@@ -229,6 +229,35 @@ def copy_project(project, owner):
     return project_copy
 
 
+def copy_threads(threads):
+    """
+    Copy the threads of a module and return the copied threads.
+
+    Args:
+        threads (list[api_models.CommentThread]): The list of threads to copy.
+
+    Returns:
+        list[api_models.CommentThread]: The list of copied threads.
+    """
+    copied_threads = []
+    for thread in threads:
+        thread_copy = copy.deepcopy(thread)
+        thread_copy.pk = None
+        thread_copy._state.adding = True
+        thread_copy.save()
+
+        for comment in thread.comments.all():
+            comment_copy = copy.deepcopy(comment)
+            comment_copy.pk = None
+            comment_copy.thread = thread_copy
+            comment_copy._state.adding = True
+            comment_copy.save()
+
+        copied_threads.append(thread_copy)
+
+    return copied_threads
+
+
 def copy_activity(activity, new_project=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
@@ -256,9 +285,10 @@ def copy_activity(activity, new_project=None):
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
-        module_copy._state.adding = True
         module_copy.land_use_change = None
         module_copy.organic_soil = None
+        copy_threads(module_copy.threads.all())
+        module_copy._state.adding = True
         module_copy.save()
 
         has_luc = getattr(module, "land_use_change", None)
@@ -269,6 +299,7 @@ def copy_activity(activity, new_project=None):
                 luc_copy = copy.deepcopy(module.land_use_change)
                 luc_copy.pk = None
                 luc_copy.activity = activity_copy
+                copy_threads(luc_copy.threads.all())
                 luc_copy._state.adding = True
                 luc_copy.save()
 
@@ -280,6 +311,7 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy = copy.deepcopy(module.organic_soil)
                 organic_soil_copy.pk = None
                 organic_soil_copy.activity = activity_copy
+                copy_threads(organic_soil_copy.threads.all())
                 organic_soil_copy._state.adding = True
                 organic_soil_copy.save()
 
@@ -303,6 +335,7 @@ def copy_activity(activity, new_project=None):
             for submodule in submodules:
                 submodule.pk = None
                 submodule.parent = module_copy
+                copy_threads(submodule.threads.all())
                 submodule._state.adding = True
                 submodule.save()
 

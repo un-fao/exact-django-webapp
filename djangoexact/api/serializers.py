@@ -3543,6 +3543,11 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         file = attrs["file"]
 
+        project: Project = self.context["request"].project
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Finalized projects cannot be modified")
+
         max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
         if file.size > max_size_in_mb * 1024 * 1024:

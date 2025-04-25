@@ -1,53 +1,101 @@
-# EX-ACT 
+# EX-ACT API
 
-## Prerequisites
+EX-ACT (Ex-Ante Carbon Balance Tool) is a Django REST Framework-based API that provides a comprehensive system for carbon balance analysis and greenhouse gas emissions calculations. This tool is designed to help estimate the impact of agriculture, forestry, and other land use projects on carbon balance and greenhouse gas emissions. It is built for direct use of the [EX-ACT Web Tool](https://exact.apps.fao.org/), but its IPCC dataset is freely accessible upon request and grant of the proper permissions to the CSI team.
+
+## 🌟 Features
+
+- **Comprehensive API Documentation**: Available in multiple formats
+  - Django API Docs (`/api/docs/`)
+  - Swagger UI (`/api/swagger/`)
+  - ReDoc (`/api/redoc/`)
+  - OpenAPI Specifications (downloadable in JSON and YAML formats)
+
+- **Advanced Calculation Modules**:
+  - Carbon balance assessment
+  - Greenhouse gas emissions calculations
+  - IPCC data integration
+  - Customizable parameters and coefficients
+
+- **Security Features**:
+  - Token-based authentication
+  - Role-based access control
+  - Secure API endpoints
+
+- **Data Management**:
+  - IPCC data integration
+  - Project data storage and retrieval
+  - Report generation capabilities
+
+## 🔧 Prerequisites
 
 - Python 3.11.0
-- Pip
-- Virtualenv (`pip install virtualenv`)
-- Everything added to PATH (if on Windows)
+- pip (Python package manager)
+- virtualenv (`pip install virtualenv`)
+- Node.js and npm (for frontend assets)
 
-<br>
+## 🚀 Quick Start
 
-### [Click here to see the Django API Docs](http://localhost:8000/api/docs/) (make sure your local Django app is running)
-### [Click here to see the Swagger API Docs](http://localhost:8000/api/swagger/) (make sure your local Django app is running)
-### [Click here to see the Redoc API Docs](http://localhost:8000/api/redoc/) (make sure your local Django app is running)
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+   ```
 
-<br>
+2. **Set Up Virtual Environment**
+   ```bash
+   # Create virtual environment
+   virtualenv env --python=python3.11
+   
+   # Activate virtual environment
+   # On Unix or MacOS:
+   source env/bin/activate
+   # On Windows:
+   source env/Scripts/activate
+   ```
 
-### [Click here to download the Swagger .yaml](http://localhost:8000/api/swagger.yaml) (make sure your local Django app is running)
-### [Click here to download the Swagger .json](http://localhost:8000/api/swagger.json) (make sure your local Django app is running)
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-<br>
+4. **Database Setup**
+   ```bash
+   cd djangoexact
+   python manage.py migrate
+   python manage.py createsuperuser
+   ```
 
-## Installation Guide
-1. Clone repository
-2. Type `cd <path\to\repository>` in your preferred terminal
-3. Double-check that you have the required Python version
-4. Install the correct Python version on your machine if you don't have it
-5. If you have multiple Python versions installed, Run command `virtualenv env --python <path\to\correct\python\version>`, otherwise just run `virtualenv env`
-6. Run command `source env/Scripts/activate` (use forward or backslashes depending on your OS)
-7. Check if the virtual environment is active: do you see (env) in your terminal?
-8. Run command `pip install -r requirements.txt`
-9. Run command `cd djangoexact`
-10. Run command `python -m manage.py migrate`
-11. Run command `python -m manage.py createsuperuser` and fill it with your preferred credentials (ex. usr:admin, pwd:admin)
-12. Run command `django manage.py runserver`
-13. Enjoy
+5. **Run Development Server**
+   ```bash
+   python manage.py runserver
+   ```
 
-<br>
+   The API will be available at `http://localhost:8000/api/`
 
-## How to dump IPCC Data in your local Database
+## 📊 IPCC Data Integration
 
-1. Make sure you have installed **django_extensions** with pip (check with command `pip list` while inside your virtual environment)
-2. Run `python manage.py runscript ipcc_dump`
-3. Wait for completion (it might take a while)
+To populate your database with IPCC data:
 
-## How to use the Postman collection of currently-working requests
+1. Ensure `django_extensions` is installed (included in requirements.txt)
+2. Run the data import script:
+   ```bash
+   python manage.py runscript ipcc_dump
+   ```
 
-1. [Download Postman](https://www.postman.com/downloads/)
-2. Import file `EX-ACT.postman_collection.json`
+## 🔍 API Testing
 
-    Alternatively,
+### Using Postman
 
-    [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/7002893-9d88940d-a037-477a-b287-d42e01c25749?action=collection%2Ffork&collection-url=entityId%3D7002893-9d88940d-a037-477a-b287-d42e01c25749%26entityType%3Dcollection%26workspaceId%3D7e75d44c-4b11-4375-afea-b500866e6198)
+1. Download [Postman](https://www.postman.com/downloads/)
+2. Import the provided collection:
+   - Use the `EX-ACT.postman_collection.json` file
+   - Or click: [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/7002893-9d88940d-a037-477a-b287-d42e01c25749?action=collection%2Ffork&collection-url=entityId%3D7002893-9d88940d-a037-477a-b287-d42e01c25749%26entityType%3Dcollection%26workspaceId%3D7e75d44c-4b11-4375-afea-b500866e6198)
+
+### API Documentation
+
+When the server is running, access the API documentation at:
+- Django API Docs: http://localhost:8000/api/docs/
+- Swagger UI: http://localhost:8000/api/swagger/
+- ReDoc: http://localhost:8000/api/redoc/
+
+## 🛠 Project Structure
