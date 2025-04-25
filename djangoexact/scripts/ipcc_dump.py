@@ -4753,6 +4753,70 @@ def add_density_zero_where_density_is_none_in_irrigation_phase_data():
     print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
 
 
+def import_fra_carbon_stock_data():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"])
+        bgb = parse_csv_number(row["bgb"])
+        litter = parse_csv_number(row["litter"])
+        deadwood = parse_csv_number(row["deadwood"])
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        FRACarbonStock.objects.create(
+            year=2020,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
+
+
+def add_ipcc_and_fra_as_data_sources():
+    """
+    Add IPCC and FRA as data sources to the database.
+    """
+    from api.models import DataSource
+
+    ipcc_data_source, created = DataSource.objects.get_or_create(short_name="IPCC")
+    if created:
+        print("Created IPCC data source")
+    else:
+        print("IPCC data source already exists")
+
+    fra_data_source, created = DataSource.objects.get_or_create(short_name="FRA")
+    if created:
+        print("Created FRA data source")
+    else:
+        print("FRA data source already exists")
+
+
 def run():
     import os
 
@@ -4774,6 +4838,8 @@ def run():
         assign_parent_fuel_types_to_fuel_types()
         create_energy_entry_module_type()
         add_change_public_project_flag_permission_to_admin_group()
+        import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "review":
@@ -4791,11 +4857,13 @@ def run():
         # create_energy_entry_module_type()
         # add_change_public_project_flag_permission_to_admin_group()
         add_density_zero_where_density_is_none_in_irrigation_phase_data()
+        import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_change_public_project_flag_permission_to_admin_group()
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "test":

@@ -6466,7 +6466,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_under_20_yrs = ipcc.ForestManagementAGB()
         self.agb_over_20_yrs = ipcc.ForestManagementAGB()
 
+        self.fra_carbon_stock = ipcc.FRACarbonStock()
+
         self.agb_max_start = None
+        self.bgb_max_start = None
         self.agb_growth_over_20_start = None
         self.agb_growth_under_20_start = None
         self.agb_start_start = None
@@ -6474,6 +6477,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.litter_dw_max_start = None
 
         self.agb_max_w = None
+        self.bgb_max_w = None
         self.agb_growth_over_20_w = None
         self.agb_growth_under_20_w = None
         self.agb_start_w = None
@@ -6481,6 +6485,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.litter_dw_max_w = None
 
         self.agb_max_wo = None
+        self.bgb_max_wo = None
         self.agb_growth_over_20_wo = None
         self.agb_growth_under_20_wo = None
         self.agb_start_wo = None
@@ -6674,6 +6679,23 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
+        has_fra_as_data_source = self.module.data_source is not None and self.module.data_source.short_name == "FRA"
+
+        if has_fra_as_data_source:
+            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.get(country=self.country)
+            self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.bgb_max_start = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
+            self.bgb_max_w = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
+            self.bgb_max_wo = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
+            self.litter_dw_max_start.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_w.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
         return super().get_defaults(calculate)
@@ -6705,7 +6727,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_start,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_start,
                 "max_agb_value": self.agb_max_start,
-                "max_bgb_value": None,  # Unused in math model
+                "max_bgb_value": self.bgb_max_start,
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)),
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)),
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)),
@@ -6782,7 +6804,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_w,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_w,
                 "max_agb_value": self.agb_max_w,
-                "max_bgb_value": None,  # TODO: max_bgb_value ?? Unused in math model
+                "max_bgb_value": self.bgb_max_w,
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)),
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)),
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)),
@@ -6857,7 +6879,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_wo,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_wo,
                 "max_agb_value": self.agb_max_wo,
-                "max_bgb_value": None,  # TODO: max_bgb_value ?? Unused in math model
+                "max_bgb_value": self.bgb_max_wo,
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)),
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)),
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)),
