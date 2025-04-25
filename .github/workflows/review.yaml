@@ -5,8 +5,8 @@ on:
     branches:
       - nothing
   #   branches: [ review-testing-pipeline, review ]
-  # pull_request:
-  #   branches: [ review ]
+  pull_request:
+    branches: [ review ]
 
 jobs:
   setup:
