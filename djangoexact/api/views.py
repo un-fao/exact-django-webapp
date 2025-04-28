@@ -1864,6 +1864,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
+        activity.delete()
+
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 
