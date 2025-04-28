@@ -472,7 +472,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if last_year_of_accounting is not None:
                 activities: list[Activity] = project.activities.all()
 
-                if any(a.start_year + a.duration_t2 > last_year_of_accounting for a in activities):
+                if any(a.start_year + a.duration > last_year_of_accounting for a in activities):
                     raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
