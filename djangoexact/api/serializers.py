@@ -3543,7 +3543,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         file = attrs["file"]
 
-        project: Project = self.context["request"].project
+        project: Project = self.context["project"]
 
         if project.is_finalized:
             raise serializers.ValidationError("Finalized projects cannot be modified")
