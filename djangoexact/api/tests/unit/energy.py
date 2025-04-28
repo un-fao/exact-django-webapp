@@ -16,6 +16,7 @@ from . import base_module
 
 class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
+        log.info("START - EnergyTestCase")
         self.ModuleClass = models.Energy
         self.submodule_classes = [
             models.EnergyEntry,
@@ -59,6 +60,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.module.refresh_from_db()
 
     def test_results_influenced_by_tier_2_values(self):
+        log.info("START - Testing results influenced by tier 2 values")
         results_view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -87,6 +89,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertNotEqual(prev_balance, response.data["balance"])
 
     def test_modify(self):
+        log.info("START - Testing modify")
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -95,6 +98,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_patch_to_not_ready(self):
+        log.info("START - Testing patch to not ready")
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -103,6 +107,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
+        log.info("START - Testing calculate results")
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -114,8 +119,9 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
+        log.info("START - Testing get defaults")
         view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{self.submodules[0].__class__.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
