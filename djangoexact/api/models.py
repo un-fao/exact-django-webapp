@@ -889,6 +889,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         return self.__get_status()
 
     @property
+    def duration(self):
+        return self.__get_duration()
+
+    @property
     def completion_percentage(self):
         return self.__calculate_completion_percentage()
 
@@ -902,7 +906,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     @property
     def start_year(self):
-        return self.start_year_t2 or self.project.start_year_of_activities
+        return self.start_year_t2 if self.start_year_t2 is not None else self.project.start_year_of_activities
 
     @property
     def is_luc(self):
