@@ -121,13 +121,13 @@ jobs:
 
         echo "$(cat djangoexact/djangoexact/settings.py)"
 
-        # pip install -r djangoexact/requirements.txt
-        # 
-        # python djangoexact/manage.py migrate
-        # python djangoexact/manage.py collectstatic --noinput
+        pip install -r djangoexact/requirements.txt
+        
+        python djangoexact/manage.py migrate
+        python djangoexact/manage.py collectstatic --noinput
 
-        # pip list
-        # sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
-        # 
-        # gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
-        # gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+        pip list
+        sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
+        
+        gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
+        gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
