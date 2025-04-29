@@ -3,52 +3,38 @@ name: Deploy Review
 on:
   push:
     branches:
-      - fix_review_pipeline
-  #   branches: [ review-testing-pipeline, review ]
-  # pull_request:
-  #   branches: [ review ]
+      - main
+      - review
+      - develop
 
 jobs:  
   deploy:
     runs-on: ubuntu-22.04
+    environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
       id-token: 'write'
       contents: 'read'
       actions: 'read'
-    environment:
-      name: review
     steps:
     - name: 'Checkout Code'
       uses: actions/checkout@v4
 
     - name: Authenticate to Google Cloud
-      id: auth
       uses: 'google-github-actions/auth@v2'
       with:
         workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
         service_account: ${{ vars.SERVICE_ACCOUNT }}
-        token_format: access_token
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    
-    - name: Verify gcloud authentication
-      run: gcloud run services list --filter=status:ACTIVE --format="value(account)"  
       
     - name: Setup cloud-sql-proxy
       run: |
         curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
         chmod +x cloud-sql-proxy
         ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
-
-    # - name: 'Cloud SQL Proxy'
-    #   uses: ahmadnassri/action-google-cloud-sql-proxy@v1
-    #   with:
-    #     token: ${{ steps.auth.outputs.access_token }}
-    #     connection: ${{ vars.DB_INSTANCE_CONNECTION }}
-    #     port: ${{ vars.DB_PORT }}  
 
     - name: Deploy
       run: |
@@ -104,3 +90,7 @@ jobs:
         gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+
+    - name: Create Issue
+      if: failure()
+      uses: un-fao/fao-ga-create-issue@v2
