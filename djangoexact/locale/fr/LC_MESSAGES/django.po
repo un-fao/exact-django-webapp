@@ -1,59 +1,48 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-25 11:19+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2025-04-25 12:53+0000\n"
+"Last-Translator: MariaGiulia Crespi <mariagiulia.crespi@fao.org>\n"
+"Language-Team: Unknown\n"
+"Language: zxx\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: api/models.py:2981
-msgid "Field Definition"
-msgstr ""
-
-#: api/models.py:2982
-msgid "Field Definitions"
-msgstr ""
+"X-Loco-Source-Locale: it_IT\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Generator: Loco https://localise.biz/"
 
 #: api/views.py:944
 msgid "increases"
-msgstr ""
+msgstr "augmente"
 
 #: api/views.py:945
 msgid "decreases"
-msgstr ""
+msgstr "diminue"
 
 #: api/views.py:993
 msgid "hectares"
-msgstr ""
+msgstr "hectares"
 
 #: api/views.py:995
 msgid "tonnes of catch"
-msgstr ""
+msgstr "tonnes de prises"
 
 #: api/views.py:997
 msgid "livestock heads"
-msgstr ""
+msgstr "têtes de bétail"
 
 #: api/views.py:1000
 msgid "energy consumption"
-msgstr ""
+msgstr "consommation d'énergie"
 
 #: api/views.py:1002
 msgid "packaging material"
-msgstr ""
+msgstr "matériel d'emballage"
 
 #: api/views.py:1004
 msgid "agricultural inputs use"
-msgstr ""
+msgstr "utilisation d'intrants agricoles"

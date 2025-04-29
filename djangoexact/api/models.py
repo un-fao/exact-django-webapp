@@ -2982,8 +2982,8 @@ class FieldDefinition(models.Model):
 
     class Meta:
         unique_together = ("module_type", "field_name")
-        verbose_name = _("Field Definition")
-        verbose_name_plural = _("Field Definitions")
+        verbose_name = "Field Definition"
+        verbose_name_plural = "Field Definitions"
 
     def __str__(self):
         return f"{self.module_type}.{self.field_name}"
