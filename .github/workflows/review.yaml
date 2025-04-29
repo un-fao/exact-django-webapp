@@ -3,59 +3,14 @@ name: Deploy Review
 on:
   push:
     branches:
-      - review
+      - fix_review_pipeline
   #   branches: [ review-testing-pipeline, review ]
   # pull_request:
   #   branches: [ review ]
 
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-    environment:
-      name: review
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        # This is the version of the action for setting up Python, not the Python version.
-        uses: actions/setup-python@v5
-        with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.11'
-          # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x64'
-      # You can test your matrix by printing the current Python version
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
-  
-  # workspace_ops:
-  #   needs: setup
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     id-token: 'write'
-  #     contents: 'read'
-  #     actions: 'write'
-  
-  #   environment:
-  #     name: review   
-  #   steps:
-  #     - uses: actions/checkout@v4
-          
-  #     # - name: Download Cloud SQL Proxy
-  #     #   run: |
-  #     #     sudo apt-get install wget
-  #     #     wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-  #     #     chmod +x cloud_sql_proxy
-          
-  #     - id: 'Auth'
-  #       uses: 'google-github-actions/auth@v2'
-  #       with:
-  #         credentials_json: ${{ secrets.PROJECT_KEYFILE }}    
-
-
-  
+jobs:  
   deploy:
-    needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       id-token: 'write'
       contents: 'read'
@@ -73,19 +28,31 @@ jobs:
         workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
         service_account: ${{ vars.SERVICE_ACCOUNT }}
         token_format: access_token
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
     
     - name: Verify gcloud authentication
       run: gcloud run services list --filter=status:ACTIVE --format="value(account)"  
       
-    - name: 'Cloud SQL Proxy'
-      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
-      with:
-        token: ${{ steps.auth.outputs.access_token }}
-        connection: ${{ vars.DB_INSTANCE_CONNECTION }}
-        port: ${{ vars.DB_PORT }}  
+    - name: Setup cloud-sql-proxy
+      run: |
+        curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
+        chmod +x cloud-sql-proxy
+        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
 
-    - run: |
+    # - name: 'Cloud SQL Proxy'
+    #   uses: ahmadnassri/action-google-cloud-sql-proxy@v1
+    #   with:
+    #     token: ${{ steps.auth.outputs.access_token }}
+    #     connection: ${{ vars.DB_INSTANCE_CONNECTION }}
+    #     port: ${{ vars.DB_PORT }}  
 
+    - name: Deploy
+      run: |
+        set +x
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
@@ -121,13 +88,17 @@ jobs:
 
         echo "$(cat djangoexact/djangoexact/settings.py)"
 
-        pip install -r djangoexact/requirements.txt
-        
-        python djangoexact/manage.py migrate
-        python djangoexact/manage.py collectstatic --noinput
+        pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+        # - yes | python manage.py makemigrations --merge
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+        yes | python manage.py sync_translation_fields
+        python manage.py update_translation_fields
 
         pip list
-        sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
-        
-        gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
+        sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/settings.py
+
+        gcloud config set project ${{ vars.PROJECT_ID }}
+        gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q

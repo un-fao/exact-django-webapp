@@ -2,7 +2,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - fix_review_pipeline
+      - review
     # paths-ignore:
       # - .github/**
 
