@@ -52,7 +52,7 @@ jobs:
 
     - name: Deploy
       run: |
-        set +x
+        set -x
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
@@ -87,6 +87,8 @@ jobs:
         sed -i 's|\$FIREBASE_SERVICE_ACCOUNT|${{ secrets.FIREBASE_SERVICE_ACCOUNT }}|g' djangoexact/djangoexact/settings.py
 
         echo "$(cat djangoexact/djangoexact/settings.py)"
+        
+        cd djangoexact
 
         pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
