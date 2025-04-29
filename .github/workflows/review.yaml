@@ -3,7 +3,7 @@ name: Deploy Review
 on:
   push:
     branches:
-      - fix_review_pipeline
+      - review
   #   branches: [ review-testing-pipeline, review ]
   # pull_request:
   #   branches: [ review ]

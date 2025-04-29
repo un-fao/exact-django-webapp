@@ -2,47 +2,22 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - _develop
-      - _review
-  pull_request:
-    branches:
-      - _main
+      - fix_review_pipeline
     # paths-ignore:
       # - .github/**
 
 jobs:
-  set-environment:
-    runs-on: ubuntu-22.04
-    permissions:
-      id-token: write
-      contents: read
-    outputs:
-      env: ${{ steps.set_env.outputs.env }}
-    steps:
-      - name: Set environment
-        id: set_env
-        run: | 
-          case "${{ github.ref_name }}" in
-            develop|_develop)
-              echo "env=develop" >> "$GITHUB_OUTPUT"
-              ;;
-            review|_review)
-              echo "env=review" >> "$GITHUB_OUTPUT"
-              ;;
-            main|_main)
-              echo "env=production" >> "$GITHUB_OUTPUT"
-              ;;
-            *)
-              ;;
-          esac
-
   deploy:
     runs-on: ubuntu-22.04
-    needs: set-environment
-    environment: ${{ needs.set-environment.outputs.env }}
+    environment: review #${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     env:
       VARS: ${{ toJson(vars) }}
       SECRETS: ${{ toJson(secrets) }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      FIREBASE_PRIVATE_KEY: ${{ secrets.SMTP_USER_PASSWORD }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SMTP_USER_PASSWORD: ${{ secrets.SMTP_USER_PASSWORD }}
     permissions:
       id-token: write
       contents: read
@@ -86,12 +61,6 @@ jobs:
           psql --host=127.0.0.1 --port=${{ vars.DB_PORT }} --username=${{ vars.DB_USERNAME }} --dbname=${{ vars.DB_NAME }} -c "\dt"
       
       - run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-      # - run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-      - run: echo DB_PASSWORD='${{ secrets.DB_PASSWORD }}' >> $GITHUB_ENV
-      - run: echo FIREBASE_PRIVATE_KEY='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
-      - run: echo FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' >> $GITHUB_ENV
-      - run: echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> $GITHUB_ENV
-      - run: echo SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
 
       - uses: franzbischoff/replace_envs@v1
         with:
@@ -122,4 +91,4 @@ jobs:
       
       - name: Create Issue
         if: failure()
-        uses: ./.github/utility/create_issue
+        uses: un-fao/fao-ga-create-issue@v2
