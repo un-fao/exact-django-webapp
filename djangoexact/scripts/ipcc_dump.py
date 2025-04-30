@@ -4692,6 +4692,141 @@ def clear_cache_of_all_modules():
         instance.invalidate_cached_results()
 
 
+def create_parent_fuel_types():
+    parent_fuel_type_names = ["Fuel", "Electricity"]
+
+    for name in parent_fuel_type_names:
+        if not ParentFuelType.objects.filter(name=name).exists():
+            ParentFuelType.objects.create(name=name)
+            print(f"Created parent fuel type: {name}")
+        else:
+            print(f"Parent fuel type {name} already exists.")
+
+
+def assign_parent_fuel_types_to_fuel_types():
+    fuel_types = FuelType.objects.all()
+    for fuel_type in fuel_types:
+        if fuel_type.name in ["Electricity", "Electricity (Grid)", "Electricity (Non-Grid)"]:
+            parent_fuel_type = ParentFuelType.objects.get(name="Electricity")
+        else:
+            parent_fuel_type = ParentFuelType.objects.get(name="Fuel")
+
+        fuel_type.parent_fuel_type = parent_fuel_type
+        fuel_type.save()
+        print(f"Assigned {parent_fuel_type} to {fuel_type}")
+
+
+def create_energy_entry_module_type():
+    module_type = ModuleType.objects.create(
+        class_name="EnergyEntry",
+        name="Energy Entry",
+        is_submodule=True,
+    )
+    print(f"Created ModuleType: {module_type}")
+
+
+def add_change_public_project_flag_permission_to_admin_group():
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    from api.models import Project
+
+    # Get the admin group
+    admin_group = Group.objects.get(name="Admin")
+
+    # Get the content type for the Project model
+    content_type = ContentType.objects.get_for_model(Project)
+
+    # Get the permission for changing the public project flag
+    permission = Permission.objects.get(codename="change_public_project_flag", content_type=content_type)
+
+    # Add the permission to the admin group
+    admin_group.permissions.add(permission)
+    print(f"Added permission {permission} to group {admin_group}")
+
+
+def add_density_zero_where_density_is_none_in_irrigation_phase_data():
+    """
+    Add density=0.0 to IrrigationPhaseData objects where density is None
+    """
+    print("Adding density=0.0 to IrrigationPhaseData objects where density is None")
+    irrigation_phase_data = IrrigationPhaseData.objects.filter(density=None).update(density=0.0)
+    print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
+
+
+def import_fra_carbon_stock_data():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"])
+        bgb = parse_csv_number(row["bgb"])
+        litter = parse_csv_number(row["litter"])
+        deadwood = parse_csv_number(row["deadwood"])
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        FRACarbonStock.objects.create(
+            year=2020,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
+
+
+def add_ipcc_and_fra_as_data_sources():
+    """
+    Add IPCC and FRA as data sources to the database.
+    """
+    from api.models import DataSource
+
+    ipcc_data_source, created = DataSource.objects.get_or_create(short_name="IPCC")
+    if created:
+        print("Created IPCC data source")
+    else:
+        print("IPCC data source already exists")
+
+    fra_data_source, created = DataSource.objects.get_or_create(short_name="FRA")
+    if created:
+        print("Created FRA data source")
+    else:
+        print("FRA data source already exists")
+
+
+def add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none():
+    """
+    Add emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None
+    """
+    print("Adding emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None")
+    obj = EmissionFactorSource.objects.get(name__iexact="Operating Margin")
+    irrigation_phases = IrrigationPhase.objects.filter(ef_source=None).update(ef_source=obj)
+    print(f"Updated {irrigation_phases} IrrigationPhaseData objects")
+
+
 def run():
     import os
 
@@ -4709,6 +4844,13 @@ def run():
         # add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
+        create_parent_fuel_types()
+        assign_parent_fuel_types_to_fuel_types()
+        create_energy_entry_module_type()
+        add_change_public_project_flag_permission_to_admin_group()
+        import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
+        add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
         pass
 
     if app_mode == "review":
@@ -4721,12 +4863,17 @@ def run():
         # delete_and_import_irrigation_phase_data()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
+        # create_parent_fuel_types()
+        # assign_parent_fuel_types_to_fuel_types()
+        # create_energy_entry_module_type()
+        # add_change_public_project_flag_permission_to_admin_group()
+        # add_density_zero_where_density_is_none_in_irrigation_phase_data()
+        # import_fra_carbon_stock_data()
+        # add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
-        add_0_2_to_co2_value_in_input_emission_factor()
         pass
 
     if app_mode == "test":
