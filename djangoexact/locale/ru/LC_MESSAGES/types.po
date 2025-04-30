@@ -21,8 +21,7 @@ msgstr "В ожидании"
 
 #. InvitationStatusType
 msgid "accepted"
-msgstr ""
-"одобренный\n"
+msgstr "одобренный\n"
 
 #. InvitationStatusType
 msgid "rejected"
@@ -1423,13 +1422,11 @@ msgstr "Восточная Европа"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
-msgstr ""
-"Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
+msgstr "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
-msgstr ""
-"Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
+msgstr "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
 
 #. GlobalWarmingPotential
 msgid "IPCC Sixth Assessment Report (AR6)"
