@@ -1,3 +1,38 @@
+"""
+Report Generation Module for EX-ACT Django WebApp.
+
+This module provides classes and utilities to generate detailed reports for projects, activities,
+and modules within the EX-ACT (EX-Ante Carbon Balance Tool) application. The reports present
+greenhouse gas emissions data and related information in Excel format.
+
+Structure:
+- ReportFactory: Factory pattern implementation for creating appropriate report classes based on module type.
+- ExcelFileManager: Handles Excel file operations including creation, modification, and export.
+- BaseProjectReport: Base class for generating project-level reports.
+- BaseActivityReport: Base class for generating activity-level reports.
+- BaseModuleReport: Base class for generating module-level reports.
+- Specialized report classes: Implementation of specific report types for various modules
+  (e.g., ForestManagementReport, LivestockReport, etc.).
+
+Key Features:
+- Creation of detailed Excel workbooks with multiple worksheets for different types of information.
+- Calculation and presentation of greenhouse gas emissions by type and source.
+- Metadata collection and presentation.
+- Support for various types of agricultural, forestry, and land-use modules.
+- Integration with the project's calculation system to extract emissions data.
+- Shadow Price of Carbon calculations and presentation.
+
+Dependencies:
+- xlsxwriter and openpyxl for Excel file manipulation
+- numpy for numerical operations
+- Django models for data access
+- Mathematical models for emissions calculations
+
+Usage:
+Reports are typically generated through the ReportFactory based on module type,
+and then built using the build_report() method on the resulting report object.
+"""
+
 from dataclasses import dataclass
 
 import xlsxwriter.format
@@ -336,6 +371,8 @@ class BaseProjectReport:
             for module in activity.modules_reports:
                 log.debug(f"Finalizing report for module {module.module_title}")
                 other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))
+                other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.DOC))
+                other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CO))
                 n2o.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))
                 ch4.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))
                 other_co2.append(module.extract_emissions(module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
@@ -344,6 +381,8 @@ class BaseProjectReport:
 
                 # With
                 other_ghgs_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.OTHER))
+                other_ghgs_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.DOC))
+                other_ghgs_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.CO))
                 n2o_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.N2O))
                 ch4_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.CH4))
                 other_co2_w.append(module.extract_emissions(module.emissions_set_w, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
@@ -352,6 +391,8 @@ class BaseProjectReport:
 
                 # Without
                 other_ghgs_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.OTHER))
+                other_ghgs_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.DOC))
+                other_ghgs_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.CO))
                 n2o_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.N2O))
                 ch4_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.CH4))
                 other_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
@@ -1116,7 +1157,7 @@ class PerennialCroplandReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Agroforestry system")
@@ -1325,7 +1366,7 @@ class AnnualCroplandReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
@@ -1447,7 +1488,7 @@ class SetAsideReport(LandModuleReport):
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Set Aside")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Set Aside").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Is set aside")
 
@@ -1482,7 +1523,7 @@ class GrasslandReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Grassland management")
@@ -1557,7 +1598,7 @@ class CoastalWetlandReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of vegetation")
@@ -1679,43 +1720,13 @@ class FloodedRiceReport(LandModuleReport):
             self.soil_co2 = [x + y for x, y in zip(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]))]
             self.soil_n2o = [x + y for x, y in zip(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]))]
             self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
-            self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
-            ### Until here
-            self.rice_cultivation_ch4 = [x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))]
-
-            self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
-
-        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_metadata(self):
-        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
-
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice").fill = Colors.LIGHT_BLUE_FILL.value
-
-        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Number of seasons")
-
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Season 1 - Hectares")
-        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Season 1 - Cultivation period")
-        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Season 1 - Water before cultivation")
-        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Season 1 - Water during cultivation")
-        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Season 1 - Organic amendment")
-        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Season 1 - Yield")
-
-        seasons: list[api_models.MinorSeasonFloodedRice] = getattr(self.module, "submodules", [])
-
-        for i, season in enumerate(seasons):
-            self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=1, value=f"Season {i + 2} - Hectares")
-            self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=1, value=f"Season {i + 2} - Cultivation period")
-            self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=1, value=f"Season {i + 2} - Water before cultivation")
-            self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=1, value=f"Season {i + 2} - Water during cultivation")
-            self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=1, value=f"Season {i + 2} - Organic amendment")
-            self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=1, value=f"Season {i + 2} - Yield")
-
-        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(seasons) + 1)
+        minor_seasons = getattr(self.module, "submodules", [])
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(minor_seasons) + 1)
 
         if self.module.is_start():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.area)
@@ -1741,7 +1752,7 @@ class FloodedRiceReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.calculator.yield_default.value)
 
-        for i, season in enumerate(seasons):
+        for i, season in enumerate(minor_seasons):
             season_calculator = calculators.FloodedRiceSeasonCalculator(season)
             season_calculator.calculate()
 

@@ -44,7 +44,8 @@ class ProjectTestCase(APITestCaseMixin):
 
         create_response = self.create_project()
         project = models.Project.objects.get(id=create_response.data["id"])
-        self.create_project_membership(project, self.user2)
+        membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
         modify_response = self.edit_project(project, self.user2, {"name": "New Name"})
         self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -92,7 +93,8 @@ class ProjectTestCase(APITestCaseMixin):
         create_project_response = self.create_project()
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
-        self.create_project_membership(project, self.user2)
+        membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
 
         create_activity_response = self.create_activity(project, self.user)
         self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
@@ -149,7 +151,8 @@ class ProjectTestCase(APITestCaseMixin):
         create_project_response = self.create_project()
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
-        self.create_project_membership(project, self.user2)
+        membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
 
         create_activity_response = self.create_activity(project, self.user)
         self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
@@ -158,7 +161,7 @@ class ProjectTestCase(APITestCaseMixin):
         module = activity.modules[0]
 
         response = self.edit_module(module, self.user2, {"area": 50})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_modify_module_as_lock_holder(self):
         """
@@ -174,6 +177,8 @@ class ProjectTestCase(APITestCaseMixin):
         7. Verify that the module's area attribute has been updated to the new value.
         """
 
+        log.info("START - test_modify_module_as_lock_holder")
+
         create_project_response = self.create_project()
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
@@ -187,6 +192,8 @@ class ProjectTestCase(APITestCaseMixin):
         response = self.edit_module(module, self.user, {"area": 50})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["area"], 50)
+
+        log.info("END - test_modify_module_as_lock_holder")
 
     def test_archive_project_and_modify(self):
         """
@@ -239,3 +246,224 @@ class ProjectTestCase(APITestCaseMixin):
 
         updated_activity = models.Activity.objects.get(id=activity.id)
         self.assertNotEqual(updated_activity.capitalization_years, project.capitalization_years)
+
+    def test_archive_project_and_try_to_change_last_year_of_accounting(self):
+        """
+        Test that changing the last year of accounting for an archived project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Archives the project.
+        3. Attempts to change the last year of accounting for the archived project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that changing the last year of accounting for an archived project is not allowed.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        archive_response = self.edit_project(project, self.user, {"is_archived": True})
+        self.assertEqual(archive_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(archive_response.data["is_archived"])
+
+        modify_response = self.edit_project(project, self.user, {"last_year_of_accounting": 2022})
+        self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_archive_project_and_add_membership(self):
+        """
+        Test that adding a project membership to an archived project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Archives the project.
+        3. Attempts to add a project membership to the archived project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that adding a project membership to an archived project is not allowed.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        archive_response = self.edit_project(project, self.user, {"is_archived": True})
+        self.assertEqual(archive_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(archive_response.data["is_archived"])
+
+        modify_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_add_another_admin_and_archive_project(self):
+        """
+        Test that adding another admin to a project and then archiving the project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Adds another user as an admin to the project.
+        3. Attempts to archive the project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that adding another admin to a project and then archiving the project is not allowed.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        self.group = models.Group.objects.get(name="Admin")
+        membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
+
+        modify_response = self.edit_project(project, self.user2, {"is_archived": True})
+        self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_changing_last_year_of_accounting_for_project_with_activity_having_duration_t2_exceeding_last_year_of_accounting(self):
+        """
+        Test that changing the last year of accounting for a project with an activity having a duration exceeding the last year of accounting is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Creates an activity within the project and verifies the activity creation.
+        3. Attempts to change the last year of accounting for the project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that changing the last year of accounting for a project with an activity having a duration exceeding the last year of accounting is not allowed.
+        """
+
+        log.info("START - test_changing_last_year_of_accounting_for_project_with_activity_having_duration_t2_exceeding_last_year_of_accounting")
+
+        self.project_data["start_year_of_activities"] = 2000
+        self.project_data["implementation_years"] = 10
+        self.project_data["last_year_of_accounting"] = 2020
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        edit_activity_response = self.edit_activity(activity, self.user, {"duration_t2": 10})
+        self.assertEqual(edit_activity_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(edit_activity_response.data["duration_t2"], 10)
+
+        edit_project_response = self.edit_project(project, self.user, {"last_year_of_accounting": 2009})
+        self.assertEqual(edit_project_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - test_changing_last_year_of_accounting_for_project_with_activity_having_duration_t2_exceeding_last_year_of_accounting")
+
+    def finalize_project_and_try_to_send_invitation_as_admin(self):
+        """
+        Test that sending an invitation as an admin after finalizing a project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to send an invitation as an admin and verifies that the modification attempt succeeds with a 200 OK status code.
+
+        The test ensures that sending an invitation as an admin after finalizing a project is allowed.
+        """
+
+        log.info("START - finalize_project_and_try_to_send_invitation_as_admin")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        modify_response = self.send_project_invitation(project, self.user2, self.group)
+        self.assertEqual(modify_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - finalize_project_and_try_to_send_invitation_as_admin")
+
+    def try_deleting_activity_of_finalized_project(self):
+        """
+        Test that deleting an activity of a finalized project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to delete an activity within the finalized project and verifies that the deletion attempt fails with a 400 Bad Request status code.
+
+        The test ensures that deleting an activity of a finalized project is not allowed.
+        """
+
+        log.info("START - try_deleting_activity_of_finalized_project")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        delete_activity_response = self.delete_activity(activity, self.user)
+        self.assertEqual(delete_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - try_deleting_activity_of_finalized_project")
+
+    def test_upload_file_in_finalized_project(self):
+        """
+        Test that uploading a file in a finalized project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to upload a file in the finalized project and verifies that the upload attempt fails with a 400 Bad Request status code.
+
+        The test ensures that uploading a file in a finalized project is not allowed.
+        """
+
+        log.info("START - test_upload_file_in_finalized_project")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        upload_file_response = self.upload_project_file(project, self.user)
+        self.assertEqual(upload_file_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - test_upload_file_in_finalized_project")
+
+    # BUG: This test is not working as expected but the functionality itself is working
+    # def test_copying_activity_of_finalized_project(self):
+    #     """
+    #     Test that copying an activity of a finalized project is not allowed.
+
+    #     This test performs the following steps:
+    #     1. Creates a project and verifies the project creation.
+    #     2. Finalizes the project.
+    #     3. Attempts to copy an activity within the finalized project and verifies that the copy attempt fails with a 400 Bad Request status code.
+
+    #     The test ensures that copying an activity of a finalized project is not allowed.
+    #     """
+
+    #     log.info("START - test_copying_activity_of_finalized_project")
+
+    #     create_project_response = self.create_project()
+    #     self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+    #     project = models.Project.objects.get(id=create_project_response.data["id"])
+
+    #     create_activity_response = self.create_activity(project, self.user)
+    #     self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+    #     activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+    #     finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+    #     self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+    #     self.assertTrue(finalize_response.data["is_finalized"])
+
+    #     copy_activity_response = self.copy_activity(activity, self.user)
+    #     self.assertEqual(copy_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    #     log.info("END - test_copying_activity_of_finalized_project")

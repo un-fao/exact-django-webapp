@@ -68,10 +68,10 @@ for language in LANGUAGES:
         GlobalWarmingPotential,
         WaterManagementTypeBeforeCultivation,
         WaterManagementTypeAfterCultivation,
+        PackagingMaterialType,
     ]
 
     for _type in types:
-
         for obj in _type.objects.all():
             # Handle None values in both msgid and msgstr
             obj_name = str(obj.name) if obj.name else ""
