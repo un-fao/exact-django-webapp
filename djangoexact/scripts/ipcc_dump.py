@@ -4817,6 +4817,16 @@ def add_ipcc_and_fra_as_data_sources():
         print("FRA data source already exists")
 
 
+def add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none():
+    """
+    Add emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None
+    """
+    print("Adding emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None")
+    obj = EmissionFactorSource.objects.get(name__iexact="Operating Margin")
+    irrigation_phases = IrrigationPhase.objects.filter(ef_source=None).update(ef_source=obj)
+    print(f"Updated {irrigation_phases} IrrigationPhaseData objects")
+
+
 def run():
     import os
 
@@ -4840,6 +4850,7 @@ def run():
         add_change_public_project_flag_permission_to_admin_group()
         import_fra_carbon_stock_data()
         add_ipcc_and_fra_as_data_sources()
+        add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
         pass
 
     if app_mode == "review":

@@ -1721,7 +1721,12 @@ class FloodedRiceReport(LandModuleReport):
             self.soil_n2o = [x + y for x, y in zip(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]))]
             self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
 
-        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(seasons) + 1)
+    def populate_metadata(self):
+        self.metadata_worksheet = self.workbook["Metadata"]
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        minor_seasons = getattr(self.module, "submodules", [])
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(minor_seasons) + 1)
 
         if self.module.is_start():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.area)
@@ -1747,7 +1752,7 @@ class FloodedRiceReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.calculator.yield_default.value)
 
-        for i, season in enumerate(seasons):
+        for i, season in enumerate(minor_seasons):
             season_calculator = calculators.FloodedRiceSeasonCalculator(season)
             season_calculator.calculate()
 
