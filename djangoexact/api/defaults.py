@@ -1597,3 +1597,74 @@ class PackagingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
         self.emission_factor_t2_wo_default = self.defaults.packaging_ef_wo.value
 
         return self.get_defaults_for_frontend()
+
+
+@dataclass
+class EnergyEntryDefaults(Defaults):
+    input: api.EnergyEntry
+
+    country_t2_default = None
+    electricity_ef_t2_start_default = None
+    electricity_ef_t2_w_default = None
+    electricity_ef_t2_wo_default = None
+    transmission_loss_t2_start_default = None
+    transmission_loss_t2_w_default = None
+    transmission_loss_t2_wo_default = None
+    energy_ef_co2_t2_start_default = None
+    energy_ef_ch4_t2_start_default = None
+    energy_ef_n2o_t2_start_default = None
+    energy_ef_co2_t2_w_default = None
+    energy_ef_ch4_t2_w_default = None
+    energy_ef_n2o_t2_w_default = None
+    energy_ef_co2_t2_wo_default = None
+    energy_ef_ch4_t2_wo_default = None
+    energy_ef_n2o_t2_wo_default = None
+
+    defaults: calcs.EnergyEntryCalculator = None
+
+    class Meta:
+        # Define the default values to return to the frontend
+        abstract = True
+        defaults = [
+            "country_t2_default",
+            "electricity_ef_t2_start_default",
+            "electricity_ef_t2_w_default",
+            "electricity_ef_t2_wo_default",
+            "transmission_loss_t2_start_default",
+            "transmission_loss_t2_w_default",
+            "transmission_loss_t2_wo_default",
+            "energy_ef_co2_t2_start_default",
+            "energy_ef_ch4_t2_start_default",
+            "energy_ef_n2o_t2_start_default",
+            "energy_ef_co2_t2_w_default",
+            "energy_ef_ch4_t2_w_default",
+            "energy_ef_n2o_t2_w_default",
+            "energy_ef_co2_t2_wo_default",
+            "energy_ef_ch4_t2_wo_default",
+            "energy_ef_n2o_t2_wo_default",
+        ]
+
+    def __post_init__(self):
+        self.defaults: calcs.EnergyEntryCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.defaults.get_defaults(calculate=calculate)
+
+        self.country_t2_default = self.defaults.country.name
+        self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected.value
+        self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected.value
+        self.electricity_ef_t2_wo_default = self.defaults.electricity_ef_selected.value
+        self.transmission_loss_t2_start_default = self.defaults.TRANSMISSION_LOSS
+        self.transmission_loss_t2_w_default = self.defaults.TRANSMISSION_LOSS
+        self.transmission_loss_t2_wo_default = self.defaults.TRANSMISSION_LOSS
+        self.energy_ef_co2_t2_start_default = self.defaults.energy_ef_default_start.co2
+        self.energy_ef_ch4_t2_start_default = self.defaults.energy_ef_default_start.ch4
+        self.energy_ef_n2o_t2_start_default = self.defaults.energy_ef_default_start.n2o
+        self.energy_ef_co2_t2_w_default = self.defaults.energy_ef_default_w.co2
+        self.energy_ef_ch4_t2_w_default = self.defaults.energy_ef_default_w.ch4
+        self.energy_ef_n2o_t2_w_default = self.defaults.energy_ef_default_w.n2o
+        self.energy_ef_co2_t2_wo_default = self.defaults.energy_ef_default_wo.co2
+        self.energy_ef_ch4_t2_wo_default = self.defaults.energy_ef_default_wo.ch4
+        self.energy_ef_n2o_t2_wo_default = self.defaults.energy_ef_default_wo.n2o
+
+        return {key: getattr(self, key) for key in self.Meta.defaults}
