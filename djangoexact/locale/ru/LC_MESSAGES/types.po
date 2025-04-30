@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
 "POT-Creation-Date: 2024-10-24 12:29\n"
-"PO-Revision-Date: 2024-12-31 06:05+0000\n"
+"PO-Revision-Date: 2025-04-29 15:16+0000\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -11,7 +11,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"\n"
 "X-Loco-Source-Locale: it_IT\n"
 "X-Loco-Parser: loco_parse_po\n"
 "X-Generator: Loco https://localise.biz/"
@@ -22,7 +21,8 @@ msgstr "В ожидании"
 
 #. InvitationStatusType
 msgid "accepted"
-msgstr "одобренный"
+msgstr ""
+"одобренный\n"
 
 #. InvitationStatusType
 msgid "rejected"
@@ -114,15 +114,15 @@ msgstr "Картофель"
 
 #. LandUseType
 msgid "N-Fixing Forages"
-msgstr "Азотфиксирующие корма"
+msgstr "N-фиксирующие корма"
 
 #. LandUseType
 msgid "Non-N-Fixing Forages"
-msgstr "Неазотфиксирующие корма"
+msgstr "Не N-фиксирующие корма"
 
 #. LandUseType
 msgid "Winter Wheat"
-msgstr "Озимая пшеница"
+msgstr "Озимая пшеница "
 
 #. LandUseType
 msgid "Spring Wheat"
@@ -142,7 +142,7 @@ msgstr "Смеси травы и клевера"
 
 #. LandUseType
 msgid "Long-Term Cultivated"
-msgstr "Долгосрочно культивируемый"
+msgstr "Долговременно культивируемый"
 
 #. LandUseType
 msgid "Perennial/Tree Crop"
@@ -162,11 +162,11 @@ msgstr "Арахис"
 
 #. LandUseType
 msgid "Alley Cropping"
-msgstr "Полосное земледелие"
+msgstr "Междурядные Культуры"
 
 #. LandUseType
 msgid "Perennial Fallow"
-msgstr "Многолетний залеж"
+msgstr "Многолетний Пар"
 
 #. LandUseType
 msgid "Hedgerow"
@@ -174,7 +174,7 @@ msgstr "Живая изгородь"
 
 #. LandUseType
 msgid "Multistrata"
-msgstr "Multistrata"
+msgstr "Многоярусный"
 
 #. LandUseType
 msgid "Parkland"
@@ -198,7 +198,7 @@ msgstr "Олива"
 
 #. LandUseType
 msgid "Orchard"
-msgstr "Плодовый сад"
+msgstr "Фруктовый сад"
 
 #. LandUseType
 msgid "Short Rotation Coppice"
@@ -214,7 +214,7 @@ msgstr "Лоза"
 
 #. LandUseType
 msgid "Oil Palm"
-msgstr "Масличная пальма"
+msgstr "Масличная Пальма"
 
 #. LandUseType
 msgid "Rubber"
@@ -226,15 +226,15 @@ msgstr "Люцерна"
 
 #. LandUseType
 msgid "Agroforestry - Default"
-msgstr "Агролесоводство - по умолчанию"
+msgstr "Агролесомелиорация - по умолчанию"
 
 #. LandUseType
 msgid "Annual Cropland"
-msgstr "Однолетние посевы"
+msgstr "Однолетние культуры"
 
 #. LandUseType
 msgid "Annual Fallow"
-msgstr "Ежегодное залежное земледелие"
+msgstr "Однолетний пар"
 
 #. LandUseType
 msgid "Flooded Rice"
@@ -246,7 +246,7 @@ msgstr "Пастбища"
 
 #. LandUseType
 msgid "Other Land (Non-Vegetated)"
-msgstr "Прочая земля (не покрытая растительностью)"
+msgstr "Прочее землепользования (не покрытая растительностью)"
 
 #. LandUseType
 msgid "Wheat"
@@ -274,7 +274,7 @@ msgstr "Влажный лес"
 
 #. LandUseType
 msgid "﻿Long-Term Cultivated"
-msgstr "Долгосрочно культивируемый"
+msgstr "Долговременно культивируемый"
 
 #. LandUseType
 msgid "Mangrove Forest"
@@ -302,7 +302,7 @@ msgstr "Отложенный"
 
 #. LandUseType
 msgid "Perennial Cropland"
-msgstr "Многолетние сельскохозяйственные угодья"
+msgstr "Многолетние культуры"
 
 #. LandUseType
 msgid "Vegetables"
@@ -322,11 +322,11 @@ msgstr "Органическая почва"
 
 #. LandUseType
 msgid "Rainforest"
-msgstr "Тропический лес"
+msgstr "Дождевой лес"
 
 #. LandUseType
 msgid "Moist Deciduous Forest"
-msgstr "Влажный лиственный лес"
+msgstr "Лиственный лес, увлажненный"
 
 #. LandUseType
 msgid "Dry Forest"
@@ -362,11 +362,11 @@ msgstr "Лесная тундра"
 
 #. LandUseType
 msgid "Mountain System"
-msgstr "Mountain System"
+msgstr "Горная система"
 
 #. LandUseType
 msgid "Other Land"
-msgstr "Прочая земля"
+msgstr "Прочее землепользования"
 
 #. LandUseType
 msgid "Grains"
@@ -398,7 +398,7 @@ msgstr "Лесистая местность"
 
 #. SettlementType
 msgid "Cultivated soil"
-msgstr "Обрабатываемая почва"
+msgstr "Культивированная почва"
 
 #. SoilType
 msgid "High Activity Clay"
@@ -436,33 +436,33 @@ msgstr "Минерал"
 msgid "Aggregated"
 msgstr "совокупный"
 
-#. TillageManagementType
+#. TillageType
 msgid "Full Tillage"
-msgstr "Полная обработка почвы"
+msgstr "Глубокая обработка"
 
-#. TillageManagementType
+#. TillageType
 msgid "Reduced Tillage"
-msgstr "Сниженная обработка почвы"
+msgstr "Поверхностная обработка"
 
-#. TillageManagementType
+#. TillageType
 msgid "No Tillage"
-msgstr "Без обработки почвы"
+msgstr "Беспахотная"
 
 #. OrganicInputType
 msgid "Low C input"
-msgstr "Низкий углеродный ввод"
+msgstr "Низкий уротупления С"
 
 #. OrganicInputType
 msgid "Medium C input"
-msgstr "Средний углеродный ввод"
+msgstr "Средний уровень поступления С"
 
 #. OrganicInputType
 msgid "High C input, no manure"
-msgstr "Высокое содержание углерода, без навоза"
+msgstr "Высокий уровень поступления С, без навоза"
 
 #. OrganicInputType
 msgid "High C input, with manure"
-msgstr "Высокое содержание углерода, с навозом"
+msgstr "Высокий уровень поступления С, с навозом"
 
 #. ResidueManagementType
 msgid "Burned"
@@ -478,7 +478,7 @@ msgstr "Экспортировано"
 
 #. WaterRegimeType
 msgid "Irrigated, Continuously Flooded"
-msgstr "Орошаемое, постоянно затопленное"
+msgstr "Орошаемый, постоянно затопленный"
 
 #. WaterRegimeType
 msgid "Irrigated, Single Drainage Period"
@@ -486,7 +486,7 @@ msgstr "Орошаемое, с одним периодом осушения"
 
 #. WaterRegimeType
 msgid "Irrigated, Multiple Drainage Periods"
-msgstr "Орошаемое, с несколькими периодами осушения"
+msgstr "Орошаемый, с неоднократным периодом осушения"
 
 #. OrganicAmendmentType
 msgid "Straw Burnt"
@@ -518,7 +518,7 @@ msgstr "Солома, внесённая за долго до посева (<30 
 
 #. GrasslandManagementType
 msgid "Non-Degraded"
-msgstr "Не деградированный"
+msgstr "Недеградированный"
 
 #. GrasslandManagementType
 msgid "High Intensity Grazing"
@@ -530,7 +530,7 @@ msgstr "Сильно деградированные"
 
 #. GrasslandManagementType
 msgid "Improved With Medium Inputs"
-msgstr "Улучшено с использованием средних затрат"
+msgstr "Улучшено со средними поступлениями"
 
 #. GrasslandManagementType
 msgid "Improved Grassland"
@@ -538,7 +538,7 @@ msgstr "Улучшенные пастбища"
 
 #. GrasslandManagementType
 msgid "Improved With High Inputs"
-msgstr "Улучшено с использованием высоких затрат"
+msgstr "Улучшено с высокими поступлениями"
 
 #. LivestockCategoryType
 msgid "Dairy Cattle"
@@ -546,7 +546,7 @@ msgstr "дойная корова"
 
 #. LivestockCategoryType
 msgid "Other Cattle"
-msgstr "Другие крупный рогатый скот"
+msgstr "Прочий крупный рогатый скот"
 
 #. LivestockCategoryType
 msgid "Camels"
@@ -558,11 +558,11 @@ msgstr "Лошади"
 
 #. LivestockCategoryType
 msgid "Mules And Asses"
-msgstr "Mules And Asses"
+msgstr "Мулы и ослы"
 
 #. LivestockCategoryType
 msgid "Other Buffalo"
-msgstr "Другие буйволы"
+msgstr "Прочий буйвол"
 
 #. LivestockCategoryType
 msgid "Dairy Buffalo"
@@ -574,7 +574,7 @@ msgstr "дойная овца"
 
 #. LivestockCategoryType
 msgid "Other Sheep"
-msgstr "Другие виды овец"
+msgstr "Прочий вид овец"
 
 #. LivestockCategoryType
 msgid "Growing Swine"
@@ -674,7 +674,7 @@ msgstr "Сухой загон"
 
 #. ManureManagementType
 msgid "Other (Pls. Go Tier 2)"
-msgstr "Прочее (уровень 2/Tier 2)"
+msgstr "Прочее (перейдите к уровень 2/Tier 2)"
 
 #. ManureManagementType
 msgid "Other (pls. Go Tier 2)"
@@ -706,7 +706,7 @@ msgstr "Система орошения"
 
 #. ModuleType
 msgid "Operation Phase of Irrigation"
-msgstr "Фаза эксплуатации ирригации"
+msgstr "Фаза эксплуатации орошения"
 
 #. ModuleType
 msgid "Project"
@@ -726,15 +726,15 @@ msgstr "Малый сезон затопленного риса"
 
 #. ModuleType
 msgid "Perennial Cropland Minor Season"
-msgstr "Многолетние сельскохозяйственные угодья, не основной сезон"
+msgstr "Многолетние культуры, малый сезон"
 
 #. ModuleType
 msgid "Annual Cropland Minor Season"
-msgstr "Однолетние посевы вторичного сезона"
+msgstr "Однолетние культуры вторичного сезона"
 
 #. ModuleType
 msgid "Livestock"
-msgstr "Домашний скот"
+msgstr "Животноводство"
 
 #. ModuleType
 msgid "Waterbody"
@@ -750,7 +750,7 @@ msgstr "Крупное рыболовное хозяйство"
 
 #. ModuleType
 msgid "Aquaculture"
-msgstr "Аквакультура"
+msgstr "Аквакультурные пруды"
 
 #. ModuleType
 msgid "Coastal Wetland"
@@ -774,11 +774,11 @@ msgstr "Топливо"
 
 #. ModuleType
 msgid "Input"
-msgstr "входные ресурсы"
+msgstr "Поступления"
 
 #. ModuleType
 msgid "Input Entry"
-msgstr "Input Entry"
+msgstr "Ввод Поступлений"
 
 #. ModuleType
 msgid "Forest Disturbance"
@@ -862,7 +862,7 @@ msgstr "Мобильный сачок"
 
 #. LargeFisheryGearType
 msgid "Not Specified"
-msgstr "Не указан"
+msgstr "Не указано"
 
 #. LargeFisheryGearType
 msgid "Bottom Trawls"
@@ -894,7 +894,7 @@ msgstr "Травли"
 
 #. SmallFisheryGearType
 msgid "Multiple"
-msgstr "Multiple"
+msgstr "Множество "
 
 #. SmallFisheryGearType
 msgid "Pots And Traps"
@@ -939,7 +939,7 @@ msgstr "Разнообразные морские ракообразные"
 
 #. FishType
 msgid "Miscellaneous Marine Fishes"
-msgstr "Разнообразные морские рыбы"
+msgstr "Разнообразные морские рыбы\n"
 
 #. FishType
 msgid "Miscellaneous Marine Molluscs"
@@ -947,7 +947,7 @@ msgstr "Разнообразные морские моллюски"
 
 #. FishType
 msgid "Mussels"
-msgstr "Mussels"
+msgstr "Мидии"
 
 #. FishType
 msgid "Redfish, Basses And Congers"
@@ -1087,11 +1087,11 @@ msgstr "Бобы"
 
 #. CropType
 msgid "Agroforestry - default"
-msgstr "Агролесоводство - по умолчанию"
+msgstr "Агролесомелиорация - по умолчанию"
 
 #. CropType
 msgid "Alley cropping"
-msgstr "Полосное агролесоводство"
+msgstr "Междурядные культуры"
 
 #. CropType
 msgid "Oil palm"
@@ -1099,7 +1099,7 @@ msgstr "Масличная пальма"
 
 #. CropType
 msgid "Perennial fallow"
-msgstr "Многолетний залеж"
+msgstr "Многолетний пар"
 
 #. CropType
 msgid "Shaded perennial"
@@ -1107,7 +1107,7 @@ msgstr "Тенистое многолетнее растение"
 
 #. DisturbanceType
 msgid "Fire"
-msgstr "Огонь"
+msgstr "Пожар"
 
 #. DisturbanceType
 msgid "Insects"
@@ -1123,11 +1123,11 @@ msgstr "Синтетические удобрения"
 
 #. MacroInputType
 msgid "N-Fertilizers On Irrigated Rice"
-msgstr "Азотные удобрения на орошаемом рисе"
+msgstr "N-удобрения на орошаемом рисе"
 
 #. MacroInputType
 msgid "Organic N-Fertilizers"
-msgstr "Органические азотные удобрения"
+msgstr "Органические N-удобрения"
 
 #. MacroInputType
 msgid "Pesticides"
@@ -1179,11 +1179,11 @@ msgstr "Инсектициды"
 
 #. InputType
 msgid "N-Fertilizers In Continuously Irrigated Rice"
-msgstr "Азотные удобрения в постоянно орошаемом рисе"
+msgstr "N-удобрения в условиях постоянного орошения риса"
 
 #. InputType
 msgid "N-Fertilizers In Wet And Dry Irrigated Rice"
-msgstr "Азотные удобрения в орошаемом рисе в условиях влажного и сухого полива"
+msgstr "N-удобрения в условиях влажного и сухого орошения риса"
 
 #. InputType
 msgid "Phosphorous"
@@ -1191,11 +1191,11 @@ msgstr "Фосфор"
 
 #. InputType
 msgid "User Defined Animal Feed (tier 2)"
-msgstr "Кормление животных, определяемое пользователем (Уровень 2/Tier 2)"
+msgstr "Кормление животных, определённый пользователем (Уровень 2/Tier 2)"
 
 #. InputType
 msgid "User Defined Input (tier 2)"
-msgstr "Пользовательский ввод (уровень 2/Tier 2)"
+msgstr "Поступление, определённый пользователем (уровень 2/Tier 2)"
 
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
@@ -1315,7 +1315,7 @@ msgstr "Реконструкция дорог (Покрытие)"
 
 #. Climate
 msgid "Cool Temperate"
-msgstr "Прохладный умеренный климат"
+msgstr "Холодный умеренный"
 
 #. Climate
 msgid "Warm Temperate"
@@ -1445,15 +1445,15 @@ msgstr "Второй оценочный отчет МГЭИК (SAR)"
 
 #. WaterManagementTypeBeforeCultivation
 msgid "Non Flooded Pre-Season <180 D"
-msgstr "Не затопленные до сезона, менее 180 дней"
+msgstr "Без затоплений <180 суток"
 
 #. WaterManagementTypeBeforeCultivation
 msgid "Non Flooded Pre-Season >180 D"
-msgstr "Не затопленные до сезона, более 180 дней"
+msgstr "Без затоплений >180 суток"
 
 #. WaterManagementTypeBeforeCultivation
 msgid "Flooded Pre-Season > 30 D"
-msgstr "Затопленный предсезонный период > 30 дней"
+msgstr "С затоплениями (>30 суток)"
 
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Wet Season (Regular Rainfed)"
@@ -1465,4 +1465,4 @@ msgstr "Дождевое орошение, сухой сезон (подверж
 
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Deep Water"
-msgstr "Дождевое орошение, глубокие воды"
+msgstr "Дождевое орошение, с высоким уровнем воды"
