@@ -120,11 +120,8 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
 
     def test_get_defaults(self):
         log.info("START - Testing get defaults")
-        view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.submodules[0].__class__.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
-        force_authenticate(request, user=self.user)
-        response = view(request, pk=self.module.pk)
+        response = self.get_module_defaults(self.submodules[0], self.user)
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
