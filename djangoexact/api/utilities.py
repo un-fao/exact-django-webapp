@@ -150,7 +150,13 @@ def has_project_permission(permission, user, project):
 
     memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
 
-    can_access = memberships and any([membership.group.permissions.filter(codename=permission).exists() for membership in memberships])
+    can_access = False
+
+    if memberships:
+        for membership in memberships:
+            if membership.group.permissions.filter(codename=permission).exists():
+                can_access = True
+                break
 
     return can_access
 
@@ -210,10 +216,46 @@ def copy_project(project, owner):
     project.owner = owner
     project_copy.save()
 
+    # Add Membership to the new project
+    api_models.ProjectMembership.objects.create(
+        user=owner,
+        project=project_copy,
+        group=api_models.Group.objects.get(name="Admin"),
+    )
+
     for activity in project.activities.all():
         copy_activity(activity, project_copy)
 
     return project_copy
+
+
+def copy_threads(threads):
+    """
+    Copy the threads of a module and return the copied threads.
+
+    Args:
+        threads (list[api_models.CommentThread]): The list of threads to copy.
+
+    Returns:
+        list[api_models.CommentThread]: The list of copied threads.
+    """
+    copied_threads = []
+    for thread in threads:
+        thread_copy = copy.deepcopy(thread)
+        thread_copy.pk = None
+        thread_copy._state.adding = True
+        thread_copy.save()
+
+        for comment in thread.comments.all():
+            comment_copy = copy.deepcopy(comment)
+            comment_copy.pk = None
+            comment_copy.thread = thread_copy
+            comment_copy._state.adding = True
+            comment_copy.save()
+
+        copied_threads.append(thread_copy)
+
+    return copied_threads
 
 
 def copy_activity(activity, new_project=None):
@@ -243,9 +285,10 @@ def copy_activity(activity, new_project=None):
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
-        module_copy._state.adding = True
         module_copy.land_use_change = None
         module_copy.organic_soil = None
+        copy_threads(module_copy.threads.all())
+        module_copy._state.adding = True
         module_copy.save()
 
         has_luc = getattr(module, "land_use_change", None)
@@ -256,6 +299,7 @@ def copy_activity(activity, new_project=None):
                 luc_copy = copy.deepcopy(module.land_use_change)
                 luc_copy.pk = None
                 luc_copy.activity = activity_copy
+                copy_threads(luc_copy.threads.all())
                 luc_copy._state.adding = True
                 luc_copy.save()
 
@@ -267,6 +311,7 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy = copy.deepcopy(module.organic_soil)
                 organic_soil_copy.pk = None
                 organic_soil_copy.activity = activity_copy
+                copy_threads(organic_soil_copy.threads.all())
                 organic_soil_copy._state.adding = True
                 organic_soil_copy.save()
 
@@ -290,6 +335,7 @@ def copy_activity(activity, new_project=None):
             for submodule in submodules:
                 submodule.pk = None
                 submodule.parent = module_copy
+                copy_threads(submodule.threads.all())
                 submodule._state.adding = True
                 submodule.save()
 
@@ -325,11 +371,11 @@ def getany(objects: list[object], key: str):
     for obj in objects:
         obj_type = type(obj)
 
-        if obj_type is dict:
+        if obj_type is dict or obj_type.__name__ == "OrderedDict":
             if key in obj:
                 return obj[key]
         else:
-            if hasattr(obj, key):
+            if hasattr(obj, key) and getattr(obj, key) is not None:
                 return getattr(obj, key)
     return None
 
@@ -469,6 +515,13 @@ def get_changes(records: list[HistoricalRecords]):
             continue
 
         delta = record.diff_against(record.prev_record)
+        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
+        delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
+
+        # TODO: Check why history_user is None when history_type = "-", which likely means deletion
+        if record.history_user is None:
+            continue
+
         change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
         for change in delta.changes:
             change_log.changes.append(Change(change.field, change.old, change.new))

@@ -37,9 +37,9 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.validated_data["irrigation_system_type"] = models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").exclude(name__in="Other").order_by("?").first().pk
 
         fuel_data = copy.deepcopy(self.validated_data)
-        fuel_data["fuel_type_start"] = models.FuelType.objects.order_by("?").first().pk
-        fuel_data["fuel_type_w"] = models.FuelType.objects.order_by("?").first().pk
-        fuel_data["fuel_type_wo"] = models.FuelType.objects.order_by("?").first().pk
+        fuel_data["fuel_type_start"] = models.FuelType.objects.filter(fuel_use_type__name="Stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).order_by("?").first().pk
+        fuel_data["fuel_type_w"] = models.FuelType.objects.filter(fuel_use_type__name="Stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).order_by("?").first().pk
+        fuel_data["fuel_type_wo"] = models.FuelType.objects.filter(fuel_use_type__name="Stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).order_by("?").first().pk
         fuel_data["well_depth"] = FuzzyFloat(0, 10).fuzz()
         fuel_data["gross_irrigation_water_start"] = FuzzyFloat(0, 100).fuzz()
         fuel_data["gross_irrigation_water_w"] = FuzzyFloat(0, 100).fuzz()
@@ -53,6 +53,8 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         fuel_data["ef_n2o_t2_start"] = FuzzyFloat(0, 1000).fuzz()
         fuel_data["ef_n2o_t2_w"] = FuzzyFloat(0, 1000).fuzz()
         fuel_data["ef_n2o_t2_wo"] = FuzzyFloat(0, 1000).fuzz()
+
+        print(fuel_data)
 
         self.edit_module(self.submodules[1], self.user, fuel_data)
 

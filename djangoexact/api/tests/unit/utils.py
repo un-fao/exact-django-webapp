@@ -1,13 +1,16 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
 from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 import logging as log
+from api import serializers
+import io
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class APITestCaseMixin(APITestCase):
@@ -79,14 +82,43 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=self.user)
         return view(request)
 
-    def create_project_membership(self, project, user):
+    def send_project_invitation(self, project, user, group):
+        """
+        Send a project invitation using the ProjectViewSet.
+
+        This method sends a project invitation by sending a POST request to the 'project-invite' endpoint
+        with the provided project data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Sending project invitation")
+        view = ProjectInvitationViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectinvitation-list"),
+            {"email": user.email, "project": project.id, "group": group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def create_project_membership(self, project, user, group=None):
         """
         Create a project membership for a user.
 
         This method creates a project membership for the provided user and project.
         """
         log.info("Creating project membership")
-        return models.ProjectMembership.objects.create(user=user, project=project, group=self.group)
+
+        if group is None:
+            group = self.group
+
+        view = ProjectMembershipViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectmembership-list"),
+            {"user": user.id, "project": project.id, "group": group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
 
     def edit_project(self, project, user, data):
         """
@@ -97,7 +129,6 @@ class APITestCaseMixin(APITestCase):
         and the response is returned.
         """
         log.info("Editing project")
-        factory = APIRequestFactory(enforce_csrf_checks=False)
         view = ProjectViewSet.as_view({"patch": "partial_update"})
 
         request = self.request_factory.patch(
@@ -107,6 +138,29 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=user)
         return view(request, pk=project.id)
+
+    def upload_project_file(self, project, user, file=None):
+        """
+        Upload a project file using the ProjectViewSet.
+
+        This method uploads a project file by sending a POST request to the 'project-upload' endpoint
+        with the provided file data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Uploading project file")
+        view = ProjectFileAttachmentViewSet.as_view({"post": "create"})
+
+        if file is None:
+            sample_content = b"Sample file content for testing."
+            file = SimpleUploadedFile("testfile.txt", sample_content, content_type="text/plain")
+
+        request = self.request_factory.post(
+            reverse("projectattachment-list"),
+            {"file": file, "project": project.id},
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request)
 
     def create_activity(self, project, user, module_types=None):
         """
@@ -155,6 +209,42 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=activity.id)
 
+    def copy_activity(self, activity, user):
+        """
+        Copy an activity using the ActivityViewSet.
+
+        This method copies an activity by sending a POST request to the 'activity-copy' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Copying activity")
+        view = ActivityViewSet.as_view({"post": "copy"})
+
+        request = self.request_factory.post(
+            reverse("activities-copy", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def delete_activity(self, activity, user):
+        """
+        Delete an activity using the ActivityViewSet.
+
+        This method deletes an activity by sending a DELETE request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Deleting activity")
+        view = ActivityViewSet.as_view({"delete": "destroy"})
+
+        request = self.request_factory.delete(
+            reverse("activities-detail", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
     def edit_module(self, module, user, data):
         """
         Edit a module using the ModuleViewSet.
@@ -193,3 +283,20 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         response = view(request)
         return response
+
+    def get_module_defaults(self, module, user):
+        """
+        Get module defaults using the ModuleViewSet.
+
+        This method retrieves module defaults by sending a GET request to the 'module-defaults' endpoint
+        with the provided module ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Getting module defaults")
+        view = generic_module_viewset(module.__class__).as_view({"get": "defaults"})
+        request = self.request_factory.get(
+            reverse(f"{module.__class__.__name__.lower()}-defaults", args=[module.pk]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)

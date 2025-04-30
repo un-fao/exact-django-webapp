@@ -97,9 +97,13 @@ from .models import (
     ApplicationParameter,
     APIHealth,
     FuelUseType,
+    PublicToken,
+    EnergyEntry,
 )
 from datetime import timedelta
 from typing import Optional
+from django.contrib.contenttypes.models import ContentType
+import api.security as security
 
 
 class EmptySerializer(serializers.Serializer):
@@ -312,7 +316,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -343,8 +347,12 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     total_hectares = serializers.SerializerMethodField()
     total_catch = serializers.SerializerMethodField()
     total_livestock = serializers.SerializerMethodField()
+    note = serializers.SerializerMethodField()
 
     capitalization_years = serializers.FloatField(read_only=True)
+
+    def get_note(self, obj):
+        return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -433,12 +441,39 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             new_years = data.get("implementation_years", None)
             is_locking = data.get("is_locked", None)
             user = self.context["request"].user
+            is_archived = data.get("is_archived", None)
+            is_finalized = data.get("is_finalized", None)
+            is_public = data.get("is_public", None)
+
+            last_year_of_accounting = data.get("last_year_of_accounting", None)
+
+            if project.is_archived and is_archived is not False:
+                raise serializers.ValidationError("Archived projects cannot be modified")
+
+            if project.is_finalized and is_finalized is not False:
+                raise serializers.ValidationError("Finalized projects cannot be modified")
+
+            if not project.is_archived and is_archived:
+                data["archived_at"] = timezone.now()
+
+            if is_archived and project.members.filter(group__name="Admin").count() > 1:
+                raise serializers.ValidationError("Project cannot be archived if there are multiple admins")
+
+            errors = security.check_permission("change_public_project_flag", user, project)
+            if is_public is not None and errors is not None:
+                raise serializers.ValidationError("User does not have permission to change the public project flag")
 
             if cost is not None:
                 total_activity_cost = project.activities.all().values_list("cost", flat=True)
 
                 if sum(total_activity_cost) > data.get("cost"):
                     raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+            if last_year_of_accounting is not None:
+                activities: list[Activity] = project.activities.all()
+
+                if any(a.start_year + a.duration > last_year_of_accounting for a in activities):
+                    raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
                 project.implementation_years = new_years
@@ -543,6 +578,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
         if project.is_archived:
             return serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_finalized:
+            return serializers.ValidationError("Finalized projects cannot have activities added")
 
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
@@ -649,6 +687,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_archived:
             raise serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Finalized projects cannot have activities added")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -1085,6 +1126,14 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
+
+        if project.is_archived:
+            log.error("Archived projects cannot have activities added")
+            raise serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_finalized:
+            log.error("Finalized projects cannot have activities added")
+            raise serializers.ValidationError("Finalized projects cannot have activities added")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
@@ -2034,6 +2083,9 @@ class EnergySerializer(ScenarioModuleSerializer):
         electricities: QuerySet[Electricity] = self.instance.electricities.all()
         fuels: QuerySet[Fuel] = self.instance.fuels.all()
 
+        if any([not entry.is_ready() for entry in self.instance.entries.all()]):
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+
         if any([not electricity.is_ready() for electricity in electricities]):
             data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
@@ -2105,6 +2157,45 @@ class FuelReadSerializer(BaseGenericModuleSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
+        mandatory_fields = {}
+
+
+# EnergyEntry
+class EnergyEntryWriteSerializer(ScenarioSubmoduleSerializer):
+    class Meta:
+        model = EnergyEntry
+        fields = "__all__"
+        ref_name = "EnergyEntry"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "quantity_consumed_per_year_start",
+                    "transmission_loss_t2_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "quantity_consumed_per_year_w",
+                    "transmission_loss_t2_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "quantity_consumed_per_year_wo",
+                    "transmission_loss_t2_wo",
+                ],
+            },
+        }
+
+
+class EnergyEntryReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = EnergyEntry
+        fields = "__all__"
+        ref_name = "EnergyEntry"
         mandatory_fields = {}
 
 
@@ -2709,14 +2800,34 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
-class ProjectMembershipSerializer(serializers.ModelSerializer):
-    user = UserReadSerializer(many=False, read_only=True)
-    group = GroupSerializer(many=False, read_only=True)
+class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=False, write_only=True)
 
     class Meta:
         model = ProjectMembership
-        fields = "__all__"
+        fields = ["project", "user", "group"]
         ref_name = "ProjectMembership"
+
+    def validate(self, data):
+        super().validate(data)
+
+        project: Project = utils.getany([data, self.instance], "project")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Cannot add members to an archived project")
+
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
+            raise serializers.ValidationError("Cannot add members to a finalized project")
+
+        return data
+
+
+class ProjectMembershipReadSerializer(serializers.Serializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
@@ -2977,15 +3088,38 @@ class ProjectInvitationModelWriteSerializer(serializers.ModelSerializer):
         ref_name = "ProjectInvitation"
 
 
-class ProjectInvitationWriteSerializer(serializers.Serializer):
+class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
+    class Meta:
+        model = ProjectInvitation
+        fields = ["email", "group", "project"]
+        ref_name = "ProjectInvitation"
+
+    def validate(self, data):
+        super().validate(data)
+
+        project: Project = utils.getany([data, self.instance], "project")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Cannot add members to an archived project")
+
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
+            raise serializers.ValidationError("Cannot add members to a finalized project")
+
+        if self.instance:
+            new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()
+            if self.instance.status.name != utils.InvitationStatus.PENDING.value and (new_status and new_status.name == utils.InvitationStatus.ACCEPTED.value):
+                raise serializers.ValidationError("Cannot accept an invitation that is not pending")
+
+        return data
+
 
 class NewNoteSerializer(serializers.ModelSerializer):
     content = serializers.CharField(required=True)
-    module_type_id = serializers.IntegerField(required=True)
+    module_type_id = serializers.IntegerField(required=False)
     module_id = serializers.IntegerField(required=True)
 
     class Meta:
@@ -2994,6 +3128,9 @@ class NewNoteSerializer(serializers.ModelSerializer):
         ref_name = "Note"
 
     def validate(self, data):
+        if data.get("module_type_id", None) is None:
+            raise serializers.ValidationError("Module type ID is required for modules")
+
         try:
             module_type = ModuleType.objects.get(pk=data["module_type_id"])
         except ModuleType.DoesNotExist:
@@ -3001,24 +3138,26 @@ class NewNoteSerializer(serializers.ModelSerializer):
 
         ModuleClass = utils.get_model(module_type.class_name, suffix=None)
         try:
-            module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+            module: Module | Submodule | Project = ModuleClass.objects.get(pk=data["module_id"])
         except ModuleClass.DoesNotExist:
             raise serializers.ValidationError("Module does not exist")
 
-        if module.note.exists():
-            raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
+        module_note = Note.objects.filter(content_type=ContentType.objects.get_for_model(module), object_id=module.id).first()
+
+        if module_note:
+            raise serializers.ValidationError(f"Note already exists for this {module_type.name}.")
 
         return super().validate(data)
 
     def save(self, **kwargs):
         module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
         ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        module: Module | Submodule = ModuleClass.objects.get(pk=self.validated_data["module_id"])
+        content_object = ModuleClass.objects.get(pk=self.validated_data["module_id"])
 
         note = Note.objects.create(
             author=self.context["request"].user,
             content=self.validated_data["content"],
-            content_object=module,
+            content_object=content_object,
         )
 
         return note
@@ -3034,6 +3173,22 @@ class NoteSerializer(serializers.ModelSerializer):
 
     def get_module_id(self, obj):
         return obj.content_object.id
+
+    def validate(self, data):
+        if not self.instance:
+            raise serializers.ValidationError("Instance not found")
+
+        project: Project = self.instance.project
+        if not project:
+            raise serializers.ValidationError("Project not found")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Project is archived")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Project is finalized")
+
+        return super().validate(data)
 
     class Meta:
         model = Note
@@ -3388,6 +3543,11 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         file = attrs["file"]
 
+        project: Project = self.context["project"]
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Finalized projects cannot be modified")
+
         max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
         if file.size > max_size_in_mb * 1024 * 1024:
@@ -3456,3 +3616,10 @@ class ProjectLockHolderInformationSerializer(serializers.Serializer):
 
     def get_locked_by(self, obj):
         return obj.locked_by.email if obj.locked_by else None
+
+
+class PublicTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicToken
+        fields = "__all__"
+        ref_name = "PublicToken"

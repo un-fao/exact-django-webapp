@@ -16,13 +16,20 @@ from . import base_module
 
 class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
+        log.info("START - EnergyTestCase")
         self.ModuleClass = models.Energy
-        self.submodule_classes = [models.Electricity, models.Fuel]
+        self.submodule_classes = [
+            models.EnergyEntry,
+            models.EnergyEntry,
+        ]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
+            "fuel_type_start": models.FuelType.objects.order_by("?").first().pk,
+            "fuel_type_w": models.FuelType.objects.order_by("?").first().pk,
+            "fuel_type_wo": models.FuelType.objects.order_by("?").first().pk,
             "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
@@ -53,6 +60,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.module.refresh_from_db()
 
     def test_results_influenced_by_tier_2_values(self):
+        log.info("START - Testing results influenced by tier 2 values")
         results_view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -66,7 +74,8 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         prev_balance = response.data["balance"]
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()
+        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()  # Electricity
+        validated_data["energy_ef_ch4_t2_start"] = FuzzyFloat(0, 10).fuzz()  # Fuel
 
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -80,6 +89,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertNotEqual(prev_balance, response.data["balance"])
 
     def test_modify(self):
+        log.info("START - Testing modify")
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -88,6 +98,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_patch_to_not_ready(self):
+        log.info("START - Testing patch to not ready")
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -96,6 +107,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
+        log.info("START - Testing calculate results")
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -107,11 +119,9 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-        view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
+        log.info("START - Testing get defaults")
 
-        force_authenticate(request, user=self.user)
-        response = view(request, pk=self.module.pk)
+        response = self.get_module_defaults(self.submodules[0], self.user)
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

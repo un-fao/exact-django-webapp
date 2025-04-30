@@ -367,11 +367,8 @@
 								The activity will be implemented starting from {{activity.start_year}}, for a total of {{activity.implementation_years}} years of implementation, with last year of accounting in {{activity.last_year_of_accounting}}.
 								<br>
 								<br>
-								Under the With project scenario, the activity will impact
-									{% if activity.is_luc %}{{activity.area}} hectares.
-									{% elif activity.is_fishery %}{{activity.catch_w}} tonnes of catch.
-									{% else %}{{activity.heads}} heads.
-									{% endif %}
+								Under the With project scenario, the activity will impact {{activity.area}} {{activity.main_impact}}{% if activity.secondary_impacts %}, plus emissions relative to {{activity.secondary_impacts}}.{% endif %}
+								<br>
 								<br>
 								The activity has a carbon balance of <b>{{activity.results.balance|floatformat:2|intcomma}} tCO2-e</b> over the period of accounting, mainly due to interventions in:
 								<br>
