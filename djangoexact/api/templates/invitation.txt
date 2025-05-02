@@ -1,0 +1,20 @@
+Invited by:	{{ invitation_sender }}
+Project title:	{{ project_title }}
+Role assigned:	{{ invitation_role }}
+Date of share:	{{ invitation_date }}
+
+Dear {{ invitation_recipient_name }},
+
+You have been invited to join the EX-ACT project "{{ project_title }}" with a role of "{{ invitation_role }}".
+To accept this invitation and begin collaborating, please click the link below:
+
+{{ invitation_link }}
+
+What is EX-ACT?
+EX-ACT (Environmental eXternalities ACcounting Tool) * is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
+
+If you require further assistance, feel free to reach out to {{ exact_email }}.
+* Previously known as EX-Ante Carbon-balance Tool
+
+Best regards,
+The EX-ACT Team
