@@ -2522,6 +2522,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
+        logger.debug(f"START ProjectFileAttachmentViewSet.download for attachment {pk}")
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, attachment.project):
@@ -2529,7 +2530,12 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
         client = storage.Client()
-        bucket = client.bucket("fao-exact-review-uploads")
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+
+        if not bucket.exists():
+            logging.error("Bucket does not exist")
+            return utils.ErrorResponse("Bucket does not exist", status=http_status.HTTP_404_NOT_FOUND)
+
         blob = bucket.blob(f"projects/{attachment.project.id}/{attachment.name}")
 
         def file_iterator(blob):
@@ -2540,6 +2546,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = HttpResponse(file_iterator(blob), content_type=blob.content_type)
         response["Content-Disposition"] = f"attachment; filename={attachment.name}"
 
+        logger.debug(f"END ProjectFileAttachmentViewSet.download for attachment {pk}")
         return response
 
     def destroy(self, request, pk=None):
