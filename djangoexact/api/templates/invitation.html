@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .details-item {
+            margin-bottom: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666666;
+        }
+        .note {
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="details-item">
+                <strong>Invited by:</strong> {{ invitation_sender }}
+            </div>
+            <div class="details-item">
+                <strong>Project title:</strong> {{ project_title }}
+            </div>
+            <div class="details-item">
+                <strong>Role assigned:</strong> {{ invitation_role }}
+            </div>
+            <div class="details-item">
+                <strong>Date of share:</strong> {{ invitation_date }}
+            </div>
+        </div>
+        <p>Dear {{ invitation_recipient_name }},</p>
+        <p>You have been invited to join the EX-ACT project "{{ project_title }}" with a role of "{{ invitation_role }}".</p>
+        <p>To accept this invitation and begin collaborating, please click the link below:</p>
+        <a href="{{ invitation_link }}">Accept Invitation</a>
+        <h3>What is EX-ACT?</h3>
+        <p>
+            EX-ACT (Environmental eXternalities ACcounting Tool) is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
+        </p>
+        <p>
+            If you require further assistance, feel free to reach out to <a href="mailto:{{ exact_email }}">{{ exact_email }}</a>.
+        </p>
+        <p class="note">* Previously known as EX-Ante Carbon-balance Tool</p>
+        <div class="footer">
+            <p>
+                Best regards,
+                <br>
+                The EX-ACT Team
+            </p>
+        </div>
+    </body>
+</html>
