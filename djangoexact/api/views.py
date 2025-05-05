@@ -33,6 +33,9 @@ import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 from datetime import datetime
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
 
 from .calculators import CalculatorFactory
 from .models import (
@@ -1461,36 +1464,23 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
-        invitation_text = """
-Invited by:\t{invitation_sender}
-Project title:\t{project_title}
-Role assigned:\t{invitation_role}
-Date of share:\t{invitation_date}
+        context = {
+            "project_title": project.name,
+            "invitation_role": group.name,
+            "invitation_recipient_name": user.get_full_name(),
+            "invitation_link": request.build_absolute_uri(invitation_link),
+            "exact_email": "ex-act@fao.org",
+            "invitation_date": invitation.created_at.strftime("%Y-%m-%d"),
+            "invitation_sender": invitation.sender.get_full_name(),
+        }
 
-Dear {invitation_recipient_name},
-You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
-To accept this invitation and begin collaborating, please click the link below:
+        html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.html"), context)
+        plain_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.txt"), context)
 
-{invitation_link}
-
-What is EX-ACT?
-EX-ACT (Environmental eXternalities ACcounting Tool) * is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
-
-If you require further assistance, feel free to reach out to {exact_email}.
-* Previously known as EX-Ante Carbon-balance Tool
-
-Best regards,
-The EX-ACT Team
-        """.format(
-            project_title=project.name,
-            invitation_role=group.name,
-            invitation_recipient_name=user.get_full_name(),
-            invitation_link=request.build_absolute_uri(invitation_link),
-            exact_email="ex-act@fao.org",
-            invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
-            invitation_sender=invitation.sender.get_full_name(),
-        )
-        send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
+        # Create and send email with both HTML and plain text versions
+        email = EmailMultiAlternatives(subject=invitation_subject, body=plain_message, from_email=settings.EMAIL_HOST_USER, to=[invitation.user.email])
+        email.attach_alternative(html_message, "text/html")
+        email.send()
 
         logging.debug(f"Email sent to user ID {user.pk} with role {group.name} for project ID {project.pk}")
         logging.debug("END ProjectInvitationViewset.create")
@@ -2532,6 +2522,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
+        logger.debug(f"START ProjectFileAttachmentViewSet.download for attachment {pk}")
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, attachment.project):
@@ -2539,7 +2530,12 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
         client = storage.Client()
-        bucket = client.bucket("fao-exact-review-uploads")
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+
+        if not bucket.exists():
+            logging.error("Bucket does not exist")
+            return utils.ErrorResponse("Bucket does not exist", status=http_status.HTTP_404_NOT_FOUND)
+
         blob = bucket.blob(f"projects/{attachment.project.id}/{attachment.name}")
 
         def file_iterator(blob):
@@ -2550,6 +2546,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = HttpResponse(file_iterator(blob), content_type=blob.content_type)
         response["Content-Disposition"] = f"attachment; filename={attachment.name}"
 
+        logger.debug(f"END ProjectFileAttachmentViewSet.download for attachment {pk}")
         return response
 
     def destroy(self, request, pk=None):
