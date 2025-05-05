@@ -104,6 +104,7 @@ from datetime import timedelta
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
+from django.conf import settings
 
 
 class EmptySerializer(serializers.Serializer):
@@ -3563,9 +3564,14 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
         from google.cloud import storage
 
+        blob = None
         try:
             client = storage.Client()
-            bucket = client.get_bucket("fao-exact-review-uploads")  # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
+            bucket = client.get_bucket(settings.STORAGE_BUCKET)
+
+            if not bucket.exists():
+                raise serializers.ValidationError("Storage bucket does not exist")
+
             project_folder = f"projects/{project.id}/"
             blob = bucket.blob(f"{project_folder}{file.name}")
 

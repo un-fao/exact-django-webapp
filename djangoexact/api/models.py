@@ -1171,8 +1171,9 @@ class Submodule(Historical, CachedResultMixin):
     def is_without(self) -> bool:
         return self.parent.is_without()
 
+    @property
     def __get_threads(self: models.Model):
-        return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
+        return [getattr(self, field.name) for field in self._meta.get_fields() if isinstance(field, models.ForeignKey) and field.name.endswith("_thread")]
 
     def get_activity(self) -> Activity:
         return self.parent.activity
