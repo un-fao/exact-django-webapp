@@ -675,7 +675,16 @@ class Project(Historical, DirtyFieldsMixin):
         self.locked_by = user
         self.save()
 
-    def unlock(self):
+    def unlock(self, send_email=True):
+        """
+        Unlocks the project and sends an email to the user who locked it.
+
+        Args:
+            send_email (bool): If True, sends an email to the user who locked the project.
+        """
+        if send_email and self.is_locked:
+            utils.send_changes_email(self)
+
         self.is_locked = False
         self.locked_at = None
         self.lock_updated_at = None
