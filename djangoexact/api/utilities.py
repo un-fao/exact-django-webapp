@@ -10,9 +10,14 @@ from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from django.utils.translation import get_language
 from django.core.exceptions import FieldDoesNotExist
-
+from django.core.mail import send_mail
+import os
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import api.models as api_models
 import ipcc.models as ipcc_models
+from datetime import timedelta
 
 import logging as log
 from django.utils.translation import gettext_lazy as _
@@ -496,7 +501,7 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     return parent_module, module_type
 
 
-def get_changes(records: list[HistoricalRecords]):
+def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = None) -> list:
     class ChangeLog:
         def __init__(self, date, user, reason, changes):
             self.date = date
@@ -507,6 +512,7 @@ def get_changes(records: list[HistoricalRecords]):
     class Change:
         def __init__(self, field, old, new):
             self.field = field
+            self.field_verbose_name = field.replace("_", " ").capitalize()
             self.old = old
             self.new = new
 
@@ -520,7 +526,7 @@ def get_changes(records: list[HistoricalRecords]):
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
+        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -633,3 +639,76 @@ def validate_uuid(uuid_string):
     except ValueError:
         return False
     return True
+
+
+def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> None:
+    """
+    Send an email to all Admin members with the changes made to the project.
+
+    Args:
+        project (Project): The project object.
+        lock_holder (CustomUser): The user who holds the lock.
+        last_lock_update_date (datetime): The date when the lock was last updated.
+        recipients (list[CustomUser], optional): List of users to send the email to. If None, defaults to all Admin members of the project.
+
+    Returns:
+        None
+    """
+
+    if project.locked_at is None or project.lock_holder is None:
+        raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
+
+    if recipients is None:
+        recipients = project.members.filter(group__name="Admin").all()
+
+    locked_at = project.locked_at
+
+    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at"]
+
+    changes = {
+        "project": {
+            "name": project.name,
+            "changes": get_changes(project.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude),
+        },
+        "activities": [],
+    }
+
+    for a in project.activities.all():
+        a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
+
+        for m in find_modules(a):
+            m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+            if not m_changes:
+                continue
+            a_data["modules"].append({"name": m.__class__.__name__, "changes": m_changes})
+
+        if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
+            changes["activities"].append(a_data)
+
+    # Send email to recipients
+    context = {
+        "project": changes["project"],
+        "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
+        "activities": changes["activities"],
+        "lock_holder_group_name": project.members.filter(user=project.lock_holder).first().group.name,
+        "lock_holder_name": project.lock_holder.get_full_name(),
+        "lock_unlock_date": locked_at,
+    }
+
+    subject = f"{context['lock_holder_group_name']} Feedback - {context['project']['name']}"
+
+    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
+        return
+
+    for recipient in recipients:
+        user = recipient.user
+        context.update({"recipient": user})
+        if user.email:
+            html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "changes", "changes.html"), context)
+            plain_message = strip_tags(html_message)
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to = user.email
+            try:
+                send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+            except Exception as e:
+                log.error(f"Failed to send email to {user.email}: {e}")
