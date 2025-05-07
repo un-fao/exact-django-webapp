@@ -1915,7 +1915,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 if has_change_in_system:
                     biomass_start = self.agb_max_start_default
                     biomass_end.value = 0
-                elif self.module.is_complete_renewal:
+                elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
                     biomass_end.value = 0
 
             elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
