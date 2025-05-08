@@ -502,21 +502,23 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     return parent_module, module_type
 
 
+class ChangeLog:
+    def __init__(self, date, user, reason, changes):
+        self.date = date
+        self.user = user
+        self.reason = reason
+        self.changes: list[Change] = changes
+
+
+class Change:
+    def __init__(self, field, old, new):
+        self.field = field
+        self.field_verbose_name = field.replace("_", " ").capitalize()
+        self.old = old
+        self.new = new
+
+
 def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = None) -> list:
-    class ChangeLog:
-        def __init__(self, date, user, reason, changes):
-            self.date = date
-            self.user = user
-            self.reason = reason
-            self.changes: list[Change] = changes
-
-    class Change:
-        def __init__(self, field, old, new):
-            self.field = field
-            self.field_verbose_name = field.replace("_", " ").capitalize()
-            self.old = old
-            self.new = new
-
     changes = []
     for record in records:
         if record.prev_record is None:
@@ -656,7 +658,29 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         None
     """
 
-    if project.locked_at is None or project.lock_holder is None:
+    def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
+        new_comments = []
+        for thread in threads:
+            comments = thread.comments.filter(date_created__gte=locked_at)
+            if comments.exists():
+                for comment in comments:
+                    comment: "api_models.Comment"
+                    changelog = ChangeLog(
+                        date=comment.date_created,
+                        user=None,
+                        reason=ChangeReasons.UPDATE.value,
+                        changes=[
+                            Change(
+                                field="comment",
+                                old=None,
+                                new=comment.content,
+                            )
+                        ],
+                    )
+                    new_comments.append(changelog)
+        return new_comments
+
+    if project.locked_at is None or project.locked_by is None:
         raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
 
     if recipients is None:
@@ -678,9 +702,29 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
 
         for m in find_modules(a):
+            m: "api_models.Module" | "api_models.Submodule"
             m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+
+            if hasattr(m, "submodules"):
+                submodules = m.submodules
+                for submodule in submodules:
+                    submodule_changes = get_changes(submodule.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+                    if submodule_changes:
+                        m_changes.extend(submodule_changes)
+
+                    threads = submodule.threads
+                    new_comments = get_new_comments(threads, locked_at)
+                    if new_comments:
+                        m_changes.extend(new_comments)
+
+            threads = m.threads
+            new_comments = get_new_comments(threads, locked_at)
+            if new_comments:
+                m_changes.extend(new_comments)
+
             if not m_changes:
                 continue
+
             a_data["modules"].append({"name": m.__class__.__name__, "changes": m_changes})
 
         if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
@@ -691,8 +735,8 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         "project": changes["project"],
         "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
         "activities": changes["activities"],
-        "lock_holder_group_name": project.members.filter(user=project.lock_holder).first().group.name,
-        "lock_holder_name": project.lock_holder.get_full_name(),
+        "lock_holder_group_name": project.members.filter(user=project.locked_by).first().group.name,
+        "lock_holder_name": project.locked_by.get_full_name(),
         "lock_unlock_date": locked_at,
     }
 

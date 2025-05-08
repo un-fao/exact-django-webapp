@@ -134,6 +134,13 @@ class ConfigParam(models.Model):
         verbose_name_plural = "Configuration parameters"
 
 
+class Historical(models.Model):
+    history = HistoricalRecords(inherit=True, related_name="%(class)s_history", cascade_delete_history=True)
+
+    class Meta:
+        abstract = True
+
+
 class CommentThread(models.Model):
     def __str__(self):
         return f"({self.pk})"
@@ -156,7 +163,7 @@ class CommentThread(models.Model):
         return "\n".join(formatted_comments)
 
 
-class Comment(models.Model):
+class Comment(Historical):
     thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="replies")
     date_created = models.DateTimeField(auto_now_add=True)
@@ -571,13 +578,6 @@ class SalinityType(models.Model):
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    class Meta:
-        abstract = True
-
-
-class Historical(models.Model):
-    history = HistoricalRecords(inherit=True, related_name="%(class)s_history", cascade_delete_history=True)
 
     class Meta:
         abstract = True
@@ -1180,7 +1180,6 @@ class Submodule(Historical, CachedResultMixin):
     def is_without(self) -> bool:
         return self.parent.is_without()
 
-    @property
     def __get_threads(self: models.Model):
         return [getattr(self, field.name) for field in self._meta.get_fields() if isinstance(field, models.ForeignKey) and field.name.endswith("_thread")]
 

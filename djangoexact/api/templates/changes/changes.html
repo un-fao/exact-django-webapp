@@ -61,7 +61,11 @@
                             <ul>
                                 {% for change_entry in m.changes %}
                                     {% for change in change_entry.changes %}
-                                        <li>{{ change.field_verbose_name }}: {{ change.old }} -> {{ change.new }}</li>
+                                        {% if change.field == "comment" %}
+                                            <li>New Comment: "{{ change.new }}"</li>
+                                        {% else %}
+                                            <li>{{ change.field_verbose_name }}: {{ change.old }} -> {{ change.new }}</li>
+                                        {% endif %}
                                     {% endfor %}
                                 {% endfor %}
                             </ul>
