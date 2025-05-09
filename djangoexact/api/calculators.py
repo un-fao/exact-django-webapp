@@ -5460,17 +5460,17 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.energy_calculator_w.get_defaults()
         self.energy_calculator_wo.get_defaults()
 
-        self.ef_default_start.co2 = self.energy_calculator_start.energy_ef_default_start.co2 if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.co2 = self.energy_calculator_start.energy_ef_default_start.co2 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
 
-        self.ef_default_w.co2 = self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.co2 = self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
 
-        self.ef_default_wo.co2 = self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.co2 = self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
 
         if self.module.is_start():
             self.irrigation_data_start = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_start)
@@ -5511,7 +5511,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_start,
-                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_start.name_en == "Electricity" else None,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_start.name_en in ["Renewable", "Electricity"] else None,
                 "fuel_net_calorific_values": self.irrigation_data_start.calorific_value,
                 "fuel_density": self.irrigation_data_start.density,
                 "depth": self.module.well_depth,
@@ -5520,7 +5520,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_start.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_start.name_en in ["Renewable", "Electricity"] else 0,
                 "gwir": self.module.gross_irrigation_water_start,
                 "delay": self.activity.delay,
             }
@@ -5541,7 +5541,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_w,
-                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_w.name_en == "Electricity" else None,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_w.name_en in ["Renewable", "Electricity"] else None,
                 "fuel_net_calorific_values": self.irrigation_data_w.calorific_value,
                 "fuel_density": self.irrigation_data_w.density,
                 "depth": self.module.well_depth,
@@ -5550,7 +5550,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_w.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_w.name_en in ["Renewable", "Electricity"] else 0,
                 "gwir": self.module.gross_irrigation_water_w,
                 "delay": self.activity.delay,
             }
@@ -5571,7 +5571,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_wo,
-                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_wo.name_en == "Electricity" else None,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_wo.name_en in ["Renewable", "Electricity"] else None,
                 "fuel_net_calorific_values": self.irrigation_data_wo.calorific_value,
                 "fuel_density": self.irrigation_data_wo.density,
                 "depth": self.module.well_depth,
@@ -5580,7 +5580,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_wo.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_wo.name_en in ["Renewable", "Electricity"] else 0,
                 "gwir": self.module.gross_irrigation_water_wo,
                 "delay": self.activity.delay,
             }
