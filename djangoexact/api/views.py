@@ -803,6 +803,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
+    def unlock(self, request, pk=None):
+        # TODO: Remove this action when not needed anymore
+        if not request.user.is_superuser:
+            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        project.unlock()
+
+        serializer = ProjectLockHolderInformationSerializer(project, many=False)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
@@ -1477,7 +1493,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.html"), context)
         plain_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.txt"), context)
 
-        # Create and send email with both HTML and plain text versions
+        # Create and send email with both HTML and plain text versions to support different email clients
+        # NOTE: Alternatives are in order of increasing preference
         email = EmailMultiAlternatives(subject=invitation_subject, body=plain_message, from_email=settings.EMAIL_HOST_USER, to=[invitation.user.email])
         email.attach_alternative(html_message, "text/html")
         email.send()
@@ -1850,7 +1867,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True)
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -2235,7 +2252,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if not (module.project.is_archived or module.project.is_finalized) and (module_results is None or not use_cached_results):
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
