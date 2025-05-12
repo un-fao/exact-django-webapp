@@ -116,8 +116,8 @@ router.register(r"executing-agencies", views.generic_viewset(models.ExecutingAge
 router.register(r"flooded-rices", views.generic_module_viewset(models.FloodedRice), basename="floodedrice")
 router.register(r"flooded-rices-minor-seasons", views.generic_module_viewset(models.MinorSeasonFloodedRice), basename="floodedriceminorseason")
 router.register(r"crop-types", views.public_generic_viewset(models.CropType), basename="croptype")
-router.register(r"water-management-types-before-cultivation", views.generic_viewset(models.WaterManagementTypeBeforeCultivation), basename="watermanagementtypesbeforecultivation")
-router.register(r"water-management-types-after-cultivation", views.generic_viewset(models.WaterManagementTypeAfterCultivation), basename="watermanagementtypesaftercultivation")
+router.register(r"water-management-types-before-cultivation", views.public_generic_viewset(models.WaterManagementTypeBeforeCultivation), basename="watermanagementtypesbeforecultivation")
+router.register(r"water-management-types-after-cultivation", views.public_generic_viewset(models.WaterManagementTypeAfterCultivation), basename="watermanagementtypesaftercultivation")
 router.register(r"organic-amendment-types", views.public_generic_viewset(models.OrganicAmendmentType), basename="organicamendmenttype")
 
 # Livestock
@@ -152,7 +152,7 @@ router.register(r"energies", views.generic_module_viewset(models.Energy), basena
 router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricity")
 router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuel")
 router.register(r"energy-entries", views.generic_module_viewset(models.EnergyEntry), basename="energyentry")
-router.register(r"emission-factor-sources", views.generic_viewset(models.EmissionFactorSource), basename="emissionfactorsources")
+router.register(r"emission-factor-sources", views.public_generic_viewset(models.EmissionFactorSource), basename="emissionfactorsources")
 
 # Fuel
 router.register(r"macro-fuel-types", views.public_generic_viewset(models.MacroFuelType), basename="macrofueltypes")
@@ -180,7 +180,7 @@ router.register(r"transport-entries", views.generic_module_viewset(models.Transp
 router.register(r"packaging-material-types", views.public_generic_viewset(models.PackagingMaterialType), basename="packagingmaterialtypes")
 router.register(r"refrigerant-types", views.public_generic_viewset(models.RefrigerantType), basename="refrigeranttypes")
 
-router.register(r"data-sources", views.generic_viewset(models.DataSource), basename="datasource")
+router.register(r"data-sources", views.public_generic_viewset(models.DataSource), basename="datasource")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),

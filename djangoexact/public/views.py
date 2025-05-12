@@ -115,7 +115,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = api_models.Activity.objects.filter(project__is_public=True)
-    serializer_class = public_serializers.PublicActivitySerializer
+    serializer_class = public_serializers.PublicActivitySerializerWithModules
     permission_classes = [AllowAny]
     pagination_class = DefaultPagination
 
@@ -142,7 +142,6 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
 
-        self.serializer_class = public_serializers.PublicActivitySerializerWithModules
         if is_summary:
             self.serializer_class = public_serializers.PublicActivitySummarySerializer
 
