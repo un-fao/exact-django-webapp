@@ -325,7 +325,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows land use types to be viewed or edited.
     """
