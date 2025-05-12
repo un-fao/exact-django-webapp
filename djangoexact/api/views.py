@@ -1,20 +1,16 @@
 import os
 import logging
 from types import SimpleNamespace
-import uuid
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
 
-from django.apps import apps
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -34,7 +30,6 @@ from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 from datetime import datetime
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 
 from .calculators import CalculatorFactory
@@ -47,7 +42,6 @@ from .models import (
     InputType,
     LandUseChange,
     LandUseType,
-    MacroInputType,
     Module,
     ModuleType,
     Project,
@@ -56,11 +50,9 @@ from .models import (
     Submodule,
     ProjectMembership,
     InvitationStatusType,
-    Definition,
     Note,
     FieldDefinition,
     LandModule,
-    CachedResultMixin,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -69,7 +61,6 @@ from .models import (
     Fishery,
     Livestock,
     LivestockCategoryType,
-    FishType,
     FisheryType,
     SmallFishery,
     LargeFishery,
@@ -77,7 +68,6 @@ from .models import (
 )
 from .serializers import (
     ActionTypes,
-    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -102,7 +92,6 @@ from .serializers import (
     get_module_serializer,
     ChangeHistorySerializer,
     ProjectInvitationModelWriteSerializer,
-    ProjectInvitationModelReadSerializer,
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
@@ -803,6 +792,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
+    def unlock(self, request, pk=None):
+        # TODO: Remove this action when not needed anymore
+        if not request.user.is_superuser:
+            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        project.unlock()
+
+        serializer = ProjectLockHolderInformationSerializer(project, many=False)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
@@ -1477,7 +1482,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.html"), context)
         plain_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.txt"), context)
 
-        # Create and send email with both HTML and plain text versions
+        # Create and send email with both HTML and plain text versions to support different email clients
+        # NOTE: Alternatives are in order of increasing preference
         email = EmailMultiAlternatives(subject=invitation_subject, body=plain_message, from_email=settings.EMAIL_HOST_USER, to=[invitation.user.email])
         email.attach_alternative(html_message, "text/html")
         email.send()
@@ -1850,7 +1856,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True)
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -2235,7 +2241,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if not (module.project.is_archived or module.project.is_finalized) and (module_results is None or not use_cached_results):
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
@@ -2342,6 +2348,8 @@ def public_generic_viewset(model: Model):
     class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
+        filterset_class = api_filters.get_model_filter(model)
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     return PublicGenericViewSet
 
@@ -2599,7 +2607,7 @@ class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilter
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]

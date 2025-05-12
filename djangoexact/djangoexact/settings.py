@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "simple_history",
     "ipcc",
     "api",
+    "public",
     "blog",
     "ckeditor",
 ]
@@ -302,3 +303,4 @@ UNFOLD = {
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
+DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
