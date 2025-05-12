@@ -1,20 +1,16 @@
 import os
 import logging
 from types import SimpleNamespace
-import uuid
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
 
-from django.apps import apps
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -34,7 +30,6 @@ from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 from datetime import datetime
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 
 from .calculators import CalculatorFactory
@@ -47,7 +42,6 @@ from .models import (
     InputType,
     LandUseChange,
     LandUseType,
-    MacroInputType,
     Module,
     ModuleType,
     Project,
@@ -56,11 +50,9 @@ from .models import (
     Submodule,
     ProjectMembership,
     InvitationStatusType,
-    Definition,
     Note,
     FieldDefinition,
     LandModule,
-    CachedResultMixin,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -69,7 +61,6 @@ from .models import (
     Fishery,
     Livestock,
     LivestockCategoryType,
-    FishType,
     FisheryType,
     SmallFishery,
     LargeFishery,
@@ -77,7 +68,6 @@ from .models import (
 )
 from .serializers import (
     ActionTypes,
-    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -102,7 +92,6 @@ from .serializers import (
     get_module_serializer,
     ChangeHistorySerializer,
     ProjectInvitationModelWriteSerializer,
-    ProjectInvitationModelReadSerializer,
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
