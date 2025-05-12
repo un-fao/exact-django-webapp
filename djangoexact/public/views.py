@@ -20,6 +20,17 @@ import types
 import api.labels as labels
 
 
+def get_modules(activity: api_models.Activity, serialized=True) -> list:
+    modules = activity.modules
+    module_serializers_list = []
+
+    for module in modules:
+        module_dict = public_serializers.get_public_module_serializer(module.__class__)(module).data
+        module_serializers_list.append(module_dict)
+
+    return module_serializers_list if serialized else modules
+
+
 class DefaultPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = "page_size"
@@ -149,6 +160,23 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
             return paginator.get_paginated_response(response)
 
         return Response(data=self.serializer_class(activities_list, many=True).data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    def modules(self, request, pk=None):
+        """
+        Lists the modules of a given activity.
+        """
+
+        activity = get_object_or_404(api_models.Activity, pk=pk)
+
+        modules = get_modules(activity, serialized=True)
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(modules, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+
+        return Response(data=modules, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
