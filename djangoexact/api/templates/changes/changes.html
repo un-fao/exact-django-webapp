@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description"
+              content="EX-ACT project changes and comments notification.">
+        <meta name="keywords"
+              content="EX-ACT, project, changes, comments, notification">
+        <title>EX-ACT</title>
+    </head>
+    <body>
+        <p>Dear {{ recipient.first_name }} {{ recipient.last_name }},</p>
+        <p>The {{ lock_holder_group_name }} has added comments for your attention.</p>
+        <hr />
+        <p>Reviewer: {{ lock_holder_name }}</p>
+        <p>Date: {{ lock_unlock_date | date:"d/m/Y" }}</p>
+        <p>Project Name: {{ project.name }}</p>
+        <p>
+            Project URL: <a href="{{ project_url }}">{{ project_url }}</a>
+        </p>
+        <hr />
+        <p>
+            <b>Comments and changes (from newest to oldest):</b>
+        </p>
+        {% if project.changes %}
+            <p>
+                <b>Project Changes</b>
+            </p>
+            <ul>
+                {% for change_entry in project.changes %}
+                    {% for change in change_entry.changes %}
+                        <li>{{ change.field_verbose_name }}: {{ change.old }} -> {{ change.new }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% for a in activities %}
+            <div style="margin-left: 20px;">
+                <p>
+                    <b>Activity:</b> {{ a.name }}
+                </p>
+                {% if a.changes %}
+                    <p>
+                        <b>Activity Changes</b>
+                    </p>
+                    <ul>
+                        {% for change_entry in a.changes %}
+                            {% for change in change_entry.changes %}
+                                <li>{{ change.field_verbose_name }}: {{ change.old }} -> {{ change.new }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% for m in a.modules %}
+                    {% if m.changes %}
+                        <div style="margin-left: 20px;">
+                            <p>
+                                <b>Module:</b> {{ m.name }}
+                            </p>
+                            <ul>
+                                {% for change_entry in m.changes %}
+                                    {% for change in change_entry.changes %}
+                                        {% if change.field == "comment" %}
+                                            <li>New Comment: "{{ change.new }}"</li>
+                                        {% else %}
+                                            <li>{{ change.field_verbose_name }}: {{ change.old }} -> {{ change.new }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <hr />
+        <p>
+            For full details, access the review directly via the project link above.
+            <br>
+            <br>
+            Best,
+            <br>
+            EX-ACT Team
+        </p>
+    </body>
+</html>
