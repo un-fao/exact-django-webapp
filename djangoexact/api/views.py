@@ -2252,7 +2252,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if not (module.project.is_archived or module.project.is_finalized) and (module_results is None or not use_cached_results):
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
