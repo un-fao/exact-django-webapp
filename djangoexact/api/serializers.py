@@ -1137,12 +1137,12 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
             project.lock(self.context["request"].user)
 
         if project.is_archived:
-            log.error("Archived projects cannot have activities added")
-            raise serializers.ValidationError("Archived projects cannot have activities added")
+            log.error("Modules belonging to archived projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to archived projects cannot be modified")
 
         if project.is_finalized:
-            log.error("Finalized projects cannot have activities added")
-            raise serializers.ValidationError("Finalized projects cannot have activities added")
+            log.error("Modules belonging to finalized projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to finalized projects cannot be modified")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
