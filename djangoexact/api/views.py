@@ -2348,6 +2348,8 @@ def public_generic_viewset(model: Model):
     class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
+        filterset_class = api_filters.get_model_filter(model)
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     return PublicGenericViewSet
 
