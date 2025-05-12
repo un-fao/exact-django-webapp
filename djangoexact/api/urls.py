@@ -42,12 +42,12 @@ router.register(r"land-use-types", views.LandUseTypeViewSet, basename="landusety
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
 router.register(r"notes", views.NoteViewSet, basename="notes")
 
-router.register(r"statuses", views.generic_viewset(models.ProjectStatus), basename="statuses")
-router.register(r"regions", views.generic_viewset(models.Region), basename="regions")
+router.register(r"statuses", views.public_generic_viewset(models.ProjectStatus), basename="statuses")
+router.register(r"regions", views.public_generic_viewset(models.Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
-router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmingPotential), basename="globalwarmingpotentials")
-router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="changerates")
-router.register(r"organization-types", views.generic_viewset(models.OrganizationType), basename="organizationtypes")
+router.register(r"global-warming-potentials", views.public_generic_viewset(GlobalWarmingPotential), basename="globalwarmingpotentials")
+router.register(r"change-rates", views.public_generic_viewset(models.ChangeRate), basename="changerates")
+router.register(r"organization-types", views.public_generic_viewset(models.OrganizationType), basename="organizationtypes")
 
 # Annual Cropland
 router.register(r"annual-croplands", views.generic_module_viewset(models.AnnualCropland), basename="annualcropland")
@@ -106,8 +106,8 @@ router.register(r"status-types", views.public_generic_viewset(models.StatusType)
 router.register(r"land-use-changes", views.generic_module_viewset(models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", views.generic_module_viewset(models.OrganicSoil), basename="organicsoil")
 router.register(r"soil-types", views.SoilTypeViewset, basename="soiltype")
-router.register(r"climates", views.generic_viewset(models.Climate), basename="climate")
-router.register(r"moistures", views.generic_viewset(models.Moisture), basename="moisture")
+router.register(r"climates", views.public_generic_viewset(models.Climate), basename="climate")
+router.register(r"moistures", views.public_generic_viewset(models.Moisture), basename="moisture")
 
 router.register(r"funding-agencies", views.generic_viewset(models.FundingAgency), basename="fundingagencies")
 router.register(r"executing-agencies", views.generic_viewset(models.ExecutingAgency), basename="executingagencies")
