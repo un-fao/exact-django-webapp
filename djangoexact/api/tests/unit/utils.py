@@ -12,6 +12,8 @@ from api import serializers
 import io
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+import public.views as public_views
+
 
 class APITestCaseMixin(APITestCase):
     def setUp(self):
@@ -300,3 +302,65 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=user)
         return view(request, pk=module.pk)
+
+    def calculate_project_results(self, project, user):
+        """
+        Calculate project results using the ProjectViewSet.
+
+        This method calculates project results by sending a POST request to the 'project-calculate' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Calculating project results")
+        view = ProjectViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("results", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def calculate_activity_results(self, activity, user):
+        """
+        Calculate activity results using the ActivityViewSet.
+
+        This method calculates activity results by sending a POST request to the 'activity-calculate' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Calculating activity results")
+        view = ActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activities-results", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def calculate_activity_results_anonimously(self, activity):
+        """
+        Calculate activity results without authentication.
+        This method calculates activity results by sending a GET request to the 'activity-results' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Calculating activity results without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activities-results", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
+
+    def get_activity_anonimously(self, activity):
+        """
+        Get activity data without authentication.
+        This method retrieves activity data by sending a GET request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting activity data without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "retrieve"})
+        request = self.request_factory.get(
+            reverse("activities-detail", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
