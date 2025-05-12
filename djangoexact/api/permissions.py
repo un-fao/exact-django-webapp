@@ -26,6 +26,12 @@ class IsPublicOrAuthenticated(BasePermission):
                     activity = get_object_or_404(Activity, pk=activity_id)
                     if activity.project.is_public:
                         return request.method in SAFE_METHODS
+                else:
+                    project_id = request.query_params.get("project_id")
+                    if project_id:
+                        project = get_object_or_404(Project, pk=project_id)
+                        if project.is_public:
+                            return request.method in SAFE_METHODS
 
             # Handle Modules (generic_module_viewset)
             module_basenames = [
