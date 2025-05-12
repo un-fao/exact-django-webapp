@@ -2607,7 +2607,7 @@ class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilter
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]
