@@ -74,7 +74,7 @@ class PublicActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = api_models.Activity
-        fields = ["id", "name", "project", "change_rate", "climate_t2", "moisture_t2", "soil_type_t2", "module_types"]
+        fields = ["id", "name", "project", "change_rate", "climate_t2", "moisture_t2", "soil_type_t2", "module_types", "duration_t2", "start_year_t2"]
         ref_name = "Activity"
 
 
@@ -83,6 +83,11 @@ class PublicActivitySerializerWithModules(PublicActivitySerializer):
 
     def get_modules(self, obj: api_models.Activity):
         return [api_serializers.get_module_serializer(module.__class__)(module, many=False).data for module in obj.modules]
+
+    class Meta:
+        model = api_models.Activity
+        fields = ["id", "name", "project", "change_rate", "climate_t2", "moisture_t2", "soil_type_t2", "module_types", "duration_t2", "start_year_t2", "modules"]
+        ref_name = "ActivityWithModules"
 
 
 def get_public_module_serializer(model_arg: models.Model) -> serializers.ModelSerializer:
