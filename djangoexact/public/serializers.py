@@ -18,7 +18,7 @@ class PublicProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = api_models.Project
-        fields = ["id", "name", "country", "climate", "moisture", "soil_type", "gw_potential", "status", "total_hectares", "total_catch", "total_livestock"]
+        exclude = ["owner", "created_at", "updated_at"]
         ref_name = "Project"
 
     def get_total_hectares(self, obj):
