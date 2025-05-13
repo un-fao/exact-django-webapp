@@ -528,6 +528,26 @@ class ProjectTestCase(APITestCaseMixin):
 
         log.info("END - test_make_project_public_and_get_report")
 
+    def test_make_project_public_and_get_activities(self):
+        """
+        Test that making a project public allows access to its activities.
+        """
+
+        log.info("START - test_make_project_public_and_get_activities")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_activities_response = self.get_activities_anonimously(project)
+        self.assertEqual(get_activities_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_get_activities")
+
     # BUG: This test is not working as expected but the functionality itself is working
     # def test_copying_activity_of_finalized_project(self):
     #     """

@@ -61,6 +61,13 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
     @action(detail=True, methods=["get"])
+    def activities(self, request, pk=None):
+        project: api_models.Project = self.get_object()
+        activities = project.activities.all()
+        serializer = public_serializers.PublicActivitySerializer(activities, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
