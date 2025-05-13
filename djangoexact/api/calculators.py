@@ -6017,25 +6017,25 @@ class OrganicSoilCalculator(BaseCalculator):
 
         try:
             self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
-            if self.ef_onsite_start.co2 is None and module.onsite_co2_drainge_t2_start is None:
+            if self.ef_onsite_start.co2 is None and module.onsite_co2_drainage_t2_start is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_start.ch4 is None and module.onsite_ch4_drainge_t2_start is None:
+            if self.ef_onsite_start.ch4 is None and module.onsite_ch4_drainage_t2_start is None:
                 raise ValueError(f"Could not find CH4 value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_start.n2o is None and module.onsite_n2o_drainge_t2_start is None:
+            if self.ef_onsite_start.n2o is None and module.onsite_n2o_drainage_t2_start is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainge_t2_start, module.onsite_n2o_drainage_t2_start])
+            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
-            if self.ef_offsite_start.doc is None and module.offsite_doc_drainge_t2_start is None:
+            if self.ef_offsite_start.doc is None and module.offsite_doc_drainage_t2_start is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainge_t2_start is None:
+            if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainage_t2_start is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainge_t2_start, module.offsite_ch4_drainge_t2_start])
+            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
@@ -6056,25 +6056,25 @@ class OrganicSoilCalculator(BaseCalculator):
 
         try:
             self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
-            if self.ef_onsite_w.co2 is None and module.onsite_co2_drainge_t2_w is None:
+            if self.ef_onsite_w.co2 is None and module.onsite_co2_drainage_t2_w is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_w.ch4 is None and module.onsite_ch4_drainge_t2_w is None:
+            if self.ef_onsite_w.ch4 is None and module.onsite_ch4_drainage_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_w.n2o is None and module.onsite_n2o_drainge_t2_w is None:
+            if self.ef_onsite_w.n2o is None and module.onsite_n2o_drainage_t2_w is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainge_t2_w, module.onsite_ch4_drainge_t2_w, module.onsite_n2o_drainge_t2_w])
+            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
-            if self.ef_offsite_w.doc is None and module.offsite_doc_drainge_t2_w is None:
+            if self.ef_offsite_w.doc is None and module.offsite_doc_drainage_t2_w is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainge_t2_w is None:
+            if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainage_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainge_t2_w, module.offsite_ch4_drainge_t2_w])
+            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
@@ -6130,25 +6130,25 @@ class OrganicSoilCalculator(BaseCalculator):
 
         try:
             self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
-            if self.ef_onsite_wo.co2 is None and module.onsite_co2_drainge_t2_wo is None:
+            if self.ef_onsite_wo.co2 is None and module.onsite_co2_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_wo.ch4 is None and module.onsite_ch4_drainge_t2_wo is None:
+            if self.ef_onsite_wo.ch4 is None and module.onsite_ch4_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_onsite_wo.n2o is None and module.onsite_n2o_drainge_t2_wo is None:
+            if self.ef_onsite_wo.n2o is None and module.onsite_n2o_drainage_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainge_t2_wo, module.onsite_ch4_drainge_t2_wo, module.onsite_n2o_drainge_t2_wo])
+            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
-            if self.ef_offsite_wo.doc is None and module.offsite_doc_drainge_t2_wo is None:
+            if self.ef_offsite_wo.doc is None and module.offsite_doc_drainage_t2_wo is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
-            if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainge_t2_wo is None:
+            if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainge_t2_wo, module.offsite_ch4_drainge_t2_wo])
+            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo])
             if missing_t2_gases:
                 raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
@@ -6240,29 +6240,29 @@ class OrganicSoilCalculator(BaseCalculator):
             "capitalization_time": self.activity.capitalization_years,
             "nitrous_constant": project.gwp.n2o,
             "ef_doc_ref_drainage_initial": self.ef_offsite_start.doc,
-            "ef_doc_tier_2_drainage_initial": input.offsite_doc_drainge_t2_start,
+            "ef_doc_tier_2_drainage_initial": input.offsite_doc_drainage_t2_start,
             "area_drained_start": input.drainage_area_start,
             "area_drained_end": input.drainage_area_w,
             "ef_co2_ref_drainage_initial": self.ef_onsite_start.co2,
-            "ef_co2_tier_2_drainage_initial": input.onsite_co2_drainge_t2_start,
+            "ef_co2_tier_2_drainage_initial": input.onsite_co2_drainage_t2_start,
             "percentage_ditches_start": input.ditches_area_start,
             "percentage_ditches_end": input.ditches_area_w,
             "ef_ch4_onsite_ref_drainage_initial": self.ef_onsite_start.ch4,
-            "ef_ch4_onsite_tier_2_drainage_initial": input.onsite_ch4_drainge_t2_start,
+            "ef_ch4_onsite_tier_2_drainage_initial": input.onsite_ch4_drainage_t2_start,
             "ef_ch4_offsite_ref_drainage_initial": self.ef_offsite_start.ch4,
-            "ef_ch4_offsite_tier_2_drainage_initial": input.offsite_ch4_drainge_t2_start,
+            "ef_ch4_offsite_tier_2_drainage_initial": input.offsite_ch4_drainage_t2_start,
             "ef_n2o_ref_drainage_initial": self.ef_onsite_start.n2o,
-            "ef_n2o_tier_2_drainage_initial": input.onsite_n2o_drainge_t2_start,
+            "ef_n2o_tier_2_drainage_initial": input.onsite_n2o_drainage_t2_start,
             "ef_doc_ref_drainage_final": self.ef_offsite_w.doc,
-            "ef_doc_tier_2_drainage_final": input.offsite_doc_drainge_t2_w,
+            "ef_doc_tier_2_drainage_final": input.offsite_doc_drainage_t2_w,
             "ef_co2_ref_drainage_final": self.ef_onsite_w.co2,
-            "ef_co2_tier_2_drainage_final": input.onsite_co2_drainge_t2_w,
+            "ef_co2_tier_2_drainage_final": input.onsite_co2_drainage_t2_w,
             "ef_ch4_onsite_ref_drainage_final": self.ef_onsite_w.ch4,
-            "ef_ch4_onsite_tier_2_drainage_final": input.onsite_ch4_drainge_t2_w,
+            "ef_ch4_onsite_tier_2_drainage_final": input.onsite_ch4_drainage_t2_w,
             "ef_ch4_offsite_ref_drainage_final": self.ef_offsite_w.ch4,
-            "ef_ch4_offsite_tier_2_drainage_final": input.offsite_ch4_drainge_t2_w,
+            "ef_ch4_offsite_tier_2_drainage_final": input.offsite_ch4_drainage_t2_w,
             "ef_n2o_ref_drainage_final": self.ef_onsite_w.n2o,
-            "ef_n2o_tier_2_drainage_final": input.onsite_n2o_drainge_t2_w,
+            "ef_n2o_tier_2_drainage_final": input.onsite_n2o_drainage_t2_w,
             "ef_doc_rewetting_initial": self.rewetting_start.doc,
             "ef_doc_rewetting_initial_tier_2": input.offsite_doc_rewetting_t2_start,
             "ef_co2_rewetting_initial": self.rewetting_start.co2,
@@ -6338,29 +6338,29 @@ class OrganicSoilCalculator(BaseCalculator):
             "capitalization_time": self.activity.capitalization_years,
             "nitrous_constant": project.gwp.n2o,
             "ef_doc_ref_drainage_initial": self.ef_offsite_start.doc,
-            "ef_doc_tier_2_drainage_initial": input.offsite_doc_drainge_t2_start,
+            "ef_doc_tier_2_drainage_initial": input.offsite_doc_drainage_t2_start,
             "area_drained_start": input.drainage_area_start,
             "area_drained_end": input.drainage_area_wo,
             "ef_co2_ref_drainage_initial": self.ef_onsite_start.co2,
-            "ef_co2_tier_2_drainage_initial": input.onsite_co2_drainge_t2_start,
+            "ef_co2_tier_2_drainage_initial": input.onsite_co2_drainage_t2_start,
             "percentage_ditches_start": input.ditches_area_start,
             "percentage_ditches_end": input.ditches_area_wo,
             "ef_ch4_onsite_ref_drainage_initial": self.ef_onsite_start.ch4,
-            "ef_ch4_onsite_tier_2_drainage_initial": input.onsite_ch4_drainge_t2_start,
+            "ef_ch4_onsite_tier_2_drainage_initial": input.onsite_ch4_drainage_t2_start,
             "ef_ch4_offsite_ref_drainage_initial": self.ef_offsite_start.ch4,
-            "ef_ch4_offsite_tier_2_drainage_initial": input.offsite_ch4_drainge_t2_start,
+            "ef_ch4_offsite_tier_2_drainage_initial": input.offsite_ch4_drainage_t2_start,
             "ef_n2o_ref_drainage_initial": self.ef_onsite_start.n2o,
-            "ef_n2o_tier_2_drainage_initial": input.onsite_n2o_drainge_t2_start,
+            "ef_n2o_tier_2_drainage_initial": input.onsite_n2o_drainage_t2_start,
             "ef_doc_ref_drainage_final": self.ef_offsite_wo.doc,
-            "ef_doc_tier_2_drainage_final": input.offsite_doc_drainge_t2_wo,
+            "ef_doc_tier_2_drainage_final": input.offsite_doc_drainage_t2_wo,
             "ef_co2_ref_drainage_final": self.ef_onsite_wo.co2,
-            "ef_co2_tier_2_drainage_final": input.onsite_co2_drainge_t2_wo,
+            "ef_co2_tier_2_drainage_final": input.onsite_co2_drainage_t2_wo,
             "ef_ch4_onsite_ref_drainage_final": self.ef_onsite_wo.ch4,
-            "ef_ch4_onsite_tier_2_drainage_final": input.onsite_ch4_drainge_t2_wo,
+            "ef_ch4_onsite_tier_2_drainage_final": input.onsite_ch4_drainage_t2_wo,
             "ef_ch4_offsite_ref_drainage_final": self.ef_offsite_wo.ch4,
-            "ef_ch4_offsite_tier_2_drainage_final": input.offsite_ch4_drainge_t2_wo,
+            "ef_ch4_offsite_tier_2_drainage_final": input.offsite_ch4_drainage_t2_wo,
             "ef_n2o_ref_drainage_final": self.ef_onsite_wo.n2o,
-            "ef_n2o_tier_2_drainage_final": input.onsite_n2o_drainge_t2_wo,
+            "ef_n2o_tier_2_drainage_final": input.onsite_n2o_drainage_t2_wo,
             "ef_doc_rewetting_initial": self.rewetting_start.doc,
             "ef_doc_rewetting_initial_tier_2": input.offsite_doc_rewetting_t2_start,
             "ef_co2_rewetting_initial": self.rewetting_start.co2,
