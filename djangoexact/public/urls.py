@@ -3,8 +3,22 @@ import public.views as public_views
 import api.models as api_models
 
 router = DefaultRouter()
-router.register(r"projects", public_views.PublicProjectViewSet, basename="project")
-router.register(r"activities", public_views.PublicActivityViewSet, basename="activity")
+router.register(r"annual-croplands", public_views.generic_public_module_viewset(api_models.AnnualCropland), basename="annualcropland")
+router.register(r"annual-croplands-minor-seasons", public_views.generic_public_module_viewset(api_models.MinorSeasonAnnualCropland), basename="annualcroplandminorseason")
+router.register(r"perennial-croplands", public_views.generic_public_module_viewset(api_models.PerennialCropland), basename="perennialcropland")
+router.register(r"perennial-croplands-minor-seasons", public_views.generic_public_module_viewset(api_models.MinorSeasonPerennialCropland), basename="perennialcroplandminorseason")
+router.register(r"grasslands", public_views.generic_public_module_viewset(api_models.Grassland), basename="grassland")
+router.register(r"small-fisheries", public_views.generic_public_module_viewset(api_models.SmallFishery), basename="smallfishery")
+router.register(r"large-fisheries", public_views.generic_public_module_viewset(api_models.LargeFishery), basename="largefishery")
+router.register(r"aquacultures", public_views.generic_public_module_viewset(api_models.Aquaculture), basename="aquaculture")
+router.register(r"inputs", public_views.generic_public_module_viewset(api_models.Input), basename="input")
+router.register(r"input-entries", public_views.generic_public_module_viewset(api_models.InputEntry), basename="inputentry")
+router.register(r"irrigations", public_views.generic_public_module_viewset(api_models.Irrigation), basename="irrigation")
+router.register(r"irrigation-systems", public_views.generic_public_module_viewset(api_models.IrrigationSystem), basename="irrigationsystem")
+router.register(r"irrigation-phases", public_views.generic_public_module_viewset(api_models.IrrigationPhase), basename="irrigationphase")
+router.register(r"set-asides", public_views.generic_public_module_viewset(api_models.SetAside), basename="setaside")
+router.register(r"other-lands", public_views.generic_public_module_viewset(api_models.OtherLand), basename="otherland")
+router.register(r"coastal-wetlands", public_views.generic_public_module_viewset(api_models.CoastalWetland), basename="coastalwetland")
 router.register(r"land-use-changes", public_views.generic_public_module_viewset(api_models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", public_views.generic_public_module_viewset(api_models.OrganicSoil), basename="organicsoil")
 router.register(r"flooded-rices", public_views.generic_public_module_viewset(api_models.FloodedRice), basename="floodedrice")
@@ -18,6 +32,8 @@ router.register(r"buildings", public_views.generic_public_module_viewset(api_mod
 router.register(r"roads", public_views.generic_public_module_viewset(api_models.Road), basename="road")
 router.register(r"other-infrastructures", public_views.generic_public_module_viewset(api_models.OtherInfrastructure), basename="otherinfrastructure")
 router.register(r"energies", public_views.generic_public_module_viewset(api_models.Energy), basename="energy")
+router.register(r"electricities", public_views.generic_public_module_viewset(api_models.Electricity), basename="electricity")
+router.register(r"fuels", public_views.generic_public_module_viewset(api_models.Fuel), basename="fuel")
 router.register(r"energy-entries", public_views.generic_public_module_viewset(api_models.EnergyEntry), basename="energyentry")
 router.register(r"storages", public_views.generic_public_module_viewset(api_models.Storage), basename="storage")
 router.register(r"storage-entries", public_views.generic_public_module_viewset(api_models.StorageEntry), basename="storageentry")
@@ -27,8 +43,6 @@ router.register(r"packagings", public_views.generic_public_module_viewset(api_mo
 router.register(r"packaging-entries", public_views.generic_public_module_viewset(api_models.PackagingEntry), basename="packagingentry")
 router.register(r"transports", public_views.generic_public_module_viewset(api_models.Transport), basename="transport")
 router.register(r"transport-entries", public_views.generic_public_module_viewset(api_models.TransportEntry), basename="transportentry")
-router.register(r"inputs", public_views.generic_public_module_viewset(api_models.Input), basename="input")
-router.register(r"input-entries", public_views.generic_public_module_viewset(api_models.InputEntry), basename="inputentry")
 
 
 urlpatterns = []

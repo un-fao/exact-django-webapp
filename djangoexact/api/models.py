@@ -1355,7 +1355,7 @@ class Module(Historical, CachedResultMixin):
         return scenarios
 
     def __get_threads(self: models.Model):
-        return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
+        return [getattr(self, field.name) for field in self._meta.get_fields() if isinstance(field, models.ForeignKey) and field.name.endswith("_thread")]
 
     def get_activity(self) -> Activity:
         return self.activity
@@ -1722,8 +1722,12 @@ class PerennialCrop(models.Model):
     class Meta:
         abstract = True
 
-    is_system_in_maturity = models.BooleanField(default=True, verbose_name="is_system_in_maturity")  # TODO: Ask Lorenzo if default should be True or False
-    is_complete_renewal = models.BooleanField(default=False, verbose_name="is_complete_renewal")
+    is_system_in_maturity = models.BooleanField(default=True)
+
+    is_complete_renewal_start = models.BooleanField(default=False)
+    is_complete_renewal_w = models.BooleanField(default=False)
+    is_complete_renewal_wo = models.BooleanField(default=False)
+    is_complete_renewal_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_is_complete_renewal_thread")
 
     tillage_management_type_start = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start", verbose_name="tillage_management_type_start")
     tillage_management_type_w = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w", verbose_name="tillage_management_type_w")
@@ -2676,57 +2680,56 @@ class OrganicSoil(LandModuleFixed):
     soil_fire_impact_percentage_wo = models.FloatField(null=True, blank=True, verbose_name="soil_fire_impact_percentage_wo")
     soil_fire_impact_percentage_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=models.SET_NULL)
 
-    onsite_co2_drainage_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_drainge_t2_start")
-    onsite_co2_drainage_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_drainge_t2_w")
-    onsite_co2_drainage_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_drainge_t2_wo")
+    onsite_co2_drainage_t2_start = models.FloatField(null=True, blank=True)
+    onsite_co2_drainage_t2_w = models.FloatField(null=True, blank=True)
+    onsite_co2_drainage_t2_wo = models.FloatField(null=True, blank=True)
 
-    onsite_ch4_drainage_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_drainge_t2_start")
-    onsite_ch4_drainage_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_drainge_t2_w")
-    onsite_ch4_drainage_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_drainge_t2_wo")
+    onsite_ch4_drainage_t2_start = models.FloatField(null=True, blank=True)
+    onsite_ch4_drainage_t2_w = models.FloatField(null=True, blank=True)
+    onsite_ch4_drainage_t2_wo = models.FloatField(null=True, blank=True)
 
-    onsite_n2o_drainage_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_drainge_t2_start")
-    onsite_n2o_drainage_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_drainge_t2_w")
-    onsite_n2o_drainage_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_drainge_t2_wo")
+    onsite_n2o_drainage_t2_start = models.FloatField(null=True, blank=True)
+    onsite_n2o_drainage_t2_w = models.FloatField(null=True, blank=True)
+    onsite_n2o_drainage_t2_wo = models.FloatField(null=True, blank=True)
 
-    offsite_doc_drainage_t2_start = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_drainge_t2_start")
-    offsite_doc_drainage_t2_w = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_drainge_t2_w")
-    offsite_doc_drainage_t2_wo = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_drainge_t2_wo")
+    offsite_doc_drainage_t2_start = models.FloatField(null=True, blank=True)
+    offsite_doc_drainage_t2_w = models.FloatField(null=True, blank=True)
+    offsite_doc_drainage_t2_wo = models.FloatField(null=True, blank=True)
 
-    offsite_ch4_drainage_t2_start = models.FloatField(null=True, blank=True, verbose_name="offsite_ch4_drainge_t2_start")
-    offsite_ch4_drainage_t2_w = models.FloatField(null=True, blank=True, verbose_name="offsite_ch4_drainge_t2_w")
-    offsite_ch4_drainage_t2_wo = models.FloatField(null=True, blank=True, verbose_name="offsite_ch4_drainge_t2_wo")
+    offsite_ch4_drainage_t2_start = models.FloatField(null=True, blank=True)
+    offsite_ch4_drainage_t2_w = models.FloatField(null=True, blank=True)
+    offsite_ch4_drainage_t2_wo = models.FloatField(null=True, blank=True)
 
-    onsite_co2_rewetting_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_rewetting_t2_start")
-    onsite_co2_rewetting_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_rewetting_t2_w")
-    onsite_co2_rewetting_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_co2_rewetting_t2_wo")
+    onsite_co2_rewetting_t2_start = models.FloatField(null=True, blank=True)
+    onsite_co2_rewetting_t2_w = models.FloatField(null=True, blank=True)
+    onsite_co2_rewetting_t2_wo = models.FloatField(null=True, blank=True)
 
-    onsite_ch4_rewetting_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_rewetting_t2_start")
-    onsite_ch4_rewetting_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_rewetting_t2_w")
-    onsite_ch4_rewetting_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_ch4_rewetting_t2_wo")
+    onsite_ch4_rewetting_t2_start = models.FloatField(null=True, blank=True)
+    onsite_ch4_rewetting_t2_w = models.FloatField(null=True, blank=True)
+    onsite_ch4_rewetting_t2_wo = models.FloatField(null=True, blank=True)
 
-    onsite_n2o_rewetting_t2_start = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_rewetting_t2_start")
-    onsite_n2o_rewetting_t2_w = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_rewetting_t2_w")
-    onsite_n2o_rewetting_t2_wo = models.FloatField(null=True, blank=True, verbose_name="onsite_n2o_rewetting_t2_wo")
+    onsite_n2o_rewetting_t2_start = models.FloatField(null=True, blank=True)
+    onsite_n2o_rewetting_t2_w = models.FloatField(null=True, blank=True)
+    onsite_n2o_rewetting_t2_wo = models.FloatField(null=True, blank=True)
 
-    offsite_doc_rewetting_t2_start = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_rewetting_t2_start")
-    offsite_doc_rewetting_t2_w = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_rewetting_t2_w")
-    offsite_doc_rewetting_t2_wo = models.FloatField(null=True, blank=True, verbose_name="offsite_doc_rewetting_t2_wo")
+    offsite_doc_rewetting_t2_start = models.FloatField(null=True, blank=True)
+    offsite_doc_rewetting_t2_w = models.FloatField(null=True, blank=True)
+    offsite_doc_rewetting_t2_wo = models.FloatField(null=True, blank=True)
 
-    mean_dry_matter_t2_start = models.FloatField(null=True, blank=True, verbose_name="mean_dry_matter_t2_start")
-    mean_dry_matter_t2_w = models.FloatField(null=True, blank=True, verbose_name="mean_dry_matter_t2_w")
-    mean_dry_matter_t2_wo = models.FloatField(null=True, blank=True, verbose_name="mean_dry_matter_t2_wo")
+    mean_dry_matter_t2_start = models.FloatField(null=True, blank=True)
+    mean_dry_matter_t2_w = models.FloatField(null=True, blank=True)
+    mean_dry_matter_t2_wo = models.FloatField(null=True, blank=True)
 
-    fire_on_soil_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co2_t2_start")
-    fire_on_soil_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co2_t2_w")
-    fire_on_soil_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co2_t2_wo")
+    fire_on_soil_co2_t2_start = models.FloatField(null=True, blank=True)
+    fire_on_soil_co2_t2_w = models.FloatField(null=True, blank=True)
+    fire_on_soil_co2_t2_wo = models.FloatField(null=True, blank=True)
+    fire_on_soil_co_t2_start = models.FloatField(null=True, blank=True)
+    fire_on_soil_co_t2_w = models.FloatField(null=True, blank=True)
+    fire_on_soil_co_t2_wo = models.FloatField(null=True, blank=True)
 
-    fire_on_soil_co_t2_start = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co_t2_start")
-    fire_on_soil_co_t2_w = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co_t2_w")
-    fire_on_soil_co_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_co_t2_wo")
-
-    fire_on_soil_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_ch4_t2_start")
-    fire_on_soil_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_ch4_t2_w")
-    fire_on_soil_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_on_soil_ch4_t2_wo")
+    fire_on_soil_ch4_t2_start = models.FloatField(null=True, blank=True)
+    fire_on_soil_ch4_t2_w = models.FloatField(null=True, blank=True)
+    fire_on_soil_ch4_t2_wo = models.FloatField(null=True, blank=True)
 
     ##### Peat Extraction #####
 
