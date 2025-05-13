@@ -364,3 +364,35 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=activity.id)
+
+    def get_report_anonimously(self, project, templated=False):
+        """
+        Get project report data without authentication.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting project report data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if templated:
+            queryparams = {"template": "fao"}
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        return view(request, pk=project.id)
+
+    def get_activities_anonimously(self, project):
+        """
+        Get activities data without authentication.
+        This method retrieves activities data by sending a GET request to the 'activities-list' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting activities data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "activities"})
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.pk]),
+            format="json",
+        )
+        return view(request, pk=project.pk)
