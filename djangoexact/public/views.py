@@ -843,7 +843,7 @@ def generic_public_module_viewset(model: api_models.Module):
             module: api_models.Module | api_models.Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            serializer = public_serializers.get_public_module_serializer(model, api_serializers.ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
+            serializer = public_serializers.get_public_module_serializer(model)(data={}, instance=module, partial=True, context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
