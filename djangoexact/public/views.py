@@ -58,7 +58,6 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = api_models.Project.objects.filter(is_public=True)
     serializer_class = public_serializers.PublicProjectSerializer
     permission_classes = [AllowAny]
-    pagination_class = None
 
     @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
