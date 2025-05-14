@@ -61,7 +61,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
-        project: api_models.Project = self.get_object()
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
         activities = project.activities.all()
         serializer = public_serializers.PublicActivitySerializer(activities, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
@@ -90,9 +90,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         """
 
         try:
-            project = api_models.Project.objects.prefetch_related("activities").get(pk=pk)
+            project = self.queryset.prefetch_related("activities").get(pk=pk)
         except api_models.Project.DoesNotExist:
-            log.error("Project not found")
             return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
@@ -148,7 +147,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
-        project: api_models.Project = self.get_object()
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
 
         if not project.is_ready():
             log.error("Project is not ready")
@@ -209,7 +208,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         try:
             activate(lang)
 
-            project: api_models.Project = self.get_object()
+            project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
             # Calculate total area of all activities
@@ -646,6 +645,8 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
 
+        get_object_or_404(self.queryset, pk=project_id, is_public=True)
+
         if is_summary:
             self.serializer_class = public_serializers.PublicActivitySummarySerializer
 
@@ -670,7 +671,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         Lists the modules of a given activity.
         """
 
-        activity = get_object_or_404(api_models.Activity, pk=pk)
+        activity = get_object_or_404(self.queryset, pk=pk)
 
         modules = get_modules(activity, serialized=True)
 
@@ -698,7 +699,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        activity = api_models.Activity.objects.prefetch_related().get(pk=pk)
+        activity = get_object_or_404(self.queryset, pk=pk)
 
         response = {**api_serializers.ActivityResultSerializer(activity).data}
 
@@ -759,9 +760,9 @@ def generic_public_module_viewset(model: api_models.Module):
             module_type = api_models.ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
-                modules = model.objects.filter(parent__activity__id=activity_id).all()
+                modules = self.queryset.filter(parent__activity__id=activity_id).all()
             else:
-                modules = model.objects.filter(activity__id=activity_id).all()
+                modules = self.queryset.filter(activity__id=activity_id).all()
 
             data = []
 
@@ -790,7 +791,7 @@ def generic_public_module_viewset(model: api_models.Module):
             Calculates and returns total emissions for a single module.
             """
             log.debug(f"START GenericModuleViewSet.results for module {model} {pk}")
-            module: api_models.Module | api_models.Submodule = get_object_or_404(model, pk=pk)
+            module: api_models.Module | api_models.Submodule = get_object_or_404(self.queryset, pk=pk)
             activity = module.get_activity()
 
             serializer = public_serializers.get_public_module_serializer(model)(data={"activity": activity.pk}, partial=True, instance=module, context={"request": request})
@@ -840,7 +841,7 @@ def generic_public_module_viewset(model: api_models.Module):
             ex. GET /annual-croplands/1/defaults/
             """
 
-            module: api_models.Module | api_models.Submodule = get_object_or_404(model, pk=pk)
+            module: api_models.Module | api_models.Submodule = get_object_or_404(self.queryset, pk=pk)
 
             serializer = public_serializers.get_public_module_serializer(model)(data={}, instance=module, partial=True, context={"request": request})
             serializer.is_valid(raise_exception=True)
@@ -863,7 +864,7 @@ def generic_public_module_viewset(model: api_models.Module):
             Returns the definitions for a module.
             """
 
-            module: api_models.Module | api_models.Submodule = get_object_or_404(model, pk=pk)
+            module: api_models.Module | api_models.Submodule = get_object_or_404(self.queryset, pk=pk)
 
             try:
                 definitions = utils.get_entity_definitions(module.module_type.class_name)
