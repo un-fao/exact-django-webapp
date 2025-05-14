@@ -92,10 +92,18 @@ class PublicActivitySerializerWithModules(PublicActivitySerializer):
 
 def get_public_module_serializer(model_arg: models.Model) -> serializers.ModelSerializer:
     class GenericPublicModuleSerializer(serializers.ModelSerializer):
+        module_type = serializers.SerializerMethodField(read_only=True)
+
         class Meta:
             model = model_arg
             fields = "__all__"
             ref_name = model_arg.__name__
+
+        def get_module_type(self, obj):
+            try:
+                return api_serializers.get_model_serializer(api_models.ModuleType)(obj.module_type, many=False).data
+            except api_models.ModuleType.DoesNotExist:
+                return None
 
     try:
         return globals()["Public" + model_arg.__name__ + "Serializer"]
