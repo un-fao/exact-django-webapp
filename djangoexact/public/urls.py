@@ -3,6 +3,8 @@ import public.views as public_views
 import api.models as api_models
 
 router = DefaultRouter()
+router.register(r"projects", public_views.PublicProjectViewSet, basename="project")
+router.register(r"activities", public_views.PublicActivityViewSet, basename="activity")
 router.register(r"annual-croplands", public_views.generic_public_module_viewset(api_models.AnnualCropland), basename="annualcropland")
 router.register(r"annual-croplands-minor-seasons", public_views.generic_public_module_viewset(api_models.MinorSeasonAnnualCropland), basename="annualcroplandminorseason")
 router.register(r"perennial-croplands", public_views.generic_public_module_viewset(api_models.PerennialCropland), basename="perennialcropland")

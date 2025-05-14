@@ -346,7 +346,7 @@ class APITestCaseMixin(APITestCase):
         log.info("Calculating activity results without authentication")
         view = public_views.PublicActivityViewSet.as_view({"get": "results"})
         request = self.request_factory.get(
-            reverse("activities-results", args=[activity.id]),
+            reverse("activity-results", args=[activity.id]),
             format="json",
         )
         return view(request, pk=activity.id)
@@ -360,7 +360,7 @@ class APITestCaseMixin(APITestCase):
         log.info("Getting activity data without authentication")
         view = public_views.PublicActivityViewSet.as_view({"get": "retrieve"})
         request = self.request_factory.get(
-            reverse("activities-detail", args=[activity.id]),
+            reverse("activity-detail", args=[activity.id]),
             format="json",
         )
         return view(request, pk=activity.id)
