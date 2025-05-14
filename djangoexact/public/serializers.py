@@ -82,7 +82,7 @@ class PublicActivitySerializerWithModules(PublicActivitySerializer):
     modules = serializers.SerializerMethodField(read_only=True)
 
     def get_modules(self, obj: api_models.Activity):
-        return [api_serializers.get_module_serializer(module.__class__)(module, many=False).data for module in obj.modules]
+        return [get_public_module_serializer(module.__class__)(module, many=False).data for module in obj.modules]
 
     class Meta:
         model = api_models.Activity
@@ -93,6 +93,7 @@ class PublicActivitySerializerWithModules(PublicActivitySerializer):
 def get_public_module_serializer(model_arg: models.Model) -> serializers.ModelSerializer:
     class GenericPublicModuleSerializer(serializers.ModelSerializer):
         module_type = serializers.SerializerMethodField(read_only=True)
+        status = api_serializers.get_model_serializer(api_models.StatusType)(read_only=True)
 
         class Meta:
             model = model_arg
