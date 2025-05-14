@@ -732,23 +732,12 @@ def generic_public_module_viewset(model: api_models.Module):
         permission_classes = [AllowAny]
 
         def get_queryset(self):
-            activity_id = utils.get_query_param_or_validation_error(self.request, "activity")
-            activity = get_object_or_404(api_models.Activity, pk=activity_id)
             module_type = api_models.ModuleType.objects.get(class_name=model.__name__)
 
-            error = security.check_permission("view_modules", self.request.user, activity.project)
-            if error:
-                return error
-
             if module_type.is_submodule:
-                return model.objects.filter(parent__activity__id=activity_id).all()
+                return model.objects.filter(parent__activity__project__is_public=True).all()
             else:
-                return model.objects.filter(activity__id=activity_id).all()
-
-        def get_serializer_class(self):
-            if self.action == "retrieve":
-                return public_serializers.get_public_module_serializer(model, api_serializers.ActionTypes.RETRIEVE)
-            return super().get_serializer_class()
+                return model.objects.filter(activity__project__is_public=True).all()
 
         @swagger_auto_schema(
             manual_parameters=[
