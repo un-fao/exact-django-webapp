@@ -730,12 +730,16 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
             changes["activities"].append(a_data)
 
+    lock_holder = project.members.filter(user=project.locked_by).first()
+    if lock_holder is None:
+        log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+
     # Send email to recipients
     context = {
         "project": changes["project"],
         "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
         "activities": changes["activities"],
-        "lock_holder_group_name": project.members.filter(user=project.locked_by).first().group.name,
+        "lock_holder_group_name": lock_holder.group.name if lock_holder else "Superuser",
         "lock_holder_name": project.locked_by.get_full_name(),
         "lock_unlock_date": locked_at,
     }
