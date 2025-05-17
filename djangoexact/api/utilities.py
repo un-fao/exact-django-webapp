@@ -661,6 +661,8 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
     def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
         new_comments = []
         for thread in threads:
+            if thread is None:
+                continue
             comments = thread.comments.filter(date_created__gte=locked_at)
             if comments.exists():
                 for comment in comments:
