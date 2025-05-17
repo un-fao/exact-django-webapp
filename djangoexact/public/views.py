@@ -645,7 +645,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
 
-        get_object_or_404(self.queryset, pk=project_id, is_public=True)
+        get_object_or_404(self.queryset, project__pk=project_id, project__is_public=True)
 
         if is_summary:
             self.serializer_class = public_serializers.PublicActivitySummarySerializer
