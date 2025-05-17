@@ -2845,6 +2845,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipReadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     project = ProjectNameIdSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
