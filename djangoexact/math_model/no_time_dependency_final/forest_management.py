@@ -257,13 +257,10 @@ class ForestManagement(BaseModule):
 
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_disturbance_component], activity=ActivityTypes.DISTURBANCE_AGB, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_disturbance_component], activity=ActivityTypes.DISTURBANCE_BGB, delay=self.delay))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
 
@@ -411,12 +408,12 @@ class ForestManagement(BaseModule):
         if self.rotation_recurrence:
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
-        elif self.disturbance_recurrence or self.logging_recurrence:
-            # This means we have disturbance or logging, if not disturbance_recurrence or logging_recurrence is None
+        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and all([x != 0 for x in self.logging_recurrence])):
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None
             calculate_degradation()
+
         # NOTE: As the three above have impact of the agb, bgb, delta_agb and delta_bgb matrices, we have to calculate the emissions after all of them
         calculate_agb_bgb_emissions()
         calculate_litter()
