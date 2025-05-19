@@ -90,7 +90,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         """
 
         try:
-            project = self.queryset.prefetch_related("activities").get(pk=pk)
+            project = self.queryset.prefetch_related("activities").get(pk=pk, is_public=True)
         except api_models.Project.DoesNotExist:
             return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
@@ -118,11 +118,10 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
                 pk = future_to_pk[future]
                 try:
                     data = future.result()
+                    response["activities"].append(data)
                 except Exception as exc:
                     log.error(f"Activity {pk} generated an exception: {exc}")
                     # You can choose to handle exceptions differently if needed
-                else:
-                    response["activities"].append(data)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -645,8 +644,6 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
 
-        get_object_or_404(self.queryset, project__pk=project_id, project__is_public=True)
-
         if is_summary:
             self.serializer_class = public_serializers.PublicActivitySummarySerializer
 
@@ -654,7 +651,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
             activity_dict = self.serializer_class(activity).data
             return activity_dict
 
-        activities_list = api_models.Activity.objects.filter(project__id=project_id)
+        activities_list = api_models.Activity.objects.filter(project__id=project_id, project__is_public=True).all()
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
@@ -699,7 +696,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        activity = get_object_or_404(self.queryset, pk=pk)
+        activity = get_object_or_404(api_models.Activity, pk=pk, project__is_public=True)
 
         response = {**api_serializers.ActivityResultSerializer(activity).data}
 
@@ -791,7 +788,7 @@ def generic_public_module_viewset(model: api_models.Module):
             Calculates and returns total emissions for a single module.
             """
             log.debug(f"START GenericModuleViewSet.results for module {model} {pk}")
-            module: api_models.Module | api_models.Submodule = get_object_or_404(self.queryset, pk=pk)
+            module: api_models.Module | api_models.Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
             serializer = public_serializers.get_public_module_serializer(model)(data={"activity": activity.pk}, partial=True, instance=module, context={"request": request})
