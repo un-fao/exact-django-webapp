@@ -854,8 +854,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             activities = total_data["activities"]
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
-            total_w = sum(result["total_w"] for result in results)
-            total_wo = sum(result["total_wo"] for result in results)
+            # TODO: Maybe instead of doing this show the module but with an error message
+            total_w = sum(result["total_w"] for result in results if result.get("total_w", None) is not None)
+            total_wo = sum(result["total_wo"] for result in results if result.get("total_wo", None) is not None)
             total_balance = total_w - total_wo
 
             project_emissions_w = total_w
@@ -872,8 +873,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
 
-            emissions_w = [result["total_w"] for result in results]
-            emissions_wo = [result["total_wo"] for result in results]
+            emissions_w = [result["total_w"] for result in results if result.get("total_w", None) is not None]
+            emissions_wo = [result["total_wo"] for result in results if result.get("total_wo", None) is not None]
 
             co2_w = {"name": "CO2", "value": 0}
             ch4_w = {"name": "CH4", "value": 0}
@@ -923,7 +924,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     if g["gas_type"]["name"] == "OTHER":
                         other_wo["value"] += sum([e["value"] for e in g["emissions"]])
 
-            balances = [result["balance"] for result in results]
+            balances = [result["balance"] for result in results if result.get("balance", None) is not None]
 
             co2 = {"name": "CO2", "value": 0}
             ch4 = {"name": "CH4", "value": 0}
@@ -983,13 +984,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
-                mlist = a["modules"]
+                mlist = list(filter(lambda x: x.get("results", None) is not None and x["results"].get("balance", None) is not None, a["modules"]))
                 modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
 
                 db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
 
-                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
-                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist if m["results"]["total_w"] is not None])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist if m["results"]["total_wo"] is not None])
                 sum_all_balance = sum_all_total_w - sum_all_total_wo
 
                 db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
