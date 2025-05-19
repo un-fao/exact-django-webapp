@@ -529,7 +529,7 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"] + (exclude_fields or [])
+        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified", "status"] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -538,7 +538,18 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
 
         change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
         for change in delta.changes:
-            change_log.changes.append(Change(change.field, change.old, change.new))
+            FieldClass = getattr(record, change.field).__class__
+            if issubclass(FieldClass, models.Model):
+                # If the field is a ForeignKey, get the related object
+                if change.old and change.new:
+                    try:
+                        old_obj = FieldClass.objects.get(pk=change.old)
+                        new_obj = FieldClass.objects.get(pk=change.new)
+                        change_log.changes.append(Change(change.field, old_obj.name, new_obj.name))
+                    except FieldClass.DoesNotExist:
+                        change_log.changes.append(Change(change.field, change.old, change.new))
+            else:
+                change_log.changes.append(Change(change.field, change.old, change.new))
 
         if len(change_log.changes) > 0:
             changes.append(change_log)
