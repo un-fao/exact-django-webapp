@@ -288,8 +288,8 @@ class ForestManagement(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay))
 
-                # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
-                self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
+                    # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
+                    self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
 
             except Exception as e:
                 traceback.print_exc()
@@ -408,7 +408,8 @@ class ForestManagement(BaseModule):
         if self.rotation_recurrence:
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
-        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and all([x != 0 for x in self.logging_recurrence])):
+        # NOTE: This is done to fix a problem of communication between front-end and back-end. Absense of disturbance should not be seen as 0, but as None. This is a temporary fix, as we should not have this problem in the future. 
+        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0 ):
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None
