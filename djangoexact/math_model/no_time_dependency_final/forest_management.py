@@ -408,7 +408,7 @@ class ForestManagement(BaseModule):
         if self.rotation_recurrence:
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
-        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and all([x != 0 for x in self.logging_recurrence])):
+        elif self.disturbance_recurrence or self.logging_recurrence:
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None
