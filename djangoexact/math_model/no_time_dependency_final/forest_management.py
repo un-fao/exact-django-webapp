@@ -244,6 +244,9 @@ class ForestManagement(BaseModule):
             try:
                 # CALCULATION FOR DISTURBANCE
                 for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, [0 for i in self.disturbance_percentage], self.disturbance_year_of_start):
+                    if recurrence == 0:
+                        # NOTE: If the recurrence is 0, it means that there is no disturbance, hence we skip the calculation. This should not happen, the front-end and back-end should send None
+                        continue
                     # NOTE: As logging and disturbance are the same, we can use the same function, however as we can see from above the percentage_fire is set to 0 for disturbance, as everything is lost and not burnt
                     result_disturbance_agb, logging_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, recurrence, start_year, percentage)
                     result_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, recurrence, start_year, percentage)
