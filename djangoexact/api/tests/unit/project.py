@@ -548,6 +548,29 @@ class ProjectTestCase(APITestCaseMixin):
 
         log.info("END - test_make_project_public_and_get_activities")
 
+    def test_that_memberships_response_has_id_field(self):
+        """
+        Test that the memberships response has an id field.
+        """
+
+        log.info("START - test_that_memberships_response_has_id_field")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_membership_response = self.create_project_membership(project, self.user)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        create_membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        get_memberships_response = self.get_project_memberships(project)
+        print(get_memberships_response.data)
+        self.assertEqual(get_memberships_response.status_code, status.HTTP_200_OK)
+        self.assertTrue("id" in get_memberships_response.data[0])
+
+        log.info("END - test_that_memberships_response_has_id_field")
     # BUG: This test is not working as expected but the functionality itself is working
     # def test_copying_activity_of_finalized_project(self):
     #     """
@@ -579,3 +602,4 @@ class ProjectTestCase(APITestCaseMixin):
     #     self.assertEqual(copy_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     #     log.info("END - test_copying_activity_of_finalized_project")
+
