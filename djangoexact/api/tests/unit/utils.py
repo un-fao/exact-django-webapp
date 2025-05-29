@@ -389,6 +389,26 @@ class APITestCaseMixin(APITestCase):
         )
         return view(request, pk=activity.id)
 
+    def get_report(self, project, user, template=None):
+        """
+        Get project report data.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Getting project report data")
+        view = ProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if template:
+            queryparams = {"template": template}
+        request = self.request_factory.get(
+            reverse("project-report", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
     def get_report_anonimously(self, project, templated=False):
         """
         Get project report data without authentication.
