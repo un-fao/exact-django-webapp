@@ -249,6 +249,9 @@ def copy_threads(module=None):
     thread_instance = None
     copied_threads = []
     for thread in threads:
+        if not hasattr(thread, "attname"):
+            continue
+
         thread_instance = getattr(module, thread.attname.replace("_id", ""), None)
         if thread_instance is None:
             continue
@@ -291,6 +294,9 @@ def copy_activity(activity, new_project=None):
 
         # Get all attributes ending with "_thread" set them to None
         for thread in module.threads:
+            if not hasattr(thread, "attname"):
+                continue
+
             setattr(module, thread.attname, None)
 
         module_copy = copy.deepcopy(module)
