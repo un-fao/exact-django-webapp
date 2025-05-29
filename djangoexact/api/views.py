@@ -1051,6 +1051,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     lt["value_w"] += m.area
                                 elif m.is_without() and not m.is_with():
                                     lt["value_wo"] += m.area
+                                elif m.is_with() and m.is_without():
+                                    lt["value_w"] += m.area
+                                    lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
 

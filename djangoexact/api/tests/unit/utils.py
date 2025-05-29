@@ -1,7 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
@@ -121,6 +121,30 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+    
+    def get_project_memberships(self, project):
+        """
+        Get project memberships for a project.
+        """
+        log.info("Getting project memberships")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(reverse("project-list"), format="json")
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
+    
+    def get_project_memberships_filter_by_user(self, project):
+        """
+        Get project memberships for a project, filtered by user.
+        """
+        log.info("Getting project memberships filtered by user")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(
+            reverse("project-list"),
+            {"user": self.user.id},
+            format="json"
+        )
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
 
     def edit_project(self, project, user, data):
         """
@@ -365,6 +389,26 @@ class APITestCaseMixin(APITestCase):
         )
         return view(request, pk=activity.id)
 
+    def get_report(self, project, user, template=None):
+        """
+        Get project report data.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Getting project report data")
+        view = ProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if template:
+            queryparams = {"template": template}
+        request = self.request_factory.get(
+            reverse("project-report", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
     def get_report_anonimously(self, project, templated=False):
         """
         Get project report data without authentication.
@@ -396,3 +440,22 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=project.pk)
+    
+    def add_comment(self, thread: models.CommentThread, text: str):
+        """
+        Add a comment to a module using the ModuleViewSet.
+
+        This method adds a comment to a module by sending a POST request to the 'module-comment' endpoint
+        with the provided module data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Adding comment to module")
+
+        view = CommentViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("comments-list"),
+            {"thread": thread.id, "content": text},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
