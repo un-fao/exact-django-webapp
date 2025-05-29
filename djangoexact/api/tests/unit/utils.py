@@ -121,6 +121,30 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+    
+    def get_project_memberships(self, project):
+        """
+        Get project memberships for a project.
+        """
+        log.info("Getting project memberships")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(reverse("project-list"), format="json")
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
+    
+    def get_project_memberships_filter_by_user(self, project):
+        """
+        Get project memberships for a project, filtered by user.
+        """
+        log.info("Getting project memberships filtered by user")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(
+            reverse("project-list"),
+            {"user": self.user.id},
+            format="json"
+        )
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
 
     def edit_project(self, project, user, data):
         """
