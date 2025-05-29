@@ -1,7 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
@@ -396,3 +396,22 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=project.pk)
+    
+    def add_comment(self, thread: models.CommentThread, text: str):
+        """
+        Add a comment to a module using the ModuleViewSet.
+
+        This method adds a comment to a module by sending a POST request to the 'module-comment' endpoint
+        with the provided module data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Adding comment to module")
+
+        view = CommentViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("comments-list"),
+            {"thread": thread.id, "content": text},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
