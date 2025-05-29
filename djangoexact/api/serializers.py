@@ -2844,11 +2844,16 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProjectMembershipReadSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+class ProjectMembershipReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     project = ProjectNameIdSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectMembership
+        fields = "__all__"
+        ref_name = "ProjectMembership"
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
