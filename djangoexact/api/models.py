@@ -682,8 +682,9 @@ class Project(Historical, DirtyFieldsMixin):
         Args:
             send_email (bool): If True, sends an email to the user who locked the project.
         """
-        if send_email and self.is_locked:
-            utils.send_changes_email(self)
+        # TODO: Uncomment this when we have a way to send recap emails again
+        # if send_email and self.is_locked:
+        #     utils.send_changes_email(self)
 
         self.is_locked = False
         self.locked_at = None
