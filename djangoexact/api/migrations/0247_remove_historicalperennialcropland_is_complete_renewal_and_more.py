@@ -11,14 +11,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='historicalperennialcropland',
-            name='is_complete_renewal',
-        ),
-        migrations.RemoveField(
-            model_name='perennialcropland',
-            name='is_complete_renewal',
-        ),
+        # migrations.RemoveField(
+        #     model_name='historicalperennialcropland',
+        #     name='is_complete_renewal',
+        # ),
+        # migrations.RemoveField(
+        #     model_name='perennialcropland',
+        #     name='is_complete_renewal',
+        # ),
         migrations.AddField(
             model_name='historicalperennialcropland',
             name='is_complete_renewal_start',
