@@ -12,269 +12,269 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.AddField(
-        #     model_name="activitytype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, validators=[django.core.validators.RegexValidator("^[a-zA-Z]*$", "Only letters are allowed."), django.core.validators.RegexValidator("[A-Z][a-z]*(\\s[A-Z][a-z]*)*", "Only capitalized words are allowed.")]),
-        # ),
-        # migrations.AddField(
-        #     model_name="buildingtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="climate",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="croptype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="disturbancetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="energysourcetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="extractionsoiltype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="fielddefinition",
-        #     name="description_ru",
-        #     field=models.TextField(null=True, verbose_name="Field Description"),
-        # ),
-        # migrations.AddField(
-        #     model_name="firetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="fisherytype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="fishtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="forestconditiontype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="foresttype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="fueltype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="fuelusetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="gastype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="grasslandmanagementtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="historicalprocessingentry",
-        #     name="fuel_type_thread",
-        #     field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to="api.commentthread"),
-        # ),
-        # migrations.AddField(
-        #     model_name="inputtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="invitationstatustype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="irrigationsystemtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="landusetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="largefisherygeartype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="livestockcategorytype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="livestockproductiontype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="macrofueltype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="macroinputtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="manuremanagementtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="moduletype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="moisture",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="organicamendmenttype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="organicinputtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="packagingmaterialtype",
-        #     name="name_en",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="packagingmaterialtype",
-        #     name="name_es",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="packagingmaterialtype",
-        #     name="name_fr",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="packagingmaterialtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="peattype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="preseasonwaterregimetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="region",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="residuemanagementtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="roadtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="settlementtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="sitelocationtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="smallfisherygeartype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="soiltype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="statustype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=255, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="tillagemanagementtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True, unique=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="trophictype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="vegetationtype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="waterbodytype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="watermanagementtypeaftercultivation",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="watermanagementtypebeforecultivation",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name="waterregimetype",
-        #     name="name_ru",
-        #     field=models.CharField(max_length=100, null=True),
-        # ),
+        migrations.AddField(
+            model_name="activitytype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, validators=[django.core.validators.RegexValidator("^[a-zA-Z]*$", "Only letters are allowed."), django.core.validators.RegexValidator("[A-Z][a-z]*(\\s[A-Z][a-z]*)*", "Only capitalized words are allowed.")]),
+        ),
+        migrations.AddField(
+            model_name="buildingtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="climate",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="croptype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="disturbancetype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True),
+        ),
+        migrations.AddField(
+            model_name="energysourcetype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="extractionsoiltype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="fielddefinition",
+            name="description_ru",
+            field=models.TextField(null=True, verbose_name="Field Description"),
+        ),
+        migrations.AddField(
+            model_name="firetype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="fisherytype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True),
+        ),
+        migrations.AddField(
+            model_name="fishtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True),
+        ),
+        migrations.AddField(
+            model_name="forestconditiontype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="foresttype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="fueltype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="fuelusetype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="gastype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="grasslandmanagementtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="historicalprocessingentry",
+            name="fuel_type_thread",
+            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to="api.commentthread"),
+        ),
+        migrations.AddField(
+            model_name="inputtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="invitationstatustype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="irrigationsystemtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="landusetype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="largefisherygeartype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="livestockcategorytype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="livestockproductiontype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="macrofueltype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="macroinputtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="manuremanagementtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="moduletype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="moisture",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="organicamendmenttype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="organicinputtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="packagingmaterialtype",
+            name="name_en",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="packagingmaterialtype",
+            name="name_es",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="packagingmaterialtype",
+            name="name_fr",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="packagingmaterialtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="peattype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="preseasonwaterregimetype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="region",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="residuemanagementtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="roadtype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="settlementtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="sitelocationtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="smallfisherygeartype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="soiltype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="statustype",
+            name="name_ru",
+            field=models.CharField(max_length=255, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="tillagemanagementtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name="trophictype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="vegetationtype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="waterbodytype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="watermanagementtypeaftercultivation",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="watermanagementtypebeforecultivation",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name="waterregimetype",
+            name="name_ru",
+            field=models.CharField(max_length=100, null=True),
+        ),
     ]
