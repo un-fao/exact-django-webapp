@@ -83,7 +83,7 @@ jobs:
 
         if [[ "${GITHUB_REF_NAME}" == "review" ]]; then
           echo "✅ Faking already-applied ipcc migration"
-          python manage.py migrate api 0247 --fake
+          python manage.py migrate api 0248 --fake
         fi
 
         python manage.py migrate
