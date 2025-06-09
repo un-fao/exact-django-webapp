@@ -82,10 +82,12 @@ jobs:
         # - yes | python manage.py makemigrations --merge
 
         if [[ "${GITHUB_REF_NAME}" == "review" ]]; then
-          echo "✅ Faking already-applied ipcc migration"
+          echo "✅ Faking already-applied ipcc migration on review"
           python manage.py migrate api 0248 --fake
+
         elif [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-          echo "🔁 Re-running 0248 migration on main"
+          echo "🔁 Forcing re-run of 0248 migration on main"
+          python manage.py migrate api 0246 --fake
           python manage.py migrate api 0248
         fi
 
