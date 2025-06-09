@@ -11,39 +11,39 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.RemoveField(
-        #     model_name='historicalperennialcropland',
-        #     name='is_complete_renewal',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='perennialcropland',
-        #     name='is_complete_renewal',
-        # ),
-        # migrations.AddField(
-        #     model_name='historicalperennialcropland',
-        #     name='is_complete_renewal_start',
-        #     field=models.BooleanField(default=False),
-        # ),
-        # migrations.AddField(
-        #     model_name='historicalperennialcropland',
-        #     name='is_complete_renewal_thread',
-        #     field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='api.commentthread'),
-        # ),
-        # migrations.AddField(
-        #     model_name='historicalperennialcropland',
-        #     name='is_complete_renewal_w',
-        #     field=models.BooleanField(default=False),
-        # ),
-        # migrations.AddField(
-        #     model_name='historicalperennialcropland',
-        #     name='is_complete_renewal_wo',
-        #     field=models.BooleanField(default=False),
-        # ),
-        # migrations.AddField(
-        #     model_name='perennialcropland',
-        #     name='is_complete_renewal_start',
-        #     field=models.BooleanField(default=False),
-        # ),
+        migrations.RemoveField(
+            model_name='historicalperennialcropland',
+            name='is_complete_renewal',
+        ),
+        migrations.RemoveField(
+            model_name='perennialcropland',
+            name='is_complete_renewal',
+        ),
+        migrations.AddField(
+            model_name='historicalperennialcropland',
+            name='is_complete_renewal_start',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='historicalperennialcropland',
+            name='is_complete_renewal_thread',
+            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='api.commentthread'),
+        ),
+        migrations.AddField(
+            model_name='historicalperennialcropland',
+            name='is_complete_renewal_w',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='historicalperennialcropland',
+            name='is_complete_renewal_wo',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='perennialcropland',
+            name='is_complete_renewal_start',
+            field=models.BooleanField(default=False),
+        ),
         migrations.AddField(
             model_name='perennialcropland',
             name='is_complete_renewal_thread',
