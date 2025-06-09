@@ -80,6 +80,12 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
         # - yes | python manage.py makemigrations --merge
+
+        if [[ "${GITHUB_REF_NAME}" == "review" ]]; then
+          echo "✅ Faking already-applied ipcc migration"
+          python manage.py migrate api 0247 --fake
+        fi
+
         python manage.py migrate
         python manage.py collectstatic --noinput
 
