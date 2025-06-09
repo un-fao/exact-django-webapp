@@ -41,6 +41,15 @@ class BaseModuleTestCase(APITestCaseMixin):
         if isinstance(self.ModuleClass, models.CoastalWetland):
             self.land_use_types = self.land_use_types.filter(is_coastal=True)
 
+    def get_results(self):
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+
+        return response
+
 
 class BaseModuleWithSubmoduleTestCase(BaseModuleTestCase):
     def setUp(self):

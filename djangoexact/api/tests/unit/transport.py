@@ -78,3 +78,10 @@ class TransportTestCase(base_module.BaseModuleWithSubmoduleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(type(response.data) == dict)
+
+    def test_excel_report(self):
+        self.test_calculate_results()
+        self.module.refresh_from_db()
+        response = self.get_report(self.project, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["Content-Type"])

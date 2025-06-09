@@ -436,6 +436,141 @@ class ProjectTestCase(APITestCaseMixin):
 
         log.info("END - test_upload_file_in_finalized_project")
 
+    def test_make_project_public_and_verify_activities_can_be_accessed(self):
+        """
+        Test that making a project public allows access to its activities.
+        """
+
+        log.info("START - test_make_project_public_and_verify_activities_can_be_accessed")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        get_activity_response = self.get_activity_anonimously(activity)
+        self.assertEqual(get_activity_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_verify_activities_can_be_accessed")
+
+    def test_make_project_public_and_verify_that_results_can_be_calculated(self):
+        """
+        Test that making a project public allows access to its results.
+        """
+
+        log.info("START - test_make_project_public_and_verify_that_results_can_be_calculated")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        get_results_response = self.calculate_activity_results_anonimously(activity)
+        self.assertEqual(get_results_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_verify_that_results_can_be_calculated")
+
+    def test_make_project_public_and_get_report(self):
+        """
+        Test that making a project public allows access to its report.
+        """
+
+        log.info("START - test_make_project_public_and_get_report")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_report_response = self.get_report_anonimously(project)
+        print(get_report_response)
+        self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_report_response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+        log.info("END - test_make_project_public_and_get_report")
+
+    def test_make_project_public_and_get_templated_report(self):
+        """
+        Test that making a project public allows access to its report.
+        """
+
+        log.info("START - test_make_project_public_and_get_report")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_report_response = self.get_report_anonimously(project, templated=True)
+        print(get_report_response)
+        self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_report_response["Content-Type"], "application/pdf")
+
+        log.info("END - test_make_project_public_and_get_report")
+
+    def test_make_project_public_and_get_activities(self):
+        """
+        Test that making a project public allows access to its activities.
+        """
+
+        log.info("START - test_make_project_public_and_get_activities")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_activities_response = self.get_activities_anonimously(project)
+        self.assertEqual(get_activities_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_get_activities")
+
+    def test_that_memberships_response_has_id_field(self):
+        """
+        Test that the memberships response has an id field.
+        """
+
+        log.info("START - test_that_memberships_response_has_id_field")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_membership_response = self.create_project_membership(project, self.user)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        create_membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        get_memberships_response = self.get_project_memberships(project)
+        print(get_memberships_response.data)
+        self.assertEqual(get_memberships_response.status_code, status.HTTP_200_OK)
+        self.assertTrue("id" in get_memberships_response.data[0])
+
+        log.info("END - test_that_memberships_response_has_id_field")
     # BUG: This test is not working as expected but the functionality itself is working
     # def test_copying_activity_of_finalized_project(self):
     #     """
@@ -467,3 +602,4 @@ class ProjectTestCase(APITestCaseMixin):
     #     self.assertEqual(copy_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     #     log.info("END - test_copying_activity_of_finalized_project")
+
