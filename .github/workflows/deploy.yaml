@@ -80,10 +80,6 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
         # - yes | python manage.py makemigrations --merge
-        python manage.py migrate ipcc 0061 --fake
-        python manage.py migrate api 0245 --fake
-        python manage.py migrate api 0246 --fake
-        python manage.py migrate api 0248_merge_20250513_1347 --fake
         python manage.py migrate
         python manage.py collectstatic --noinput
 
