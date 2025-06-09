@@ -56,6 +56,9 @@ from datetime import datetime
 from io import BytesIO
 from rest_framework.test import APIRequestFactory
 from itertools import zip_longest
+import os
+import tempfile
+from datetime import datetime
 
 log.basicConfig(level=log.DEBUG)
 
@@ -164,8 +167,18 @@ class ExcelFileManager:
         self.excel_file.seek(0)
 
         if self.SAVE_TO_FILE:
-            with open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "reports", f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"), "wb") as f:
+            # Use the system's temporary directory
+            reports_dir = os.path.join(tempfile.gettempdir(), "reports")
+            os.makedirs(reports_dir, exist_ok=True)  # Ensure the directory exists
+
+            filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+            filepath = os.path.join(reports_dir, filename)
+
+            with open(filepath, "wb") as f:
                 f.write(self.excel_file.getvalue())
+
+            # Optional: store filepath for downstream access
+            self.saved_report_path = filepath
 
     def get_excel_bytes(self):
         # Get the current Excel file as bytes (e.g., for download)
