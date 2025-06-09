@@ -10,9 +10,14 @@ from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from django.utils.translation import get_language
 from django.core.exceptions import FieldDoesNotExist
-
+from django.core.mail import send_mail
+import os
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import api.models as api_models
 import ipcc.models as ipcc_models
+from datetime import timedelta
 
 import logging as log
 from django.utils.translation import gettext_lazy as _
@@ -213,6 +218,7 @@ def copy_project(project, owner):
     project_copy.pk = None
     project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
+    project_copy.is_finalized = False
     project.owner = owner
     project_copy.save()
 
@@ -243,6 +249,9 @@ def copy_threads(module=None):
     thread_instance = None
     copied_threads = []
     for thread in threads:
+        if not hasattr(thread, "attname"):
+            continue
+
         thread_instance = getattr(module, thread.attname.replace("_id", ""), None)
         if thread_instance is None:
             continue
@@ -285,6 +294,9 @@ def copy_activity(activity, new_project=None):
 
         # Get all attributes ending with "_thread" set them to None
         for thread in module.threads:
+            if not hasattr(thread, "attname"):
+                continue
+
             setattr(module, thread.attname, None)
 
         module_copy = copy.deepcopy(module)
@@ -496,20 +508,23 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     return parent_module, module_type
 
 
-def get_changes(records: list[HistoricalRecords]):
-    class ChangeLog:
-        def __init__(self, date, user, reason, changes):
-            self.date = date
-            self.user = user
-            self.reason = reason
-            self.changes: list[Change] = changes
+class ChangeLog:
+    def __init__(self, date, user, reason, changes):
+        self.date = date
+        self.user = user
+        self.reason = reason
+        self.changes: list[Change] = changes
 
-    class Change:
-        def __init__(self, field, old, new):
-            self.field = field
-            self.old = old
-            self.new = new
 
+class Change:
+    def __init__(self, field, old, new):
+        self.field = field
+        self.field_verbose_name = field.replace("_", " ").capitalize()
+        self.old = old
+        self.new = new
+
+
+def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = None) -> list:
     changes = []
     for record in records:
         if record.prev_record is None:
@@ -520,7 +535,7 @@ def get_changes(records: list[HistoricalRecords]):
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
+        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified", "status", "map_data"] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -529,7 +544,18 @@ def get_changes(records: list[HistoricalRecords]):
 
         change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
         for change in delta.changes:
-            change_log.changes.append(Change(change.field, change.old, change.new))
+            FieldClass = getattr(record, change.field).__class__
+            if issubclass(FieldClass, models.Model):
+                # If the field is a ForeignKey, get the related object
+                if change.old and change.new:
+                    try:
+                        old_obj = FieldClass.objects.get(pk=change.old)
+                        new_obj = FieldClass.objects.get(pk=change.new)
+                        change_log.changes.append(Change(change.field, old_obj.name, new_obj.name))
+                    except FieldClass.DoesNotExist:
+                        change_log.changes.append(Change(change.field, change.old, change.new))
+            else:
+                change_log.changes.append(Change(change.field, change.old, change.new))
 
         if len(change_log.changes) > 0:
             changes.append(change_log)
@@ -633,3 +659,124 @@ def validate_uuid(uuid_string):
     except ValueError:
         return False
     return True
+
+
+def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> None:
+    """
+    Send an email to all Admin members with the changes made to the project.
+
+    Args:
+        project (Project): The project object.
+        lock_holder (CustomUser): The user who holds the lock.
+        last_lock_update_date (datetime): The date when the lock was last updated.
+        recipients (list[CustomUser], optional): List of users to send the email to. If None, defaults to all Admin members of the project.
+
+    Returns:
+        None
+    """
+
+    def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
+        new_comments = []
+        for thread in threads:
+            if thread is None:
+                continue
+            comments = thread.comments.filter(date_created__gte=locked_at)
+            if comments.exists():
+                for comment in comments:
+                    comment: "api_models.Comment"
+                    changelog = ChangeLog(
+                        date=comment.date_created,
+                        user=None,
+                        reason=ChangeReasons.UPDATE.value,
+                        changes=[
+                            Change(
+                                field="comment",
+                                old=None,
+                                new=comment.content,
+                            )
+                        ],
+                    )
+                    new_comments.append(changelog)
+        return new_comments
+
+    if project.locked_at is None or project.locked_by is None:
+        raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
+
+    if recipients is None:
+        recipients = project.members.filter(group__name="Admin").all()
+
+    locked_at = project.locked_at
+
+    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at"]
+
+    changes = {
+        "project": {
+            "name": project.name,
+            "changes": get_changes(project.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude),
+        },
+        "activities": [],
+    }
+
+    for a in project.activities.all():
+        a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
+
+        for m in find_modules(a):
+            m: "api_models.Module" | "api_models.Submodule"
+            m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+
+            if hasattr(m, "submodules"):
+                submodules = m.submodules
+                for submodule in submodules:
+                    submodule_changes = get_changes(submodule.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+                    if submodule_changes:
+                        m_changes.extend(submodule_changes)
+
+                    threads = submodule.threads
+                    new_comments = get_new_comments(threads, locked_at)
+                    if new_comments:
+                        m_changes.extend(new_comments)
+
+            threads = m.threads
+            new_comments = get_new_comments(threads, locked_at)
+            if new_comments:
+                m_changes.extend(new_comments)
+
+            if not m_changes:
+                continue
+
+            a_data["modules"].append({"name": m.__class__.__name__, "changes": m_changes})
+
+        if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
+            changes["activities"].append(a_data)
+
+    lock_holder = project.members.filter(user=project.locked_by).first()
+    if lock_holder is None:
+        log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+
+    # Send email to recipients
+    context = {
+        "project": changes["project"],
+        "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
+        "activities": changes["activities"],
+        "lock_holder_group_name": lock_holder.group.name if lock_holder else "Superuser",
+        "lock_holder_name": project.locked_by.get_full_name(),
+        "lock_unlock_date": locked_at,
+    }
+
+    subject = f"{context['lock_holder_group_name']} Feedback - {context['project']['name']}"
+
+    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
+        return
+
+    for recipient in recipients:
+        user = recipient.user
+        context.update({"recipient": user})
+        if user.email:
+            html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "changes", "changes.html"), context)
+            plain_message = strip_tags(html_message)
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to = user.email
+            try:
+                send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+            except Exception as e:
+                log.error(f"Failed to send email to {user.email}: {e}")

@@ -1,20 +1,16 @@
 import os
 import logging
 from types import SimpleNamespace
-import uuid
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
 
-from django.apps import apps
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -34,7 +30,6 @@ from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 from datetime import datetime
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 
 from .calculators import CalculatorFactory
@@ -47,7 +42,6 @@ from .models import (
     InputType,
     LandUseChange,
     LandUseType,
-    MacroInputType,
     Module,
     ModuleType,
     Project,
@@ -56,11 +50,9 @@ from .models import (
     Submodule,
     ProjectMembership,
     InvitationStatusType,
-    Definition,
     Note,
     FieldDefinition,
     LandModule,
-    CachedResultMixin,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -69,7 +61,6 @@ from .models import (
     Fishery,
     Livestock,
     LivestockCategoryType,
-    FishType,
     FisheryType,
     SmallFishery,
     LargeFishery,
@@ -77,7 +68,6 @@ from .models import (
 )
 from .serializers import (
     ActionTypes,
-    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -102,7 +92,6 @@ from .serializers import (
     get_module_serializer,
     ChangeHistorySerializer,
     ProjectInvitationModelWriteSerializer,
-    ProjectInvitationModelReadSerializer,
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
@@ -336,7 +325,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows land use types to be viewed or edited.
     """
@@ -803,6 +792,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
+    def unlock(self, request, pk=None):
+        # TODO: Remove this action when not needed anymore
+        if not request.user.is_superuser:
+            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        project.unlock()
+
+        serializer = ProjectLockHolderInformationSerializer(project, many=False)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
@@ -849,8 +854,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             activities = total_data["activities"]
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
-            total_w = sum(result["total_w"] for result in results)
-            total_wo = sum(result["total_wo"] for result in results)
+            # TODO: Maybe instead of doing this show the module but with an error message
+            total_w = sum(result["total_w"] for result in results if result.get("total_w", None) is not None)
+            total_wo = sum(result["total_wo"] for result in results if result.get("total_wo", None) is not None)
             total_balance = total_w - total_wo
 
             project_emissions_w = total_w
@@ -867,8 +873,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
 
-            emissions_w = [result["total_w"] for result in results]
-            emissions_wo = [result["total_wo"] for result in results]
+            emissions_w = [result["total_w"] for result in results if result.get("total_w", None) is not None]
+            emissions_wo = [result["total_wo"] for result in results if result.get("total_wo", None) is not None]
 
             co2_w = {"name": "CO2", "value": 0}
             ch4_w = {"name": "CH4", "value": 0}
@@ -918,7 +924,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     if g["gas_type"]["name"] == "OTHER":
                         other_wo["value"] += sum([e["value"] for e in g["emissions"]])
 
-            balances = [result["balance"] for result in results]
+            balances = [result["balance"] for result in results if result.get("balance", None) is not None]
 
             co2 = {"name": "CO2", "value": 0}
             ch4 = {"name": "CH4", "value": 0}
@@ -978,13 +984,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
-                mlist = a["modules"]
+                mlist = list(filter(lambda x: x.get("results", None) is not None and x["results"].get("balance", None) is not None, a["modules"]))
                 modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
 
                 db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
 
-                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
-                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist if m["results"]["total_w"] is not None])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist if m["results"]["total_wo"] is not None])
                 sum_all_balance = sum_all_total_w - sum_all_total_wo
 
                 db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
@@ -1044,6 +1050,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 if m.is_with() and not m.is_without():
                                     lt["value_w"] += m.area
                                 elif m.is_without() and not m.is_with():
+                                    lt["value_wo"] += m.area
+                                elif m.is_with() and m.is_without():
+                                    lt["value_w"] += m.area
                                     lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
@@ -1477,7 +1486,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.html"), context)
         plain_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.txt"), context)
 
-        # Create and send email with both HTML and plain text versions
+        # Create and send email with both HTML and plain text versions to support different email clients
+        # NOTE: Alternatives are in order of increasing preference
         email = EmailMultiAlternatives(subject=invitation_subject, body=plain_message, from_email=settings.EMAIL_HOST_USER, to=[invitation.user.email])
         email.attach_alternative(html_message, "text/html")
         email.send()
@@ -1850,7 +1860,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True)
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -2235,7 +2245,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if not (module.project.is_archived or module.project.is_finalized) and (module_results is None or not use_cached_results):
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
@@ -2342,6 +2352,8 @@ def public_generic_viewset(model: Model):
     class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
+        filterset_class = api_filters.get_model_filter(model)
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     return PublicGenericViewSet
 
@@ -2594,12 +2606,12 @@ class APIHealthView(views.APIView):
         return Response(serializer.data, status=status)
 
 
-class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilterViewSet):
+class FuelTypeViewSet(viewsets.ModelViewSet, PublicViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]

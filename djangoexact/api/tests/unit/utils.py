@@ -1,7 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
@@ -11,6 +11,8 @@ import logging as log
 from api import serializers
 import io
 from django.core.files.uploadedfile import SimpleUploadedFile
+
+import public.views as public_views
 
 
 class APITestCaseMixin(APITestCase):
@@ -119,6 +121,30 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+    
+    def get_project_memberships(self, project):
+        """
+        Get project memberships for a project.
+        """
+        log.info("Getting project memberships")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(reverse("project-list"), format="json")
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
+    
+    def get_project_memberships_filter_by_user(self, project):
+        """
+        Get project memberships for a project, filtered by user.
+        """
+        log.info("Getting project memberships filtered by user")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(
+            reverse("project-list"),
+            {"user": self.user.id},
+            format="json"
+        )
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
 
     def edit_project(self, project, user, data):
         """
@@ -300,3 +326,136 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=user)
         return view(request, pk=module.pk)
+
+    def calculate_project_results(self, project, user):
+        """
+        Calculate project results using the ProjectViewSet.
+
+        This method calculates project results by sending a POST request to the 'project-calculate' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Calculating project results")
+        view = ProjectViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("results", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def calculate_activity_results(self, activity, user):
+        """
+        Calculate activity results using the ActivityViewSet.
+
+        This method calculates activity results by sending a POST request to the 'activity-calculate' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Calculating activity results")
+        view = ActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activities-results", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def calculate_activity_results_anonimously(self, activity):
+        """
+        Calculate activity results without authentication.
+        This method calculates activity results by sending a GET request to the 'activity-results' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Calculating activity results without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activity-results", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
+
+    def get_activity_anonimously(self, activity):
+        """
+        Get activity data without authentication.
+        This method retrieves activity data by sending a GET request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting activity data without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "retrieve"})
+        request = self.request_factory.get(
+            reverse("activity-detail", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
+
+    def get_report(self, project, user, template=None):
+        """
+        Get project report data.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Getting project report data")
+        view = ProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if template:
+            queryparams = {"template": template}
+        request = self.request_factory.get(
+            reverse("project-report", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def get_report_anonimously(self, project, templated=False):
+        """
+        Get project report data without authentication.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting project report data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if templated:
+            queryparams = {"template": "fao"}
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        return view(request, pk=project.id)
+
+    def get_activities_anonimously(self, project):
+        """
+        Get activities data without authentication.
+        This method retrieves activities data by sending a GET request to the 'activities-list' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.info("Getting activities data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "activities"})
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.pk]),
+            format="json",
+        )
+        return view(request, pk=project.pk)
+    
+    def add_comment(self, thread: models.CommentThread, text: str):
+        """
+        Add a comment to a module using the ModuleViewSet.
+
+        This method adds a comment to a module by sending a POST request to the 'module-comment' endpoint
+        with the provided module data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Adding comment to module")
+
+        view = CommentViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("comments-list"),
+            {"thread": thread.id, "content": text},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)

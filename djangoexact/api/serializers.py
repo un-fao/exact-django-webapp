@@ -501,7 +501,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                     log.warning(f"Project is already locked by: {project.locked_by.email}")
                     raise serializers.ValidationError("The project is already locked")
 
-                project.lock(user)
+                if project.is_locked:
+                    project.refresh_lock()
+                else:
+                    project.lock(self.context["request"].user)
 
             # If an unlock is requested
             elif is_locking is False:
@@ -586,6 +589,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
+        project.lock(self.context["request"].user)
 
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.get(name_en="Land Use Change")
@@ -1127,14 +1131,18 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
+        if project.is_locked:
+            project.refresh_lock()
+        else:
+            project.lock(self.context["request"].user)
 
         if project.is_archived:
-            log.error("Archived projects cannot have activities added")
-            raise serializers.ValidationError("Archived projects cannot have activities added")
+            log.error("Modules belonging to archived projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to archived projects cannot be modified")
 
         if project.is_finalized:
-            log.error("Finalized projects cannot have activities added")
-            raise serializers.ValidationError("Finalized projects cannot have activities added")
+            log.error("Modules belonging to finalized projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to finalized projects cannot be modified")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
@@ -1173,6 +1181,17 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         if not data.get("parent", None) and (not self.instance or not self.instance.parent):
             log.error(f"Parent field is required for {self.Meta.ref_name}")
             raise serializers.ValidationError("Parent field is required")
+
+        project: Project = data["parent"].activity.project if data.get("parent") else self.instance.parent.activity.project
+
+        project._check_lock_expiration()
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
+            log.error("Project is locked by another user")
+            raise serializers.ValidationError("Project is locked by another user")
+        if project.is_locked:
+            project.refresh_lock()
+        else:
+            project.lock(self.context["request"].user)
 
         is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
 
@@ -2825,10 +2844,16 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProjectMembershipReadSerializer(serializers.Serializer):
+class ProjectMembershipReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     project = ProjectNameIdSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectMembership
+        fields = "__all__"
+        ref_name = "ProjectMembership"
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
