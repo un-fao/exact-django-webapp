@@ -8,7 +8,8 @@ from .general_functions import (
     compute_yearly_or_half_year_cumulative,
     som_emissions,
     compute_yearly_delta,
-    breakdown_proportionally_to_values
+    breakdown_proportionally_to_values,
+    compute_luc_hectare_delta
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -80,11 +81,10 @@ class OtherLandUseChanges(BaseModule):
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
         # NOTE: Difference in number of hectares of which we change land use each year, compared to previous year
-        self.hectare_variation_yearly = compute_yearly_delta(self.area, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectare_variation_yearly = compute_luc_hectare_delta(self.area, 0, self.implementation_time, self.capitalization_time, self.rate_type)
         
-
     def calculate_emissions(self):
-        
+
         def calculate_biomass():
             try:
                 initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2
