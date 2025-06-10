@@ -123,6 +123,19 @@ def compute_yearly_delta(start_value, end_value, years_implementation, years_cap
 
     return delta_yearly
 
+def compute_luc_hectare_delta(start_value, end_value, years_implementation, years_capitalization, function):
+    if function != "immediate":
+        values_at_year = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
+        delta_yearly = [values_at_year[i] - values_at_year[i - 1] for i in range(1, len(values_at_year))]
+
+        # Delta can not be negative
+        delta_yearly = [abs(i) for i in delta_yearly]
+    
+    else:
+        # In case of immediate change, the delta is the difference between the start and end value divided by the number of years of implementation
+        delta_yearly = [start_value] + [end_value] * (years_implementation + years_capitalization - 1)
+
+    return delta_yearly
 
 import matplotlib.pyplot as plt
 
@@ -807,4 +820,5 @@ def plot_matrix_with_values(matrix, cmap='viridis', title="Matrix Plot"):
     
     # Save the plot
     plt.savefig(f"matrices/{title}.png")
+    
     
