@@ -339,7 +339,7 @@ def biomass_emissions(
     time_capitalization,
 ):
 
-    yearly_variation_hectares = compute_yearly_delta(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
+    yearly_variation_hectares = compute_luc_hectare_delta(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
 
     biomass_variation = biomass_final - biomass_initial
 
