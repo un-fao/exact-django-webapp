@@ -1908,8 +1908,8 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_start():
             if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = getattr(self, f"agb_max_{scenario_type_start.value}_default")
-                biomass_end: ipcc.PerennialMaxAGB = getattr(self, f"agb_max_{scenario_type_end.value}_default")
+                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
 
             if scenario_type_start is utils.ScenarioTypes.START:
                 if has_change_in_system:
