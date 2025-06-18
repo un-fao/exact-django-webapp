@@ -1921,10 +1921,12 @@ class PerennialCropCalculator(LandModuleCalculator):
             elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
                 if has_change_in_system:
                     biomass_start.value = 0
-                    biomass_end = baseline_biomass_end
+                    biomass_end.value = None
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
                 elif not self.module.is_system_in_maturity:
                     biomass_start = baseline_biomass_start
+                    biomass_end.value = None
+                elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
                     biomass_end.value = None
 
         return biomass_start, biomass_end
@@ -2064,6 +2066,9 @@ class PerennialCropCalculator(LandModuleCalculator):
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
             )
+            
+            if self.module.is_complete_renewal_w:
+                self.end_module_has_growth_w = True
 
             self.inputs_w = {
                 "hectares_start": 0,
@@ -2124,6 +2129,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 utils.ScenarioTypes.WITHOUT,
                 utils.ScenarioTypes.WITHOUT,
             )
+            if self.module.is_complete_renewal_wo:
+                self.end_module_has_growth_wo = True
 
             self.inputs_wo = {
                 "hectares_start": 0,
