@@ -1,5 +1,7 @@
 import traceback
 
+from numpy import inf
+
 from .general_functions import (
     breakdown_proportionally_to_values,
     soil_emissions,
@@ -37,6 +39,7 @@ class PerennialCropland(LandModule):
     t_biomass_tier_2: Optional[float]
     agb_rate_default: float
     agb_rate_tier_2: Optional[float]
+    agb_maximum_c_tier_2: Optional[float]
     agb_maximum_c: float
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float]
@@ -125,14 +128,18 @@ class PerennialCropland(LandModule):
                         agb_rate = self.agb_rate_default * 44 / 12 if self.agb_rate_tier_2 is None else self.agb_rate_tier_2 * 44 / 12
                         bgb_rate = self.bgb_rate_default * 44 / 12 if self.bgb_rate_tier_2 is None else self.bgb_rate_tier_2 * 44 / 12
 
-                        if self.agb_rate_tier_2:    
-                            max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
+                        if self.agb_rate_tier_2:
+                            if self.agb_maximum_c_tier_2:
+                                max_agb = self.agb_maximum_c_tier_2 * 44 / 12
+                            else:
+                                # If agb_maximum_c_tier_2 is not provided, we use the default value
+                                max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12    
                         else:
                             max_agb = self.agb_maximum_c * 44 / 12
 
                         biomass_accumulation_rate = agb_rate + bgb_rate
 
-                        max_years_growth = max_agb / agb_rate
+                        max_years_growth = max_agb / agb_rate if max_agb != 0 else self.implementation_time + self.capitalization_time
                         
                         # BREAKDOWN THE HECTARES FOR MAX YEARS GROWTH
                         hectares_before_n, hectares_after_n = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
