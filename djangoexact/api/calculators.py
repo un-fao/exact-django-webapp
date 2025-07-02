@@ -1993,6 +1993,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_start_w,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -2052,6 +2053,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_start_wo,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
 
@@ -2115,6 +2117,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
+                "agb_maximum_c_tier_2": self.agb_max_t2_w
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -2177,6 +2180,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
+                "agb_maximum_c_tier_2": self.agb_max_t2_wo
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
