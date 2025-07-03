@@ -1607,10 +1607,10 @@ class LandModule(Module):
         abstract = True
 
     def is_perennial(self) -> bool:
-        return self.module_type.class_name == ["PerennialCropland"]
+        return self.module_type.class_name == "PerennialCropland"
 
     def is_forest(self) -> bool:
-        return self.module_type.class_name == ["ForestManagement"]
+        return self.module_type.class_name == "ForestManagement"
 
 
 class LandSubmodule(Submodule):
