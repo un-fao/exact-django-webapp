@@ -1942,8 +1942,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 elif not self.module.is_system_in_maturity:
                     biomass_start = baseline_biomass_start
                     biomass_end.value = None
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
                 elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
                     biomass_end.value = None
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
         return biomass_start, biomass_end
 
