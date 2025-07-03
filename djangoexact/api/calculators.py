@@ -2019,7 +2019,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             biomass_start, biomass_end = self._compute_biomass_for_maturity(
                 self.agb_start_default,
                 self.ag_default_wo,
-                self.module.land_use_type_start != self.module.land_use_type_wo,
+                self.module.land_use_type_start != self.module.land_use_type_wo if not self.module.land_use_type_wo is None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITHOUT,
             )
