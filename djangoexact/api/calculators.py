@@ -1927,7 +1927,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                     biomass_end.value = 0
                     if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
                         biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
-                elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
+                elif ((scenario_type_end == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_end == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
                     biomass_end.value = 0
 
             elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
@@ -1942,8 +1942,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 elif not self.module.is_system_in_maturity:
                     biomass_start = baseline_biomass_start
                     biomass_end.value = None
-                elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+                elif ((scenario_type_start == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_start == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
                     biomass_end.value = None
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
         return biomass_start, biomass_end
 
@@ -2207,7 +2209,6 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
             self.results_start_wo.plot_emissions_and_aggregate_by_activity("perennial_start_wo")
