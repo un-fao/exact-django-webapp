@@ -1908,12 +1908,19 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_start():
             if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
+                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default")) 
+                if self.agb_max_t2_start is not None:
+                    biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
+                    
+                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default")) 
+                if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
+                    biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
 
             if scenario_type_start is utils.ScenarioTypes.START:
                 if has_change_in_system:
                     biomass_start = self.agb_max_start_default
+                    if self.agb_max_t2_start is not None:
+                        biomass_start.value =  copy.deepcopy(self.agb_max_t2_start)
                     biomass_end.value = 0
                 elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
                     biomass_end.value = 0
@@ -1993,6 +2000,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_start_w,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -2052,6 +2060,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_start_wo,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
 
@@ -2115,6 +2124,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
+                "agb_maximum_c_tier_2": self.agb_max_t2_w
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -2177,6 +2187,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
+                "agb_maximum_c_tier_2": self.agb_max_t2_wo
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
