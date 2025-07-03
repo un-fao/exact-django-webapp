@@ -1908,12 +1908,19 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_start():
             if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
+                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default")) 
+                if self.agb_max_t2_start is not None:
+                    biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
+                    
+                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default")) 
+                if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
+                    biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
 
             if scenario_type_start is utils.ScenarioTypes.START:
                 if has_change_in_system:
                     biomass_start = self.agb_max_start_default
+                    if self.agb_max_t2_start is not None:
+                        biomass_start.value =  copy.deepcopy(self.agb_max_t2_start)
                     biomass_end.value = 0
                 elif (self.module.is_with() and self.module.is_complete_renewal_w) or (self.module.is_without() and self.module.is_complete_renewal_wo):
                     biomass_end.value = 0
