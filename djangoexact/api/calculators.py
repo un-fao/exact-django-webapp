@@ -1056,7 +1056,15 @@ class OtherLandUseCalculator(BaseCalculator):
             raise Exception(f"LandUseType for {luc.module_type_wo.name} does not exist")
 
         try:
-            biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
+            if luc.module_type_start.name_en == "Perennial Cropland":
+                if module_start.is_system_in_maturity:
+                    biomass_initial = ipcc.PerennialMaxAGB.objects.get_or_default(climate=self.climate, land_use_type=luc_start)
+                else:
+                    biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
+            else:
+                biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
+            
+                    
         except ipcc.ForestTotalBiomass.DoesNotExist:
             raise Exception(f"ForestTotalBiomass for {luc_start.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
@@ -1140,7 +1148,7 @@ class OtherLandUseCalculator(BaseCalculator):
             inputs_w = {
                 "end_module_has_growth": module_w.is_perennial() or module_w.is_forest(),
                 "initial_lu_biomass": biomass_initial.value,
-                "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
+                "initial_lu_biomass_tier_2": module_start.biomass_t2_start if not module_start.is_perennial() else module_start.agb_max_t2_start,
                 "final_lu_biomass": biomass_final_w.value,
                 "final_lu_biomass_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "c_n_ratio": c_n_ratio,
@@ -1183,7 +1191,7 @@ class OtherLandUseCalculator(BaseCalculator):
             inputs_wo = {
                 "end_module_has_growth": module_wo.is_perennial() or module_wo.is_forest(),
                 "initial_lu_biomass": biomass_initial.value,
-                "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
+                "initial_lu_biomass_tier_2": module_start.biomass_t2_start if not module_start.is_perennial() else module_start.agb_max_t2_start,
                 "final_lu_biomass": biomass_final_wo.value,
                 "final_lu_biomass_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "c_n_ratio": c_n_ratio,
