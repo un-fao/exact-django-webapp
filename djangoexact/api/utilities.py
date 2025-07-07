@@ -22,6 +22,7 @@ from datetime import timedelta
 import logging as log
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
+from django.db import transaction
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -214,25 +215,33 @@ def get_unique_name(instance, name):
 
 
 def copy_project(project, owner):
-    project_copy = copy.deepcopy(project)
-    project_copy.pk = None
-    project_copy.name = get_unique_name(project_copy, project_copy.name)
-    project_copy._state.adding = True
-    project_copy.is_finalized = False
-    project.owner = owner
-    project_copy.save()
+    transaction.set_autocommit(False)
+    try:
+        project_copy = copy.deepcopy(project)
+        project_copy.pk = None
+        project_copy.name = get_unique_name(project_copy, project_copy.name)
+        project_copy._state.adding = True
+        project_copy.is_finalized = False
+        project.owner = owner
+        project_copy.save()
 
-    # Add Membership to the new project
-    api_models.ProjectMembership.objects.create(
-        user=owner,
-        project=project_copy,
-        group=api_models.Group.objects.get(name="Admin"),
-    )
+        # Add Membership to the new project
+        # BUG: Membership is assigned to the original project, not the copied one
+        api_models.ProjectMembership.objects.create(
+            user=owner,
+            project=project_copy,
+            group=api_models.Group.objects.get(name="Admin"),
+        )
 
-    for activity in project.activities.all():
-        copy_activity(activity, project_copy)
+        for activity in project.activities.all():
+            copy_activity(activity, project_copy)
 
-    return project_copy
+        transaction.commit()
+
+        return project_copy
+    except Exception as e:
+        log.error(f"Error copying project: {e}")
+        raise e
 
 
 def copy_threads(module=None):
@@ -252,9 +261,11 @@ def copy_threads(module=None):
         if not hasattr(thread, "attname"):
             continue
 
+        # BUG: Thread already exists in the module error
         thread_instance = getattr(module, thread.attname.replace("_id", ""), None)
         if thread_instance is None:
             continue
+
         thread_copy = copy.deepcopy(thread_instance)
         thread_copy.pk = None
         thread_copy._state.adding = True
