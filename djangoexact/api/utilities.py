@@ -23,6 +23,7 @@ import logging as log
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
 from django.db import transaction
+import api.security as security
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -234,7 +235,7 @@ def copy_project(project, owner):
         )
 
         for activity in project.activities.all():
-            copy_activity(activity, project_copy)
+            copy_activity(activity, project_copy, owner)
 
         transaction.commit()
 
@@ -244,46 +245,90 @@ def copy_project(project, owner):
         raise e
 
 
-def copy_threads(module=None):
+def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module"):
     """
     Copy the threads of a module and return the copied threads.
 
     Args:
-        threads (list[api_models.CommentThread]): The list of threads to copy.
+        module: The module whose threads to copy.
 
     Returns:
         list[api_models.CommentThread]: The list of copied threads.
     """
-    threads = module.threads
-    thread_instance = None
+
     copied_threads = []
-    for thread in threads:
-        if not hasattr(thread, "attname"):
-            continue
 
-        # BUG: Thread already exists in the module error
-        thread_instance = getattr(module, thread.attname.replace("_id", ""), None)
-        if thread_instance is None:
-            continue
+    # Iterate through all fields of the module to find thread fields
+    for field in module_to._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module_from, field.name, None)
 
-        thread_copy = copy.deepcopy(thread_instance)
-        thread_copy.pk = None
-        thread_copy._state.adding = True
-        thread_copy.save()
+                if thread_instance is None:
+                    continue
 
-        for comment in thread_instance.comments.all():
-            comment_copy = copy.deepcopy(comment)
-            comment_copy.pk = None
-            comment_copy.thread = thread_copy
-            comment_copy._state.adding = True
-            comment_copy.save()
+                # Create a new thread copy
+                thread_copy = copy.deepcopy(thread_instance)
+                thread_copy.pk = None
+                thread_copy._state.adding = True
+                thread_copy.save()
 
-        copied_threads.append(thread_copy)
+                # Copy all comments from the original thread
+                for comment in thread_instance.comments.all():
+                    comment_copy = copy.deepcopy(comment)
+                    comment_copy.pk = None
+                    comment_copy.thread = thread_copy
+                    comment_copy._state.adding = True
+                    comment_copy.save()
+
+                # Assign the new thread to the module
+                setattr(module_to, field.name, thread_copy)
+                copied_threads.append(thread_copy)
 
     return copied_threads
 
 
-def copy_activity(activity, new_project=None):
+def clear_threads(module):
+    """
+    Clear the threads of a module by deleting all associated CommentThread instances.
+
+    Args:
+        module: The module whose threads to clear.
+    """
+
+    # Iterate through all fields of the module to find thread fields
+    for field in module._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module, field.name, None)
+                if thread_instance is not None:
+                    setattr(module, field.name, None)
+
+
+def handle_threads(module_from: "api_models.Module", module_to: "api_models.Module", owner=None):
+    """
+    Handle the copying of threads from one module to another, ensuring that the threads are copied correctly
+    and that the new module has the correct ownership.
+
+    Args:
+        module_from: The source module from which to copy threads.
+        module_to: The destination module to which threads will be copied.
+        owner: The owner of the new module, if applicable.
+
+    Returns:
+        None
+    """
+
+    can_view_comments = security.check_permission("can_view_comment", owner, module_from.activity.project)
+    if owner is not None and can_view_comments:
+        copy_threads(module_from, module_to)
+    else:
+        clear_threads(module_to)
+
+    module_to.save()
+
+
+def copy_activity(activity, new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
     activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
@@ -303,21 +348,13 @@ def copy_activity(activity, new_project=None):
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
 
-        # Get all attributes ending with "_thread" set them to None
-        for thread in module.threads:
-            if not hasattr(thread, "attname"):
-                continue
-
-            setattr(module, thread.attname, None)
-
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy.land_use_change = None
         module_copy.organic_soil = None
-        copy_threads(module)
         module_copy._state.adding = True
-        module_copy.save()
+        handle_threads(module, module_copy, owner)
 
         has_luc = getattr(module, "land_use_change", None)
         has_organic_soil = getattr(module, "organic_soil", None)
@@ -327,9 +364,9 @@ def copy_activity(activity, new_project=None):
                 luc_copy = copy.deepcopy(module.land_use_change)
                 luc_copy.pk = None
                 luc_copy.activity = activity_copy
-                copy_threads(luc_copy)
                 luc_copy._state.adding = True
                 luc_copy.save()
+                handle_threads(module.land_use_change, luc_copy, owner)
 
             module_copy.land_use_change = luc_copy
             module_copy.save()
@@ -339,9 +376,9 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy = copy.deepcopy(module.organic_soil)
                 organic_soil_copy.pk = None
                 organic_soil_copy.activity = activity_copy
-                copy_threads(organic_soil_copy)
                 organic_soil_copy._state.adding = True
                 organic_soil_copy.save()
+                handle_threads(module.organic_soil, organic_soil_copy, owner)
 
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
@@ -363,9 +400,9 @@ def copy_activity(activity, new_project=None):
             for submodule in submodules:
                 submodule.pk = None
                 submodule.parent = module_copy
-                copy_threads(submodule)
                 submodule._state.adding = True
                 submodule.save()
+                handle_threads(submodule, submodule, owner)
 
     return activity_copy
 
