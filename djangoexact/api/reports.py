@@ -139,7 +139,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
-        self.SAVE_TO_FILE = True  # Set to True to save the Excel file to disk
+        self.SAVE_TO_FILE = False  # Set to True to save the Excel file to disk. ONLY FOR DEBUGGING.
 
     def _create_initial_excel(self):
         workbook = xlsxwriter.Workbook(self.excel_file, {"in_memory": True})
@@ -166,6 +166,7 @@ class ExcelFileManager:
         workbook.save(self.excel_file)
         self.excel_file.seek(0)
 
+        # TODO: Set to True ONLY for debugging purposes.
         if self.SAVE_TO_FILE:
             # Use the system's temporary directory
             reports_dir = os.path.join(tempfile.gettempdir(), "reports")

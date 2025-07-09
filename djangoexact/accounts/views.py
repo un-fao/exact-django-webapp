@@ -1,15 +1,12 @@
 import json
 
-import firebase_admin
-import firebase_admin.firestore
-import firebase_admin.messaging
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from firebase_admin import auth as firebase_admin_auth
-from rest_framework import authentication, generics, permissions, status
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,7 +18,6 @@ from .serializers import (
     LoginResponseSerializer,
     LoginSerializer,
     RegisterSerializer,
-    UserSerializer,
     UserSummarySerializer,
     PasswordResetSerializer,
 )
@@ -118,7 +114,11 @@ class LoginExistingUserView(APIView):
                 user = auth.sign_in_with_email_and_password(email, password)
             except Exception as e:
                 error = json.loads(e.strerror)
-                return Response({"error": error["error"]["message"]}, status=status.HTTP_401_UNAUTHORIZED)
+
+                if error.get("error", {}).get("message") == "INVALID_LOGIN_CREDENTIALS":
+                    return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+                return Response({"error": error.get("error", {}).get("message", "Bad Request")}, status=status.HTTP_400_BAD_REQUEST)
 
             existing_user = User.objects.get(firebase_uid=user["localId"])
 
