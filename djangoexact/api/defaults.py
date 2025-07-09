@@ -713,39 +713,55 @@ class IrrigationSystemDefaults(Defaults):
         )
 
 
+@dataclass
 class IrrigationPhaseDefaults(Defaults):
-    def __init__(self, input: calcs.IrrigationPhase):
-        super().__init__(input)
+    input: api.IrrigationPhase
 
-        self.values = SimpleNamespace(
-            ef_co2_t2_start_default=0,
-            ef_co2_t2_w_default=0,
-            ef_co2_t2_wo_default=0,
-            ef_n2o_t2_start_default=0,
-            ef_n2o_t2_w_default=0,
-            ef_n2o_t2_wo_default=0,
-            ef_ch4_t2_start_default=0,
-            ef_ch4_t2_w_default=0,
-            ef_ch4_t2_wo_default=0,
-        )
+    ef_co2_t2_start_default: float = None
+    ef_co2_t2_w_default: float = None
+    ef_co2_t2_wo_default: float = None
+    ef_n2o_t2_start_default: float = None
+    ef_n2o_t2_w_default: float = None
+    ef_n2o_t2_wo_default: float = None
+    ef_ch4_t2_start_default: float = None
+    ef_ch4_t2_w_default: float = None
+    ef_ch4_t2_wo_default: float = None
+    transmission_loss_t2_start_default: float = None
+    transmission_loss_t2_w_default: float = None
+    transmission_loss_t2_wo_default: float = None
+    average_pressure_t2_default: float = None
+    total_dynamic_head_t2_default: float = None
+    pumping_efficiency_t2_start_default: float = None
+    pumping_efficiency_t2_w_default: float = None
+    pumping_efficiency_t2_wo_default: float = None
+
+    defaults: calcs.IrrigationPhaseCalculator = None
+
+    def __post_init__(self):
+        self.defaults: calcs.IrrigationPhaseCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.IrrigationPhase
+        self.defaults.get_defaults(calculate=calculate)
 
-        defaults = calcs.IrrigationPhaseCalculator(self.input)
-        defaults.get_defaults(calculate=calculate)
+        self.ef_co2_t2_start_default = self.defaults.ef_default_start.co2
+        self.ef_co2_t2_w_default = self.defaults.ef_default_w.co2
+        self.ef_co2_t2_wo_default = self.defaults.ef_default_wo.co2
+        self.ef_n2o_t2_start_default = self.defaults.ef_default_start.n2o
+        self.ef_n2o_t2_w_default = self.defaults.ef_default_w.n2o
+        self.ef_n2o_t2_wo_default = self.defaults.ef_default_wo.n2o
+        self.ef_ch4_t2_start_default = self.defaults.ef_default_start.ch4
+        self.ef_ch4_t2_w_default = self.defaults.ef_default_wo.ch4
+        self.ef_ch4_t2_wo_default = self.defaults.ef_default_wo.ch4
+        self.transmission_loss_t2_start_default = self.defaults.transportation_loss_default.value
+        self.transmission_loss_t2_w_default = self.defaults.transportation_loss_default.value
+        self.transmission_loss_t2_wo_default = self.defaults.transportation_loss_default.value
+        self.average_pressure_t2_default = self.defaults.pressure_default.avg_pressure
+        self.total_dynamic_head_t2_default = self.defaults.pressure_default.head
+        self.pumping_efficiency_t2_start_default = self.defaults.pumping_efficiency_default.value
+        self.pumping_efficiency_t2_w_default = self.defaults.pumping_efficiency_default.value
+        self.pumping_efficiency_t2_wo_default = self.defaults.pumping_efficiency_default.value
 
-        return SimpleNamespace(
-            ef_co2_t2_start_default=defaults.ef_default_start.co2,
-            ef_co2_t2_w_default=defaults.ef_default_w.co2,
-            ef_co2_t2_wo_default=defaults.ef_default_wo.co2,
-            ef_n2o_t2_start_default=defaults.ef_default_start.n2o,
-            ef_n2o_t2_w_default=defaults.ef_default_w.n2o,
-            ef_n2o_t2_wo_default=defaults.ef_default_wo.n2o,
-            ef_ch4_t2_start_default=defaults.ef_default_start.ch4,
-            ef_ch4_t2_w_default=defaults.ef_default_wo.ch4,
-            ef_ch4_t2_wo_default=defaults.ef_default_wo.ch4,
-        )
+        return {key: getattr(self, key) for key in self.__dataclass_fields__ if key.endswith("_default")}
 
 
 class SettlementDefaults(Defaults):
@@ -1624,7 +1640,6 @@ class EnergyEntryDefaults(Defaults):
 
     class Meta:
         # Define the default values to return to the frontend
-        abstract = True
         defaults = [
             "country_t2_default",
             "electricity_ef_t2_start_default",
@@ -1650,6 +1665,7 @@ class EnergyEntryDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
         self.defaults.get_defaults(calculate=calculate)
 
+        # TODO: Remove this when the naming is streamlined
         self.country_t2_default = self.defaults.country.name
         self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected.value
         self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected.value

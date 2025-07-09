@@ -1063,8 +1063,7 @@ class OtherLandUseCalculator(BaseCalculator):
                     biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
             else:
                 biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
-            
-                    
+
         except ipcc.ForestTotalBiomass.DoesNotExist:
             raise Exception(f"ForestTotalBiomass for {luc_start.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
@@ -1916,8 +1915,8 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_start():
             if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default")) 
-                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default")) 
+                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
 
             if scenario_type_start is utils.ScenarioTypes.START:
                 if has_change_in_system:
@@ -2011,7 +2010,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_start_w,
-                "agb_maximum_c_tier_2": self.agb_max_t2_start
+                "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -2071,7 +2070,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_start_wo,
-                "agb_maximum_c_tier_2": self.agb_max_t2_start
+                "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
 
@@ -2086,7 +2085,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
             )
-            
+
             if self.module.is_complete_renewal_w:
                 self.end_module_has_growth_w = True
 
@@ -2135,7 +2134,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
-                "agb_maximum_c_tier_2": self.agb_max_t2_w
+                "agb_maximum_c_tier_2": self.agb_max_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -2198,7 +2197,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
-                "agb_maximum_c_tier_2": self.agb_max_t2_wo
+                "agb_maximum_c_tier_2": self.agb_max_t2_wo,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -5489,16 +5488,16 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.energy_calculator_wo.get_defaults()
 
         self.ef_default_start.co2 = self.energy_calculator_start.energy_ef_default_start.co2 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_w.co2 = self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_wo.co2 = self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
 
         if self.module.is_start():
             self.irrigation_data_start = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_start)
