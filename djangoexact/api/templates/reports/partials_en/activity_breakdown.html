@@ -1,0 +1,39 @@
+{% load humanize %}
+<section class="section">
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h3>Carbon Balance by Activity</h3>
+            <p>Total activities: {{ activities_total|length }}</p>
+        </div>
+    </div>
+    {% for activity in activities_total %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="card-header bg-secondary text-white w-100">
+                        <h4 class="mb-0">
+                            <b>Activity {{ forloop.counter }} - {{ activity.name }}</b>
+                        </h4>
+                    </div>
+                    <div class="col-sm-12 text-start">
+                        <p>The activity will be implemented starting from {{ activity.start_year }}, for {{ activity.implementation_years }} years, ending in {{ activity.last_year_of_accounting }}.</p>
+                        <p>
+                            Impact: {{ activity.area }} {{ activity.main_impact }}
+                            {% if activity.secondary_impacts %}, plus emissions from {{ activity.secondary_impacts }}{% endif %}
+                            .
+                        </p>
+                        <p>
+                            Carbon balance: <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>.
+                        </p>
+                        <p>Interventions include:</p>
+                        <ol>
+                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:2|intcomma }} tCO2-e)</li>{% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} New page every two activities {% endcomment %}
+        {% if forloop.counter|divisibleby:2 and not forloop.last %}<div class="page-break"></div>{% endif %}
+    {% endfor %}
+</section>

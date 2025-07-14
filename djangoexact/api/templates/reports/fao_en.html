@@ -12,71 +12,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
               rel="stylesheet"
               crossorigin="anonymous" />
-        <style>
-        @page {
-            size: A4;
-            margin: 2cm;
-            @top-left { content: element(page-header); }
-            @bottom-left { content: element(page-footer); }
-        }
-        header, footer {
-            position: running(page-header);
-            height: 2cm;
-            line-height: 2cm;
-            padding-left: 0.5cm;
-            font-size: 12px;
-        }
-        body {
-            font-family: 'Open Sans', Calibri, Candara, Arial, sans-serif;
-        }
-        section.section {
-            page-break-inside: avoid;
-            break-inside: avoid;
-            margin-bottom: 30px;
-        }
-        .page-break {
-            page-break-before: always;
-        }
-        .card {
-            border: none;
-        }
-        .timeline-container { padding: 20px; }
-        .timeline { height: 12px; position: relative; }
-        .timeline-phase { position: absolute; height: 100%; top: 0; }
-        .implementation-phase { left: 15%; width: 35%; }
-        .capitalization-phase { left: 50%; width: 35%; }
-        .segments {
-            width: 100%; height: 100%;
-            background-size: 24px 100%;
-            background-repeat: repeat-x;
-        }
-        .implementation-segments {
-            background-image: linear-gradient(90deg, #98d8b1 0px, #98d8b1 12px, #7ac495 12px, #7ac495 24px);
-        }
-        .capitalization-segments {
-            background-image: linear-gradient(90deg, #99c5ff 0px, #99c5ff 12px, #77adff 12px, #77adff 24px);
-        }
-        .timeline-point {
-            position: absolute;
-            width: 24px; height: 24px;
-            background-color: #212529;
-            border-radius: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-        }
-        .timeline-point .year, .timeline-point .label {
-            position: absolute;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 1.1em;
-        }
-        .timeline-point .year { bottom: 30px; left: 35%; font-weight: bold; }
-        .timeline-point .label { top: 30px; left: 35%; }
-        .timeline-point.start { left: 15%; }
-        .timeline-point.implementation { left: 50%; }
-        .timeline-point.end { left: 85%; }
-        </style>
+        {% include "reports/partials_common/style.html" %}
     </head>
     <body>
         <header>
@@ -86,61 +22,24 @@
             Downloaded on {{ download_date_time }} | EX-ACT Version: V10 | User: {{ user.email }}
         </footer>
         <main>
-            {% include "reports/partials/cover.html" %}
-            {% include "reports/partials/project_description.html" %}
+            {% include "reports/partials_en/cover.html" %}
+            {% include "reports/partials_en/project_description.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/project_summary.html" %}
+            {% include "reports/partials_en/project_summary.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/total_balance.html" %}
+            {% include "reports/partials_en/total_balance.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/ghg_breakdown.html" %}
+            {% include "reports/partials_en/ghg_breakdown.html" %}
             <div class="page-break"></div>
-            <section class="section">
-                <div class="card">
-                    <div class="card-header bg-dark text-white">
-                        <h3>Carbon Balance by Activity</h3>
-                        <p>Total activities: {{ activities_total|length }}</p>
-                    </div>
-                </div>
-                {% for activity in activities_total %}
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="card-header bg-secondary text-white w-100">
-                                    <h4 class="mb-0">
-                                        <b>Activity {{ forloop.counter }} - {{ activity.name }}</b>
-                                    </h4>
-                                </div>
-                                <div class="col-sm-12 text-start">
-                                    <p>The activity will be implemented starting from {{ activity.start_year }}, for {{ activity.implementation_years }} years, ending in {{ activity.last_year_of_accounting }}.</p>
-                                    <p>
-                                        Impact: {{ activity.area }} {{ activity.main_impact }}
-                                        {% if activity.secondary_impacts %}, plus emissions from {{ activity.secondary_impacts }}{% endif %}
-                                        .
-                                    </p>
-                                    <p>
-                                        Carbon balance: <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>.
-                                    </p>
-                                    <p>Interventions include:</p>
-                                    <ol>
-                                        {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:2|intcomma }} tCO2-e)</li>{% endfor %}
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% comment %} New page every two activities {% endcomment %}
-                    {% if forloop.counter|divisibleby:2 and not forloop.last %}<div class="page-break"></div>{% endif %}
-                {% endfor %}
-            </section>
+            {% include "reports/partials_en/activity_breakdown.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/units_table.html" %}
+            {% include "reports/partials_en/units_table.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/methodology.html" %}
+            {% include "reports/partials_en/methodology.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/disclaimer.html" %}
+            {% include "reports/partials_en/disclaimer.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials/notes.html" %}
+            {% include "reports/partials_en/notes.html" %}
         </main>
     </body>
 </html>
