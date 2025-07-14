@@ -1157,6 +1157,10 @@ class Submodule(Historical, CachedResultMixin):
     def threads(self):
         return self.__get_threads()
 
+    @property
+    def activity(self):
+        return self.get_activity()
+
     def save(self, *args, **kwargs):
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
