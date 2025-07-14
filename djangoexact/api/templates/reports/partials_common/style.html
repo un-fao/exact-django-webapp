@@ -1,0 +1,65 @@
+<style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @top-left { content: element(page-header); }
+            @bottom-left { content: element(page-footer); }
+        }
+        header, footer {
+            position: running(page-header);
+            height: 2cm;
+            line-height: 2cm;
+            padding-left: 0.5cm;
+            font-size: 12px;
+        }
+        body {
+            font-family: 'Open Sans', Calibri, Candara, Arial, sans-serif;
+        }
+        section.section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: 30px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        .card {
+            border: none;
+        }
+        .timeline-container { padding: 20px; }
+        .timeline { height: 12px; position: relative; }
+        .timeline-phase { position: absolute; height: 100%; top: 0; }
+        .implementation-phase { left: 15%; width: 35%; }
+        .capitalization-phase { left: 50%; width: 35%; }
+        .segments {
+            width: 100%; height: 100%;
+            background-size: 24px 100%;
+            background-repeat: repeat-x;
+        }
+        .implementation-segments {
+            background-image: linear-gradient(90deg, #98d8b1 0px, #98d8b1 12px, #7ac495 12px, #7ac495 24px);
+        }
+        .capitalization-segments {
+            background-image: linear-gradient(90deg, #99c5ff 0px, #99c5ff 12px, #77adff 12px, #77adff 24px);
+        }
+        .timeline-point {
+            position: absolute;
+            width: 24px; height: 24px;
+            background-color: #212529;
+            border-radius: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        .timeline-point .year, .timeline-point .label {
+            position: absolute;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 1.1em;
+        }
+        .timeline-point .year { bottom: 30px; left: 35%; font-weight: bold; }
+        .timeline-point .label { top: 30px; left: 35%; }
+        .timeline-point.start { left: 15%; }
+        .timeline-point.implementation { left: 50%; }
+        .timeline-point.end { left: 85%; }
+</style>

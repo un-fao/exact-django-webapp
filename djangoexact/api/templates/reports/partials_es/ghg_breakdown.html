@@ -1,0 +1,40 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Resultados de la Evaluación de GEI</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">
+                    <b>Balance de Carbono por GEI</b>
+                </h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        El principal GEI que contribuye al balance es
+                        <b>{{ project_primary_ghg }}</b>, que
+                        <b>{{ project_primary_ghg_direction }}</b> en
+                        {{ project_primary_ghg_emissions|floatformat:2|intcomma }} tCO2-e,
+                        como resultado de la diferencia con el escenario "Sin Proyecto", seguido por
+                        <b>{{ project_secondary_ghg }}</b> que
+                        <b>{{ project_secondary_ghg_direction }}</b> en
+                        {{ project_secondary_ghg_emissions|floatformat:2|intcomma }} tCO2-e y
+                        <b>{{ project_tertiary_ghg }}</b> que
+                        <b>{{ project_tertiary_ghg_direction }}</b>
+                        en {{ project_tertiary_ghg_emissions|floatformat:2|intcomma }} tCO2-e.
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <img src="data:image/svg+xml;base64,{{ project_gases_chart_base64 }}"
+                                 alt="BalanceChart"
+                                 width="100%"
+                                 height="400"
+                                 id="balanceChart" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
