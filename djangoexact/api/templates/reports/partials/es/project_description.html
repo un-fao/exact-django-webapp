@@ -50,7 +50,7 @@
                     </p>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mb-4">
                 <h4 class="text-center">Duración del Proyecto</h4>
                 <hr />
                 <div class="col-sm-6 text-start text-black">
@@ -67,26 +67,28 @@
                     </p>
                 </div>
             </div>
-            <div class="row timeline-container">
+            <div class="row pt-5">
                 <div class="col-12">
-                    <div class="timeline">
-                        <div class="timeline-phase implementation-phase">
-                            <div class="segments implementation-segments"></div>
-                        </div>
-                        <div class="timeline-phase capitalization-phase">
-                            <div class="segments capitalization-segments"></div>
-                        </div>
-                        <div class="timeline-point start">
-                            <div class="year">{{ project.start_year_of_activities }}</div>
-                            <div class="label">Año de inicio de contabilidad</div>
-                        </div>
-                        <div class="timeline-point implementation">
-                            <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
-                            <div class="label">Año final de implementación</div>
-                        </div>
-                        <div class="timeline-point end">
-                            <div class="year">{{ project.last_year_of_accounting }}</div>
-                            <div class="label">Último año de contabilidad</div>
+                    <div class="timeline-container">
+                        <div class="timeline">
+                            <div class="timeline-phase implementation-phase">
+                                <div class="segments implementation-segments"></div>
+                            </div>
+                            <div class="timeline-phase capitalization-phase">
+                                <div class="segments capitalization-segments"></div>
+                            </div>
+                            <div class="timeline-point start">
+                                <div class="year">{{ project.start_year_of_activities }}</div>
+                                <div class="label text-wrap text-center timeline-label">Año de inicio de contabilidad</div>
+                            </div>
+                            <div class="timeline-point implementation">
+                                <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
+                                <div class="label text-wrap text-center timeline-label">Año final de implementación</div>
+                            </div>
+                            <div class="timeline-point end">
+                                <div class="year">{{ project.last_year_of_accounting }}</div>
+                                <div class="label text-wrap text-center timeline-label">Último año de contabilidad</div>
+                            </div>
                         </div>
                     </div>
                 </div>

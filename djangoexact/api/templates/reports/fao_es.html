@@ -10,7 +10,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
               rel="stylesheet"
               crossorigin="anonymous" />
-        {% include "reports/partials_common/style.html" %}
+        {% include "reports/partials/common/style.html" %}
     </head>
     <body>
         <header>
@@ -20,24 +20,24 @@
             Descargado el {{ download_date_time }} | EX-ACT Versión: V10 | Usuario: {{ user.email }}
         </footer>
         <main>
-            {% include "reports/partials_es/cover.html" %}
-            {% include "reports/partials_es/project_description.html" %}
+            {% include "reports/partials/es/cover.html" %}
+            {% include "reports/partials/es/project_description.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/project_summary.html" %}
+            {% include "reports/partials/es/project_summary.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/total_balance.html" %}
+            {% include "reports/partials/es/total_balance.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/ghg_breakdown.html" %}
+            {% include "reports/partials/es/ghg_breakdown.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/activity_breakdown.html" %}
+            {% include "reports/partials/es/activity_breakdown.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/units_table.html" %}
+            {% include "reports/partials/es/units_table.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/methodology.html" %}
+            {% include "reports/partials/es/methodology.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/disclaimer.html" %}
+            {% include "reports/partials/es/disclaimer.html" %}
             <div class="page-break"></div>
-            {% include "reports/partials_es/notes.html" %}
+            {% include "reports/partials/es/notes.html" %}
         </main>
     </body>
 </html>

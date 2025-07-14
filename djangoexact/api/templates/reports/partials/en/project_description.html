@@ -50,7 +50,7 @@
                     </p>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mb-4">
                 <h4 class="text-center">Project Duration</h4>
                 <hr />
                 <div class="col-sm-6 text-start text-black">
@@ -66,7 +66,7 @@
                     </p>
                 </div>
             </div>
-            <div class="row" style="padding-top: 60px">
+            <div class="row">
                 <div class="col-12">
                     <div class="timeline-container">
                         <div class="timeline">
@@ -78,15 +78,15 @@
                             </div>
                             <div class="timeline-point start">
                                 <div class="year">{{ project.start_year_of_activities }}</div>
-                                <div class="label" style="font-size: 14px">Start year of accounting</div>
+                                <div class="label text-wrap text-center timeline-label">Start year of accounting</div>
                             </div>
                             <div class="timeline-point implementation">
                                 <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
-                                <div class="label" style="font-size: 14px">End year of implementation</div>
+                                <div class="label text-wrap text-center timeline-label">End year of implementation</div>
                             </div>
                             <div class="timeline-point end">
                                 <div class="year">{{ project.last_year_of_accounting }}</div>
-                                <div class="label" style="font-size: 14px">Last year of accounting</div>
+                                <div class="label text-wrap text-center timeline-label">Last year of accounting</div>
                             </div>
                         </div>
                     </div>
