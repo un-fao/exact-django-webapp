@@ -1097,12 +1097,21 @@ class LandModuleReport(BaseModuleReport):
         self.fire_n2o_row_index = last_results_row + 4
         self.fire_ch4_row_index = last_results_row + 5
 
-        for i in range(self.duration):
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.biomass_co2[i])
-            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.soil_co2[i])
-            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.soil_n2o[i])
-            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.fire_n2o[i])
-            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.fire_ch4[i])
+        offset = self.activity_report.project_report.duration - self.duration
+        for i in range(self.activity_report.project_report.duration):
+            if self.activity_report.project_report.duration - self.duration > i:
+                # If the year is before the start of the activity, fill with 0
+                self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=0)
+                self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=0)
+                self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=0)
+                self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=0)
+                self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=0)
+            else:
+                self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.biomass_co2[i - offset])
+                self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.soil_co2[i - offset])
+                self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.soil_n2o[i - offset])
+                self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.fire_n2o[i - offset])
+                self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.fire_ch4[i - offset])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
