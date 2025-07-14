@@ -2058,16 +2058,12 @@ class FisheryReport(BaseModuleReport):
     refrigeration_hfc_source = (math_utils.ActivityTypes.REFRIGERANT, math_utils.GasTypes.OTHER)
     electricity_co2_eq_source = (math_utils.ActivityTypes.ICE, math_utils.GasTypes.OTHER)
 
-    def __post_init__(self):
-        return super().__post_init__()
-
     def build_report(self):
         super().build_report()
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
         last_results_row = self.results_worksheet.max_row
-
         self.liquid_fuel_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1])
         self.liquid_fuel_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1])
         self.liquid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1])
@@ -2739,8 +2735,8 @@ class EnergyReport(BaseModuleReport):
         submodules: list[api_models.Submodule] = self.module.submodules
 
         for submodule in submodules:
-            CalculatorClass = calculators.ElectricityCalculator if isinstance(submodule, api_models.Electricity) else calculators.FuelCalculator
-            submodule: api_models.Electricity | api_models.Fuel
+            CalculatorClass = calculators.EnergyEntryCalculator
+            submodule: api_models.EnergyEntry
 
             calculator = CalculatorClass(submodule)
             from api.calculators import Result
@@ -2753,16 +2749,13 @@ class EnergyReport(BaseModuleReport):
 
             self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
 
-            if isinstance(submodule, api_models.Fuel):
-                if "solid" in submodule.fuel_type_w.macro_fuel_type.name.casefold():
-                    self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
-                    self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
-                    self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
+            self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
+            self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
+            self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
 
-                elif "liquid" in submodule.fuel_type_w.macro_fuel_type.name.casefold():
-                    self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
-                    self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
-                    self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
+            self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
+            self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
+            self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.electricity_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_ch4, self.liquid_fuel_n2o)))
@@ -3457,8 +3450,6 @@ class TransportReport(BaseModuleReport):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
 
-        last_metadata_row = self.metadata_worksheet.max_row
-
     def add_submodules_results(self):
         submodules: list[api_models.TransportEntry] = self.module.submodules
 
@@ -3834,7 +3825,7 @@ class StorageReport(BaseModuleReport):
 
         self.add_submodules_results()
 
-        yearly_emissions = list(map(sum, zip_longest(self.fuel_co2_eq, self.fuel_ch4_eq, self.fuel_n2o_eq, self.electricity_co2_eq, fillvalue=0)))
+        yearly_emissions = list(map(sum, zip_longest(self.electricity_co2_eq, fillvalue=0)))
         cumulative_emissions = np.cumsum(yearly_emissions)
 
         self.cumulative_emissions = cumulative_emissions

@@ -2406,7 +2406,7 @@ class Energy(Module):
 
     @property
     def submodules(self) -> list["Submodule"]:
-        return list(self.electricities.all()) + list(self.fuels.all())
+        return list(self.entries.all())
 
 
 class ElectricityTier2Mixin(models.Model):
