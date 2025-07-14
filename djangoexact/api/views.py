@@ -402,6 +402,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
+        if project.members.filter(group__name="Admin").count() > 1:
+            return utils.ErrorResponse("You cannot delete a project if there are other admins. You can only remove yourself from it", status=http_status.HTTP_400_BAD_REQUEST)
+
         # NOTE: This is a workaround for a bug in the simple_history library caused by an unhandled AttributeError when deleting a project with no previous history
         if project.history.count() > 0:
             utils.update_change_reason(project, utils.ChangeReasons.DELETE.value)
