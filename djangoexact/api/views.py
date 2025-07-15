@@ -65,6 +65,7 @@ from .models import (
     SmallFishery,
     LargeFishery,
     PublicToken,
+    HandInHandAssessment,
 )
 from .serializers import (
     ActionTypes,
@@ -111,6 +112,10 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
+    HandInHandRegionSerializer,
+    HandInHandCountrySerializer,
+    HandInHandAssessmentSerializer,
+    HandInHandAssessmentGroupedSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -2687,3 +2692,35 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer.save(project=project, user=self.request.user)
 
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    """
+
+    queryset = HandInHandAssessment.objects.all()
+    serializer_class = HandInHandAssessmentSerializer
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "grouped",
+                openapi.IN_QUERY,
+                description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+        ],
+        responses={200: HandInHandAssessmentGroupedSerializer},
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Get all Hand in Hand assessments, optionally grouped by region > country > year
+        """
+        grouped = request.query_params.get("grouped", "false").lower() == "true"
+
+        if grouped:
+            serializer = HandInHandAssessmentGroupedSerializer(data={})
+            return Response(serializer.to_representation(None))
+
+        return super().list(request, *args, **kwargs)
