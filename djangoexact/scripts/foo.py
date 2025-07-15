@@ -282,6 +282,24 @@ def import_hih_countries():
             print(f"Country already exists: {country.name} in region {country.region.name}")
 
 
+def add_public_id_to_projects():
+    """
+    Add public_id to all projects
+    """
+    projects = []
+    for project in models.Project.objects.all():
+        if not project.public_id:
+            project.public_id = models.uuid.uuid4()
+            projects.append(project)
+            print(f"Added public_id {project.public_id} to project {project.name}")
+        else:
+            print(f"Project {project.name} already has public_id {project.public_id}")
+
+    if projects:
+        models.Project.objects.bulk_update(projects, ["public_id"])
+        print(f"Updated {len(projects)} projects with public_id")
+
+
 def run():
     import os
 
@@ -303,8 +321,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        import_hih_regions()
-        import_hih_countries()
         pass
 
     if app_mode == "test":
