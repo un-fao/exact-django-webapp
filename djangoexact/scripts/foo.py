@@ -6,7 +6,8 @@ import logging as log
 from django.db.models import Q
 from djangoexact.settings import auth
 import firebase_admin
-from firebase_admin import auth as firebase_admin_auth
+import os
+import pandas as pd
 
 # TODO: Run in review and prod
 
@@ -253,6 +254,34 @@ def search_historical_projects_for_project_name():
             print("----------------------------------------\n\n\n")
 
 
+def import_hih_regions():
+    """
+    Import Hand in Hand regions from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHRegion.json"))
+    for index, row in df.iterrows():
+        region, created = models.HandInHandRegion.objects.get_or_create(name=row["name"])
+        if created:
+            print(f"Created region: {region.name}")
+        else:
+            print(f"Region already exists: {region.name}")
+
+
+def import_hih_countries():
+    """
+    Import Hand in Hand countries from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHCountry.json"))
+    for index, row in df.iterrows():
+        country, created = models.HandInHandCountry.objects.get_or_create(name=row["name"], region=models.HandInHandRegion.objects.get(name=row["region"]), iso_code=row["code"])
+        if created:
+            print(f"Created country: {country.name} in region {country.region.name}")
+        else:
+            print(f"Country already exists: {country.name} in region {country.region.name}")
+
+
 def run():
     import os
 
@@ -261,15 +290,21 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        search_historical_projects_for_project_name()
+        # search_historical_projects_for_project_name()
+        import_hih_regions()
+        import_hih_countries()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        import_hih_regions()
+        import_hih_countries()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        import_hih_regions()
+        import_hih_countries()
         pass
 
     if app_mode == "test":
