@@ -316,10 +316,11 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
     tags = ProjectTagSerializer(many=True, read_only=True)
+    public_link = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "public_id"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -331,6 +332,11 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
         user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
         return [group.group.name for group in user_project_group] if user_project_group else []
+
+    def get_public_link(self, obj):
+        if obj.is_public and obj.public_id:
+            return f"{settings.FRONTEND_URL}/projects/{obj.public_id}"
+        return None
 
 
 class ProjectResultSerializer(serializers.Serializer):
