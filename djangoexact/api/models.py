@@ -633,7 +633,6 @@ class Project(Historical, DirtyFieldsMixin):
     map_data = models.JSONField(null=True, blank=True, verbose_name="map_data")
 
     is_public = models.BooleanField(default=False, verbose_name="is_public")
-    public_id = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
     @property
@@ -657,9 +656,6 @@ class Project(Historical, DirtyFieldsMixin):
 
                 for thread in threads:
                     thread.start()
-
-        if not self.public_id:
-            self.public_id = uuid.uuid4()
 
         super().save(*args, **kwargs)
 
