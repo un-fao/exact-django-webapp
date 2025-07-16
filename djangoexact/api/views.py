@@ -1395,9 +1395,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             membership.project.owner = other_admin.user
             membership.project.save()
 
-        elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
-            logging.error("Selected user does not have permission to delete project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        error = security.check_permission("delete_projectmembership", self.request.user, membership.project)
+        if error and not membership.user == self.request.user:
+            return error
 
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()
