@@ -58,11 +58,10 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = api_models.Project.objects.filter(is_public=True)
     serializer_class = public_serializers.PublicProjectSerializer
     permission_classes = [AllowAny]
-    lookup_field = "public_id"
 
     @action(detail=True, methods=["get"])
-    def activities(self, request, public_id=None):
-        project: api_models.Project = get_object_or_404(self.queryset, public_id=public_id)
+    def activities(self, request, pk=None):
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
         activities = project.activities.all()
         serializer = public_serializers.PublicActivitySerializer(activities, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
@@ -85,13 +84,13 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: api_serializers.ProjectResultSerializer},
     )
-    def results(self, request, public_id=None):
+    def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the project.
         """
 
         try:
-            project = self.queryset.prefetch_related("activities").get(public_id=public_id, is_public=True)
+            project = self.queryset.prefetch_related("activities").get(pk=pk, is_public=True)
         except api_models.Project.DoesNotExist:
             return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
@@ -146,15 +145,15 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
-    def report(self, request, public_id=None):
-        project: api_models.Project = get_object_or_404(self.queryset, public_id=public_id)
+    def report(self, request, pk=None):
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
 
         if not project.is_ready():
             log.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         if request.query_params.get("template", None):
-            response = self.template(request, public_id=public_id)
+            response = self.template(request, pk=pk)
             return response
 
         selected_activities = request.query_params.get("activities", "").split(",")
@@ -190,7 +189,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
-    def template(self, request, public_id=None):
+    def template(self, request, pk=None):
         template_name = request.query_params.get("template")
         try:
             lang = request.query_params.get("lang", request.LANGUAGE_CODE)
@@ -208,14 +207,14 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         try:
             activate(lang)
 
-            project: api_models.Project = get_object_or_404(self.queryset, public_id=public_id)
+            project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
             # Calculate total area of all activities
             total_area = sum(activity.area for activity in project.activities.all())
 
             # Call project results endpoint
-            total_results_response = self.results(request, public_id=public_id)
+            total_results_response = self.results(request, pk=pk)
 
             total_data = total_results_response.data
             activities = total_data["activities"]
@@ -642,7 +641,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
         """
         log.info("ActivityViewSet.list")
-        public_id = utils.get_query_param_or_validation_error(self.request, "public_id")
+        project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
 
         if is_summary:
@@ -652,7 +651,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
             activity_dict = self.serializer_class(activity).data
             return activity_dict
 
-        activities_list = api_models.Activity.objects.filter(project__public_id=public_id, project__is_public=True).all()
+        activities_list = api_models.Activity.objects.filter(project__id=project_id, project__is_public=True).all()
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
