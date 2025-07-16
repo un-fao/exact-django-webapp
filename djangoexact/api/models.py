@@ -509,7 +509,7 @@ class LargeFisheryGearType(models.Model):
 
 class SmallFisheryGearType(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    fishery_type = models.ManyToManyField(FisheryType, related_name="gear_types", null=True, blank=True)
+    fishery_types = models.ManyToManyField(FisheryType, related_name="gear_types", null=True, blank=True)
 
     def __str__(self):
         return self.name
