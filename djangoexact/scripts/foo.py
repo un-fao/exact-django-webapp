@@ -300,6 +300,31 @@ def add_public_id_to_projects():
         print(f"Updated {len(projects)} projects with public_id")
 
 
+def remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types():
+    """
+    Remove Irrigation modules from Wood, Peat, and Charcoal fuel types
+    """
+    modules_to_remove = [
+        models.ModuleType.objects.get(class_name="Irrigation"),
+        models.ModuleType.objects.get(class_name="IrrigationPhase"),
+        models.ModuleType.objects.get(class_name="IrrigationSystem"),
+    ]
+    modules_to_add = [
+        models.ModuleType.objects.get(class_name="Processing"),
+        models.ModuleType.objects.get(class_name="ProcessingEntry"),
+        models.ModuleType.objects.get(class_name="Packaging"),
+        models.ModuleType.objects.get(class_name="PackagingEntry"),
+    ]
+    for fuel_type in models.FuelType.objects.filter(name__in=["Wood", "Peat", "Charcoal"]):
+        fuel_type.module_types.remove(*modules_to_remove)
+        fuel_type.save()
+        print(f"Removed Irrigation modules from {fuel_type.name} fuel type")
+
+        fuel_type.module_types.add(*modules_to_add)
+        fuel_type.save()
+        print(f"Added Processing and Packaging modules to {fuel_type.name} fuel type")
+
+
 def run():
     import os
 
@@ -311,16 +336,19 @@ def run():
         # search_historical_projects_for_project_name()
         import_hih_regions()
         import_hih_countries()
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
         import_hih_regions()
         import_hih_countries()
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "test":
