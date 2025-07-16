@@ -4827,6 +4827,28 @@ def add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_em
     print(f"Updated {irrigation_phases} IrrigationPhaseData objects")
 
 
+def add_small_fishery_gear_types_fishery_types_relationships():
+    """
+    Add relationships between SmallFisheryGearType and FisheryType.
+    """
+    from api.models import SmallFisheryGearType, FisheryType
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SmallFisheryGearType_FisheryType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        gear_type: SmallFisheryGearType = SmallFisheryGearType.objects.get(name__iexact=row["gear_type"])
+        fishery_types = FisheryType.objects.filter(name__in=row["fishery_types"].split(", ")).all()
+
+        print(f"Assigning {gear_type} to {list(fishery_types)}")
+        for fishery_type in fishery_types:
+            gear_type.fishery_types.add(fishery_type)
+            print(f"Added {fishery_type} to {gear_type}")
+
+
 def run():
     import os
 
@@ -4851,6 +4873,7 @@ def run():
         import_fra_carbon_stock_data()
         add_ipcc_and_fra_as_data_sources()
         add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
+        add_small_fishery_gear_types_fishery_types_relationships()
         pass
 
     if app_mode == "review":
@@ -4870,6 +4893,7 @@ def run():
         # add_density_zero_where_density_is_none_in_irrigation_phase_data()
         # import_fra_carbon_stock_data()
         # add_ipcc_and_fra_as_data_sources()
+        add_small_fishery_gear_types_fishery_types_relationships()
         pass
 
     if app_mode == "development":
