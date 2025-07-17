@@ -24,6 +24,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
-        migrations.RunPython(historical_gen_uuid, reverse_code=migrations.RunPython.noop),
+        # Skipping UUID population since public_id field is removed in migration 0257
+        # migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
+        # migrations.RunPython(historical_gen_uuid, reverse_code=migrations.RunPython.noop),
     ]
