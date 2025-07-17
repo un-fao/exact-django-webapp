@@ -1,0 +1,38 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>GHG Assessment Results</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">
+                    <b>Carbon Balance by GHG</b>
+                </h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        The main GHG contributing to the balance is
+                        <b>{{ project_primary_ghg }}</b>, which
+                        <b>{{ project_primary_ghg_direction }}</b> by
+                        {{ project_primary_ghg_emissions|floatformat:2|intcomma }} tCO2-e,
+                        resulting from the difference with the “Without Project" scenario,
+                        followed by <b>{{ project_secondary_ghg }}</b> which
+                        <b>{{ project_secondary_ghg_direction }}</b> by
+                        {{ project_secondary_ghg_emissions|floatformat:2|intcomma }} tCO2-e and
+                        <b>{{ project_tertiary_ghg }}</b> which
+                        <b>{{ project_tertiary_ghg_direction }}</b>
+                        by {{ project_tertiary_ghg_emissions|floatformat:2|intcomma }} tCO2-e.
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <img src="data:image/svg+xml;base64,{{ project_gases_chart_base64 }}"
+                                 alt="BalanceChart"
+                                 id="balanceChart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -65,6 +65,7 @@ from .models import (
     SmallFishery,
     LargeFishery,
     PublicToken,
+    HandInHandAssessment,
 )
 from .serializers import (
     ActionTypes,
@@ -111,6 +112,10 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
+    HandInHandRegionSerializer,
+    HandInHandCountrySerializer,
+    HandInHandAssessmentSerializer,
+    HandInHandAssessmentGroupedSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -401,6 +406,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         error = security.check_permission("delete_project", self.request.user, project)
         if error:
             return error
+
+        if project.members.filter(group__name="Admin").count() > 1:
+            return utils.ErrorResponse("You cannot delete a project if there are other admins. You can only remove yourself from it", status=http_status.HTTP_400_BAD_REQUEST)
 
         # NOTE: This is a workaround for a bug in the simple_history library caused by an unhandled AttributeError when deleting a project with no previous history
         if project.history.count() > 0:
@@ -1387,9 +1395,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             membership.project.owner = other_admin.user
             membership.project.save()
 
-        elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
-            logging.error("Selected user does not have permission to delete project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        error = security.check_permission("delete_projectmembership", self.request.user, membership.project)
+        if error and not membership.user == self.request.user:
+            return error
 
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()
@@ -2684,3 +2692,35 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer.save(project=project, user=self.request.user)
 
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    """
+
+    queryset = HandInHandAssessment.objects.all()
+    serializer_class = HandInHandAssessmentSerializer
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "grouped",
+                openapi.IN_QUERY,
+                description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+        ],
+        responses={200: HandInHandAssessmentGroupedSerializer},
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Get all Hand in Hand assessments, optionally grouped by region > country > year
+        """
+        grouped = request.query_params.get("grouped", "false").lower() == "true"
+
+        if grouped:
+            serializer = HandInHandAssessmentGroupedSerializer(data={})
+            return Response(serializer.to_representation(None))
+
+        return super().list(request, *args, **kwargs)
