@@ -4918,7 +4918,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        change_other_land_flu_data_to_1()
         pass
 
     if app_mode == "test":
