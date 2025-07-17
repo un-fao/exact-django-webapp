@@ -10,14 +10,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name="historicalproject",
-            name="public_id",
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False),
-        ),
-        migrations.AlterField(
-            model_name="project",
-            name="public_id",
-            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
-        ),
+        # migrations.AlterField(
+        #     model_name="historicalproject",
+        #     name="public_id",
+        #     field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False),
+        # ),
+        # migrations.AlterField(
+        #     model_name="project",
+        #     name="public_id",
+        #     field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+        # ),
     ]
