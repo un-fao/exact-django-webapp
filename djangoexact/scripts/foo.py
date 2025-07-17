@@ -6,7 +6,8 @@ import logging as log
 from django.db.models import Q
 from djangoexact.settings import auth
 import firebase_admin
-from firebase_admin import auth as firebase_admin_auth
+import os
+import pandas as pd
 
 # TODO: Run in review and prod
 
@@ -253,6 +254,77 @@ def search_historical_projects_for_project_name():
             print("----------------------------------------\n\n\n")
 
 
+def import_hih_regions():
+    """
+    Import Hand in Hand regions from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHRegion.json"))
+    for index, row in df.iterrows():
+        region, created = models.HandInHandRegion.objects.get_or_create(name=row["name"])
+        if created:
+            print(f"Created region: {region.name}")
+        else:
+            print(f"Region already exists: {region.name}")
+
+
+def import_hih_countries():
+    """
+    Import Hand in Hand countries from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHCountry.json"))
+    for index, row in df.iterrows():
+        country, created = models.HandInHandCountry.objects.get_or_create(name=row["name"], region=models.HandInHandRegion.objects.get(name=row["region"]), iso_code=row["code"])
+        if created:
+            print(f"Created country: {country.name} in region {country.region.name}")
+        else:
+            print(f"Country already exists: {country.name} in region {country.region.name}")
+
+
+def add_public_id_to_projects():
+    """
+    Add public_id to all projects
+    """
+    projects = []
+    for project in models.Project.objects.all():
+        if not project.public_id:
+            project.public_id = models.uuid.uuid4()
+            projects.append(project)
+            print(f"Added public_id {project.public_id} to project {project.name}")
+        else:
+            print(f"Project {project.name} already has public_id {project.public_id}")
+
+    if projects:
+        models.Project.objects.bulk_update(projects, ["public_id"])
+        print(f"Updated {len(projects)} projects with public_id")
+
+
+def remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types():
+    """
+    Remove Irrigation modules from Wood, Peat, and Charcoal fuel types
+    """
+    modules_to_remove = [
+        models.ModuleType.objects.get(class_name="Irrigation"),
+        models.ModuleType.objects.get(class_name="IrrigationPhase"),
+        models.ModuleType.objects.get(class_name="IrrigationSystem"),
+    ]
+    modules_to_add = [
+        models.ModuleType.objects.get(class_name="Processing"),
+        models.ModuleType.objects.get(class_name="ProcessingEntry"),
+        models.ModuleType.objects.get(class_name="Packaging"),
+        models.ModuleType.objects.get(class_name="PackagingEntry"),
+    ]
+    for fuel_type in models.FuelType.objects.filter(name__in=["Wood", "Peat", "Charcoal"]):
+        fuel_type.module_types.remove(*modules_to_remove)
+        fuel_type.save()
+        print(f"Removed Irrigation modules from {fuel_type.name} fuel type")
+
+        fuel_type.module_types.add(*modules_to_add)
+        fuel_type.save()
+        print(f"Added Processing and Packaging modules to {fuel_type.name} fuel type")
+
+
 def run():
     import os
 
@@ -261,15 +333,22 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        search_historical_projects_for_project_name()
+        # search_historical_projects_for_project_name()
+        import_hih_regions()
+        import_hih_countries()
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        import_hih_regions()
+        import_hih_countries()
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "test":

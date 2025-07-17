@@ -1,0 +1,85 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Desglose de Unidades</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Sin Proyecto</th>
+                        <th>Con Proyecto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if land_types %}
+                        <tr>
+                            <td>
+                                <b>Cobertura terrestre (hectáreas)</b>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% for land in land_types %}
+                            <tr>
+                                <td>{{ land.name }}</td>
+                                <td>{{ land.value_wo }}</td>
+                                <td>{{ land.value_w }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    {% if livestock_heads %}
+                        <tr>
+                            <td>
+                                <b>Cabezas de Ganado</b>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% for heads in livestock_heads %}
+                            <tr>
+                                <td>{{ heads.name }}</td>
+                                <td>{{ heads.value_wo }}</td>
+                                <td>{{ heads.value_w }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    {% if small_fishery_types or large_fishery_data or aquaculture_data %}
+                        <tr>
+                            <td>
+                                <b>Pesca (toneladas de captura por año)</b>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% if small_fishery_types %}
+                            {% for fishery in small_fishery_types %}
+                                <tr>
+                                    <td>{{ fishery.name }}</td>
+                                    <td>{{ fishery.value_wo }}</td>
+                                    <td>{{ fishery.value_w }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                        {% if large_fishery_data %}
+                            <tr>
+                                <td>{{ large_fishery_data.name }}</td>
+                                <td>{{ large_fishery_data.value_wo }}</td>
+                                <td>{{ large_fishery_data.value_w }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if aquaculture_data %}
+                            <tr>
+                                <td>{{ aquaculture_data.name }}</td>
+                                <td>{{ aquaculture_data.value_wo }}</td>
+                                <td>{{ aquaculture_data.value_w }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
