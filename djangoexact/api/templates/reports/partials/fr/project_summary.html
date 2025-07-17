@@ -1,0 +1,27 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Résumé du Projet</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">Résumé du Projet</h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        <strong>Superficie Totale (hectares) :</strong>
+                        {{ total_area|floatformat:2|intcomma }}
+                    </p>
+                    <p>
+                        <strong>Total de Têtes :</strong> {{ total_heads|floatformat:2|intcomma }}
+                    </p>
+                    <p>
+                        <strong>Total de Tonnes de Capture :</strong>
+                        {{ total_tonnes_of_catch|floatformat:2|intcomma }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

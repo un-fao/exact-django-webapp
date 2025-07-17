@@ -181,6 +181,7 @@ router.register(r"packaging-material-types", views.public_generic_viewset(models
 router.register(r"refrigerant-types", views.public_generic_viewset(models.RefrigerantType), basename="refrigeranttypes")
 
 router.register(r"data-sources", views.public_generic_viewset(models.DataSource), basename="datasource")
+router.register(r"hih-assessments", views.HandInHandAssessmentViewSet, basename="handinhandassessment")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
