@@ -1,0 +1,110 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Description du Projet</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">Identification du Projet</h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        <strong>Nom du Projet :</strong> {{ project.name }}
+                    </p>
+                    <p>
+                        <strong>Code du Projet :</strong> {{ project.code }}
+                    </p>
+                    <p>
+                        <strong>Agence de Financement :</strong> {{ project.funding_agency }}
+                    </p>
+                    <p>
+                        <strong>Agence d'Exécution :</strong> {{ project.executing_agency }}
+                    </p>
+                    <p>
+                        <strong>Coût du Projet [USD] :</strong> {{ project.cost|floatformat:2|intcomma }}
+                    </p>
+                    <p>
+                        <strong>Statut du projet :</strong> {{ project.status }}
+                    </p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <h4 class="text-center">Caractéristiques du Site du Projet</h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        <strong>Pays :</strong> {{ project.country }}
+                    </p>
+                    <p>
+                        <strong>Climat :</strong> {{ project.climate }}
+                    </p>
+                    <p>
+                        <strong>Humidité :</strong> {{ project.moisture }}
+                    </p>
+                    <p>
+                        <strong>Type de Sol :</strong> {{ project.soil_type }}
+                    </p>
+                    <p>
+                        <strong>SOCref [tC/ha] :</strong> {{ soc|floatformat:2|default:"N/A" }}
+                    </p>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <h4 class="text-center">Durée du Projet</h4>
+                <hr />
+                <div class="col-sm-6 text-start text-black">
+                    <p>
+                        <strong>Année de Début de Comptabilisation :</strong>
+                        {{ start_year_of_activities }}
+                    </p>
+                    <p>
+                        <strong>Phase d'implémentation [nombre d'années] :</strong>
+                        {{ implementation_years }}
+                    </p>
+                    <p>
+                        <strong>Dernière Année de Comptabilisation :</strong> {{ last_year_of_accounting }}
+                    </p>
+                </div>
+            </div>
+            <div class="row pt-5">
+                <div class="col-12">
+                    <div class="timeline-container">
+                        <div class="timeline">
+                            <div class="timeline-phase implementation-phase">
+                                <div class="segments implementation-segments"></div>
+                            </div>
+                            <div class="timeline-phase capitalization-phase">
+                                <div class="segments capitalization-segments"></div>
+                            </div>
+                            <div class="timeline-point start">
+                                <div class="year">{{ project.start_year_of_activities }}</div>
+                                <div class="label text-wrap text-center timeline-label">
+                                    Année de début de
+                                    <br>
+                                    comptabilisation
+                                </div>
+                            </div>
+                            <div class="timeline-point implementation">
+                                <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
+                                <div class="label text-wrap text-center timeline-label">
+                                    Année de fin
+                                    <br>
+                                    d'implémentation
+                                </div>
+                            </div>
+                            <div class="timeline-point end">
+                                <div class="year">{{ project.last_year_of_accounting }}</div>
+                                <div class="label text-wrap text-center timeline-label">
+                                    Dernière année de
+                                    <br>
+                                    comptabilisation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

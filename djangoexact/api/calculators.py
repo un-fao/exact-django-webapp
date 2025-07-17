@@ -7332,14 +7332,14 @@ class BaseValueChainCalculator(BaseCalculator):
 
         self.module: ValueChainSubmodule
 
-        self.energy_calculator_w: ElectricityCalculator | FuelCalculator = None
-        self.energy_calculator_wo: ElectricityCalculator | FuelCalculator = None
+        self.energy_calculator_w: EnergyEntryCalculator = None
+        self.energy_calculator_wo: EnergyEntryCalculator = None
 
         if self.module.is_ready():
             if self.module.is_with():
-                self.energy_calculator_w = ElectricityCalculator(self.module) if self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() in utils.ELECTRIC_FUEL_TYPES else FuelCalculator(self.module)
+                self.energy_calculator_w = EnergyEntryCalculator(self.module)
             if self.module.is_without():
-                self.energy_calculator_wo = ElectricityCalculator(self.module) if self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() in utils.ELECTRIC_FUEL_TYPES else FuelCalculator(self.module)
+                self.energy_calculator_wo = EnergyEntryCalculator(self.module)
 
         self.energy_math_start_w = None
         self.energy_math_start_wo = None

@@ -1,0 +1,97 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Project Description</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">Project Identification</h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        <strong>Project Name:</strong> {{ project.name }}
+                    </p>
+                    <p>
+                        <strong>Project Code:</strong> {{ project.code }}
+                    </p>
+                    <p>
+                        <strong>Funding Agency:</strong> {{ project.funding_agency }}
+                    </p>
+                    <p>
+                        <strong>Executing Agency:</strong> {{ project.executing_agency }}
+                    </p>
+                    <p>
+                        <strong>Project Cost [USD]:</strong> {{ project.cost|floatformat:2|intcomma }}
+                    </p>
+                    <p>
+                        <strong>Status:</strong> {{ project.status }}
+                    </p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <h4 class="text-center">Project Site Characteristics</h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        <strong>Country:</strong> {{ project.country }}
+                    </p>
+                    <p>
+                        <strong>Climate:</strong> {{ project.climate }}
+                    </p>
+                    <p>
+                        <strong>Moisture:</strong> {{ project.moisture }}
+                    </p>
+                    <p>
+                        <strong>Soil Type:</strong> {{ project.soil_type }}
+                    </p>
+                    <p>
+                        <strong>SOCref [tC/ha]:</strong> {{ soc|floatformat:2|default:"N/A" }}
+                    </p>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <h4 class="text-center">Project Duration</h4>
+                <hr />
+                <div class="col-sm-6 text-start text-black">
+                    <p>
+                        <strong>Start Year of Accounting:</strong> {{ start_year_of_activities }}
+                    </p>
+                    <p>
+                        <strong>Implementation phase [no. of years]:</strong>
+                        {{ implementation_years }}
+                    </p>
+                    <p>
+                        <strong>Last Year of Accounting:</strong> {{ last_year_of_accounting }}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="timeline-container">
+                        <div class="timeline">
+                            <div class="timeline-phase implementation-phase">
+                                <div class="segments implementation-segments"></div>
+                            </div>
+                            <div class="timeline-phase capitalization-phase">
+                                <div class="segments capitalization-segments"></div>
+                            </div>
+                            <div class="timeline-point start">
+                                <div class="year">{{ project.start_year_of_activities }}</div>
+                                <div class="label text-wrap text-center timeline-label">Start year of accounting</div>
+                            </div>
+                            <div class="timeline-point implementation">
+                                <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
+                                <div class="label text-wrap text-center timeline-label">End year of implementation</div>
+                            </div>
+                            <div class="timeline-point end">
+                                <div class="year">{{ project.last_year_of_accounting }}</div>
+                                <div class="label text-wrap text-center timeline-label">Last year of accounting</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
