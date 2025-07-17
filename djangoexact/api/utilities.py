@@ -319,7 +319,9 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
         None
     """
 
-    can_view_comments = security.check_permission("can_view_comment", owner, module_from.activity.project)
+    activity = module_from.activity
+
+    can_view_comments = security.check_permission("can_view_comment", owner, activity.project)
     if owner is not None and can_view_comments:
         copy_threads(module_from, module_to)
     else:
