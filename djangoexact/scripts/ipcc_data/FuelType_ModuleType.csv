@@ -1,0 +1,64 @@
+module_type,fuel_type,fuel_use_type
+ENERGY,Natural Gas,Mobile
+ENERGY,LPG,Mobile
+ENERGY,Gasoil/Diesel Oil,Mobile
+ENERGY,Motor Gasoline,Mobile
+ENERGY,Renewable,Stationary
+ENERGY,Electricity,Stationary
+ENERGY,Charcoal,Stationary
+ENERGY,Peat,Stationary
+ENERGY,Wood,Stationary
+ENERGY,Gasoline (4-stroke),Off-Road
+ENERGY,Gasoline (2-stroke),Off-Road
+ENERGY,Diesel,Off-Road
+ENERGY,Ethanol (Trucks),Mobile
+ENERGY,Ethanol (Cars),Mobile
+ENERGY,LPG,Stationary
+ENERGY,Natural Gas,Stationary
+ENERGY,Gasoil/Diesel Oil,Stationary
+ENERGY,Motor Gasoline,Stationary
+ENERGY,Waste Oil/Lubricants,Stationary
+TRANSPORT,Natural Gas,Mobile
+TRANSPORT,LPG,Mobile
+TRANSPORT,Gasoil/Diesel Oil,Mobile
+TRANSPORT,Motor Gasoline,Mobile
+TRANSPORT,Gasoline (4-stroke),Off-Road
+TRANSPORT,Gasoline (2-stroke),Off-Road
+TRANSPORT,Diesel,Off-Road
+TRANSPORT,Ethanol (Trucks),Mobile
+TRANSPORT,Ethanol (Cars),Mobile
+PACKAGING,Renewable,Stationary
+PACKAGING,Electricity,Stationary
+PACKAGING,Charcoal,Stationary
+PACKAGING,Wood,Stationary
+PACKAGING,LPG,Stationary
+PACKAGING,Natural Gas,Stationary
+PACKAGING,Gasoil/Diesel Oil,Stationary
+PACKAGING,Motor Gasoline,Stationary
+PACKAGING,Waste Oil/Lubricants,Stationary
+STORAGE,Renewable,Stationary
+STORAGE,Electricity,Stationary
+STORAGE,Charcoal,Stationary
+STORAGE,Wood,Stationary
+STORAGE,LPG,Stationary
+STORAGE,Natural Gas,Stationary
+STORAGE,Gasoil/Diesel Oil,Stationary
+STORAGE,Motor Gasoline,Stationary
+STORAGE,Waste Oil/Lubricants,Stationary
+PROCESSING,Renewable,Stationary
+PROCESSING,Electricity,Stationary
+PROCESSING,Charcoal,Stationary
+PROCESSING,Peat,Stationary
+PROCESSING,Wood,Stationary
+PROCESSING,LPG,Stationary
+PROCESSING,Natural Gas,Stationary
+PROCESSING,Gasoil/Diesel Oil,Stationary
+PROCESSING,Motor Gasoline,Stationary
+PROCESSING,Waste Oil/Lubricants,Stationary
+IRRIGATION,Renewable,Stationary
+IRRIGATION,Electricity,Stationary
+IRRIGATION,LPG,Stationary
+IRRIGATION,Natural Gas,Stationary
+IRRIGATION,Gasoil/Diesel Oil,Stationary
+IRRIGATION,Motor Gasoline,Stationary
+IRRIGATION,Waste Oil/Lubricants,Stationary
