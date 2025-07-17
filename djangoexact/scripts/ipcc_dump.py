@@ -4867,6 +4867,35 @@ def change_other_land_flu_data_to_1():
     print(f"Updated {len(entries)} OtherLandFLUData objects to have a value of 1.0")
 
 
+def update_module_types_of_fuel_types():
+    """
+    Update the module types of FuelType objects to include 'EnergyEntry'.
+    """
+    from api.models import ModuleType, FuelType
+
+    module_types = ModuleType.objects.filter(class_name__in=["EnergyEntry", "TransportEntry", "PackagingEntry", "StorageEntry", "ProcessingEntry", "IrrigationPhase", "IrrigationSystem"])
+    print(f"Found {module_types.count()} module types: {module_types}")
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_ModuleType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        print(f"Processing row {i}: {row}")
+        sub_module_types = module_types.filter(class_name__icontains=row["module_type"])
+        for module_type in sub_module_types:
+            fuel_type = FuelType.objects.get(name=row["fuel_type"], fuel_use_type__name=row["fuel_use_type"])
+            fuel_type.module_types.clear()  # Clear existing module types
+            if module_type and fuel_type:
+                print(f"Adding {module_type} to {fuel_type}")
+                fuel_type.module_types.add(module_type)
+                fuel_type.save()
+            else:
+                print(f"Could not find module type or fuel type for row {i}")
+
+
 def run():
     import os
 
@@ -4914,6 +4943,7 @@ def run():
         # add_ipcc_and_fra_as_data_sources()
         add_small_fishery_gear_types_fishery_types_relationships()
         change_other_land_flu_data_to_1()
+        update_module_types_of_fuel_types()
         pass
 
     if app_mode == "development":
