@@ -99,8 +99,10 @@ from .models import (
     FuelUseType,
     PublicToken,
     EnergyEntry,
+    HandInHandRegion,
+    HandInHandCountry,
+    HandInHandAssessment,
 )
-from datetime import timedelta
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
@@ -3654,3 +3656,81 @@ class PublicTokenSerializer(serializers.ModelSerializer):
         model = PublicToken
         fields = "__all__"
         ref_name = "PublicToken"
+
+
+class HandInHandRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandRegion
+        fields = "__all__"
+        ref_name = "HandInHandRegion"
+
+
+class HandInHandCountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandCountry
+        fields = "__all__"
+        ref_name = "HandInHandCountry"
+
+
+class HandInHandAssessmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandAssessment
+        fields = ["id", "name", "year", "country", "link"]
+        ref_name = "HandInHandAssessment"
+
+
+class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
+    """
+    Serializer that returns HandInHandAssessment data grouped by region > country > year
+    """
+
+    def to_representation(self, instance):
+        # Get all assessments
+        assessments = HandInHandAssessment.objects.select_related("country__region").order_by("country__region__name", "country__name", "year", "name")
+
+        # Group by region, then country, then year
+        grouped_data = {}
+
+        for assessment in assessments:
+            region_name = assessment.country.region.name
+            country_name = assessment.country.name
+            year = assessment.year or "Unknown Year"
+
+            # Initialize region if not exists
+            if region_name not in grouped_data:
+                grouped_data[region_name] = {"name": region_name, "countries": {}}
+
+            # Initialize country if not exists
+            if country_name not in grouped_data[region_name]["countries"]:
+                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": assessment.country.iso_code, "years": {}}
+
+            # Initialize year if not exists
+            if year not in grouped_data[region_name]["countries"][country_name]["years"]:
+                grouped_data[region_name]["countries"][country_name]["years"][year] = {"year": year, "assessments": []}
+
+            # Add assessment to the year
+            grouped_data[region_name]["countries"][country_name]["years"][year]["assessments"].append({"id": assessment.id, "name": assessment.name, "link": assessment.link})
+
+        # Convert nested dictionaries to lists for better JSON structure
+        result = []
+        for region_name, region_data in grouped_data.items():
+            region_dict = {"name": region_data["name"], "countries": []}
+
+            for country_name, country_data in region_data["countries"].items():
+                country_dict = {"name": country_data["name"], "iso_code": country_data["iso_code"], "years": []}
+
+                for year, year_data in country_data["years"].items():
+                    country_dict["years"].append(year_data)
+
+                # Sort years (handle "Unknown Year" case)
+                country_dict["years"].sort(key=lambda x: float("inf") if x["year"] == "Unknown Year" else x["year"])
+                region_dict["countries"].append(country_dict)
+
+            # Sort countries alphabetically
+            region_dict["countries"].sort(key=lambda x: x["name"])
+            result.append(region_dict)
+
+        # Sort regions alphabetically
+        result.sort(key=lambda x: x["name"])
+
+        return result

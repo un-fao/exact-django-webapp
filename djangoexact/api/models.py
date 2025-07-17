@@ -509,6 +509,7 @@ class LargeFisheryGearType(models.Model):
 
 class SmallFisheryGearType(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    fishery_types = models.ManyToManyField(FisheryType, related_name="gear_types", null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -1156,6 +1157,10 @@ class Submodule(Historical, CachedResultMixin):
     @property
     def threads(self):
         return self.__get_threads()
+
+    @property
+    def activity(self):
+        return self.get_activity()
 
     def save(self, *args, **kwargs):
         if not self.parent:
@@ -2402,7 +2407,7 @@ class Energy(Module):
 
     @property
     def submodules(self) -> list["Submodule"]:
-        return list(self.electricities.all()) + list(self.fuels.all())
+        return list(self.entries.all())
 
 
 class ElectricityTier2Mixin(models.Model):
@@ -3124,3 +3129,35 @@ class PublicToken(models.Model):
 
     def __str__(self):
         return self.token
+
+
+class HandInHandRegion(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class HandInHandCountry(models.Model):
+    region = models.ForeignKey(HandInHandRegion, on_delete=models.CASCADE, related_name="countries")
+    name = models.CharField(max_length=255, unique=True)
+    iso_code = models.CharField(max_length=3, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name} ({self.iso_code})"
+
+
+class HandInHandAssessment(models.Model):
+    country = models.ForeignKey(HandInHandCountry, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, unique=True)
+    link = models.URLField(max_length=2000, null=True, blank=True)
+    year = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Hand in Hand Assessment"
+        verbose_name_plural = "Hand in Hand Assessments"
+        ordering = ["country", "year"]
+        unique_together = ("country", "name")
+
+    def __str__(self):
+        return f"{self.country.name} - {self.name} ({self.year})"
