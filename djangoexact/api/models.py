@@ -2057,37 +2057,45 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
 
     ##### TIER 2 #####
 
-    agb_growth_rate_le_20_yrs_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_le_20_yrs_t2_start")
-    agb_growth_rate_le_20_yrs_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_le_20_yrs_t2_w")
-    agb_growth_rate_le_20_yrs_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_le_20_yrs_t2_wo")
+    agb_max_t2_start = models.FloatField(null=True, blank=True)
+    agb_max_t2_w = models.FloatField(null=True, blank=True)
+    agb_max_t2_wo = models.FloatField(null=True, blank=True)
 
-    agb_growth_rate_gt_20_yrs_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_gt_20_yrs_t2_start")
-    agb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_gt_20_yrs_t2_w")
-    agb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_growth_rate_gt_20_yrs_t2_wo")
+    agb_growth_rate_le_20_yrs_t2_start = models.FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_w = models.FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    bgb_growth_rate_le_20_yrs_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_le_20_yrs_t2_start")
-    bgb_growth_rate_le_20_yrs_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_le_20_yrs_t2_w")
-    bgb_growth_rate_le_20_yrs_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_le_20_yrs_t2_wo")
+    agb_growth_rate_gt_20_yrs_t2_start = models.FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    bgb_growth_rate_gt_20_yrs_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_gt_20_yrs_t2_start")
-    bgb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_gt_20_yrs_t2_w")
-    bgb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_growth_rate_gt_20_yrs_t2_wo")
+    bgb_max_t2_start = models.FloatField(null=True, blank=True)
+    bgb_max_t2_w = models.FloatField(null=True, blank=True)
+    bgb_max_t2_wo = models.FloatField(null=True, blank=True)
 
-    rotation_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0, verbose_name="rotation_start_year_t2_start")
-    rotation_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0, verbose_name="rotation_start_year_t2_w")
-    rotation_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0, verbose_name="rotation_start_year_t2_wo")
+    bgb_growth_rate_le_20_yrs_t2_start = models.FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_w = models.FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    logging_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0, verbose_name="logging_start_year_t2_start")
-    logging_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0, verbose_name="logging_start_year_t2_w")
-    logging_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0, verbose_name="logging_start_year_t2_wo")
+    bgb_growth_rate_gt_20_yrs_t2_start = models.FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    logging_dry_matter_logged_t2_start = models.FloatField(null=True, blank=True, verbose_name="logging_dry_matter_logged_t2_start")
-    logging_dry_matter_logged_t2_w = models.FloatField(null=True, blank=True, verbose_name="logging_dry_matter_logged_t2_w")
-    logging_dry_matter_logged_t2_wo = models.FloatField(null=True, blank=True, verbose_name="logging_dry_matter_logged_t2_wo")
+    rotation_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
 
-    degradation_dry_matter_impacted_t2_start = models.FloatField(null=True, blank=True, verbose_name="degradation_dry_matter_impacted_t2_start")
-    degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True, verbose_name="degradation_dry_matter_impacted_t2_w")
-    degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True, verbose_name="degradation_dry_matter_impacted_t2_wo")
+    logging_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
+
+    logging_dry_matter_logged_t2_start = models.FloatField(null=True, blank=True)
+    logging_dry_matter_logged_t2_w = models.FloatField(null=True, blank=True)
+    logging_dry_matter_logged_t2_wo = models.FloatField(null=True, blank=True)
+
+    degradation_dry_matter_impacted_t2_start = models.FloatField(null=True, blank=True)
+    degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True)
+    degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True)
 
     @property
     def submodules(self) -> list["Submodule"]:
