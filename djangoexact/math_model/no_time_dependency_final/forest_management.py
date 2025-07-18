@@ -78,7 +78,8 @@ class ForestManagement(BaseModule):
     bgb_yearly_growth_over_20_tier_2: float
     agb_start_default: float
     agb_start_tier_2: float
-    max_agb_value: float
+    max_agb_value_default: float
+    max_agb_value_tier_2: Optional[float]  
     max_bgb_value: Optional[float]  # NOTE: AS OF NOW IT'S NOT USED YET, PREDISPONED FOR FUTURE IMPLEMENTATION
 
     ########### ROTATION RELATED VARIABLES ############
@@ -149,6 +150,7 @@ class ForestManagement(BaseModule):
         self.agb_yearly_growth_under_20 = self.agb_yearly_growth_under_20_default if self.agb_yearly_growth_under_20_tier_2 is None else self.agb_yearly_growth_under_20_tier_2
         self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
+        self.max_agb_value = self.max_agb_value_default if self.max_agb_value_tier_2 is None else self.max_agb_value_tier_2
         if self.max_bgb_value is None:  # TODO: Re-implement it as tier2 (yes, I'm looking at you, Bart. hi :] )
             self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
         self.litter_20_years = self.litter_20_years_default if not self.litter_20_years_tier_2 else self.litter_20_years_tier_2

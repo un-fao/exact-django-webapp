@@ -4941,13 +4941,14 @@ def run():
         # add_density_zero_where_density_is_none_in_irrigation_phase_data()
         # import_fra_carbon_stock_data()
         # add_ipcc_and_fra_as_data_sources()
-        add_small_fishery_gear_types_fishery_types_relationships()
-        change_other_land_flu_data_to_1()
-        update_module_types_of_fuel_types()
+        # add_small_fishery_gear_types_fishery_types_relationships()
+        # change_other_land_flu_data_to_1()
+        # update_module_types_of_fuel_types()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        add_small_fishery_gear_types_fishery_types_relationships()
         pass
 
     if app_mode == "test":
