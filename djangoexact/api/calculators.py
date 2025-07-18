@@ -3755,11 +3755,11 @@ class EnergyEntryCalculator(BaseCalculator):
             log.debug("IS WITH")
             self.inputs_w = {
                 "emissions_factor_co2": self.energy_ef_default_w.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_w,
                 "emissions_factor_ch4": self.energy_ef_default_w.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_w,
                 "emissions_factor_n2o": self.energy_ef_default_w.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_w,
                 "rate_type": self.change_rate.name,
@@ -3795,11 +3795,11 @@ class EnergyEntryCalculator(BaseCalculator):
             log.debug("IS WITHOUT")
             self.inputs_wo = {
                 "emissions_factor_co2": self.energy_ef_default_wo.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_wo,
                 "emissions_factor_ch4": self.energy_ef_default_wo.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_wo,
                 "emissions_factor_n2o": self.energy_ef_default_wo.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "rate_type": self.change_rate.name,
