@@ -45,12 +45,31 @@ class PerennialCropland(LandModule):
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float]
     end_module_has_growth: bool
+    
+    # NOTE: Add specific AGB and BGB and t2 values
+    agb_start_default: float
+    agb_start_tier_2: Optional[float]
+    bgb_start_default: float
+    bgb_start_tier_2: Optional[float]
+    
+    agb_end_default: float
+    agb_end_tier_2: Optional[float]
+    bgb_end_default: float
+    bgb_end_tier_2: Optional[float]
 
     def __post_init__(self):
         super().__post_init__()
 
         # Tier 2 value
         self.residue_availability_tier_2_default = None
+        
+        self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
+        self.bgb_start = self.bgb_start_default if self.bgb_start_tier_2 is None else self.bgb_start_tier_2
+        self.agb_end = self.agb_end_default if self.agb_end_tier_2 is None else self.agb_end_tier_2
+        self.bgb_end = self.bgb_end_default if self.bgb_end_tier_2 is None else self.bgb_end_tier_2
+        
+        self.biomass_start = self.agb_start + self.bgb_start
+        self.biomass_end = self.agb_end + self.bgb_end
 
     def calculate_emissions(
         self,
@@ -143,7 +162,7 @@ class PerennialCropland(LandModule):
 
                         biomass_accumulation_rate = agb_rate + bgb_rate
 
-                        max_years_growth = math.floor((max_agb - self.biomass_start * (44/12)) / agb_rate) if max_agb != 0 else self.implementation_time + self.capitalization_time
+                        max_years_growth = math.floor((max_agb - self.agb_start * (44/12)) / agb_rate) if max_agb != 0 else self.implementation_time + self.capitalization_time
                         if max_years_growth < 0:
                             # NOTE: This means that the biomass_start is already greater than the maximum agb, so we have to return an error
                             raise ValueError("The biomass_start is greater than the maximum agb in one of the Project scenarios, which is not allowed. Check tier 2 values")
@@ -152,7 +171,7 @@ class PerennialCropland(LandModule):
                         hectares_before_n, hectares_after_n = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
 
                         calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
-                        tabular = ((max_agb - self.biomass_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
+                        tabular = ((max_agb - self.agb_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
 
                         total = -min(calculated, tabular) if (max_agb != 0 and self.hectares_end != 0) else -calculated
 
