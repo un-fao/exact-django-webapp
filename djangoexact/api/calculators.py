@@ -1737,13 +1737,13 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.fires_combustion_factor_wo: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
         self.agb_start_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
         self.agb_w_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
-        self.ag_default_wo: ipcc.PerennialAGB = ipcc.PerennialAGB()
+        self.agb_wo_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
         self.agb_max_start_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_w_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_wo_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.bgb_start_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
         self.bgb_w_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
-        self.bg_default_wo: ipcc.PerennialBGB = ipcc.PerennialBGB()
+        self.bgb_wo_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
 
         # Calculated by math model
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
@@ -1848,7 +1848,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {self.module.land_use_type_wo.name} does not exist")
 
             try:
-                self.ag_default_wo = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
+                self.agb_wo_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialAGB.DoesNotExist:
                 if self.agb_t2_wo is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
@@ -1860,7 +1860,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                     raise Exception(f"PerennialMaxAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
-                self.bg_default_wo = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
+                self.bgb_wo_default = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialBGB.DoesNotExist:
                 if self.bgb_t2_wo is None:
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
@@ -1884,8 +1884,8 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.biomass_ef_wo.value = 0
 
     def _compute_biomass_for_maturity(
-        self, biomass_start, biomass_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
-    ) -> tuple[ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB]:
+        self, agb_start, agb_end, bgb_start, bgb_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
+    ) -> tuple[ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.PerennialBGB, ipcc.PerennialBGB]:
         """
         Computes and adjusts biomass values for start and end scenarios based on system maturity and scenario types.
 
@@ -1904,50 +1904,74 @@ class PerennialCropCalculator(LandModuleCalculator):
             tuple: Adjusted (biomass_start, biomass_end) values based on the scenario conditions
         """
 
-        baseline_biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_start)
-        baseline_biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_end)
+        baseline_biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(agb_start)
+        baseline_biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(agb_end)
+        baseline_bgb_start: ipcc.PerennialBGB = copy.deepcopy(bgb_start)
+        baseline_bgb_end: ipcc.PerennialBGB = copy.deepcopy(bgb_end)
 
-        biomass_start = baseline_biomass_start
-        biomass_end = baseline_biomass_end
+        agb_start = baseline_biomass_start
+        bgb_start = baseline_bgb_start
+
+        agb_end = baseline_biomass_end
+        bgb_end = baseline_bgb_end
 
         # Checking the start scenario covers both "Perennial -> LUC" and "Perennial -> Perennial" cases
         # In all other cases, the biomass values are returned as is
         if self.module.is_start():
             if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
+                agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                agb_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
+                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default")) # TODO: This has to be taken from ipcc.ForestManagementBGB (see ForestManagement implementation)
+                bgb_end = copy.deepcopy(getattr(self, f"bgb_{scenario_type_end.value}_default")) # TODO: This has to be taken from ipcc.ForestManagementBGB (see ForestManagement implementation)
 
             if scenario_type_start is utils.ScenarioTypes.START:
                 if has_change_in_system:
-                    biomass_start = self.agb_max_start_default
+                    agb_start = self.agb_max_start_default
+                    bgb_start = self.bgb_start_default
                     if self.agb_max_t2_start is not None:
-                        biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    biomass_end.value = 0
+                        agb_start.value = copy.deepcopy(self.agb_max_t2_start)
+                    if self.bgb_t2_start is not None:
+                        bgb_start.value = copy.deepcopy(self.bgb_t2_start)
+                    agb_end.value = 0
+                    bgb_end.value = 0
                     if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
+                        agb_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
+                    if getattr(self, f"bgb_t2_{scenario_type_end.value}") is not None:
+                        bgb_end.value = copy.deepcopy(getattr(self, f"bgb_t2_{scenario_type_end.value}"))
                 elif ((scenario_type_end == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_end == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    biomass_end.value = 0
+                    agb_end.value = 0
+                    bgb_end.value = 0
 
             elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
                 if has_change_in_system:
-                    biomass_start.value = 0
+                    agb_start.value = 0
+                    bgb_start.value = 0
                     if self.agb_max_t2_start is not None:
-                        biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    biomass_end.value = None
+                        agb_start.value = copy.deepcopy(self.agb_max_t2_start)
+                    if self.bgb_t2_start is not None:
+                        bgb_start.value = copy.deepcopy(self.bgb_t2_start)
+                    agb_end.value = None
+                    bgb_end.value = None
                     if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
+                        agb_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
+                    if getattr(self, f"bgb_t2_{scenario_type_end.value}") is not None:
+                        bgb_end.value = copy.deepcopy(getattr(self, f"bgb_t2_{scenario_type_end.value}"))
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
                 elif not self.module.is_system_in_maturity:
-                    biomass_start = baseline_biomass_start
-                    biomass_end.value = None
+                    agb_start = baseline_biomass_start
+                    bgb_start = baseline_biomass_start
+                    agb_end.value = None
+                    bgb_end.value = None
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
                 elif ((scenario_type_start == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_start == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    biomass_start.value = 0
-                    biomass_end.value = None
+                    agb_start.value = 0
+                    bgb_start.value = 0
+                    agb_end.value = None
+                    bgb_end.value = None
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
-        return biomass_start, biomass_end
+        return agb_start, agb_end, bgb_start, bgb_end
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
@@ -1958,10 +1982,12 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.get_defaults()
 
         if self.module.is_start():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.agb_start_default,
                 self.agb_w_default,
-                self.module.land_use_type_start != self.module.land_use_type_w if not self.module.land_use_type_w is None else False,
+                self.bgb_start_default,
+                self.bgb_w_default,
+                self.module.land_use_type_start != self.module.land_use_type_w if self.module.land_use_type_w is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITH,
             )
@@ -2005,11 +2031,15 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "delay": self.activity.delay,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_w,
+                "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_start_w,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
@@ -2018,10 +2048,12 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_start_w = MathPerennialCropland(**self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.agb_start_default,
-                self.ag_default_wo,
-                self.module.land_use_type_start != self.module.land_use_type_wo if not self.module.land_use_type_wo is None else False,
+                self.agb_wo_default,
+                self.bgb_start_default,
+                self.bgb_wo_default,
+                self.module.land_use_type_start != self.module.land_use_type_wo if self.module.land_use_type_wo is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITHOUT,
             )
@@ -2065,11 +2097,15 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "delay": self.activity.delay,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_wo,
+                "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_start_wo,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
@@ -2079,9 +2115,11 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_start_wo.calculate_emissions()
 
         if self.module.is_with():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.biomass_ef_start_w,
                 self.biomass_ef_w,
+                self.bgb_start_default,
+                self.bgb_w_default,
                 self.module.land_use_type_start != self.module.land_use_type_w,
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
@@ -2130,10 +2168,14 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_w,
+                "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
                 "agb_maximum_c_tier_2": self.agb_max_t2_w,
             }
@@ -2143,9 +2185,11 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_w.calculate_emissions()
 
         if self.module.is_without():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.biomass_ef_start_wo,
                 self.biomass_ef_wo,
+                self.bgb_start_default,
+                self.bgb_wo_default,
                 self.module.land_use_type_start != self.module.land_use_type_wo,
                 utils.ScenarioTypes.WITHOUT,
                 utils.ScenarioTypes.WITHOUT,
@@ -2169,10 +2213,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_wo,
                 "t_biomass_tier_2": self.residue_availability_t2_wo,
-                "agb_rate_default": self.ag_default_wo.value,
+                "agb_rate_default": self.agb_wo_default.value,
                 "agb_rate_tier_2": self.agb_t2_wo,
                 "agb_maximum_c": self.agb_max_wo_default.value,
-                "bgb_rate_default": self.bg_default_wo.value,
+                "bgb_rate_default": self.bgb_wo_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
@@ -2193,10 +2237,14 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_wo, # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_wo,
+                "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
                 "agb_maximum_c_tier_2": self.agb_max_t2_wo,
             }
