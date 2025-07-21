@@ -4843,7 +4843,6 @@ def add_small_fishery_gear_types_fishery_types_relationships():
         gear_type: SmallFisheryGearType = SmallFisheryGearType.objects.get(name__iexact=row["gear_type"])
         fishery_types = FisheryType.objects.filter(name__in=row["fishery_types"].split(", ")).all()
 
-        print(f"Assigning {gear_type} to {list(fishery_types)}")
         for fishery_type in fishery_types:
             gear_type.fishery_types.add(fishery_type)
             print(f"Added {fishery_type} to {gear_type}")
@@ -4874,7 +4873,6 @@ def update_module_types_of_fuel_types():
     from api.models import ModuleType, FuelType
 
     module_types = ModuleType.objects.filter(class_name__in=["EnergyEntry", "TransportEntry", "PackagingEntry", "StorageEntry", "ProcessingEntry", "IrrigationPhase", "IrrigationSystem"])
-    print(f"Found {module_types.count()} module types: {module_types}")
 
     df = pd.read_csv(
         os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_ModuleType.csv"),
@@ -4883,7 +4881,6 @@ def update_module_types_of_fuel_types():
     )
 
     for i, row in df.iterrows():
-        print(f"Processing row {i}: {row}")
         sub_module_types = module_types.filter(class_name__icontains=row["module_type"])
         for module_type in sub_module_types:
             fuel_type = FuelType.objects.get(name=row["fuel_type"], fuel_use_type__name=row["fuel_use_type"])
@@ -4894,6 +4891,20 @@ def update_module_types_of_fuel_types():
                 fuel_type.save()
             else:
                 print(f"Could not find module type or fuel type for row {i}")
+
+
+def convert_storage_refrigerant_ef_from_kg_to_tonnes():
+    """
+    Convert the refrigerant emission factors in StorageEmissionFactor from kg to tonnes.
+    """
+    from ipcc.models import ValueChainRefrigerantEmissionFactor
+
+    refrigerant_efs = ValueChainRefrigerantEmissionFactor.objects.all()
+    for ef in refrigerant_efs:
+        if ef.value is not None:
+            ef.value /= 1000  # Convert kg to tonnes
+            ef.save()
+            print(f"Updated {ef} to {ef.value} tonnes")
 
 
 def run():
@@ -4926,29 +4937,11 @@ def run():
 
     if app_mode == "review":
         # TODO: Run in review
-        # get_or_create_soil_types_and_update_info()
-        # delete_and_import_forest_total_biomass()
-        # delete_and_import_total_biomass_after_defo()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
-        # delete_and_import_irrigation_phase_data()
-        # import_shadow_prices_of_carbon()
-        # add_0_2_to_co2_value_in_input_emission_factor()
-        # create_parent_fuel_types()
-        # assign_parent_fuel_types_to_fuel_types()
-        # create_energy_entry_module_type()
-        # add_change_public_project_flag_permission_to_admin_group()
-        # add_density_zero_where_density_is_none_in_irrigation_phase_data()
-        # import_fra_carbon_stock_data()
-        # add_ipcc_and_fra_as_data_sources()
-        # add_small_fishery_gear_types_fishery_types_relationships()
-        # change_other_land_flu_data_to_1()
-        # update_module_types_of_fuel_types()
+        convert_storage_refrigerant_ef_from_kg_to_tonnes()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_small_fishery_gear_types_fishery_types_relationships()
         pass
 
     if app_mode == "test":

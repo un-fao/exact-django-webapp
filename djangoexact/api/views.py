@@ -1833,7 +1833,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer,)
     def copy(self, request, pk=None):
         activity: Activity = self.get_object()
         error = security.check_permission("view_activity", self.request.user, activity.project)
@@ -1846,7 +1846,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if activity.project.is_archived:
             return utils.ErrorResponse("Cannot copy activity from an archived project", status=http_status.HTTP_400_BAD_REQUEST)
 
-        new_activity = utils.copy_activity(activity)
+        new_activity = utils.copy_activity(activity, owner=self.request.user)
 
         return Response(data=self.serializer_class(new_activity).data, status=http_status.HTTP_201_CREATED)
 
