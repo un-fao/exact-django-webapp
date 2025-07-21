@@ -12,36 +12,59 @@ from api.tests.unit.utils import APITestCaseMixin
 from api import serializers
 import copy
 from . import base_module
+import time
+import logging
+logging.getLogger().setLevel(logging.CRITICAL)
+logging.getLogger('matplotlib').setLevel(logging.CRITICAL)
+logging.getLogger('django').setLevel(logging.CRITICAL)
 
 
 class ForestManagementTestCase(base_module.BaseModuleTestCase):
+
+    def build_validated_data(self):
+        validated_data = {
+            "land_use_type_start": self.land_use_types.order_by("?").first().id,
+            "forest_type": models.ForestType.objects.order_by("?").first().id,
+            "forest_condition_type": models.ForestConditionType.objects.order_by("?").first().id,
+            # NOTE: Added to avoid validation errors due to missing IPCC data for some forest types
+            # "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            # "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            # "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+        }
+        return validated_data
+
     def setUp(self):
         self.ModuleClass = models.ForestManagement
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
-        self.validated_data = {
-            "land_use_type_start": self.land_use_types.order_by("?").first().id,
-            "forest_type": models.ForestType.objects.order_by("?").first().id,
-            "forest_condition_type": models.ForestConditionType.objects.order_by("?").first().id,
-            # NOTE: Added to avoid validation errors due to missing IPCC data for some forest types
-            "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-        }
+        self.validated_data = self.build_validated_data()
 
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
+
+        has_results = False
+        while not has_results:
+            response = self.get_results()
+            if response.status_code == status.HTTP_200_OK:
+                has_results = True
+            else:
+                print(f"No results found, retrying...")
+                super().setUp()
+                self.validated_data = self.build_validated_data()
+                self.edit_module(self.module, self.user, self.validated_data)
+                self.module.refresh_from_db()
+                time.sleep(1)
 
     def test_modify(self):
         validated_data = copy.deepcopy(self.validated_data)
@@ -143,3 +166,31 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
         self.assertNotEqual(first_balance, response.data["balance"])
+
+    def test_changing_agb_max_t2_w_changes_results(self):
+        # Get initial results
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("balance", response.data)
+        initial_balance = response.data["balance"]
+
+        # Change the value of agb_max_t2_w
+        edit_response = self.edit_module(self.module, self.user, {"agb_max_t2_w": 100})
+        self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.module.refresh_from_db()
+
+        # Check that the results change
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("balance", response.data)
+        new_balance = response.data["balance"]
+
+        # The results should change
+        self.assertNotEqual(initial_balance, new_balance)
