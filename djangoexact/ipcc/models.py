@@ -14,6 +14,9 @@ class GlobalWarmingPotential(Model):
     n2o = FloatField()
     ch4_fossil = FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class TotalBiomassAfterDefoManager(Manager):
     def get_or_default(self, climate, moisture, continent, land_use_type):
