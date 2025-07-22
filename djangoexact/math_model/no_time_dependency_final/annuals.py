@@ -15,20 +15,20 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AnnualCropland(LandModule):
 
     nitrous_constant: float
     methane_constant: float
     ef_methane_agr_residues_main: float
     combustion_factor_main: float
-    residue_main_tier_2: Optional[float]
+    residue_main_tier_2: Optional[float] = None
     n_estimation_slope_main: float
     n_estimation_intercept_main: float
     yield_value_main: float
     ef_methane_agr_residues_minor: float
     combustion_factor_minor: float
-    residue_minor_tier_2: Optional[float]
+    residue_minor_tier_2: Optional[float] = None
     n_estimation_slope_minor: float
     n_estimation_intercept_minor: float
     yield_value_minor: float

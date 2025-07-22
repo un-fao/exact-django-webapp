@@ -21,7 +21,7 @@ from .general_functions import (
 from dataclasses import dataclass, field
 from typing import Optional
 
-@dataclass
+@dataclass(kw_only=True)
 class BaseModule:
     implementation_time: int
     capitalization_time: int
@@ -43,27 +43,27 @@ class BaseModule:
             raise e
         
 
-@dataclass
+@dataclass(kw_only=True)
 class LandModule(BaseModule):
     hectares_start: float
     hectares_end: float
 
     soc_start_default: float
     soc_end_default: float
-    soc_start_tier_2: Optional[float]
-    soc_end_tier_2: Optional[float]
+    soc_start_tier_2: Optional[float] = None
+    soc_end_tier_2: Optional[float] = None
     fmg_start_default: float
     fmg_end_default: float
-    fmg_start_tier_2: Optional[float]
-    fmg_end_tier_2: Optional[float]
+    fmg_start_tier_2: Optional[float] = None
+    fmg_end_tier_2: Optional[float] = None
     flu_start_default: float
     flu_end_default: float
-    flu_start_tier_2: Optional[float]
-    flu_end_tier_2: Optional[float]
+    flu_start_tier_2: Optional[float] = None
+    flu_end_tier_2: Optional[float] = None
     fi_start_default: float
     fi_end_default: float
-    fi_start_tier_2: Optional[float]
-    fi_end_tier_2: Optional[float]
+    fi_start_tier_2: Optional[float] = None
+    fi_end_tier_2: Optional[float] = None
 
     calculate_soc_som: bool
     calculate_biomass: bool
@@ -72,10 +72,10 @@ class LandModule(BaseModule):
     # NOTE: biomass_start and biomass_end are set to Optional[float] only because in 
     # Perennial Biomass Emissions it is necessary for the calculations (if self.biomass_start and self.biomass_end:)
     # maybe we can send a parameter to the perennial or perennial.calculate_emissions() to avoid this
-    biomass_start_default: Optional[float]
-    biomass_end_default: Optional[float]
-    biomass_start_tier_2: Optional[float]
-    biomass_end_tier_2: Optional[float]
+    biomass_start_default: Optional[float] = None
+    biomass_end_default: Optional[float] = None
+    biomass_start_tier_2: Optional[float] = None
+    biomass_end_tier_2: Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()
