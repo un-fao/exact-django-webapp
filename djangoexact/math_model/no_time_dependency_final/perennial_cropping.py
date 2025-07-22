@@ -25,7 +25,7 @@ from typing import Optional
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PerennialCropland(LandModule):
 
     nitrous_constant: float
@@ -36,26 +36,26 @@ class PerennialCropland(LandModule):
     emission_factor_burning_methane: float
     combustion_factor: float
     fire_periodicity_default: float
-    fire_periodicity_tier_2: Optional[float]
-    t_biomass_tier_2: Optional[float]
+    fire_periodicity_tier_2: Optional[float] = None
+    t_biomass_tier_2: Optional[float] = None
     agb_rate_default: float
-    agb_rate_tier_2: Optional[float]
-    agb_maximum_c_tier_2: Optional[float]
+    agb_rate_tier_2: Optional[float] = None
+    agb_maximum_c_tier_2: Optional[float] = None
     agb_maximum_c: float
     bgb_rate_default: float
-    bgb_rate_tier_2: Optional[float]
+    bgb_rate_tier_2: Optional[float] = None
     end_module_has_growth: bool
     
     # NOTE: Add specific AGB and BGB and t2 values
     agb_start_default: float
-    agb_start_tier_2: Optional[float]
+    agb_start_tier_2: Optional[float] = None
     bgb_start_default: float
-    bgb_start_tier_2: Optional[float]
+    bgb_start_tier_2: Optional[float] = None
     
     agb_end_default: float
-    agb_end_tier_2: Optional[float]
+    agb_end_tier_2: Optional[float] = None
     bgb_end_default: float
-    bgb_end_tier_2: Optional[float]
+    bgb_end_tier_2: Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()

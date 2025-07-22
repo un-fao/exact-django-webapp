@@ -17,14 +17,14 @@ from typing import Optional
 from .generalized_modules import BaseModule
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ValueChain(BaseModule):
 
     # Emission factors
     emission_factor_start_default: float
     emission_factor_end_default: float
-    emission_factor_start_tier_2: Optional[float]
-    emission_factor_end_tier_2: Optional[float]
+    emission_factor_start_tier_2: Optional[float] = None
+    emission_factor_end_tier_2: Optional[float] = None
 
     # Input quantities
     input_quantity_start: float
