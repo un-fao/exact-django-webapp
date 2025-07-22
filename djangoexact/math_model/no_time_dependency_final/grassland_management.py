@@ -22,7 +22,7 @@ from .ghg_emissions_classes import (
 
 from .generalized_modules import BaseModule, LandModule
 
-@dataclass
+@dataclass(kw_only=True)
 class GrasslandManagement(LandModule):
 
     nitrous_constant: float
@@ -35,7 +35,7 @@ class GrasslandManagement(LandModule):
     agb_ref: float
     agb_tier_2: float
     cf_ref: float
-    cf_tier_2: Optional[float]
+    cf_tier_2: Optional[float] = None
     
 
     def calculate_emissions(

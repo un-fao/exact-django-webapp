@@ -35,13 +35,13 @@ import traceback
 
 # NOTE: ForestManagement class extends LandModule even though it does not have a biomass_start and end.
 # As these variables have beene set to Optional for Perennial it should work fine.
-@dataclass
+@dataclass(kw_only=True)
 class ForestManagement(BaseModule):
     """Forest management module"""
 
     ########### VARIABLES FOR W AND WO CASES ############
     is_same_forest_type: bool
-    forest_start: Optional[Self]
+    forest_start: Optional[Self] = None
 
     ########### GENERAL LAND MODULE VARIABLES ############ # NOTE: Can't directly extend LandModule as it has biomass values (consider changing this)
     hectares_start: float
@@ -49,20 +49,20 @@ class ForestManagement(BaseModule):
 
     soc_start_default: float
     soc_end_default: float
-    soc_start_tier_2: Optional[float]
-    soc_end_tier_2: Optional[float]
+    soc_start_tier_2: Optional[float] = None
+    soc_end_tier_2: Optional[float] = None
     fmg_start_default: float
     fmg_end_default: float
-    fmg_start_tier_2: Optional[float]
-    fmg_end_tier_2: Optional[float]
+    fmg_start_tier_2: Optional[float] = None
+    fmg_end_tier_2: Optional[float] = None
     flu_start_default: float
     flu_end_default: float
-    flu_start_tier_2: Optional[float]
-    flu_end_tier_2: Optional[float]
+    flu_start_tier_2: Optional[float] = None
+    flu_end_tier_2: Optional[float] = None
     fi_start_default: float
     fi_end_default: float
-    fi_start_tier_2: Optional[float]
-    fi_end_tier_2: Optional[float]
+    fi_start_tier_2: Optional[float] = None
+    fi_end_tier_2: Optional[float] = None
 
     ef_nitrous_som: float
 
@@ -79,9 +79,9 @@ class ForestManagement(BaseModule):
     agb_start_default: float
     agb_start_tier_2: float
     max_agb_value_default: float
-    max_agb_value_tier_2: Optional[float]  
-    max_bgb_value_default: Optional[float]  
-    max_bgb_value_tier_2: Optional[float]  
+    max_agb_value_tier_2: Optional[float] = None
+    max_bgb_value_default: Optional[float] = None
+    max_bgb_value_tier_2: Optional[float] = None
 
     ########### ROTATION RELATED VARIABLES ############
     rotation_recurrence: int
