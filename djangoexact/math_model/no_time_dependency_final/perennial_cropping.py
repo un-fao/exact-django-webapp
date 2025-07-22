@@ -52,9 +52,9 @@ class PerennialCropland(LandModule):
     bgb_start_default: float
     bgb_start_tier_2: Optional[float] = None
     
-    agb_end_default: float
+    agb_end_default: Optional[float] = None
     agb_end_tier_2: Optional[float] = None
-    bgb_end_default: float
+    bgb_end_default: Optional[float] = None
     bgb_end_tier_2: Optional[float] = None
 
     def __post_init__(self):
