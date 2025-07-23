@@ -1886,6 +1886,7 @@ class PerennialCropCalculator(LandModuleCalculator):
     def _compute_biomass_for_maturity(
         self, agb_start, agb_end, bgb_start, bgb_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
     ) -> tuple[ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.PerennialBGB, ipcc.PerennialBGB]:
+        
         """
         Computes and adjusts biomass values for start and end scenarios based on system maturity and scenario types.
 
@@ -1904,74 +1905,86 @@ class PerennialCropCalculator(LandModuleCalculator):
             tuple: Adjusted (biomass_start, biomass_end) values based on the scenario conditions
         """
 
-        baseline_biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(agb_start)
-        baseline_biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(agb_end)
-        baseline_bgb_start: ipcc.PerennialBGB = copy.deepcopy(bgb_start)
-        baseline_bgb_end: ipcc.PerennialBGB = copy.deepcopy(bgb_end)
-
-        agb_start = baseline_biomass_start
-        bgb_start = baseline_bgb_start
-
-        agb_end = baseline_biomass_end
-        bgb_end = baseline_bgb_end
-
-        # Checking the start scenario covers both "Perennial -> LUC" and "Perennial -> Perennial" cases
-        # In all other cases, the biomass values are returned as is
-        if self.module.is_start():
+        module_start_is_perennial = self._is_scenario_perennial(scenario_type_start)
+        module_end_is_perennial = self._is_scenario_perennial(scenario_type_end)
+        
+        is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
+        
+        # Case 1: Perennial to LUC
+        if module_start_is_perennial and not module_end_is_perennial:
             if self.module.is_system_in_maturity:
-                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
                 agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                agb_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default"))
-                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default")) # TODO: This has to be taken from ipcc.ForestManagementBGB (see ForestManagement implementation)
-                bgb_end = copy.deepcopy(getattr(self, f"bgb_{scenario_type_end.value}_default")) # TODO: This has to be taken from ipcc.ForestManagementBGB (see ForestManagement implementation)
+                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
+                agb_end.value = 0
+                bgb_end.value = 0
+            else:
+                agb_start = self.biomass_ef_start
+                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
+                agb_end.value = 0
+                bgb_end.value = 0
+        
+        # Case 2: Perennial remaining Perennial
+        elif module_start_is_perennial and module_end_is_perennial:
+            if self.module.is_system_in_maturity:
+                agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
+                agb_end = copy.deepcopy(agb_start)
+                bgb_end = copy.deepcopy(bgb_start)
+            else:
+                agb_start = self.biomass_ef_start
+                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
+                agb_end.value = None
+                bgb_end.value = None
+                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
-            if scenario_type_start is utils.ScenarioTypes.START:
-                if has_change_in_system:
-                    agb_start = self.agb_max_start_default
-                    bgb_start = self.bgb_start_default
-                    if self.agb_max_t2_start is not None:
-                        agb_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    if self.bgb_t2_start is not None:
-                        bgb_start.value = copy.deepcopy(self.bgb_t2_start)
+            if has_change_in_system or is_complete_renewal:
+                if scenario_type_start == utils.ScenarioTypes.START:
                     agb_end.value = 0
                     bgb_end.value = 0
-                    if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        agb_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
-                    if getattr(self, f"bgb_t2_{scenario_type_end.value}") is not None:
-                        bgb_end.value = copy.deepcopy(getattr(self, f"bgb_t2_{scenario_type_end.value}"))
-                elif ((scenario_type_end == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_end == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    agb_end.value = 0
-                    bgb_end.value = 0
-
-            elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
-                if has_change_in_system:
-                    agb_start.value = 0
-                    bgb_start.value = 0
-                    if self.agb_max_t2_start is not None:
-                        agb_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    if self.bgb_t2_start is not None:
-                        bgb_start.value = copy.deepcopy(self.bgb_t2_start)
-                    agb_end.value = None
-                    bgb_end.value = None
-                    if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        agb_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
-                    if getattr(self, f"bgb_t2_{scenario_type_end.value}") is not None:
-                        bgb_end.value = copy.deepcopy(getattr(self, f"bgb_t2_{scenario_type_end.value}"))
-                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
-                elif not self.module.is_system_in_maturity:
-                    agb_start = baseline_biomass_start
-                    bgb_start = baseline_biomass_start
-                    agb_end.value = None
-                    bgb_end.value = None
-                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
-                elif ((scenario_type_start == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_start == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    agb_start.value = 0
+                else:
+                    agb_start.value = 0 
                     bgb_start.value = 0
                     agb_end.value = None
                     bgb_end.value = None
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
+        # Case 3: Perennial from LUC
+        elif not module_start_is_perennial and module_end_is_perennial:
+            agb_start.value = 0
+            bgb_start.value = 0
+            agb_end.value = None
+            bgb_end.value = None
+            setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+        
         return agb_start, agb_end, bgb_start, bgb_end
+
+    def _is_scenario_perennial(self, scenario_type: utils.ScenarioTypes) -> bool:
+        """Helper method to determine if a scenario represents a perennial module type."""
+        if hasattr(self.module, 'land_use_change') and self.module.land_use_change:
+            luc = self.module.land_use_change
+            if scenario_type == utils.ScenarioTypes.START:
+                return luc.module_type_start.class_name == "PerennialCropland"
+            elif scenario_type == utils.ScenarioTypes.WITH:
+                return luc.module_type_w.class_name == "PerennialCropland"
+            elif scenario_type == utils.ScenarioTypes.WITHOUT:
+                return luc.module_type_wo.class_name == "PerennialCropland"
+        else:
+            # If no land use change, check if current module is perennial
+            return self.module.__class__.__name__ == "PerennialCropland"
+        return False
+
+    def _is_complete_renewal(self, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes) -> bool:
+        """Helper method to determine if there's complete renewal for the given scenarios."""
+        if scenario_type_start == utils.ScenarioTypes.START:
+            if scenario_type_end == utils.ScenarioTypes.WITH:
+                return self.module.is_complete_renewal_w
+            elif scenario_type_end == utils.ScenarioTypes.WITHOUT:
+                return self.module.is_complete_renewal_wo
+        elif scenario_type_start == utils.ScenarioTypes.WITH:
+            return self.module.is_complete_renewal_w
+        elif scenario_type_start == utils.ScenarioTypes.WITHOUT:
+            return self.module.is_complete_renewal_wo
+        return False
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
