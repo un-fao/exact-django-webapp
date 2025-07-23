@@ -69,7 +69,13 @@ class PerennialCropland(LandModule):
         self.bgb_end = self.bgb_end_default if self.bgb_end_tier_2 is None else self.bgb_end_tier_2
         
         self.biomass_start = self.agb_start + self.bgb_start
-        self.biomass_end = self.agb_end + self.bgb_end
+        # I evaluate biomass end if there is growth in the end module
+        if self.end_module_has_growth:
+            # If agb_end or bgb_end is not provided, we assume that the biomass end is 0
+            self.biomass_end = None
+        else:
+            # If both agb_end and bgb_end are provided, we calculate the biomass end
+            self.biomass_end = self.agb_end + self.bgb_end
 
     def calculate_emissions(
         self,
