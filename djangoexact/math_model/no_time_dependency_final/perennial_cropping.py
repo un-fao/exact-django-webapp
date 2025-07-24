@@ -25,7 +25,7 @@ from typing import Optional
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PerennialCropland(LandModule):
 
     nitrous_constant: float
@@ -36,21 +36,46 @@ class PerennialCropland(LandModule):
     emission_factor_burning_methane: float
     combustion_factor: float
     fire_periodicity_default: float
-    fire_periodicity_tier_2: Optional[float]
-    t_biomass_tier_2: Optional[float]
+    fire_periodicity_tier_2: Optional[float] = None
+    t_biomass_tier_2: Optional[float] = None
     agb_rate_default: float
-    agb_rate_tier_2: Optional[float]
-    agb_maximum_c_tier_2: Optional[float]
+    agb_rate_tier_2: Optional[float] = None
+    agb_maximum_c_tier_2: Optional[float] = None
     agb_maximum_c: float
     bgb_rate_default: float
-    bgb_rate_tier_2: Optional[float]
+    bgb_rate_tier_2: Optional[float] = None
     end_module_has_growth: bool
+    
+    # NOTE: Add specific AGB and BGB and t2 values
+    agb_start_default: float
+    agb_start_tier_2: Optional[float] = None
+    bgb_start_default: float
+    bgb_start_tier_2: Optional[float] = None
+    
+    agb_end_default: Optional[float] = None
+    agb_end_tier_2: Optional[float] = None
+    bgb_end_default: Optional[float] = None
+    bgb_end_tier_2: Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()
 
         # Tier 2 value
         self.residue_availability_tier_2_default = None
+        
+        self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
+        self.bgb_start = self.bgb_start_default if self.bgb_start_tier_2 is None else self.bgb_start_tier_2
+        self.agb_end = self.agb_end_default if self.agb_end_tier_2 is None else self.agb_end_tier_2
+        self.bgb_end = self.bgb_end_default if self.bgb_end_tier_2 is None else self.bgb_end_tier_2
+        
+        self.biomass_start = self.agb_start + self.bgb_start
+        # I evaluate biomass end if there is growth in the end module
+        if self.end_module_has_growth:
+            # If agb_end or bgb_end is not provided, we assume that the biomass end is 0
+            self.biomass_end = None
+        else:
+            # If both agb_end and bgb_end are provided, we calculate the biomass end
+            self.biomass_end = self.agb_end + self.bgb_end
 
     def calculate_emissions(
         self,
@@ -143,7 +168,7 @@ class PerennialCropland(LandModule):
 
                         biomass_accumulation_rate = agb_rate + bgb_rate
 
-                        max_years_growth = math.floor((max_agb - self.biomass_start * (44/12)) / agb_rate) if max_agb != 0 else self.implementation_time + self.capitalization_time
+                        max_years_growth = math.floor((max_agb - self.agb_start * (44/12)) / agb_rate) if max_agb != 0 else self.implementation_time + self.capitalization_time
                         if max_years_growth < 0:
                             # NOTE: This means that the biomass_start is already greater than the maximum agb, so we have to return an error
                             raise ValueError("The biomass_start is greater than the maximum agb in one of the Project scenarios, which is not allowed. Check tier 2 values")
@@ -152,7 +177,7 @@ class PerennialCropland(LandModule):
                         hectares_before_n, hectares_after_n = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
 
                         calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
-                        tabular = ((max_agb - self.biomass_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
+                        tabular = ((max_agb - self.agb_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
 
                         total = -min(calculated, tabular) if (max_agb != 0 and self.hectares_end != 0) else -calculated
 
