@@ -147,6 +147,14 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         validated_data["is_system_in_maturity"] = False
         validated_data["land_use_type_w"] = self.trees.exclude(id=self.validated_data["land_use_type_start"]).order_by("?").first().id
 
+        print(f"land_use_type_start: {validated_data['land_use_type_start']}")
+        print(f"land_use_type_w: {validated_data['land_use_type_w']}")
+        print(f"land_use_type_wo: {validated_data['land_use_type_wo']}")
+        print(f"is_system_in_maturity: {validated_data['is_system_in_maturity']}")
+        print(f"is_complete_renewal_start: {validated_data['is_complete_renewal_start']}")
+        print(f"is_complete_renewal_w: {validated_data['is_complete_renewal_w']}")
+        print(f"is_complete_renewal_wo: {validated_data['is_complete_renewal_wo']}")
+
         response = self.edit_module(self.module, self.user, validated_data, put=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

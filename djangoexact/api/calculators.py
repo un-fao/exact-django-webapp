@@ -2058,7 +2058,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_w,
                 "bgb_end_tier_2": self.module.bgb_t2_w,
-                "end_module_has_growth": self.end_module_has_growth_start_w,
+                "end_module_has_growth": self.end_module_has_growth_w,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -2124,7 +2124,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_wo,
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
-                "end_module_has_growth": self.end_module_has_growth_start_wo,
+                "end_module_has_growth": self.end_module_has_growth_wo,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
