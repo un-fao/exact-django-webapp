@@ -1909,6 +1909,11 @@ class PerennialCropCalculator(LandModuleCalculator):
         module_end_is_perennial = self._is_scenario_perennial(scenario_type_end)
         
         is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
+
+        agb_start = copy.deepcopy(agb_start)
+        agb_end = copy.deepcopy(agb_end)
+        bgb_start = copy.deepcopy(bgb_start)
+        bgb_end = copy.deepcopy(bgb_end)
         
         # Case 1: Perennial to LUC
         if module_start_is_perennial and not module_end_is_perennial:
