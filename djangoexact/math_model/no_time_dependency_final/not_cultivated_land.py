@@ -21,7 +21,7 @@ from .ghg_emissions_classes import (
 
 from .generalized_modules import LandModule
 
-@dataclass
+@dataclass(kw_only=True)
 class NotCultivatedLand(LandModule):
 
     nitrous_constant : float

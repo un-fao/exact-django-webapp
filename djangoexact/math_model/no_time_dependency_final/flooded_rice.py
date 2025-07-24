@@ -21,29 +21,29 @@ from .generalized_modules import LandModule
 from dataclasses import dataclass, field
 from typing import Optional
 
-@dataclass
+@dataclass(kw_only=True)
 class FloodedRice(LandModule):
     EFc_ref: float
-    EFc_tier_2: Optional[float]
+    EFc_tier_2: Optional[float] = None
     SFw_ref: float
-    SFw_tier_2: Optional[float]
+    SFw_tier_2: Optional[float] = None
     SFp_ref: float
-    SFp_tier_2: Optional[float]
+    SFp_tier_2: Optional[float] = None
     cfoa: float
-    SFo_tier_2: Optional[float]
-    adjusted_daily_ef_methane_tier_2: Optional[float]
+    SFo_tier_2: Optional[float] = None
+    adjusted_daily_ef_methane_tier_2: Optional[float] = None
     yield_ref: float
-    yield_tier_2: Optional[float]
+    yield_tier_2: Optional[float] = None
     rice_slope: float
     rice_intercept: float
-    straw_tonnes_tier_2: Optional[float]
+    straw_tonnes_tier_2: Optional[float] = None
     methane_ef: float
     rice_cf: float
     nitrous_ef: float
     nitrous_constant: float
     methane_constant: float
     cultivation_period_ref: float
-    cultivation_period_tier_2: Optional[float]
+    cultivation_period_tier_2: Optional[float] = None
     straw_burnt: float
     delay: int 
     is_minor_season: bool = True

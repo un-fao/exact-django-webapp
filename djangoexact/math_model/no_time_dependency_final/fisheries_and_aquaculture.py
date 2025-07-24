@@ -14,29 +14,29 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Fishery(BaseModule):
     catch_start: float
     catch_end: float
     ef_diesel_default_co2: float
-    ef_diesel_co2_start_tier_2: Optional[float]
-    ef_diesel_co2_end_tier_2: Optional[float]
+    ef_diesel_co2_start_tier_2: Optional[float] = None
+    ef_diesel_co2_end_tier_2: Optional[float] = None
     ef_diesel_default_n2o: float
-    ef_diesel_n2o_start_tier_2: Optional[float]
-    ef_diesel_n2o_end_tier_2: Optional[float]
+    ef_diesel_n2o_start_tier_2: Optional[float] = None
+    ef_diesel_n2o_end_tier_2: Optional[float] = None
     ef_diesel_default_ch4: float
-    ef_diesel_ch4_start_tier_2: Optional[float]
-    ef_diesel_ch4_end_tier_2: Optional[float]
+    ef_diesel_ch4_start_tier_2: Optional[float] = None
+    ef_diesel_ch4_end_tier_2: Optional[float] = None
     fui_default_start: float
     fui_default_end: float
-    fui_start_tier_2: Optional[float]
-    fui_end_tier_2: Optional[float]
+    fui_start_tier_2: Optional[float] = None
+    fui_end_tier_2: Optional[float] = None
     gwp_refrigerant_default: float
-    gwp_refrigerant_start_tier_2: Optional[float]
-    gwp_refrigerant_end_tier_2: Optional[float]
+    gwp_refrigerant_start_tier_2: Optional[float] = None
+    gwp_refrigerant_end_tier_2: Optional[float] = None
     quantity_lost_refrigerant_default: float
-    quantity_lost_refrigerant_start_tier_2: Optional[float]
-    quantity_lost_refrigerant_end_tier_2: Optional[float]
+    quantity_lost_refrigerant_start_tier_2: Optional[float] = None
+    quantity_lost_refrigerant_end_tier_2: Optional[float] = None
     percentage_refrigerant_start: float
     percentage_refrigerant_end: float
     tonnes_ice_default: float
@@ -159,7 +159,7 @@ class Fishery(BaseModule):
         calculate_ice_emissions()
 
 
-@dataclass
+@dataclass(kw_only=True)
 class CoastalAquaculture(BaseModule):
     production_start: float
     production_end: float
