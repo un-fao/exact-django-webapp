@@ -1,11 +1,10 @@
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "$version"
-version_scheme = "semver"
-version = "0.16.0"
+version_scheme = "pep440"
+version = "1.15.0"
 update_changelog_on_bump = true
-major_version_zero = true
 tag = false
 version_files = [
-  "djangolsipt/djangolsipt/__init__.py"
+  "djangoexact/djangoexact/__init__.py"
 ]
