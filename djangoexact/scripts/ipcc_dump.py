@@ -4933,11 +4933,12 @@ def run():
         add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
         add_small_fishery_gear_types_fishery_types_relationships()
         change_other_land_flu_data_to_1()
+        update_module_types_of_fuel_types()
+        convert_storage_refrigerant_ef_from_kg_to_tonnes()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        convert_storage_refrigerant_ef_from_kg_to_tonnes()
         pass
 
     if app_mode == "development":
