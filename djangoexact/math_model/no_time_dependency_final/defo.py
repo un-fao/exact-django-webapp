@@ -23,13 +23,13 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Defo(BaseModule):
 
     ha_start: float
     ha_end: float
     biomass_final_1_year_t_per_ha_default: float
-    biomass_final_1_year_t_per_ha_tier_2: Optional[float]
+    biomass_final_1_year_t_per_ha_tier_2: Optional[float] = None
     nitrous_constant: float
     methane_constant: float
     fire_bool: bool
@@ -38,13 +38,13 @@ class Defo(BaseModule):
     cf_vegetation: float
     moisture_emission_factor: float
     litter: float
-    litter_tier_2: Optional[float]
+    litter_tier_2: Optional[float] = None
     dw: float
-    dw_tier_2: Optional[float]
+    dw_tier_2: Optional[float] = None
     hwp_before_t_dm_per_ha: float
     mangrove_factor: float
-    bgb_t_c_per_ha_tier_2: Optional[float]
-    agb_t_c_per_ha_tier_2: Optional[float]
+    bgb_t_c_per_ha_tier_2: Optional[float] = None
+    agb_t_c_per_ha_tier_2: Optional[float] = None
     agb_t_c_per_ha_default: float
     bgb_t_c_per_ha_default_input_parameter: float
     c_n_ratio: float
