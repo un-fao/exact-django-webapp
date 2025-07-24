@@ -1,3 +1,29 @@
+## 1.15.0 (2025-07-24)
+
+### Feat
+
+- **testing**: add system maturity testing in perennial cropland unit test class
+- **testing**: add method to get module details and add the ability to edit a module using PUT instead of PATCH
+- added default None to Optionals and changed dataclasses to kw_only
+- **perennial cropland**: add bgb as an input for the mathematical model
+- **perennial**: split biomass into agb and bgb
+- **forest management**: add tier2 value for max bgb
+- **forest**: add bgb tier 2 values
+- added versions changelog
+
+### Fix
+
+- Change commitizen version scheme
+- typos in commitizen configuration toml
+- Adjust growth dinamics for start-with and start-without scenarios
+- Deepcopy reference AGB and BGB values in maturity computations to avoid in-memory value replacements
+- **perennial_cropping**: fix biomass assignment
+- **perennial cropland**: complete rewrite of maturity computation
+- set Perennial agb and bgb to nullable
+- added wildcard prefix in allowed hosts to accept load balancer internal hostnames
+- **perennial cropland**: initialize biomass_start to 0 for complete renewal
+- **grassland**: remove reference to single biomass values causing the wrong bioimass tier2 values to be evaluated
+
 ## 1.14.6 (2025-07-21)
 
 ### Feat
