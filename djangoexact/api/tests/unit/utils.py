@@ -1,15 +1,11 @@
 from rest_framework.test import APIRequestFactory, APITestCase
-from rest_framework import status
 from django.urls import reverse
 from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
-import api.tests.factories as factories
 from rest_framework.test import force_authenticate
-from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
+from factory.fuzzy import FuzzyText, FuzzyInteger
 import logging as log
-from api import serializers
-import io
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 import public.views as public_views
@@ -271,19 +267,40 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=activity.id)
 
-    def edit_module(self, module, user, data):
+    def get_module_details(self, module, user):
+        """
+        Get module details using the ModuleViewSet.
+        """
+        log.info("Getting module details")
+        view = generic_module_viewset(module.__class__).as_view({"get": "retrieve"})
+        request = self.request_factory.get(reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]), format="json")
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
+
+    def edit_module(self, module, user, data, put=False):
         """
         Edit a module using the ModuleViewSet.
 
-        This method edits a module by sending a PATCH request to the 'module-detail' endpoint
+        This method edits a module by sending a PATCH or PUT request to the 'module-detail' endpoint
         with the provided module data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
+
+        Args:
+            module: The module to edit
+            user: The user making the request
+            data: The data to update the module with
+            put: If True, do a PUT request instead of PATCH, transferring all module data
         """
         log.debug(f"Editing module: {module.__class__.__name__}")
         log.debug(f"Data: {data}")
-        view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
-        # Get viewset url name
-        request = self.request_factory.patch(
+        if put:
+            view = generic_module_viewset(module.__class__).as_view({"put": "update"})
+        else:
+            view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
+
+        http_method = self.request_factory.put if put else self.request_factory.patch
+
+        request = http_method(
             reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]),
             data,
             format="json",
