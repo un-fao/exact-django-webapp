@@ -837,7 +837,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", request.LANGUAGE_CODE)
+        lang = request.query_params.get("lang", "en")
+        if request.LANGUAGE_CODE:
+            lang = request.LANGUAGE_CODE
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
