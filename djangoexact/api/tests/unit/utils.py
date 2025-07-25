@@ -476,3 +476,16 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+    
+    def send_recap_email(self, project, user):
+        """
+        Send a recap email using the ProjectViewSet.
+        """
+        log.info("Sending recap email")
+        view = ProjectViewSet.as_view({"post": "recap"})
+        request = self.request_factory.post(
+            reverse("project-recap", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
