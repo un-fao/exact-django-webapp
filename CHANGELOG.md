@@ -1,3 +1,14 @@
+## 1.15.1 (2025-07-25)
+
+### Feat
+
+- Add recap endpoint to manually send recap email for a project
+- Add notification email opt out for users
+
+### Fix
+
+- **Templated Report**: Make english the default language and only evaluate request LANGUAGE_CODE if present
+
 ## 1.15.0 (2025-07-24)
 
 ### Feat
