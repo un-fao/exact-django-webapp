@@ -753,7 +753,7 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
 
     if recipients is None:
-        recipients = project.members.filter(group__name="Admin").all()
+        recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
 
     locked_at = project.locked_at
 
@@ -819,7 +819,7 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         return
 
     for recipient in recipients:
-        user = recipient.user
+        user: api_models.CustomUser = recipient.user
         context.update({"recipient": user})
         if user.email:
             html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "changes", "changes.html"), context)
