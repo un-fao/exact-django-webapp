@@ -75,6 +75,8 @@ class CustomUser(AbstractUser):
     organization = models.CharField(max_length=255, null=True, blank=True)
     firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
+    is_opted_out_of_emails = models.BooleanField(default=False)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

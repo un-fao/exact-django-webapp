@@ -500,7 +500,6 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertTrue(make_public_response.data["is_public"])
 
         get_report_response = self.get_report_anonimously(project)
-        print(get_report_response)
         self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
         self.assertEqual(get_report_response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -566,7 +565,6 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
 
         get_memberships_response = self.get_project_memberships(project)
-        print(get_memberships_response.data)
         self.assertEqual(get_memberships_response.status_code, status.HTTP_200_OK)
         self.assertTrue("id" in get_memberships_response.data[0])
 
@@ -603,3 +601,19 @@ class ProjectTestCase(APITestCaseMixin):
 
     #     log.info("END - test_copying_activity_of_finalized_project")
 
+    def test_send_recap_email(self):
+        """
+        Test that sending a recap email is not allowed for opted out users.
+        """
+
+        log.info("START - test_send_recap_email")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        send_recap_email_response = self.send_recap_email(project, self.user)
+        print(send_recap_email_response.data)
+        self.assertEqual(send_recap_email_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_send_recap_email")

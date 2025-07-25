@@ -837,7 +837,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", request.LANGUAGE_CODE)
+        lang = request.query_params.get("lang", "en")
+        if request.LANGUAGE_CODE:
+            lang = request.LANGUAGE_CODE
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1266,6 +1268,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectTagSerializer(tags, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
+        operation_description="Send recap email with project changes",
+        responses={
+            200: "Email sent successfully",
+            400: "Bad request",
+            500: "Internal server error"
+        }
+    )
+    def recap(self, request, pk=None):
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        try:
+            utils.send_changes_email(project)
+            return Response({"message": "Recap email sent successfully"}, status=http_status.HTTP_200_OK)
+
+        except Exception as e:
+            return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
