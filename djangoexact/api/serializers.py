@@ -314,7 +314,6 @@ class ProjectTagSerializer(serializers.ModelSerializer):
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
-    country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
     tags = ProjectTagSerializer(many=True, read_only=True)
 
     class Meta:
@@ -339,18 +338,7 @@ class ProjectResultSerializer(serializers.Serializer):
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
-    climate = get_model_serializer(Climate)(many=False, read_only=True)
-    country = CountrySerializer(many=False, read_only=True)
-    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
-    soil_type = get_model_serializer(SoilType)(many=False, read_only=True)
-    gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
-    status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
-    owner = UserReadSerializer(many=False, read_only=True)
     role = serializers.SerializerMethodField()
-    total_hectares = serializers.SerializerMethodField()
-    total_catch = serializers.SerializerMethodField()
-    total_livestock = serializers.SerializerMethodField()
-    note = serializers.SerializerMethodField()
 
     capitalization_years = serializers.FloatField(read_only=True)
 
@@ -531,6 +519,23 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         # Ask the frontend team if this is still necessary before removing it.
         self.sanitize_soc_ref_t2(self.initial_data)
         return super().is_valid(raise_exception=raise_exception)
+
+
+# Response serializers for project statistics endpoints
+class ProjectTotalHectaresSerializer(serializers.Serializer):
+    total_hectares = serializers.FloatField()
+
+
+class ProjectTotalCatchSerializer(serializers.Serializer):
+    start = serializers.FloatField()
+    w = serializers.FloatField()
+    wo = serializers.FloatField()
+
+
+class ProjectTotalLivestockSerializer(serializers.Serializer):
+    start = serializers.IntegerField()
+    w = serializers.IntegerField()
+    wo = serializers.IntegerField()
 
 
 class ActivitySummarySerializer(serializers.ModelSerializer):

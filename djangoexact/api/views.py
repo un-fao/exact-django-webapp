@@ -104,6 +104,9 @@ from .serializers import (
     ProjectSummarySerializer,
     ActivitySummarySerializer,
     ProjectTagSerializer,
+    ProjectTotalHectaresSerializer,
+    ProjectTotalCatchSerializer,
+    ProjectTotalLivestockSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
     APIStatusSerializer,
@@ -826,6 +829,94 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ActivitySerializer(activities, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"], url_path="total-hectares")
+    @swagger_auto_schema(
+        responses={
+            404: "Project not found", 
+            403: "Selected user does not have permission to view project", 
+            200: ProjectTotalHectaresSerializer
+        }
+    )
+    def total_hectares(self, request, pk=None):
+        """
+        Returns the total hectares for all land modules in the project.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        total_hectares = sum([activity.get_land_modules_area() for activity in project.activities.all()])
+        
+        data = {"total_hectares": total_hectares}
+        serializer = ProjectTotalHectaresSerializer(data)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-catch")
+    @swagger_auto_schema(
+        responses={
+            404: "Project not found", 
+            403: "Selected user does not have permission to view project", 
+            200: ProjectTotalCatchSerializer
+        }
+    )
+    def total_catch(self, request, pk=None):
+        """
+        Returns the total catch for all fisheries and aquaculture in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        small_fisheries = SmallFishery.objects.filter(activity__project=project).all()
+        large_fisheries = LargeFishery.objects.filter(activity__project=project).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=project).all()
+
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
+
+        scenario_based_catch = {
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
+        }
+        
+        serializer = ProjectTotalCatchSerializer(scenario_based_catch)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-livestock")
+    @swagger_auto_schema(
+        responses={
+            404: "Project not found", 
+            403: "Selected user does not have permission to view project", 
+            200: ProjectTotalLivestockSerializer
+        }
+    )
+    def total_livestock(self, request, pk=None):
+        """
+        Returns the total number of livestock heads in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        livestock = Livestock.objects.filter(activity__project=project).all()
+
+        all_livestock_start = sum([animal.heads_number_start for animal in list(filter(lambda animal: animal.heads_number_start is not None, livestock))])
+        all_livestock_w = sum([animal.heads_number_w for animal in list(filter(lambda animal: animal.heads_number_w is not None, livestock))])
+        all_livestock_wo = sum([animal.heads_number_wo for animal in list(filter(lambda animal: animal.heads_number_wo is not None, livestock))])
+
+        scenario_based_livestock = {
+            "start": all_livestock_start,
+            "w": all_livestock_w,
+            "wo": all_livestock_wo,
+        }
+        
+        serializer = ProjectTotalLivestockSerializer(scenario_based_livestock)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
     @swagger_auto_schema(
         operation_description="Generate a PDF from an HTML template",
         manual_parameters=[
@@ -1291,6 +1382,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        responses={200: ProjectSummarySerializer},
+        operation_description="Get a summary of a project, including user roles and tags",
+    )
+    def summary(self, request, pk=None):
+        serializer = ProjectSummarySerializer(self.get_object(), context={"request": request})
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
+    
+    
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
     serializer_class = ProjectMembershipReadSerializer
