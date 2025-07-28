@@ -108,7 +108,6 @@ from django.contrib.contenttypes.models import ContentType
 import api.security as security
 from django.conf import settings
 
-
 class EmptySerializer(serializers.Serializer):
     pass
 
@@ -537,14 +536,6 @@ class ProjectTotalLivestockSerializer(serializers.Serializer):
     w = serializers.IntegerField()
     wo = serializers.IntegerField()
 
-
-class ActivitySummarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage"]
-        ref_name = "Activity"
-
-
 class ActivityResultSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     cost = serializers.FloatField(read_only=True)
@@ -552,17 +543,6 @@ class ActivityResultSerializer(serializers.Serializer):
 
 
 class ActivitySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=255, read_only=True)
-    project = ReadProjectSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
-    climate_t2 = get_model_serializer(Climate)(read_only=True)
-    moisture_t2 = get_model_serializer(Moisture)(read_only=True)
-    soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
-    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
-    owner = UserReadSerializer(many=False, read_only=True)
-
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
     completion_percentage = serializers.FloatField(read_only=True)
 
     class Meta:
@@ -570,12 +550,45 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "Activity"
 
+class ModuleTypeIdModuleIdSerializer(serializers.Serializer):
+    module_type = serializers.PrimaryKeyRelatedField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    endpoint_url = serializers.SerializerMethodField(read_only=True)
+
+    def get_endpoint_url(self, obj):
+        """
+        Returns the API endpoint URL for this module type by dynamically 
+        looking up the URL pattern from the router configuration
+        """
+        if not hasattr(obj, 'module_type') or not obj.module_type:
+            return None
+            
+        module_type = obj.module_type
+        class_name = module_type.class_name
+        
+        try:
+            from api.urls import router
+            from django.apps import apps
+            try:
+                model_class = apps.get_model('api', class_name)
+            except LookupError:
+                return None
+            
+            for prefix, viewset_class, basename in router.registry:
+                if hasattr(viewset_class, 'queryset') and viewset_class.queryset is not None:
+                    if viewset_class.queryset.model == model_class:
+                        return f"api/{prefix}/"
+                        
+        except (ImportError, AttributeError):
+            pass
+            
+        return None
 
 class ActivitySerializerWithModules(ActivitySerializer):
     modules = serializers.SerializerMethodField(read_only=True)
 
     def get_modules(self, obj: Activity):
-        return [get_module_serializer(module.__class__)(module, many=False).data for module in obj.modules]
+        return ModuleTypeIdModuleIdSerializer(obj.modules, many=True).data
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):

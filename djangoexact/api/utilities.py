@@ -830,3 +830,62 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
                 send_mail(subject, plain_message, from_email, [to], html_message=html_message)
             except Exception as e:
                 log.error(f"Failed to send email to {user.email}: {e}")
+
+
+def paginated_parallel_response(queryset, request, process_function, paginator_class=None, max_workers=None, serializer_class=None, serializer_kwargs=None):
+    """
+    Generalized utility for handling paginated responses with parallel processing.
+    
+    Args:
+        queryset: Django queryset to paginate and process
+        request: Django request object
+        process_function: Function to process each item (optional if serializer_class provided)
+        paginator_class: Pagination class to use (defaults to DefaultPagination)
+        max_workers: Maximum number of worker threads (defaults to None for automatic)
+        serializer_class: Serializer class to use instead of process_function
+        serializer_kwargs: Additional kwargs to pass to serializer
+    
+    Returns:
+        Response: Paginated response with processed data
+    """
+    from concurrent.futures import ThreadPoolExecutor
+    from rest_framework.pagination import PageNumberPagination
+    from rest_framework import status as http_status
+    
+    # Use default pagination if none provided
+    if paginator_class is None:
+        # Import DefaultPagination from views to avoid circular imports
+        from api.views import DefaultPagination
+        paginator_class = DefaultPagination
+    
+    # Create processing function if serializer_class is provided
+    if serializer_class is not None and process_function is None:
+        serializer_kwargs = serializer_kwargs or {}
+        def process_function(item):
+            return serializer_class(item, **serializer_kwargs).data
+    
+    if process_function is None:
+        raise ValueError("Either process_function or serializer_class must be provided")
+    
+    # Create paginator and paginate queryset
+    paginator = paginator_class()
+    page = paginator.paginate_queryset(queryset, request)
+    
+    if page is not None:
+        # Process page items in parallel
+        executor_kwargs = {}
+        if max_workers is not None:
+            executor_kwargs['max_workers'] = max_workers
+            
+        with ThreadPoolExecutor(**executor_kwargs) as executor:
+            response_data = list(executor.map(process_function, page))
+        return paginator.get_paginated_response(response_data)
+    
+    # If no pagination, process all items
+    if serializer_class is not None:
+        serializer_kwargs = serializer_kwargs or {}
+        response_data = serializer_class(queryset, many=True, **serializer_kwargs).data
+    else:
+        response_data = list(map(process_function, queryset))
+    
+    return Response(data=response_data, status=http_status.HTTP_200_OK)

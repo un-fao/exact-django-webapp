@@ -102,7 +102,6 @@ from .serializers import (
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
-    ActivitySummarySerializer,
     ProjectTagSerializer,
     ProjectTotalHectaresSerializer,
     ProjectTotalCatchSerializer,
@@ -115,10 +114,9 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
-    HandInHandRegionSerializer,
-    HandInHandCountrySerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
+    ModuleTypeIdModuleIdSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -540,17 +538,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if is_summary:
             SerializerClass = ProjectSummarySerializer
 
-        def serialize_project(project):
-            return SerializerClass(project, context={"request": request}).data
-
-        paginator = DefaultPagination()
-        page = paginator.paginate_queryset(ordered_projects, request)
-        if page is not None:
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                response = list(executor.map(serialize_project, page))
-            return paginator.get_paginated_response(response)
-
-        return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
+        return utils.paginated_parallel_response(
+            queryset=ordered_projects,
+            request=request,
+            serializer_class=SerializerClass,
+            max_workers=10,
+            serializer_kwargs={'context': {'request': request}},
+            process_function=lambda project: SerializerClass(project, context={"request": request}).data
+        )
 
     activities = openapi.Parameter(
         "activities",
@@ -812,17 +807,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project.unlock()
 
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
-        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
-
-    @action(detail=True, methods=["get"])
-    def activities(self, request, pk=None):
-        project: Project = self.get_object()
-        error = security.check_permission("view_project", self.request.user, project)
-        if error:
-            return error
-
-        activities = project.activities.all()
-        serializer = ActivitySerializer(activities, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="total-hectares")
@@ -1830,36 +1814,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
-        is_summary = request.query_params.get("summary", False)
-        SerializerClass = ActivitySerializerWithModules
-        if is_summary:
-            SerializerClass = ActivitySummarySerializer
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
             return error
 
-        def process_activity(activity):
-            activity_dict = SerializerClass(activity).data
-            return activity_dict
-
         activities_list = Activity.objects.filter(project__id=project_id)
 
-        # Start measuring time
-        start = time.time()
-
-        paginator = DefaultPagination()
-        page = paginator.paginate_queryset(activities_list, request)
-        if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
-                logger.debug(f"Time taken to process activities: {time.time() - start}")
-            return paginator.get_paginated_response(response)
-
-        # End measuring time
-        logger.debug(f"Time taken to process activities: {time.time() - start}")
-
-        return Response(data=SerializerClass(activities_list, many=True).data, status=http_status.HTTP_200_OK)
+        return utils.paginated_parallel_response(
+            queryset=activities_list,
+            request=request,
+            serializer_class=self.serializer_class,
+            process_function=lambda activity: self.serializer_class(activity).data
+        )
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
@@ -1918,7 +1885,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        modules = get_modules(activity)
+        modules = ModuleTypeIdModuleIdSerializer(activity.modules, many=True).data
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(modules, request)
@@ -1954,7 +1921,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer,)
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer})
     def copy(self, request, pk=None):
         activity: Activity = self.get_object()
         error = security.check_permission("view_activity", self.request.user, activity.project)
