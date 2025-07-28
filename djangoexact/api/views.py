@@ -1722,7 +1722,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Activity.objects.all()
-    serializer_class = ActivitySerializerWithModules
+    serializer_class = ActivitySerializer
     permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
     def update(self, request, *args, **kwargs):
@@ -1800,7 +1800,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id],
+        manual_parameters=[project_id, openapi.Parameter("modules", openapi.IN_QUERY, description="Return modules", type=openapi.TYPE_BOOLEAN)],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -1814,6 +1814,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
+        modules = self.request.query_params.get("modules", False)
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
@@ -1821,11 +1822,13 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         activities_list = Activity.objects.filter(project__id=project_id)
 
+        SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
+
         return utils.paginated_parallel_response(
             queryset=activities_list,
             request=request,
-            serializer_class=self.serializer_class,
-            process_function=lambda activity: self.serializer_class(activity).data
+            serializer_class=SerializerClass,
+            process_function=lambda activity: SerializerClass(activity).data
         )
 
     @action(detail=True, methods=["get"])
@@ -1875,6 +1878,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(response)
 
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity modules", 200: ModuleTypeIdModuleIdSerializer(many=True)})
     def modules(self, request, pk=None):
         """
         Lists the modules of a given activity.
