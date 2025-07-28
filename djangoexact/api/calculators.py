@@ -1910,56 +1910,57 @@ class PerennialCropCalculator(LandModuleCalculator):
         
         is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
 
-        agb_start = copy.deepcopy(agb_start)
-        agb_end = copy.deepcopy(agb_end)
-        bgb_start = copy.deepcopy(bgb_start)
-        bgb_end = copy.deepcopy(bgb_end)
-        
-        # Case 1: Perennial to LUC
-        if module_start_is_perennial and not module_end_is_perennial:
+        self.agb_start = copy.deepcopy(agb_start)
+        self.agb_end = copy.deepcopy(agb_end)
+        self.bgb_start = copy.deepcopy(bgb_start)
+        self.bgb_end = copy.deepcopy(bgb_end)
+
+        def perennial_to_luc():
             if self.module.is_system_in_maturity:
-                agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
-                agb_end.value = 0
-                bgb_end.value = 0
+                self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                self.bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
             else:
-                agb_start = self.biomass_ef_start
-                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
-                agb_end.value = 0
-                bgb_end.value = 0
+                self.agb_start = self.biomass_ef_start
+                self.bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
+            
+            self.agb_end.value = 0
+            self.bgb_end.value = 0
+
+        def perennial_from_luc():
+            self.agb_start.value = 0
+            self.bgb_start.value = 0
+            self.agb_end.value = None
+            self.bgb_end.value = None
+            setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
         
-        # Case 2: Perennial remaining Perennial
-        elif module_start_is_perennial and module_end_is_perennial:
+        def perennial_to_perennial():
             if self.module.is_system_in_maturity:
-                agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
-                agb_end = copy.deepcopy(agb_start)
-                bgb_end = copy.deepcopy(bgb_start)
+                self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                self.bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
             else:
-                agb_start = self.biomass_ef_start
-                bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
-                agb_end.value = None
-                bgb_end.value = None
-                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+                self.agb_start = self.biomass_ef_start
+                self.bgb_start = copy.deepcopy(getattr(self, f"bgb_{scenario_type_start.value}_default"))
 
             if has_change_in_system or is_complete_renewal:
                 if scenario_type_start == utils.ScenarioTypes.START:
-                    agb_end.value = 0
-                    bgb_end.value = 0
+                    perennial_to_luc()
                 else:
-                    agb_start.value = 0 
-                    bgb_start.value = 0
-                    agb_end.value = None
-                    bgb_end.value = None
-                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+                    perennial_from_luc()
+            elif not self.module.is_system_in_maturity:
+                self.agb_end = None
+                self.bgb_end = None
+                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+            else:
+                self.agb_end = copy.deepcopy(self.agb_start)
+                self.bgb_end = copy.deepcopy(self.bgb_start)
+        
 
-        # Case 3: Perennial from LUC
+        if module_start_is_perennial and not module_end_is_perennial:
+            perennial_to_luc()
+        elif module_start_is_perennial and module_end_is_perennial:
+            perennial_to_perennial()
         elif not module_start_is_perennial and module_end_is_perennial:
-            agb_start.value = 0
-            bgb_start.value = 0
-            agb_end.value = None
-            bgb_end.value = None
-            setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+            perennial_from_luc()
         
         return agb_start, agb_end, bgb_start, bgb_end
 
