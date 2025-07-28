@@ -498,7 +498,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             200: ReadProjectSerializer,
             201: ProjectSummarySerializer,
         },
-        serializer_class=ReadProjectSerializer,
     )
     def list(self, request):
         """
@@ -528,15 +527,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 else:
                     filters[f"project__{key}"] = value
 
-        # NOTE: Users can have multiple memberships to the same project, so we need to filter by distinct projects
-        # And deduplicate them by assigning them to a dictionary with the project id as the unique key
-        shared_projects = request.user.memberships.filter(**filters).distinct()
-        project_map = {}
-        for share in shared_projects:
-            project = share.project
-            if utils.has_project_permission("view_project", self.request.user, project):
-                project_map[project.pk] = project
-        projects_list = list(project_map.values())
+        # Get projects that the user has access to with view permission
+        projects_list = Project.objects.filter(
+            members__user=request.user,
+            members__group__permissions__codename="view_project",
+            **{f"members__{k}": v for k, v in filters.items()}
+        ).distinct()
 
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
