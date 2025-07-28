@@ -6283,10 +6283,12 @@ class OrganicSoilCalculator(BaseCalculator):
             self.onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.onsite_ef_wo.co2 is None and module.onsite_co2_peat_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+            if self.onsite_ef_wo.ch4 is None and module.onsite_ch4_peat_t2_wo is None:
+                raise ValueError(f"Could not find CH4 value of On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.onsite_ef_wo.n2o is None and module.onsite_n2o_peat_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
+            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
             if missing_t2_gases:
                 raise ValueError(f"Could not find On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
@@ -6399,7 +6401,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "ef_co2_onsite_ref": self.onsite_ef_w.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_w,
                 "ef_ch4_onsite_ref": self.onsite_ef_w.ch4,
-                "ef_ch4_onsite_tier_2": None,  # NOTE: Set to None, why?
+                "ef_ch4_onsite_tier_2": input.onsite_ch4_peat_t2_w,
                 "ef_n2o_onsite_ref": self.onsite_ef_w.n2o,
                 "ef_n2o_onsite_tier_2": input.onsite_n2o_peat_t2_w,
                 "ef_doc_offsite_ref": self.offsite_ef_w.doc,
@@ -6497,7 +6499,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "ef_co2_onsite_ref": self.onsite_ef_wo.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_wo,
                 "ef_ch4_onsite_ref": self.onsite_ef_wo.ch4,
-                "ef_ch4_onsite_tier_2": None,  # NOTE: Set to None, why?
+                "ef_ch4_onsite_tier_2": input.onsite_ch4_peat_t2_wo,
                 "ef_n2o_onsite_ref": self.onsite_ef_wo.n2o,
                 "ef_n2o_onsite_tier_2": input.onsite_n2o_peat_t2_wo,
                 "ef_doc_offsite_ref": self.offsite_ef_wo.doc,
