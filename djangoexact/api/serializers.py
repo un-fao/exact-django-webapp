@@ -1430,29 +1430,39 @@ class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
             "start": {
                 "mandatory": [
                     "land_use_type_start",
-                    # "tillage_management_type_start",
-                    # "organic_input_type_start",
                     "residue_management_type_start",
                 ],
             },
             "with": {
                 "mandatory": [
                     "land_use_type_w",
-                    # "tillage_management_type_w",
-                    # "organic_input_type_w",
                     "residue_management_type_w",
                 ],
             },
             "without": {
                 "mandatory": [
                     "land_use_type_wo",
-                    # "tillage_management_type_wo",
-                    # "organic_input_type_wo",
                     "residue_management_type_wo",
                 ],
             },
         }
 
+    def validate(self, data):
+        parent: AnnualCropland = self.instance.parent if self.instance else data.get("parent")
+        land_use_type_start = self.instance.land_use_type_start if self.instance else data.get("land_use_type_start", None)
+        land_use_type_w = self.instance.land_use_type_w if self.instance else data.get("land_use_type_w", None)
+        land_use_type_wo = self.instance.land_use_type_wo if self.instance else data.get("land_use_type_wo", None)
+
+        if parent and not parent.is_start() and land_use_type_start:
+            raise serializers.ValidationError("Land use type start cannot be set if the main cropland is not in the start scenario")
+        
+        if parent and not parent.is_with() and land_use_type_w:
+            raise serializers.ValidationError("Land use type with cannot be set if the main cropland is not in the with scenario")
+        
+        if parent and not parent.is_without() and land_use_type_wo:
+            raise serializers.ValidationError("Land use type without cannot be set if the main cropland is not in the without scenario")
+
+        return super().validate(data)
 
 class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
@@ -1460,6 +1470,7 @@ class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "MinorSeasonAnnualCropland"
         mandatory_fields = MinorSeasonAnnualCroplandWriteSerializer.Meta.mandatory_fields
+
 
 
 class AnnualCroplandSerializer(LandModuleSeralizer):
