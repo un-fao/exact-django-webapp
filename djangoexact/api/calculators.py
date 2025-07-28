@@ -3551,7 +3551,15 @@ class InputEntryCalculator(BaseCalculator):
         try:
             self.ref = ipcc.InputReference.objects.get(input_type=self.module.input_type)
         except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {self.module.input_type.name} does not exist.")
+            if "User Defined" not in self.module.input_type.name:
+                raise ValueError(f"Reference for {self.module.input_type.name} does not exist.")
+
+            if self.needs_co2_ref and self.module.co2_emissions_t2 is None:
+                raise ValueError(f"CO2 emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
+            if self.needs_n2o_ref and self.module.n2o_emissions_t2 is None:
+                raise ValueError(f"N2O emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
+            if self.needs_co2_e_ref and self.module.co2_e_emissions_t2 is None:
+                raise ValueError(f"CO2-eq emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
 
         self.ef = ipcc.InputEmissionFactor.objects.filter(input_type=self.module.input_type, climate=self.climate, moisture=self.moisture).first()
 
