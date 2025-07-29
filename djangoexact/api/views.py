@@ -2727,7 +2727,7 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows Hand in Hand assessments to be viewed or edited.
     """
@@ -2735,12 +2735,22 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = HandInHandAssessment.objects.all()
     serializer_class = HandInHandAssessmentSerializer
 
+    # Cache settings
+    CACHE_KEY_PREFIX = "handinhand_assessments"
+    CACHE_TIMEOUT_SECONDS = 60 * 15  # 15 minutes
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
                 "grouped",
                 openapi.IN_QUERY,
                 description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
         ],
@@ -2751,9 +2761,25 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all Hand in Hand assessments, optionally grouped by region > country > year
         """
         grouped = request.query_params.get("grouped", "false").lower() == "true"
+        use_cache = request.query_params.get("cached", "true").lower() == "true"
+
+        # Generate cache key based on grouping option
+        cache_key = f"{self.CACHE_KEY_PREFIX}_{'grouped' if grouped else 'list'}"
+
+        # Try to get cached data if cache is enabled
+        if use_cache:
+            cached_data = cache.get(cache_key)
+            if cached_data is not None:
+                return Response(cached_data)
 
         if grouped:
             serializer = HandInHandAssessmentGroupedSerializer(data={})
-            return Response(serializer.to_representation(None))
+            response_data = serializer.to_representation(None)
+        else:
+            response_data = super().list(request, *args, **kwargs).data
 
-        return super().list(request, *args, **kwargs)
+        # Cache the response data
+        if use_cache:
+            cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
+
+        return Response(response_data)
