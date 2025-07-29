@@ -66,7 +66,15 @@ def cycle_all_modules_and_invalidate_cached_results():
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
             if hasattr(ModuleClass, "last_cached_at"):
-                ModuleClass.history.all().update(updated_at=None, last_cached_at=None, cached_results_total=None, cached_results_by_activity=None, cached_results_by_gas=None, cached_results_by_activity_by_gas=None, last_modified=None)
+                ModuleClass.history.all().update(
+                    updated_at=None,
+                    last_cached_at=None,
+                    cached_results_total=None,
+                    cached_results_by_activity=None,
+                    cached_results_by_gas=None,
+                    cached_results_by_activity_by_gas=None,
+                    last_modified=None,
+                )
                 for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
                     if hasattr(module, "invalidate_cached_results"):
                         module.invalidate_cached_results()
@@ -282,6 +290,23 @@ def import_hih_countries():
             print(f"Country already exists: {country.name} in region {country.region.name}")
 
 
+def import_hih_links():
+    """
+    Import Hand in Hand links from the database
+    """
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    for index, row in df.iterrows():
+        country = models.HandInHandCountry.objects.get(name=row["country"])
+        link = row["link"]
+        name = row["name"]
+        year = row["year"]
+        assessment, created = models.HandInHandAssessment.objects.get_or_create(country=country, link=link, name=name, year=year)
+        if created:
+            print(f"Created assessment: {assessment.name} for {assessment.country.name} in {assessment.year}")
+        else:
+            print(f"Assessment already exists: {assessment.name} for {assessment.country.name} in {assessment.year}")
+
+
 def add_public_id_to_projects():
     """
     Add public_id to all projects
@@ -336,24 +361,25 @@ def run():
         # search_historical_projects_for_project_name()
         import_hih_regions()
         import_hih_countries()
+        import_hih_links()
         remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        import_hih_regions()
-        import_hih_countries()
-        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
+        import_hih_links()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
         remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
+        import_hih_links()
         pass
 
     if app_mode == "test":
         # TODO: Run in test
         add_default_project_lock_expiration_time_minutes_application_parameter()
+        import_hih_links()
         pass
 
     return True
