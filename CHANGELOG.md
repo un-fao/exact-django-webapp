@@ -1,3 +1,22 @@
+## 1.15.2 (2025-07-29)
+
+### Feat
+
+- cache hih assessment endpoint
+- add hih assessments import script and data
+
+### Fix
+
+- **Project**: make unlock endpoint post instead of get
+- **Defaults**: remove old references to energy and fuel calculators causing null values in value chain classes
+- **Organic Soil**: Adjust peat area checks causing None Types to be wrongly evaluated
+- **Organic Soil**: Add missing onsite ch4 peat extraction ef tier2 input for all scenarios
+- **Input Entry**: Add specific tier2 checks for user defined inputs
+- **Minor Season Annual Cropland**: Add additional validation checking for improper scenario inputs
+- **Dynamic Filter**: Remove duplicate results from multiple search queries
+- **Forest Management**: Solve a disturbance input issue causing a crash
+- **Perennial**: Adjust logic for maturity computations for perennial remaining perennial
+
 ## 1.15.1 (2025-07-25)
 
 ### Feat
