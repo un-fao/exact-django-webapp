@@ -799,7 +799,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
         # TODO: Remove this action when not needed anymore
         if not request.user.is_superuser:
@@ -1272,11 +1273,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
         operation_description="Send recap email with project changes",
-        responses={
-            200: "Email sent successfully",
-            400: "Bad request",
-            500: "Internal server error"
-        }
+        responses={200: "Email sent successfully", 400: "Bad request", 500: "Internal server error"},
     )
     def recap(self, request, pk=None):
         project = self.get_object()
@@ -1290,6 +1287,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
@@ -1857,7 +1855,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer,)
+    @swagger_auto_schema(
+        responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer},
+        request_body=EmptySerializer,
+    )
     def copy(self, request, pk=None):
         activity: Activity = self.get_object()
         error = security.check_permission("view_activity", self.request.user, activity.project)
@@ -2286,7 +2287,15 @@ def generic_module_viewset(model: Module):
                     results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS).data
                     results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module_results = (
+                        results_total
+                        if aggregate_by == BreakdownTypes.TOTAL
+                        else results_by_activity
+                        if aggregate_by == BreakdownTypes.ACTIVITY
+                        else results_by_gas
+                        if aggregate_by == BreakdownTypes.GAS
+                        else results_by_activity_gas
+                    )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -2718,7 +2727,7 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows Hand in Hand assessments to be viewed or edited.
     """
@@ -2726,12 +2735,22 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = HandInHandAssessment.objects.all()
     serializer_class = HandInHandAssessmentSerializer
 
+    # Cache settings
+    CACHE_KEY_PREFIX = "handinhand_assessments"
+    CACHE_TIMEOUT_SECONDS = 60 * 15  # 15 minutes
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
                 "grouped",
                 openapi.IN_QUERY,
                 description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
         ],
@@ -2742,9 +2761,25 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all Hand in Hand assessments, optionally grouped by region > country > year
         """
         grouped = request.query_params.get("grouped", "false").lower() == "true"
+        use_cache = request.query_params.get("cached", "true").lower() == "true"
+
+        # Generate cache key based on grouping option
+        cache_key = f"{self.CACHE_KEY_PREFIX}_{'grouped' if grouped else 'list'}"
+
+        # Try to get cached data if cache is enabled
+        if use_cache:
+            cached_data = cache.get(cache_key)
+            if cached_data is not None:
+                return Response(cached_data)
 
         if grouped:
             serializer = HandInHandAssessmentGroupedSerializer(data={})
-            return Response(serializer.to_representation(None))
+            response_data = serializer.to_representation(None)
+        else:
+            response_data = super().list(request, *args, **kwargs).data
 
-        return super().list(request, *args, **kwargs)
+        # Cache the response data
+        if use_cache:
+            cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
+
+        return Response(response_data)

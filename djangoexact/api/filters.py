@@ -108,4 +108,4 @@ class DynamicSearchAndFilterBackend(BaseFilterBackend):
                     else:
                         # Try filtering by name if not a digit
                         filters[f"{param}__name__icontains"] = value
-        return queryset.filter(**filters)
+        return queryset.filter(**filters).distinct()
