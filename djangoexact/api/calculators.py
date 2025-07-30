@@ -6688,6 +6688,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.disturbances = None
 
     def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
         land_use_type = self.module.land_use_type_start
 
         self.is_afforestation_w = self.luc and self.luc.module_type_w.class_name == "ForestManagement" and self.luc.module_type_start.class_name != "ForestManagement"
