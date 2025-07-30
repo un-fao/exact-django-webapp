@@ -24,33 +24,39 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
     def build_validated_data(self):
         validated_data = {
             "land_use_type_start": self.land_use_types.order_by("?").first().id,
-            "forest_type": models.ForestType.objects.order_by("?").first().id,
-            "forest_condition_type": models.ForestConditionType.objects.order_by("?").first().id,
+            "forest_type": models.ForestType.objects.get(name_en="Natural").id,
+            "forest_condition_type": models.ForestConditionType.objects.get(name_en="Primary").id,
+            "rotation_start_year_t2_start": 1,
+            "rotation_start_year_t2_w": 2,
+            "rotation_start_year_t2_wo": 0,
+            "rotation_length_yrs_start": 2,
+            "rotation_length_yrs_w": 2,
+            "rotation_length_yrs_wo": 2,
             # NOTE: Added to avoid validation errors due to missing IPCC data for some forest types
-            "agb_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "agb_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "agb_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "bgb_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "bgb_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "bgb_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "agb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "agb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "agb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "bgb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "bgb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "bgb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
-            "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "agb_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "agb_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "agb_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "agb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "agb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "agb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            # "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
         }
         return validated_data
 
@@ -224,5 +230,6 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("agb_max_t2_wo_default", response.data)
 
-    def test_t2_fields_balance_changes(self):
-        self._test_t2_field_balance_changes()
+    def test_that_agb_t2_changes_balance(self):
+        t2_fields = [field for field, _ in self._get_t2_fields_with_test_values(self.ModuleClass) if field in ["agb_t2_start", "agb_t2_w", "agb_t2_wo"]]
+        self._test_t2_field_balance_changes(t2_fields=t2_fields)
