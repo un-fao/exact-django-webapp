@@ -6921,7 +6921,9 @@ class ForestManagementCalculator(LandModuleCalculator):
         has_fra_as_data_source = self.module.data_source is not None and self.module.data_source.short_name == "FRA"
 
         if has_fra_as_data_source:
-            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.get(country=self.country)
+            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
+            if self.fra_carbon_stock is None:
+                raise ValueError(f"FRA carbon stock data not found for {self.country.name}")
             self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
