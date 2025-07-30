@@ -276,15 +276,15 @@ class PerennialCroplandDefaults(Defaults):
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
             soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
-            agb_t2_start_default=defaults.agb_start_default.value,
-            agb_t2_w_default=defaults.agb_w_default.value,
-            agb_t2_wo_default=defaults.agb_wo_default.value,
-            agb_max_t2_start_default=defaults.agb_max_start_default.value,
-            agb_max_t2_w_default=defaults.agb_max_w_default.value,
-            agb_max_t2_wo_default=defaults.agb_max_wo_default.value,
-            bgb_t2_start_default=defaults.bgb_start_default.value,
-            bgb_t2_w_default=defaults.bgb_w_default.value,
-            bgb_t2_wo_default=defaults.bgb_wo_default.value,
+            agb_t2_start_default=defaults.agb_start_default.value if self.input.is_start() else defaults.biomass_ef_start_w.value or defaults.biomass_ef_start_wo.value,
+            agb_t2_w_default=defaults.agb_w_default.value if self.input.is_with() else defaults.biomass_ef_w.value,
+            agb_t2_wo_default=defaults.agb_wo_default.value if self.input.is_without() else defaults.biomass_ef_wo.value,
+            agb_max_t2_start_default=defaults.agb_max_start_default.value if self.input.is_start() else defaults.agb_max_w_default.value or defaults.agb_max_wo_default.value,
+            agb_max_t2_w_default=defaults.agb_max_w_default.value if self.input.is_with() else defaults.agb_max_wo_default.value,
+            agb_max_t2_wo_default=defaults.agb_max_wo_default.value if self.input.is_without() else defaults.agb_max_wo_default.value,
+            bgb_t2_start_default=defaults.bgb_start_default.value if self.input.is_start() else 0,
+            bgb_t2_w_default=defaults.bgb_w_default.value if self.input.is_with() else 0,
+            bgb_t2_wo_default=defaults.bgb_wo_default.value if self.input.is_without() else 0,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1381,32 +1381,32 @@ class ForestManagementDefaults(Defaults):
         bgb_growth_after_20_yrs_w = 0
         bgb_growth_after_20_yrs_wo = 0
 
-        if defaults.agb_start_w:
+        if defaults.agb_start_w is not None:
             agb_start = defaults.agb_start_w
-        elif defaults.agb_start_wo:
+        elif defaults.agb_start_wo is not None:
             agb_start = defaults.agb_start_wo
 
-        if defaults.bgb_after_20_yrs and defaults.agb_start_w:
+        if defaults.bgb_after_20_yrs is not None and defaults.agb_start_w is not None:
             bgb_start = defaults.agb_start_w * defaults.bgb_after_20_yrs.value
-        elif defaults.bgb_after_20_yrs and defaults.agb_start_wo:
+        elif defaults.bgb_after_20_yrs is not None and defaults.agb_start_wo is not None:
             bgb_start = defaults.agb_start_wo * defaults.bgb_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs and defaults.agb_max_w:
+        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_w is not None:
             bgb_w = defaults.agb_max_w * defaults.bgb_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs and defaults.agb_max_wo:
+        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_wo is not None:
             bgb_wo = defaults.agb_max_wo * defaults.bgb_after_20_yrs.value
 
-        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_w:
+        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
             bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.bgb_before_20_yrs.value
 
-        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_wo:
+        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
             bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.bgb_before_20_yrs.value
 
-        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_w:
+        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
             bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.bgb_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_wo:
+        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
             bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
 
         return SimpleNamespace(
@@ -1428,12 +1428,12 @@ class ForestManagementDefaults(Defaults):
             deadwood_t2_start_default=defaults.litter_dw_start_w.dw,
             deadwood_t2_w_default=defaults.litter_dw.dw,
             deadwood_t2_wo_default=defaults.litter_dw.dw,
-            agb_t2_start_default=agb_start,
-            agb_t2_w_default=defaults.agb_max_w,
-            agb_t2_wo_default=defaults.agb_max_wo,
-            bgb_t2_start_default=bgb_start,
-            bgb_t2_w_default=bgb_w,
-            bgb_t2_wo_default=bgb_wo,
+            agb_t2_start_default=agb_start if self.input.is_start() else defaults.biomass_ef_start_w.value or defaults.biomass_ef_start_wo.value,
+            agb_t2_w_default=defaults.agb_max_w if self.input.is_with() else defaults.biomass_ef_w.value,
+            agb_t2_wo_default=defaults.agb_max_wo if self.input.is_without() else defaults.biomass_ef_wo.value,
+            bgb_t2_start_default=bgb_start if self.input.is_start() else 0,
+            bgb_t2_w_default=bgb_w if self.input.is_with() else 0,
+            bgb_t2_wo_default=bgb_wo if self.input.is_without() else 0,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=defaults.agb_growth_under_20_w,
             agb_growth_rate_le_20_yrs_t2_wo_default=defaults.agb_growth_under_20_wo,
