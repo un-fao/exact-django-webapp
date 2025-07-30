@@ -80,6 +80,19 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=self.user)
         return view(request)
 
+    def unlock_project(self, project, user):
+        """
+        Unlock a project using the ProjectViewSet.
+        """
+        log.info("Unlocking project")
+        view = ProjectViewSet.as_view({"post": "unlock"})
+        request = self.request_factory.post(
+            reverse("project-unlock", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
     def send_project_invitation(self, project, user, group):
         """
         Send a project invitation using the ProjectViewSet.
@@ -117,7 +130,7 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
-    
+
     def get_project_memberships(self, project):
         """
         Get project memberships for a project.
@@ -127,18 +140,14 @@ class APITestCaseMixin(APITestCase):
         request = self.request_factory.get(reverse("project-list"), format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
-    
+
     def get_project_memberships_filter_by_user(self, project):
         """
         Get project memberships for a project, filtered by user.
         """
         log.info("Getting project memberships filtered by user")
         view = ProjectViewSet.as_view({"get": "memberships"})
-        request = self.request_factory.get(
-            reverse("project-list"),
-            {"user": self.user.id},
-            format="json"
-        )
+        request = self.request_factory.get(reverse("project-list"), {"user": self.user.id}, format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
 
@@ -457,7 +466,7 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=project.pk)
-    
+
     def add_comment(self, thread: models.CommentThread, text: str):
         """
         Add a comment to a module using the ModuleViewSet.
@@ -476,7 +485,7 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
-    
+
     def send_recap_email(self, project, user):
         """
         Send a recap email using the ProjectViewSet.

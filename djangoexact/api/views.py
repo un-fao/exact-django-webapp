@@ -802,11 +802,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
-        # TODO: Remove this action when not needed anymore
-        if not request.user.is_superuser:
-            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
-
         project: Project = self.get_object()
+        if not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
