@@ -27,18 +27,30 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
             "forest_type": models.ForestType.objects.order_by("?").first().id,
             "forest_condition_type": models.ForestConditionType.objects.order_by("?").first().id,
             # NOTE: Added to avoid validation errors due to missing IPCC data for some forest types
-            # "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            # "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            # "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            # "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            # "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            # "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
-            # "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            "agb_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "agb_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "agb_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "bgb_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "bgb_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "bgb_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "agb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "agb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "agb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "bgb_max_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "bgb_max_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "bgb_max_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(1, 100).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(1, 100).fuzz(),
         }
         return validated_data
 
@@ -59,7 +71,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
             if response.status_code == status.HTTP_200_OK:
                 has_results = True
             else:
-                print(f"No results found, retrying...")
+                print("No results found, retrying...")
                 super().setUp()
                 self.validated_data = self.build_validated_data()
                 self.edit_module(self.module, self.user, self.validated_data)
@@ -135,7 +147,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertIsInstance(response.data, dict)
 
     def test_select_fra_data_source_and_check_if_results_change(self):
         # Call the view to get the first results
@@ -211,3 +223,6 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         response = self.get_module_defaults(self.module, self.user)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("agb_max_t2_wo_default", response.data)
+
+    def test_t2_fields_balance_changes(self):
+        self._test_t2_field_balance_changes()
