@@ -521,7 +521,6 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertTrue(make_public_response.data["is_public"])
 
         get_report_response = self.get_report_anonimously(project, templated=True)
-        print(get_report_response)
         self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
         self.assertEqual(get_report_response["Content-Type"], "application/pdf")
 
