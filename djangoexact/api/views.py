@@ -838,7 +838,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
         lang = request.query_params.get("lang", "en")
-        if request.LANGUAGE_CODE:
+        if hasattr(request, "LANGUAGE_CODE"):
             lang = request.LANGUAGE_CODE
 
         if not template_name:
