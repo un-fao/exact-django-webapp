@@ -164,13 +164,14 @@ class BaseModuleTestCase(APITestCaseMixin):
             # For unsupported field types, return None to skip
             return None
 
-    def _test_t2_field_balance_changes(self, model_class=None):
+    def _test_t2_field_balance_changes(self, model_class=None, t2_fields=None):
         """
         Generic method to test _t2 field balance changes for any model.
         This can be moved to a base class for reuse across different module tests.
 
         Args:
             model_class: The model class to test (defaults to self.ModuleClass)
+            t2_fields: Optional list of specific t2 fields to test. If None, all t2 fields will be tested.
 
         Returns:
             dict: Balance change results for each field tested
@@ -180,6 +181,10 @@ class BaseModuleTestCase(APITestCaseMixin):
 
         # Dynamically discover all _t2 fields from the model
         t2_fields_to_test = self._get_t2_fields_with_test_values(model_class)
+
+        # Filter t2_fields_to_test if specific fields were provided
+        if t2_fields is not None:
+            t2_fields_to_test = [(field, value) for field, value in t2_fields_to_test if field in t2_fields]
 
         if not t2_fields_to_test:
             self.skipTest(f"No _t2 fields found in {model_class.__name__} model")
