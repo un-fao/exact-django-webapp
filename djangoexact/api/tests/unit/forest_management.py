@@ -14,13 +14,13 @@ import copy
 from . import base_module
 import time
 import logging
+
 logging.getLogger().setLevel(logging.CRITICAL)
-logging.getLogger('matplotlib').setLevel(logging.CRITICAL)
-logging.getLogger('django').setLevel(logging.CRITICAL)
+logging.getLogger("matplotlib").setLevel(logging.CRITICAL)
+logging.getLogger("django").setLevel(logging.CRITICAL)
 
 
 class ForestManagementTestCase(base_module.BaseModuleTestCase):
-
     def build_validated_data(self):
         validated_data = {
             "land_use_type_start": self.land_use_types.order_by("?").first().id,
@@ -194,3 +194,20 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
 
         # The results should change
         self.assertNotEqual(initial_balance, new_balance)
+
+    def test_if_defaults_contain_not_none_agb_max_t2_start_default(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("agb_max_t2_start_default", response.data)
+        self.assertIsNotNone(response.data["agb_max_t2_start_default"])
+
+    def test_if_defaults_contain_not_none_agb_max_t2_w_default(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("agb_max_t2_w_default", response.data)
+        self.assertIsNotNone(response.data["agb_max_t2_w_default"])
+
+    def test_if_defaults_contain_not_none_agb_max_t2_wo_default(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("agb_max_t2_wo_default", response.data)
