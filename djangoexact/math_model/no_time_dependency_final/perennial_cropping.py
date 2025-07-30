@@ -49,7 +49,7 @@ class PerennialCropland(LandModule):
     # NOTE: Add specific AGB and BGB and t2 values
     agb_start_default: float
     agb_start_tier_2: Optional[float] = None
-    bgb_start_default: float
+    bgb_start_default: Optional[float] = None
     bgb_start_tier_2: Optional[float] = None
     
     agb_end_default: Optional[float] = None
@@ -62,9 +62,15 @@ class PerennialCropland(LandModule):
 
         # Tier 2 value
         self.residue_availability_tier_2_default = None
-        
+                
         self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
-        self.bgb_start = self.bgb_start_default if self.bgb_start_tier_2 is None else self.bgb_start_tier_2
+        self.agb_rate = self.agb_rate_default * 44 / 12 if self.agb_rate_tier_2 is None else self.agb_rate_tier_2 * 44 / 12
+
+        # NOTE: This is the amount of bgb evaluated at the start based on the agb start compared to the agb rate growth (number of years of growth)
+        self.years_growth_bgb = self.agb_start/self.agb_rate
+        self.bgb_rate = self.bgb_rate_default * 44 / 12 if self.bgb_rate_tier_2 is None else self.bgb_rate_tier_2 * 44 / 12
+        self.bgb_start = self.bgb_rate * self.years_growth_bgb if self.bgb_start_tier_2 is None else self.bgb_start_tier_2
+
         self.agb_end = self.agb_end_default if self.agb_end_tier_2 is None else self.agb_end_tier_2
         self.bgb_end = self.bgb_end_default if self.bgb_end_tier_2 is None else self.bgb_end_tier_2
         
