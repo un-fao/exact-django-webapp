@@ -42,9 +42,9 @@ class BaseModuleTestCase(APITestCaseMixin):
         if isinstance(self.ModuleClass, models.CoastalWetland):
             self.land_use_types = self.land_use_types.filter(is_coastal=True)
 
-    def get_results(self):
+    def get_results(self, cached="true"):
         view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]) + f"?cached={cached}", format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
@@ -195,7 +195,7 @@ class BaseModuleTestCase(APITestCaseMixin):
 
         # Get initial balance
         view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse(f"{model_class.__name__.lower()}-results", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{model_class.__name__.lower()}-results", args=[self.module.pk]) + "?cached=false", format="json")
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
 
