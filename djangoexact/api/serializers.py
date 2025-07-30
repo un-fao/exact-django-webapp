@@ -78,6 +78,7 @@ from .models import (
     SoilType,
     StatusType,
     ProjectMembership,
+    ProjectNotificationPreference,
     Waterbody,
     LandModule,
     InvitationStatusType,
@@ -891,7 +892,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
+            new_module_types = list(
+                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
+            )
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
@@ -1455,14 +1458,15 @@ class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
 
         if parent and not parent.is_start() and land_use_type_start:
             raise serializers.ValidationError("Land use type start cannot be set if the main cropland is not in the start scenario")
-        
+
         if parent and not parent.is_with() and land_use_type_w:
             raise serializers.ValidationError("Land use type with cannot be set if the main cropland is not in the with scenario")
-        
+
         if parent and not parent.is_without() and land_use_type_wo:
             raise serializers.ValidationError("Land use type without cannot be set if the main cropland is not in the without scenario")
 
         return super().validate(data)
+
 
 class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
@@ -1470,7 +1474,6 @@ class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "MinorSeasonAnnualCropland"
         mandatory_fields = MinorSeasonAnnualCroplandWriteSerializer.Meta.mandatory_fields
-
 
 
 class AnnualCroplandSerializer(LandModuleSeralizer):
@@ -2867,6 +2870,47 @@ class ProjectMembershipReadSerializer(serializers.ModelSerializer):
         model = ProjectMembership
         fields = "__all__"
         ref_name = "ProjectMembership"
+
+
+class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        ref_name = "ProjectNotificationPreference"
+
+
+class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["project", "is_opted_out"]
+        ref_name = "ProjectNotificationPreference"
+
+    def validate(self, data):
+        super().validate(data)
+
+        # Get the user from the request context
+        user = self.context["request"].user
+        project = data["project"]
+
+        # Check if user is a member of the project
+        if not ProjectMembership.objects.filter(user=user, project=project).exists():
+            raise serializers.ValidationError("You must be a member of this project to manage notification preferences")
+
+        return data
+
+    def create(self, validated_data):
+        # Set the user from the request context
+        validated_data["user"] = self.context["request"].user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Ensure user can only update their own preferences
+        if instance.user != self.context["request"].user:
+            raise serializers.ValidationError("You can only update your own notification preferences")
+        return super().update(instance, validated_data)
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):

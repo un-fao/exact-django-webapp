@@ -585,7 +585,16 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified", "status", "map_data"] + (exclude_fields or [])
+        fields_to_remove = [
+            "last_cached_at",
+            "cached_results_total",
+            "cached_results_by_activity",
+            "cached_results_by_gas",
+            "cached_results_by_activity_by_gas",
+            "last_modified",
+            "status",
+            "map_data",
+        ] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -644,7 +653,9 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+    field_definitions = {
+        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
+    }
 
     return field_definitions
 
@@ -753,7 +764,20 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
 
     if recipients is None:
-        recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+        from api.models import ProjectNotificationPreference
+
+        # Get all admin members who haven't opted out globally
+        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+
+        # Filter out users who have opted out of notifications for this specific project
+        recipients = []
+        for member in potential_recipients:
+            user = member.user
+            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
+
+            # If no project-specific preference exists, or if they haven't opted out for this project, include them
+            if project_preference is None or not project_preference.is_opted_out:
+                recipients.append(member)
 
     locked_at = project.locked_at
 
