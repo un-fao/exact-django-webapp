@@ -41,7 +41,7 @@ class APITestCaseMixin(APITestCase):
         self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
-        self.country = models.Country.objects.order_by("?").first()
+        self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
