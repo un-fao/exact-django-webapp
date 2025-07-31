@@ -191,11 +191,9 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        try:
-            lang = request.query_params.get("lang", request.LANGUAGE_CODE)
-        except Exception as e:
-            log.error(f"Error getting language: {e}")
-            lang = "en"
+        lang = request.query_params.get("lang", "en")
+        if hasattr(request, "LANGUAGE_CODE"):
+            lang = request.LANGUAGE_CODE
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
@@ -777,7 +775,12 @@ def generic_public_module_viewset(model: api_models.Module):
                     openapi.IN_QUERY,
                     description="Aggregate results by",
                     type=openapi.TYPE_STRING,
-                    enum=[api_serializers.BreakdownTypes.TOTAL.value, api_serializers.BreakdownTypes.ACTIVITY.value, api_serializers.BreakdownTypes.GAS.value, api_serializers.BreakdownTypes.ACTIVITY_GAS.value],
+                    enum=[
+                        api_serializers.BreakdownTypes.TOTAL.value,
+                        api_serializers.BreakdownTypes.ACTIVITY.value,
+                        api_serializers.BreakdownTypes.GAS.value,
+                        api_serializers.BreakdownTypes.ACTIVITY_GAS.value,
+                    ],
                 ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
@@ -818,7 +821,15 @@ def generic_public_module_viewset(model: api_models.Module):
                     results_by_gas = api_serializers.DynamicResultFactory.create(activity, by_gas, aggregate_by=api_serializers.BreakdownTypes.GAS).data
                     results_by_activity_gas = api_serializers.DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = results_total if aggregate_by == api_serializers.BreakdownTypes.TOTAL else results_by_activity if aggregate_by == api_serializers.BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == api_serializers.BreakdownTypes.GAS else results_by_activity_gas
+                    module_results = (
+                        results_total
+                        if aggregate_by == api_serializers.BreakdownTypes.TOTAL
+                        else results_by_activity
+                        if aggregate_by == api_serializers.BreakdownTypes.ACTIVITY
+                        else results_by_gas
+                        if aggregate_by == api_serializers.BreakdownTypes.GAS
+                        else results_by_activity_gas
+                    )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = api_serializers.DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
