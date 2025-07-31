@@ -35,7 +35,6 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fishery_type"] = models.FisheryType.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
@@ -44,7 +43,6 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fishery_type"] = None
         response = self.edit_module(self.module, self.user, validated_data)
@@ -53,7 +51,6 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -65,7 +62,6 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -74,7 +70,7 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertTrue(type(response.data) is dict)
 
     def test_excel_report(self):
         self.test_calculate_results()
@@ -82,3 +78,11 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         response = self.get_report(self.project, self.user)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["Content-Type"])
+
+    def test_presence_of_fui_t2_in_defaults(self):
+        response = self.get_module_defaults(self.module, self.user)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("fui_t2_start_default", response.data)
+        self.assertIn("fui_t2_w_default", response.data)
+        self.assertIn("fui_t2_wo_default", response.data)
