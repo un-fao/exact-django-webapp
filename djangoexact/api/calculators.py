@@ -6927,6 +6927,9 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_start_start = self.agb_max_start  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_w = self.agb_max_w  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_wo = self.agb_max_wo  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
             self.bgb_max_start = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
             self.bgb_max_w = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
             self.bgb_max_wo = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
