@@ -26,9 +26,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify_and_check_cache_invalidation(self):
-        # Check that the cache is invalidated
         response = self.get_results()
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
@@ -46,7 +44,6 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 self.assertEqual(response.data["status"]["name"], "READY")
 
-                # Check that the cache is invalidated
                 view = self.module_viewset.as_view({"get": "results"})
                 request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -80,6 +77,8 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_add_minor_season_and_calculate_results(self):
+        previous_balance = self.get_results().data["balance"]
+
         validated_data = copy.deepcopy(self.validated_data)
         validated_data.update(
             {
@@ -101,10 +100,10 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
+        self.assertNotEqual(previous_balance, response.data["balance"])
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
@@ -112,7 +111,6 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
@@ -123,19 +121,16 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertTrue(isinstance(response.data, dict))
 
     def test_add_comment_and_copy_project(self):
         thread = self.module.tillage_management_type_thread
         response = self.add_comment(thread, "test comment")
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         response = self.copy_activity(self.activity, self.user)
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
