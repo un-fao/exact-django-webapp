@@ -264,7 +264,6 @@ def compute_matrix_for_log_rec_dis(start_value, end_value, years_implementation,
 
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-# LIVESTOCK CH4 HEAD GENERAL FUNCTION
 def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float, 
                                  percentage_prp_default: float, percentage_prp_tier_2: float | None, 
                                  ef_system_default: list, gas_prp_tier_2: float, percentage_system_default: list, 
