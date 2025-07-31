@@ -95,39 +95,39 @@ class UnitTestAnnualCroplandFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def tillage_management_type_start(self):
-        return models.TillageManagementType.objects.first()
+        return models.TillageManagementType.objects.order_by("?").first()
 
     @factory.lazy_attribute
     def tillage_management_type_w(self):
-        return models.TillageManagementType.objects.first()
+        return models.TillageManagementType.objects.order_by("?").first()
 
     @factory.lazy_attribute
     def tillage_management_type_wo(self):
-        return models.TillageManagementType.objects.first()
+        return models.TillageManagementType.objects.order_by("?").first()
 
     @factory.lazy_attribute
     def organic_input_type_start(self):
-        return models.OrganicInputType.objects.filter(is_active=True).first()
+        return models.OrganicInputType.objects.order_by("?").filter(is_active=True).first()
 
     @factory.lazy_attribute
     def organic_input_type_w(self):
-        return models.OrganicInputType.objects.filter(is_active=True).first()
+        return models.OrganicInputType.objects.order_by("?").filter(is_active=True).first()
 
     @factory.lazy_attribute
     def organic_input_type_wo(self):
-        return models.OrganicInputType.objects.filter(is_active=True).first()
+        return models.OrganicInputType.objects.order_by("?").filter(is_active=True).first()
 
     @factory.lazy_attribute
     def residue_management_type_start(self):
-        return models.ResidueManagementType.objects.first()
+        return models.ResidueManagementType.objects.order_by("?").first()
 
     @factory.lazy_attribute
     def residue_management_type_w(self):
-        return models.ResidueManagementType.objects.first()
+        return models.ResidueManagementType.objects.order_by("?").first()
 
     @factory.lazy_attribute
     def residue_management_type_wo(self):
-        return models.ResidueManagementType.objects.first()
+        return models.ResidueManagementType.objects.order_by("?").first()
 
     @classmethod
     def get_validated_data(cls, **kwargs):
