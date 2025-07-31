@@ -49,6 +49,7 @@ from .models import (
     StatusType,
     Submodule,
     ProjectMembership,
+    ProjectNotificationPreference,
     InvitationStatusType,
     Note,
     FieldDefinition,
@@ -85,6 +86,8 @@ from .serializers import (
     ReadProjectSerializer,
     ProjectMembershipWriteSerializer,
     ProjectMembershipReadSerializer,
+    ProjectNotificationPreferenceReadSerializer,
+    ProjectNotificationPreferenceWriteSerializer,
     UserReadSerializer,
     UserWriteSerializer,
     WriteActivitySerializer,
@@ -802,11 +805,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
-        # TODO: Remove this action when not needed anymore
-        if not request.user.is_superuser:
-            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
-
         project: Project = self.get_object()
+        if not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -839,7 +841,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
         lang = request.query_params.get("lang", "en")
-        if request.LANGUAGE_CODE:
+        if hasattr(request, "LANGUAGE_CODE"):
             lang = request.LANGUAGE_CODE
 
         if not template_name:
@@ -1429,6 +1431,96 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+
+class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectNotificationPreference.objects.all()
+    serializer_class = ProjectNotificationPreferenceReadSerializer
+
+    def get_queryset(self):
+        """Filter to only show the current user's notification preferences"""
+        return self.queryset.filter(user=self.request.user)
+
+    @swagger_auto_schema(
+        operation_description="Get notification preferences for the current user",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer(many=True),
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        project_id = self.request.query_params.get("project_id", None)
+
+        queryset = self.get_queryset()
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Get or create notification preference for a specific project",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Create or update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            201: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+        },
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = ProjectNotificationPreferenceWriteSerializer(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        project = serializer.validated_data["project"]
+
+        # Get or create the preference
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+
+        if not created:
+            # Update existing preference
+            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.save()
+
+        response_serializer = ProjectNotificationPreferenceReadSerializer(preference)
+        status_code = http_status.HTTP_201_CREATED if created else http_status.HTTP_200_OK
+
+        return Response(response_serializer.data, status=status_code)
+
+    @swagger_auto_schema(
+        operation_description="Update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+            403: "Forbidden",
+        },
+    )
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
+
+        return Response(response_serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

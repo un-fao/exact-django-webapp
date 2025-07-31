@@ -34,6 +34,7 @@ project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags"
 
 router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="projectinvitations")
 router.register(r"project-memberships", views.ProjectMembershipViewSet, basename="projectmembership")
+router.register(r"project-notification-preferences", views.ProjectNotificationPreferenceViewSet, basename="projectnotificationpreferences")
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")
