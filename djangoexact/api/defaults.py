@@ -598,6 +598,9 @@ class LargeFisheryDefaults(Defaults):
             inshore_ice_production_kwh_per_tonne_t2_start_default=0,
             inshore_ice_production_kwh_per_tonne_t2_w_default=0,
             inshore_ice_production_kwh_per_tonne_t2_wo_default=0,
+            fui_t2_start_default=0,
+            fui_t2_w_default=0,
+            fui_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -628,6 +631,9 @@ class LargeFisheryDefaults(Defaults):
             inshore_ice_production_kwh_per_tonne_t2_start_default=defaults.kw_tonnes,
             inshore_ice_production_kwh_per_tonne_t2_w_default=defaults.kw_tonnes,
             inshore_ice_production_kwh_per_tonne_t2_wo_default=defaults.kw_tonnes,
+            fui_t2_start_default=defaults.fui_default_start,
+            fui_t2_w_default=defaults.fui_default_w,
+            fui_t2_wo_default=defaults.fui_default_wo,
         )
 
 
@@ -657,6 +663,9 @@ class SmallFisheryDefaults(Defaults):
             inshore_ice_production_kwh_per_tonne_t2_start_default=0,
             inshore_ice_production_kwh_per_tonne_t2_w_default=0,
             inshore_ice_production_kwh_per_tonne_t2_wo_default=0,
+            fui_t2_start_default=0,
+            fui_t2_w_default=0,
+            fui_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -687,6 +696,9 @@ class SmallFisheryDefaults(Defaults):
             inshore_ice_production_kwh_per_tonne_t2_start_default=defaults.kw_tonnes,
             inshore_ice_production_kwh_per_tonne_t2_w_default=defaults.kw_tonnes,
             inshore_ice_production_kwh_per_tonne_t2_wo_default=defaults.kw_tonnes,
+            fui_t2_start_default=defaults.fui_start,
+            fui_t2_w_default=defaults.fui_w,
+            fui_t2_wo_default=defaults.fui_wo,
         )
 
 
