@@ -759,7 +759,13 @@ class DeforestationCalculator(BaseCalculator):
         dry_matter_wo = luc.dry_matter_wo if luc else None
 
         # BUG: Aren't these handled in the parent class?
-        soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
         som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
@@ -1012,7 +1018,13 @@ class OtherLandUseCalculator(BaseCalculator):
         soil_type = self.soil_type
 
         # BUG: Isn't this handled in the parent class?
-        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
 
         cm = {
             "climate": climate,
@@ -1080,8 +1092,6 @@ class OtherLandUseCalculator(BaseCalculator):
             biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
-
-        soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
 
         try:
             fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
