@@ -1,3 +1,31 @@
+## 1.15.3 (2025-07-31)
+
+### Feat
+
+- **test**: add agb and bgb t2 in forest management unit test
+- **test**: add ability to calculate non-cached results
+- **test**: add ability to override t2 fields to test with custom list
+- **test**: add logic to methodically test the effect of t2 values on module results
+- **Forest Management**: add agb_max_t2 defaults and corresponding tests
+- add project-level notification opt in
+
+### Fix
+
+- **fisheries**: add FUI data to defaults
+- raise error if fra carbon stock data is not found for project country
+- **test**: filter out countries with no region in test project setup
+- **mathematical model**: wrong falsy check for litter and deadwood t2 values in forest management
+- add logic that sends default biomass in AGB/BGB modules where scenario is not used
+- **Public Project Template**: unchecked language code reference causing AttributeError
+- allow lock holders to unlock projects
+- **Perennial**: update bgb_start evaluation logic and set bgb_start to nullable
+- **Perennial Cropland**: attribute reference issue causing wrong values in maturity computation
+
+### Refactor
+
+- rewrite some tests to include results retry logic
+- set bgb_start to None instead of bgb rate in perennial crop maturity computation
+
 ## 1.15.2 (2025-07-29)
 
 ### Feat

@@ -156,8 +156,8 @@ class ForestManagement(BaseModule):
             self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
         else:
             self.max_bgb_value = self.max_bgb_value_default if self.max_bgb_value_tier_2 is None else self.max_bgb_value_tier_2
-        self.litter_20_years = self.litter_20_years_default if not self.litter_20_years_tier_2 else self.litter_20_years_tier_2
-        self.deadwood_20_years = self.deadwood_20_years_default if not self.deadwood_20_years_tier_2 else self.deadwood_20_years_tier_2
+        self.litter_20_years = self.litter_20_years_default if self.litter_20_years_tier_2 is None else self.litter_20_years_tier_2
+        self.deadwood_20_years = self.deadwood_20_years_default if self.deadwood_20_years_tier_2 is None else self.deadwood_20_years_tier_2
 
         ########### GENERALE LAND MODULE ASSIGNMENTS ############
         fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
