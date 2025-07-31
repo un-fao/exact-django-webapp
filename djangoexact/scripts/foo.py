@@ -350,6 +350,19 @@ def remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types():
         print(f"Added Processing and Packaging modules to {fuel_type.name} fuel type")
 
 
+def find_duplicates_in_crop_yield_stat_model():
+    """
+    Find duplicates in CropYieldStat model
+    """
+    from django.db.models import Count
+
+    # Get all CropYieldStats and find duplicates based on crop, country and year
+    duplicates = ipcc_models.CropYieldStat.objects.values("land_use_type__name", "continent__name").annotate(count=Count("id")).filter(count__gt=1)
+
+    for duplicate in duplicates:
+        print(f"Duplicate: {duplicate['land_use_type__name']} {duplicate['continent__name']}")
+
+
 def run():
     import os
 
@@ -372,8 +385,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
-        import_hih_links()
         pass
 
     if app_mode == "test":
