@@ -1,3 +1,25 @@
+## 1.15.4 (2025-08-01)
+
+### Feat
+
+- **forest management**: add litter and deadwood max default initialization for non-afforestation scenarios with FRA data source
+- **test**: add scaffolding for unit testing of land use changes
+- **forest management**: add initial AGB values based on AGB Max for forest management calculations when FRA data source is selected
+
+### Fix
+
+- **test**: modify annual cropland unit test so that minor season data is correctly randomized
+- **test**: randomize object selection in UnitTestAnnualCroplandFactory
+- **annual cropland**: correct minor yield refrence value for start scenario in calculator
+- **annuals**: set minor to Optional
+- **livestock**: add logic to override systems arrays when complementary manure management is selected
+- **livestock**: fix livestock inputs
+- **luc**: add tier2 checks for soc in deforestation and other land use change calculators
+
+### Refactor
+
+- **test**: add support for module factories to build validated data in unit tests
+
 ## 1.15.3 (2025-07-31)
 
 ### Feat
