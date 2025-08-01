@@ -759,7 +759,13 @@ class DeforestationCalculator(BaseCalculator):
         dry_matter_wo = luc.dry_matter_wo if luc else None
 
         # BUG: Aren't these handled in the parent class?
-        soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
         som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
@@ -1012,7 +1018,13 @@ class OtherLandUseCalculator(BaseCalculator):
         soil_type = self.soil_type
 
         # BUG: Isn't this handled in the parent class?
-        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
 
         cm = {
             "climate": climate,
@@ -1080,8 +1092,6 @@ class OtherLandUseCalculator(BaseCalculator):
             biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
-
-        soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
 
         try:
             fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
@@ -1511,7 +1521,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_w.average,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1573,7 +1583,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_wo.average,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -4876,6 +4886,51 @@ class LivestockCalculator(BaseCalculator):
                 if self.ch4_ef_t2_start:
                     self.ch4_ef_t2_start = self.ch4_ef_t2_start.value
 
+                # System for complementary manure management
+                self.ef_ch4_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_start = [self.ef_ch4_systems_start.value if self.ef_ch4_systems_start.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_start = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_start = [self.animal_waste_management_systems_start.value if self.animal_waste_management_systems_start.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_start = [self.ef_n2o_direct_systems_start.value if self.ef_n2o_direct_systems_start.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_start = [self.ef_n2o_volatilization_systems_start.value if self.ef_n2o_volatilization_systems_start.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_start = [self.ef_n2o_leaching_systems_start.value if self.ef_n2o_leaching_systems_start.value else 0]
+
         if module.is_with():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_w,
@@ -5090,6 +5145,51 @@ class LivestockCalculator(BaseCalculator):
                 if self.ch4_ef_t2_w:
                     self.ch4_ef_t2_w = self.ch4_ef_t2_w.value
 
+                # System for complementary manure management
+                self.ef_ch4_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_wo = [self.ef_ch4_systems_wo.value if self.ef_ch4_systems_wo.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_wo = [self.animal_waste_management_systems_wo.value if self.animal_waste_management_systems_wo.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_wo = [self.ef_n2o_direct_systems_wo.value if self.ef_n2o_direct_systems_wo.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_wo = [self.ef_n2o_volatilization_systems_wo.value if self.ef_n2o_volatilization_systems_wo.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_wo = [self.ef_n2o_leaching_systems_wo.value if self.ef_n2o_leaching_systems_wo.value else 0]
+
         if module.is_without():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_wo,
@@ -5303,6 +5403,51 @@ class LivestockCalculator(BaseCalculator):
                 )
                 if self.ch4_ef_t2_wo:
                     self.ch4_ef_t2_wo = self.ch4_ef_t2_wo.value
+
+                # System for complementary manure management
+                self.ef_ch4_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_wo = [self.ef_ch4_systems_wo.value if self.ef_ch4_systems_wo.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_wo = [self.animal_waste_management_systems_wo.value if self.animal_waste_management_systems_wo.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_wo = [self.ef_n2o_direct_systems_wo.value if self.ef_n2o_direct_systems_wo.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_wo = [self.ef_n2o_volatilization_systems_wo.value if self.ef_n2o_volatilization_systems_wo.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_wo = [self.ef_n2o_leaching_systems_wo.value if self.ef_n2o_leaching_systems_wo.value else 0]
 
         return
 
@@ -6921,12 +7066,15 @@ class ForestManagementCalculator(LandModuleCalculator):
         has_fra_as_data_source = self.module.data_source is not None and self.module.data_source.short_name == "FRA"
 
         if has_fra_as_data_source:
-            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
+            self.fra_carbon_stock: ipcc.FRACarbonStock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
             if self.fra_carbon_stock is None:
                 raise ValueError(f"FRA carbon stock data not found for {self.country.name}")
             self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_start_start = self.agb_max_start  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_w = self.agb_max_w  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_wo = self.agb_max_wo  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
             self.bgb_max_start = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
             self.bgb_max_w = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
             self.bgb_max_wo = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
@@ -6936,6 +7084,14 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+
+            # NOTE: Lorenzo 01/08/2025: For forest remaining forest (no affo), the litter and deadwood start are the same as the max values
+            if not self.is_afforestation_w:
+                self.litter_dw_start_w.litter = self.litter_dw_max_start.litter
+                self.litter_dw_start_w.dw = self.litter_dw_max_start.dw
+            if not self.is_afforestation_wo:
+                self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
+                self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
