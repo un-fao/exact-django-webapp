@@ -7066,7 +7066,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         has_fra_as_data_source = self.module.data_source is not None and self.module.data_source.short_name == "FRA"
 
         if has_fra_as_data_source:
-            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
+            self.fra_carbon_stock: ipcc.FRACarbonStock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
             if self.fra_carbon_stock is None:
                 raise ValueError(f"FRA carbon stock data not found for {self.country.name}")
             self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
@@ -7084,6 +7084,14 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+
+            # NOTE: Lorenzo 01/08/2025: For forest remaining forest (no affo), the litter and deadwood start are the same as the max values
+            if not self.is_afforestation_w:
+                self.litter_dw_start_w.litter = self.litter_dw_max_start.litter
+                self.litter_dw_start_w.dw = self.litter_dw_max_start.dw
+            if not self.is_afforestation_wo:
+                self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
+                self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
