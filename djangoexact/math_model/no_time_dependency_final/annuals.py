@@ -26,24 +26,24 @@ class AnnualCropland(LandModule):
     n_estimation_slope_main: float
     n_estimation_intercept_main: float
     yield_value_main: float
-    ef_methane_agr_residues_minor: float
-    combustion_factor_minor: float
+    ef_methane_agr_residues_minor: Optional[float] = None
+    combustion_factor_minor: Optional[float] = None
     residue_minor_tier_2: Optional[float] = None
     n_estimation_slope_minor: float
-    n_estimation_intercept_minor: float
-    yield_value_minor: float
+    n_estimation_intercept_minor: Optional[float] = None
+    yield_value_minor: Optional[float] = None
     ef_nitrous_agr_residues_main: float
     retained_main: bool
-    ef_nitrous_agr_residues_minor: float
-    retained_minor: bool
+    ef_nitrous_agr_residues_minor: Optional[float] = None
+    retained_minor: Optional[bool] = None
     n_content_ag_main: float
     ratio_bg_ag_main: float
     n_content_bg_main: float
-    n_content_ag_minor: float
-    ratio_bg_ag_minor: float
-    n_content_bg_minor: float
-    yield_main_tier_2: Optional[float]
-    yield_minor_tier_2: Optional[float]
+    n_content_ag_minor: Optional[float] = None
+    ratio_bg_ag_minor: Optional[float] = None
+    n_content_bg_minor: Optional[float] = None
+    yield_main_tier_2: Optional[float] = None
+    yield_minor_tier_2: Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -90,59 +90,86 @@ class AnnualCropland(LandModule):
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_emissions_residue_burning():
-            ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
-
+        def calculate_main_season_emissions():
+            """Calculate methane and nitrous emissions for main season"""
             yield_value_main = self.yield_main * 1000
-            yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
-
+            
+            # Calculate agricultural residue for main season
             ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
             ag_residue_tonnes_main = ag_residue_main / 1000
+            
+            # Calculate methane emissions for main season
             if self.ef_methane_agr_residues_main:
                 main_season_methane = ag_residue_tonnes_main * self.ef_methane_agr_residues_main * self.combustion_factor_main
             else:
                 main_season_methane = 0
-            ag_residue_minor = self.residue_minor_tier_2 * 1000 if self.residue_minor_tier_2 else yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor if yield_value_minor else 0
-            ag_residue_tonnes_minor = ag_residue_minor / 1000
-            if self.ef_methane_agr_residues_minor:
-                minor_season_methane = ag_residue_tonnes_minor * self.ef_methane_agr_residues_minor * self.combustion_factor_minor
-            else:
-                minor_season_methane = 0
-
-            kg_methane = main_season_methane + minor_season_methane
-
-            #################### COMPUTATION OF AMOUNT OF KG OF NITROUS ######################
+            
+            # Calculate nitrous emissions for main season
             annual_n_residues_main = ag_residue_main * self.n_content_ag_main + (yield_value_main + ag_residue_main) * self.ratio_bg_ag_main * self.n_content_bg_main
-            # COMPUTATION FOR MAIN
-            # this means if "Burned"
+            
+            # Check if burned
             if self.ef_nitrous_agr_residues_main:
                 main_season_nitrous = ag_residue_tonnes_main * self.ef_nitrous_agr_residues_main * self.combustion_factor_main
-            # this means if "Retained"
+            # Check if retained
             elif self.retained_main:
                 n2o_n_conversion = 44 / 28
                 main_season_nitrous = annual_n_residues_main * self.ef_nitrous_som * n2o_n_conversion
             else:
                 main_season_nitrous = 0
-            # COMPUTATION FOR MINOR
-            annual_n_residues_minor = ag_residue_minor * self.n_content_ag_minor + (yield_value_minor + ag_residue_minor) * self.ratio_bg_ag_minor * self.n_content_bg_minor if yield_value_minor else 0
-            # COMPUTATION FOR MAIN
-            # this means if "Burned"
+            
+            return main_season_methane, main_season_nitrous
 
+        def calculate_minor_season_emissions():
+            """Calculate methane and nitrous emissions for minor season"""
+            yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
+            
+            # Calculate agricultural residue for minor season
+            ag_residue_minor = self.residue_minor_tier_2 * 1000 if self.residue_minor_tier_2 else yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor if yield_value_minor else 0
+            ag_residue_tonnes_minor = ag_residue_minor / 1000
+            
+            # Calculate methane emissions for minor season
+            if self.ef_methane_agr_residues_minor:
+                minor_season_methane = ag_residue_tonnes_minor * self.ef_methane_agr_residues_minor * self.combustion_factor_minor
+            else:
+                minor_season_methane = 0
+            
+            # Calculate nitrous emissions for minor season
+            annual_n_residues_minor = ag_residue_minor * self.n_content_ag_minor + (yield_value_minor + ag_residue_minor) * self.ratio_bg_ag_minor * self.n_content_bg_minor if yield_value_minor else 0
+            
+            # Check if burned
             if self.ef_nitrous_agr_residues_minor:
                 minor_season_nitrous = ag_residue_tonnes_minor * self.ef_nitrous_agr_residues_minor * self.combustion_factor_minor
-            # this means if "Retained" BUT IN REALITY NOT REALLY, AT LEAST IT SEEMS TO WORK (WITHOUT A MINOR)
+            # Check if retained
             elif self.retained_minor:
                 n2o_n_conversion = 44 / 28
                 minor_season_nitrous = annual_n_residues_minor * self.ef_nitrous_som * n2o_n_conversion
             else:
                 minor_season_nitrous = 0
+            
+            return minor_season_methane, minor_season_nitrous
 
+        def calculate_emissions_residue_burning():
+            """Calculate total residue burning emissions from main and minor seasons"""
+            # Calculate emissions for both seasons
+            main_season_methane, main_season_nitrous = calculate_main_season_emissions()
+            
+            if self.yield_value_minor is None:
+                minor_season_methane = 0
+                minor_season_nitrous = 0
+            else:
+                # Calculate emissions for minor season only if yield_value_minor is provided
+                minor_season_methane, minor_season_nitrous = calculate_minor_season_emissions()
+
+            
+            # Combine seasonal emissions
+            kg_methane = main_season_methane + minor_season_methane
             kg_nitrous = main_season_nitrous + minor_season_nitrous
 
-            #################### COMPUTATION OF TOTAL EMISSIONS ######################
+            # Calculate total emissions
             total_nitrous = (sum(self.hectares_total)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.hectares_total)) * kg_methane * self.methane_constant / 1000
 
+            # Create emission sets
             residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
             residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
 

@@ -44,7 +44,7 @@ class Livestock(BaseModule):
     ch4_system_tier_2_start: Optional[float] = None
     ch4_system_tier_2_end: Optional[float] = None
     percentage_system_default_start: List[float]
-    percentage_system_default_end: float
+    percentage_system_default_end: List[float]
     tam_start: float
     tam_end: float
     vser_start: float
