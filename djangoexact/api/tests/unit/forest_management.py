@@ -210,3 +210,21 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         new_balance = results.data["total_w"]
 
         self.assertNotEqual(initial_balance, new_balance)
+
+    def test_set_fra_data_source_and_check_if_litter_and_deadwood_defaults_change(self):
+        defaults = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(defaults.status_code, status.HTTP_200_OK)
+        self.assertIn("litter_t2_w_default", defaults.data)
+        self.assertIn("deadwood_t2_w_default", defaults.data)
+
+        edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
+        self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.module.refresh_from_db()
+
+        new_defaults = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(new_defaults.status_code, status.HTTP_200_OK)
+        self.assertIn("litter_t2_w_default", new_defaults.data)
+        self.assertIn("deadwood_t2_w_default", new_defaults.data)
+        self.assertNotEqual(new_defaults.data["litter_t2_w_default"], defaults.data["litter_t2_w_default"])
+        self.assertNotEqual(new_defaults.data["deadwood_t2_w_default"], defaults.data["deadwood_t2_w_default"])
