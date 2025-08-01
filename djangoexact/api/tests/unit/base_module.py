@@ -50,6 +50,7 @@ class BaseModuleTestCase(APITestCaseMixin):
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
+        log.error(response.data) if response.status_code != status.HTTP_200_OK else None
 
         return response
 

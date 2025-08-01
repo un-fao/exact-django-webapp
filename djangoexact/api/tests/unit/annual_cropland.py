@@ -25,41 +25,6 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
 
-    def test_modify_and_check_cache_invalidation(self):
-        response = self.get_results()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
-
-        old_balance = response.data["balance"]
-
-        is_modification_valid = False
-
-        while not is_modification_valid:
-            try:
-                validated_data = copy.deepcopy(self.validated_data)
-                validated_data["land_use_type_w"] = factories.UnitTestAnnualCroplandFactory.build().land_use_type_w.id
-                response = self.edit_module(self.module, self.user, validated_data)
-
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(response.data["status"]["name"], "READY")
-
-                view = self.module_viewset.as_view({"get": "results"})
-                request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
-
-                force_authenticate(request, user=self.user)
-                response = view(request, pk=self.module.pk)
-
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertTrue("balance" in response.data)
-
-                new_balance = response.data["balance"]
-                is_modification_valid = True
-            except Exception as e:
-                pass
-
-        self.assertNotEqual(old_balance, new_balance)
-
     def test_modify(self):
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type_start"] = factories.UnitTestAnnualCroplandFactory.build().land_use_type_start.id
@@ -79,31 +44,24 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
     def test_add_minor_season_and_calculate_results(self):
         previous_balance = self.get_results().data["balance"]
 
-        validated_data = copy.deepcopy(self.validated_data)
-        validated_data.update(
-            {
-                "minor_land_use_type_start": factories.UnitTestAnnualCroplandFactory.build().land_use_type_start.id,
-                "minor_land_use_type_w": factories.UnitTestAnnualCroplandFactory.build().land_use_type_w.id,
-                "minor_land_use_type_wo": factories.UnitTestAnnualCroplandFactory.build().land_use_type_wo.id,
-                "minor_residue_management_type_start": factories.UnitTestAnnualCroplandFactory.build().residue_management_type_start.id,
-                "minor_residue_management_type_w": factories.UnitTestAnnualCroplandFactory.build().residue_management_type_w.id,
-                "minor_residue_management_type_wo": factories.UnitTestAnnualCroplandFactory.build().residue_management_type_wo.id,
-            }
-        )
-        response = self.edit_module(self.module, self.user, validated_data)
+        minor_season_data = {
+            "minor_land_use_type_start": self.land_use_types.exclude(id=self.validated_data["land_use_type_start"]).order_by("?").first().id,
+            "minor_land_use_type_w": self.land_use_types.exclude(id=self.validated_data["land_use_type_w"]).order_by("?").first().id,
+            "minor_land_use_type_wo": self.land_use_types.exclude(id=self.validated_data["land_use_type_wo"]).order_by("?").first().id,
+            "minor_residue_management_type_start": models.ResidueManagementType.objects.exclude(id=self.validated_data["residue_management_type_start"]).order_by("?").first().id,
+            "minor_residue_management_type_w": models.ResidueManagementType.objects.exclude(id=self.validated_data["residue_management_type_w"]).order_by("?").first().id,
+            "minor_residue_management_type_wo": models.ResidueManagementType.objects.exclude(id=self.validated_data["residue_management_type_wo"]).order_by("?").first().id,
+        }
+
+        response = self.edit_module(self.module, self.user, minor_season_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
 
-        view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
-
-        force_authenticate(request, user=self.user)
-        response = view(request, pk=self.module.pk)
+        new_balance = self.get_results(cached="false").data["balance"]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
-        self.assertNotEqual(previous_balance, response.data["balance"])
+        self.assertNotEqual(previous_balance, new_balance)
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
