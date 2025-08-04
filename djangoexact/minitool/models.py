@@ -24,3 +24,6 @@ class StatisticsModuleTotal(models.Model):
     max = models.FloatField()
     q1 = models.FloatField()
     q3 = models.FloatField()
+
+    class Meta:
+        unique_together = ["module_type", "field", "from_value", "to_value"]

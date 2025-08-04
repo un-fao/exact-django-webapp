@@ -11,4 +11,10 @@ class EntrySerializer(serializers.ModelSerializer):
 class StatisticsModuleTotalSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.StatisticsModuleTotal
-        fields = ["module_type", "field", "from_value", "to_value", "mean", "median", "min", "max", "q1", "q3"]
+        fields = ["id", "module_type", "field", "from_value", "to_value", "mean", "median", "min", "max", "q1", "q3"]
+
+
+class StatisticsModuleTotalAggregateSerializer(serializers.Serializer):
+    module_type = serializers.CharField()
+    field = serializers.CharField()
+    total = serializers.FloatField()
