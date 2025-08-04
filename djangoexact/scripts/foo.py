@@ -363,6 +363,29 @@ def find_duplicates_in_crop_yield_stat_model():
         print(f"Duplicate: {duplicate['land_use_type__name']} {duplicate['continent__name']}")
 
 
+def add_macro_input_type_other():
+    """
+    Add MacroInputType Other to all InputTypes
+    """
+    models.MacroInputType.objects.create(name="Other")
+
+
+def add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_feed():
+    """
+    Add Other macro input type to User Defined Tier 2 InputType
+    """
+    user_defined_input_types = models.InputType.objects.filter(name_en__icontains="User Defined").exclude(name_en__icontains="Animal Feed")
+    other_macro_input_type = models.MacroInputType.objects.get(name="Other")
+    input_types_to_update = []
+    for input_type in user_defined_input_types:
+        input_type.macro_input_type = other_macro_input_type
+        input_types_to_update.append(input_type)
+
+    if input_types_to_update:
+        models.InputType.objects.bulk_update(input_types_to_update, ["macro_input_type"])
+        print(f"Updated {len(input_types_to_update)} input types with macro input type {other_macro_input_type.name}")
+
+
 def run():
     import os
 
@@ -380,11 +403,12 @@ def run():
 
     if app_mode == "review":
         # TODO: Run in review
-        import_hih_links()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        add_macro_input_type_other()
+        add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_feed()
         pass
 
     if app_mode == "test":

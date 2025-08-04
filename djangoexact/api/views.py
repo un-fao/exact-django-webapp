@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
+import traceback
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
@@ -645,7 +646,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
-        project: Project = self.get_object()
+        project: Project = get_object_or_404(Project, pk=pk)
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -669,6 +670,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            traceback.print_exc()
             logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -2199,12 +2201,12 @@ def generic_module_viewset(model: Module):
                 return get_module_serializer(model, action=ActionTypes.CREATE)
             return get_module_serializer(model)
 
-        def update(self, request, *args, **kwargs):
+        def update(self, request, pk=None):
             """
             Updates a module.
             """
 
-            module: Module | Submodule | LandModule = self.get_object()
+            module: Module | Submodule | LandModule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2227,12 +2229,12 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
-        def partial_update(self, request, *args, **kwargs):
+        def partial_update(self, request, pk=None):
             """
             Partially updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2408,13 +2410,8 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-            activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
-            error = security.check_permission("view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, module.activity.project)
             if error:
                 return error
 
@@ -2431,7 +2428,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"])
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
-            module: Module = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
             error = security.check_permission("view_modules", self.request.user, activity.project)
