@@ -1957,10 +1957,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         def perennial_to_luc():
             if self.module.is_system_in_maturity:
                 self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                self.bgb_start = None
+                self.bgb_start.value = None
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
-                self.bgb_start = None
+                self.bgb_start.value = None
 
             self.agb_end.value = 0
             self.bgb_end.value = 0
@@ -1975,10 +1975,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         def perennial_to_perennial():
             if self.module.is_system_in_maturity:
                 self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                self.bgb_start = None
+                self.bgb_start.value = None
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
-                self.bgb_start = None
+                self.bgb_start.value = None
 
             if has_change_in_system or is_complete_renewal:
                 if scenario_type_start == utils.ScenarioTypes.START:
@@ -1986,8 +1986,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 else:
                     perennial_from_luc()
             elif not self.module.is_system_in_maturity:
-                self.agb_end = None
-                self.bgb_end = None
+                self.agb_end.value = None
+                self.bgb_end.value = None
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
             else:
                 self.agb_end = copy.deepcopy(self.agb_start)
