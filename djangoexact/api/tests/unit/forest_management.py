@@ -1,15 +1,8 @@
-from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import generic_module_viewset
 import api.models as models
 import ipcc.models as ipcc_models
-import api.tests.factories as factories
 from rest_framework.test import force_authenticate
-from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice, FuzzyFloat
-import logging as log
-from api.tests.unit.utils import APITestCaseMixin
-from api import serializers
 import copy
 from . import base_module
 import time
@@ -18,6 +11,9 @@ import logging
 logging.getLogger().setLevel(logging.CRITICAL)
 logging.getLogger("matplotlib").setLevel(logging.CRITICAL)
 logging.getLogger("django").setLevel(logging.CRITICAL)
+logging.getLogger("django.request").propagate = False
+
+logging.basicConfig(level=logging.CRITICAL)
 
 
 class ForestManagementTestCase(base_module.BaseModuleTestCase):
@@ -77,7 +73,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
             if response.status_code == status.HTTP_200_OK:
                 has_results = True
             else:
-                print("No results found, retrying...")
+                logging.info("No results found, retrying...")
                 super().setUp()
                 self.validated_data = self.build_validated_data()
                 self.edit_module(self.module, self.user, self.validated_data)
@@ -88,8 +84,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         acceptable = False
         while not acceptable:
             try:
-                validated_data = self.build_validated_data()
-                response = self.edit_module(self.module, self.user, validated_data)
+                response = self.edit_module(self.module, self.user, {"land_use_type_start": self.land_use_types.order_by("?").first().id})
 
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 self.assertEqual(response.data["status"]["name"], "READY")
@@ -98,15 +93,15 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
                 logging.error("Retrying...")
                 time.sleep(1)
 
+        return response
+
     def test_modify_and_check_cache_invalidation(self):
         logging.info("START test_modify_and_check_cache_invalidation")
-
-        old_modified = self.module.last_modified
 
         self.test_modify()
         self.module.refresh_from_db()
 
-        self.assertNotEqual(self.module.last_modified, old_modified)
+        self.assertIsNone(self.module.last_cached_at)
 
         logging.info("END test_modify_and_check_cache_invalidation")
 
@@ -228,3 +223,11 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertIn("deadwood_t2_w_default", new_defaults.data)
         self.assertNotEqual(new_defaults.data["litter_t2_w_default"], defaults.data["litter_t2_w_default"])
         self.assertNotEqual(new_defaults.data["deadwood_t2_w_default"], defaults.data["deadwood_t2_w_default"])
+
+    def test_get_defaults_and_check_it_has_agb_and_bgb_max_t2_start_default(self):
+        defaults = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(defaults.status_code, status.HTTP_200_OK)
+        self.assertIn("agb_max_t2_start_default", defaults.data)
+        self.assertIn("bgb_max_t2_start_default", defaults.data)
+        self.assertIsNotNone(defaults.data["agb_max_t2_start_default"])
+        self.assertIsNotNone(defaults.data["bgb_max_t2_start_default"])
