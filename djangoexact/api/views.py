@@ -2201,12 +2201,12 @@ def generic_module_viewset(model: Module):
                 return get_module_serializer(model, action=ActionTypes.CREATE)
             return get_module_serializer(model)
 
-        def update(self, request, *args, **kwargs):
+        def update(self, request, pk=None):
             """
             Updates a module.
             """
 
-            module: Module | Submodule | LandModule = self.get_object()
+            module: Module | Submodule | LandModule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2229,12 +2229,12 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
-        def partial_update(self, request, *args, **kwargs):
+        def partial_update(self, request, pk=None):
             """
             Partially updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2428,7 +2428,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"])
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
-            module: Module = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
             error = security.check_permission("view_modules", self.request.user, activity.project)

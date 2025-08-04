@@ -1349,6 +1349,9 @@ class ForestManagementDefaults(Defaults):
             agb_t2_start_default=0,
             agb_t2_w_default=0,
             agb_t2_wo_default=0,
+            agb_max_t2_start_default=0,
+            agb_max_t2_w_default=0,
+            agb_max_t2_wo_default=0,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=0,
             agb_growth_rate_le_20_yrs_t2_wo_default=0,
@@ -1358,6 +1361,9 @@ class ForestManagementDefaults(Defaults):
             bgb_t2_start_default=0,
             bgb_t2_w_default=0,
             bgb_t2_wo_default=0,
+            bgb_max_t2_start_default=0,
+            bgb_max_t2_w_default=0,
+            bgb_max_t2_wo_default=0,
             bgb_growth_rate_le_20_yrs_t2_start_default=0,
             bgb_growth_rate_le_20_yrs_t2_w_default=0,
             bgb_growth_rate_le_20_yrs_t2_wo_default=0,
@@ -1421,6 +1427,21 @@ class ForestManagementDefaults(Defaults):
         if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
             bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
 
+        bgb_max_start = 0
+        bgb_max_w = 0
+        bgb_max_wo = 0
+
+        if defaults.math_start_w is not None:
+            bgb_max_start = defaults.math_start_w.max_bgb_value_default.value
+        elif defaults.math_start_wo is not None:
+            bgb_max_start = defaults.math_start_wo.max_bgb_value_default.value
+
+        if defaults.math_w is not None:
+            bgb_max_w = defaults.math_w.max_bgb_value_default.value
+
+        if defaults.math_wo is not None:
+            bgb_max_wo = defaults.math_wo.max_bgb_value_default.value
+
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
@@ -1449,6 +1470,9 @@ class ForestManagementDefaults(Defaults):
             bgb_t2_start_default=bgb_start if self.input.is_start() else 0,
             bgb_t2_w_default=bgb_w if self.input.is_with() else 0,
             bgb_t2_wo_default=bgb_wo if self.input.is_without() else 0,
+            bgb_max_t2_start_default=bgb_max_start,
+            bgb_max_t2_w_default=bgb_max_w,
+            bgb_max_t2_wo_default=bgb_max_wo,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=defaults.agb_growth_under_20_w,
             agb_growth_rate_le_20_yrs_t2_wo_default=defaults.agb_growth_under_20_wo,
