@@ -1957,10 +1957,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         def perennial_to_luc():
             if self.module.is_system_in_maturity:
                 self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                self.bgb_start = None
+                self.bgb_start.value = None
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
-                self.bgb_start = None
+                self.bgb_start.value = None
 
             self.agb_end.value = 0
             self.bgb_end.value = 0
@@ -1975,10 +1975,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         def perennial_to_perennial():
             if self.module.is_system_in_maturity:
                 self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
-                self.bgb_start = None
+                self.bgb_start.value = None
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
-                self.bgb_start = None
+                self.bgb_start.value = None
 
             if has_change_in_system or is_complete_renewal:
                 if scenario_type_start == utils.ScenarioTypes.START:
@@ -1986,8 +1986,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 else:
                     perennial_from_luc()
             elif not self.module.is_system_in_maturity:
-                self.agb_end = None
-                self.bgb_end = None
+                self.agb_end.value = None
+                self.bgb_end.value = None
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
             else:
                 self.agb_end = copy.deepcopy(self.agb_start)
@@ -6611,8 +6611,8 @@ class OrganicSoilCalculator(BaseCalculator):
             self.peat_extraction_inputs_w = {
                 "hectares_start": input.peat_area_start,
                 "hectares_end": input.peat_area_w,
-                "percentage_ditches_start": input.peat_ditches_area_start,
-                "percentage_ditches_end": input.peat_ditches_area_w,
+                "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
+                "percentage_ditches_end": input.peat_ditches_area_w if input.peat_ditches_area_w is not None else 0,
                 "rate_type": self.change_rate.name,
                 "ef_co2_onsite_ref": self.onsite_ef_w.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_w,
@@ -6630,8 +6630,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "mass_tonnes_tier_2": input.peat_density_t2_w,
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_w.volume,
-                "extraction_height_start": input.peat_extraction_height_start,
-                "extraction_height_end": input.peat_extraction_height_w,
+                "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
+                "extraction_height_end": input.peat_extraction_height_w if input.peat_extraction_height_w is not None else 0,
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
@@ -6709,8 +6709,8 @@ class OrganicSoilCalculator(BaseCalculator):
             self.peat_extraction_inputs_wo = {
                 "hectares_start": input.peat_area_start,
                 "hectares_end": input.peat_area_wo,
-                "percentage_ditches_start": input.peat_ditches_area_start,
-                "percentage_ditches_end": input.peat_ditches_area_wo,
+                "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
+                "percentage_ditches_end": input.peat_ditches_area_wo if input.peat_ditches_area_wo is not None else 0,
                 "rate_type": self.change_rate.name,
                 "ef_co2_onsite_ref": self.onsite_ef_wo.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_wo,
@@ -6728,8 +6728,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "mass_tonnes_tier_2": input.peat_density_t2_wo,
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_wo.volume,
-                "extraction_height_start": input.peat_extraction_height_start,
-                "extraction_height_end": input.peat_extraction_height_wo,
+                "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
+                "extraction_height_end": input.peat_extraction_height_wo if input.peat_extraction_height_wo is not None else 0,
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
@@ -6780,6 +6780,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         super().__init__(module)
 
         self.forest: ForestManagement = self.luc.forestmanagement if self.luc else self.module
+        self.math_start_w: MathForestManagement = None
+        self.math_start_wo: MathForestManagement = None
+        self.math_w: MathForestManagement = None
+        self.math_wo: MathForestManagement = None
 
         self.is_afforestation_w = False
         self.is_afforestation_wo = False
