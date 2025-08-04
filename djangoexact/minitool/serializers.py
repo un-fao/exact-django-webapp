@@ -18,3 +18,9 @@ class StatisticsModuleTotalAggregateSerializer(serializers.Serializer):
     module_type = serializers.CharField()
     field = serializers.CharField()
     total = serializers.FloatField()
+
+
+class EmissionStatisticsByModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.EmissionStatisticsByModule
+        fields = "__all__"

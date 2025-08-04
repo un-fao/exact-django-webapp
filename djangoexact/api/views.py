@@ -2113,7 +2113,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows module types to be viewed or edited.
     """

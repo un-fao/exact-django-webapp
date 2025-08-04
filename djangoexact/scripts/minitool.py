@@ -644,9 +644,9 @@ def run():
     ANNUAL_CROPLAND = False
     FLOODED_RICE = False
     GRASSLAND = False
-    LIVESTOCK = False
+    LIVESTOCK = True
 
-    MAX_ROWS = None
+    MAX_ROWS = 10000
 
     if GRASSLAND:
         compute_permutations(
