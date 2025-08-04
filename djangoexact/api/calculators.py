@@ -6780,6 +6780,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         super().__init__(module)
 
         self.forest: ForestManagement = self.luc.forestmanagement if self.luc else self.module
+        self.math_start_w: MathForestManagement = None
+        self.math_start_wo: MathForestManagement = None
+        self.math_w: MathForestManagement = None
+        self.math_wo: MathForestManagement = None
 
         self.is_afforestation_w = False
         self.is_afforestation_wo = False
