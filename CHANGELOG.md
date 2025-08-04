@@ -1,3 +1,14 @@
+## 1.15.5 (2025-08-04)
+
+### Fix
+
+- **defaults**: add max agb and max bgb values to forest management
+- **input**: add macro input type other to user defined inputs
+- **report**: remove balance stats for shadow price of carbon
+- **perennial cropland**: wrong None allocation causing crash in maturity computation
+- **organic soil**: set None ditches area and extraction height to zero to avoid NoneType errors in mathematical model
+- make defaults endpoint accessible regardless of project lock
+
 ## 1.15.4 (2025-08-01)
 
 ### Feat
