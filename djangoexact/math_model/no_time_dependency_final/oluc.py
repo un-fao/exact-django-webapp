@@ -8,7 +8,8 @@ from .general_functions import (
     compute_yearly_or_half_year_cumulative,
     som_emissions,
     compute_yearly_delta,
-    breakdown_proportionally_to_values
+    breakdown_proportionally_to_values,
+    compute_luc_hectare_delta
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -24,14 +25,14 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OtherLandUseChanges(BaseModule):
 
     # NOTE: I can't utilize LandModule for this as it does not have area_start and area_end. Maybe we could change LandModule? Not worth it I think
     initial_lu_biomass: float
-    initial_lu_biomass_tier_2: Optional[float]
+    initial_lu_biomass_tier_2: Optional[float] = None
     final_lu_biomass: float
-    final_lu_biomass_tier_2: Optional[float]
+    final_lu_biomass_tier_2: Optional[float] = None
     c_n_ratio: float
     moisture_emission_factor: float
     combustion_factor: float
@@ -42,20 +43,20 @@ class OtherLandUseChanges(BaseModule):
     fire_bool: bool
     soc_start_default: float
     soc_end_default: float
-    soc_start_tier_2: Optional[float]
-    soc_end_tier_2: Optional[float]
+    soc_start_tier_2: Optional[float] = None
+    soc_end_tier_2: Optional[float] = None
     fmg_start_default: float
     fmg_end_default: float
-    fmg_start_tier_2: Optional[float]
-    fmg_end_tier_2: Optional[float]
+    fmg_start_tier_2: Optional[float] = None
+    fmg_end_tier_2: Optional[float] = None
     flu_start_default: float
     flu_end_default: float
-    flu_start_tier_2: Optional[float]
-    flu_end_tier_2: Optional[float]
+    flu_start_tier_2: Optional[float] = None
+    flu_end_tier_2: Optional[float] = None
     fi_start_default: float
     fi_end_default: float
-    fi_start_tier_2: Optional[float]
-    fi_end_tier_2: Optional[float]
+    fi_start_tier_2: Optional[float] = None
+    fi_end_tier_2: Optional[float] = None
     calculate_soc_som: bool
     area: float
     dry_matter_end: float
@@ -80,11 +81,10 @@ class OtherLandUseChanges(BaseModule):
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
         # NOTE: Difference in number of hectares of which we change land use each year, compared to previous year
-        self.hectare_variation_yearly = compute_yearly_delta(self.area, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectare_variation_yearly = compute_luc_hectare_delta(self.area, 0, self.implementation_time, self.capitalization_time, self.rate_type)
         
-
     def calculate_emissions(self):
-        
+
         def calculate_biomass():
             try:
                 initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2

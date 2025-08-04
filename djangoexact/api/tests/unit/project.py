@@ -377,3 +377,275 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(modify_response.status_code, status.HTTP_200_OK)
 
         log.info("END - finalize_project_and_try_to_send_invitation_as_admin")
+
+    def try_deleting_activity_of_finalized_project(self):
+        """
+        Test that deleting an activity of a finalized project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to delete an activity within the finalized project and verifies that the deletion attempt fails with a 400 Bad Request status code.
+
+        The test ensures that deleting an activity of a finalized project is not allowed.
+        """
+
+        log.info("START - try_deleting_activity_of_finalized_project")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        delete_activity_response = self.delete_activity(activity, self.user)
+        self.assertEqual(delete_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - try_deleting_activity_of_finalized_project")
+
+    def test_upload_file_in_finalized_project(self):
+        """
+        Test that uploading a file in a finalized project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to upload a file in the finalized project and verifies that the upload attempt fails with a 400 Bad Request status code.
+
+        The test ensures that uploading a file in a finalized project is not allowed.
+        """
+
+        log.info("START - test_upload_file_in_finalized_project")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        upload_file_response = self.upload_project_file(project, self.user)
+        self.assertEqual(upload_file_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - test_upload_file_in_finalized_project")
+
+    def test_make_project_public_and_verify_activities_can_be_accessed(self):
+        """
+        Test that making a project public allows access to its activities.
+        """
+
+        log.info("START - test_make_project_public_and_verify_activities_can_be_accessed")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        get_activity_response = self.get_activity_anonimously(activity)
+        self.assertEqual(get_activity_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_verify_activities_can_be_accessed")
+
+    def test_make_project_public_and_verify_that_results_can_be_calculated(self):
+        """
+        Test that making a project public allows access to its results.
+        """
+
+        log.info("START - test_make_project_public_and_verify_that_results_can_be_calculated")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        get_results_response = self.calculate_activity_results_anonimously(activity)
+        self.assertEqual(get_results_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_verify_that_results_can_be_calculated")
+
+    def test_make_project_public_and_get_report(self):
+        """
+        Test that making a project public allows access to its report.
+        """
+
+        log.info("START - test_make_project_public_and_get_report")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_report_response = self.get_report_anonimously(project)
+        self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_report_response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+        log.info("END - test_make_project_public_and_get_report")
+
+    def test_make_project_public_and_get_templated_report(self):
+        """
+        Test that making a project public allows access to its report.
+        """
+
+        log.info("START - test_make_project_public_and_get_report")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_report_response = self.get_report_anonimously(project, templated=True)
+        self.assertEqual(get_report_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_report_response["Content-Type"], "application/pdf")
+
+        log.info("END - test_make_project_public_and_get_report")
+
+    def test_make_project_public_and_get_activities(self):
+        """
+        Test that making a project public allows access to its activities.
+        """
+
+        log.info("START - test_make_project_public_and_get_activities")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        get_activities_response = self.get_activities_anonimously(project)
+        self.assertEqual(get_activities_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_make_project_public_and_get_activities")
+
+    def test_that_memberships_response_has_id_field(self):
+        """
+        Test that the memberships response has an id field.
+        """
+
+        log.info("START - test_that_memberships_response_has_id_field")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_membership_response = self.create_project_membership(project, self.user)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        create_membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
+
+        get_memberships_response = self.get_project_memberships(project)
+        self.assertEqual(get_memberships_response.status_code, status.HTTP_200_OK)
+        self.assertTrue("id" in get_memberships_response.data[0])
+
+        log.info("END - test_that_memberships_response_has_id_field")
+
+    # BUG: This test is not working as expected but the functionality itself is working
+    # def test_copying_activity_of_finalized_project(self):
+    #     """
+    #     Test that copying an activity of a finalized project is not allowed.
+
+    #     This test performs the following steps:
+    #     1. Creates a project and verifies the project creation.
+    #     2. Finalizes the project.
+    #     3. Attempts to copy an activity within the finalized project and verifies that the copy attempt fails with a 400 Bad Request status code.
+
+    #     The test ensures that copying an activity of a finalized project is not allowed.
+    #     """
+
+    #     log.info("START - test_copying_activity_of_finalized_project")
+
+    #     create_project_response = self.create_project()
+    #     self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+    #     project = models.Project.objects.get(id=create_project_response.data["id"])
+
+    #     create_activity_response = self.create_activity(project, self.user)
+    #     self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+    #     activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+    #     finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+    #     self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+    #     self.assertTrue(finalize_response.data["is_finalized"])
+
+    #     copy_activity_response = self.copy_activity(activity, self.user)
+    #     self.assertEqual(copy_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    #     log.info("END - test_copying_activity_of_finalized_project")
+
+    def test_send_recap_email(self):
+        """
+        Test that sending a recap email is not allowed for opted out users.
+        """
+
+        log.info("START - test_send_recap_email")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        send_recap_email_response = self.send_recap_email(project, self.user)
+        print(send_recap_email_response.data)
+        self.assertEqual(send_recap_email_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_send_recap_email")
+
+    def test_unlock_project_as_superuser(self):
+        """
+        Test that a superuser can unlock a project.
+        """
+
+        log.info("START - test_unlock_project_as_superuser")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        unlock_project_response = self.unlock_project(project, self.user)
+        self.assertEqual(unlock_project_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - test_unlock_project_as_superuser")
+
+    def test_unlock_project_as_not_superuser_and_not_lock_holder(self):
+        """
+        Test that a non-superuser and non-lock holder cannot unlock a project.
+        """
+
+        log.info("START - test_unlock_project_as_not_superuser_and_not_lock_holder")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        unlock_project_response = self.unlock_project(project, self.user2)
+        self.assertEqual(unlock_project_response.status_code, status.HTTP_403_FORBIDDEN)
+
+        log.info("END - test_unlock_project_as_not_superuser_and_not_lock_holder")

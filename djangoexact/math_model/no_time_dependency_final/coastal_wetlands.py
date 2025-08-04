@@ -17,7 +17,7 @@ from .generalized_modules import LandModule, BaseModule
 from dataclasses import dataclass
 from typing import Optional
 
-@dataclass
+@dataclass(kw_only=True)
 class CoastalWetland(BaseModule):
 
     maximum_area_for_water_management: float
@@ -29,22 +29,22 @@ class CoastalWetland(BaseModule):
     deadwood_default: float
     soil_1m_default: float
     EF_drainage_default: float
-    agb_tier_2: Optional[float]
-    bgb_tier_2: Optional[float]
-    litter_tier_2: Optional[float]
-    deadwood_tier_2: Optional[float]
-    soil_1m_tier_2: Optional[float]
-    EF_drainage_tier_2: Optional[float]
+    agb_tier_2: Optional[float] = None
+    bgb_tier_2: Optional[float] = None
+    litter_tier_2: Optional[float] = None
+    deadwood_tier_2: Optional[float] = None
+    soil_1m_tier_2: Optional[float] = None
+    EF_drainage_tier_2: Optional[float] = None
     area_excavated_start: float
     area_excavated_end: float
     area_revegated_start: float
     area_revegated_end: float
     percentage_c_lost_excavation_default: float
-    percentage_c_lost_excavation_tier_2: Optional[float]
+    percentage_c_lost_excavation_tier_2: Optional[float] = None
     ef_rewetting_carbon_default: float
     ef_rewetting_methane_default: float
-    ef_rewetting_carbon_tier_2: Optional[float]
-    ef_rewetting_methane_tier_2: Optional[float]
+    ef_rewetting_carbon_tier_2: Optional[float] = None
+    ef_rewetting_methane_tier_2: Optional[float] = None
     soil_type: float
     methane_constant: float
     mangrove_factor: float

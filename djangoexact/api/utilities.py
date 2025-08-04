@@ -10,13 +10,20 @@ from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from django.utils.translation import get_language
 from django.core.exceptions import FieldDoesNotExist
-
+from django.core.mail import send_mail
+import os
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import api.models as api_models
 import ipcc.models as ipcc_models
+from datetime import timedelta
 
 import logging as log
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
+from django.db import transaction
+import api.security as security
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -209,27 +216,121 @@ def get_unique_name(instance, name):
 
 
 def copy_project(project, owner):
-    project_copy = copy.deepcopy(project)
-    project_copy.pk = None
-    project_copy.name = get_unique_name(project_copy, project_copy.name)
-    project_copy._state.adding = True
-    project.owner = owner
-    project_copy.save()
+    transaction.set_autocommit(False)
+    try:
+        project_copy = copy.deepcopy(project)
+        project_copy.pk = None
+        project_copy.name = get_unique_name(project_copy, project_copy.name)
+        project_copy._state.adding = True
+        project_copy.is_finalized = False
+        project.owner = owner
+        project_copy.save()
 
-    # Add Membership to the new project
-    api_models.ProjectMembership.objects.create(
-        user=owner,
-        project=project_copy,
-        group=api_models.Group.objects.get(name="Admin"),
-    )
+        # Add Membership to the new project
+        # BUG: Membership is assigned to the original project, not the copied one
+        api_models.ProjectMembership.objects.create(
+            user=owner,
+            project=project_copy,
+            group=api_models.Group.objects.get(name="Admin"),
+        )
 
-    for activity in project.activities.all():
-        copy_activity(activity, project_copy)
+        for activity in project.activities.all():
+            copy_activity(activity, project_copy, owner)
 
-    return project_copy
+        transaction.commit()
+
+        return project_copy
+    except Exception as e:
+        log.error(f"Error copying project: {e}")
+        raise e
 
 
-def copy_activity(activity, new_project=None):
+def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module"):
+    """
+    Copy the threads of a module and return the copied threads.
+
+    Args:
+        module: The module whose threads to copy.
+
+    Returns:
+        list[api_models.CommentThread]: The list of copied threads.
+    """
+
+    copied_threads = []
+
+    # Iterate through all fields of the module to find thread fields
+    for field in module_to._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module_from, field.name, None)
+
+                if thread_instance is None:
+                    continue
+
+                # Create a new thread copy
+                thread_copy = copy.deepcopy(thread_instance)
+                thread_copy.pk = None
+                thread_copy._state.adding = True
+                thread_copy.save()
+
+                # Copy all comments from the original thread
+                for comment in thread_instance.comments.all():
+                    comment_copy = copy.deepcopy(comment)
+                    comment_copy.pk = None
+                    comment_copy.thread = thread_copy
+                    comment_copy._state.adding = True
+                    comment_copy.save()
+
+                # Assign the new thread to the module
+                setattr(module_to, field.name, thread_copy)
+                copied_threads.append(thread_copy)
+
+    return copied_threads
+
+
+def clear_threads(module):
+    """
+    Clear the threads of a module by deleting all associated CommentThread instances.
+
+    Args:
+        module: The module whose threads to clear.
+    """
+
+    # Iterate through all fields of the module to find thread fields
+    for field in module._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module, field.name, None)
+                if thread_instance is not None:
+                    setattr(module, field.name, None)
+
+
+def handle_threads(module_from: "api_models.Module", module_to: "api_models.Module", owner=None):
+    """
+    Handle the copying of threads from one module to another, ensuring that the threads are copied correctly
+    and that the new module has the correct ownership.
+
+    Args:
+        module_from: The source module from which to copy threads.
+        module_to: The destination module to which threads will be copied.
+        owner: The owner of the new module, if applicable.
+
+    Returns:
+        None
+    """
+
+    activity = module_from.activity
+
+    can_view_comments = security.check_permission("can_view_comment", owner, activity.project)
+    if owner is not None and can_view_comments:
+        copy_threads(module_from, module_to)
+    else:
+        clear_threads(module_to)
+
+    module_to.save()
+
+
+def copy_activity(activity, new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
     activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
@@ -249,17 +350,13 @@ def copy_activity(activity, new_project=None):
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
 
-        # Get all attributes ending with "_thread" set them to None
-        for thread in module.threads:
-            setattr(module, thread.attname, None)
-
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
-        module_copy._state.adding = True
         module_copy.land_use_change = None
         module_copy.organic_soil = None
-        module_copy.save()
+        module_copy._state.adding = True
+        handle_threads(module, module_copy, owner)
 
         has_luc = getattr(module, "land_use_change", None)
         has_organic_soil = getattr(module, "organic_soil", None)
@@ -271,6 +368,7 @@ def copy_activity(activity, new_project=None):
                 luc_copy.activity = activity_copy
                 luc_copy._state.adding = True
                 luc_copy.save()
+                handle_threads(module.land_use_change, luc_copy, owner)
 
             module_copy.land_use_change = luc_copy
             module_copy.save()
@@ -282,6 +380,7 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy.activity = activity_copy
                 organic_soil_copy._state.adding = True
                 organic_soil_copy.save()
+                handle_threads(module.organic_soil, organic_soil_copy, owner)
 
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
@@ -305,6 +404,7 @@ def copy_activity(activity, new_project=None):
                 submodule.parent = module_copy
                 submodule._state.adding = True
                 submodule.save()
+                handle_threads(submodule, submodule, owner)
 
     return activity_copy
 
@@ -458,20 +558,23 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     return parent_module, module_type
 
 
-def get_changes(records: list[HistoricalRecords]):
-    class ChangeLog:
-        def __init__(self, date, user, reason, changes):
-            self.date = date
-            self.user = user
-            self.reason = reason
-            self.changes: list[Change] = changes
+class ChangeLog:
+    def __init__(self, date, user, reason, changes):
+        self.date = date
+        self.user = user
+        self.reason = reason
+        self.changes: list[Change] = changes
 
-    class Change:
-        def __init__(self, field, old, new):
-            self.field = field
-            self.old = old
-            self.new = new
 
+class Change:
+    def __init__(self, field, old, new):
+        self.field = field
+        self.field_verbose_name = field.replace("_", " ").capitalize()
+        self.old = old
+        self.new = new
+
+
+def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = None) -> list:
     changes = []
     for record in records:
         if record.prev_record is None:
@@ -482,9 +585,36 @@ def get_changes(records: list[HistoricalRecords]):
             continue
 
         delta = record.diff_against(record.prev_record)
+        fields_to_remove = [
+            "last_cached_at",
+            "cached_results_total",
+            "cached_results_by_activity",
+            "cached_results_by_gas",
+            "cached_results_by_activity_by_gas",
+            "last_modified",
+            "status",
+            "map_data",
+        ] + (exclude_fields or [])
+        delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
+
+        # TODO: Check why history_user is None when history_type = "-", which likely means deletion
+        if record.history_user is None:
+            continue
+
         change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
         for change in delta.changes:
-            change_log.changes.append(Change(change.field, change.old, change.new))
+            FieldClass = getattr(record, change.field).__class__
+            if issubclass(FieldClass, models.Model):
+                # If the field is a ForeignKey, get the related object
+                if change.old and change.new:
+                    try:
+                        old_obj = FieldClass.objects.get(pk=change.old)
+                        new_obj = FieldClass.objects.get(pk=change.new)
+                        change_log.changes.append(Change(change.field, old_obj.name, new_obj.name))
+                    except FieldClass.DoesNotExist:
+                        change_log.changes.append(Change(change.field, change.old, change.new))
+            else:
+                change_log.changes.append(Change(change.field, change.old, change.new))
 
         if len(change_log.changes) > 0:
             changes.append(change_log)
@@ -523,7 +653,9 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+    field_definitions = {
+        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
+    }
 
     return field_definitions
 
@@ -588,3 +720,137 @@ def validate_uuid(uuid_string):
     except ValueError:
         return False
     return True
+
+
+def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> None:
+    """
+    Send an email to all Admin members with the changes made to the project.
+
+    Args:
+        project (Project): The project object.
+        lock_holder (CustomUser): The user who holds the lock.
+        last_lock_update_date (datetime): The date when the lock was last updated.
+        recipients (list[CustomUser], optional): List of users to send the email to. If None, defaults to all Admin members of the project.
+
+    Returns:
+        None
+    """
+
+    def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
+        new_comments = []
+        for thread in threads:
+            if thread is None:
+                continue
+            comments = thread.comments.filter(date_created__gte=locked_at)
+            if comments.exists():
+                for comment in comments:
+                    comment: "api_models.Comment"
+                    changelog = ChangeLog(
+                        date=comment.date_created,
+                        user=None,
+                        reason=ChangeReasons.UPDATE.value,
+                        changes=[
+                            Change(
+                                field="comment",
+                                old=None,
+                                new=comment.content,
+                            )
+                        ],
+                    )
+                    new_comments.append(changelog)
+        return new_comments
+
+    if project.locked_at is None or project.locked_by is None:
+        raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
+
+    if recipients is None:
+        from api.models import ProjectNotificationPreference
+
+        # Get all admin members who haven't opted out globally
+        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+
+        # Filter out users who have opted out of notifications for this specific project
+        recipients = []
+        for member in potential_recipients:
+            user = member.user
+            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
+
+            # If no project-specific preference exists, or if they haven't opted out for this project, include them
+            if project_preference is None or not project_preference.is_opted_out:
+                recipients.append(member)
+
+    locked_at = project.locked_at
+
+    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at"]
+
+    changes = {
+        "project": {
+            "name": project.name,
+            "changes": get_changes(project.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude),
+        },
+        "activities": [],
+    }
+
+    for a in project.activities.all():
+        a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
+
+        for m in find_modules(a):
+            m: "api_models.Module" | "api_models.Submodule"
+            m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+
+            if hasattr(m, "submodules"):
+                submodules = m.submodules
+                for submodule in submodules:
+                    submodule_changes = get_changes(submodule.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+                    if submodule_changes:
+                        m_changes.extend(submodule_changes)
+
+                    threads = submodule.threads
+                    new_comments = get_new_comments(threads, locked_at)
+                    if new_comments:
+                        m_changes.extend(new_comments)
+
+            threads = m.threads
+            new_comments = get_new_comments(threads, locked_at)
+            if new_comments:
+                m_changes.extend(new_comments)
+
+            if not m_changes:
+                continue
+
+            a_data["modules"].append({"name": m.__class__.__name__, "changes": m_changes})
+
+        if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
+            changes["activities"].append(a_data)
+
+    lock_holder = project.members.filter(user=project.locked_by).first()
+    if lock_holder is None:
+        log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+
+    # Send email to recipients
+    context = {
+        "project": changes["project"],
+        "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
+        "activities": changes["activities"],
+        "lock_holder_group_name": lock_holder.group.name if lock_holder else "Superuser",
+        "lock_holder_name": project.locked_by.get_full_name(),
+        "lock_unlock_date": locked_at,
+    }
+
+    subject = f"{context['lock_holder_group_name']} Feedback - {context['project']['name']}"
+
+    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
+        return
+
+    for recipient in recipients:
+        user: api_models.CustomUser = recipient.user
+        context.update({"recipient": user})
+        if user.email:
+            html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "changes", "changes.html"), context)
+            plain_message = strip_tags(html_message)
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to = user.email
+            try:
+                send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+            except Exception as e:
+                log.error(f"Failed to send email to {user.email}: {e}")

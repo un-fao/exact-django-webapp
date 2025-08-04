@@ -2,23 +2,28 @@ import re
 
 
 def get_url_name(model_name):
-    url_name = model_name
+    # Improved algorithm to handle sequences of capital letters correctly
+    result = []
+    current_word = ""
 
-    # regex split on capital letters
-    url_name = re.split(r"(?<!^)(?=[A-Z](?![A-Z]|$))", url_name)
+    for i, char in enumerate(model_name):
+        if char.isupper():
+            # If this is the start of the string, or previous was also uppercase and next is not lowercase,
+            # append to current word
+            if i == 0 or (model_name[i - 1].isupper() and (i == len(model_name) - 1 or not model_name[i + 1].islower())):
+                current_word += char
+            else:
+                # New word starts
+                if current_word:
+                    result.append(current_word)
+                current_word = char
+        else:
+            current_word += char
 
-    # If an entry of the array contains two capital letters in a row, split only on the first one of the sequence
-    for i in range(len(url_name)):
-        if len(url_name[i]) > 1:
-            # cycle through the string and find a sequence of two capital letters
-            for j in range(len(url_name[i])):
-                if url_name[i][j].isupper() and url_name[i][j + 1].isupper():
-                    # split on the first capital letter of the sequence
-                    url_name[i] = url_name[i][:j] + "-" + url_name[i][j:]
-                    break
+    if current_word:
+        result.append(current_word)
 
-    url_name = "".join([f"-{x}" for x in url_name]).lower()
-    url_name = url_name[1:]
+    url_name = "-".join(result).lower()
 
     if url_name[-1] == "s":
         url_name += "es"

@@ -44,7 +44,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "simple_history",
     "ipcc",
     "api",
+    "public",
     "blog",
     "ckeditor",
     "minitool",
@@ -201,6 +202,7 @@ LANGUAGES = [
     ("en", "English"),
     ("fr", "French"),
     ("es", "Spanish"),
+    ("ru", "Russian"),
 ]
 
 USE_TZ = True
@@ -310,3 +312,6 @@ UNFOLD = {
 }
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
+DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")

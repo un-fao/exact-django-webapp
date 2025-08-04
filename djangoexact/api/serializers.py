@@ -78,6 +78,7 @@ from .models import (
     SoilType,
     StatusType,
     ProjectMembership,
+    ProjectNotificationPreference,
     Waterbody,
     LandModule,
     InvitationStatusType,
@@ -99,11 +100,14 @@ from .models import (
     FuelUseType,
     PublicToken,
     EnergyEntry,
+    HandInHandRegion,
+    HandInHandCountry,
+    HandInHandAssessment,
 )
-from datetime import timedelta
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
+from django.conf import settings
 
 
 class EmptySerializer(serializers.Serializer):
@@ -472,7 +476,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if last_year_of_accounting is not None:
                 activities: list[Activity] = project.activities.all()
 
-                if any(a.start_year + a.duration_t2 > last_year_of_accounting for a in activities):
+                if any(a.start_year + a.duration > last_year_of_accounting for a in activities):
                     raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
@@ -500,7 +504,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                     log.warning(f"Project is already locked by: {project.locked_by.email}")
                     raise serializers.ValidationError("The project is already locked")
 
-                project.lock(user)
+                if project.is_locked:
+                    project.refresh_lock()
+                else:
+                    project.lock(self.context["request"].user)
 
             # If an unlock is requested
             elif is_locking is False:
@@ -585,6 +592,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
+        project.lock(self.context["request"].user)
 
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.get(name_en="Land Use Change")
@@ -884,7 +892,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
+            new_module_types = list(
+                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
+            )
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
@@ -1126,14 +1136,18 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
+        if project.is_locked:
+            project.refresh_lock()
+        else:
+            project.lock(self.context["request"].user)
 
         if project.is_archived:
-            log.error("Archived projects cannot have activities added")
-            raise serializers.ValidationError("Archived projects cannot have activities added")
+            log.error("Modules belonging to archived projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to archived projects cannot be modified")
 
         if project.is_finalized:
-            log.error("Finalized projects cannot have activities added")
-            raise serializers.ValidationError("Finalized projects cannot have activities added")
+            log.error("Modules belonging to finalized projects cannot be modified")
+            raise serializers.ValidationError("Modules belonging to finalized projects cannot be modified")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
@@ -1172,6 +1186,17 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         if not data.get("parent", None) and (not self.instance or not self.instance.parent):
             log.error(f"Parent field is required for {self.Meta.ref_name}")
             raise serializers.ValidationError("Parent field is required")
+
+        project: Project = data["parent"].activity.project if data.get("parent") else self.instance.parent.activity.project
+
+        project._check_lock_expiration()
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
+            log.error("Project is locked by another user")
+            raise serializers.ValidationError("Project is locked by another user")
+        if project.is_locked:
+            project.refresh_lock()
+        else:
+            project.lock(self.context["request"].user)
 
         is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
 
@@ -1408,28 +1433,39 @@ class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
             "start": {
                 "mandatory": [
                     "land_use_type_start",
-                    # "tillage_management_type_start",
-                    # "organic_input_type_start",
                     "residue_management_type_start",
                 ],
             },
             "with": {
                 "mandatory": [
                     "land_use_type_w",
-                    # "tillage_management_type_w",
-                    # "organic_input_type_w",
                     "residue_management_type_w",
                 ],
             },
             "without": {
                 "mandatory": [
                     "land_use_type_wo",
-                    # "tillage_management_type_wo",
-                    # "organic_input_type_wo",
                     "residue_management_type_wo",
                 ],
             },
         }
+
+    def validate(self, data):
+        parent: AnnualCropland = self.instance.parent if self.instance else data.get("parent")
+        land_use_type_start = self.instance.land_use_type_start if self.instance else data.get("land_use_type_start", None)
+        land_use_type_w = self.instance.land_use_type_w if self.instance else data.get("land_use_type_w", None)
+        land_use_type_wo = self.instance.land_use_type_wo if self.instance else data.get("land_use_type_wo", None)
+
+        if parent and not parent.is_start() and land_use_type_start:
+            raise serializers.ValidationError("Land use type start cannot be set if the main cropland is not in the start scenario")
+
+        if parent and not parent.is_with() and land_use_type_w:
+            raise serializers.ValidationError("Land use type with cannot be set if the main cropland is not in the with scenario")
+
+        if parent and not parent.is_without() and land_use_type_wo:
+            raise serializers.ValidationError("Land use type without cannot be set if the main cropland is not in the without scenario")
+
+        return super().validate(data)
 
 
 class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
@@ -2824,10 +2860,57 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProjectMembershipReadSerializer(serializers.Serializer):
+class ProjectMembershipReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     project = ProjectNameIdSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectMembership
+        fields = "__all__"
+        ref_name = "ProjectMembership"
+
+
+class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        ref_name = "ProjectNotificationPreference"
+
+
+class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["project", "is_opted_out"]
+        ref_name = "ProjectNotificationPreference"
+
+    def validate(self, data):
+        super().validate(data)
+
+        # Get the user from the request context
+        user = self.context["request"].user
+        project = data["project"]
+
+        # Check if user is a member of the project
+        if not ProjectMembership.objects.filter(user=user, project=project).exists():
+            raise serializers.ValidationError("You must be a member of this project to manage notification preferences")
+
+        return data
+
+    def create(self, validated_data):
+        # Set the user from the request context
+        validated_data["user"] = self.context["request"].user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Ensure user can only update their own preferences
+        if instance.user != self.context["request"].user:
+            raise serializers.ValidationError("You can only update your own notification preferences")
+        return super().update(instance, validated_data)
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
@@ -3543,6 +3626,11 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         file = attrs["file"]
 
+        project: Project = self.context["project"]
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Finalized projects cannot be modified")
+
         max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
         if file.size > max_size_in_mb * 1024 * 1024:
@@ -3558,9 +3646,14 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
         from google.cloud import storage
 
+        blob = None
         try:
             client = storage.Client()
-            bucket = client.get_bucket("fao-exact-review-uploads")  # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
+            bucket = client.get_bucket(settings.STORAGE_BUCKET)
+
+            if not bucket.exists():
+                raise serializers.ValidationError("Storage bucket does not exist")
+
             project_folder = f"projects/{project.id}/"
             blob = bucket.blob(f"{project_folder}{file.name}")
 
@@ -3618,3 +3711,81 @@ class PublicTokenSerializer(serializers.ModelSerializer):
         model = PublicToken
         fields = "__all__"
         ref_name = "PublicToken"
+
+
+class HandInHandRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandRegion
+        fields = "__all__"
+        ref_name = "HandInHandRegion"
+
+
+class HandInHandCountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandCountry
+        fields = "__all__"
+        ref_name = "HandInHandCountry"
+
+
+class HandInHandAssessmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandAssessment
+        fields = ["id", "name", "year", "country", "link"]
+        ref_name = "HandInHandAssessment"
+
+
+class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
+    """
+    Serializer that returns HandInHandAssessment data grouped by region > country > year
+    """
+
+    def to_representation(self, instance):
+        # Get all assessments
+        assessments = HandInHandAssessment.objects.select_related("country__region").order_by("country__region__name", "country__name", "year", "name")
+
+        # Group by region, then country, then year
+        grouped_data = {}
+
+        for assessment in assessments:
+            region_name = assessment.country.region.name
+            country_name = assessment.country.name
+            year = assessment.year or "Unknown Year"
+
+            # Initialize region if not exists
+            if region_name not in grouped_data:
+                grouped_data[region_name] = {"name": region_name, "countries": {}}
+
+            # Initialize country if not exists
+            if country_name not in grouped_data[region_name]["countries"]:
+                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": assessment.country.iso_code, "years": {}}
+
+            # Initialize year if not exists
+            if year not in grouped_data[region_name]["countries"][country_name]["years"]:
+                grouped_data[region_name]["countries"][country_name]["years"][year] = {"year": year, "assessments": []}
+
+            # Add assessment to the year
+            grouped_data[region_name]["countries"][country_name]["years"][year]["assessments"].append({"id": assessment.id, "name": assessment.name, "link": assessment.link})
+
+        # Convert nested dictionaries to lists for better JSON structure
+        result = []
+        for region_name, region_data in grouped_data.items():
+            region_dict = {"name": region_data["name"], "countries": []}
+
+            for country_name, country_data in region_data["countries"].items():
+                country_dict = {"name": country_data["name"], "iso_code": country_data["iso_code"], "years": []}
+
+                for year, year_data in country_data["years"].items():
+                    country_dict["years"].append(year_data)
+
+                # Sort years (handle "Unknown Year" case)
+                country_dict["years"].sort(key=lambda x: float("inf") if x["year"] == "Unknown Year" else x["year"])
+                region_dict["countries"].append(country_dict)
+
+            # Sort countries alphabetically
+            region_dict["countries"].sort(key=lambda x: x["name"])
+            result.append(region_dict)
+
+        # Sort regions alphabetically
+        result.sort(key=lambda x: x["name"])
+
+        return result

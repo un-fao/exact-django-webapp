@@ -4753,6 +4753,160 @@ def add_density_zero_where_density_is_none_in_irrigation_phase_data():
     print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
 
 
+def import_fra_carbon_stock_data():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"])
+        bgb = parse_csv_number(row["bgb"])
+        litter = parse_csv_number(row["litter"])
+        deadwood = parse_csv_number(row["deadwood"])
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        FRACarbonStock.objects.create(
+            year=2020,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
+
+
+def add_ipcc_and_fra_as_data_sources():
+    """
+    Add IPCC and FRA as data sources to the database.
+    """
+    from api.models import DataSource
+
+    ipcc_data_source, created = DataSource.objects.get_or_create(short_name="IPCC")
+    if created:
+        print("Created IPCC data source")
+    else:
+        print("IPCC data source already exists")
+
+    fra_data_source, created = DataSource.objects.get_or_create(short_name="FRA")
+    if created:
+        print("Created FRA data source")
+    else:
+        print("FRA data source already exists")
+
+
+def add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none():
+    """
+    Add emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None
+    """
+    print("Adding emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None")
+    obj = EmissionFactorSource.objects.get(name__iexact="Operating Margin")
+    irrigation_phases = IrrigationPhase.objects.filter(ef_source=None).update(ef_source=obj)
+    print(f"Updated {irrigation_phases} IrrigationPhaseData objects")
+
+
+def add_small_fishery_gear_types_fishery_types_relationships():
+    """
+    Add relationships between SmallFisheryGearType and FisheryType.
+    """
+    from api.models import SmallFisheryGearType, FisheryType
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SmallFisheryGearType_FisheryType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        gear_type: SmallFisheryGearType = SmallFisheryGearType.objects.get(name__iexact=row["gear_type"])
+        fishery_types = FisheryType.objects.filter(name__in=row["fishery_types"].split(", ")).all()
+
+        for fishery_type in fishery_types:
+            gear_type.fishery_types.add(fishery_type)
+            print(f"Added {fishery_type} to {gear_type}")
+
+
+def change_other_land_flu_data_to_1():
+    """
+    Change OtherLandFLUData objects to have a value of 1.0 for all land use types.
+    """
+    from ipcc.models import FLUData
+
+    print("Changing OtherLandFLUData objects to have a value of 1.0 for all land use types")
+    flu_datas = FLUData.objects.filter(land_use_type__name__iexact="Other Land").all()
+    entries = []
+    for flu_data in flu_datas:
+        print(f"Changing {flu_data} to have a value of 1.0")
+        flu_data.value = 1.0
+        entries.append(flu_data)
+
+    FLUData.objects.bulk_update(entries, ["value"])
+    print(f"Updated {len(entries)} OtherLandFLUData objects to have a value of 1.0")
+
+
+def update_module_types_of_fuel_types():
+    """
+    Update the module types of FuelType objects to include 'EnergyEntry'.
+    """
+    from api.models import ModuleType, FuelType
+
+    module_types = ModuleType.objects.filter(class_name__in=["EnergyEntry", "TransportEntry", "PackagingEntry", "StorageEntry", "ProcessingEntry", "IrrigationPhase", "IrrigationSystem"])
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_ModuleType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        sub_module_types = module_types.filter(class_name__icontains=row["module_type"])
+        for module_type in sub_module_types:
+            fuel_type = FuelType.objects.get(name=row["fuel_type"], fuel_use_type__name=row["fuel_use_type"])
+            fuel_type.module_types.clear()  # Clear existing module types
+            if module_type and fuel_type:
+                print(f"Adding {module_type} to {fuel_type}")
+                fuel_type.module_types.add(module_type)
+                fuel_type.save()
+            else:
+                print(f"Could not find module type or fuel type for row {i}")
+
+
+def convert_storage_refrigerant_ef_from_kg_to_tonnes():
+    """
+    Convert the refrigerant emission factors in StorageEmissionFactor from kg to tonnes.
+    """
+    from ipcc.models import ValueChainRefrigerantEmissionFactor
+
+    refrigerant_efs = ValueChainRefrigerantEmissionFactor.objects.all()
+    for ef in refrigerant_efs:
+        if ef.value is not None:
+            ef.value /= 1000  # Convert kg to tonnes
+            ef.save()
+            print(f"Updated {ef} to {ef.value} tonnes")
+
+
 def run():
     import os
 
@@ -4774,28 +4928,21 @@ def run():
         assign_parent_fuel_types_to_fuel_types()
         create_energy_entry_module_type()
         add_change_public_project_flag_permission_to_admin_group()
+        import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
+        add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
+        add_small_fishery_gear_types_fishery_types_relationships()
+        change_other_land_flu_data_to_1()
+        update_module_types_of_fuel_types()
+        convert_storage_refrigerant_ef_from_kg_to_tonnes()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        # get_or_create_soil_types_and_update_info()
-        # delete_and_import_forest_total_biomass()
-        # delete_and_import_total_biomass_after_defo()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
-        # delete_and_import_irrigation_phase_data()
-        # import_shadow_prices_of_carbon()
-        # add_0_2_to_co2_value_in_input_emission_factor()
-        # create_parent_fuel_types()
-        # assign_parent_fuel_types_to_fuel_types()
-        # create_energy_entry_module_type()
-        # add_change_public_project_flag_permission_to_admin_group()
-        add_density_zero_where_density_is_none_in_irrigation_phase_data()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "test":

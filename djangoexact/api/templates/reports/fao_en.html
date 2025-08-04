@@ -1,0 +1,45 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description"
+              content="Environmental eXternalities ACcounting Tool (EX-ACT) - Carbon balance report for project activities and GHG emissions analysis">
+        <meta name="keywords"
+              content="EX-ACT, carbon balance, GHG emissions, environmental accounting, climate change, carbon footprint">
+        <title>Report</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+              rel="stylesheet"
+              crossorigin="anonymous" />
+        {% include "reports/partials/common/style.html" %}
+    </head>
+    <body>
+        <header>
+            Environmental eXternalities ACcounting Tool (EX-ACT)
+        </header>
+        <footer>
+            Downloaded on {{ download_date_time }} | EX-ACT Version: V10 | User: {{ user.email }}
+        </footer>
+        <main>
+            {% include "reports/partials/en/cover.html" %}
+            {% include "reports/partials/en/project_description.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/project_summary.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/total_balance.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/ghg_breakdown.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/activity_breakdown.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/units_table.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/methodology.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/disclaimer.html" %}
+            <div class="page-break"></div>
+            {% include "reports/partials/en/notes.html" %}
+        </main>
+    </body>
+</html>

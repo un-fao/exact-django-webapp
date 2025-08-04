@@ -4,6 +4,8 @@ from .coastal_wetland import *
 from .flooded_rice import *
 from .forest_management import *
 from .grassland import *
+from .land_use_change import *
+from .land_use_change_examples import *
 from .large_fishery import *
 from .livestock import *
 from .perennial_cropland import *

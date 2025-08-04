@@ -16,20 +16,20 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Inputs(BaseModule):
     unit_start: float
     unit_end: float
     ipcc_factor_co2: float
-    tier_2_factor_co2: Optional[float]
+    tier_2_factor_co2: Optional[float] = None
     unit_factor_co2: float
     emissions_factor_co2: float
     ipcc_factor_n2o: float
-    tier_2_factor_n2o: Optional[float]
+    tier_2_factor_n2o: Optional[float] = None
     unit_factor_n2o: float
     emissions_factor_n2o: float
     ipcc_factor_eq: float
-    tier_2_factor_eq: Optional[float]
+    tier_2_factor_eq: Optional[float] = None
     unit_factor_eq: float
     emissions_factor_eq: float
 
@@ -64,19 +64,19 @@ class Inputs(BaseModule):
             raise e
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OperationPhaseIrrigation(BaseModule):
     ef_co2_default: float
-    ef_co2_tier_2: Optional[float]
+    ef_co2_tier_2: Optional[float] = None
     ef_n2o_default: float
-    ef_n2o_tier_2: Optional[float]
+    ef_n2o_tier_2: Optional[float] = None
     ef_ch4_default: float
-    ef_ch4_tier_2: Optional[float]
-    total_dynamic_head_tier_2: Optional[float]
+    ef_ch4_tier_2: Optional[float] = None
+    total_dynamic_head_tier_2: Optional[float] = None
     average_pressure_default: float
-    average_pressure_tier_2: Optional[float]
+    average_pressure_tier_2: Optional[float] = None
     pumping_efficiency_default: float
-    pumping_efficiency_tier_2: Optional[float]
+    pumping_efficiency_tier_2: Optional[float] = None
     erh_electricity: float
     fuel_density: float
     fuel_net_calorific_values: float
@@ -163,10 +163,10 @@ class OperationPhaseIrrigation(BaseModule):
             raise e
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Roads(BaseModule):
     ef_ipcc: float
-    ef_tier_2: Optional[float]
+    ef_tier_2: Optional[float] = None
     units_end: float  # This will be used to set `units_end`
 
     def calculate_emissions(self):
@@ -186,11 +186,11 @@ class Roads(BaseModule):
             raise e
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ElectricityConsumption(BaseModule):
     emissions_factor: float
-    specific_factor_start: Optional[float]
-    specific_factor_end: Optional[float]
+    specific_factor_start: Optional[float] = None
+    specific_factor_end: Optional[float] = None
     mwh_start: float
     mwh_end: float
     percent_loss_transportation_start: float
@@ -216,15 +216,15 @@ class ElectricityConsumption(BaseModule):
             raise e
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SolidAndLiquidFuelsConsumption(BaseModule):
     # Now we have co2, ch4 and n2o factors
     emissions_factor_co2: float
-    specific_factor_co2: Optional[float]
+    specific_factor_co2: Optional[float] = None
     emissions_factor_ch4: float
-    specific_factor_ch4: Optional[float]
+    specific_factor_ch4: Optional[float] = None
     emissions_factor_n2o: float
-    specific_factor_n2o: Optional[float]
+    specific_factor_n2o: Optional[float] = None
     mwh_start: float
     mwh_end: float
     nitrous_constant: float
@@ -264,10 +264,10 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             raise e
 
 
-@dataclass
+@dataclass(kw_only=True)
 class NewIrrigation(BaseModule):
     ef_ref: float
-    ef_tier_2: Optional[float]
+    ef_tier_2: Optional[float] = None
     units_start: float
     units_end: float
 

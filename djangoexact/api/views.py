@@ -1,20 +1,17 @@
 import os
 import logging
 from types import SimpleNamespace
-import uuid
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
+import traceback
 
-from django.apps import apps
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -33,6 +30,8 @@ import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 from datetime import datetime
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
 
 from .calculators import CalculatorFactory
 from .models import (
@@ -44,7 +43,6 @@ from .models import (
     InputType,
     LandUseChange,
     LandUseType,
-    MacroInputType,
     Module,
     ModuleType,
     Project,
@@ -52,12 +50,11 @@ from .models import (
     StatusType,
     Submodule,
     ProjectMembership,
+    ProjectNotificationPreference,
     InvitationStatusType,
-    Definition,
     Note,
     FieldDefinition,
     LandModule,
-    CachedResultMixin,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -66,15 +63,14 @@ from .models import (
     Fishery,
     Livestock,
     LivestockCategoryType,
-    FishType,
     FisheryType,
     SmallFishery,
     LargeFishery,
     PublicToken,
+    HandInHandAssessment,
 )
 from .serializers import (
     ActionTypes,
-    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -91,6 +87,8 @@ from .serializers import (
     ReadProjectSerializer,
     ProjectMembershipWriteSerializer,
     ProjectMembershipReadSerializer,
+    ProjectNotificationPreferenceReadSerializer,
+    ProjectNotificationPreferenceWriteSerializer,
     UserReadSerializer,
     UserWriteSerializer,
     WriteActivitySerializer,
@@ -99,7 +97,6 @@ from .serializers import (
     get_module_serializer,
     ChangeHistorySerializer,
     ProjectInvitationModelWriteSerializer,
-    ProjectInvitationModelReadSerializer,
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
@@ -119,6 +116,10 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
+    HandInHandRegionSerializer,
+    HandInHandCountrySerializer,
+    HandInHandAssessmentSerializer,
+    HandInHandAssessmentGroupedSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -135,6 +136,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import api.permissions as api_permissions
+from django.utils.translation import gettext as _
+from django.utils.translation import activate
 
 logger = logging.getLogger("console")
 
@@ -331,7 +334,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows land use types to be viewed or edited.
     """
@@ -407,6 +410,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         error = security.check_permission("delete_project", self.request.user, project)
         if error:
             return error
+
+        if project.members.filter(group__name="Admin").count() > 1:
+            return utils.ErrorResponse("You cannot delete a project if there are other admins. You can only remove yourself from it", status=http_status.HTTP_400_BAD_REQUEST)
 
         # NOTE: This is a workaround for a bug in the simple_history library caused by an unhandled AttributeError when deleting a project with no previous history
         if project.history.count() > 0:
@@ -640,7 +646,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
-        project: Project = self.get_object()
+        project: Project = get_object_or_404(Project, pk=pk)
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -664,6 +670,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            traceback.print_exc()
             logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -797,6 +804,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
+    def unlock(self, request, pk=None):
+        project: Project = self.get_object()
+        if not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        project.unlock()
+
+        serializer = ProjectLockHolderInformationSerializer(project, many=False)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
     @action(detail=True, methods=["get"])
     def activities(self, request, pk=None):
         project: Project = self.get_object()
@@ -810,22 +833,29 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description="Generate a PDF from an HTML template",
-        manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
+        manual_parameters=[
+            openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("lang", openapi.IN_QUERY, description="Language of the template", type=openapi.TYPE_STRING, required=False),
+        ],
         responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
+        lang = request.query_params.get("lang", "en")
+        if hasattr(request, "LANGUAGE_CODE"):
+            lang = request.LANGUAGE_CODE
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}.html"):
-            templates = [os.path.splitext(template)[0] for template in os.listdir(f"{current_dir}/templates/reports")]
-            return utils.ErrorResponse(f"Template '{template_name}' not found. Available templates: {templates}", status=http_status.HTTP_400_BAD_REQUEST)
+        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}_{lang}.html"):
+            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
+            activate(lang)
+
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
@@ -839,8 +869,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             activities = total_data["activities"]
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
-            total_w = sum(result["total_w"] for result in results)
-            total_wo = sum(result["total_wo"] for result in results)
+            # TODO: Maybe instead of doing this show the module but with an error message
+            total_w = sum(result["total_w"] for result in results if result.get("total_w", None) is not None)
+            total_wo = sum(result["total_wo"] for result in results if result.get("total_wo", None) is not None)
             total_balance = total_w - total_wo
 
             project_emissions_w = total_w
@@ -857,8 +888,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
 
-            emissions_w = [result["total_w"] for result in results]
-            emissions_wo = [result["total_wo"] for result in results]
+            emissions_w = [result["total_w"] for result in results if result.get("total_w", None) is not None]
+            emissions_wo = [result["total_wo"] for result in results if result.get("total_wo", None) is not None]
 
             co2_w = {"name": "CO2", "value": 0}
             ch4_w = {"name": "CH4", "value": 0}
@@ -908,7 +939,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     if g["gas_type"]["name"] == "OTHER":
                         other_wo["value"] += sum([e["value"] for e in g["emissions"]])
 
-            balances = [result["balance"] for result in results]
+            balances = [result["balance"] for result in results if result.get("balance", None) is not None]
 
             co2 = {"name": "CO2", "value": 0}
             ch4 = {"name": "CH4", "value": 0}
@@ -934,21 +965,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             gases = [co2, ch4, n2o, co, doc, other]
 
-            highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
-            second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
-            third_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[2]
+            INCREASES = _("increases")
+            DECREASES = _("decreases")
+
+            sorted_gases = sorted(gases, key=lambda x: (abs(x["value"]) and x["value"] != 0), reverse=True)
+            highest_gas = sorted_gases[0]
+            second_highest_gas = sorted_gases[1]
+            third_highest_gas = sorted_gases[2]
 
             project_primary_ghg = highest_gas["name"]
             project_primary_ghg_emissions = highest_gas["value"]
-            project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
+            project_primary_ghg_direction = INCREASES if project_primary_ghg_emissions >= 0 else DECREASES
 
             project_secondary_ghg = second_highest_gas["name"]
             project_secondary_ghg_emissions = second_highest_gas["value"]
-            project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
+            project_secondary_ghg_direction = INCREASES if project_secondary_ghg_emissions >= 0 else DECREASES
 
             project_tertiary_ghg = third_highest_gas["name"]
             project_tertiary_ghg_emissions = third_highest_gas["value"]
-            project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
+            project_tertiary_ghg_direction = INCREASES if project_tertiary_ghg_emissions >= 0 else DECREASES
 
             activities = project.activities.all()
 
@@ -964,16 +999,39 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
-                mlist = a["modules"]
-                modules_by_highest_emissions = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)
+                mlist = list(filter(lambda x: x.get("results", None) is not None and x["results"].get("balance", None) is not None, a["modules"]))
+                modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
 
                 db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
 
-                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
-                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist if m["results"]["total_w"] is not None])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist if m["results"]["total_wo"] is not None])
                 sum_all_balance = sum_all_total_w - sum_all_total_wo
 
                 db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
+
+                main_impact = None
+                secondary_impacts = []
+
+                if db_activity.is_luc:
+                    main_impact = _("hectares")
+                elif db_activity.is_fishery:
+                    main_impact = _("tonnes of catch")
+                elif db_activity.is_livestock:
+                    main_impact = _("livestock heads")
+
+                if any([db_activity.is_energy, db_activity.is_storage, db_activity.is_transport, db_activity.is_processing]):
+                    secondary_impacts.append(_("energy consumption"))
+                if db_activity.is_packaging:
+                    secondary_impacts.append(_("packaging material"))
+                if db_activity.is_input:
+                    secondary_impacts.append(_("agricultural inputs use"))
+
+                secondary_impacts = ", ".join(secondary_impacts)
+
+                db_activity.main_impact = main_impact
+                if secondary_impacts:
+                    db_activity.secondary_impacts = secondary_impacts
 
                 for m in db_activity.modules:
                     if issubclass(m.__class__, Fishery):
@@ -1008,8 +1066,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     lt["value_w"] += m.area
                                 elif m.is_without() and not m.is_with():
                                     lt["value_wo"] += m.area
+                                elif m.is_with() and m.is_without():
+                                    lt["value_w"] += m.area
+                                    lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
+
+            processed_activities = sorted(processed_activities, key=lambda x: x.results["balance"], reverse=total_balance > 0)
 
             livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
             small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
@@ -1133,7 +1196,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 return chart_base64
 
             # Get faologo.eps from static files
-            faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
+            try:
+                faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
+            except FileNotFoundError:
+                faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
 
             # Add it as base64 to the context
             faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
@@ -1179,7 +1245,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 "download_date_time": download_date_time,
             }
 
-            html = render(request, f"reports/{template_name}.html", context).content.decode()
+            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
@@ -1206,6 +1272,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
         tags = ProjectTag.objects.filter(user=self.request.user).values("name", "id").distinct()
         serializer = ProjectTagSerializer(tags, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
+        operation_description="Send recap email with project changes",
+        responses={200: "Email sent successfully", 400: "Bad request", 500: "Internal server error"},
+    )
+    def recap(self, request, pk=None):
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        try:
+            utils.send_changes_email(project)
+            return Response({"message": "Recap email sent successfully"}, status=http_status.HTTP_200_OK)
+
+        except Exception as e:
+            return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1336,9 +1421,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             membership.project.owner = other_admin.user
             membership.project.save()
 
-        elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
-            logging.error("Selected user does not have permission to delete project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        error = security.check_permission("delete_projectmembership", self.request.user, membership.project)
+        if error and not membership.user == self.request.user:
+            return error
 
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()
@@ -1348,6 +1433,96 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+
+class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectNotificationPreference.objects.all()
+    serializer_class = ProjectNotificationPreferenceReadSerializer
+
+    def get_queryset(self):
+        """Filter to only show the current user's notification preferences"""
+        return self.queryset.filter(user=self.request.user)
+
+    @swagger_auto_schema(
+        operation_description="Get notification preferences for the current user",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer(many=True),
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        project_id = self.request.query_params.get("project_id", None)
+
+        queryset = self.get_queryset()
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Get or create notification preference for a specific project",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Create or update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            201: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+        },
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = ProjectNotificationPreferenceWriteSerializer(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        project = serializer.validated_data["project"]
+
+        # Get or create the preference
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+
+        if not created:
+            # Update existing preference
+            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.save()
+
+        response_serializer = ProjectNotificationPreferenceReadSerializer(preference)
+        status_code = http_status.HTTP_201_CREATED if created else http_status.HTTP_200_OK
+
+        return Response(response_serializer.data, status=status_code)
+
+    @swagger_auto_schema(
+        operation_description="Update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+            403: "Forbidden",
+        },
+    )
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
+
+        return Response(response_serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1422,36 +1597,24 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
-        invitation_text = """
-Invited by:\t{invitation_sender}
-Project title:\t{project_title}
-Role assigned:\t{invitation_role}
-Date of share:\t{invitation_date}
+        context = {
+            "project_title": project.name,
+            "invitation_role": group.name,
+            "invitation_recipient_name": user.get_full_name(),
+            "invitation_link": request.build_absolute_uri(invitation_link),
+            "exact_email": "ex-act@fao.org",
+            "invitation_date": invitation.created_at.strftime("%Y-%m-%d"),
+            "invitation_sender": invitation.sender.get_full_name(),
+        }
 
-Dear {invitation_recipient_name},
-You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
-To accept this invitation and begin collaborating, please click the link below:
+        html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.html"), context)
+        plain_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "invitation.txt"), context)
 
-{invitation_link}
-
-What is EX-ACT?
-EX-ACT (Environmental eXternalities ACcounting Tool) * is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
-
-If you require further assistance, feel free to reach out to {exact_email}.
-* Previously known as EX-Ante Carbon-balance Tool
-
-Best regards,
-The EX-ACT Team
-        """.format(
-            project_title=project.name,
-            invitation_role=group.name,
-            invitation_recipient_name=user.get_full_name(),
-            invitation_link=request.build_absolute_uri(invitation_link),
-            exact_email="ex-act@fao.org",
-            invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
-            invitation_sender=invitation.sender.get_full_name(),
-        )
-        send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
+        # Create and send email with both HTML and plain text versions to support different email clients
+        # NOTE: Alternatives are in order of increasing preference
+        email = EmailMultiAlternatives(subject=invitation_subject, body=plain_message, from_email=settings.EMAIL_HOST_USER, to=[invitation.user.email])
+        email.attach_alternative(html_message, "text/html")
+        email.send()
 
         logging.debug(f"Email sent to user ID {user.pk} with role {group.name} for project ID {project.pk}")
         logging.debug("END ProjectInvitationViewset.create")
@@ -1786,14 +1949,23 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
+    @swagger_auto_schema(
+        responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer},
+        request_body=EmptySerializer,
+    )
     def copy(self, request, pk=None):
-        activity = self.get_object()
+        activity: Activity = self.get_object()
         error = security.check_permission("view_activity", self.request.user, activity.project)
         if error:
             return error
 
-        new_activity = utils.copy_activity(activity)
+        if activity.project.is_finalized:
+            return utils.ErrorResponse("Cannot copy activity from a finalized project", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if activity.project.is_archived:
+            return utils.ErrorResponse("Cannot copy activity from an archived project", status=http_status.HTTP_400_BAD_REQUEST)
+
+        new_activity = utils.copy_activity(activity, owner=self.request.user)
 
         return Response(data=self.serializer_class(new_activity).data, status=http_status.HTTP_201_CREATED)
 
@@ -1808,6 +1980,20 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         changes = utils.get_changes(activity.history.all())
 
         return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        activity = self.get_object()
+        error = security.check_permission("delete_activity", self.request.user, activity.project)
+        if error:
+            return error
+
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        activity.delete()
+
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 
 class CommentThreadViewSet(viewsets.ModelViewSet):
@@ -2015,12 +2201,12 @@ def generic_module_viewset(model: Module):
                 return get_module_serializer(model, action=ActionTypes.CREATE)
             return get_module_serializer(model)
 
-        def update(self, request, *args, **kwargs):
+        def update(self, request, pk=None):
             """
             Updates a module.
             """
 
-            module: Module | Submodule | LandModule = self.get_object()
+            module: Module | Submodule | LandModule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2043,12 +2229,12 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
-        def partial_update(self, request, *args, **kwargs):
+        def partial_update(self, request, pk=None):
             """
             Partially updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2186,7 +2372,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if not (module.project.is_archived or module.project.is_finalized) and (module_results is None or not use_cached_results):
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
@@ -2195,7 +2381,15 @@ def generic_module_viewset(model: Module):
                     results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS).data
                     results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module_results = (
+                        results_total
+                        if aggregate_by == BreakdownTypes.TOTAL
+                        else results_by_activity
+                        if aggregate_by == BreakdownTypes.ACTIVITY
+                        else results_by_gas
+                        if aggregate_by == BreakdownTypes.GAS
+                        else results_by_activity_gas
+                    )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -2216,13 +2410,8 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-            activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
-            error = security.check_permission("view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, module.activity.project)
             if error:
                 return error
 
@@ -2239,7 +2428,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"])
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
-            module: Module = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
             error = security.check_permission("view_modules", self.request.user, activity.project)
@@ -2293,6 +2482,8 @@ def public_generic_viewset(model: Model):
     class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
+        filterset_class = api_filters.get_model_filter(model)
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     return PublicGenericViewSet
 
@@ -2473,6 +2664,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
+        logger.debug(f"START ProjectFileAttachmentViewSet.download for attachment {pk}")
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, attachment.project):
@@ -2480,7 +2672,12 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
         client = storage.Client()
-        bucket = client.bucket("fao-exact-review-uploads")
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+
+        if not bucket.exists():
+            logging.error("Bucket does not exist")
+            return utils.ErrorResponse("Bucket does not exist", status=http_status.HTTP_404_NOT_FOUND)
+
         blob = bucket.blob(f"projects/{attachment.project.id}/{attachment.name}")
 
         def file_iterator(blob):
@@ -2491,6 +2688,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = HttpResponse(file_iterator(blob), content_type=blob.content_type)
         response["Content-Disposition"] = f"attachment; filename={attachment.name}"
 
+        logger.debug(f"END ProjectFileAttachmentViewSet.download for attachment {pk}")
         return response
 
     def destroy(self, request, pk=None):
@@ -2538,12 +2736,12 @@ class APIHealthView(views.APIView):
         return Response(serializer.data, status=status)
 
 
-class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilterViewSet):
+class FuelTypeViewSet(viewsets.ModelViewSet, PublicViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]
@@ -2616,3 +2814,61 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer.save(project=project, user=self.request.user)
 
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
+    """
+    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    """
+
+    queryset = HandInHandAssessment.objects.all()
+    serializer_class = HandInHandAssessmentSerializer
+
+    # Cache settings
+    CACHE_KEY_PREFIX = "handinhand_assessments"
+    CACHE_TIMEOUT_SECONDS = 60 * 15  # 15 minutes
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "grouped",
+                openapi.IN_QUERY,
+                description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+        ],
+        responses={200: HandInHandAssessmentGroupedSerializer},
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Get all Hand in Hand assessments, optionally grouped by region > country > year
+        """
+        grouped = request.query_params.get("grouped", "false").lower() == "true"
+        use_cache = request.query_params.get("cached", "true").lower() == "true"
+
+        # Generate cache key based on grouping option
+        cache_key = f"{self.CACHE_KEY_PREFIX}_{'grouped' if grouped else 'list'}"
+
+        # Try to get cached data if cache is enabled
+        if use_cache:
+            cached_data = cache.get(cache_key)
+            if cached_data is not None:
+                return Response(cached_data)
+
+        if grouped:
+            serializer = HandInHandAssessmentGroupedSerializer(data={})
+            response_data = serializer.to_representation(None)
+        else:
+            response_data = super().list(request, *args, **kwargs).data
+
+        # Cache the response data
+        if use_cache:
+            cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
+
+        return Response(response_data)

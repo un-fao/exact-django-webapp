@@ -123,6 +123,19 @@ def compute_yearly_delta(start_value, end_value, years_implementation, years_cap
 
     return delta_yearly
 
+def compute_luc_hectare_delta(start_value, end_value, years_implementation, years_capitalization, function):
+    if function != "immediate":
+        values_at_year = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
+        delta_yearly = [values_at_year[i] - values_at_year[i - 1] for i in range(1, len(values_at_year))]
+
+        # Delta can not be negative
+        delta_yearly = [abs(i) for i in delta_yearly]
+    
+    else:
+        # In case of immediate change, the delta is the difference between the start and end value divided by the number of years of implementation
+        delta_yearly = [start_value] + [end_value] * (years_implementation + years_capitalization - 1)
+
+    return delta_yearly
 
 import matplotlib.pyplot as plt
 
@@ -251,7 +264,6 @@ def compute_matrix_for_log_rec_dis(start_value, end_value, years_implementation,
 
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-# LIVESTOCK CH4 HEAD GENERAL FUNCTION
 def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float, 
                                  percentage_prp_default: float, percentage_prp_tier_2: float | None, 
                                  ef_system_default: list, gas_prp_tier_2: float, percentage_system_default: list, 
@@ -326,7 +338,7 @@ def biomass_emissions(
     time_capitalization,
 ):
 
-    yearly_variation_hectares = compute_yearly_delta(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
+    yearly_variation_hectares = compute_luc_hectare_delta(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
 
     biomass_variation = biomass_final - biomass_initial
 
@@ -807,4 +819,5 @@ def plot_matrix_with_values(matrix, cmap='viridis', title="Matrix Plot"):
     
     # Save the plot
     plt.savefig(f"matrices/{title}.png")
+    
     

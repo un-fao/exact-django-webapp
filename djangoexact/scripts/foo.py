@@ -6,7 +6,8 @@ import logging as log
 from django.db.models import Q
 from djangoexact.settings import auth
 import firebase_admin
-from firebase_admin import auth as firebase_admin_auth
+import os
+import pandas as pd
 
 # TODO: Run in review and prod
 
@@ -65,7 +66,15 @@ def cycle_all_modules_and_invalidate_cached_results():
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
             if hasattr(ModuleClass, "last_cached_at"):
-                ModuleClass.history.all().update(updated_at=None, last_cached_at=None, cached_results_total=None, cached_results_by_activity=None, cached_results_by_gas=None, cached_results_by_activity_by_gas=None, last_modified=None)
+                ModuleClass.history.all().update(
+                    updated_at=None,
+                    last_cached_at=None,
+                    cached_results_total=None,
+                    cached_results_by_activity=None,
+                    cached_results_by_gas=None,
+                    cached_results_by_activity_by_gas=None,
+                    last_modified=None,
+                )
                 for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
                     if hasattr(module, "invalidate_cached_results"):
                         module.invalidate_cached_results()
@@ -253,6 +262,130 @@ def search_historical_projects_for_project_name():
             print("----------------------------------------\n\n\n")
 
 
+def import_hih_regions():
+    """
+    Import Hand in Hand regions from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHRegion.json"))
+    for index, row in df.iterrows():
+        region, created = models.HandInHandRegion.objects.get_or_create(name=row["name"])
+        if created:
+            print(f"Created region: {region.name}")
+        else:
+            print(f"Region already exists: {region.name}")
+
+
+def import_hih_countries():
+    """
+    Import Hand in Hand countries from the database
+    """
+
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHCountry.json"))
+    for index, row in df.iterrows():
+        country, created = models.HandInHandCountry.objects.get_or_create(name=row["name"], region=models.HandInHandRegion.objects.get(name=row["region"]), iso_code=row["code"])
+        if created:
+            print(f"Created country: {country.name} in region {country.region.name}")
+        else:
+            print(f"Country already exists: {country.name} in region {country.region.name}")
+
+
+def import_hih_links():
+    """
+    Import Hand in Hand links from the database
+    """
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    for index, row in df.iterrows():
+        country = models.HandInHandCountry.objects.get(name=row["country"])
+        link = row["link"]
+        name = row["name"]
+        year = row["year"]
+        assessment, created = models.HandInHandAssessment.objects.get_or_create(country=country, link=link, name=name, year=year)
+        if created:
+            print(f"Created assessment: {assessment.name} for {assessment.country.name} in {assessment.year}")
+        else:
+            print(f"Assessment already exists: {assessment.name} for {assessment.country.name} in {assessment.year}")
+
+
+def add_public_id_to_projects():
+    """
+    Add public_id to all projects
+    """
+    projects = []
+    for project in models.Project.objects.all():
+        if not project.public_id:
+            project.public_id = models.uuid.uuid4()
+            projects.append(project)
+            print(f"Added public_id {project.public_id} to project {project.name}")
+        else:
+            print(f"Project {project.name} already has public_id {project.public_id}")
+
+    if projects:
+        models.Project.objects.bulk_update(projects, ["public_id"])
+        print(f"Updated {len(projects)} projects with public_id")
+
+
+def remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types():
+    """
+    Remove Irrigation modules from Wood, Peat, and Charcoal fuel types
+    """
+    modules_to_remove = [
+        models.ModuleType.objects.get(class_name="Irrigation"),
+        models.ModuleType.objects.get(class_name="IrrigationPhase"),
+        models.ModuleType.objects.get(class_name="IrrigationSystem"),
+    ]
+    modules_to_add = [
+        models.ModuleType.objects.get(class_name="Processing"),
+        models.ModuleType.objects.get(class_name="ProcessingEntry"),
+        models.ModuleType.objects.get(class_name="Packaging"),
+        models.ModuleType.objects.get(class_name="PackagingEntry"),
+    ]
+    for fuel_type in models.FuelType.objects.filter(name__in=["Wood", "Peat", "Charcoal"]):
+        fuel_type.module_types.remove(*modules_to_remove)
+        fuel_type.save()
+        print(f"Removed Irrigation modules from {fuel_type.name} fuel type")
+
+        fuel_type.module_types.add(*modules_to_add)
+        fuel_type.save()
+        print(f"Added Processing and Packaging modules to {fuel_type.name} fuel type")
+
+
+def find_duplicates_in_crop_yield_stat_model():
+    """
+    Find duplicates in CropYieldStat model
+    """
+    from django.db.models import Count
+
+    # Get all CropYieldStats and find duplicates based on crop, country and year
+    duplicates = ipcc_models.CropYieldStat.objects.values("land_use_type__name", "continent__name").annotate(count=Count("id")).filter(count__gt=1)
+
+    for duplicate in duplicates:
+        print(f"Duplicate: {duplicate['land_use_type__name']} {duplicate['continent__name']}")
+
+
+def add_macro_input_type_other():
+    """
+    Add MacroInputType Other to all InputTypes
+    """
+    models.MacroInputType.objects.create(name="Other")
+
+
+def add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_feed():
+    """
+    Add Other macro input type to User Defined Tier 2 InputType
+    """
+    user_defined_input_types = models.InputType.objects.filter(name_en__icontains="User Defined").exclude(name_en__icontains="Animal Feed")
+    other_macro_input_type = models.MacroInputType.objects.get(name="Other")
+    input_types_to_update = []
+    for input_type in user_defined_input_types:
+        input_type.macro_input_type = other_macro_input_type
+        input_types_to_update.append(input_type)
+
+    if input_types_to_update:
+        models.InputType.objects.bulk_update(input_types_to_update, ["macro_input_type"])
+        print(f"Updated {len(input_types_to_update)} input types with macro input type {other_macro_input_type.name}")
+
+
 def run():
     import os
 
@@ -261,7 +394,11 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        search_historical_projects_for_project_name()
+        # search_historical_projects_for_project_name()
+        import_hih_regions()
+        import_hih_countries()
+        import_hih_links()
+        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "review":
@@ -270,11 +407,14 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        add_macro_input_type_other()
+        add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_feed()
         pass
 
     if app_mode == "test":
         # TODO: Run in test
         add_default_project_lock_expiration_time_minutes_application_parameter()
+        import_hih_links()
         pass
 
     return True
