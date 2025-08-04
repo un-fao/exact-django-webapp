@@ -278,6 +278,17 @@ class BaseModuleTestCase(APITestCaseMixin):
 
         return balance_changes
 
+    def test_defaults_visible_with_different_lock_holder(self):
+        """
+        Test that the defaults are visible to different lock holders.
+        """
+        self.project.lock(self.user2)
+        self.project.save()
+
+        defaults_response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(defaults_response.status_code, status.HTTP_200_OK)
+        self.assertIsInstance(defaults_response.data, dict)
+
 
 class BaseModuleWithSubmoduleTestCase(BaseModuleTestCase):
     def setUp(self):

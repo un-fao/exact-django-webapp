@@ -2408,13 +2408,8 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-            activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
-            error = security.check_permission("view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, module.activity.project)
             if error:
                 return error
 
