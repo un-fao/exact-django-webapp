@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
+import traceback
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
@@ -645,7 +646,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
-        project: Project = self.get_object()
+        project: Project = get_object_or_404(Project, pk=pk)
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -669,6 +670,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            traceback.print_exc()
             logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
