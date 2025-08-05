@@ -3389,8 +3389,8 @@ class OrganicSoilReport(BaseModuleReport):
 
         luc: api_models.LandUseChange = self.module.land_use_change
 
-        if self.module.is_start():
-            math = self.calculator.math_start_w or self.calculator.math_start_wo
+        if self.module.is_start() and (self.calculator.peat_extraction_math_w is not None or self.calculator.peat_extraction_math_wo is not None):
+            math = self.calculator.peat_extraction_math_w or self.calculator.peat_extraction_math_wo
             peat_density = math.peat_density_tier_2_default
 
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=luc.module_type_start.area)
@@ -3406,8 +3406,8 @@ class OrganicSoilReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=self.module.peat_type.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=peat_density)
 
-        if self.module.is_with():
-            math = self.calculator.math_start_w
+        if self.module.is_with() and (self.calculator.peat_extraction_math_w is not None):
+            math = self.calculator.peat_extraction_math_w
             peat_density = math.peat_density_tier_2_default
 
             self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=luc.module_type_start.area)
@@ -3423,8 +3423,8 @@ class OrganicSoilReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 23, column=3, value=self.module.peat_type.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 24, column=3, value=peat_density)
 
-        if self.module.is_without():
-            math = self.calculator.math_start_wo
+        if self.module.is_without() and (self.calculator.peat_extraction_math_wo is not None):
+            math = self.calculator.peat_extraction_math_wo
             peat_density = math.peat_density_tier_2_default
 
             self.metadata_worksheet.cell(row=last_metadata_row + 25, column=4, value=luc.module_type_start.area)

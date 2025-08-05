@@ -844,25 +844,28 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if not module.is_start():
                 for field in module._meta.fields:
                     if field.name.endswith("_start"):
-                        # If field is a boolean, set it to False
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            # Use field default if defined, otherwise None
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_with():
                 for field in module._meta.fields:
                     if field.name.endswith("_w"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_without():
                 for field in module._meta.fields:
                     if field.name.endswith("_wo"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
 
             if hasattr(module, "area"):
                 module.area = self.validated_data.get("area")
