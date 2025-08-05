@@ -402,8 +402,8 @@ def copy_activity(activity, new_project=None, owner=None):
                 submodule.pk = None
                 submodule.parent = module_copy
                 submodule._state.adding = True
-                submodule.save()
                 handle_threads(submodule, submodule, owner)
+                submodule.save()
 
     return activity_copy
 
