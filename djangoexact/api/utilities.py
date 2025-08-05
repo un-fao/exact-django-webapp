@@ -395,18 +395,7 @@ def copy_activity(activity, new_project=None, owner=None):
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
-        submodules = []
-
-        if module.__class__.__name__ == "FloodedRice":
-            submodules = list(module.minor_seasons.all())
-        elif module.__class__.__name__ == "Input":
-            submodules = list(module.input_entries.all())
-        elif module.__class__.__name__ == "Energy":
-            submodules = list(module.electricities.all())
-            submodules.extend(list(module.fuels.all()))
-        elif module.__class__.__name__ == "Irrigation":
-            submodules = list(module.irrigation_systems.all())
-            submodules.extend(list(module.irrigation_phases.all()))
+        submodules = module.submodules if hasattr(module, "submodules") else []
 
         if submodules:
             for submodule in submodules:
