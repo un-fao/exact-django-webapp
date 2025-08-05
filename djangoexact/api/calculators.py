@@ -1992,6 +1992,8 @@ class PerennialCropCalculator(LandModuleCalculator):
             else:
                 self.agb_end = copy.deepcopy(self.agb_start)
                 self.bgb_end = copy.deepcopy(self.bgb_start)
+                if self.agb_end.value is None or self.bgb_end.value is None:
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
         if module_start_is_perennial and not module_end_is_perennial:
             perennial_to_luc()
@@ -6825,6 +6827,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.litter_dw_start_wo = None
         self.litter_dw_max_wo = None
 
+        self.bgb_max_start = None
+        self.bgb_max_w = None
+        self.bgb_max_wo = None
+
         self.agb_under_20_start = None
         self.agb_over_20_start = None
 
@@ -6838,6 +6844,13 @@ class ForestManagementCalculator(LandModuleCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
+
+        if calculate:
+            self.calculate()
+            self.bgb_max_start = self.math_start_w.max_bgb_value if self.math_start_w else self.math_start_wo.max_bgb_value if self.math_start_wo else 0
+            self.bgb_max_w = self.math_w.max_bgb_value if self.math_w else 0
+            self.bgb_max_wo = self.math_wo.max_bgb_value if self.math_wo else 0
+
         land_use_type = self.module.land_use_type_start
 
         self.is_afforestation_w = self.luc and self.luc.module_type_w.class_name == "ForestManagement" and self.luc.module_type_start.class_name != "ForestManagement"
@@ -7079,9 +7092,9 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_start_start = self.agb_max_start  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
             self.agb_start_w = self.agb_max_w  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
             self.agb_start_wo = self.agb_max_wo  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
-            self.bgb_max_start = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
-            self.bgb_max_w = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
-            self.bgb_max_wo = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
+            self.bgb_max_start = self.fra_carbon_stock.bgb
+            self.bgb_max_w = self.fra_carbon_stock.bgb
+            self.bgb_max_wo = self.fra_carbon_stock.bgb
             self.litter_dw_max_start.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
             self.litter_dw_max_w.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
             self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
