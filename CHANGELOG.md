@@ -1,3 +1,9 @@
+## 1.15.7 (2025-08-05)
+
+### Fix
+
+- **copy**: handle submodule comment threads before saving
+
 ## 1.15.6 (2025-08-05)
 
 ### Fix
