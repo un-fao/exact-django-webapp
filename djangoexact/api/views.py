@@ -1953,8 +1953,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer},
         request_body=EmptySerializer,
     )
+    @transaction.atomic
     def copy(self, request, pk=None):
-        activity: Activity = self.get_object()
+        activity: Activity = get_object_or_404(Activity, pk=pk)
         error = security.check_permission("view_activity", self.request.user, activity.project)
         if error:
             return error
