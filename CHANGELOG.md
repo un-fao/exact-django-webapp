@@ -1,3 +1,15 @@
+## 1.15.6 (2025-08-05)
+
+### Fix
+
+- **copy**: generalize logic handling copy of submodules
+- remove test exception
+- **activity builder**: set fields to default values if present when senitizing modules inputs
+- **perennial cropland**: add missing growth flag for computed biomass values
+- **forest management**: fetch the proper BGB Max values from mathematical model for defaults
+- **copy**: add updated organic soil to LUC module to avoid primary key conflicts
+- **report**: preventorganic soil peat to be considered when not present
+
 ## 1.15.5 (2025-08-04)
 
 ### Fix
