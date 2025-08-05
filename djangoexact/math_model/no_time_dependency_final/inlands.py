@@ -342,9 +342,10 @@ class PeatExtraction(BaseModule):
     extraction_height_start: float
     extraction_height_end: float
 
+    peat_density_tier_2_default: Optional[float] = None
+
     def __post_init__(self):
         super().__post_init__()
-        self.peat_density_tier_2_default = None
 
     def calculate_emissions(self):
         def drainage_emissions():
