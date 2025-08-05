@@ -188,6 +188,7 @@ def find_modules(activity):
     return modules
 
 
+@transaction.atomic
 def get_unique_name(instance, name):
     """
     Generates a unique name for a Django model instance by appending a counter if necessary.
@@ -215,6 +216,7 @@ def get_unique_name(instance, name):
     return f"{name} ({i})"
 
 
+@transaction.atomic
 def copy_project(project, owner):
     transaction.set_autocommit(False)
     try:
@@ -245,6 +247,7 @@ def copy_project(project, owner):
         raise e
 
 
+@transaction.atomic
 def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module"):
     """
     Copy the threads of a module and return the copied threads.
@@ -288,6 +291,7 @@ def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module
     return copied_threads
 
 
+@transaction.atomic
 def clear_threads(module):
     """
     Clear the threads of a module by deleting all associated CommentThread instances.
@@ -305,6 +309,7 @@ def clear_threads(module):
                     setattr(module, field.name, None)
 
 
+@transaction.atomic
 def handle_threads(module_from: "api_models.Module", module_to: "api_models.Module", owner=None):
     """
     Handle the copying of threads from one module to another, ensuring that the threads are copied correctly
@@ -330,6 +335,7 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
     module_to.save()
 
 
+@transaction.atomic
 def copy_activity(activity, new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
@@ -367,6 +373,7 @@ def copy_activity(activity, new_project=None, owner=None):
                 luc_copy.pk = None
                 luc_copy.activity = activity_copy
                 luc_copy._state.adding = True
+                luc_copy.organic_soil = None
                 luc_copy.save()
                 handle_threads(module.land_use_change, luc_copy, owner)
 
@@ -379,24 +386,16 @@ def copy_activity(activity, new_project=None, owner=None):
                 organic_soil_copy.pk = None
                 organic_soil_copy.activity = activity_copy
                 organic_soil_copy._state.adding = True
+                if luc_copy:
+                    luc_copy.organic_soil = organic_soil_copy
+                    luc_copy.save()
                 organic_soil_copy.save()
                 handle_threads(module.organic_soil, organic_soil_copy, owner)
 
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
-        submodules = []
-
-        if module.__class__.__name__ == "FloodedRice":
-            submodules = list(module.minor_seasons.all())
-        elif module.__class__.__name__ == "Input":
-            submodules = list(module.input_entries.all())
-        elif module.__class__.__name__ == "Energy":
-            submodules = list(module.electricities.all())
-            submodules.extend(list(module.fuels.all()))
-        elif module.__class__.__name__ == "Irrigation":
-            submodules = list(module.irrigation_systems.all())
-            submodules.extend(list(module.irrigation_phases.all()))
+        submodules = module.submodules if hasattr(module, "submodules") else []
 
         if submodules:
             for submodule in submodules:
