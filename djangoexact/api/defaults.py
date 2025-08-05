@@ -1388,7 +1388,7 @@ class ForestManagementDefaults(Defaults):
         self.input: api.ForestManagement
 
         defaults = calcs.ForestManagementCalculator(self.input)
-        defaults.get_defaults(calculate=calculate)
+        defaults.get_defaults(calculate=True)
 
         agb_start = 0
         bgb_start = 0
@@ -1431,16 +1431,14 @@ class ForestManagementDefaults(Defaults):
         bgb_max_w = 0
         bgb_max_wo = 0
 
-        if defaults.math_start_w is not None:
-            bgb_max_start = defaults.math_start_w.max_bgb_value_default.value
-        elif defaults.math_start_wo is not None:
-            bgb_max_start = defaults.math_start_wo.max_bgb_value_default.value
+        if defaults.bgb_max_start is not None:
+            bgb_max_start = defaults.bgb_max_start
 
-        if defaults.math_w is not None:
-            bgb_max_w = defaults.math_w.max_bgb_value_default.value
+        if defaults.bgb_max_w is not None:
+            bgb_max_w = defaults.bgb_max_w
 
-        if defaults.math_wo is not None:
-            bgb_max_wo = defaults.math_wo.max_bgb_value_default.value
+        if defaults.bgb_max_wo is not None:
+            bgb_max_wo = defaults.bgb_max_wo
 
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
