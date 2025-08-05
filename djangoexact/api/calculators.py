@@ -1992,6 +1992,8 @@ class PerennialCropCalculator(LandModuleCalculator):
             else:
                 self.agb_end = copy.deepcopy(self.agb_start)
                 self.bgb_end = copy.deepcopy(self.bgb_start)
+                if self.agb_end.value is None or self.bgb_end.value is None:
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
         if module_start_is_perennial and not module_end_is_perennial:
             perennial_to_luc()
