@@ -415,7 +415,6 @@ def copy_activity(activity, new_project=None, owner=None):
                 submodule._state.adding = True
                 submodule.save()
                 handle_threads(submodule, submodule, owner)
-    raise Exception("test")
 
     return activity_copy
 
