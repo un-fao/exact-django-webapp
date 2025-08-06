@@ -394,11 +394,6 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        # search_historical_projects_for_project_name()
-        import_hih_regions()
-        import_hih_countries()
-        import_hih_links()
-        remove_irrigation_modules_from_wood_peat_and_charcoal_fuel_types()
         pass
 
     if app_mode == "review":
@@ -407,8 +402,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        add_macro_input_type_other()
-        add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_feed()
         pass
 
     if app_mode == "test":
