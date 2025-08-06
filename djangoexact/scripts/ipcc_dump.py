@@ -4683,7 +4683,11 @@ def clear_cache_of_all_modules():
         if issubclass(model, (CachedResultMixin)) and not model._meta.abstract:
             instances.extend(model.objects.all())
 
-    instances = [instance for instance in instances if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])]
+    instances = [
+        instance
+        for instance in instances
+        if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])
+    ]
 
     log.debug(f"Clearing cache for {len(instances)} instances")
 
@@ -4717,12 +4721,15 @@ def assign_parent_fuel_types_to_fuel_types():
 
 
 def create_energy_entry_module_type():
-    module_type = ModuleType.objects.create(
+    module_type, created = ModuleType.objects.get_or_create(
         class_name="EnergyEntry",
         name="Energy Entry",
         is_submodule=True,
     )
-    print(f"Created ModuleType: {module_type}")
+    if created:
+        print(f"Created ModuleType: {module_type}")
+    else:
+        print(f"ModuleType already exists: {module_type}")
 
 
 def add_change_public_project_flag_permission_to_admin_group():
@@ -4783,6 +4790,8 @@ def import_fra_carbon_stock_data():
         deadwood = parse_csv_number(row["deadwood"])
         carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
         carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        print(f"Creating {country} {2020} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
 
         FRACarbonStock.objects.create(
             year=2020,
@@ -4915,26 +4924,6 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        # import_definitions.import_definitions()
-        # rename_solar_fuel_type_to_renewable()
-        assign_fuel_type_units()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
-        # delete_and_import_irrigation_phase_data()
-        # add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
-        # import_shadow_prices_of_carbon()
-        # add_0_2_to_co2_value_in_input_emission_factor()
-        create_parent_fuel_types()
-        assign_parent_fuel_types_to_fuel_types()
-        create_energy_entry_module_type()
-        add_change_public_project_flag_permission_to_admin_group()
-        import_fra_carbon_stock_data()
-        add_ipcc_and_fra_as_data_sources()
-        add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
-        add_small_fishery_gear_types_fishery_types_relationships()
-        change_other_land_flu_data_to_1()
-        update_module_types_of_fuel_types()
-        convert_storage_refrigerant_ef_from_kg_to_tonnes()
         pass
 
     if app_mode == "review":
@@ -4943,6 +4932,7 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        import_fra_carbon_stock_data()
         pass
 
     if app_mode == "test":

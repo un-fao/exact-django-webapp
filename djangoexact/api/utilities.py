@@ -336,7 +336,7 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
 
 
 @transaction.atomic
-def copy_activity(activity, new_project=None, owner=None):
+def copy_activity(activity: "api_models.Activity", new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
     activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
@@ -351,48 +351,40 @@ def copy_activity(activity, new_project=None, owner=None):
     luc_copy = None
     organic_soil_copy = None
 
-    for module in activity.modules:
-        module: api_models.Module
-        if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
-            continue
+    luc = list(filter(lambda x: x.__class__.__name__ == "LandUseChange", activity.modules))[0] if list(filter(lambda x: x.__class__.__name__ == "LandUseChange", activity.modules)) else None
+    organic_soil = list(filter(lambda x: x.__class__.__name__ == "OrganicSoil", activity.modules))[0] if list(filter(lambda x: x.__class__.__name__ == "OrganicSoil", activity.modules)) else None
 
+    if luc:
+        luc_copy = copy.deepcopy(luc)
+        luc_copy.pk = None
+        luc_copy.activity = activity_copy
+        luc_copy._state.adding = True
+        luc_copy.organic_soil = None
+        handle_threads(luc, luc_copy, owner)
+        luc_copy.save()
+
+    if organic_soil:
+        organic_soil_copy = copy.deepcopy(organic_soil)
+        organic_soil_copy.pk = None
+        organic_soil_copy.activity = activity_copy
+        organic_soil_copy._state.adding = True
+        handle_threads(organic_soil, organic_soil_copy, owner)
+        organic_soil_copy.save()
+        if luc_copy:
+            luc_copy.organic_soil = organic_soil_copy
+            luc_copy.save()
+
+    for module in list(filter(lambda x: x.__class__.__name__ not in ["LandUseChange", "OrganicSoil"], activity.modules)):
+        module: api_models.Module
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy.land_use_change = None
-        module_copy.organic_soil = None
         module_copy._state.adding = True
         handle_threads(module, module_copy, owner)
 
-        has_luc = getattr(module, "land_use_change", None)
-        has_organic_soil = getattr(module, "organic_soil", None)
-
-        if has_luc:
-            if not luc_copy:
-                luc_copy = copy.deepcopy(module.land_use_change)
-                luc_copy.pk = None
-                luc_copy.activity = activity_copy
-                luc_copy._state.adding = True
-                luc_copy.organic_soil = None
-                luc_copy.save()
-                handle_threads(module.land_use_change, luc_copy, owner)
-
+        if luc_copy:
             module_copy.land_use_change = luc_copy
-            module_copy.save()
-
-        if has_organic_soil:
-            if not organic_soil_copy:
-                organic_soil_copy = copy.deepcopy(module.organic_soil)
-                organic_soil_copy.pk = None
-                organic_soil_copy.activity = activity_copy
-                organic_soil_copy._state.adding = True
-                if luc_copy:
-                    luc_copy.organic_soil = organic_soil_copy
-                    luc_copy.save()
-                organic_soil_copy.save()
-                handle_threads(module.organic_soil, organic_soil_copy, owner)
-
-            module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
         submodules = module.submodules if hasattr(module, "submodules") else []
