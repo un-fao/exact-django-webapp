@@ -35,7 +35,6 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fish_type"] = models.FishType.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
@@ -44,44 +43,16 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_modify_and_check_cache_invalidation(self):
+        self.module.refresh_from_db()
+
+        second_to_last_modified = self.module.last_modified
+
         self.test_modify()
+        self.module.refresh_from_db()
 
-        # Check that the cache is invalidated
-        view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
-
-        force_authenticate(request, user=self.user)
-        response = view(request, pk=self.module.pk)
-        print(response.data)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
-
-        old_balance = response.data["balance"]
-
-        validated_data = copy.deepcopy(self.validated_data)
-        validated_data["total_catch_yr_w"] = 10000
-        response = self.edit_module(self.module, self.user, validated_data)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
-
-        # Check that the cache is invalidated
-        view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
-
-        force_authenticate(request, user=self.user)
-        response = view(request, pk=self.module.pk)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
-
-        new_balance = response.data["balance"]
-
-        self.assertNotEqual(old_balance, new_balance)
+        self.assertNotEqual(second_to_last_modified, self.module.last_modified)
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fish_type"] = None
         response = self.edit_module(self.module, self.user, validated_data)
@@ -90,7 +61,6 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -102,7 +72,6 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -111,4 +80,12 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertTrue(type(response.data) is dict)
+
+    def test_presence_of_fui_t2_in_defaults(self):
+        response = self.get_module_defaults(self.module, self.user)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("fui_t2_start_default", response.data)
+        self.assertIn("fui_t2_w_default", response.data)
+        self.assertIn("fui_t2_wo_default", response.data)

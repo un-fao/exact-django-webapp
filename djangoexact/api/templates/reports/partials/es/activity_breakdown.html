@@ -1,0 +1,43 @@
+{% load humanize %}
+<section class="section">
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h3>Balance de Carbono por Actividad</h3>
+            <p>Total de actividades: {{ activities_total|length }}</p>
+        </div>
+    </div>
+    {% for activity in activities_total %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="card-header bg-secondary text-white w-100">
+                        <h4 class="mb-0">
+                            <b>Actividad {{ forloop.counter }} - {{ activity.name }}</b>
+                        </h4>
+                    </div>
+                    <div class="col-sm-12 text-start">
+                        <p>
+                            La actividad se implementará a partir de {{ activity.start_year }}, durante
+                            un total de {{ activity.implementation_years }} años de implementación, con
+                            el último año de contabilidad en {{ activity.last_year_of_accounting }}.
+                        </p>
+                        <p>
+                            Bajo el escenario Con Proyecto, la actividad impactará {{ activity.area }} {{ activity.main_impact }}
+                            {% if activity.secondary_impacts %}, además de emisiones relativas a {{ activity.secondary_impacts }}.{% endif %}
+                        </p>
+                        <p>
+                            La actividad tiene un balance de carbono de
+                            <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>
+                            durante todo el período de contabilidad, principalmente debido a intervenciones en:
+                        </p>
+                        <ol>
+                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:2|intcomma }} tCO2-e)</li>{% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} Nueva página cada dos actividades {% endcomment %}
+        {% if forloop.counter|divisibleby:2 and not forloop.last %}<div class="page-break"></div>{% endif %}
+    {% endfor %}
+</section>

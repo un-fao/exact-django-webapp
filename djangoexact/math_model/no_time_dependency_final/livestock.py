@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Livestock(BaseModule):
 
     methane_constant: float
@@ -27,24 +27,24 @@ class Livestock(BaseModule):
     head_number_end: float
     specific_factor_default_start: float
     specific_factor_default_end: float
-    specific_factor_start_tier_2: Optional[float]
-    specific_factor_end_tier_2: Optional[float]
+    specific_factor_start_tier_2: Optional[float] = None
+    specific_factor_end_tier_2: Optional[float] = None
     ef_prp_methane_start: float
     ef_prp_methane_end: float
     percentage_prp_default_start: float
     percentage_prp_default_end: float
-    percentage_prp_tier_2_start: Optional[float]
-    percentage_prp_tier_2_end: Optional[float]
+    percentage_prp_tier_2_start: Optional[float] = None
+    percentage_prp_tier_2_end: Optional[float] = None
     ef_system_methane_start: List[float]
     ef_system_methane_end: List[float]
-    ch4_prp_tier_2_start: Optional[float]
-    ch4_prp_tier_2_end: Optional[float]
+    ch4_prp_tier_2_start: Optional[float] = None
+    ch4_prp_tier_2_end: Optional[float] = None
     ch4_system_default_start: float
     ch4_system_default_end: float
-    ch4_system_tier_2_start: Optional[float]
-    ch4_system_tier_2_end: Optional[float]
+    ch4_system_tier_2_start: Optional[float] = None
+    ch4_system_tier_2_end: Optional[float] = None
     percentage_system_default_start: List[float]
-    percentage_system_default_end: float
+    percentage_system_default_end: List[float]
     tam_start: float
     tam_end: float
     vser_start: float
@@ -53,34 +53,34 @@ class Livestock(BaseModule):
     ef_prp_nitrous_direct_end: float
     ef_system_nitrous_direct_start: List[float]
     ef_system_nitrous_direct_end: float
-    n2o_prp_tier_2_start_direct: Optional[float]
-    n2o_prp_tier_2_end_direct: Optional[float]
+    n2o_prp_tier_2_start_direct: Optional[float] = None
+    n2o_prp_tier_2_end_direct: Optional[float] = None
     n2o_system_direct_default_start: float
     n2o_system_direct_default_end: float
-    n2o_system_direct_tier_2_start: Optional[float]
-    n2o_system_direct_tier_2_end: Optional[float]
+    n2o_system_direct_tier_2_start: Optional[float] = None
+    n2o_system_direct_tier_2_end: Optional[float] = None
     ner_start: float
     ner_end: float
     ef_prp_nitrous_indirect_volatization_start: float
     ef_prp_nitrous_indirect_volatization_end: float
     ef_system_nitrous_indirect_volatization_start: List[float]
     ef_system_nitrous_indirect_volatization_end: float
-    n2o_prp_tier_2_start_indirect_volatization: Optional[float]
-    n2o_prp_tier_2_end_indirect_volatization: Optional[float]
+    n2o_prp_tier_2_start_indirect_volatization: Optional[float] = None
+    n2o_prp_tier_2_end_indirect_volatization: Optional[float] = None
     n20_system_indirect_volatization_default_start: float
     n20_system_indirect_volatization_default_end: float
-    n20_system_indirect_volatization_tier_2_start: Optional[float]
-    n20_system_indirect_volatization_tier_2_end: Optional[float]
+    n20_system_indirect_volatization_tier_2_start: Optional[float] = None
+    n20_system_indirect_volatization_tier_2_end: Optional[float] = None
     ef_prp_nitrous_indirect_leaching_start: float
     ef_prp_nitrous_indirect_leaching_end: float
     ef_system_nitrous_indirect_leaching_start: List[float]
     ef_system_nitrous_indirect_leaching_end: float
-    n2o_prp_tier_2_start_indirect_leaching: Optional[float]
-    n2o_prp_tier_2_end_indirect_leaching: Optional[float]
+    n2o_prp_tier_2_start_indirect_leaching: Optional[float] = None
+    n2o_prp_tier_2_end_indirect_leaching: Optional[float] = None
     n20_system_indirect_leaching_default_start: float
     n20_system_indirect_leaching_default_end: float
-    n20_system_indirect_leaching_tier_2_start: Optional[float]
-    n20_system_indirect_leaching_tier_2_end: Optional[float]
+    n20_system_indirect_leaching_tier_2_start: Optional[float] = None
+    n20_system_indirect_leaching_tier_2_end: Optional[float] = None
     nitrous_constant: float
     volatilization_multiplier: float
     leaching_multiplier: float
