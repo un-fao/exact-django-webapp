@@ -78,6 +78,7 @@ from .models import (
     SoilType,
     StatusType,
     ProjectMembership,
+    ProjectNotificationPreference,
     Waterbody,
     LandModule,
     InvitationStatusType,
@@ -99,8 +100,10 @@ from .models import (
     FuelUseType,
     PublicToken,
     EnergyEntry,
+    HandInHandRegion,
+    HandInHandCountry,
+    HandInHandAssessment,
 )
-from datetime import timedelta
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
@@ -841,25 +844,28 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if not module.is_start():
                 for field in module._meta.fields:
                     if field.name.endswith("_start"):
-                        # If field is a boolean, set it to False
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            # Use field default if defined, otherwise None
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_with():
                 for field in module._meta.fields:
                     if field.name.endswith("_w"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_without():
                 for field in module._meta.fields:
                     if field.name.endswith("_wo"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
 
             if hasattr(module, "area"):
                 module.area = self.validated_data.get("area")
@@ -889,7 +895,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
+            new_module_types = list(
+                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
+            )
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
@@ -1428,28 +1436,39 @@ class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
             "start": {
                 "mandatory": [
                     "land_use_type_start",
-                    # "tillage_management_type_start",
-                    # "organic_input_type_start",
                     "residue_management_type_start",
                 ],
             },
             "with": {
                 "mandatory": [
                     "land_use_type_w",
-                    # "tillage_management_type_w",
-                    # "organic_input_type_w",
                     "residue_management_type_w",
                 ],
             },
             "without": {
                 "mandatory": [
                     "land_use_type_wo",
-                    # "tillage_management_type_wo",
-                    # "organic_input_type_wo",
                     "residue_management_type_wo",
                 ],
             },
         }
+
+    def validate(self, data):
+        parent: AnnualCropland = self.instance.parent if self.instance else data.get("parent")
+        land_use_type_start = self.instance.land_use_type_start if self.instance else data.get("land_use_type_start", None)
+        land_use_type_w = self.instance.land_use_type_w if self.instance else data.get("land_use_type_w", None)
+        land_use_type_wo = self.instance.land_use_type_wo if self.instance else data.get("land_use_type_wo", None)
+
+        if parent and not parent.is_start() and land_use_type_start:
+            raise serializers.ValidationError("Land use type start cannot be set if the main cropland is not in the start scenario")
+
+        if parent and not parent.is_with() and land_use_type_w:
+            raise serializers.ValidationError("Land use type with cannot be set if the main cropland is not in the with scenario")
+
+        if parent and not parent.is_without() and land_use_type_wo:
+            raise serializers.ValidationError("Land use type without cannot be set if the main cropland is not in the without scenario")
+
+        return super().validate(data)
 
 
 class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
@@ -2856,6 +2875,47 @@ class ProjectMembershipReadSerializer(serializers.ModelSerializer):
         ref_name = "ProjectMembership"
 
 
+class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        ref_name = "ProjectNotificationPreference"
+
+
+class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectNotificationPreference
+        fields = ["project", "is_opted_out"]
+        ref_name = "ProjectNotificationPreference"
+
+    def validate(self, data):
+        super().validate(data)
+
+        # Get the user from the request context
+        user = self.context["request"].user
+        project = data["project"]
+
+        # Check if user is a member of the project
+        if not ProjectMembership.objects.filter(user=user, project=project).exists():
+            raise serializers.ValidationError("You must be a member of this project to manage notification preferences")
+
+        return data
+
+    def create(self, validated_data):
+        # Set the user from the request context
+        validated_data["user"] = self.context["request"].user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Ensure user can only update their own preferences
+        if instance.user != self.context["request"].user:
+            raise serializers.ValidationError("You can only update your own notification preferences")
+        return super().update(instance, validated_data)
+
+
 class SetAsideWriteSerializer(LandModuleSeralizer):
     class Meta:
         model = SetAside
@@ -3654,3 +3714,81 @@ class PublicTokenSerializer(serializers.ModelSerializer):
         model = PublicToken
         fields = "__all__"
         ref_name = "PublicToken"
+
+
+class HandInHandRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandRegion
+        fields = "__all__"
+        ref_name = "HandInHandRegion"
+
+
+class HandInHandCountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandCountry
+        fields = "__all__"
+        ref_name = "HandInHandCountry"
+
+
+class HandInHandAssessmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HandInHandAssessment
+        fields = ["id", "name", "year", "country", "link"]
+        ref_name = "HandInHandAssessment"
+
+
+class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
+    """
+    Serializer that returns HandInHandAssessment data grouped by region > country > year
+    """
+
+    def to_representation(self, instance):
+        # Get all assessments
+        assessments = HandInHandAssessment.objects.select_related("country__region").order_by("country__region__name", "country__name", "year", "name")
+
+        # Group by region, then country, then year
+        grouped_data = {}
+
+        for assessment in assessments:
+            region_name = assessment.country.region.name
+            country_name = assessment.country.name
+            year = assessment.year or "Unknown Year"
+
+            # Initialize region if not exists
+            if region_name not in grouped_data:
+                grouped_data[region_name] = {"name": region_name, "countries": {}}
+
+            # Initialize country if not exists
+            if country_name not in grouped_data[region_name]["countries"]:
+                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": assessment.country.iso_code, "years": {}}
+
+            # Initialize year if not exists
+            if year not in grouped_data[region_name]["countries"][country_name]["years"]:
+                grouped_data[region_name]["countries"][country_name]["years"][year] = {"year": year, "assessments": []}
+
+            # Add assessment to the year
+            grouped_data[region_name]["countries"][country_name]["years"][year]["assessments"].append({"id": assessment.id, "name": assessment.name, "link": assessment.link})
+
+        # Convert nested dictionaries to lists for better JSON structure
+        result = []
+        for region_name, region_data in grouped_data.items():
+            region_dict = {"name": region_data["name"], "countries": []}
+
+            for country_name, country_data in region_data["countries"].items():
+                country_dict = {"name": country_data["name"], "iso_code": country_data["iso_code"], "years": []}
+
+                for year, year_data in country_data["years"].items():
+                    country_dict["years"].append(year_data)
+
+                # Sort years (handle "Unknown Year" case)
+                country_dict["years"].sort(key=lambda x: float("inf") if x["year"] == "Unknown Year" else x["year"])
+                region_dict["countries"].append(country_dict)
+
+            # Sort countries alphabetically
+            region_dict["countries"].sort(key=lambda x: x["name"])
+            result.append(region_dict)
+
+        # Sort regions alphabetically
+        result.sort(key=lambda x: x["name"])
+
+        return result

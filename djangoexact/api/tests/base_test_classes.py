@@ -286,9 +286,7 @@ class LandUseChangeTest(ActivityTest):
         log.info(f"Created LUC with parameters {self.get_parameters(self.land_use_change)}")
 
     def calculate_results(self):
-
         try:
-
             self.module_start_results: tuple = CalculatorFactory().calculate_result(self.module_start)
             self.module_end_results: tuple = CalculatorFactory().calculate_result(self.module_end)
             self.land_use_change_results: tuple = CalculatorFactory().calculate_result(self.land_use_change)

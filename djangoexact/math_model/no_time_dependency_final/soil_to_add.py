@@ -19,7 +19,7 @@ from .generalized_modules import LandModule
 from dataclasses import dataclass
 from typing import Optional
 
-@dataclass
+@dataclass(kw_only=True)
 class SoilToAdd(LandModule):
 
     def calculate_emissions(self):

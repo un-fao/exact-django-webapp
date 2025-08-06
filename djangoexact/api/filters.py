@@ -1,6 +1,6 @@
 import django_filters as filters
 from .models import FuelType, SoilType
-from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey, JSONField
+from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey, ManyToManyField
 from rest_framework.filters import BaseFilterBackend
 
 
@@ -58,6 +58,11 @@ class DynamicSearchAndFilterBackend(BaseFilterBackend):
                     elif isinstance(field, ForeignKey):
                         search_fields.append(f"{field.name}__name")
 
+                # Add ManyToMany fields for search
+                for field in model._meta.many_to_many:
+                    if isinstance(field, ManyToManyField):
+                        search_fields.append(f"{field.name}__name")
+
             query = Q()
             for search_term in search_terms:
                 term_query = Q()
@@ -79,6 +84,8 @@ class DynamicSearchAndFilterBackend(BaseFilterBackend):
 
         query_params = request.query_params
         model_fields = {field.name for field in queryset.model._meta.fields}
+        # Add ManyToMany field names for filtering
+        m2m_fields = {field.name for field in queryset.model._meta.many_to_many}
 
         # Handle dynamic filtering for other query parameters
         filters = {}
@@ -87,4 +94,18 @@ class DynamicSearchAndFilterBackend(BaseFilterBackend):
                 continue
             if param in model_fields:
                 filters[param] = value
-        return queryset.filter(**filters)
+            elif param in m2m_fields:
+                # Handle ManyToMany filtering (support comma-separated values)
+                if "," in value:
+                    # Multiple values: filter by any of the provided IDs
+                    ids = [int(id_val.strip()) for id_val in value.split(",") if id_val.strip().isdigit()]
+                    if ids:
+                        filters[f"{param}__in"] = ids
+                else:
+                    # Single value
+                    if value.isdigit():
+                        filters[param] = int(value)
+                    else:
+                        # Try filtering by name if not a digit
+                        filters[f"{param}__name__icontains"] = value
+        return queryset.filter(**filters).distinct()

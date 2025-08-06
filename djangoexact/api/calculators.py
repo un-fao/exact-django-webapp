@@ -657,7 +657,9 @@ class LandModuleCalculator(BaseCalculator):
                     missing_scenarios.append("Without")
 
                 if missing_scenarios:
-                    raise Exception(f"SOC for {self.climate.name} climate, {self.moisture.name} moisture, and {self.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}")
+                    raise Exception(
+                        f"SOC for {self.climate.name} climate, {self.moisture.name} moisture, and {self.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}"
+                    )
 
         self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.climate.name} moisture does not exist")
 
@@ -757,7 +759,13 @@ class DeforestationCalculator(BaseCalculator):
         dry_matter_wo = luc.dry_matter_wo if luc else None
 
         # BUG: Aren't these handled in the parent class?
-        soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
         som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
@@ -1010,7 +1018,13 @@ class OtherLandUseCalculator(BaseCalculator):
         soil_type = self.soil_type
 
         # BUG: Isn't this handled in the parent class?
-        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            if project.soc_ref_t2 is None:
+                raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
+            else:
+                soc = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
 
         cm = {
             "climate": climate,
@@ -1063,8 +1077,7 @@ class OtherLandUseCalculator(BaseCalculator):
                     biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
             else:
                 biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
-            
-                    
+
         except ipcc.ForestTotalBiomass.DoesNotExist:
             raise Exception(f"ForestTotalBiomass for {luc_start.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
@@ -1079,8 +1092,6 @@ class OtherLandUseCalculator(BaseCalculator):
             biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
-
-        soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
 
         try:
             fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
@@ -1299,12 +1310,24 @@ class AnnualCropCalculator(LandModuleCalculator):
         if module.is_ready() and calculate:
             self.calculate()
 
-            self.residue_availability_t2_start = SimpleNamespace(value=getattr_or_default(self.math_start_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_main_tier_2_default"))
-            self.residue_availability_t2_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default"))
-            self.residue_availability_t2_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default"))
-            self.minor_residue_availability_t2_start = SimpleNamespace(value=getattr_or_default(self.math_start_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_minor_tier_2_default"))
-            self.minor_residue_availability_t2_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
-            self.minor_residue_availability_t2_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
+            self.residue_availability_t2_start = SimpleNamespace(
+                value=getattr_or_default(self.math_start_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_main_tier_2_default")
+            )
+            self.residue_availability_t2_w = SimpleNamespace(
+                value=getattr_or_default(self.math_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default")
+            )
+            self.residue_availability_t2_wo = SimpleNamespace(
+                value=getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default")
+            )
+            self.minor_residue_availability_t2_start = SimpleNamespace(
+                value=getattr_or_default(self.math_start_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_minor_tier_2_default")
+            )
+            self.minor_residue_availability_t2_w = SimpleNamespace(
+                value=getattr_or_default(self.math_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default")
+            )
+            self.minor_residue_availability_t2_wo = SimpleNamespace(
+                value=getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default")
+            )
 
         climate = self.climate
         moisture = self.moisture
@@ -1320,7 +1343,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues does not exist")
 
         if module.minor_land_use_type_start or module.minor_land_use_type_w or module.minor_land_use_type_wo:
-            self.minor_burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues for minor crop does not exist")
+            self.minor_burning_emission_factor = utils.get_or_raise(
+                ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues for minor crop does not exist"
+            )
 
         if module.is_start():
             lut_start = module.land_use_type_start
@@ -1333,7 +1358,9 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CroplandFLU for {lut_start} in {climate} climate and {moisture} moisture does not exist")
 
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start} does not exist")
-            self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start} does not exist", method="get_or_grains")
+            self.n_estimation_factor_start = utils.get_or_raise(
+                ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start} does not exist", method="get_or_grains"
+            )
 
             try:
                 self.crop_yield_start = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_start)
@@ -1371,7 +1398,9 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CroplandFLU for {lut_w} in {climate} climate and {moisture} moisture does not exist")
 
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
-            self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w} does not exist", method="get_or_grains")
+            self.n_estimation_factor_w = utils.get_or_raise(
+                ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w} does not exist", method="get_or_grains"
+            )
 
             try:
                 self.crop_yield_w = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_w)
@@ -1409,7 +1438,9 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CroplandFLU for {lut_wo} in {climate} climate and {moisture} moisture does not exist")
 
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo} does not exist")
-            self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo} does not exist", method="get_or_grains")
+            self.n_estimation_factor_wo = utils.get_or_raise(
+                ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo} does not exist", method="get_or_grains"
+            )
 
             try:
                 self.crop_yield_wo = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_wo)
@@ -1490,7 +1521,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_w.average,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1552,7 +1583,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_wo.average,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1738,13 +1769,13 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.fires_combustion_factor_wo: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
         self.agb_start_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
         self.agb_w_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
-        self.ag_default_wo: ipcc.PerennialAGB = ipcc.PerennialAGB()
+        self.agb_wo_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
         self.agb_max_start_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_w_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_wo_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.bgb_start_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
         self.bgb_w_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
-        self.bg_default_wo: ipcc.PerennialBGB = ipcc.PerennialBGB()
+        self.bgb_wo_default: ipcc.PerennialBGB = ipcc.PerennialBGB()
 
         # Calculated by math model
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
@@ -1796,7 +1827,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_ready() and calculate:
             self.calculate()
 
-            self.residue_availability_t2_start = SimpleNamespace(value=getattr(self.math_start_w, "residue_availability_tier_2_default", 0) or getattr(self.math_start_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_start = SimpleNamespace(
+                value=getattr(self.math_start_w, "residue_availability_tier_2_default", 0) or getattr(self.math_start_wo, "biomass_availability_tier_2_default", 0)
+            )
             self.residue_availability_t2_w = SimpleNamespace(value=getattr(self.math_w, "residue_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
             self.residue_availability_t2_wo = SimpleNamespace(value=getattr(self.math_w, "residue_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
 
@@ -1804,7 +1837,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.default_fire_periodicity = ApplicationParameter.objects.get(name="default_fire_periodicity")
 
         if self.module.is_start():
-            self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {self.module.land_use_type_start.name} does not exist", method="get_or_default")
+            self.fires_combustion_factor_start = utils.get_or_raise(
+                ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {self.module.land_use_type_start.name} does not exist", method="get_or_default"
+            )
 
             try:
                 self.agb_start_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
@@ -1825,7 +1860,9 @@ class PerennialCropCalculator(LandModuleCalculator):
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_start} in {self.climate} climate does not exist for start scenario. Please provide Tier 2 values.")
 
         if self.module.is_with():
-            self.fires_combustion_factor_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {self.module.land_use_type_w.name} does not exist", method="get_or_default")
+            self.fires_combustion_factor_w = utils.get_or_raise(
+                ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {self.module.land_use_type_w.name} does not exist", method="get_or_default"
+            )
 
             try:
                 self.agb_w_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
@@ -1849,7 +1886,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {self.module.land_use_type_wo.name} does not exist")
 
             try:
-                self.ag_default_wo = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
+                self.agb_wo_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialAGB.DoesNotExist:
                 if self.agb_t2_wo is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
@@ -1861,7 +1898,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                     raise Exception(f"PerennialMaxAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
-                self.bg_default_wo = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
+                self.bgb_wo_default = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialBGB.DoesNotExist:
                 if self.bgb_t2_wo is None:
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
@@ -1885,8 +1922,10 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.biomass_ef_wo.value = 0
 
     def _compute_biomass_for_maturity(
-        self, biomass_start, biomass_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
-    ) -> tuple[ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB]:
+        self, agb_start, agb_end, bgb_start, bgb_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
+    ) -> tuple[
+        ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.PerennialBGB, ipcc.PerennialBGB
+    ]:
         """
         Computes and adjusts biomass values for start and end scenarios based on system maturity and scenario types.
 
@@ -1905,49 +1944,94 @@ class PerennialCropCalculator(LandModuleCalculator):
             tuple: Adjusted (biomass_start, biomass_end) values based on the scenario conditions
         """
 
-        baseline_biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_start)
-        baseline_biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_end)
+        module_start_is_perennial = self._is_scenario_perennial(scenario_type_start)
+        module_end_is_perennial = self._is_scenario_perennial(scenario_type_end)
 
-        biomass_start = baseline_biomass_start
-        biomass_end = baseline_biomass_end
+        is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
 
-        # Checking the start scenario covers both "Perennial -> LUC" and "Perennial -> Perennial" cases
-        # In all other cases, the biomass values are returned as is
-        if self.module.is_start():
+        self.agb_start = copy.deepcopy(agb_start)
+        self.agb_end = copy.deepcopy(agb_end)
+        self.bgb_start = copy.deepcopy(bgb_start)
+        self.bgb_end = copy.deepcopy(bgb_end)
+
+        def perennial_to_luc():
             if self.module.is_system_in_maturity:
-                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default")) 
-                biomass_end = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_end.value}_default")) 
+                self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                self.bgb_start.value = None
+            else:
+                self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
+                self.bgb_start.value = None
 
-            if scenario_type_start is utils.ScenarioTypes.START:
-                if has_change_in_system:
-                    biomass_start = self.agb_max_start_default
-                    if self.agb_max_t2_start is not None:
-                        biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    biomass_end.value = 0
-                    if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
-                elif ((scenario_type_end == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_end == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    biomass_end.value = 0
+            self.agb_end.value = 0
+            self.bgb_end.value = 0
 
-            elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
-                if has_change_in_system:
-                    biomass_start.value = 0
-                    if self.agb_max_t2_start is not None:
-                        biomass_start.value = copy.deepcopy(self.agb_max_t2_start)
-                    biomass_end.value = None
-                    if getattr(self, f"agb_max_t2_{scenario_type_end.value}") is not None:
-                        biomass_end.value = copy.deepcopy(getattr(self, f"agb_max_t2_{scenario_type_end.value}"))
-                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
-                elif not self.module.is_system_in_maturity:
-                    biomass_start = baseline_biomass_start
-                    biomass_end.value = None
-                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
-                elif ((scenario_type_start == utils.ScenarioTypes.WITH) and self.module.is_complete_renewal_w) or ((scenario_type_start == utils.ScenarioTypes.WITHOUT) and self.module.is_complete_renewal_wo):
-                    biomass_end.value = None
+        def perennial_from_luc():
+            self.agb_start.value = 0
+            self.bgb_start.value = 0
+            self.agb_end.value = None
+            self.bgb_end.value = None
+            setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+
+        def perennial_to_perennial():
+            if self.module.is_system_in_maturity:
+                self.agb_start = copy.deepcopy(getattr(self, f"agb_max_{scenario_type_start.value}_default"))
+                self.bgb_start.value = None
+            else:
+                self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
+                self.bgb_start.value = None
+
+            if has_change_in_system or is_complete_renewal:
+                if scenario_type_start == utils.ScenarioTypes.START:
+                    perennial_to_luc()
+                else:
+                    perennial_from_luc()
+            elif not self.module.is_system_in_maturity:
+                self.agb_end.value = None
+                self.bgb_end.value = None
+                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
+            else:
+                self.agb_end = copy.deepcopy(self.agb_start)
+                self.bgb_end = copy.deepcopy(self.bgb_start)
+                if self.agb_end.value is None or self.bgb_end.value is None:
                     setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
 
-        return biomass_start, biomass_end
+        if module_start_is_perennial and not module_end_is_perennial:
+            perennial_to_luc()
+        elif module_start_is_perennial and module_end_is_perennial:
+            perennial_to_perennial()
+        elif not module_start_is_perennial and module_end_is_perennial:
+            perennial_from_luc()
+
+        # NOTE: Lorenzo 2025/07/30: "Sarà quello comunque, dai."
+        return self.agb_start, self.agb_end, self.bgb_start, self.bgb_end
+
+    def _is_scenario_perennial(self, scenario_type: utils.ScenarioTypes) -> bool:
+        """Helper method to determine if a scenario represents a perennial module type."""
+        if hasattr(self.module, "land_use_change") and self.module.land_use_change:
+            luc = self.module.land_use_change
+            if scenario_type == utils.ScenarioTypes.START:
+                return luc.module_type_start.class_name == "PerennialCropland"
+            elif scenario_type == utils.ScenarioTypes.WITH:
+                return luc.module_type_w.class_name == "PerennialCropland"
+            elif scenario_type == utils.ScenarioTypes.WITHOUT:
+                return luc.module_type_wo.class_name == "PerennialCropland"
+        else:
+            # If no land use change, check if current module is perennial
+            return self.module.__class__.__name__ == "PerennialCropland"
+        return False
+
+    def _is_complete_renewal(self, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes) -> bool:
+        """Helper method to determine if there's complete renewal for the given scenarios."""
+        if scenario_type_start == utils.ScenarioTypes.START:
+            if scenario_type_end == utils.ScenarioTypes.WITH:
+                return self.module.is_complete_renewal_w
+            elif scenario_type_end == utils.ScenarioTypes.WITHOUT:
+                return self.module.is_complete_renewal_wo
+        elif scenario_type_start == utils.ScenarioTypes.WITH:
+            return self.module.is_complete_renewal_w
+        elif scenario_type_start == utils.ScenarioTypes.WITHOUT:
+            return self.module.is_complete_renewal_wo
+        return False
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
@@ -1958,10 +2042,12 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.get_defaults()
 
         if self.module.is_start():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.agb_start_default,
                 self.agb_w_default,
-                self.module.land_use_type_start != self.module.land_use_type_w if not self.module.land_use_type_w is None else False,
+                self.bgb_start_default,
+                self.bgb_w_default,
+                self.module.land_use_type_start != self.module.land_use_type_w if self.module.land_use_type_w is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITH,
             )
@@ -2005,23 +2091,29 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "delay": self.activity.delay,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
-                "end_module_has_growth": self.end_module_has_growth_start_w,
-                "agb_maximum_c_tier_2": self.agb_max_t2_start
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_w,
+                "bgb_end_tier_2": self.module.bgb_t2_w,
+                "end_module_has_growth": self.end_module_has_growth_w,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
             self.math_start_w = MathPerennialCropland(**self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.agb_start_default,
-                self.ag_default_wo,
-                self.module.land_use_type_start != self.module.land_use_type_wo if not self.module.land_use_type_wo is None else False,
+                self.agb_wo_default,
+                self.bgb_start_default,
+                self.bgb_wo_default,
+                self.module.land_use_type_start != self.module.land_use_type_wo if self.module.land_use_type_wo is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITHOUT,
             )
@@ -2065,13 +2157,17 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "delay": self.activity.delay,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
-                "end_module_has_growth": self.end_module_has_growth_start_wo,
-                "agb_maximum_c_tier_2": self.agb_max_t2_start
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_wo,
+                "bgb_end_tier_2": self.module.bgb_t2_wo,
+                "end_module_has_growth": self.end_module_has_growth_wo,
+                "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
 
@@ -2079,14 +2175,16 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_start_wo.calculate_emissions()
 
         if self.module.is_with():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.biomass_ef_start_w,
                 self.biomass_ef_w,
+                self.bgb_start_default,
+                self.bgb_w_default,
                 self.module.land_use_type_start != self.module.land_use_type_w,
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
             )
-            
+
             if self.module.is_complete_renewal_w:
                 self.end_module_has_growth_w = True
 
@@ -2130,12 +2228,16 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_w,
+                "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
-                "agb_maximum_c_tier_2": self.agb_max_t2_w
+                "agb_maximum_c_tier_2": self.agb_max_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -2143,9 +2245,11 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_w.calculate_emissions()
 
         if self.module.is_without():
-            biomass_start, biomass_end = self._compute_biomass_for_maturity(
+            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
                 self.biomass_ef_start_wo,
                 self.biomass_ef_wo,
+                self.bgb_start_default,
+                self.bgb_wo_default,
                 self.module.land_use_type_start != self.module.land_use_type_wo,
                 utils.ScenarioTypes.WITHOUT,
                 utils.ScenarioTypes.WITHOUT,
@@ -2169,10 +2273,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_wo,
                 "t_biomass_tier_2": self.residue_availability_t2_wo,
-                "agb_rate_default": self.ag_default_wo.value,
+                "agb_rate_default": self.agb_wo_default.value,
                 "agb_rate_tier_2": self.agb_t2_wo,
                 "agb_maximum_c": self.agb_max_wo_default.value,
-                "bgb_rate_default": self.bg_default_wo.value,
+                "bgb_rate_default": self.bgb_wo_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
@@ -2193,12 +2297,16 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
-                "biomass_start_default": biomass_start.value,
-                "biomass_end_default": biomass_end.value,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "agb_start_default": agb_start.value,
+                "bgb_start_default": bgb_start.value,
+                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "bgb_start_tier_2": self.module.bgb_t2_wo,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_end_default": agb_end.value,
+                "bgb_end_default": bgb_end.value,
+                "agb_end_tier_2": self.module.agb_t2_wo,
+                "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
-                "agb_maximum_c_tier_2": self.agb_max_t2_wo
+                "agb_maximum_c_tier_2": self.agb_max_t2_wo,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -2354,7 +2462,9 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             if missing_scenarios:
                 raise Exception(f"Default nitrous estimation factor is not defined for rice. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
-        self.burning_emission_factor_default = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
+        self.burning_emission_factor_default = utils.get_or_raise(
+            ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues"
+        )
         self.rice_cf_default = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
@@ -3164,7 +3274,9 @@ class LargeFisheryCalculator(BaseCalculator):
             self.fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_start)
         except ipcc.LargeFisheryFUI.DoesNotExist:
             if self.module.fui_t2_start is None:
-                raise ValueError(f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_start.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+                raise ValueError(
+                    f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_start.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios."
+                )
 
         try:
             self.fui_default_w = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_w)
@@ -3464,7 +3576,9 @@ class InputEntryCalculator(BaseCalculator):
 
         self.module: InputEntry
 
-        self.ref = SimpleNamespace(co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0)
+        self.ref = SimpleNamespace(
+            co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0
+        )
         self.ef = SimpleNamespace(co2_value=0, n2o_value=0, co2_eq_value=0)
 
         self.needs_co2_ref = None
@@ -3484,7 +3598,15 @@ class InputEntryCalculator(BaseCalculator):
         try:
             self.ref = ipcc.InputReference.objects.get(input_type=self.module.input_type)
         except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {self.module.input_type.name} does not exist.")
+            if "User Defined" not in self.module.input_type.name:
+                raise ValueError(f"Reference for {self.module.input_type.name} does not exist.")
+
+            if self.needs_co2_ref and self.module.co2_emissions_t2 is None:
+                raise ValueError(f"CO2 emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
+            if self.needs_n2o_ref and self.module.n2o_emissions_t2 is None:
+                raise ValueError(f"N2O emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
+            if self.needs_co2_e_ref and self.module.co2_e_emissions_t2 is None:
+                raise ValueError(f"CO2-eq emission factor for {self.module.input_type} does not exist for {self.climate} and {self.moisture}. Please define tier 2 values.")
 
         self.ef = ipcc.InputEmissionFactor.objects.filter(input_type=self.module.input_type, climate=self.climate, moisture=self.moisture).first()
 
@@ -3660,11 +3782,17 @@ class EnergyEntryCalculator(BaseCalculator):
 
             if energy_ef:
                 if energy_ef.co2 is None and getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
                 if energy_ef.ch4 is None and getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
                 if energy_ef.n2o is None and getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
 
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             if getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
@@ -3756,11 +3884,11 @@ class EnergyEntryCalculator(BaseCalculator):
             log.debug("IS WITH")
             self.inputs_w = {
                 "emissions_factor_co2": self.energy_ef_default_w.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_w,
                 "emissions_factor_ch4": self.energy_ef_default_w.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_w,
                 "emissions_factor_n2o": self.energy_ef_default_w.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_w,
                 "rate_type": self.change_rate.name,
@@ -3796,11 +3924,11 @@ class EnergyEntryCalculator(BaseCalculator):
             log.debug("IS WITHOUT")
             self.inputs_wo = {
                 "emissions_factor_co2": self.energy_ef_default_wo.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_wo,
                 "emissions_factor_ch4": self.energy_ef_default_wo.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_wo,
                 "emissions_factor_n2o": self.energy_ef_default_wo.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "rate_type": self.change_rate.name,
@@ -3978,11 +4106,17 @@ class FuelCalculator(BaseCalculator):
 
             if energy_ef:
                 if energy_ef.co2 is None and getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
                 if energy_ef.ch4 is None and getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
                 if energy_ef.n2o is None and getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
-                    raise ValueError(f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                    raise ValueError(
+                        f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}"
+                    )
 
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             if getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
@@ -4754,6 +4888,51 @@ class LivestockCalculator(BaseCalculator):
                 if self.ch4_ef_t2_start:
                     self.ch4_ef_t2_start = self.ch4_ef_t2_start.value
 
+                # System for complementary manure management
+                self.ef_ch4_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_start = [self.ef_ch4_systems_start.value if self.ef_ch4_systems_start.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_start = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_start = [self.animal_waste_management_systems_start.value if self.animal_waste_management_systems_start.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_start = [self.ef_n2o_direct_systems_start.value if self.ef_n2o_direct_systems_start.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_start = [self.ef_n2o_volatilization_systems_start.value if self.ef_n2o_volatilization_systems_start.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_start = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_start = [self.ef_n2o_leaching_systems_start.value if self.ef_n2o_leaching_systems_start.value else 0]
+
         if module.is_with():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_w,
@@ -4968,6 +5147,51 @@ class LivestockCalculator(BaseCalculator):
                 if self.ch4_ef_t2_w:
                     self.ch4_ef_t2_w = self.ch4_ef_t2_w.value
 
+                # System for complementary manure management
+                self.ef_ch4_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_wo = [self.ef_ch4_systems_wo.value if self.ef_ch4_systems_wo.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_wo = [self.animal_waste_management_systems_wo.value if self.animal_waste_management_systems_wo.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_wo = [self.ef_n2o_direct_systems_wo.value if self.ef_n2o_direct_systems_wo.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_wo = [self.ef_n2o_volatilization_systems_wo.value if self.ef_n2o_volatilization_systems_wo.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_wo = [self.ef_n2o_leaching_systems_wo.value if self.ef_n2o_leaching_systems_wo.value else 0]
+
         if module.is_without():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_wo,
@@ -5181,6 +5405,51 @@ class LivestockCalculator(BaseCalculator):
                 )
                 if self.ch4_ef_t2_wo:
                     self.ch4_ef_t2_wo = self.ch4_ef_t2_wo.value
+
+                # System for complementary manure management
+                self.ef_ch4_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | ch4 | complementary_mm,
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_ch4_system_values_wo = [self.ef_ch4_systems_wo.value if self.ef_ch4_systems_wo.value else 0]
+
+                # Percentage for complementary manure management
+                self.animal_waste_management_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockAWMS,
+                    production_category_region_flt | complementary_mm,
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    method="get",
+                )
+                self.animal_waste_management_systems_values_wo = [self.animal_waste_management_systems_wo.value if self.animal_waste_management_systems_wo.value else 0]
+
+                # PRP N2O Direct EF of other systems
+                self.ef_n2o_direct_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | n2o | complementary_mm,
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_direct_systems_wo = [self.ef_n2o_direct_systems_wo.value if self.ef_n2o_direct_systems_wo.value else 0]
+
+                # PRP N2O Volatilization EF of other systems
+                self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | volatilization | complementary_mm,
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_volatilization_systems_wo = [self.ef_n2o_volatilization_systems_wo.value if self.ef_n2o_volatilization_systems_wo.value else 0]
+
+                # PRP N2O Leaching EF of other systems
+                self.ef_n2o_leaching_systems_wo = utils.get_or_raise(
+                    ipcc.LivestockManureEF,
+                    manure_ef_flt | leaching | complementary_mm,
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    method="get",
+                )
+                self.ef_n2o_leaching_systems_wo = [self.ef_n2o_leaching_systems_wo.value if self.ef_n2o_leaching_systems_wo.value else 0]
 
         return
 
@@ -5488,17 +5757,25 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.energy_calculator_w.get_defaults()
         self.energy_calculator_wo.get_defaults()
 
-        self.ef_default_start.co2 = self.energy_calculator_start.energy_ef_default_start.co2 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
-        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.co2 = (
+            self.energy_calculator_start.energy_ef_default_start.co2
+            if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"]
+            else self.energy_calculator_start.electricity_ef_selected.value
+        )
+        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
 
-        self.ef_default_w.co2 = self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
-        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.co2 = (
+            self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+        )
+        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
 
-        self.ef_default_wo.co2 = self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
-        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.co2 = (
+            self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+        )
+        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
+        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
 
         if self.module.is_start():
             self.irrigation_data_start = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_start)
@@ -5682,28 +5959,36 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.CoastalBGB.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "bgb_t2")
             if missing_scenarios:
-                raise ValueError(f"BGB for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(
+                    f"BGB for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}"
+                )
 
         try:
             self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "litter_t2")
             if missing_scenarios:
-                raise ValueError(f"Litter for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(
+                    f"Litter for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}"
+                )
 
         try:
             self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "deadwood_t2")
             if missing_scenarios:
-                raise ValueError(f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(
+                    f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}"
+                )
 
         try:
             self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
             if missing_scenarios:
-                raise ValueError(f"Soil 1m for {self.module.land_use_type} {self.climate} {self.moisture} in {self.soil_type_name} soil is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(
+                    f"Soil 1m for {self.module.land_use_type} {self.climate} {self.moisture} in {self.soil_type_name} soil is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}"
+                )
 
         try:
             self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=self.module.land_use_type)
@@ -5724,14 +6009,18 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CO2 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} in {self.soil_type_name} is missing. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(
+                    f"Rewetting CO2 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} in {self.soil_type_name} is missing. Please insert tier 2 values for the relevant scenarios."
+                )
 
         try:
             self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=self.module.land_use_type, salinity=self.salinity_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} with {self.salinity_type} salinity is missing. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(
+                    f"Rewetting CH4 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} with {self.salinity_type} salinity is missing. Please insert tier 2 values for the relevant scenarios."
+                )
 
     def calculate(self) -> Result:
         """
@@ -6046,65 +6335,67 @@ class OrganicSoilCalculator(BaseCalculator):
         try:
             self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_start.co2 is None and module.onsite_co2_drainage_t2_start is None:
-                raise ValueError(f"Could not find CO2 value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of EF On-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_start.ch4 is None and module.onsite_ch4_drainage_t2_start is None:
-                raise ValueError(f"Could not find CH4 value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF On-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_start.n2o is None and module.onsite_n2o_drainage_t2_start is None:
-                raise ValueError(f"Could not find N2O value of EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of EF On-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_start.doc is None and module.offsite_doc_drainage_t2_start is None:
-                raise ValueError(f"Could not find DOC value of EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of EF Off-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainage_t2_start is None:
-                raise ValueError(f"Could not find CH4 value of EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF Off-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_start)
             if self.rewetting_start.co2 is None and module.onsite_co2_rewetting_t2_start is None:
-                raise ValueError(f"Could not find CO2 value of Rewetting Start for {module.peat_type.name}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_start.ch4 is None and module.onsite_ch4_rewetting_t2_start is None:
-                raise ValueError(f"Could not find CH4 value of Rewetting Start for {module.peat_type.name}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_start.n2o is None and module.onsite_n2o_rewetting_t2_start is None:
-                raise ValueError(f"Could not find N2O value of Rewetting Start for {module.peat_type.name}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_start.doc is None and module.offsite_doc_rewetting_t2_start is None:
-                raise ValueError(f"Could not find DOC value of Rewetting Start for {module.peat_type.name}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start])
+            missing_t2_gases = filter(
+                lambda x: x is None, [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start]
+            )
             if missing_t2_gases:
-                raise ValueError(f"Could not find Rewetting EF Start for {module.peat_type.name}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Rewetting EF Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_w.co2 is None and module.onsite_co2_drainage_t2_w is None:
-                raise ValueError(f"Could not find CO2 value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of EF On-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_w.ch4 is None and module.onsite_ch4_drainage_t2_w is None:
-                raise ValueError(f"Could not find CH4 value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF On-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_w.n2o is None and module.onsite_n2o_drainage_t2_w is None:
-                raise ValueError(f"Could not find N2O value of EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of EF On-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_w.doc is None and module.offsite_doc_drainage_t2_w is None:
-                raise ValueError(f"Could not find DOC value of EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of EF Off-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainage_t2_w is None:
-                raise ValueError(f"Could not find CH4 value of EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF Off-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_w = module.fire_type_w is not None
         if self.is_fire_used_w:
@@ -6116,69 +6407,69 @@ class OrganicSoilCalculator(BaseCalculator):
         try:
             self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_w)
             if self.rewetting_w.co2 is None and module.onsite_co2_rewetting_t2_w is None:
-                raise ValueError(f"Could not find CO2 value of Rewetting W for {module.peat_type.name}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_w.ch4 is None and module.onsite_ch4_rewetting_t2_w is None:
-                raise ValueError(f"Could not find CH4 value of Rewetting W for {module.peat_type.name}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_w.n2o is None and module.onsite_n2o_rewetting_t2_w is None:
-                raise ValueError(f"Could not find N2O value of Rewetting W for {module.peat_type.name}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_w.doc is None and module.offsite_doc_rewetting_t2_w is None:
-                raise ValueError(f"Could not find DOC value of Rewetting W for {module.peat_type.name}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_w, module.onsite_ch4_rewetting_t2_w, module.onsite_n2o_rewetting_t2_w, module.offsite_doc_rewetting_t2_w])
             if missing_t2_gases:
-                raise ValueError(f"Could not find Rewetting W for {module.peat_type.name}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.onsite_ef_w.co2 is None and module.onsite_co2_peat_t2_w is None:
-                raise ValueError(f"Could not find CO2 value of On-Site EF W for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of On-Site EF W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.onsite_ef_w.n2o is None and module.onsite_n2o_peat_t2_w is None:
-                raise ValueError(f"Could not find N2O value of On-Site EF W for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of On-Site EF W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_w, module.onsite_n2o_peat_t2_w])
             if missing_t2_gases:
-                raise ValueError(f"Could not find On-Site EF W for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find On-Site EF W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.offsite_ef_w.doc is None and module.offsite_doc_peat_t2_w is None:
-                raise ValueError(f"Could not find DOC value of Off-Site EF W for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of Off-Site EF W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.offsite_ef_w.ch4 is None and module.offsite_ch4_peat_t2_w is None:
-                raise ValueError(f"Could not find CH4 value of Off-Site EF W for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of Off-Site EF W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_w, module.offsite_ch4_peat_t2_w])
             if missing_t2_gases:
-                raise ValueError(f"Could not find Off-Site EF With for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Off-Site EF With for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
         except ipcc.PeatExtractionConversionFactor.DoesNotExist:
             if module.peat_density_t2_w is None:
-                raise ValueError(f"Could not find Conversion Factor With for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Conversion Factor With for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_wo.co2 is None and module.onsite_co2_drainage_t2_wo is None:
-                raise ValueError(f"Could not find CO2 value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of EF On-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_wo.ch4 is None and module.onsite_ch4_drainage_t2_wo is None:
-                raise ValueError(f"Could not find CH4 value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF On-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_wo.n2o is None and module.onsite_n2o_drainage_t2_wo is None:
-                raise ValueError(f"Could not find N2O value of EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of EF On-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_wo.doc is None and module.offsite_doc_drainage_t2_wo is None:
-                raise ValueError(f"Could not find DOC value of EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of EF Off-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainage_t2_wo is None:
-                raise ValueError(f"Could not find CH4 value of EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of EF Off-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo])
             if missing_t2_gases:
-                raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_wo = module.fire_type_wo is not None
         if self.is_fire_used_wo:
@@ -6191,45 +6482,49 @@ class OrganicSoilCalculator(BaseCalculator):
         try:
             self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_wo)
             if self.rewetting_wo.co2 is None and module.onsite_co2_rewetting_t2_wo is None:
-                raise ValueError(f"Could not find CO2 value of Rewetting WO for {module.peat_type.name}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_wo.ch4 is None and module.onsite_ch4_rewetting_t2_wo is None:
-                raise ValueError(f"Could not find CH4 value of Rewetting WO for {module.peat_type.name}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_wo.n2o is None and module.onsite_n2o_rewetting_t2_wo is None:
-                raise ValueError(f"Could not find N2O value of Rewetting WO for {module.peat_type.name}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_wo.doc is None and module.offsite_doc_rewetting_t2_wo is None:
-                raise ValueError(f"Could not find DOC value of Rewetting WO for {module.peat_type.name}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo])
+            missing_t2_gases = filter(
+                lambda x: x is None, [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo]
+            )
             if missing_t2_gases:
-                raise ValueError(f"Could not find Rewetting WO for {module.peat_type.name}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         ##### Peat Extraction Inputs #####
         try:
             self.onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.onsite_ef_wo.co2 is None and module.onsite_co2_peat_t2_wo is None:
-                raise ValueError(f"Could not find CO2 value of On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CO2 value of On-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+            if self.onsite_ef_wo.ch4 is None and module.onsite_ch4_peat_t2_wo is None:
+                raise ValueError(f"Could not find CH4 value of On-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.onsite_ef_wo.n2o is None and module.onsite_n2o_peat_t2_wo is None:
-                raise ValueError(f"Could not find N2O value of On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find N2O value of On-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
+            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
             if missing_t2_gases:
-                raise ValueError(f"Could not find On-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find On-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.offsite_ef_wo.doc is None and module.offsite_doc_peat_t2_wo is None:
-                raise ValueError(f"Could not find DOC value of Off-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find DOC value of Off-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.offsite_ef_wo.ch4 is None and module.offsite_ch4_peat_t2_wo is None:
-                raise ValueError(f"Could not find CH4 value of Off-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find CH4 value of Off-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
             missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_wo, module.offsite_ch4_peat_t2_wo])
             if missing_t2_gases:
-                raise ValueError(f"Could not find Off-Site EF WO for {module.peat_type.name}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
+                raise ValueError(f"Could not find Off-Site EF WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
             self.conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
         except ipcc.PeatExtractionConversionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Conversion Factor WO for {module.peat_type.name}, {self.climate}, {self.moisture}")
+            raise ValueError(f"Could not find Conversion Factor WO for {module.peat_type}, {self.climate}, {self.moisture}")
 
     def calculate(self) -> Result:
         super().calculate(self.module)
@@ -6314,17 +6609,17 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_w = MathOrganicSoil(**self.organic_soil_inputs_w)
         self.organic_soil_math_w.calculate_emissions()
 
-        if input.peat_area_start:
+        if input.peat_area_start is not None and input.peat_area_w is not None:
             self.peat_extraction_inputs_w = {
                 "hectares_start": input.peat_area_start,
                 "hectares_end": input.peat_area_w,
-                "percentage_ditches_start": input.peat_ditches_area_start,
-                "percentage_ditches_end": input.peat_ditches_area_w,
+                "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
+                "percentage_ditches_end": input.peat_ditches_area_w if input.peat_ditches_area_w is not None else 0,
                 "rate_type": self.change_rate.name,
                 "ef_co2_onsite_ref": self.onsite_ef_w.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_w,
                 "ef_ch4_onsite_ref": self.onsite_ef_w.ch4,
-                "ef_ch4_onsite_tier_2": None,  # NOTE: Set to None, why?
+                "ef_ch4_onsite_tier_2": input.onsite_ch4_peat_t2_w,
                 "ef_n2o_onsite_ref": self.onsite_ef_w.n2o,
                 "ef_n2o_onsite_tier_2": input.onsite_n2o_peat_t2_w,
                 "ef_doc_offsite_ref": self.offsite_ef_w.doc,
@@ -6337,8 +6632,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "mass_tonnes_tier_2": input.peat_density_t2_w,
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_w.volume,
-                "extraction_height_start": input.peat_extraction_height_start,
-                "extraction_height_end": input.peat_extraction_height_w,
+                "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
+                "extraction_height_end": input.peat_extraction_height_w if input.peat_extraction_height_w is not None else 0,
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
@@ -6412,17 +6707,17 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_wo = MathOrganicSoil(**self.organic_soil_inputs_wo)
         self.organic_soil_math_wo.calculate_emissions()
 
-        if input.peat_area_start:
+        if input.peat_area_start is not None and input.peat_area_wo is not None:
             self.peat_extraction_inputs_wo = {
                 "hectares_start": input.peat_area_start,
                 "hectares_end": input.peat_area_wo,
-                "percentage_ditches_start": input.peat_ditches_area_start,
-                "percentage_ditches_end": input.peat_ditches_area_wo,
+                "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
+                "percentage_ditches_end": input.peat_ditches_area_wo if input.peat_ditches_area_wo is not None else 0,
                 "rate_type": self.change_rate.name,
                 "ef_co2_onsite_ref": self.onsite_ef_wo.co2,
                 "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_wo,
                 "ef_ch4_onsite_ref": self.onsite_ef_wo.ch4,
-                "ef_ch4_onsite_tier_2": None,  # NOTE: Set to None, why?
+                "ef_ch4_onsite_tier_2": input.onsite_ch4_peat_t2_wo,
                 "ef_n2o_onsite_ref": self.onsite_ef_wo.n2o,
                 "ef_n2o_onsite_tier_2": input.onsite_n2o_peat_t2_wo,
                 "ef_doc_offsite_ref": self.offsite_ef_wo.doc,
@@ -6435,8 +6730,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "mass_tonnes_tier_2": input.peat_density_t2_wo,
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_wo.volume,
-                "extraction_height_start": input.peat_extraction_height_start,
-                "extraction_height_end": input.peat_extraction_height_wo,
+                "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
+                "extraction_height_end": input.peat_extraction_height_wo if input.peat_extraction_height_wo is not None else 0,
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
@@ -6455,12 +6750,20 @@ class OrganicSoilCalculator(BaseCalculator):
             "peat_extraction": self.peat_extraction_inputs_wo,
         }
 
-        self.organic_soil_results_w = self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-        self.organic_soil_results_wo = self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.organic_soil_results_w = (
+            self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        )
+        self.organic_soil_results_wo = (
+            self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        )
 
         if input.peat_area_start:
-            self.peat_extraction_results_w = self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-            self.peat_extraction_results_wo = self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+            self.peat_extraction_results_w = (
+                self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+            )
+            self.peat_extraction_results_wo = (
+                self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+            )
 
             self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
             self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
@@ -6479,6 +6782,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         super().__init__(module)
 
         self.forest: ForestManagement = self.luc.forestmanagement if self.luc else self.module
+        self.math_start_w: MathForestManagement = None
+        self.math_start_wo: MathForestManagement = None
+        self.math_w: MathForestManagement = None
+        self.math_wo: MathForestManagement = None
 
         self.is_afforestation_w = False
         self.is_afforestation_wo = False
@@ -6520,6 +6827,10 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.litter_dw_start_wo = None
         self.litter_dw_max_wo = None
 
+        self.bgb_max_start = None
+        self.bgb_max_w = None
+        self.bgb_max_wo = None
+
         self.agb_under_20_start = None
         self.agb_over_20_start = None
 
@@ -6532,6 +6843,14 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.disturbances = None
 
     def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        if calculate:
+            self.calculate()
+            self.bgb_max_start = self.math_start_w.max_bgb_value if self.math_start_w else self.math_start_wo.max_bgb_value if self.math_start_wo else 0
+            self.bgb_max_w = self.math_w.max_bgb_value if self.math_w else 0
+            self.bgb_max_wo = self.math_wo.max_bgb_value if self.math_wo else 0
+
         land_use_type = self.module.land_use_type_start
 
         self.is_afforestation_w = self.luc and self.luc.module_type_w.class_name == "ForestManagement" and self.luc.module_type_start.class_name != "ForestManagement"
@@ -6551,7 +6870,9 @@ class ForestManagementCalculator(LandModuleCalculator):
         AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
         BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
         BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
-        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
+        LITTER_DW_NOT_FOUND = (
+            f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
+        )
 
         # NOTE: For non-forest is ipcc.AfforestationCombustionFactor (used in OLUC?)
         self.combustion_factor_start: ipcc.ForestCombustionFactor = utils.get_or_raise(
@@ -6603,36 +6924,48 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         if self.module.is_start() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max])):
             if self.forest.agb_t2_start is None:
-                raise ValueError(f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_start.agb_min = self.agb_under_20_start.agb_max = self.forest.agb_t2_start
 
         # Check AGB under 20 years for with scenario
         if self.module.is_with() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max])):
             if self.forest.agb_t2_w is None:
-                raise ValueError(f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_w.agb_min = self.agb_under_20_w.agb_max = self.forest.agb_t2_w
 
         # Check AGB under 20 years for without scenario
         if self.module.is_without() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max])):
             if self.forest.agb_t2_wo is None:
-                raise ValueError(f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_wo.agb_min = self.agb_under_20_wo.agb_max = self.forest.agb_t2_wo
 
         if self.module.is_start() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max])):
             if self.forest.agb_growth_rate_le_20_yrs_t2_start is None:
-                raise ValueError(f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_start.agb_growth_min = self.agb_under_20_start.agb_growth_max = self.forest.agb_growth_rate_le_20_yrs_t2_start
 
         # Check AGB growth under 20 years for with scenario
         if self.module.is_with() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max])):
             if self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
-                raise ValueError(f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_w.agb_growth_min = self.agb_under_20_w.agb_growth_max = self.forest.agb_growth_rate_le_20_yrs_t2_w
 
         # Check AGB growth under 20 years for without scenario
         if self.module.is_without() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max])):
             if self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
-                raise ValueError(f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_under_20_wo.agb_growth_min = self.agb_under_20_wo.agb_growth_max = self.forest.agb_growth_rate_le_20_yrs_t2_wo
 
         self.agb_over_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=21 if "Secondary" in self.forest.forest_condition_type.name else 0)
@@ -6645,38 +6978,56 @@ class ForestManagementCalculator(LandModuleCalculator):
         # Check AGB over 20 years for with scenario
         if self.module.is_with() and (any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max])):
             if self.forest.agb_t2_w is None:
-                raise ValueError(f"Reference values for AGB over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_over_20_w.agb_min = self.agb_over_20_w.agb_max = self.forest.agb_t2_w
 
         # Check AGB over 20 years for without scenario
         if self.module.is_without() and (any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max])):
             if self.forest.agb_t2_wo is None:
-                raise ValueError(f"Reference values for AGB over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_over_20_wo.agb_min = self.agb_over_20_wo.agb_max = self.forest.agb_t2_wo
 
         # Check AGB growth over 20 years for with scenario
         if self.module.is_with() and (any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max])):
             if self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
-                raise ValueError(f"Reference values for AGB growth over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB growth over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_over_20_w.agb_growth_min = self.agb_over_20_w.agb_growth_max = self.forest.agb_growth_rate_gt_20_yrs_t2_w
 
         # Check AGB growth over 20 years for without scenario
         if self.module.is_without() and (any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max])):
             if self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
-                raise ValueError(f"Reference values for AGB growth over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+                raise ValueError(
+                    f"Reference values for AGB growth over 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values."
+                )
             self.agb_over_20_wo.agb_growth_min = self.agb_over_20_wo.agb_growth_max = self.forest.agb_growth_rate_gt_20_yrs_t2_wo
 
         # START - Reference Values for forest remaining forest
 
-        self.agb_max_start = statistics.mean([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) if all([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) else self.forest.agb_t2_start
-        self.agb_growth_over_20_start = statistics.mean([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min]) if all([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_start
+        self.agb_max_start = (
+            statistics.mean([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) if all([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) else self.forest.agb_t2_start
+        )
+        self.agb_growth_over_20_start = (
+            statistics.mean([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min])
+            if all([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min])
+            else self.forest.agb_growth_rate_gt_20_yrs_t2_start
+        )
         self.agb_growth_under_20_start = 0
         self.agb_start_start = self.agb_max_start
         self.litter_dw_start_start = self.litter_dw
         self.litter_dw_max_start = self.litter_dw
 
         self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if all([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) else self.forest.agb_t2_w
-        self.agb_growth_over_20_w = statistics.mean([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) if all([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_w
+        self.agb_growth_over_20_w = (
+            statistics.mean([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min])
+            if all([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min])
+            else self.forest.agb_growth_rate_gt_20_yrs_t2_w
+        )
         self.agb_growth_under_20_w = 0
         self.agb_start_w = self.agb_max_w
         self.litter_dw_start_w = self.litter_dw
@@ -6686,7 +7037,11 @@ class ForestManagementCalculator(LandModuleCalculator):
         # TODO: Add litter start, litter end. Affo -> start=0, end=reference_values. Forest -> start=reference_values, end=refernce_values
 
         self.agb_max_wo = statistics.mean([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) if all([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) else self.forest.agb_t2_wo
-        self.agb_growth_over_20_wo = statistics.mean([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min]) if all([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_wo
+        self.agb_growth_over_20_wo = (
+            statistics.mean([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min])
+            if all([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min])
+            else self.forest.agb_growth_rate_gt_20_yrs_t2_wo
+        )
         self.agb_growth_under_20_wo = 0
         self.agb_start_wo = self.agb_max_wo
         self.litter_dw_start_wo = self.litter_dw
@@ -6694,35 +7049,66 @@ class ForestManagementCalculator(LandModuleCalculator):
         # END - Reference Values for forest remaining forest
 
         if self.is_afforestation_w:
-            self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max]) if all([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max]) else self.forest.agb_t2_w
-            self.agb_growth_under_20_w = statistics.mean([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min]) if all([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_w
+            self.agb_max_w = (
+                statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max])
+                if self.activity.implementation_years > 20
+                else statistics.mean([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max])
+                if all([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max])
+                else self.forest.agb_t2_w
+            )
+            self.agb_growth_under_20_w = (
+                statistics.mean([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min])
+                if all([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min])
+                else self.forest.agb_growth_rate_le_20_yrs_t2_w
+            )
             self.agb_start_w = 0
             self.litter_dw_start_w = SimpleNamespace(litter=0, dw=0)
 
         if self.is_afforestation_wo:
             self.agb_max_wo = (
-                statistics.mean([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max]) if all([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max]) else self.forest.agb_t2_wo
+                statistics.mean([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max])
+                if self.activity.implementation_years > 20
+                else statistics.mean([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max])
+                if all([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max])
+                else self.forest.agb_t2_wo
             )
-            self.agb_growth_under_20_wo = statistics.mean([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) if all([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_wo
+            self.agb_growth_under_20_wo = (
+                statistics.mean([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min])
+                if all([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min])
+                else self.forest.agb_growth_rate_le_20_yrs_t2_wo
+            )
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
         has_fra_as_data_source = self.module.data_source is not None and self.module.data_source.short_name == "FRA"
 
         if has_fra_as_data_source:
-            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.get(country=self.country)
+            self.fra_carbon_stock: ipcc.FRACarbonStock = ipcc.FRACarbonStock.objects.filter(country=self.country).first()
+            if self.fra_carbon_stock is None:
+                raise ValueError(f"FRA carbon stock data not found for {self.country.name}")
             self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
             self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
-            self.bgb_max_start = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
-            self.bgb_max_w = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
-            self.bgb_max_wo = self.fra_carbon_stock.bgb if self.fra_carbon_stock.bgb is not None else 0
+            self.agb_start_start = self.agb_max_start  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_w = self.agb_max_w  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.agb_start_wo = self.agb_max_wo  # NOTE: Lorenzo 31/07/2025: AGB is basically AGB Max, so they can be set as equal
+            self.bgb_max_start = self.fra_carbon_stock.bgb
+            self.bgb_max_w = self.fra_carbon_stock.bgb
+            self.bgb_max_wo = self.fra_carbon_stock.bgb
             self.litter_dw_max_start.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
             self.litter_dw_max_w.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
             self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
             self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
             self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+
+            # NOTE: Lorenzo 01/08/2025: For forest remaining forest (no affo), the litter and deadwood start are the same as the max values
+            if not self.is_afforestation_w:
+                self.litter_dw_start_w.litter = self.litter_dw_max_start.litter
+                self.litter_dw_start_w.dw = self.litter_dw_max_start.dw
+            if not self.is_afforestation_wo:
+                self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
+                self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
@@ -6749,16 +7135,18 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_start,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_start,
                 "agb_start_default": self.agb_start_start,
-                "agb_start_tier_2": self.forest.agb_t2_start,
+                "agb_start_tier_2": self.forest.agb_t2_start if self.forest.agb_t2_start else self.agb_start_start,  # TODO: Lorenzo 18/07/2025: Discuss all afforestation-related tier 2 values
                 "agb_yearly_growth_under_20_default": self.agb_growth_under_20_start,
                 "agb_yearly_growth_under_20_tier_2": self.forest.agb_growth_rate_le_20_yrs_t2_start,
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_start,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_start,
-                "max_agb_value": self.agb_max_start,
-                "max_bgb_value": self.bgb_max_start,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)),
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)),
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)),
+                "max_agb_value_default": self.agb_max_start,
+                "max_agb_value_tier_2": self.forest.agb_max_t2_start,
+                "max_bgb_value_default": self.bgb_max_start,
+                "max_bgb_value_tier_2": self.forest.bgb_max_t2_start,
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else [],
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else [],
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_start,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_start,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
@@ -6826,16 +7214,18 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_w,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_w,
                 "agb_start_default": self.agb_start_w,
-                "agb_start_tier_2": self.forest.agb_t2_w,
+                "agb_start_tier_2": self.forest.agb_t2_w if not self.is_afforestation_w else self.agb_start_w,
                 "agb_yearly_growth_under_20_default": self.agb_growth_under_20_w,
                 "agb_yearly_growth_under_20_tier_2": self.forest.agb_growth_rate_le_20_yrs_t2_w,
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_w,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_w,
-                "max_agb_value": self.agb_max_w,
-                "max_bgb_value": self.bgb_max_w,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)),
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)),
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)),
+                "max_agb_value_default": self.agb_max_w,
+                "max_agb_value_tier_2": self.forest.agb_max_t2_w,
+                "max_bgb_value_default": self.bgb_max_w,
+                "max_bgb_value_tier_2": self.forest.bgb_max_t2_w,
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else [],
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else [],
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_w,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_w,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_w,
@@ -6901,16 +7291,18 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_wo,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_wo,
                 "agb_start_default": self.agb_start_wo,
-                "agb_start_tier_2": self.forest.agb_t2_wo,
+                "agb_start_tier_2": self.forest.agb_t2_wo if not self.is_afforestation_wo else self.agb_start_wo,
                 "agb_yearly_growth_under_20_default": self.agb_growth_under_20_wo,
                 "agb_yearly_growth_under_20_tier_2": self.forest.agb_growth_rate_le_20_yrs_t2_wo,
                 "agb_yearly_growth_over_20_default": self.agb_growth_over_20_wo,
                 "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_wo,
-                "max_agb_value": self.agb_max_wo,
-                "max_bgb_value": self.bgb_max_wo,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)),
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)),
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)),
+                "max_agb_value_default": self.agb_max_wo,
+                "max_agb_value_tier_2": self.forest.agb_max_t2_wo,
+                "max_bgb_value_default": self.bgb_max_wo,
+                "max_bgb_value_tier_2": self.forest.bgb_max_t2_wo,
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else [],
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else [],
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_wo,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_wo,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_wo,
@@ -7333,14 +7725,14 @@ class BaseValueChainCalculator(BaseCalculator):
 
         self.module: ValueChainSubmodule
 
-        self.energy_calculator_w: ElectricityCalculator | FuelCalculator = None
-        self.energy_calculator_wo: ElectricityCalculator | FuelCalculator = None
+        self.energy_calculator_w: EnergyEntryCalculator = None
+        self.energy_calculator_wo: EnergyEntryCalculator = None
 
         if self.module.is_ready():
             if self.module.is_with():
-                self.energy_calculator_w = ElectricityCalculator(self.module) if self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() in utils.ELECTRIC_FUEL_TYPES else FuelCalculator(self.module)
+                self.energy_calculator_w = EnergyEntryCalculator(self.module)
             if self.module.is_without():
-                self.energy_calculator_wo = ElectricityCalculator(self.module) if self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() in utils.ELECTRIC_FUEL_TYPES else FuelCalculator(self.module)
+                self.energy_calculator_wo = EnergyEntryCalculator(self.module)
 
         self.energy_math_start_w = None
         self.energy_math_start_wo = None
@@ -7499,7 +7891,9 @@ class StorageEntryCalculator(BaseValueChainCalculator):
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo += (
+            self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        )
         self.results_w += self.electricity_math_w.result if self.electricity_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo += self.electricity_math_wo.result if self.electricity_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
@@ -7696,7 +8090,9 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo += (
+            self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        )
         self.results_w += self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo += self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
@@ -7746,7 +8142,9 @@ class TransportEntryCalculator(BaseValueChainCalculator):
             self.energy_math_wo = self.energy_calculator_wo.math_wo
 
         self.results_start_w = self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
-        self.results_start_wo = self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = (
+            self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        )
         self.results_w = self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 

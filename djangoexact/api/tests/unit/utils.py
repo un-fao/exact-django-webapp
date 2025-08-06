@@ -1,17 +1,13 @@
 from rest_framework.test import APIRequestFactory, APITestCase
-from rest_framework import status
 from django.urls import reverse
 from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
-import api.tests.factories as factories
 from rest_framework.test import force_authenticate
-from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
+from factory.fuzzy import FuzzyText, FuzzyInteger
 import logging as log
-from api import serializers
-import io
 from django.core.files.uploadedfile import SimpleUploadedFile
-
+from rest_framework import status
 import public.views as public_views
 
 
@@ -45,12 +41,13 @@ class APITestCaseMixin(APITestCase):
         self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
-        self.country = models.Country.objects.order_by("?").first()
+        self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
         self.module_type = models.ModuleType.objects.filter(is_luc=True).order_by("?").first()
         self.change_rate = models.ChangeRate.objects.get(name="linear")
+        self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
         self.project_data = {
             "name": FuzzyText().fuzz(),
             "start_year_of_activities": 2024,
@@ -60,7 +57,7 @@ class APITestCaseMixin(APITestCase):
             "climate": self.climate.id,
             "moisture": self.moisture.id,
             "soil_type": self.soil_type.id,
-            "gw_potential": ipcc_models.GlobalWarmingPotential.objects.order_by("?").first().id,
+            "gw_potential": self.gw_potential.id,
             "soc_ref_t2": FuzzyInteger(0, 100).fuzz(),
         }
 
@@ -83,6 +80,19 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+
+    def unlock_project(self, project, user):
+        """
+        Unlock a project using the ProjectViewSet.
+        """
+        log.info("Unlocking project")
+        view = ProjectViewSet.as_view({"post": "unlock"})
+        request = self.request_factory.post(
+            reverse("project-unlock", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
 
     def send_project_invitation(self, project, user, group):
         """
@@ -121,7 +131,7 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
-    
+
     def get_project_memberships(self, project):
         """
         Get project memberships for a project.
@@ -131,18 +141,14 @@ class APITestCaseMixin(APITestCase):
         request = self.request_factory.get(reverse("project-list"), format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
-    
+
     def get_project_memberships_filter_by_user(self, project):
         """
         Get project memberships for a project, filtered by user.
         """
         log.info("Getting project memberships filtered by user")
         view = ProjectViewSet.as_view({"get": "memberships"})
-        request = self.request_factory.get(
-            reverse("project-list"),
-            {"user": self.user.id},
-            format="json"
-        )
+        request = self.request_factory.get(reverse("project-list"), {"user": self.user.id}, format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
 
@@ -188,7 +194,7 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request)
 
-    def create_activity(self, project, user, module_types=None):
+    def create_activity(self, project, user, module_types=None, land_use_change=False):
         """
         Create an activity using the ActivityViewSet.
 
@@ -201,11 +207,21 @@ class APITestCaseMixin(APITestCase):
         activity_builder_data = {
             "name": FuzzyText().fuzz(),
             "project": project.id,
-            "module_types": [self.module_type.id] if module_types is None else [module_type.id for module_type in module_types],
             "area": 100,
             "change_rate": self.change_rate.id,
             "cost": 0,
         }
+
+        if land_use_change:
+            activity_builder_data["land_use_change"] = {
+                "module_type_start": module_types[0].id,
+                "module_type_w": module_types[1].id,
+                "module_type_wo": module_types[2].id,
+            }
+        elif module_types:
+            activity_builder_data["module_types"] = [module_type.id for module_type in module_types]
+        else:
+            activity_builder_data["module_types"] = [self.module_type.id]
 
         view = ActivityViewSet.as_view({"post": "build"})
         request = self.request_factory.post(
@@ -214,7 +230,11 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         force_authenticate(request, user=user)
-        return view(request)
+
+        response = view(request)
+        log.error(response.data) if response.status_code != status.HTTP_200_OK else None
+
+        return response
 
     def edit_activity(self, activity, user, data):
         """
@@ -271,19 +291,40 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=activity.id)
 
-    def edit_module(self, module, user, data):
+    def get_module_details(self, module, user):
+        """
+        Get module details using the ModuleViewSet.
+        """
+        log.info("Getting module details")
+        view = generic_module_viewset(module.__class__).as_view({"get": "retrieve"})
+        request = self.request_factory.get(reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]), format="json")
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
+
+    def edit_module(self, module, user, data, put=False):
         """
         Edit a module using the ModuleViewSet.
 
-        This method edits a module by sending a PATCH request to the 'module-detail' endpoint
+        This method edits a module by sending a PATCH or PUT request to the 'module-detail' endpoint
         with the provided module data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
+
+        Args:
+            module: The module to edit
+            user: The user making the request
+            data: The data to update the module with
+            put: If True, do a PUT request instead of PATCH, transferring all module data
         """
         log.debug(f"Editing module: {module.__class__.__name__}")
         log.debug(f"Data: {data}")
-        view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
-        # Get viewset url name
-        request = self.request_factory.patch(
+        if put:
+            view = generic_module_viewset(module.__class__).as_view({"put": "update"})
+        else:
+            view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
+
+        http_method = self.request_factory.put if put else self.request_factory.patch
+
+        request = http_method(
             reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]),
             data,
             format="json",
@@ -440,7 +481,7 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=project.pk)
-    
+
     def add_comment(self, thread: models.CommentThread, text: str):
         """
         Add a comment to a module using the ModuleViewSet.
@@ -459,3 +500,16 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+
+    def send_recap_email(self, project, user):
+        """
+        Send a recap email using the ProjectViewSet.
+        """
+        log.info("Sending recap email")
+        view = ProjectViewSet.as_view({"post": "recap"})
+        request = self.request_factory.post(
+            reverse("project-recap", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)

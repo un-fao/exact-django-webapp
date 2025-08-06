@@ -22,6 +22,8 @@ from datetime import timedelta
 import logging as log
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
+from django.db import transaction
+import api.security as security
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -186,6 +188,7 @@ def find_modules(activity):
     return modules
 
 
+@transaction.atomic
 def get_unique_name(instance, name):
     """
     Generates a unique name for a Django model instance by appending a counter if necessary.
@@ -213,66 +216,127 @@ def get_unique_name(instance, name):
     return f"{name} ({i})"
 
 
+@transaction.atomic
 def copy_project(project, owner):
-    project_copy = copy.deepcopy(project)
-    project_copy.pk = None
-    project_copy.name = get_unique_name(project_copy, project_copy.name)
-    project_copy._state.adding = True
-    project_copy.is_finalized = False
-    project.owner = owner
-    project_copy.save()
+    transaction.set_autocommit(False)
+    try:
+        project_copy = copy.deepcopy(project)
+        project_copy.pk = None
+        project_copy.name = get_unique_name(project_copy, project_copy.name)
+        project_copy._state.adding = True
+        project_copy.is_finalized = False
+        project.owner = owner
+        project_copy.save()
 
-    # Add Membership to the new project
-    api_models.ProjectMembership.objects.create(
-        user=owner,
-        project=project_copy,
-        group=api_models.Group.objects.get(name="Admin"),
-    )
+        # Add Membership to the new project
+        # BUG: Membership is assigned to the original project, not the copied one
+        api_models.ProjectMembership.objects.create(
+            user=owner,
+            project=project_copy,
+            group=api_models.Group.objects.get(name="Admin"),
+        )
 
-    for activity in project.activities.all():
-        copy_activity(activity, project_copy)
+        for activity in project.activities.all():
+            copy_activity(activity, project_copy, owner)
 
-    return project_copy
+        transaction.commit()
+
+        return project_copy
+    except Exception as e:
+        log.error(f"Error copying project: {e}")
+        raise e
 
 
-def copy_threads(module=None):
+@transaction.atomic
+def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module"):
     """
     Copy the threads of a module and return the copied threads.
 
     Args:
-        threads (list[api_models.CommentThread]): The list of threads to copy.
+        module: The module whose threads to copy.
 
     Returns:
         list[api_models.CommentThread]: The list of copied threads.
     """
-    threads = module.threads
-    thread_instance = None
+
     copied_threads = []
-    for thread in threads:
-        if not hasattr(thread, "attname"):
-            continue
 
-        thread_instance = getattr(module, thread.attname.replace("_id", ""), None)
-        if thread_instance is None:
-            continue
-        thread_copy = copy.deepcopy(thread_instance)
-        thread_copy.pk = None
-        thread_copy._state.adding = True
-        thread_copy.save()
+    # Iterate through all fields of the module to find thread fields
+    for field in module_to._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module_from, field.name, None)
 
-        for comment in thread_instance.comments.all():
-            comment_copy = copy.deepcopy(comment)
-            comment_copy.pk = None
-            comment_copy.thread = thread_copy
-            comment_copy._state.adding = True
-            comment_copy.save()
+                if thread_instance is None:
+                    continue
 
-        copied_threads.append(thread_copy)
+                # Create a new thread copy
+                thread_copy = copy.deepcopy(thread_instance)
+                thread_copy.pk = None
+                thread_copy._state.adding = True
+                thread_copy.save()
+
+                # Copy all comments from the original thread
+                for comment in thread_instance.comments.all():
+                    comment_copy = copy.deepcopy(comment)
+                    comment_copy.pk = None
+                    comment_copy.thread = thread_copy
+                    comment_copy._state.adding = True
+                    comment_copy.save()
+
+                # Assign the new thread to the module
+                setattr(module_to, field.name, thread_copy)
+                copied_threads.append(thread_copy)
 
     return copied_threads
 
 
-def copy_activity(activity, new_project=None):
+@transaction.atomic
+def clear_threads(module):
+    """
+    Clear the threads of a module by deleting all associated CommentThread instances.
+
+    Args:
+        module: The module whose threads to clear.
+    """
+
+    # Iterate through all fields of the module to find thread fields
+    for field in module._meta.get_fields():
+        if field.name.endswith("_thread") and hasattr(field, "related_model"):
+            if field.related_model == api_models.CommentThread:
+                thread_instance = getattr(module, field.name, None)
+                if thread_instance is not None:
+                    setattr(module, field.name, None)
+
+
+@transaction.atomic
+def handle_threads(module_from: "api_models.Module", module_to: "api_models.Module", owner=None):
+    """
+    Handle the copying of threads from one module to another, ensuring that the threads are copied correctly
+    and that the new module has the correct ownership.
+
+    Args:
+        module_from: The source module from which to copy threads.
+        module_to: The destination module to which threads will be copied.
+        owner: The owner of the new module, if applicable.
+
+    Returns:
+        None
+    """
+
+    activity = module_from.activity
+
+    can_view_comments = security.check_permission("can_view_comment", owner, activity.project)
+    if owner is not None and can_view_comments:
+        copy_threads(module_from, module_to)
+    else:
+        clear_threads(module_to)
+
+    module_to.save()
+
+
+@transaction.atomic
+def copy_activity(activity, new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
     activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
@@ -292,21 +356,13 @@ def copy_activity(activity, new_project=None):
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
 
-        # Get all attributes ending with "_thread" set them to None
-        for thread in module.threads:
-            if not hasattr(thread, "attname"):
-                continue
-
-            setattr(module, thread.attname, None)
-
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy.land_use_change = None
         module_copy.organic_soil = None
-        copy_threads(module)
         module_copy._state.adding = True
-        module_copy.save()
+        handle_threads(module, module_copy, owner)
 
         has_luc = getattr(module, "land_use_change", None)
         has_organic_soil = getattr(module, "organic_soil", None)
@@ -316,9 +372,10 @@ def copy_activity(activity, new_project=None):
                 luc_copy = copy.deepcopy(module.land_use_change)
                 luc_copy.pk = None
                 luc_copy.activity = activity_copy
-                copy_threads(luc_copy)
                 luc_copy._state.adding = True
+                luc_copy.organic_soil = None
                 luc_copy.save()
+                handle_threads(module.land_use_change, luc_copy, owner)
 
             module_copy.land_use_change = luc_copy
             module_copy.save()
@@ -328,32 +385,24 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy = copy.deepcopy(module.organic_soil)
                 organic_soil_copy.pk = None
                 organic_soil_copy.activity = activity_copy
-                copy_threads(organic_soil_copy)
                 organic_soil_copy._state.adding = True
+                if luc_copy:
+                    luc_copy.organic_soil = organic_soil_copy
+                    luc_copy.save()
                 organic_soil_copy.save()
+                handle_threads(module.organic_soil, organic_soil_copy, owner)
 
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
-        submodules = []
-
-        if module.__class__.__name__ == "FloodedRice":
-            submodules = list(module.minor_seasons.all())
-        elif module.__class__.__name__ == "Input":
-            submodules = list(module.input_entries.all())
-        elif module.__class__.__name__ == "Energy":
-            submodules = list(module.electricities.all())
-            submodules.extend(list(module.fuels.all()))
-        elif module.__class__.__name__ == "Irrigation":
-            submodules = list(module.irrigation_systems.all())
-            submodules.extend(list(module.irrigation_phases.all()))
+        submodules = module.submodules if hasattr(module, "submodules") else []
 
         if submodules:
             for submodule in submodules:
                 submodule.pk = None
                 submodule.parent = module_copy
-                copy_threads(submodule)
                 submodule._state.adding = True
+                handle_threads(submodule, submodule, owner)
                 submodule.save()
 
     return activity_copy
@@ -535,7 +584,16 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified", "status", "map_data"] + (exclude_fields or [])
+        fields_to_remove = [
+            "last_cached_at",
+            "cached_results_total",
+            "cached_results_by_activity",
+            "cached_results_by_gas",
+            "cached_results_by_activity_by_gas",
+            "last_modified",
+            "status",
+            "map_data",
+        ] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -594,7 +652,9 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+    field_definitions = {
+        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
+    }
 
     return field_definitions
 
@@ -703,7 +763,20 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
 
     if recipients is None:
-        recipients = project.members.filter(group__name="Admin").all()
+        from api.models import ProjectNotificationPreference
+
+        # Get all admin members who haven't opted out globally
+        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+
+        # Filter out users who have opted out of notifications for this specific project
+        recipients = []
+        for member in potential_recipients:
+            user = member.user
+            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
+
+            # If no project-specific preference exists, or if they haven't opted out for this project, include them
+            if project_preference is None or not project_preference.is_opted_out:
+                recipients.append(member)
 
     locked_at = project.locked_at
 
@@ -769,7 +842,7 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         return
 
     for recipient in recipients:
-        user = recipient.user
+        user: api_models.CustomUser = recipient.user
         context.update({"recipient": user})
         if user.email:
             html_message = render_to_string(os.path.join(settings.BASE_DIR, "api", "templates", "changes", "changes.html"), context)
