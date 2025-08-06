@@ -1,3 +1,11 @@
+## 1.15.8 (2025-08-06)
+
+### Fix
+
+- **activity builder**: move module deletion at the end so activity editing is not affected by delete cascade
+- **copy**: rework logic so that organic soil is properly copied
+- **fra**: align some countries with mismatching names in the dataset
+
 ## 1.15.7 (2025-08-05)
 
 ### Fix
