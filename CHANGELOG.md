@@ -1,3 +1,9 @@
+## 1.15.9 (2025-08-07)
+
+### Fix
+
+- **activity copy**: remove module saving from handle_threads to avoid integrity errors
+
 ## 1.15.8 (2025-08-06)
 
 ### Fix
