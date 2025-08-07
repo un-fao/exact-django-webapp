@@ -332,8 +332,6 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
     else:
         clear_threads(module_to)
 
-    module_to.save()
-
 
 @transaction.atomic
 def copy_activity(activity: "api_models.Activity", new_project=None, owner=None):
@@ -368,11 +366,10 @@ def copy_activity(activity: "api_models.Activity", new_project=None, owner=None)
         organic_soil_copy.pk = None
         organic_soil_copy.activity = activity_copy
         organic_soil_copy._state.adding = True
+        if luc_copy:
+            organic_soil_copy.land_use_change = luc_copy
         handle_threads(organic_soil, organic_soil_copy, owner)
         organic_soil_copy.save()
-        if luc_copy:
-            luc_copy.organic_soil = organic_soil_copy
-            luc_copy.save()
 
     for module in list(filter(lambda x: x.__class__.__name__ not in ["LandUseChange", "OrganicSoil"], activity.modules)):
         module: api_models.Module
@@ -381,11 +378,10 @@ def copy_activity(activity: "api_models.Activity", new_project=None, owner=None)
         module_copy.activity = activity_copy
         module_copy.land_use_change = None
         module_copy._state.adding = True
-        handle_threads(module, module_copy, owner)
-
         if luc_copy:
             module_copy.land_use_change = luc_copy
-            module_copy.save()
+        handle_threads(module, module_copy, owner)
+        module_copy.save()
 
         submodules = module.submodules if hasattr(module, "submodules") else []
 
