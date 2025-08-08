@@ -27,7 +27,7 @@ def identify_categorical_columns(headers):
             continue
 
         # Skip columns that are likely numerical (based on name patterns)
-        numerical_patterns = ["heads_number", "start", "w"]
+        numerical_patterns = ["heads_number"]
         if any(pattern in col for pattern in numerical_patterns):
             continue
 

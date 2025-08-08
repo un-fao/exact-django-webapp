@@ -7,15 +7,132 @@ import minitool.models as models
 import minitool.serializers as serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
-from django.db.models import JSONField, Sum, F, Avg, Min, Max
+from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q
 from rest_framework.pagination import PageNumberPagination
 import api.models as api_models
+import statistics
+from collections import defaultdict
+from typing import Dict, List, Any
 
 
 class DefaultPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = "page_size"
     max_page_size = 10000
+
+
+class EmissionsModulesViewSet(viewsets.GenericViewSet):
+    """
+    ViewSet for emissions modules data with filtering and aggregation capabilities.
+    """
+
+    def calculate_statistics(self, values: List[float]) -> Dict[str, float]:
+        """Calculate statistical measures for a list of values."""
+        if not values:
+            return {"count": 0, "sum": 0, "mean": 0, "median": 0, "min": 0, "max": 0, "q1": 0, "q3": 0}
+
+        sorted_values = sorted(values)
+        n = len(sorted_values)
+
+        q1_idx = n // 4
+        q3_idx = 3 * n // 4
+
+        return {
+            "count": n,
+            "sum": sum(values),
+            "mean": statistics.mean(values),
+            "median": statistics.median(values),
+            "min": min(values),
+            "max": max(values),
+            "q1": sorted_values[q1_idx] if n > 0 else 0,
+            "q3": sorted_values[q3_idx] if n > 0 else 0,
+        }
+
+    def aggregate_by_change(self, queryset) -> Dict[str, Dict[str, Any]]:
+        """
+        Aggregate data by change type with structured output using database queries.
+        """
+        # Get all unique fields
+        fields = queryset.values_list("field", flat=True).distinct()
+
+        results = []
+        for field in fields:
+            field_data = {"field": field, "changes": []}
+
+            # Get all changes for this field
+            field_changes = (
+                queryset.filter(field=field)
+                .values("from_value", "to_value")
+                .annotate(count=Sum("count"), sum_total=Sum("sum_total"), mean=Avg("mean"), median=Avg("median"), min_value=Min("min_value"), max_value=Max("max_value"), q1=Avg("q1"), q3=Avg("q3"))
+            )
+
+            for change in field_changes:
+                change_data = {
+                    "from": change["from_value"],
+                    "to": change["to_value"],
+                    "statistics": {
+                        "count": change["count"],
+                        "sum": change["sum_total"],
+                        "mean": change["mean"],
+                        "median": change["median"],
+                        "min": change["min_value"],
+                        "max": change["max_value"],
+                        "q1": change["q1"],
+                        "q3": change["q3"],
+                    },
+                }
+                field_data["changes"].append(change_data)
+
+            # Sort changes by count (descending)
+            field_data["changes"].sort(key=lambda x: x["statistics"]["count"], reverse=True)
+            results.append(field_data)
+
+        return results
+
+    @decorators.action(detail=False, methods=["get"])
+    def livestock(self, request, *args, **kwargs):
+        """
+        Get livestock emissions modules data with filtering and aggregation.
+        """
+        # Get filter parameters from query params
+        filters = {}
+        filter_fields = ["region", "climate", "moisture", "soil_type", "livestock_category_type", "field"]
+
+        for field in filter_fields:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+
+        # Start with base queryset
+        queryset = models.LivestockChangeAggregate.objects.all()
+
+        # Apply filters
+        if filters.get("region"):
+            queryset = queryset.filter(region=filters["region"])
+        if filters.get("climate"):
+            queryset = queryset.filter(climate=filters["climate"])
+        if filters.get("moisture"):
+            queryset = queryset.filter(moisture=filters["moisture"])
+        if filters.get("soil_type"):
+            queryset = queryset.filter(soil_type=filters["soil_type"])
+        if filters.get("livestock_category_type"):
+            queryset = queryset.filter(livestock_category_type=filters["livestock_category_type"])
+        if filters.get("field"):
+            queryset = queryset.filter(field=filters["field"])
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No livestock data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
 
 
 class EntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
