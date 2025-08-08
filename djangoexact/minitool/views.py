@@ -134,6 +134,126 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response(response_data)
 
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland ")
+    def annual_cropland(self, request, *args, **kwargs):
+        """
+        Get annual cropland emissions modules data with filtering and aggregation.
+        """
+        # Get filter parameters from query params
+        filters = {}
+        filter_fields = ["region", "climate", "moisture", "soil_type", "livestock_category_type", "field"]
+
+        for field in filter_fields:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+
+        # Start with base queryset
+        queryset = models.AnnualCroplandChangeAggregate.objects.all()
+
+        # Apply filters
+        if filters.get("region"):
+            queryset = queryset.filter(region=filters["region"])
+        if filters.get("climate"):
+            queryset = queryset.filter(climate=filters["climate"])
+        if filters.get("moisture"):
+            queryset = queryset.filter(moisture=filters["moisture"])
+        if filters.get("soil_type"):
+            queryset = queryset.filter(soil_type=filters["soil_type"])
+        if filters.get("field"):
+            queryset = queryset.filter(field=filters["field"])
+
+        # Get total count
+        total_records = queryset.count()
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice")
+    def flooded_rice(self, request, *args, **kwargs):
+        """
+        Get flooded rice emissions modules data with filtering and aggregation.
+        """
+        # Get filter parameters from query params
+        filters = {}
+        filter_fields = ["region", "climate", "moisture", "soil_type", "field"]
+
+        for field in filter_fields:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+
+        # Start with base queryset
+        queryset = models.FloodedRiceChangeAggregate.objects.all()
+
+        # Apply filters
+        if filters.get("region"):
+            queryset = queryset.filter(region=filters["region"])
+        if filters.get("climate"):
+            queryset = queryset.filter(climate=filters["climate"])
+        if filters.get("moisture"):
+            queryset = queryset.filter(moisture=filters["moisture"])
+        if filters.get("soil_type"):
+            queryset = queryset.filter(soil_type=filters["soil_type"])
+        if filters.get("field"):
+            queryset = queryset.filter(field=filters["field"])
+
+        # Get total count
+        total_records = queryset.count()
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland")
+    def grassland(self, request, *args, **kwargs):
+        """
+        Get grassland emissions modules data with filtering and aggregation.
+        """
+        # Get filter parameters from query params
+        filters = {}
+        filter_fields = ["region", "climate", "moisture", "soil_type", "field"]
+
+        for field in filter_fields:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+
+        # Start with base queryset
+        queryset = models.GrasslandChangeAggregate.objects.all()
+
+        # Apply filters
+        if filters.get("region"):
+            queryset = queryset.filter(region=filters["region"])
+        if filters.get("climate"):
+            queryset = queryset.filter(climate=filters["climate"])
+        if filters.get("moisture"):
+            queryset = queryset.filter(moisture=filters["moisture"])
+        if filters.get("soil_type"):
+            queryset = queryset.filter(soil_type=filters["soil_type"])
+        if filters.get("field"):
+            queryset = queryset.filter(field=filters["field"])
+
+        # Get total count
+        total_records = queryset.count()
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
 
 class EntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     class GenericFilterSet(django_filters.FilterSet):
