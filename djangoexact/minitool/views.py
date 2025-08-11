@@ -8,11 +8,30 @@ import minitool.serializers as serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q
+from django.db import connection
 from rest_framework.pagination import PageNumberPagination
 import api.models as api_models
 import statistics
 from collections import defaultdict
 from typing import Dict, List, Any
+from functools import wraps
+from .db_manager import managed_db_connection, cleanup_connections, get_connection_info
+
+
+def close_db_connections(view_func):
+    """Decorator to ensure database connections are closed after view execution."""
+
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        try:
+            return view_func(*args, **kwargs)
+        finally:
+            # Close all database connections
+            from django.db import connections
+
+            connections.close_all()
+
+    return wrapper
 
 
 class DefaultPagination(PageNumberPagination):
@@ -52,42 +71,48 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         """
         Aggregate data by change type with structured output using database queries.
         """
-        # Get all unique fields
-        fields = queryset.values_list("field", flat=True).distinct()
+        try:
+            # Get all unique fields
+            fields = queryset.values_list("field", flat=True).distinct()
 
-        results = []
-        for field in fields:
-            field_data = {"field": field, "changes": []}
+            results = []
+            for field in fields:
+                field_data = {"field": field, "changes": []}
 
-            # Get all changes for this field
-            field_changes = (
-                queryset.filter(field=field)
-                .values("from_value", "to_value")
-                .annotate(count=Sum("count"), sum_total=Sum("sum_total"), mean=Avg("mean"), median=Avg("median"), min_value=Min("min_value"), max_value=Max("max_value"), q1=Avg("q1"), q3=Avg("q3"))
-            )
+                # Get all changes for this field
+                field_changes = (
+                    queryset.filter(field=field)
+                    .values("from_value", "to_value")
+                    .annotate(
+                        count=Sum("count"), sum_total=Sum("sum_total"), mean=Avg("mean"), median=Avg("median"), min_value=Min("min_value"), max_value=Max("max_value"), q1=Avg("q1"), q3=Avg("q3")
+                    )
+                )
 
-            for change in field_changes:
-                change_data = {
-                    "from": change["from_value"],
-                    "to": change["to_value"],
-                    "statistics": {
-                        "count": change["count"],
-                        "sum": change["sum_total"],
-                        "mean": change["mean"],
-                        "median": change["median"],
-                        "min": change["min_value"],
-                        "max": change["max_value"],
-                        "q1": change["q1"],
-                        "q3": change["q3"],
-                    },
-                }
-                field_data["changes"].append(change_data)
+                for change in field_changes:
+                    change_data = {
+                        "from": change["from_value"],
+                        "to": change["to_value"],
+                        "statistics": {
+                            "count": change["count"],
+                            "sum": change["sum_total"],
+                            "mean": change["mean"],
+                            "median": change["median"],
+                            "min": change["min_value"],
+                            "max": change["max_value"],
+                            "q1": change["q1"],
+                            "q3": change["q3"],
+                        },
+                    }
+                    field_data["changes"].append(change_data)
 
-            # Sort changes by count (descending)
-            field_data["changes"].sort(key=lambda x: x["statistics"]["count"], reverse=True)
-            results.append(field_data)
+                # Sort changes by count (descending)
+                field_data["changes"].sort(key=lambda x: x["statistics"]["count"], reverse=True)
+                results.append(field_data)
 
-        return results
+            return results
+        finally:
+            # Ensure connections are cleaned up after heavy aggregation
+            cleanup_connections()
 
     def get_filtered_queryset(self, module_type, request, extra_filters=None):
         """Helper method to get filtered queryset for any module."""
@@ -219,6 +244,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         return Response(filters_with_entries)
 
     @decorators.action(detail=False, methods=["get"])
+    @close_db_connections
     def livestock(self, request, *args, **kwargs):
         """
         Get livestock emissions modules data with filtering and aggregation.
@@ -240,6 +266,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         return Response(response_data)
 
     @decorators.action(detail=False, methods=["get"], url_path="annual-cropland")
+    @close_db_connections
     def annual_cropland(self, request, *args, **kwargs):
         """
         Get annual cropland emissions modules data with filtering and aggregation.
@@ -261,6 +288,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         return Response(response_data)
 
     @decorators.action(detail=False, methods=["get"], url_path="flooded-rice")
+    @close_db_connections
     def flooded_rice(self, request, *args, **kwargs):
         """
         Get flooded rice emissions modules data with filtering and aggregation.
@@ -282,6 +310,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         return Response(response_data)
 
     @decorators.action(detail=False, methods=["get"], url_path="grassland")
+    @close_db_connections
     def grassland(self, request, *args, **kwargs):
         """
         Get grassland emissions modules data with filtering and aggregation.
@@ -550,6 +579,38 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         }
 
         return Response(summary_data)
+
+    @decorators.action(detail=False, methods=["get"], url_path="db-status")
+    def db_status(self, request, *args, **kwargs):
+        """Get database connection status for monitoring."""
+        try:
+            # Use the connection manager to get info
+            db_info = get_connection_info()
+            return Response(db_info)
+        except Exception as e:
+            return Response({"connection_healthy": False, "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @decorators.action(detail=False, methods=["get"], url_path="connection-stats")
+    def connection_stats(self, request, *args, **kwargs):
+        """Get detailed connection statistics for monitoring."""
+        try:
+            from django.db import connections
+
+            stats = {"total_connections": len(connections.all()), "databases": {}}
+
+            for db_name, db_connection in connections.all().items():
+                stats["databases"][db_name] = {
+                    "connected": db_connection.connection is not None,
+                    "settings": {
+                        "name": db_connection.settings_dict.get("NAME", "unknown"),
+                        "host": db_connection.settings_dict.get("HOST", "unknown"),
+                        "port": db_connection.settings_dict.get("PORT", "unknown"),
+                    },
+                }
+
+            return Response(stats)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
