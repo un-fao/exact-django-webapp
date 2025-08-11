@@ -7,14 +7,8 @@ from collections import defaultdict
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from minitool.models import (
-    LivestockChange,
-    LivestockChangeAggregate,
-    AnnualCroplandChange,
-    AnnualCroplandChangeAggregate,
-    FloodedRiceChange,
-    FloodedRiceChangeAggregate,
-    GrasslandChange,
-    GrasslandChangeAggregate,
+    ChangeRecord,
+    ChangeAggregate,
 )
 
 
@@ -94,48 +88,86 @@ class Command(BaseCommand):
         if show_progress:
             self.stdout.write(f"Loaded {total_records:,} records")
 
-        # Get model classes for this module type
-        change_model, aggregate_model = self.get_models_for_module(module_type)
-
-        if not change_model or not aggregate_model:
-            self.stdout.write(self.style.ERROR(f"Unknown module type: {module_type}"))
-            return
-
         # Clear existing data if requested
         if clear_existing:
             if show_progress:
                 self.stdout.write("Clearing existing data...")
-            change_model.objects.all().delete()
-            aggregate_model.objects.all().delete()
+            # Clear data for this specific module type
+            ChangeRecord.objects.filter(module_type__icontains=module_type.replace("-", " ").title()).delete()
+            ChangeAggregate.objects.filter(module_type__icontains=module_type.replace("-", " ").title()).delete()
             if show_progress:
                 self.stdout.write("Existing data cleared")
 
         # Import individual records
         if not aggregate_only:
-            self.import_individual_records(data, change_model, module_type, show_progress, total_records)
+            self.import_individual_records(data, module_type, show_progress, total_records)
 
         # Create aggregated data
-        self.create_aggregated_data(data, aggregate_model, module_type, show_progress, total_records)
+        self.create_aggregated_data(data, module_type, show_progress, total_records)
 
         if show_progress:
             self.stdout.write(self.style.SUCCESS(f"Import completed successfully for {module_type}!"))
         else:
             self.stdout.write(f"Import completed for {module_type}")
 
-    def get_models_for_module(self, module_type):
-        """Get the appropriate model classes for a module type."""
-        model_mapping = {
-            "livestock": (LivestockChange, LivestockChangeAggregate),
-            "annual-cropland": (AnnualCroplandChange, AnnualCroplandChangeAggregate),
-            "flooded-rice": (FloodedRiceChange, FloodedRiceChangeAggregate),
-            "grassland": (GrasslandChange, GrasslandChangeAggregate),
-        }
-        return model_mapping.get(module_type, (None, None))
+    def identify_filter_columns(self, data, module_type):
+        """
+        Identify filter columns based on the rule:
+        - If a column is not numerical and doesn't end with "_start", "_w", or "_wo",
+          it should be used as a filter
+        """
+        if not data:
+            return []
 
-    def import_individual_records(self, data, change_model, module_type, show_progress, total_records):
+        # Get all unique keys from the data
+        all_keys = set()
+        for record in data:
+            all_keys.update(record.keys())
+
+        # Standard filter columns that are always included
+        standard_filters = {"module_type", "region", "climate", "moisture", "soil_type", "total", "changes"}
+
+        # Identify custom filter columns
+        custom_filters = []
+        for key in all_keys:
+            if key in standard_filters:
+                continue
+
+            # Check if it's a numerical field by looking at the first few records
+            is_numerical = True
+            for record in data[:10]:  # Check first 10 records
+                if key in record:
+                    value = record[key]
+                    if value is not None and value != "":
+                        try:
+                            float(value)
+                        except (ValueError, TypeError):
+                            is_numerical = False
+                            break
+
+            # If not numerical and doesn't end with excluded suffixes, it's a filter
+            if not is_numerical and not any(key.endswith(suffix) for suffix in ["_start", "_w", "_wo"]):
+                custom_filters.append(key)
+
+        return custom_filters
+
+    def extract_filter_fields(self, record, filter_columns):
+        """Extract filter fields from a record."""
+        filter_fields = {}
+        for column in filter_columns:
+            if column in record:
+                filter_fields[column] = record.get(column, "")
+        return filter_fields
+
+    def import_individual_records(self, data, module_type, show_progress, total_records):
         """Import individual change records."""
         if show_progress:
             self.stdout.write("Importing individual records...")
+
+        # Identify filter columns for this module
+        filter_columns = self.identify_filter_columns(data, module_type)
+        if show_progress and filter_columns:
+            self.stdout.write(f"Identified filter columns: {', '.join(filter_columns)}")
 
         records_created = 0
         records_skipped = 0
@@ -157,8 +189,8 @@ class Command(BaseCommand):
                 soil_type = record.get("soil_type", "")
                 total = record.get("total", 0)
 
-                # Extract module-specific fields
-                extra_fields = self.extract_module_specific_fields(record, module_type)
+                # Extract custom filter fields
+                filter_fields = self.extract_filter_fields(record, filter_columns)
 
                 for change in record.get("changes", []):
                     field = change.get("field", "")
@@ -171,7 +203,7 @@ class Command(BaseCommand):
                         continue
 
                     # Create or update record
-                    change_record, created = change_model.objects.get_or_create(
+                    change_record, created = ChangeRecord.objects.get_or_create(
                         module_type=module_type_value,
                         region=region,
                         climate=climate,
@@ -180,7 +212,7 @@ class Command(BaseCommand):
                         field=field,
                         from_value=str(from_value),
                         to_value=str(to_value),
-                        **{k: v for k, v in extra_fields.items() if k in change_model._meta.get_fields()},
+                        custom_filters=filter_fields,
                         defaults={"total": total},
                     )
 
@@ -197,22 +229,13 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"Individual records: {records_created:,} created, {records_skipped:,} skipped")
 
-    def extract_module_specific_fields(self, record, module_type):
-        """Extract module-specific fields from the record."""
-        extra_fields = {}
-
-        if module_type == "livestock":
-            extra_fields["livestock_category_type"] = record.get("livestock_category_type", "")
-        elif module_type == "grassland":
-            # Grassland has a 'module' field but we use module_type as the main identifier
-            pass
-
-        return extra_fields
-
-    def create_aggregated_data(self, data, aggregate_model, module_type, show_progress, total_records):
+    def create_aggregated_data(self, data, module_type, show_progress, total_records):
         """Create aggregated change statistics."""
         if show_progress:
             self.stdout.write("Creating aggregated data...")
+
+        # Identify filter columns for this module
+        filter_columns = self.identify_filter_columns(data, module_type)
 
         # Group data by change type and filters
         aggregations = {}
@@ -235,12 +258,13 @@ class Command(BaseCommand):
                 if not all([field, from_value, to_value]):
                     continue
 
-                # Create aggregation key
-                key_parts = [field, str(from_value), str(to_value), record.get("region"), record.get("climate"), record.get("moisture"), record.get("soil_type")]
+                # Create aggregation key with standard fields
+                key_parts = [field, str(from_value), str(to_value), record.get("region"), record.get("climate"), record.get("moisture"), record.get("soil_type"), record.get("module_type")]
 
-                # Add module-specific fields to the key
-                if module_type == "livestock":
-                    key_parts.append(record.get("livestock_category_type", ""))
+                # Add custom filter fields to the key
+                for column in filter_columns:
+                    if column in record:
+                        key_parts.append(record.get(column, ""))
 
                 key = tuple(key_parts)
 
@@ -266,18 +290,21 @@ class Command(BaseCommand):
                     self.update_progress("Saving Aggregations", processed_aggregations, total_aggregations, records_created, records_updated)
 
                 # Extract key parts
-                if module_type == "livestock":
-                    field, from_value, to_value, region, climate, moisture, soil_type, livestock_category_type = key
-                    extra_fields = {"livestock_category_type": livestock_category_type}
-                else:
-                    field, from_value, to_value, region, climate, moisture, soil_type = key
-                    extra_fields = {}
+                base_parts = 8  # field, from_value, to_value, region, climate, moisture, soil_type, module_type
+                field, from_value, to_value, region, climate, moisture, soil_type, module_type = key[:base_parts]
+
+                # Extract custom filter fields
+                custom_filters = {}
+                for i, column in enumerate(filter_columns):
+                    if i < len(key) - base_parts:
+                        custom_filters[column] = key[base_parts + i]
 
                 # Calculate statistics
                 stats = self.calculate_statistics(values)
 
                 # Create or update aggregated record
-                aggregate_record, created = aggregate_model.objects.get_or_create(
+                aggregate_record, created = ChangeAggregate.objects.get_or_create(
+                    module_type=module_type,
                     field=field,
                     from_value=from_value,
                     to_value=to_value,
@@ -285,7 +312,7 @@ class Command(BaseCommand):
                     climate=climate,
                     moisture=moisture,
                     soil_type=soil_type,
-                    **{k: v for k, v in extra_fields.items() if k in aggregate_model._meta.get_fields()},
+                    custom_filters=custom_filters,
                     defaults={
                         "count": stats["count"],
                         "sum_total": stats["sum"],

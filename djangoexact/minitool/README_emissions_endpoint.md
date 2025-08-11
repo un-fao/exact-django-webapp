@@ -10,13 +10,56 @@ GET /minitool/emissions/modules/livestock/
 
 ## Query Parameters
 
-### Filter Parameters
+### Standard Filter Parameters
 - `region` - Filter by region (e.g., "Eastern Africa", "Central Africa")
 - `climate` - Filter by climate (e.g., "Warm Temperate", "Tropical", "Boreal")
 - `moisture` - Filter by moisture (e.g., "Dry", "Moist")
 - `soil_type` - Filter by soil type (e.g., "Wetland", "High Activity Clay", "Sandy")
-- `livestock_category_type` - Filter by livestock category (e.g., "Dairy Cattle", "Other Cattle")
 - `field` - Filter by change field (e.g., "livestock_production_type")
+
+### Module-Specific Filter Parameters
+- `livestock_category_type` - Filter by livestock category (e.g., "Dairy Cattle", "Other Cattle") - **Livestock only**
+
+### Custom Filter Parameters
+The system automatically detects custom filter columns based on the data. Any column that is not numerical and doesn't end with "_start", "_w", or "_wo" is treated as a filter. These custom filters are stored in the `custom_filters` JSONField and can be queried directly.
+
+For example, if your data has a custom column like `livestock_category_type`, you can filter by it directly:
+```
+GET /minitool/emissions/modules/livestock/?livestock_category_type=Dairy%20Cattle
+```
+
+## Available Custom Filters
+
+To discover what custom filters are available for each module, use the custom-filters endpoints:
+
+### Livestock
+```
+GET /minitool/emissions/modules/livestock/custom-filters/
+```
+
+### Annual Cropland
+```
+GET /minitool/emissions/modules/annual-cropland/custom-filters/
+```
+
+### Flooded Rice
+```
+GET /minitool/emissions/modules/flooded-rice/custom-filters/
+```
+
+### Grassland
+```
+GET /minitool/emissions/modules/grassland/custom-filters/
+```
+
+These endpoints return a JSON object with available custom filter fields and their possible values:
+
+```json
+{
+  "livestock_category_type": ["Dairy Cattle", "Other Cattle", "Sheep", "Goats"],
+  "production_system": ["Intensive", "Extensive", "Mixed"]
+}
+```
 
 ## Response Format
 
@@ -24,7 +67,8 @@ GET /minitool/emissions/modules/livestock/
 {
   "filters_applied": {
     "region": "Eastern Africa",
-    "climate": "Warm Temperate"
+    "climate": "Warm Temperate",
+    "livestock_category_type": "Dairy Cattle"
   },
   "total_records_analyzed": 72,
   "aggregated_results": {
@@ -79,14 +123,24 @@ GET /minitool/emissions/modules/livestock/?region=Eastern%20Africa
 GET /minitool/emissions/modules/livestock/?region=Eastern%20Africa&climate=Warm%20Temperate&moisture=Dry
 ```
 
-### Filter by livestock category
+### Filter by livestock category (standard field)
 ```
 GET /minitool/emissions/modules/livestock/?livestock_category_type=Dairy%20Cattle
+```
+
+### Filter by custom field
+```
+GET /minitool/emissions/modules/livestock/?production_system=Intensive
 ```
 
 ### Filter by specific field
 ```
 GET /minitool/emissions/modules/livestock/?field=livestock_production_type
+```
+
+### Get available custom filters
+```
+GET /minitool/emissions/modules/livestock/custom-filters/
 ```
 
 ## Data Models
@@ -99,20 +153,26 @@ Stores individual livestock change records with all metadata and the change deta
 ### LivestockChangeAggregate
 Stores pre-aggregated statistics for each change type, enabling fast querying and filtering.
 
+Both models include a `custom_filters` JSONField that stores dynamic filter columns.
+
 ## Data Import
 
 To import data from the JSON file into the database models, use the management command:
 
 ```bash
 # Import all data (clears existing data first)
-python manage.py import_livestock_changes --clear
+python manage.py import_changes --all --clear
 
-# Import with custom file path
-python manage.py import_livestock_changes --file path/to/livestock_changes.json
+# Import specific module
+python manage.py import_changes --file livestock_changes.json --module-type livestock
 
 # Import only aggregated data (skip individual records)
-python manage.py import_livestock_changes --aggregate-only
+python manage.py import_changes --all --aggregate-only
 ```
+
+The import command automatically detects custom filter columns based on the rule:
+- If a column is not numerical and doesn't end with "_start", "_w", or "_wo", it's treated as a filter
+- These custom filters are stored in the `custom_filters` JSONField
 
 ## Performance
 
@@ -120,4 +180,5 @@ The endpoint uses database queries and pre-aggregated statistics for optimal per
 - Filtering is done at the database level
 - Statistics are pre-calculated and stored
 - Queries are optimized with database indexes
+- JSON field filtering is supported for custom filters
 - Results are returned in a structured format for easy consumption

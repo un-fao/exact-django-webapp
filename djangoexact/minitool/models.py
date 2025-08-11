@@ -55,7 +55,12 @@ class EmissionStatisticsByModule(models.Model):
         unique_together = ["module_type", "region", "climate", "moisture", "soil_type"]
 
 
-class BaseChange(models.Model):
+class ChangeRecord(models.Model):
+    """
+    Generalized model to store individual change records for all module types.
+    Uses custom_filters JSONField to store module-specific filter data.
+    """
+
     module_type = models.CharField(max_length=255)
     region = models.CharField(max_length=255)
     climate = models.CharField(max_length=255)
@@ -65,10 +70,11 @@ class BaseChange(models.Model):
     field = models.CharField(max_length=255)
     from_value = models.CharField(max_length=255)
     to_value = models.CharField(max_length=255)
+    # Store all custom filter columns as JSON
+    custom_filters = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        abstract = True
-        unique_together = ["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value"]
+        unique_together = ["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value", "custom_filters"]
         indexes = [
             models.Index(fields=["module_type"]),
             models.Index(fields=["region"]),
@@ -76,58 +82,21 @@ class BaseChange(models.Model):
             models.Index(fields=["moisture"]),
             models.Index(fields=["soil_type"]),
             models.Index(fields=["field"]),
+            # Index the JSONField for better performance
+            models.Index(fields=["custom_filters"], name="changerecord_custom_idx"),
         ]
 
     def __str__(self):
         return f"{self.module_type} - {self.region} - {self.field}: {self.from_value} -> {self.to_value}"
 
 
-class LivestockChange(BaseChange):
+class ChangeAggregate(models.Model):
     """
-    Model to store individual livestock change records.
-    """
-
-    module_type = models.CharField(max_length=255, default="Livestock")
-    livestock_category_type = models.CharField(max_length=255)
-
-    class Meta:
-        unique_together = ["module_type", "region", "climate", "moisture", "soil_type", "livestock_category_type", "field", "from_value", "to_value"]
-        indexes = [
-            models.Index(fields=["module_type"]),
-            models.Index(fields=["region"]),
-            models.Index(fields=["climate"]),
-            models.Index(fields=["moisture"]),
-            models.Index(fields=["soil_type"]),
-            models.Index(fields=["field"]),
-            models.Index(fields=["livestock_category_type"]),
-        ]
-
-
-class AnnualCroplandChange(BaseChange):
-    """
-    Model to store individual annual cropland change records.
+    Generalized model to store pre-aggregated change statistics for all module types.
+    Uses custom_filters JSONField to store module-specific filter data.
     """
 
-    module_type = models.CharField(max_length=255, default="Annual Cropland")
-
-
-class FloodedRiceChange(BaseChange):
-    """
-    Model to store individual flooded rice change records.
-    """
-
-    module_type = models.CharField(max_length=255, default="Flooded Rice")
-
-
-class GrasslandChange(BaseChange):
-    """
-    Model to store individual grassland change records.
-    """
-
-    module_type = models.CharField(max_length=255, default="Grassland")
-
-
-class BaseChangeAggregate(models.Model):
+    module_type = models.CharField(max_length=255)
     field = models.CharField(max_length=255)
     from_value = models.CharField(max_length=255)
     to_value = models.CharField(max_length=255)
@@ -135,6 +104,8 @@ class BaseChangeAggregate(models.Model):
     climate = models.CharField(max_length=255, null=True, blank=True)
     moisture = models.CharField(max_length=255, null=True, blank=True)
     soil_type = models.CharField(max_length=255, null=True, blank=True)
+    # Store all custom filter columns as JSON
+    custom_filters = models.JSONField(default=dict, blank=True)
 
     count = models.IntegerField()
     sum_total = models.FloatField()
@@ -146,62 +117,89 @@ class BaseChangeAggregate(models.Model):
     q3 = models.FloatField()
 
     class Meta:
-        abstract = True
-        unique_together = ["field", "from_value", "to_value", "region", "climate", "moisture", "soil_type"]
+        unique_together = ["module_type", "field", "from_value", "to_value", "region", "climate", "moisture", "soil_type", "custom_filters"]
         indexes = [
+            models.Index(fields=["module_type"]),
             models.Index(fields=["field"]),
             models.Index(fields=["region"]),
             models.Index(fields=["climate"]),
             models.Index(fields=["moisture"]),
             models.Index(fields=["soil_type"]),
+            # Index the JSONField for better performance
+            models.Index(fields=["custom_filters"], name="changeaggregate_custom_idx"),
         ]
 
     def __str__(self):
         return f"{self.field}: {self.from_value} -> {self.to_value} (Count: {self.count})"
 
 
-class LivestockChangeAggregate(BaseChangeAggregate):
-    """
-    Model to store pre-aggregated livestock change statistics.
-    """
-
-    # Filter fields
-    livestock_category_type = models.CharField(max_length=255)
+# Legacy model aliases for backward compatibility
+# These can be removed after updating all references
+class BaseChange(ChangeRecord):
+    """Legacy alias for backward compatibility."""
 
     class Meta:
-        unique_together = ["field", "from_value", "to_value", "region", "climate", "moisture", "soil_type", "livestock_category_type"]
-        indexes = [
-            models.Index(fields=["field"]),
-            models.Index(fields=["region"]),
-            models.Index(fields=["climate"]),
-            models.Index(fields=["moisture"]),
-            models.Index(fields=["soil_type"]),
-            models.Index(fields=["livestock_category_type"]),
-        ]
-
-    def __str__(self):
-        return f"{self.field}: {self.from_value} -> {self.to_value} (Count: {self.count})"
+        proxy = True
 
 
-class AnnualCroplandChangeAggregate(BaseChangeAggregate):
-    """
-    Model to store pre-aggregated annual cropland change statistics.
-    """
+class BaseChangeAggregate(ChangeAggregate):
+    """Legacy alias for backward compatibility."""
 
-    pass
-
-
-class FloodedRiceChangeAggregate(BaseChangeAggregate):
-    """
-    Model to store pre-aggregated flooded rice change statistics.
-    """
-
-    pass
+    class Meta:
+        proxy = True
 
 
-class GrasslandChangeAggregate(BaseChangeAggregate):
-    """
-    Model to store pre-aggregated grassland change statistics.
-    """
+class LivestockChange(ChangeRecord):
+    """Legacy alias for backward compatibility."""
 
-    pass
+    class Meta:
+        proxy = True
+
+
+class LivestockChangeAggregate(ChangeAggregate):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class AnnualCroplandChange(ChangeRecord):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class AnnualCroplandChangeAggregate(ChangeAggregate):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class FloodedRiceChange(ChangeRecord):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class FloodedRiceChangeAggregate(ChangeAggregate):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class GrasslandChange(ChangeRecord):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True
+
+
+class GrasslandChangeAggregate(ChangeAggregate):
+    """Legacy alias for backward compatibility."""
+
+    class Meta:
+        proxy = True

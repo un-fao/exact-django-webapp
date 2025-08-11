@@ -559,7 +559,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     fields.update(
         {
             "climate_moistures": climate_moistures,
-            "soil_types": models.SoilType.objects.filter(is_coastal=False).all(),
+            "soil_types": models.SoilType.objects.filter(is_coastal=False, active=True).all(),
             "region": models.Region.objects.all(),
         }
     )
@@ -646,7 +646,7 @@ def run():
     GRASSLAND = False
     LIVESTOCK = True
 
-    MAX_ROWS = 10000
+    MAX_ROWS = None
 
     if GRASSLAND:
         compute_permutations(

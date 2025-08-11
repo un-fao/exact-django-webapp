@@ -112,3 +112,4 @@ djangoexact/.commitizen/openai_cache.json
 djangoexact/djangoexact/.env.minitool
 djangoexact/minitool.db
 djangoexact/minitool.db
+djangoexact/minitool/data/changes/livestock_changes.json

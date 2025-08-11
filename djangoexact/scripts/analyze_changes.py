@@ -198,7 +198,7 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
     return output_path
 
 
-def main():
+def run():
     """Main function to run the analysis."""
     import argparse
 
@@ -215,10 +215,3 @@ def main():
         print(f"Output file: {output_path}")
     except Exception as e:
         print(f"Error: {e}")
-        return 1
-
-    return 0
-
-
-if __name__ == "__main__":
-    exit(main())
