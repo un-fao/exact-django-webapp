@@ -154,14 +154,34 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return custom_filters
 
+    def get_fields_with_entries(self, queryset):
+        """Helper method to get fields with their unique entries."""
+        fields = queryset.values_list("field", flat=True).distinct()
+
+        # Get unique entries for each field
+        fields_with_entries = []
+        for field in fields:
+            # Get unique from_value and to_value entries for this field
+            from_values = queryset.filter(field=field).values_list("from_value", flat=True).distinct()
+            to_values = queryset.filter(field=field).values_list("to_value", flat=True).distinct()
+
+            # Combine and deduplicate all unique values
+            all_values = list(set(list(from_values) + list(to_values)))
+
+            field_data = {"field": field, "unique_entries": sorted(all_values) if all_values else []}
+            fields_with_entries.append(field_data)
+
+        return fields_with_entries
+
     @decorators.action(detail=False, methods=["get"])
     def fields(self, request, *args, **kwargs):
         """
         Get fields for emissions modules data with filtering and aggregation.
+        Returns both field names and their unique entries.
         """
         queryset = models.ChangeAggregate.objects.all()
-        fields = queryset.values_list("field", flat=True).distinct()
-        return Response(list(fields))
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
 
     @decorators.action(detail=False, methods=["get"])
     def livestock(self, request, *args, **kwargs):
@@ -250,10 +270,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     # Nested actions for livestock module
     @decorators.action(detail=False, methods=["get"], url_path="livestock/fields")
     def livestock_fields(self, request, *args, **kwargs):
-        """Get available fields for livestock data."""
+        """Get available fields for livestock data with their unique entries."""
         queryset = models.ChangeAggregate.objects.filter(module_type="Livestock")
-        fields = queryset.values_list("field", flat=True).distinct()
-        return Response(list(fields))
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/categories")
     def livestock_categories(self, request, *args, **kwargs):
@@ -289,10 +309,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     # Nested actions for annual cropland module
     @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/fields")
     def annual_cropland_fields(self, request, *args, **kwargs):
-        """Get available fields for annual cropland data."""
+        """Get available fields for annual cropland data with their unique entries."""
         queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
-        fields = queryset.values_list("field", flat=True).distinct()
-        return Response(list(fields))
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
 
     @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/regions")
     def annual_cropland_regions(self, request, *args, **kwargs):
@@ -321,10 +341,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     # Nested actions for flooded rice module
     @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/fields")
     def flooded_rice_fields(self, request, *args, **kwargs):
-        """Get available fields for flooded rice data."""
+        """Get available fields for flooded rice data with their unique entries."""
         queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
-        fields = queryset.values_list("field", flat=True).distinct()
-        return Response(list(fields))
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
 
     @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/regions")
     def flooded_rice_regions(self, request, *args, **kwargs):
@@ -353,10 +373,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     # Nested actions for grassland module
     @decorators.action(detail=False, methods=["get"], url_path="grassland/fields")
     def grassland_fields(self, request, *args, **kwargs):
-        """Get available fields for grassland data."""
+        """Get available fields for grassland data with their unique entries."""
         queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
-        fields = queryset.values_list("field", flat=True).distinct()
-        return Response(list(fields))
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
 
     @decorators.action(detail=False, methods=["get"], url_path="grassland/regions")
     def grassland_regions(self, request, *args, **kwargs):
