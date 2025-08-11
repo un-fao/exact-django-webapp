@@ -173,6 +173,27 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return fields_with_entries
 
+    def get_filters_with_entries(self, queryset, custom_only=False):
+        """Helper method to get filters with their unique entries."""
+        filters_with_entries = {}
+
+        # Standard filters (only include if custom_only is False)
+        if not custom_only:
+            standard_filters = ["region", "climate", "moisture", "soil_type"]
+            for filter_name in standard_filters:
+                values = queryset.values_list(filter_name, flat=True).distinct()
+                filters_with_entries[filter_name] = sorted(list(values)) if values else []
+
+        # Custom filters
+        if queryset.exists():
+            first_record = queryset.first()
+            if hasattr(first_record, "custom_filters") and first_record.custom_filters:
+                for filter_name in first_record.custom_filters.keys():
+                    values = queryset.exclude(custom_filters__isnull=True).exclude(custom_filters={}).values_list(f"custom_filters__{filter_name}", flat=True).distinct()
+                    filters_with_entries[filter_name] = sorted(list(values)) if values else []
+
+        return filters_with_entries
+
     @decorators.action(detail=False, methods=["get"])
     def fields(self, request, *args, **kwargs):
         """
@@ -182,6 +203,20 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         queryset = models.ChangeAggregate.objects.all()
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"])
+    def filters(self, request, *args, **kwargs):
+        """
+        Get filters for emissions modules data with filtering and aggregation.
+        Returns both standard filters and custom filters with their unique entries.
+
+        Query parameters:
+        - custom_only: If 'true', returns only custom module filters (default: false)
+        """
+        queryset = models.ChangeAggregate.objects.all()
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
 
     @decorators.action(detail=False, methods=["get"])
     def livestock(self, request, *args, **kwargs):
@@ -275,6 +310,19 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
 
+    @decorators.action(detail=False, methods=["get"], url_path="livestock/filters")
+    def livestock_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for livestock data with their unique entries.
+
+        Query parameters:
+        - custom_only: If 'true', returns only custom module filters (default: false)
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Livestock")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
     @decorators.action(detail=False, methods=["get"], url_path="livestock/categories")
     def livestock_categories(self, request, *args, **kwargs):
         """Get available livestock categories."""
@@ -314,6 +362,19 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
 
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/filters")
+    def annual_cropland_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for annual cropland data with their unique entries.
+
+        Query parameters:
+        - custom_only: If 'true', returns only custom module filters (default: false)
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
     @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/regions")
     def annual_cropland_regions(self, request, *args, **kwargs):
         """Get available regions for annual cropland data."""
@@ -346,6 +407,19 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
 
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/filters")
+    def flooded_rice_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for flooded rice data with their unique entries.
+
+        Query parameters:
+        - custom_only: If 'true', returns only custom module filters (default: false)
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
     @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/regions")
     def flooded_rice_regions(self, request, *args, **kwargs):
         """Get available regions for flooded rice data."""
@@ -377,6 +451,19 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland/filters")
+    def grassland_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for grassland data with their unique entries.
+
+        Query parameters:
+        - custom_only: If 'true', returns only custom module filters (default: false)
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
 
     @decorators.action(detail=False, methods=["get"], url_path="grassland/regions")
     def grassland_regions(self, request, *args, **kwargs):
