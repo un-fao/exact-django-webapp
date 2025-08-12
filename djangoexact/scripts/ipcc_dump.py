@@ -4922,6 +4922,17 @@ def change_aggregate_from_floodedrice_to_flooded_rice():
     print("Done")
 
 
+def delete_all_floodedrice_module_type_entries_from_aggregates():
+    """
+    Delete all Flooded Rice module type entries from the aggregates.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Deleting all Flooded Rice module type entries from the aggregates")
+    ChangeAggregate.objects.filter(module_type__exact="floodedrice").delete()
+    print("Done")
+
+
 def run():
     import os
 

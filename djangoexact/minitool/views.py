@@ -244,6 +244,54 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         return Response(filters_with_entries)
 
     @decorators.action(detail=False, methods=["get"])
+    def types(self, request, *args, **kwargs):
+        """
+        Get available module types in statistics/modules.
+        Returns a list of all available module types with their details.
+        """
+        # Get all unique module types from the database
+        module_types = models.ChangeAggregate.objects.values_list("module_type", flat=True).distinct()
+
+        # Build response with dynamic module information
+        available_modules = []
+        for module_type in module_types:
+            # Get module-specific queryset
+            queryset = models.ChangeAggregate.objects.filter(module_type=module_type)
+
+            # Generate dynamic module ID (convert to lowercase, replace spaces with hyphens)
+            module_id = module_type.lower().replace(" ", "-")
+
+            # Get custom filters dynamically
+            custom_filters = []
+            if queryset.exists():
+                first_record = queryset.first()
+                if hasattr(first_record, "custom_filters") and first_record.custom_filters:
+                    custom_filters = list(first_record.custom_filters.keys())
+
+            # Get all available filters for this module
+            available_filters = list(self.get_filters_with_entries(queryset, custom_only=False).keys())
+
+            # Build module data dynamically
+            module_data = {
+                "id": module_id,
+                "name": module_type,
+                "display_name": module_type,
+                "description": f"{module_type} emissions and management data",
+                "has_custom_filters": len(custom_filters) > 0,
+                "custom_filters": custom_filters,
+                "endpoint": f"/statistics/modules/{module_id}/",
+                "total_records": queryset.count(),
+                "total_changes": queryset.aggregate(total=Sum("count"))["total"] or 0,
+                "unique_fields": queryset.values("field").distinct().count(),
+                "unique_regions": queryset.values("region").distinct().count(),
+                "available_filters": available_filters,
+            }
+
+            available_modules.append(module_data)
+
+        return Response({"available_modules": available_modules, "total_modules": len(available_modules), "modules": [module["id"] for module in available_modules]})
+
+    @decorators.action(detail=False, methods=["get"])
     @close_db_connections
     def livestock(self, request, *args, **kwargs):
         """
