@@ -150,6 +150,10 @@ if os.getenv("GAE_APPLICATION", None):
         "minitool": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": os.path.join(BASE_DIR, "minitool.db"),
+            "OPTIONS": {
+                "timeout": 20,
+                "check_same_thread": False,
+            },
         },
     }
 else:
