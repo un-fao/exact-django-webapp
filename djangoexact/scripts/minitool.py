@@ -647,9 +647,9 @@ def run():
     import api.models as models
 
     ANNUAL_CROPLAND = False
-    FLOODED_RICE = False
+    FLOODED_RICE = True
     GRASSLAND = False
-    LIVESTOCK = True
+    LIVESTOCK = False
 
     MAX_ROWS = None
 

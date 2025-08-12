@@ -4683,7 +4683,11 @@ def clear_cache_of_all_modules():
         if issubclass(model, (CachedResultMixin)) and not model._meta.abstract:
             instances.extend(model.objects.all())
 
-    instances = [instance for instance in instances if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])]
+    instances = [
+        instance
+        for instance in instances
+        if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])
+    ]
 
     log.debug(f"Clearing cache for {len(instances)} instances")
 
@@ -4905,6 +4909,17 @@ def convert_storage_refrigerant_ef_from_kg_to_tonnes():
             ef.value /= 1000  # Convert kg to tonnes
             ef.save()
             print(f"Updated {ef} to {ef.value} tonnes")
+
+
+def change_aggregate_from_floodedrice_to_flooded_rice():
+    """
+    Change the aggregate from FloodedRice to Flooded Rice.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Changing aggregate from FloodedRice to Flooded Rice")
+    ChangeAggregate.objects.filter(module_type__iexact="flooded_rice").update(module_type="Flooded Rice")
+    print("Done")
 
 
 def run():

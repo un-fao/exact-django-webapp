@@ -87,10 +87,17 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
             if start_value != w_value:
                 row_changes.append({"field": base_name, "from": start_value, "to": w_value})
 
+        module_mapping = {
+            "livestock": "Livestock",
+            "annualcropland": "Annual Cropland",
+            "grassland": "Grassland",
+            "floodedrice": "Flooded Rice",
+        }
+
         # Only add to results if there are changes
         if row_changes:
             record = {
-                "module_type": row_module_type,
+                "module_type": module_mapping.get(row_module_type.lower(), row_module_type),
                 "region": region,
                 "climate": climate,
                 "moisture": moisture,
@@ -124,14 +131,8 @@ def get_module_type_from_filename(file_path: str) -> str:
     module_mapping = {
         "livestock": "Livestock",
         "annualcropland": "Annual Cropland",
-        "perennialcropland": "Perennial Cropland",
         "grassland": "Grassland",
-        "forest": "Forest",
-        "wetland": "Wetland",
-        "aquaculture": "Aquaculture",
-        "fishery": "Fishery",
-        "settlement": "Settlement",
-        "infrastructure": "Infrastructure",
+        "floodedrice": "Flooded Rice",
     }
 
     for key, value in module_mapping.items():
@@ -199,18 +200,9 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
 
 
 def run():
-    """Main function to run the analysis."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Analyze CSV files for changes between _start and _w columns")
-    parser.add_argument("csv_file", help="Path to the CSV file to analyze")
-    parser.add_argument("--output", "-o", help="Output JSON file path")
-    parser.add_argument("--module-type", "-m", help="Module type override")
-
-    args = parser.parse_args()
-
     try:
-        output_path = analyze_csv_file(args.csv_file, args.output, args.module_type)
+        for module_type in ["floodedrice", "annualcropland", "grassland", "livestock"]:
+            output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
         print(f"\nAnalysis completed successfully!")
         print(f"Output file: {output_path}")
     except Exception as e:
