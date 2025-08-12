@@ -909,7 +909,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                 # TODO: Maybe instead of checking the module type we can check the instance class?
 
-                if luc.module_type not in kept_module_types:
+                if luc and luc.module_type not in kept_module_types:
                     module_instance.land_use_change = None
                     module_instance.save()
                     continue
