@@ -43,7 +43,6 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["grassland_management_type_start"] = models.GrasslandManagementType.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
@@ -91,7 +90,6 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         self.assertNotEqual(old_balance, new_balance)
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["grassland_management_type_start"] = None
         response = self.edit_module(self.module, self.user, validated_data)
@@ -100,7 +98,6 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -112,7 +109,6 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -122,3 +118,13 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(type(response.data) == dict)
+
+    def test_that_changing_grassland_management_type_changes_fi_in_defaults(self):
+        self.test_get_defaults()
+
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["grassland_management_type_start"] = models.GrasslandManagementType.objects.order_by("?").first().id
+        response = self.edit_module(self.module, self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "READY")
