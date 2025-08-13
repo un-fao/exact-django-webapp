@@ -97,6 +97,10 @@ def snake_case(str):
     return "".join(res)
 
 
+def snake_case_to_readable(str):
+    return " ".join(str.split("_")).title()
+
+
 def sanitize_for_model(str: str):
     return str.replace(" ", "").replace("-", "").replace("_", "")
 
