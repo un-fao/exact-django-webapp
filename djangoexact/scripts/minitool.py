@@ -256,6 +256,30 @@ class FloodedRiceData(BaseData):
         }
 
 
+@dataclass
+class PerennialCroplandData(BaseData):
+    def __post_init__(self):
+        super().__post_init__()
+        # self.module: "models.PerennialCropland"
+        self.land_use_type_start = self.module.land_use_type_start.name if self.module.land_use_type_start else None
+        self.land_use_type_w = self.module.land_use_type_w.name if self.module.land_use_type_w else None
+        self.land_use_type_wo = self.module.land_use_type_start.name if self.module.land_use_type_start else None
+        self.tillage_management_type_start = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
+        self.tillage_management_type_w = self.module.tillage_management_type_w.name if self.module.tillage_management_type_w else None
+        self.tillage_management_type_wo = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "land_use_type_start": self.land_use_type_start,
+            "land_use_type_w": self.land_use_type_w,
+            "land_use_type_wo": self.land_use_type_wo,
+            "tillage_management_type_start": self.tillage_management_type_start,
+            "tillage_management_type_w": self.tillage_management_type_w,
+            "tillage_management_type_wo": self.tillage_management_type_wo,
+        }
+
+
 def compute_data(data: list[BaseData]):
     df = pd.DataFrame(data)
     result = df.agg(
@@ -279,8 +303,10 @@ def build_data(module):
         return GrasslandData(module).to_dict()
     elif module.__class__.__name__ == "FloodedRice":
         return FloodedRiceData(module).to_dict()
+    elif module.__class__.__name__ == "PerennialCropland":
+        return PerennialCroplandData(module).to_dict()
     else:
-        raise ValueError(f"Unsupported module type: {type(module)}")
+        raise ValueError(f"Unsupported module type: {module.__class__.__name__}")
 
 
 # Because "runscript" sets up Django automatically for the parent process,
@@ -538,6 +564,60 @@ def process_combinations_floodedrice(combo):
     return module
 
 
+def process_combinations_perennialcropland(combo):
+    import api.tests.factories as factories
+    import api.calculators as calculators
+    import api.models as models
+
+    logging.getLogger().setLevel(logging.CRITICAL)
+
+    # organic_input_type
+    # tillage_management_type
+
+    (
+        land_use_type_start,
+        land_use_type_w,
+        organic_input_type_start,
+        organic_input_type_w,
+        tillage_management_type_start,
+        tillage_management_type_w,
+        climate_moisture,
+        soil_type,
+        region,
+    ) = combo
+    climate, moisture = climate_moisture
+
+    p = factories.ProjectFactory.build(
+        climate=climate,
+        moisture=moisture,
+        soil_type=soil_type,
+        country=region.countries.order_by("?").first(),
+    )
+    a = factories.ActivityFactory.build(project=p)
+    module = factories.PerennialCroplandFactory.build(
+        activity=a,
+        area=1,
+        land_use_type_start=land_use_type_start,
+        land_use_type_w=land_use_type_w,
+        land_use_type_wo=land_use_type_start,
+        organic_input_type_start=organic_input_type_start,
+        organic_input_type_w=organic_input_type_w,
+        organic_input_type_wo=organic_input_type_start,
+        tillage_management_type_start=tillage_management_type_start,
+        tillage_management_type_w=tillage_management_type_w,
+        tillage_management_type_wo=tillage_management_type_start,
+    )
+
+    try:
+        balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
+    except Exception as e:
+        return None
+
+    module = build_data(module)
+    module["total"] = balance
+    return module
+
+
 def chunked_product(*iterables, chunk_size=1000):
     """
     Yields chunks (lists) of the Cartesian product of `iterables`
@@ -551,7 +631,7 @@ def chunked_product(*iterables, chunk_size=1000):
         yield chunk
 
 
-def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
+def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None, is_coastal=False):
     import api.models as models
     import math
 
@@ -564,7 +644,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     fields.update(
         {
             "climate_moistures": climate_moistures,
-            "soil_types": models.SoilType.objects.filter(is_coastal=False, active=True).all(),
+            "soil_types": models.SoilType.objects.filter(is_coastal=is_coastal, active=True).all(),
             "region": models.Region.objects.all(),
         }
     )
@@ -647,11 +727,12 @@ def run():
     import api.models as models
 
     ANNUAL_CROPLAND = False
-    FLOODED_RICE = True
+    FLOODED_RICE = False
     GRASSLAND = False
     LIVESTOCK = False
+    PERENNIAL_CROPLAND = True
 
-    MAX_ROWS = None
+    MAX_ROWS = 25000
 
     if GRASSLAND:
         compute_permutations(
@@ -711,5 +792,21 @@ def run():
                 "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
             },
             models.FloodedRice,
+            stop_at=MAX_ROWS,
+        )
+
+    if PERENNIAL_CROPLAND:
+        compute_permutations(
+            {
+                "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+                "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+                "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
+                "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
+                "tillage_management_type_start": models.TillageManagementType.objects.all(),
+                "tillage_management_type_w": models.TillageManagementType.objects.all(),
+                "is_biomass_burned_start": [True, False],
+                "is_biomass_burned_w": [True, False],
+            },
+            models.PerennialCropland,
             stop_at=MAX_ROWS,
         )
