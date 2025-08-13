@@ -818,8 +818,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
         luc.module_type_wo = self.validated_data["land_use_change"]["module_type_wo"]
         luc.area = self.validated_data["area"]
 
-        self.instance.module_types.add(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id)
-
         luc.save()
         self.instance.save()
 
@@ -844,25 +842,28 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if not module.is_start():
                 for field in module._meta.fields:
                     if field.name.endswith("_start"):
-                        # If field is a boolean, set it to False
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            # Use field default if defined, otherwise None
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_with():
                 for field in module._meta.fields:
                     if field.name.endswith("_w"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
             if not module.is_without():
                 for field in module._meta.fields:
                     if field.name.endswith("_wo"):
                         if field.get_internal_type() == "BooleanField":
                             setattr(module, field.name, False)
                         else:
-                            setattr(module, field.name, None)
+                            default = field.get_default() if field.has_default() else None
+                            setattr(module, field.name, default)
 
             if hasattr(module, "area"):
                 module.area = self.validated_data.get("area")
@@ -881,14 +882,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
             create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
-            luc: LandUseChange = self.instance.landusechange.first()
-            if luc and has_luc_module:
-                self.edit_existing_luc()
-            elif luc and not has_luc_module:
-                self.delete_existing_luc()
-            elif not luc and has_luc_module:
-                luc = self.handle_luc_module(self.instance, create_organic_soil)
-
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
@@ -900,19 +893,27 @@ class ActivityBuilderSerializer(serializers.Serializer):
             removed_module_types = list(set(old_module_types) - set(new_module_types))
             added_module_types = list(set(new_module_types) - set(old_module_types))
 
-            for module in removed_module_types:
-                ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.filter(activity=self.instance)
-                if module_instance.exists():
-                    module_instance.first().delete()
-
             for module in kept_module_types:
                 if module.class_name == "LandUseChange":
                     continue
 
                 ModuleClass = apps.get_model("api", module.class_name)
                 module_instance = ModuleClass.objects.filter(activity=self.instance).first()
+
+                if module.class_name == "OrganicSoil":
+                    if luc.module_type not in kept_module_types:
+                        luc.organic_soil = None
+                        luc.save()
+                        module_instance.land_use_change = None
+                        module_instance.save()
+
                 # TODO: Maybe instead of checking the module type we can check the instance class?
+
+                if luc and luc.module_type not in kept_module_types:
+                    module_instance.land_use_change = None
+                    module_instance.save()
+                    continue
+
                 if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
                     module_instance.land_use_change = luc
                     module_instance.save()
@@ -937,11 +938,24 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     module_instance.land_use_change = luc
                     module_instance.save()
 
+            if luc and has_luc_module:
+                self.edit_existing_luc()
+            elif luc and not has_luc_module:
+                self.delete_existing_luc()
+            elif not luc and has_luc_module:
+                luc = self.handle_luc_module(self.instance, create_organic_soil)
+
+            for module in removed_module_types:
+                ModuleClass = apps.get_model("api", module.class_name)
+                module_instance = ModuleClass.objects.filter(activity=self.instance)
+                if module_instance.exists():
+                    module_instance.first().delete()
+
+            self.sanitize_input_entries()
+
             self.instance.module_types.clear()
             self.instance.module_types.add(*new_module_types)
             self.instance.save()
-
-            self.sanitize_input_entries()
 
             return self.instance
 

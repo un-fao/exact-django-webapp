@@ -251,18 +251,18 @@ Tropical;Wet;Vine;;1,01
 Tropical Montane;Moist;Vine;;1
 Tropical Montane;Dry;Vine;;1
 Tropical Montane;Wet;Vine;;1
-Boreal;Moist;Degraded Land;;0,33
-Boreal;Dry;Degraded Land;;0,33
-Cool Temperate;Moist;Degraded Land;;0,33
-Cool Temperate;Dry;Degraded Land;;0,33
-Warm Temperate;Moist;Degraded Land;;0,33
-Warm Temperate;Dry;Degraded Land;;0,33
-Tropical;Moist;Degraded Land;;0,33
-Tropical;Dry;Degraded Land;;0,33
-Tropical;Wet;Degraded Land;;0,33
-Tropical Montane;Moist;Degraded Land;;0,33
-Tropical Montane;Dry;Degraded Land;;0,33
-Tropical Montane;Wet;Degraded Land;;0,33
+Boreal;Moist;Other Land;;0,33
+Boreal;Dry;Other Land;;0,33
+Cool Temperate;Moist;Other Land;;0,33
+Cool Temperate;Dry;Other Land;;0,33
+Warm Temperate;Moist;Other Land;;0,33
+Warm Temperate;Dry;Other Land;;0,33
+Tropical;Moist;Other Land;;0,33
+Tropical;Dry;Other Land;;0,33
+Tropical;Wet;Other Land;;0,33
+Tropical Montane;Moist;Other Land;;0,33
+Tropical Montane;Dry;Other Land;;0,33
+Tropical Montane;Wet;Other Land;;0,33
 Boreal;Moist;;Improved with high inputs;1
 Boreal;Dry;;Improved with high inputs;1
 Cool Temperate;Moist;;Improved with high inputs;1

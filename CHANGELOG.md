@@ -1,3 +1,65 @@
+## 1.15.12 (2025-08-13)
+
+### Fix
+
+- **grassland**: add fi, flu, fmg override based on grassland management practices in calculator
+- remove old reference to degraded land in favor of other land in FLU data
+
+## 1.15.11 (2025-08-13)
+
+### Fix
+
+- **project copy**: remove double transaction management logic causing TransactionManagementError
+
+## 1.15.10 (2025-08-12)
+
+### Fix
+
+- **activity builder**: add missing check for luc presence when editing activity
+
+## 1.15.9 (2025-08-07)
+
+### Fix
+
+- **activity copy**: remove module saving from handle_threads to avoid integrity errors
+
+## 1.15.8 (2025-08-06)
+
+### Fix
+
+- **activity builder**: move module deletion at the end so activity editing is not affected by delete cascade
+- **copy**: rework logic so that organic soil is properly copied
+- **fra**: align some countries with mismatching names in the dataset
+
+## 1.15.7 (2025-08-05)
+
+### Fix
+
+- **copy**: handle submodule comment threads before saving
+
+## 1.15.6 (2025-08-05)
+
+### Fix
+
+- **copy**: generalize logic handling copy of submodules
+- remove test exception
+- **activity builder**: set fields to default values if present when senitizing modules inputs
+- **perennial cropland**: add missing growth flag for computed biomass values
+- **forest management**: fetch the proper BGB Max values from mathematical model for defaults
+- **copy**: add updated organic soil to LUC module to avoid primary key conflicts
+- **report**: preventorganic soil peat to be considered when not present
+
+## 1.15.5 (2025-08-04)
+
+### Fix
+
+- **defaults**: add max agb and max bgb values to forest management
+- **input**: add macro input type other to user defined inputs
+- **report**: remove balance stats for shadow price of carbon
+- **perennial cropland**: wrong None allocation causing crash in maturity computation
+- **organic soil**: set None ditches area and extraction height to zero to avoid NoneType errors in mathematical model
+- make defaults endpoint accessible regardless of project lock
+
 ## 1.15.4 (2025-08-01)
 
 ### Feat
