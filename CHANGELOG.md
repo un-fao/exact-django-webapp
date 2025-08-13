@@ -1,3 +1,10 @@
+## 1.15.12 (2025-08-13)
+
+### Fix
+
+- **grassland**: add fi, flu, fmg override based on grassland management practices in calculator
+- remove old reference to degraded land in favor of other land in FLU data
+
 ## 1.15.11 (2025-08-13)
 
 ### Fix
