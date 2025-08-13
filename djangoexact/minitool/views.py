@@ -123,7 +123,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         queryset = models.ChangeAggregate.objects.all()
 
         # Filter by module type using custom_filters
-        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland"}
+        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
         module_type_value = module_type_mapping.get(module_type, module_type)
         queryset = queryset.filter(module_type=module_type_value)
 
@@ -379,6 +379,28 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response(response_data)
 
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland")
+    @close_db_connections
+    def perennial_cropland(self, request, *args, **kwargs):
+        """
+        Get perennial cropland emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("perennial-cropland", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No perennial cropland data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
     # Nested actions for livestock module
     @decorators.action(detail=False, methods=["get"], url_path="livestock/fields")
     def livestock_fields(self, request, *args, **kwargs):
@@ -565,6 +587,45 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/statistics")
+    def perennial_cropland_statistics(self, request, *args, **kwargs):
+        """Get overall statistics for perennial cropland data."""
+        queryset, filters = self.get_filtered_queryset("perennial-cropland", request)
+        total_records = queryset.count()
+        total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
+        avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
+
+        return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
+
+    # Nested actions for perennial cropland module
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/fields")
+    def perennial_cropland_fields(self, request, *args, **kwargs):
+        """Get available fields for perennial cropland data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/filters")
+    def perennial_cropland_filters(self, request, *args, **kwargs):
+        """Get available filters for perennial cropland data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/regions")
+    def perennial_cropland_regions(self, request, *args, **kwargs):
+        """Get available regions for perennial cropland data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/custom-filters")
+    def perennial_cropland_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for perennial cropland data."""
+        custom_filters = self.get_available_custom_filters("perennial-cropland")
+        return Response(custom_filters)
 
     # Cross-module nested actions
     @decorators.action(detail=False, methods=["get"], url_path="compare")
