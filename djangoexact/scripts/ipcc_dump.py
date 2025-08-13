@@ -4916,6 +4916,78 @@ def convert_storage_refrigerant_ef_from_kg_to_tonnes():
             print(f"Updated {ef} to {ef.value} tonnes")
 
 
+def add_fi_data_for_all_grassland_management_types():
+    """
+    Add FI data for all grassland management types.
+    """
+    from ipcc.models import FIData
+
+    FIData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"]) if not pd.isna(row["organic_input_type"]) else None
+        value = parse_csv_number(row["value"])
+        FIData.objects.create(climate=climate, moisture=moisture, organic_input_type=organic_input_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {organic_input_type} {grassland_management_type} {value}")
+
+
+def add_flu_data_for_all_grassland_management_types():
+    """
+    Add FLU data for all grassland management types.
+    """
+    from ipcc.models import FLUData
+
+    FLUData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"]) if not pd.isna(row["land_use_type"]) else None
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FLUData.objects.create(climate=climate, moisture=moisture, land_use_type=land_use_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {land_use_type} {grassland_management_type} {value}")
+
+
+def add_fmg_data_for_all_grassland_management_types():
+    """
+    Add FMG data for all grassland management types.
+    """
+    from ipcc.models import FMGData
+
+    FMGData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"]) if not pd.isna(row["tillage_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FMGData.objects.create(climate=climate, moisture=moisture, grassland_management_type=grassland_management_type, tillage_management_type=tillage_management_type, value=value)
+        print(f"Created {climate} {moisture} {grassland_management_type} {tillage_management_type} {value}")
+
+
 def run():
     import os
 
@@ -4924,6 +4996,9 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
+        add_fi_data_for_all_grassland_management_types()
+        add_flu_data_for_all_grassland_management_types()
+        add_fmg_data_for_all_grassland_management_types()
         pass
 
     if app_mode == "review":
@@ -4932,7 +5007,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        import_fra_carbon_stock_data()
         pass
 
     if app_mode == "test":
