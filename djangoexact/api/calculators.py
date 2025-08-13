@@ -2784,6 +2784,7 @@ class GrasslandCalculator(LandModuleCalculator):
         super().get_defaults(calculate)
 
         module: Grassland = self.data
+        self.module = module
 
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
 
@@ -2800,6 +2801,63 @@ class GrasslandCalculator(LandModuleCalculator):
             missing_scenarios = utils.find_empty_scenarios(module, "combustion_factor_t2")
             if missing_scenarios:
                 raise Exception(f"Default combustion factor does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+
+        if self.module.is_start():
+            self.fi = ipcc.FIData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_start).first()
+            if self.fi is None or self.fi.value is None:
+                raise Exception(
+                    f"FI for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_start} grassland management type does not exist. Please provide Tier 2 values for start scenario"
+                )
+
+            self.flu = ipcc.FLUData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_start).first()
+            if self.flu is None or self.flu.value is None:
+                raise Exception(
+                    f"FLU for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_start} grassland management type does not exist. Please provide Tier 2 values for start scenario"
+                )
+
+            self.fmg = ipcc.FMGData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_start).first()
+            if self.fmg is None or self.fmg.value is None:
+                raise Exception(
+                    f"FMG for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_start} grassland management type does not exist. Please provide Tier 2 values for start scenario"
+                )
+
+        if self.module.is_with():
+            self.fi = ipcc.FIData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_w).first()
+            if self.fi is None or self.fi.value is None:
+                raise Exception(
+                    f"FI for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_w} grassland management type does not exist. Please provide Tier 2 values for with scenario"
+                )
+
+            self.flu = ipcc.FLUData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_w).first()
+            if self.flu is None or self.flu.value is None:
+                raise Exception(
+                    f"FLU for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_w} grassland management type does not exist. Please provide Tier 2 values for with scenario"
+                )
+
+            self.fmg = ipcc.FMGData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_w).first()
+            if self.fmg is None or self.fmg.value is None:
+                raise Exception(
+                    f"FMG for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_w} grassland management type does not exist. Please provide Tier 2 values for with scenario"
+                )
+
+        if self.module.is_without():
+            self.fi = ipcc.FIData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_wo).first()
+            if self.fi is None or self.fi.value is None:
+                raise Exception(
+                    f"FI for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_wo} grassland management type does not exist. Please provide Tier 2 values for without scenario"
+                )
+
+            self.flu = ipcc.FLUData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_wo).first()
+            if self.flu is None or self.flu.value is None:
+                raise Exception(
+                    f"FLU for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_wo} grassland management type does not exist. Please provide Tier 2 values for without scenario"
+                )
+
+            self.fmg = ipcc.FMGData.objects.filter(climate=self.climate, moisture=self.moisture, grassland_management_type=self.module.grassland_management_type_wo).first()
+            if self.fmg is None or self.fmg.value is None:
+                raise Exception(
+                    f"FMG for {self.climate} climate, {self.moisture} moisture, {self.module.grassland_management_type_wo} grassland management type does not exist. Please provide Tier 2 values for without scenario"
+                )
 
     def calculate(self) -> list[Result]:
         """
