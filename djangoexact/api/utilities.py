@@ -218,7 +218,6 @@ def get_unique_name(instance, name):
 
 @transaction.atomic
 def copy_project(project, owner):
-    transaction.set_autocommit(False)
     try:
         project_copy = copy.deepcopy(project)
         project_copy.pk = None
@@ -238,8 +237,6 @@ def copy_project(project, owner):
 
         for activity in project.activities.all():
             copy_activity(activity, project_copy, owner)
-
-        transaction.commit()
 
         return project_copy
     except Exception as e:
