@@ -1,3 +1,15 @@
+## 1.15.11 (2025-08-13)
+
+### Fix
+
+- **project copy**: remove double transaction management logic causing TransactionManagementError
+
+## 1.15.10 (2025-08-12)
+
+### Fix
+
+- **activity builder**: add missing check for luc presence when editing activity
+
 ## 1.15.9 (2025-08-07)
 
 ### Fix
