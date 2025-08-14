@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--file", type=str, help="Path to the changes JSON file")
-        parser.add_argument("--module-type", type=str, choices=["livestock", "annual-cropland", "flooded-rice", "grassland"], help="Module type to import")
+        parser.add_argument("--module-type", type=str, choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland"], help="Module type to import")
         parser.add_argument("--clear", action="store_true", help="Clear existing data before importing")
         parser.add_argument("--aggregate-only", action="store_true", help="Only create aggregated data, skip individual records")
         parser.add_argument("--all", action="store_true", help="Import all module types from their respective files")
@@ -48,6 +48,7 @@ class Command(BaseCommand):
             ("annual-cropland", "annualcropland_changes.json"),
             ("flooded-rice", "floodedrice_changes.json"),
             ("grassland", "grassland_changes.json"),
+            ("perennial-cropland", "perennialcropland_changes.json"),
         ]
 
         total_modules = len(module_configs)

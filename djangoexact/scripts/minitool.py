@@ -7,6 +7,7 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 import django
 import random
+import traceback
 
 
 def get_results(model):
@@ -256,6 +257,30 @@ class FloodedRiceData(BaseData):
         }
 
 
+@dataclass
+class PerennialCroplandData(BaseData):
+    def __post_init__(self):
+        super().__post_init__()
+        # self.module: "models.PerennialCropland"
+        self.land_use_type_start = self.module.land_use_type_start.name if self.module.land_use_type_start else None
+        self.land_use_type_w = self.module.land_use_type_w.name if self.module.land_use_type_w else None
+        self.land_use_type_wo = self.module.land_use_type_start.name if self.module.land_use_type_start else None
+        self.tillage_management_type_start = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
+        self.tillage_management_type_w = self.module.tillage_management_type_w.name if self.module.tillage_management_type_w else None
+        self.tillage_management_type_wo = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "land_use_type_start": self.land_use_type_start,
+            "land_use_type_w": self.land_use_type_w,
+            "land_use_type_wo": self.land_use_type_wo,
+            "tillage_management_type_start": self.tillage_management_type_start,
+            "tillage_management_type_w": self.tillage_management_type_w,
+            "tillage_management_type_wo": self.tillage_management_type_wo,
+        }
+
+
 def compute_data(data: list[BaseData]):
     df = pd.DataFrame(data)
     result = df.agg(
@@ -279,8 +304,10 @@ def build_data(module):
         return GrasslandData(module).to_dict()
     elif module.__class__.__name__ == "FloodedRice":
         return FloodedRiceData(module).to_dict()
+    elif module.__class__.__name__ == "PerennialCropland":
+        return PerennialCroplandData(module).to_dict()
     else:
-        raise ValueError(f"Unsupported module type: {type(module)}")
+        raise ValueError(f"Unsupported module type: {module.__class__.__name__}")
 
 
 # Because "runscript" sets up Django automatically for the parent process,
@@ -365,7 +392,9 @@ def process_combinations_grassland(combo):
         balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
     except Exception as e:
         globals()["errors"] += 1
-        return None
+        # Return error information instead of None
+        error_info = {"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc(), "combination": combo}
+        return {"error": error_info}
 
     # Suppose "build_data" is a helper that modifies the module into a dict
     module = build_data(module)
@@ -412,7 +441,9 @@ def process_combinations_livestock(combo):
     try:
         balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
     except Exception as e:
-        return None
+        # Return error information instead of None
+        error_info = {"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc(), "combination": combo}
+        return {"error": error_info}
 
     # Suppose "build_data" is a helper that modifies the module into a dict
     module = build_data(module)
@@ -477,7 +508,9 @@ def process_combinations_annualcropland(combo):
     try:
         balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
     except Exception as e:
-        return None
+        # Return error information instead of None
+        error_info = {"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc(), "combination": combo}
+        return {"error": error_info}
 
     module = build_data(module)
     module["total"] = balance
@@ -531,7 +564,75 @@ def process_combinations_floodedrice(combo):
     try:
         balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
     except Exception as e:
-        return None
+        # Return error information instead of None
+        error_info = {"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc(), "combination": combo}
+        return {"error": error_info}
+
+    module = build_data(module)
+    module["total"] = balance
+    return module
+
+
+def process_combinations_perennialcropland(combo):
+    import api.tests.factories as factories
+    import api.calculators as calculators
+    import api.models as models
+
+    logging.getLogger().setLevel(logging.CRITICAL)
+
+    # organic_input_type
+    # tillage_management_type
+
+    (
+        land_use_type_start,
+        land_use_type_w,
+        organic_input_type_start,
+        organic_input_type_w,
+        tillage_management_type_start,
+        tillage_management_type_w,
+        is_biomass_burned_start,
+        is_biomass_burned_w,
+        fire_periodicity_t2_start,
+        fire_periodicity_t2_w,
+        climate_moisture,
+        soil_type,
+        region,
+    ) = combo
+    climate, moisture = climate_moisture
+
+    p = factories.ProjectFactory.build(
+        climate=climate,
+        moisture=moisture,
+        soil_type=soil_type,
+        country=region.countries.order_by("?").first(),
+    )
+    a = factories.ActivityFactory.build(project=p)
+    module = factories.PerennialCroplandFactory.build(
+        activity=a,
+        area=1,
+        land_use_type_start=land_use_type_start,
+        land_use_type_w=land_use_type_w,
+        land_use_type_wo=land_use_type_start,
+        organic_input_type_start=organic_input_type_start,
+        organic_input_type_w=organic_input_type_w,
+        organic_input_type_wo=organic_input_type_start,
+        tillage_management_type_start=tillage_management_type_start,
+        tillage_management_type_w=tillage_management_type_w,
+        tillage_management_type_wo=tillage_management_type_start,
+        is_biomass_burned_start=is_biomass_burned_start,
+        is_biomass_burned_w=is_biomass_burned_w,
+        is_biomass_burned_wo=is_biomass_burned_start,
+        fire_periodicity_t2_start=fire_periodicity_t2_start,
+        fire_periodicity_t2_w=fire_periodicity_t2_w,
+        fire_periodicity_t2_wo=fire_periodicity_t2_start,
+    )
+
+    try:
+        balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
+    except Exception as e:
+        # Return error information instead of None
+        error_info = {"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc(), "combination": combo}
+        return {"error": error_info}
 
     module = build_data(module)
     module["total"] = balance
@@ -551,20 +652,49 @@ def chunked_product(*iterables, chunk_size=1000):
         yield chunk
 
 
-def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
+def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None, is_coastal=False):
     import api.models as models
     import math
 
-    active_climates = models.Climate.objects.filter(is_active=True).all()
-    climate_moistures = []
-    for c in active_climates:
-        for m in c.moistures.all():
-            climate_moistures.append((c, m))
+    # Get land use types for this model
+    land_use_types = []
+    if "land_use_type_start" in fields:
+        land_use_types.extend(fields["land_use_type_start"])
+    if "land_use_type_w" in fields:
+        land_use_types.extend(fields["land_use_type_w"])
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_land_use_types = []
+    for lut in land_use_types:
+        if lut.id not in seen:
+            seen.add(lut.id)
+            unique_land_use_types.append(lut)
+
+    # Get all valid climate-moisture combinations for these land use types
+    valid_climate_moistures = set()
+    if unique_land_use_types:
+        # Filter by land use type constraints
+        for land_use_type in unique_land_use_types:
+            for climate in land_use_type.climates.all():
+                for moisture in climate.moistures.all():
+                    valid_climate_moistures.add((climate, moisture))
+        print(f"Found {len(valid_climate_moistures)} valid climate-moisture combinations for {len(unique_land_use_types)} land use types")
+    else:
+        # Fallback: use all active climates and their moistures (for modules without land use types)
+        active_climates = models.Climate.objects.filter(is_active=True).all()
+        for c in active_climates:
+            for m in c.moistures.all():
+                valid_climate_moistures.add((c, m))
+        print(f"Using all active climate-moisture combinations ({len(valid_climate_moistures)}) for modules without land use type constraints")
+
+    # Convert back to list and sort for consistency
+    climate_moistures = sorted(list(valid_climate_moistures), key=lambda x: (x[0].id, x[1].id))
 
     fields.update(
         {
             "climate_moistures": climate_moistures,
-            "soil_types": models.SoilType.objects.filter(is_coastal=False, active=True).all(),
+            "soil_types": models.SoilType.objects.filter(is_coastal=is_coastal, active=True).all(),
             "region": models.Region.objects.all(),
         }
     )
@@ -590,38 +720,75 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     print(f"Total permutations (theoretical): {total:,}")
 
     data = []
+    errors_data = []
     local_errors = 0
 
-    with ProcessPoolExecutor(max_workers=4, initializer=django_initializer) as executor:
-        pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations")
+    def save_data():
+        """Helper function to save data to CSV"""
+        if data:
+            df = pd.DataFrame(data)
+            filepath = os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__.lower()}.csv")
+            df.to_csv(filepath, index=False)
+            print(f"Saved {len(data)} rows to {filepath}")
 
-        for chunk in chunked_product(*iterables, chunk_size=chunk_size):
-            results_iter = executor.map(combiner_function, chunk)
+        if errors_data:
+            errors_df = pd.DataFrame(errors_data)
+            errors_filepath = os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__.lower()}_errors.csv")
+            errors_df.to_csv(errors_filepath, index=False)
+            print(f"Saved {len(errors_data)} errors to {errors_filepath}")
 
-            for result in results_iter:
-                if stop_at and len(data) >= stop_at:
-                    # Terminate worker processes
-                    for proc in executor._processes.values():
-                        proc.terminate()
-                    executor.shutdown(wait=False, cancel_futures=True)
-                    break
+        print(f"Total errors: {globals()['errors']}")
 
-                if result and result.get("total", 0) != 0:
-                    data.append(result)
+    try:
+        with ProcessPoolExecutor(max_workers=4, initializer=django_initializer) as executor:
+            pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations")
+
+            for chunk in chunked_product(*iterables, chunk_size=chunk_size):
+                results_iter = executor.map(combiner_function, chunk)
+
+                for result in results_iter:
+                    if stop_at and len(data) >= stop_at:
+                        # Terminate worker processes
+                        for proc in executor._processes.values():
+                            proc.terminate()
+                        executor.shutdown(wait=False, cancel_futures=True)
+                        break
+
+                    if result and "error" in result:
+                        # This is an error result
+                        errors_data.append(result["error"])
+                        local_errors += 1
+                    elif result and result.get("total", 0) != 0:
+                        # This is a successful result
+                        data.append(result)
+                    else:
+                        # This is a None result (no error info captured)
+                        local_errors += 1
+
+                    pbar.update(1)
                 else:
-                    local_errors += 1
+                    # If we never broke out of the loop,
+                    # proceed to the next chunk
+                    continue
 
-                pbar.update(1)
-            else:
-                # If we never broke out of the loop,
-                # proceed to the next chunk
-                continue
+                # If we did break due to stop_at,
+                # break out of the outer loop
+                break
 
-            # If we did break due to stop_at,
-            # break out of the outer loop
-            break
+            pbar.close()
 
-        pbar.close()
+    except KeyboardInterrupt:
+        print(f"\nKeyboard interrupt detected! Saving {len(data)} computed rows...")
+        print(f"Errors encountered so far: {local_errors}")
+        # Clean up the progress bar
+        try:
+            pbar.close()
+        except:
+            pass
+        # Save the data we have so far
+        save_data()
+        print("Data saved successfully. Exiting gracefully.")
+        return
 
     globals()["errors"] += local_errors
 
@@ -647,69 +814,94 @@ def run():
     import api.models as models
 
     ANNUAL_CROPLAND = False
-    FLOODED_RICE = True
+    FLOODED_RICE = False
     GRASSLAND = False
-    LIVESTOCK = False
+    LIVESTOCK = True
+    PERENNIAL_CROPLAND = False
 
-    MAX_ROWS = None
+    MAX_ROWS = 25000
 
-    if GRASSLAND:
-        compute_permutations(
-            {
-                "grassland_management_type_start": models.GrasslandManagementType.objects.all(),
-                "grassland_management_type_w": models.GrasslandManagementType.objects.all(),
-                "is_fire_used_start": [True, False],
-                "is_fire_used_w": [True, False],
-                "fire_periodicity_start": [1],
-                "fire_periodicity_w": [1],
-                "fire_impact_start": [1, 0],
-                "fire_impact_w": [1, 0],
-                "yield_start": [1],
-                "yield_w": [1],
-            },
-            models.Grassland,
-            stop_at=MAX_ROWS,
-        )
+    try:
+        if GRASSLAND:
+            compute_permutations(
+                {
+                    "grassland_management_type_start": models.GrasslandManagementType.objects.all(),
+                    "grassland_management_type_w": models.GrasslandManagementType.objects.all(),
+                    "is_fire_used_start": [True, False],
+                    "is_fire_used_w": [True, False],
+                    "fire_periodicity_start": [1],
+                    "fire_periodicity_w": [1],
+                    "fire_impact_start": [1, 0],
+                    "fire_impact_w": [1, 0],
+                    "yield_start": [1],
+                    "yield_w": [1],
+                },
+                models.Grassland,
+                stop_at=MAX_ROWS,
+            )
 
-    if LIVESTOCK:
-        compute_permutations(
-            {
-                "livestock_category_types": models.LivestockCategoryType.objects.all(),
-                "livestock_production_type_start": models.LivestockProductionType.objects.all(),
-                "livestock_production_type_w": models.LivestockProductionType.objects.all(),
-                "heads_number_start": [1],
-                "heads_number_w": [1],
-            },
-            models.Livestock,
-            stop_at=MAX_ROWS,
-        )
+        if LIVESTOCK:
+            compute_permutations(
+                {
+                    "livestock_category_types": models.LivestockCategoryType.objects.all(),
+                    "livestock_production_type_start": models.LivestockProductionType.objects.all(),
+                    "livestock_production_type_w": models.LivestockProductionType.objects.all(),
+                    "heads_number_start": [1],
+                    "heads_number_w": [1],
+                },
+                models.Livestock,
+                stop_at=MAX_ROWS,
+            )
 
-    if ANNUAL_CROPLAND:
-        compute_permutations(
-            {
-                "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
-                "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
-                "tillage_management_type_start": models.TillageManagementType.objects.all(),
-                "tillage_management_type_w": models.TillageManagementType.objects.all(),
-                "organic_input_type_start": models.OrganicInputType.objects.all(),
-                "organic_input_type_w": models.OrganicInputType.objects.all(),
-                "residue_management_type_start": models.ResidueManagementType.objects.all(),
-                "residue_management_type_w": models.ResidueManagementType.objects.all(),
-            },
-            models.AnnualCropland,
-            stop_at=MAX_ROWS,
-        )
+        if ANNUAL_CROPLAND:
+            compute_permutations(
+                {
+                    "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
+                    "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
+                    "tillage_management_type_start": models.TillageManagementType.objects.all(),
+                    "tillage_management_type_w": models.TillageManagementType.objects.all(),
+                    "organic_input_type_start": models.OrganicInputType.objects.all(),
+                    "organic_input_type_w": models.OrganicInputType.objects.all(),
+                    "residue_management_type_start": models.ResidueManagementType.objects.all(),
+                    "residue_management_type_w": models.ResidueManagementType.objects.all(),
+                },
+                models.AnnualCropland,
+                stop_at=MAX_ROWS,
+            )
 
-    if FLOODED_RICE:
-        compute_permutations(
-            {
-                "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
-                "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
-                "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
-                "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
-                "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
-                "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
-            },
-            models.FloodedRice,
-            stop_at=MAX_ROWS,
-        )
+        if FLOODED_RICE:
+            compute_permutations(
+                {
+                    "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
+                    "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
+                    "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
+                    "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
+                    "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
+                    "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
+                },
+                models.FloodedRice,
+                stop_at=MAX_ROWS,
+            )
+
+        if PERENNIAL_CROPLAND:
+            compute_permutations(
+                {
+                    "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+                    "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+                    "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
+                    "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
+                    "tillage_management_type_start": models.TillageManagementType.objects.all(),
+                    "tillage_management_type_w": models.TillageManagementType.objects.all(),
+                    "is_biomass_burned_start": [True, False],
+                    "is_biomass_burned_w": [True, False],
+                    "fire_periodicity_t2_start": [1],
+                    "fire_periodicity_t2_w": [1],
+                },
+                models.PerennialCropland,
+                stop_at=MAX_ROWS,
+            )
+
+    except KeyboardInterrupt:
+        print(f"\nKeyboard interrupt detected in main run function!")
+        print("Script terminated by user. Any completed computations have been saved.")
+        return
