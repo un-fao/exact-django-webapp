@@ -44,7 +44,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", ".minitool-741920004150.europe-west1.run.app"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
