@@ -605,8 +605,11 @@ def process_combinations_perennialcropland(combo):
         moisture=moisture,
         soil_type=soil_type,
         country=region.countries.order_by("?").first(),
+        implementation_years=0,
+        start_year_of_activities=2025,
+        last_year_of_accounting=2026,
     )
-    a = factories.ActivityFactory.build(project=p)
+    a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
     module = factories.PerennialCroplandFactory.build(
         activity=a,
         area=1,
@@ -796,13 +799,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None, is
         print(f"No data for {model.__name__}!")
         return
 
-    df = pd.DataFrame(data)
-    print(f"Total {model.__name__} rows: {len(data)}")
-    print(f"Errors: {globals()['errors']}")
-
-    filepath = os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__.lower()}.csv")
-
-    df.to_csv(filepath, index=False)
+    save_data()
 
 
 def run():
@@ -813,13 +810,13 @@ def run():
     # --- Parent process has Django, so we can safely import models here. ---
     import api.models as models
 
-    ANNUAL_CROPLAND = False
-    FLOODED_RICE = False
-    GRASSLAND = False
-    LIVESTOCK = True
-    PERENNIAL_CROPLAND = False
+    ANNUAL_CROPLAND = True
+    FLOODED_RICE = True
+    GRASSLAND = True
+    LIVESTOCK = False
+    PERENNIAL_CROPLAND = True
 
-    MAX_ROWS = 25000
+    MAX_ROWS = 10000
 
     try:
         if GRASSLAND:
