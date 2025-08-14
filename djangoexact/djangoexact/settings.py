@@ -142,7 +142,6 @@ if os.getenv("GAE_APPLICATION", None):
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
-                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
@@ -168,7 +167,6 @@ else:
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
-                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
