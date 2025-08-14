@@ -97,6 +97,10 @@ def snake_case(str):
     return "".join(res)
 
 
+def snake_case_to_readable(str):
+    return " ".join(str.split("_")).title()
+
+
 def sanitize_for_model(str: str):
     return str.replace(" ", "").replace("-", "").replace("_", "")
 
@@ -188,6 +192,7 @@ def find_modules(activity):
     return modules
 
 
+@transaction.atomic
 def get_unique_name(instance, name):
     """
     Generates a unique name for a Django model instance by appending a counter if necessary.
@@ -215,8 +220,8 @@ def get_unique_name(instance, name):
     return f"{name} ({i})"
 
 
+@transaction.atomic
 def copy_project(project, owner):
-    transaction.set_autocommit(False)
     try:
         project_copy = copy.deepcopy(project)
         project_copy.pk = None
@@ -237,14 +242,13 @@ def copy_project(project, owner):
         for activity in project.activities.all():
             copy_activity(activity, project_copy, owner)
 
-        transaction.commit()
-
         return project_copy
     except Exception as e:
         log.error(f"Error copying project: {e}")
         raise e
 
 
+@transaction.atomic
 def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module"):
     """
     Copy the threads of a module and return the copied threads.
@@ -288,6 +292,7 @@ def copy_threads(module_from: "api_models.Module", module_to: "api_models.Module
     return copied_threads
 
 
+@transaction.atomic
 def clear_threads(module):
     """
     Clear the threads of a module by deleting all associated CommentThread instances.
@@ -305,6 +310,7 @@ def clear_threads(module):
                     setattr(module, field.name, None)
 
 
+@transaction.atomic
 def handle_threads(module_from: "api_models.Module", module_to: "api_models.Module", owner=None):
     """
     Handle the copying of threads from one module to another, ensuring that the threads are copied correctly
@@ -327,10 +333,9 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
     else:
         clear_threads(module_to)
 
-    module_to.save()
 
-
-def copy_activity(activity, new_project=None, owner=None):
+@transaction.atomic
+def copy_activity(activity: "api_models.Activity", new_project=None, owner=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
     activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
@@ -345,66 +350,49 @@ def copy_activity(activity, new_project=None, owner=None):
     luc_copy = None
     organic_soil_copy = None
 
-    for module in activity.modules:
-        module: api_models.Module
-        if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
-            continue
+    luc = list(filter(lambda x: x.__class__.__name__ == "LandUseChange", activity.modules))[0] if list(filter(lambda x: x.__class__.__name__ == "LandUseChange", activity.modules)) else None
+    organic_soil = list(filter(lambda x: x.__class__.__name__ == "OrganicSoil", activity.modules))[0] if list(filter(lambda x: x.__class__.__name__ == "OrganicSoil", activity.modules)) else None
 
+    if luc:
+        luc_copy = copy.deepcopy(luc)
+        luc_copy.pk = None
+        luc_copy.activity = activity_copy
+        luc_copy._state.adding = True
+        luc_copy.organic_soil = None
+        handle_threads(luc, luc_copy, owner)
+        luc_copy.save()
+
+    if organic_soil:
+        organic_soil_copy = copy.deepcopy(organic_soil)
+        organic_soil_copy.pk = None
+        organic_soil_copy.activity = activity_copy
+        organic_soil_copy._state.adding = True
+        if luc_copy:
+            organic_soil_copy.land_use_change = luc_copy
+        handle_threads(organic_soil, organic_soil_copy, owner)
+        organic_soil_copy.save()
+
+    for module in list(filter(lambda x: x.__class__.__name__ not in ["LandUseChange", "OrganicSoil"], activity.modules)):
+        module: api_models.Module
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy.land_use_change = None
-        module_copy.organic_soil = None
         module_copy._state.adding = True
-        handle_threads(module, module_copy, owner)
-
-        has_luc = getattr(module, "land_use_change", None)
-        has_organic_soil = getattr(module, "organic_soil", None)
-
-        if has_luc:
-            if not luc_copy:
-                luc_copy = copy.deepcopy(module.land_use_change)
-                luc_copy.pk = None
-                luc_copy.activity = activity_copy
-                luc_copy._state.adding = True
-                luc_copy.save()
-                handle_threads(module.land_use_change, luc_copy, owner)
-
+        if luc_copy:
             module_copy.land_use_change = luc_copy
-            module_copy.save()
+        handle_threads(module, module_copy, owner)
+        module_copy.save()
 
-        if has_organic_soil:
-            if not organic_soil_copy:
-                organic_soil_copy = copy.deepcopy(module.organic_soil)
-                organic_soil_copy.pk = None
-                organic_soil_copy.activity = activity_copy
-                organic_soil_copy._state.adding = True
-                organic_soil_copy.save()
-                handle_threads(module.organic_soil, organic_soil_copy, owner)
-
-            module_copy.organic_soil = organic_soil_copy
-            module_copy.save()
-
-        submodules = []
-
-        if module.__class__.__name__ == "FloodedRice":
-            submodules = list(module.minor_seasons.all())
-        elif module.__class__.__name__ == "Input":
-            submodules = list(module.input_entries.all())
-        elif module.__class__.__name__ == "Energy":
-            submodules = list(module.electricities.all())
-            submodules.extend(list(module.fuels.all()))
-        elif module.__class__.__name__ == "Irrigation":
-            submodules = list(module.irrigation_systems.all())
-            submodules.extend(list(module.irrigation_phases.all()))
+        submodules = module.submodules if hasattr(module, "submodules") else []
 
         if submodules:
             for submodule in submodules:
                 submodule.pk = None
                 submodule.parent = module_copy
                 submodule._state.adding = True
-                submodule.save()
                 handle_threads(submodule, submodule, owner)
+                submodule.save()
 
     return activity_copy
 
@@ -585,7 +573,16 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             continue
 
         delta = record.diff_against(record.prev_record)
-        fields_to_remove = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified", "status", "map_data"] + (exclude_fields or [])
+        fields_to_remove = [
+            "last_cached_at",
+            "cached_results_total",
+            "cached_results_by_activity",
+            "cached_results_by_gas",
+            "cached_results_by_activity_by_gas",
+            "last_modified",
+            "status",
+            "map_data",
+        ] + (exclude_fields or [])
         delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
@@ -644,7 +641,9 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+    field_definitions = {
+        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
+    }
 
     return field_definitions
 
@@ -753,7 +752,20 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
 
     if recipients is None:
-        recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+        from api.models import ProjectNotificationPreference
+
+        # Get all admin members who haven't opted out globally
+        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
+
+        # Filter out users who have opted out of notifications for this specific project
+        recipients = []
+        for member in potential_recipients:
+            user = member.user
+            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
+
+            # If no project-specific preference exists, or if they haven't opted out for this project, include them
+            if project_preference is None or not project_preference.is_opted_out:
+                recipients.append(member)
 
     locked_at = project.locked_at
 

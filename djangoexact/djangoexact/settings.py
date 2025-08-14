@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "public",
     "blog",
     "ckeditor",
+    "minitool",
 ]
 
 if DEBUG:
@@ -98,6 +99,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "minitool.middleware.DatabaseConnectionMiddleware",  # Add connection cleanup middleware
 ]
 
 ROOT_URLCONF = "djangoexact.urls"
@@ -139,9 +141,20 @@ if os.getenv("GAE_APPLICATION", None):
             },
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
+                "application_name": "djangoexact",  # Help identify connections
+                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
-            "CONN_MAX_AGE": 30,
-        }
+            "CONN_MAX_AGE": 0,  # Close connections immediately after use
+            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
+        },
+        "minitool": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "minitool.db"),
+            "OPTIONS": {
+                "timeout": 20,
+                "check_same_thread": False,
+            },
+        },
     }
 else:
     DATABASES = {
@@ -154,10 +167,22 @@ else:
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
+                "application_name": "djangoexact",  # Help identify connections
+                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
-            "CONN_MAX_AGE": 30,
-        }
+            "CONN_MAX_AGE": 0,  # Close connections immediately after use
+            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
+        },
+        "minitool": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "minitool.db"),
+        },
     }
+
+DATABASE_ROUTERS = ["minitool.db_router.AppSpecificDatabaseRouter", "ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
+
+# Database connection management
+DATABASE_CONNECTION_POOLING = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

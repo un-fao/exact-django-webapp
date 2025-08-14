@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 import numpy as np
+import traceback
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
@@ -49,6 +50,7 @@ from .models import (
     StatusType,
     Submodule,
     ProjectMembership,
+    ProjectNotificationPreference,
     InvitationStatusType,
     Note,
     FieldDefinition,
@@ -85,6 +87,8 @@ from .serializers import (
     ReadProjectSerializer,
     ProjectMembershipWriteSerializer,
     ProjectMembershipReadSerializer,
+    ProjectNotificationPreferenceReadSerializer,
+    ProjectNotificationPreferenceWriteSerializer,
     UserReadSerializer,
     UserWriteSerializer,
     WriteActivitySerializer,
@@ -526,11 +530,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     filters[f"project__{key}"] = value
 
         # Get projects that the user has access to with view permission
-        projects_list = Project.objects.filter(
-            members__user=request.user,
-            members__group__permissions__codename="view_project",
-            **{f"members__{k}": v for k, v in filters.items()}
-        ).distinct()
+        projects_list = Project.objects.filter(members__user=request.user, members__group__permissions__codename="view_project", **{f"members__{k}": v for k, v in filters.items()}).distinct()
 
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
@@ -543,8 +543,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             request=request,
             serializer_class=SerializerClass,
             max_workers=10,
-            serializer_kwargs={'context': {'request': request}},
-            process_function=lambda project: SerializerClass(project, context={"request": request}).data
+            serializer_kwargs={"context": {"request": request}},
+            process_function=lambda project: SerializerClass(project, context={"request": request}).data,
         )
 
     activities = openapi.Parameter(
@@ -636,7 +636,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
-        project: Project = self.get_object()
+        project: Project = get_object_or_404(Project, pk=pk)
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -660,6 +660,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            traceback.print_exc()
             logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -793,13 +794,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
-        # TODO: Remove this action when not needed anymore
-        if not request.user.is_superuser:
-            return utils.ErrorResponse("Only superusers can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
-
         project: Project = self.get_object()
+        if not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
+
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
@@ -810,13 +811,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="total-hectares")
-    @swagger_auto_schema(
-        responses={
-            404: "Project not found", 
-            403: "Selected user does not have permission to view project", 
-            200: ProjectTotalHectaresSerializer
-        }
-    )
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalHectaresSerializer})
     def total_hectares(self, request, pk=None):
         """
         Returns the total hectares for all land modules in the project.
@@ -827,19 +822,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return error
 
         total_hectares = sum([activity.get_land_modules_area() for activity in project.activities.all()])
-        
+
         data = {"total_hectares": total_hectares}
         serializer = ProjectTotalHectaresSerializer(data)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="total-catch")
-    @swagger_auto_schema(
-        responses={
-            404: "Project not found", 
-            403: "Selected user does not have permission to view project", 
-            200: ProjectTotalCatchSerializer
-        }
-    )
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalCatchSerializer})
     def total_catch(self, request, pk=None):
         """
         Returns the total catch for all fisheries and aquaculture in the project across all scenarios.
@@ -861,18 +850,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
             "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
         }
-        
+
         serializer = ProjectTotalCatchSerializer(scenario_based_catch)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="total-livestock")
-    @swagger_auto_schema(
-        responses={
-            404: "Project not found", 
-            403: "Selected user does not have permission to view project", 
-            200: ProjectTotalLivestockSerializer
-        }
-    )
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalLivestockSerializer})
     def total_livestock(self, request, pk=None):
         """
         Returns the total number of livestock heads in the project across all scenarios.
@@ -893,7 +876,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "w": all_livestock_w,
             "wo": all_livestock_wo,
         }
-        
+
         serializer = ProjectTotalLivestockSerializer(scenario_based_livestock)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
@@ -909,7 +892,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
         lang = request.query_params.get("lang", "en")
-        if request.LANGUAGE_CODE:
+        if hasattr(request, "LANGUAGE_CODE"):
             lang = request.LANGUAGE_CODE
 
         if not template_name:
@@ -1343,11 +1326,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
         operation_description="Send recap email with project changes",
-        responses={
-            200: "Email sent successfully",
-            400: "Bad request",
-            500: "Internal server error"
-        }
+        responses={200: "Email sent successfully", 400: "Bad request", 500: "Internal server error"},
     )
     def recap(self, request, pk=None):
         project = self.get_object()
@@ -1370,8 +1349,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def summary(self, request, pk=None):
         serializer = ProjectSummarySerializer(self.get_object(), context={"request": request})
         return Response(serializer.data, status=http_status.HTTP_200_OK)
-    
-    
+
+
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
     serializer_class = ProjectMembershipReadSerializer
@@ -1512,6 +1491,96 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+
+class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectNotificationPreference.objects.all()
+    serializer_class = ProjectNotificationPreferenceReadSerializer
+
+    def get_queryset(self):
+        """Filter to only show the current user's notification preferences"""
+        return self.queryset.filter(user=self.request.user)
+
+    @swagger_auto_schema(
+        operation_description="Get notification preferences for the current user",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer(many=True),
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        project_id = self.request.query_params.get("project_id", None)
+
+        queryset = self.get_queryset()
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Get or create notification preference for a specific project",
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Create or update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            201: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+        },
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = ProjectNotificationPreferenceWriteSerializer(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        project = serializer.validated_data["project"]
+
+        # Get or create the preference
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+
+        if not created:
+            # Update existing preference
+            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.save()
+
+        response_serializer = ProjectNotificationPreferenceReadSerializer(preference)
+        status_code = http_status.HTTP_201_CREATED if created else http_status.HTTP_200_OK
+
+        return Response(response_serializer.data, status=status_code)
+
+    @swagger_auto_schema(
+        operation_description="Update notification preference for a project",
+        request_body=ProjectNotificationPreferenceWriteSerializer,
+        responses={
+            200: ProjectNotificationPreferenceReadSerializer,
+            400: "Bad request",
+            403: "Forbidden",
+        },
+    )
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user != request.user:
+            return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
+
+        return Response(response_serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1824,12 +1893,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
 
-        return utils.paginated_parallel_response(
-            queryset=activities_list,
-            request=request,
-            serializer_class=SerializerClass,
-            process_function=lambda activity: SerializerClass(activity).data
-        )
+        return utils.paginated_parallel_response(queryset=activities_list, request=request, serializer_class=SerializerClass, process_function=lambda activity: SerializerClass(activity).data)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
@@ -1925,9 +1989,13 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer})
+    @swagger_auto_schema(
+        responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer},
+        request_body=EmptySerializer,
+    )
+    @transaction.atomic
     def copy(self, request, pk=None):
-        activity: Activity = self.get_object()
+        activity: Activity = get_object_or_404(Activity, pk=pk)
         error = security.check_permission("view_activity", self.request.user, activity.project)
         if error:
             return error
@@ -2086,7 +2154,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows module types to be viewed or edited.
     """
@@ -2174,12 +2242,12 @@ def generic_module_viewset(model: Module):
                 return get_module_serializer(model, action=ActionTypes.CREATE)
             return get_module_serializer(model)
 
-        def update(self, request, *args, **kwargs):
+        def update(self, request, pk=None):
             """
             Updates a module.
             """
 
-            module: Module | Submodule | LandModule = self.get_object()
+            module: Module | Submodule | LandModule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2202,12 +2270,12 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
-        def partial_update(self, request, *args, **kwargs):
+        def partial_update(self, request, pk=None):
             """
             Partially updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity: Activity = module.get_activity()
 
             error = security.check_permission("change_modules", self.request.user, activity.project)
@@ -2354,7 +2422,15 @@ def generic_module_viewset(model: Module):
                     results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS).data
                     results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module_results = (
+                        results_total
+                        if aggregate_by == BreakdownTypes.TOTAL
+                        else results_by_activity
+                        if aggregate_by == BreakdownTypes.ACTIVITY
+                        else results_by_gas
+                        if aggregate_by == BreakdownTypes.GAS
+                        else results_by_activity_gas
+                    )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -2375,13 +2451,8 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-            activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
-            error = security.check_permission("view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, module.activity.project)
             if error:
                 return error
 
@@ -2398,7 +2469,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"])
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
-            module: Module = self.get_object()
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
             error = security.check_permission("view_modules", self.request.user, activity.project)
@@ -2786,7 +2857,7 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows Hand in Hand assessments to be viewed or edited.
     """
@@ -2794,12 +2865,22 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = HandInHandAssessment.objects.all()
     serializer_class = HandInHandAssessmentSerializer
 
+    # Cache settings
+    CACHE_KEY_PREFIX = "handinhand_assessments"
+    CACHE_TIMEOUT_SECONDS = 60 * 15  # 15 minutes
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
                 "grouped",
                 openapi.IN_QUERY,
                 description="Return assessments grouped by region > country > year",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
         ],
@@ -2810,9 +2891,25 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all Hand in Hand assessments, optionally grouped by region > country > year
         """
         grouped = request.query_params.get("grouped", "false").lower() == "true"
+        use_cache = request.query_params.get("cached", "true").lower() == "true"
+
+        # Generate cache key based on grouping option
+        cache_key = f"{self.CACHE_KEY_PREFIX}_{'grouped' if grouped else 'list'}"
+
+        # Try to get cached data if cache is enabled
+        if use_cache:
+            cached_data = cache.get(cache_key)
+            if cached_data is not None:
+                return Response(cached_data)
 
         if grouped:
             serializer = HandInHandAssessmentGroupedSerializer(data={})
-            return Response(serializer.to_representation(None))
+            response_data = serializer.to_representation(None)
+        else:
+            response_data = super().list(request, *args, **kwargs).data
 
-        return super().list(request, *args, **kwargs)
+        # Cache the response data
+        if use_cache:
+            cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
+
+        return Response(response_data)

@@ -108,3 +108,6 @@ djangoexact/scripts/minitool/
 djangoexact/djangoexact/.env.test
 djangoexact/djangoexact/.env.scenario
 CHANGES.md
+djangoexact/.commitizen/openai_cache.json
+djangoexact/djangoexact/.env.minitool
+djangoexact/minitool/data/changes/perennialcropland_changes.json

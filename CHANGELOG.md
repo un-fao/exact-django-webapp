@@ -1,3 +1,140 @@
+## 1.15.13 (2025-08-14)
+
+### Fix
+
+- **grassland**: overwrite default soc with grassland-specific soc when needed
+
+## 1.15.12 (2025-08-13)
+
+### Fix
+
+- **grassland**: add fi, flu, fmg override based on grassland management practices in calculator
+- remove old reference to degraded land in favor of other land in FLU data
+
+## 1.15.11 (2025-08-13)
+
+### Fix
+
+- **project copy**: remove double transaction management logic causing TransactionManagementError
+
+## 1.15.10 (2025-08-12)
+
+### Fix
+
+- **activity builder**: add missing check for luc presence when editing activity
+
+## 1.15.9 (2025-08-07)
+
+### Fix
+
+- **activity copy**: remove module saving from handle_threads to avoid integrity errors
+
+## 1.15.8 (2025-08-06)
+
+### Fix
+
+- **activity builder**: move module deletion at the end so activity editing is not affected by delete cascade
+- **copy**: rework logic so that organic soil is properly copied
+- **fra**: align some countries with mismatching names in the dataset
+
+## 1.15.7 (2025-08-05)
+
+### Fix
+
+- **copy**: handle submodule comment threads before saving
+
+## 1.15.6 (2025-08-05)
+
+### Fix
+
+- **copy**: generalize logic handling copy of submodules
+- remove test exception
+- **activity builder**: set fields to default values if present when senitizing modules inputs
+- **perennial cropland**: add missing growth flag for computed biomass values
+- **forest management**: fetch the proper BGB Max values from mathematical model for defaults
+- **copy**: add updated organic soil to LUC module to avoid primary key conflicts
+- **report**: preventorganic soil peat to be considered when not present
+
+## 1.15.5 (2025-08-04)
+
+### Fix
+
+- **defaults**: add max agb and max bgb values to forest management
+- **input**: add macro input type other to user defined inputs
+- **report**: remove balance stats for shadow price of carbon
+- **perennial cropland**: wrong None allocation causing crash in maturity computation
+- **organic soil**: set None ditches area and extraction height to zero to avoid NoneType errors in mathematical model
+- make defaults endpoint accessible regardless of project lock
+
+## 1.15.4 (2025-08-01)
+
+### Feat
+
+- **forest management**: add litter and deadwood max default initialization for non-afforestation scenarios with FRA data source
+- **test**: add scaffolding for unit testing of land use changes
+- **forest management**: add initial AGB values based on AGB Max for forest management calculations when FRA data source is selected
+
+### Fix
+
+- **test**: modify annual cropland unit test so that minor season data is correctly randomized
+- **test**: randomize object selection in UnitTestAnnualCroplandFactory
+- **annual cropland**: correct minor yield refrence value for start scenario in calculator
+- **annuals**: set minor to Optional
+- **livestock**: add logic to override systems arrays when complementary manure management is selected
+- **livestock**: fix livestock inputs
+- **luc**: add tier2 checks for soc in deforestation and other land use change calculators
+
+### Refactor
+
+- **test**: add support for module factories to build validated data in unit tests
+
+## 1.15.3 (2025-07-31)
+
+### Feat
+
+- **test**: add agb and bgb t2 in forest management unit test
+- **test**: add ability to calculate non-cached results
+- **test**: add ability to override t2 fields to test with custom list
+- **test**: add logic to methodically test the effect of t2 values on module results
+- **Forest Management**: add agb_max_t2 defaults and corresponding tests
+- add project-level notification opt in
+
+### Fix
+
+- **fisheries**: add FUI data to defaults
+- raise error if fra carbon stock data is not found for project country
+- **test**: filter out countries with no region in test project setup
+- **mathematical model**: wrong falsy check for litter and deadwood t2 values in forest management
+- add logic that sends default biomass in AGB/BGB modules where scenario is not used
+- **Public Project Template**: unchecked language code reference causing AttributeError
+- allow lock holders to unlock projects
+- **Perennial**: update bgb_start evaluation logic and set bgb_start to nullable
+- **Perennial Cropland**: attribute reference issue causing wrong values in maturity computation
+
+### Refactor
+
+- rewrite some tests to include results retry logic
+- set bgb_start to None instead of bgb rate in perennial crop maturity computation
+
+## 1.15.2 (2025-07-29)
+
+### Feat
+
+- cache hih assessment endpoint
+- add hih assessments import script and data
+
+### Fix
+
+- **Project**: make unlock endpoint post instead of get
+- **Defaults**: remove old references to energy and fuel calculators causing null values in value chain classes
+- **Organic Soil**: Adjust peat area checks causing None Types to be wrongly evaluated
+- **Organic Soil**: Add missing onsite ch4 peat extraction ef tier2 input for all scenarios
+- **Input Entry**: Add specific tier2 checks for user defined inputs
+- **Minor Season Annual Cropland**: Add additional validation checking for improper scenario inputs
+- **Dynamic Filter**: Remove duplicate results from multiple search queries
+- **Forest Management**: Solve a disturbance input issue causing a crash
+- **Perennial**: Adjust logic for maturity computations for perennial remaining perennial
+
 ## 1.15.1 (2025-07-25)
 
 ### Feat

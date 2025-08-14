@@ -4683,7 +4683,11 @@ def clear_cache_of_all_modules():
         if issubclass(model, (CachedResultMixin)) and not model._meta.abstract:
             instances.extend(model.objects.all())
 
-    instances = [instance for instance in instances if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])]
+    instances = [
+        instance
+        for instance in instances
+        if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])
+    ]
 
     log.debug(f"Clearing cache for {len(instances)} instances")
 
@@ -4717,12 +4721,15 @@ def assign_parent_fuel_types_to_fuel_types():
 
 
 def create_energy_entry_module_type():
-    module_type = ModuleType.objects.create(
+    module_type, created = ModuleType.objects.get_or_create(
         class_name="EnergyEntry",
         name="Energy Entry",
         is_submodule=True,
     )
-    print(f"Created ModuleType: {module_type}")
+    if created:
+        print(f"Created ModuleType: {module_type}")
+    else:
+        print(f"ModuleType already exists: {module_type}")
 
 
 def add_change_public_project_flag_permission_to_admin_group():
@@ -4783,6 +4790,8 @@ def import_fra_carbon_stock_data():
         deadwood = parse_csv_number(row["deadwood"])
         carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
         carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        print(f"Creating {country} {2020} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
 
         FRACarbonStock.objects.create(
             year=2020,
@@ -4907,6 +4916,100 @@ def convert_storage_refrigerant_ef_from_kg_to_tonnes():
             print(f"Updated {ef} to {ef.value} tonnes")
 
 
+def change_aggregate_from_floodedrice_to_flooded_rice():
+    """
+    Change the aggregate from FloodedRice to Flooded Rice.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Changing aggregate from FloodedRice to Flooded Rice")
+    ChangeAggregate.objects.filter(module_type__iexact="flooded_rice").update(module_type="Flooded Rice")
+    print("Done")
+
+
+def delete_all_floodedrice_module_type_entries_from_aggregates():
+    """
+    Delete all Flooded Rice module type entries from the aggregates.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Deleting all Flooded Rice module type entries from the aggregates")
+    ChangeAggregate.objects.filter(module_type__exact="floodedrice").delete()
+    print("Done")
+
+
+def add_fi_data_for_all_grassland_management_types():
+    """
+    Add FI data for all grassland management types.
+    """
+    from ipcc.models import FIData
+
+    FIData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"]) if not pd.isna(row["organic_input_type"]) else None
+        value = parse_csv_number(row["value"])
+        FIData.objects.create(climate=climate, moisture=moisture, organic_input_type=organic_input_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {organic_input_type} {grassland_management_type} {value}")
+
+
+def add_flu_data_for_all_grassland_management_types():
+    """
+    Add FLU data for all grassland management types.
+    """
+    from ipcc.models import FLUData
+
+    FLUData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"]) if not pd.isna(row["land_use_type"]) else None
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FLUData.objects.create(climate=climate, moisture=moisture, land_use_type=land_use_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {land_use_type} {grassland_management_type} {value}")
+
+
+def add_fmg_data_for_all_grassland_management_types():
+    """
+    Add FMG data for all grassland management types.
+    """
+    from ipcc.models import FMGData
+
+    FMGData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"]) if not pd.isna(row["tillage_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FMGData.objects.create(climate=climate, moisture=moisture, grassland_management_type=grassland_management_type, tillage_management_type=tillage_management_type, value=value)
+        print(f"Created {climate} {moisture} {grassland_management_type} {tillage_management_type} {value}")
+
+
 def run():
     import os
 
@@ -4915,26 +5018,9 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        # import_definitions.import_definitions()
-        # rename_solar_fuel_type_to_renewable()
-        assign_fuel_type_units()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
-        # delete_and_import_irrigation_phase_data()
-        # add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
-        # import_shadow_prices_of_carbon()
-        # add_0_2_to_co2_value_in_input_emission_factor()
-        create_parent_fuel_types()
-        assign_parent_fuel_types_to_fuel_types()
-        create_energy_entry_module_type()
-        add_change_public_project_flag_permission_to_admin_group()
-        import_fra_carbon_stock_data()
-        add_ipcc_and_fra_as_data_sources()
-        add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none()
-        add_small_fishery_gear_types_fishery_types_relationships()
-        change_other_land_flu_data_to_1()
-        update_module_types_of_fuel_types()
-        convert_storage_refrigerant_ef_from_kg_to_tonnes()
+        add_fi_data_for_all_grassland_management_types()
+        add_flu_data_for_all_grassland_management_types()
+        add_fmg_data_for_all_grassland_management_types()
         pass
 
     if app_mode == "review":

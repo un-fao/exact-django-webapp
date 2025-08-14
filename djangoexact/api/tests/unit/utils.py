@@ -7,7 +7,7 @@ from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyText, FuzzyInteger
 import logging as log
 from django.core.files.uploadedfile import SimpleUploadedFile
-
+from rest_framework import status
 import public.views as public_views
 
 
@@ -41,12 +41,13 @@ class APITestCaseMixin(APITestCase):
         self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
-        self.country = models.Country.objects.order_by("?").first()
+        self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
         self.module_type = models.ModuleType.objects.filter(is_luc=True).order_by("?").first()
         self.change_rate = models.ChangeRate.objects.get(name="linear")
+        self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
         self.project_data = {
             "name": FuzzyText().fuzz(),
             "start_year_of_activities": 2024,
@@ -56,7 +57,7 @@ class APITestCaseMixin(APITestCase):
             "climate": self.climate.id,
             "moisture": self.moisture.id,
             "soil_type": self.soil_type.id,
-            "gw_potential": ipcc_models.GlobalWarmingPotential.objects.order_by("?").first().id,
+            "gw_potential": self.gw_potential.id,
             "soc_ref_t2": FuzzyInteger(0, 100).fuzz(),
         }
 
@@ -79,6 +80,19 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
+
+    def unlock_project(self, project, user):
+        """
+        Unlock a project using the ProjectViewSet.
+        """
+        log.info("Unlocking project")
+        view = ProjectViewSet.as_view({"post": "unlock"})
+        request = self.request_factory.post(
+            reverse("project-unlock", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
 
     def send_project_invitation(self, project, user, group):
         """
@@ -117,7 +131,7 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
-    
+
     def get_project_memberships(self, project):
         """
         Get project memberships for a project.
@@ -127,18 +141,14 @@ class APITestCaseMixin(APITestCase):
         request = self.request_factory.get(reverse("project-list"), format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
-    
+
     def get_project_memberships_filter_by_user(self, project):
         """
         Get project memberships for a project, filtered by user.
         """
         log.info("Getting project memberships filtered by user")
         view = ProjectViewSet.as_view({"get": "memberships"})
-        request = self.request_factory.get(
-            reverse("project-list"),
-            {"user": self.user.id},
-            format="json"
-        )
+        request = self.request_factory.get(reverse("project-list"), {"user": self.user.id}, format="json")
         force_authenticate(request, user=self.user)
         return view(request, pk=project.id)
 
@@ -184,7 +194,7 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request)
 
-    def create_activity(self, project, user, module_types=None):
+    def create_activity(self, project, user, module_types=None, land_use_change=False):
         """
         Create an activity using the ActivityViewSet.
 
@@ -197,11 +207,21 @@ class APITestCaseMixin(APITestCase):
         activity_builder_data = {
             "name": FuzzyText().fuzz(),
             "project": project.id,
-            "module_types": [self.module_type.id] if module_types is None else [module_type.id for module_type in module_types],
             "area": 100,
             "change_rate": self.change_rate.id,
             "cost": 0,
         }
+
+        if land_use_change:
+            activity_builder_data["land_use_change"] = {
+                "module_type_start": module_types[0].id,
+                "module_type_w": module_types[1].id,
+                "module_type_wo": module_types[2].id,
+            }
+        elif module_types:
+            activity_builder_data["module_types"] = [module_type.id for module_type in module_types]
+        else:
+            activity_builder_data["module_types"] = [self.module_type.id]
 
         view = ActivityViewSet.as_view({"post": "build"})
         request = self.request_factory.post(
@@ -210,7 +230,11 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         force_authenticate(request, user=user)
-        return view(request)
+
+        response = view(request)
+        log.error(response.data) if response.status_code != status.HTTP_200_OK else None
+
+        return response
 
     def edit_activity(self, activity, user, data):
         """
@@ -457,7 +481,7 @@ class APITestCaseMixin(APITestCase):
             format="json",
         )
         return view(request, pk=project.pk)
-    
+
     def add_comment(self, thread: models.CommentThread, text: str):
         """
         Add a comment to a module using the ModuleViewSet.
@@ -476,7 +500,7 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=self.user)
         return view(request)
-    
+
     def send_recap_email(self, project, user):
         """
         Send a recap email using the ProjectViewSet.
