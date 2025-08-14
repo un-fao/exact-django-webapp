@@ -386,6 +386,28 @@ def add_other_macro_input_type_to_user_defined_tier_2_input_type_except_animal_f
         print(f"Updated {len(input_types_to_update)} input types with macro input type {other_macro_input_type.name}")
 
 
+def find_all_countries_with_no_region():
+    """
+    Find all countries with no region
+    """
+    countries = models.Country.objects.filter(region=None)
+    print(f"Found {countries.count()} countries with no region")
+    for country in countries:
+        country.delete()
+        print(f"Deleted country: {country.name}")
+
+
+def find_all_countries_with_no_ipcc_region():
+    """
+    Find all countries with no ipcc region
+    """
+    countries = models.Country.objects.filter(ipcc_region=None)
+    print(f"Found {countries.count()} countries with no ipcc region")
+    for country in countries:
+        country.delete()
+        print(f"Deleted country: {country.name}")
+
+
 def run():
     import os
 
@@ -402,6 +424,8 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        find_all_countries_with_no_region()
+        find_all_countries_with_no_ipcc_region()
         pass
 
     if app_mode == "test":

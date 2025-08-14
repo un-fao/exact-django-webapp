@@ -816,8 +816,8 @@ def run():
     ANNUAL_CROPLAND = False
     FLOODED_RICE = False
     GRASSLAND = False
-    LIVESTOCK = False
-    PERENNIAL_CROPLAND = True
+    LIVESTOCK = True
+    PERENNIAL_CROPLAND = False
 
     MAX_ROWS = 25000
 
