@@ -1,3 +1,9 @@
+## 1.15.13 (2025-08-14)
+
+### Fix
+
+- **grassland**: overwrite default soc with grassland-specific soc when needed
+
 ## 1.15.12 (2025-08-13)
 
 ### Fix
