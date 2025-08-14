@@ -615,7 +615,9 @@ class LandModuleCalculator(BaseCalculator):
         self.calculate_biomass_w = not (self.module.is_start() and self.module.is_with())
         self.calculate_biomass_wo = not (self.module.is_start() and self.module.is_without())
 
-        self.soc_start = self.soc_w = self.soc_wo = ipcc.SoilOrganicCarbon()
+        self.soc_start: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
+        self.soc_w: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
+        self.soc_wo: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
 
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
@@ -626,40 +628,33 @@ class LandModuleCalculator(BaseCalculator):
     def get_defaults(self, calculate=False) -> dict:
         moisture_flt = {"moisture": self.moisture}
 
-        try:
-            self.soc = ipcc.SoilOrganicCarbon.objects.get(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type)
-            self.soc_start = self.soc_w = self.soc_wo = self.soc
-        except ipcc.SoilOrganicCarbon.DoesNotExist:
-            missing_scenarios = []
+        self.soc = ipcc.SoilOrganicCarbon.objects.filter(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type).first()
+        self.soc_start = self.soc_w = self.soc_wo = self.soc
 
-            # NOTE: Hierarchical order of precedence for SOC: Project < Activity < Module
-            if self.project.soc_ref_t2 is not None:
-                self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.project.soc_ref_t2)
+        if isinstance(self.module, Grassland):
+            if self.module.is_start():
+                self.soc_start = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_start).first()
+            if self.module.is_with():
+                self.soc_w = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_w).first()
+            if self.module.is_without():
+                self.soc_wo = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_wo).first()
 
-            if self.activity.soc_t2 is not None:
-                self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.activity.soc_t2)
+        self.soc_t2_start = getattr(self.module_start, "soc_t2_start", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
+        self.soc_t2_w = getattr(self.module_w, "soc_t2_w", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
+        self.soc_t2_wo = getattr(self.module_wo, "soc_t2_wo", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
 
-            if self.module.soc_t2_start is not None:
-                self.soc_start = SimpleNamespace(value=self.module.soc_t2_start)
+        missing_scenarios = []
+        if self.soc_t2_start is None and self.soc_start is None or self.soc_start.value is None:
+            missing_scenarios.append("Start")
+        if self.soc_t2_w is None and self.soc_w is None or self.soc_w.value is None:
+            missing_scenarios.append("With")
+        if self.soc_t2_wo is None and self.soc_wo is None or self.soc_wo.value is None:
+            missing_scenarios.append("Without")
 
-            if self.module.soc_t2_w is not None:
-                self.soc_w = SimpleNamespace(value=self.module.soc_t2_w)
-
-            if self.module.soc_t2_wo is not None:
-                self.soc_wo = SimpleNamespace(value=self.module.soc_t2_wo)
-
-            if self.soc.value is None and not all(x.value is not None for x in [self.soc_start, self.soc_w, self.soc_wo]):
-                if self.soc_start.value is None:
-                    missing_scenarios.append("Start")
-                if self.module.is_with() and self.soc_w.value is None:
-                    missing_scenarios.append("With")
-                if self.module.is_without() and self.soc_wo.value is None:
-                    missing_scenarios.append("Without")
-
-                if missing_scenarios:
-                    raise Exception(
-                        f"SOC for {self.climate.name} climate, {self.moisture.name} moisture, and {self.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}"
-                    )
+        if missing_scenarios:
+            raise Exception(
+                f"SOC for {self.climate.name} climate, {self.moisture.name} moisture, and {self.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}"
+            )
 
         self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.climate.name} moisture does not exist")
 
