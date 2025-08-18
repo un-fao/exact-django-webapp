@@ -355,8 +355,18 @@ class Command(BaseCommand):
         sorted_values = sorted(values)
         n = len(sorted_values)
 
-        q1 = statistics.quantiles(values, n=4)[0]
-        q3 = statistics.quantiles(values, n=4)[2]
+        # Handle cases with insufficient data for quartiles
+        if n < 2:
+            # For single value, set quartiles to the same value
+            q1 = q3 = values[0]
+        else:
+            try:
+                quantiles = statistics.quantiles(values, n=4)
+                q1 = quantiles[0]
+                q3 = quantiles[2]
+            except statistics.StatisticsError:
+                # Fallback for edge cases
+                q1 = q3 = statistics.median(values)
 
         return {
             "count": n,
