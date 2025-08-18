@@ -117,7 +117,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     def get_filtered_queryset(self, module_type, request, extra_filters=None):
         """Helper method to get filtered queryset for any module."""
         filters = {}
-        filter_fields = ["region", "climate", "moisture", "soil_type", "field"]
+        filter_fields = ["country", "climate", "moisture", "soil_type", "field"]
 
         # Start with base queryset filtered by module type
         queryset = models.ChangeAggregate.objects.all()
@@ -132,7 +132,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             value = request.query_params.get(field)
             if value:
                 filters[field] = value
-                if hasattr(queryset.model, field):
+                if field == "country":
+                    country = api_models.Country.objects.get(name=value)
+                    queryset = queryset.filter(region=country.region)
+                elif hasattr(queryset.model, field):
                     queryset = queryset.filter(**{field: value})
 
         # Apply custom filters from custom_filters JSONField
@@ -204,9 +207,12 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         # Standard filters (only include if custom_only is False)
         if not custom_only:
-            standard_filters = ["region", "climate", "moisture", "soil_type"]
+            standard_filters = ["country", "climate", "moisture", "soil_type"]
             for filter_name in standard_filters:
-                values = queryset.values_list(filter_name, flat=True).distinct()
+                if filter_name == "country":
+                    values = models.Country.objects.values_list("name", flat=True).distinct()
+                else:
+                    values = queryset.values_list(filter_name, flat=True).distinct()
                 filters_with_entries[filter_name] = sorted(list(values)) if values else []
 
         # Custom filters
