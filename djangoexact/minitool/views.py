@@ -161,7 +161,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
     def get_available_custom_filters(self, module_type):
         """Get available custom filter fields and their values for a specific module."""
-        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland"}
+        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
         module_type_value = module_type_mapping.get(module_type, module_type)
 
         queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
@@ -220,6 +220,9 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             first_record = queryset.first()
             if hasattr(first_record, "custom_filters") and first_record.custom_filters:
                 for filter_name in first_record.custom_filters.keys():
+                    # Exclude module from custom filter list
+                    if filter_name == "module":
+                        continue
                     values = queryset.exclude(custom_filters__isnull=True).exclude(custom_filters={}).values_list(f"custom_filters__{filter_name}", flat=True).distinct()
                     filters_with_entries[filter_name] = sorted(list(values)) if values else []
 
@@ -642,7 +645,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         comparison_data = {}
 
         for module in modules:
-            module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland"}
+            module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
             module_type_value = module_type_mapping.get(module, module)
 
             queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
