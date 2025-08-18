@@ -210,7 +210,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             standard_filters = ["country", "climate", "moisture", "soil_type"]
             for filter_name in standard_filters:
                 if filter_name == "country":
-                    values = models.Country.objects.values_list("name", flat=True).distinct()
+                    values = api_models.Country.objects.values_list("name", flat=True).distinct()
                 else:
                     values = queryset.values_list(filter_name, flat=True).distinct()
                 filters_with_entries[filter_name] = sorted(list(values)) if values else []
