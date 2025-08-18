@@ -1430,6 +1430,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if admin_count == 1:
                 return utils.ErrorResponse("Cannot delete the last Admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if membership.project.locked_by == membership.user:
+            membership.project.unlock()
+
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
