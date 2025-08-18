@@ -355,8 +355,8 @@ class Command(BaseCommand):
         sorted_values = sorted(values)
         n = len(sorted_values)
 
-        q1_idx = n // 4
-        q3_idx = 3 * n // 4
+        q1 = statistics.quantiles(values, n=4)[0]
+        q3 = statistics.quantiles(values, n=4)[2]
 
         return {
             "count": n,
@@ -365,8 +365,8 @@ class Command(BaseCommand):
             "median": statistics.median(values),
             "min": min(values),
             "max": max(values),
-            "q1": sorted_values[q1_idx] if n > 0 else 0,
-            "q3": sorted_values[q3_idx] if n > 0 else 0,
+            "q1": q1,
+            "q3": q3,
         }
 
     def update_progress(self, phase, current, total, created, skipped, final=False):
