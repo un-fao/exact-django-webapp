@@ -556,9 +556,6 @@ def process_combinations_floodedrice(combo):
         organic_amendment_type_start=organic_amendment_type_start,
         organic_amendment_type_w=organic_amendment_type_w,
         organic_amendment_type_wo=organic_amendment_type_start,
-        land_use_type_start=models.LandUseType.objects.get(name_en="Flooded Rice"),
-        land_use_type_w=models.LandUseType.objects.get(name_en="Flooded Rice"),
-        land_use_type_wo=models.LandUseType.objects.get(name_en="Flooded Rice"),
     )
 
     try:
