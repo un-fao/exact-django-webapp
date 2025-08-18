@@ -268,6 +268,15 @@ class PerennialCroplandData(BaseData):
         self.tillage_management_type_start = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
         self.tillage_management_type_w = self.module.tillage_management_type_w.name if self.module.tillage_management_type_w else None
         self.tillage_management_type_wo = self.module.tillage_management_type_start.name if self.module.tillage_management_type_start else None
+        self.organic_input_type_start = self.module.organic_input_type_start.name if self.module.organic_input_type_start else None
+        self.organic_input_type_w = self.module.organic_input_type_w.name if self.module.organic_input_type_w else None
+        self.organic_input_type_wo = self.module.organic_input_type_start.name if self.module.organic_input_type_start else None
+        self.is_biomass_burned_start = self.module.is_biomass_burned_start
+        self.is_biomass_burned_w = self.module.is_biomass_burned_w
+        self.is_biomass_burned_wo = self.module.is_biomass_burned_start
+        self.fire_periodicity_t2_start = self.module.fire_periodicity_t2_start
+        self.fire_periodicity_t2_w = self.module.fire_periodicity_t2_w
+        self.fire_periodicity_t2_wo = self.module.fire_periodicity_t2_start
 
     def to_dict(self):
         return {
@@ -278,6 +287,15 @@ class PerennialCroplandData(BaseData):
             "tillage_management_type_start": self.tillage_management_type_start,
             "tillage_management_type_w": self.tillage_management_type_w,
             "tillage_management_type_wo": self.tillage_management_type_wo,
+            "organic_input_type_start": self.organic_input_type_start,
+            "organic_input_type_w": self.organic_input_type_w,
+            "organic_input_type_wo": self.organic_input_type_wo,
+            "is_biomass_burned_start": self.is_biomass_burned_start,
+            "is_biomass_burned_w": self.is_biomass_burned_w,
+            "is_biomass_burned_wo": self.is_biomass_burned_wo,
+            "fire_periodicity_t2_start": self.fire_periodicity_t2_start,
+            "fire_periodicity_t2_w": self.fire_periodicity_t2_w,
+            "fire_periodicity_t2_wo": self.fire_periodicity_t2_wo,
         }
 
 
@@ -556,9 +574,6 @@ def process_combinations_floodedrice(combo):
         organic_amendment_type_start=organic_amendment_type_start,
         organic_amendment_type_w=organic_amendment_type_w,
         organic_amendment_type_wo=organic_amendment_type_start,
-        land_use_type_start=models.LandUseType.objects.get(name_en="Flooded Rice"),
-        land_use_type_w=models.LandUseType.objects.get(name_en="Flooded Rice"),
-        land_use_type_wo=models.LandUseType.objects.get(name_en="Flooded Rice"),
     )
 
     try:
@@ -605,8 +620,11 @@ def process_combinations_perennialcropland(combo):
         moisture=moisture,
         soil_type=soil_type,
         country=region.countries.order_by("?").first(),
+        implementation_years=0,
+        start_year_of_activities=2025,
+        last_year_of_accounting=2026,
     )
-    a = factories.ActivityFactory.build(project=p)
+    a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
     module = factories.PerennialCroplandFactory.build(
         activity=a,
         area=1,
@@ -796,13 +814,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None, is
         print(f"No data for {model.__name__}!")
         return
 
-    df = pd.DataFrame(data)
-    print(f"Total {model.__name__} rows: {len(data)}")
-    print(f"Errors: {globals()['errors']}")
-
-    filepath = os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__.lower()}.csv")
-
-    df.to_csv(filepath, index=False)
+    save_data()
 
 
 def run():
@@ -816,10 +828,10 @@ def run():
     ANNUAL_CROPLAND = False
     FLOODED_RICE = False
     GRASSLAND = False
-    LIVESTOCK = True
-    PERENNIAL_CROPLAND = False
+    LIVESTOCK = False
+    PERENNIAL_CROPLAND = True
 
-    MAX_ROWS = 25000
+    MAX_ROWS = 10000
 
     try:
         if GRASSLAND:

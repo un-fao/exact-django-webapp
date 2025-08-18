@@ -178,7 +178,7 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
         output_file = f"{base_name}_changes.json"
 
     # Save to JSON file
-    output_path = os.path.join(os.path.dirname(csv_file_path), output_file)
+    output_path = os.path.join("minitool", "data", "changes", output_file)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(changes_data, f, indent=2, ensure_ascii=False)
 
@@ -203,7 +203,7 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
 
 def run():
     try:
-        for module_type in ["perennialcropland"]:
+        for module_type in ["annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock"]:
             output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
         print(f"\nAnalysis completed successfully!")
         print(f"Output file: {output_path}")

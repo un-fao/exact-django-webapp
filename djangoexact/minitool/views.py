@@ -117,7 +117,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     def get_filtered_queryset(self, module_type, request, extra_filters=None):
         """Helper method to get filtered queryset for any module."""
         filters = {}
-        filter_fields = ["region", "climate", "moisture", "soil_type", "field"]
+        filter_fields = ["country", "climate", "moisture", "soil_type", "field"]
 
         # Start with base queryset filtered by module type
         queryset = models.ChangeAggregate.objects.all()
@@ -132,7 +132,10 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             value = request.query_params.get(field)
             if value:
                 filters[field] = value
-                if hasattr(queryset.model, field):
+                if field == "country":
+                    country = api_models.Country.objects.get(name=value)
+                    queryset = queryset.filter(region=country.region)
+                elif hasattr(queryset.model, field):
                     queryset = queryset.filter(**{field: value})
 
         # Apply custom filters from custom_filters JSONField
@@ -158,7 +161,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
     def get_available_custom_filters(self, module_type):
         """Get available custom filter fields and their values for a specific module."""
-        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland"}
+        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
         module_type_value = module_type_mapping.get(module_type, module_type)
 
         queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
@@ -204,9 +207,12 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         # Standard filters (only include if custom_only is False)
         if not custom_only:
-            standard_filters = ["region", "climate", "moisture", "soil_type"]
+            standard_filters = ["country", "climate", "moisture", "soil_type"]
             for filter_name in standard_filters:
-                values = queryset.values_list(filter_name, flat=True).distinct()
+                if filter_name == "country":
+                    values = api_models.Country.objects.values_list("name", flat=True).distinct()
+                else:
+                    values = queryset.values_list(filter_name, flat=True).distinct()
                 filters_with_entries[filter_name] = sorted(list(values)) if values else []
 
         # Custom filters
@@ -214,6 +220,9 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             first_record = queryset.first()
             if hasattr(first_record, "custom_filters") and first_record.custom_filters:
                 for filter_name in first_record.custom_filters.keys():
+                    # Exclude module from custom filter list
+                    if filter_name == "module":
+                        continue
                     values = queryset.exclude(custom_filters__isnull=True).exclude(custom_filters={}).values_list(f"custom_filters__{filter_name}", flat=True).distinct()
                     filters_with_entries[filter_name] = sorted(list(values)) if values else []
 
@@ -636,7 +645,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         comparison_data = {}
 
         for module in modules:
-            module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland"}
+            module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
             module_type_value = module_type_mapping.get(module, module)
 
             queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
