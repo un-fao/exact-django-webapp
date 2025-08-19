@@ -92,6 +92,7 @@ class ForestManagement(BaseModule):
     disturbance_recurrence: list[int]
     disturbance_percentage: list[float]
     disturbance_year_of_start: list[int]
+    disturbance_percentage_fire: list[float]
 
     ########### DEGRADATION RELATED VARIABLES ############
     degradation_percentage: float
@@ -248,7 +249,7 @@ class ForestManagement(BaseModule):
         def calculate_disturbance_or_logging():
             try:
                 # CALCULATION FOR DISTURBANCE
-                for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, [0 for i in self.disturbance_percentage], self.disturbance_year_of_start):
+                for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, self.disturbance_percentage_fire, self.disturbance_year_of_start):
                     if recurrence == 0:
                         # NOTE: If the recurrence is 0, it means that there is no disturbance, hence we skip the calculation. This should not happen, the front-end and back-end should send None
                         continue
