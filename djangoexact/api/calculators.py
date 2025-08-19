@@ -7144,6 +7144,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_start,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_start,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
@@ -7223,6 +7226,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_w,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_w,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_w,
@@ -7300,6 +7306,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_wo,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_wo,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_wo,
