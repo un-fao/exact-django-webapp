@@ -1,0 +1,961 @@
+region,climate,moisture,soil_type,total
+Eastern Asia,Tropical,Wet,Spodic,52.38105805647109
+Eastern Asia,Cool Temperate,Moist,Volcanic,44.61951920254527
+Eastern Asia,Boreal,Dry,Spodic,37.42060860930019
+Eastern Africa,Tropical Montane,Dry,Volcanic,34.85407018260243
+Eastern Asia,Tropical,Wet,Wetland,33.47932040720942
+Oceania,Tropical,Moist,Sandy,30.19972376148474
+Oceania,Tropical,Dry,Low Activity Clay,29.992787670297236
+Eastern Asia,Cool Temperate,Moist,Spodic,29.208304944824985
+Eastern Asia,Boreal,Moist,Low Activity Clay,28.945263512455067
+Oceania,Warm Temperate,Dry,Volcanic,28.568547207231
+North America,Tropical,Moist,Volcanic,28.547439997605032
+Europe,Tropical Montane,Dry,Low Activity Clay,28.275584608214974
+Oceania,Warm Temperate,Dry,High Activity Clay,26.156744474978492
+Eastern Asia,Warm Temperate,Moist,Low Activity Clay,25.978020137090187
+Europe,Tropical,Moist,High Activity Clay,24.94900717023001
+Eastern Asia,Tropical Montane,Dry,Volcanic,24.81160391230913
+Oceania,Tropical,Moist,Spodic,24.785755682749965
+Oceania,Tropical,Wet,Sandy,24.622750554936605
+Eastern Asia,Cool Temperate,Dry,Spodic,23.235468201405865
+Oceania,Cool Temperate,Dry,High Activity Clay,23.21494394283534
+Oceania,Boreal,Dry,High Activity Clay,22.384215595032142
+Europe,Warm Temperate,Dry,High Activity Clay,21.352671429695988
+North America,Tropical,Dry,Spodic,21.055584287237007
+Eastern Asia,Tropical,Moist,Spodic,20.026706891290463
+Oceania,Cool Temperate,Moist,Low Activity Clay,19.8712827452194
+Eastern Asia,Tropical,Moist,Low Activity Clay,19.68283292784927
+Eastern Asia,Cool Temperate,Moist,Wetland,19.61694966712937
+Oceania,Boreal,Moist,Wetland,18.94070593554359
+Eastern Asia,Tropical Montane,Dry,Wetland,18.12537111261444
+South-Eastern Asia,Boreal,Moist,Wetland,17.730096545537993
+Eastern Asia,Tropical,Dry,Low Activity Clay,17.658373328353353
+Oceania,Tropical Montane,Dry,Sandy,17.087995161576394
+Oceania,Tropical,Moist,Wetland,16.921017706063683
+Eastern Asia,Boreal,Dry,High Activity Clay,16.862341638018673
+South-Eastern Asia,Warm Temperate,Moist,High Activity Clay,16.269034954503834
+South-Eastern Asia,Tropical,Moist,Sandy,15.99619677490956
+Oceania,Tropical Montane,Dry,Wetland,15.682161951767062
+North America,Tropical,Moist,High Activity Clay,15.318892176555028
+Oceania,Warm Temperate,Moist,Wetland,15.252474870226763
+North America,Tropical Montane,Dry,Wetland,15.091297027052995
+Oceania,Tropical,Wet,High Activity Clay,14.803985638996572
+North America,Tropical Montane,Dry,High Activity Clay,14.434427571419993
+Oceania,Boreal,Moist,High Activity Clay,14.393929322293028
+South-Eastern Asia,Boreal,Dry,High Activity Clay,14.325287016858272
+South America,Cool Temperate,Moist,Spodic,14.050206316396022
+South-Eastern Asia,Boreal,Moist,Sandy,13.942471556470666
+Oceania,Tropical,Moist,Volcanic,13.842054171528666
+Eastern Asia,Cool Temperate,Moist,Low Activity Clay,13.728005641434176
+Oceania,Boreal,Dry,Spodic,13.68640833396066
+South-Eastern Asia,Cool Temperate,Moist,High Activity Clay,13.514297496788195
+Europe,Tropical Montane,Dry,Wetland,13.251337168004987
+North America,Boreal,Moist,Volcanic,13.113464250705022
+South-Eastern Asia,Tropical Montane,Dry,Spodic,13.061175109222727
+North America,Tropical,Moist,Spodic,12.944556466725018
+Oceania,Boreal,Moist,Low Activity Clay,12.879843542078747
+South-Eastern Asia,Boreal,Moist,High Activity Clay,12.80749970722685
+Central America,Tropical,Wet,Volcanic,12.657647840644266
+South-Eastern Asia,Cool Temperate,Moist,Spodic,12.266576502865423
+North America,Warm Temperate,Dry,Low Activity Clay,12.149697603458009
+Eastern Asia,Tropical,Dry,Volcanic,12.089776247946995
+South-Eastern Asia,Tropical,Dry,High Activity Clay,11.983143684433097
+Oceania,Tropical,Wet,Low Activity Clay,11.953749473307601
+North America,Tropical,Moist,Sandy,11.657979710782534
+Europe,Tropical,Moist,Sandy,11.576800938497996
+Oceania,Cool Temperate,Moist,Volcanic,11.567592015403907
+Oceania,Warm Temperate,Dry,Low Activity Clay,11.542667615847158
+South-Eastern Asia,Tropical,Moist,Wetland,11.438339375454914
+Oceania,Warm Temperate,Moist,Low Activity Clay,11.421512540825722
+South-Eastern Asia,Warm Temperate,Moist,Low Activity Clay,11.226091264423207
+South-Eastern Asia,Boreal,Dry,Wetland,11.150145045886068
+Oceania,Tropical Montane,Dry,Low Activity Clay,10.878571278133178
+Europe,Cool Temperate,Dry,High Activity Clay,10.854559043355
+South-Eastern Asia,Cool Temperate,Dry,Wetland,10.842617097643068
+Eastern Asia,Warm Temperate,Moist,Spodic,10.616176056273893
+Eastern Africa,Warm Temperate,Dry,High Activity Clay,10.580023581581052
+South-Eastern Asia,Cool Temperate,Dry,Spodic,10.486683028144087
+Oceania,Boreal,Dry,Wetland,10.45377765894941
+Oceania,Boreal,Moist,Sandy,10.437777917706159
+Eastern Asia,Boreal,Moist,Volcanic,10.372162339084579
+Caribbean,Boreal,Moist,Wetland,10.370161297761726
+Oceania,Tropical,Moist,High Activity Clay,10.353875724432756
+North America,Warm Temperate,Moist,Volcanic,10.231492769891979
+Eastern Asia,Tropical,Wet,High Activity Clay,10.199364475204007
+Oceania,Tropical,Dry,Volcanic,10.026796764730237
+Eastern Asia,Tropical,Wet,Low Activity Clay,9.945111875067326
+South-Eastern Asia,Tropical,Moist,High Activity Clay,9.936325324858407
+Central America,Cool Temperate,Moist,Spodic,9.89665400528302
+North America,Cool Temperate,Moist,Wetland,9.87120415587399
+Oceania,Boreal,Dry,Sandy,9.820703420921092
+South-Eastern Asia,Warm Temperate,Dry,High Activity Clay,9.77447427699151
+Oceania,Boreal,Moist,Volcanic,9.753836320344888
+North America,Cool Temperate,Dry,Wetland,9.70063771801597
+Central America,Boreal,Moist,Sandy,9.673668580872398
+South-Eastern Asia,Boreal,Moist,Spodic,9.497198223038831
+South-Eastern Asia,Tropical Montane,Dry,Wetland,9.452631062760272
+Central America,Warm Temperate,Dry,Low Activity Clay,9.421527855619257
+Eastern Asia,Cool Temperate,Dry,Wetland,9.373725817245168
+Eastern Asia,Warm Temperate,Moist,Wetland,9.269935217103539
+Eastern Asia,Cool Temperate,Dry,High Activity Clay,9.18834425216084
+Eastern Asia,Tropical,Moist,Wetland,9.032149678944483
+South-Eastern Asia,Boreal,Moist,Volcanic,9.02324042770326
+South-Eastern Asia,Tropical,Moist,Spodic,8.998867806780096
+South-Eastern Asia,Cool Temperate,Moist,Low Activity Clay,8.977688236441182
+North America,Tropical Montane,Dry,Volcanic,8.962508023229983
+South-Eastern Asia,Tropical Montane,Dry,High Activity Clay,8.909242519091501
+Europe,Cool Temperate,Dry,Volcanic,8.862409749622506
+South-Eastern Asia,Cool Temperate,Dry,High Activity Clay,8.816674683125694
+Oceania,Cool Temperate,Dry,Spodic,8.691088448011927
+Western Africa,Warm Temperate,Moist,Sandy,8.683659941765644
+North America,Warm Temperate,Dry,High Activity Clay,8.595862094128005
+Oceania,Warm Temperate,Moist,High Activity Clay,8.575204791411949
+South-Eastern Asia,Tropical,Wet,Volcanic,8.502162544423747
+South-Eastern Asia,Warm Temperate,Moist,Sandy,8.411891452468709
+Eastern Asia,Boreal,Dry,Wetland,8.393602616834126
+Oceania,Warm Temperate,Dry,Wetland,8.366439906814662
+Oceania,Cool Temperate,Dry,Wetland,8.309435507582396
+Western Africa,Warm Temperate,Moist,Wetland,8.309426607442175
+South-Eastern Asia,Tropical,Wet,Low Activity Clay,8.22502859250315
+South-Eastern Asia,Cool Temperate,Moist,Volcanic,8.140195535811786
+South-Eastern Asia,Boreal,Dry,Low Activity Clay,8.065115732730476
+Europe,Warm Temperate,Moist,Volcanic,7.860762241894493
+Europe,Cool Temperate,Dry,Low Activity Clay,7.823883810515003
+Central America,Boreal,Dry,Low Activity Clay,7.676501544319918
+Caribbean,Cool Temperate,Dry,Volcanic,7.628659643775159
+South-Eastern Asia,Tropical,Dry,Sandy,7.5126441168831475
+South-Eastern Asia,Tropical,Moist,Low Activity Clay,7.495598897846605
+Oceania,Tropical,Wet,Spodic,7.463871086451673
+North America,Tropical Montane,Dry,Low Activity Clay,7.460218851487501
+North America,Tropical,Dry,Wetland,7.303445827833032
+Oceania,Boreal,Dry,Volcanic,7.242998802439434
+Southern Africa,Warm Temperate,Moist,Wetland,7.181779584830741
+Eastern Asia,Boreal,Dry,Sandy,7.1359196910690645
+Caribbean,Tropical,Moist,Low Activity Clay,7.074853325961045
+Eastern Asia,Boreal,Dry,Low Activity Clay,7.066824810671679
+South America,Tropical,Moist,High Activity Clay,6.984531701587441
+Central Asia,Warm Temperate,Moist,Low Activity Clay,6.958073009278552
+South America,Tropical Montane,Dry,Spodic,6.9149906164262385
+South-Eastern Asia,Tropical Montane,Dry,Low Activity Clay,6.861852372129927
+Caribbean,Cool Temperate,Dry,Sandy,6.693769568061131
+Europe,Warm Temperate,Dry,Low Activity Clay,6.654129110171988
+South America,Tropical,Dry,Sandy,6.607342557374308
+South America,Boreal,Moist,Low Activity Clay,6.607088729470161
+Europe,Tropical,Wet,Low Activity Clay,6.552009452767477
+Europe,Cool Temperate,Moist,Low Activity Clay,6.5292709176450066
+Oceania,Tropical,Moist,Low Activity Clay,6.457620760795063
+Europe,Tropical,Dry,Low Activity Clay,6.438168257377523
+Caribbean,Tropical,Dry,Sandy,6.4066360702807055
+South-Eastern Asia,Tropical,Wet,Sandy,6.401887999472121
+North America,Tropical,Wet,Spodic,6.373586312055003
+Oceania,Cool Temperate,Moist,Sandy,6.35541309913845
+Europe,Tropical,Moist,Wetland,6.348565496574018
+Caribbean,Cool Temperate,Moist,Low Activity Clay,6.327134820155781
+Caribbean,Cool Temperate,Moist,Wetland,6.320196364477347
+Oceania,Warm Temperate,Moist,Sandy,6.30556231858968
+Central America,Warm Temperate,Moist,Volcanic,6.2955534874299595
+North America,Cool Temperate,Dry,Volcanic,6.293623905227004
+Central America,Tropical Montane,Dry,Volcanic,6.22524452523004
+South-Eastern Asia,Boreal,Dry,Sandy,6.15309143173128
+Central America,Boreal,Dry,High Activity Clay,6.152763170132719
+Central America,Cool Temperate,Dry,Sandy,6.112994125993103
+Europe,Warm Temperate,Moist,Spodic,6.096897708917485
+South-Eastern Asia,Boreal,Moist,Low Activity Clay,6.053752245661407
+Eastern Asia,Tropical Montane,Dry,High Activity Clay,6.041083654644663
+South-Eastern Asia,Tropical,Wet,Spodic,5.9935118335052575
+Northern Africa,Tropical,Dry,Low Activity Clay,5.973130827241456
+Eastern Asia,Tropical,Moist,Volcanic,5.951750552978585
+Western Africa,Boreal,Dry,Wetland,5.841538299280035
+North America,Cool Temperate,Moist,Spodic,5.805321141329493
+North America,Warm Temperate,Dry,Volcanic,5.771031751310015
+Central America,Cool Temperate,Dry,High Activity Clay,5.767230915074961
+Eastern Asia,Boreal,Moist,High Activity Clay,5.690676300310823
+South-Eastern Asia,Warm Temperate,Moist,Wetland,5.662461739741936
+South America,Cool Temperate,Moist,Volcanic,5.589472760360767
+Eastern Asia,Boreal,Moist,Spodic,5.574317323299767
+Europe,Cool Temperate,Dry,Wetland,5.464192231192502
+North America,Warm Temperate,Moist,Spodic,5.449371603402004
+Eastern Asia,Tropical,Dry,Wetland,5.446844543417947
+South-Eastern Asia,Warm Temperate,Dry,Spodic,5.42353419903656
+Central America,Boreal,Dry,Spodic,5.422846616016441
+Western Asia,Warm Temperate,Dry,Sandy,5.386571107962059
+South America,Warm Temperate,Dry,Volcanic,5.342213513117855
+South-Eastern Asia,Tropical,Wet,High Activity Clay,5.334841994747573
+Europe,Tropical,Dry,Wetland,5.322147719949989
+Central Asia,Cool Temperate,Moist,Spodic,5.313038794864819
+South-Eastern Asia,Warm Temperate,Moist,Spodic,5.247098496127617
+South-Eastern Asia,Boreal,Dry,Spodic,5.245349520580507
+Western Asia,Tropical Montane,Dry,Low Activity Clay,5.226664392943533
+South America,Tropical,Wet,Volcanic,5.171473252078653
+Caribbean,Boreal,Dry,Spodic,5.099533707946009
+Caribbean,Warm Temperate,Moist,Sandy,5.071688544873867
+South-Eastern Asia,Cool Temperate,Moist,Sandy,5.047426656309337
+South America,Tropical,Dry,Low Activity Clay,5.041012068471538
+Central America,Tropical Montane,Dry,Spodic,5.0006000971928835
+Central America,Cool Temperate,Moist,Volcanic,4.908476905932531
+Caribbean,Warm Temperate,Moist,Wetland,4.879815016059154
+Central America,Tropical,Moist,Wetland,4.8722444798368665
+Western Africa,Warm Temperate,Dry,Low Activity Clay,4.868297823975073
+Southern Asia,Tropical,Moist,Low Activity Clay,4.855894481091719
+South America,Warm Temperate,Dry,Wetland,4.819754325210415
+South-Eastern Asia,Tropical,Dry,Low Activity Clay,4.77029252327593
+Oceania,Warm Temperate,Moist,Spodic,4.764434611816172
+Northern Africa,Warm Temperate,Dry,Spodic,4.755803250678529
+Europe,Cool Temperate,Moist,Spodic,4.750203482157502
+Southern Asia,Tropical,Dry,Wetland,4.680334831660139
+Western Africa,Warm Temperate,Dry,Sandy,4.67585843993101
+Central Africa,Warm Temperate,Dry,Sandy,4.654072112269747
+Oceania,Cool Temperate,Moist,Wetland,4.589415080849991
+South-Eastern Asia,Tropical,Dry,Wetland,4.553067675082725
+Eastern Asia,Cool Temperate,Dry,Sandy,4.543984361364065
+Southern Asia,Boreal,Dry,Spodic,4.53940870354545
+Europe,Boreal,Dry,Wetland,4.4570291667449995
+Western Asia,Cool Temperate,Dry,Spodic,4.455231591074718
+Central Asia,Tropical,Moist,Spodic,4.447219192026089
+Northern Africa,Cool Temperate,Moist,Sandy,4.408328552964729
+Europe,Cool Temperate,Moist,High Activity Clay,4.379100320260003
+South America,Tropical,Wet,Low Activity Clay,4.379072035324629
+Caribbean,Tropical Montane,Dry,Low Activity Clay,4.377406759555977
+North America,Boreal,Dry,Low Activity Clay,4.353573588097508
+Caribbean,Warm Temperate,Moist,High Activity Clay,4.346501882814817
+South-Eastern Asia,Tropical,Moist,Volcanic,4.271530727443529
+Northern Africa,Tropical,Moist,High Activity Clay,4.2589880426451145
+Central Africa,Warm Temperate,Moist,Wetland,4.234997999936336
+Southern Asia,Tropical,Dry,High Activity Clay,4.226074813087336
+Western Asia,Tropical,Wet,Wetland,4.221172031822037
+Central Asia,Cool Temperate,Moist,Wetland,4.2192153643785115
+Southern Asia,Cool Temperate,Moist,High Activity Clay,4.116103799448872
+Caribbean,Tropical,Dry,Low Activity Clay,4.102491800373857
+Eastern Asia,Tropical,Moist,Sandy,4.062176198592704
+Southern Asia,Warm Temperate,Moist,Volcanic,4.04710207576613
+Caribbean,Tropical Montane,Dry,Wetland,4.030449365842017
+Europe,Warm Temperate,Dry,Wetland,4.007516060074996
+North America,Tropical,Wet,Sandy,3.982113963367495
+South America,Cool Temperate,Moist,High Activity Clay,3.9646082928488715
+Caribbean,Warm Temperate,Dry,Wetland,3.963378450313426
+Northern Africa,Warm Temperate,Dry,Low Activity Clay,3.936895657045304
+Caribbean,Tropical,Moist,Wetland,3.936404817886117
+South-Eastern Asia,Tropical Montane,Dry,Volcanic,3.9198712036873338
+Central Africa,Warm Temperate,Dry,Wetland,3.9132350772948445
+North America,Warm Temperate,Moist,Sandy,3.8910413188020083
+North America,Warm Temperate,Moist,High Activity Clay,3.8531485856010352
+Southern Asia,Tropical,Moist,Wetland,3.829136472584937
+Caribbean,Tropical,Wet,Low Activity Clay,3.7931623533818764
+Western Africa,Warm Temperate,Dry,Volcanic,3.79151568815245
+Southern Asia,Boreal,Moist,Spodic,3.7619440376318583
+Southern Asia,Tropical,Wet,Low Activity Clay,3.759797245967327
+Southern Asia,Cool Temperate,Dry,High Activity Clay,3.7341134894943067
+South America,Boreal,Moist,Sandy,3.7055256101252363
+South America,Warm Temperate,Dry,Spodic,3.6077754590222617
+Southern Asia,Tropical,Moist,Sandy,3.581673437164926
+South America,Boreal,Dry,High Activity Clay,3.5722996052038463
+Central Asia,Cool Temperate,Moist,Low Activity Clay,3.514556089732542
+Southern Asia,Warm Temperate,Moist,Low Activity Clay,3.5107850015834643
+Southern Asia,Tropical Montane,Dry,Volcanic,3.4945932642789614
+Southern Asia,Boreal,Dry,Low Activity Clay,3.4665248490078495
+Southern Asia,Tropical,Wet,Volcanic,3.4438924343710124
+Oceania,Boreal,Moist,Spodic,3.4276817371964157
+Central America,Warm Temperate,Dry,High Activity Clay,3.42059570636487
+Eastern Africa,Boreal,Moist,High Activity Clay,3.415645800048474
+Caribbean,Boreal,Dry,Sandy,3.402689731361763
+Western Africa,Warm Temperate,Dry,High Activity Clay,3.3904999718285573
+Caribbean,Cool Temperate,Moist,Spodic,3.3169345093065443
+Southern Asia,Cool Temperate,Moist,Sandy,3.3069584159370877
+Southern Asia,Tropical,Moist,Spodic,3.303833938978501
+Southern Asia,Tropical,Moist,High Activity Clay,3.297054614402888
+North America,Tropical,Wet,Low Activity Clay,3.296216568989996
+Central America,Boreal,Moist,Volcanic,3.28915068375507
+Southern Asia,Boreal,Dry,Volcanic,3.273547580857182
+Southern Asia,Tropical,Dry,Spodic,3.256033386752463
+Southern Asia,Warm Temperate,Moist,Sandy,3.237951164568749
+Northern Africa,Tropical Montane,Dry,Wetland,3.2328498932402585
+Caribbean,Warm Temperate,Dry,Spodic,3.2307881564617906
+Northern Africa,Tropical Montane,Dry,High Activity Clay,3.202916746061187
+Southern Asia,Tropical Montane,Dry,High Activity Clay,3.1793779820675567
+Southern Asia,Warm Temperate,Moist,Spodic,3.1680168468069922
+Southern Asia,Cool Temperate,Moist,Wetland,3.1371273238513164
+Southern Asia,Cool Temperate,Moist,Volcanic,3.1093282453245523
+South America,Boreal,Dry,Spodic,3.1044489973026623
+Southern Asia,Tropical Montane,Dry,Wetland,3.100479258899172
+Western Asia,Tropical,Wet,High Activity Clay,3.052123046162329
+Central America,Cool Temperate,Dry,Low Activity Clay,3.050059780589501
+Southern Asia,Cool Temperate,Dry,Sandy,3.0487888435251596
+Caribbean,Tropical Montane,Dry,Sandy,2.993568929556422
+Central Asia,Boreal,Dry,Sandy,2.97752495729706
+Northern Africa,Warm Temperate,Moist,Wetland,2.9765480283434993
+Caribbean,Boreal,Moist,Low Activity Clay,2.9648403509902286
+Eastern Asia,Warm Temperate,Dry,Spodic,2.9434236517447925
+Southern Asia,Boreal,Moist,Wetland,2.9371801750239896
+Northern Africa,Cool Temperate,Dry,Volcanic,2.8523451123495596
+Southern Asia,Tropical,Wet,Sandy,2.8453188502499294
+Central America,Warm Temperate,Moist,High Activity Clay,2.840468340287072
+Eastern Africa,Tropical,Dry,Wetland,2.839025075131944
+North America,Boreal,Moist,High Activity Clay,2.833825158742489
+Eastern Africa,Warm Temperate,Dry,Spodic,2.8154061820271785
+Southern Asia,Warm Temperate,Moist,High Activity Clay,2.8153267183095356
+South America,Warm Temperate,Moist,Spodic,2.791887301045714
+South-Eastern Asia,Cool Temperate,Dry,Sandy,2.729499277409248
+North America,Cool Temperate,Dry,Low Activity Clay,2.6494013788289847
+South America,Cool Temperate,Dry,Sandy,2.642706950717667
+Southern Asia,Boreal,Moist,High Activity Clay,2.616903856320494
+Europe,Tropical,Moist,Volcanic,2.572107485759994
+Central Asia,Cool Temperate,Moist,High Activity Clay,2.537641601098799
+South America,Tropical Montane,Dry,High Activity Clay,2.494529419614537
+Western Asia,Warm Temperate,Dry,High Activity Clay,2.485555211205632
+South America,Boreal,Dry,Low Activity Clay,2.4745173963171725
+Southern Asia,Cool Temperate,Dry,Spodic,2.4714810704119454
+Southern Asia,Tropical,Dry,Sandy,2.4435288679917306
+Southern Asia,Boreal,Dry,Wetland,2.4316995300495527
+Northern Africa,Warm Temperate,Dry,Wetland,2.4234085805218717
+Southern Asia,Tropical,Wet,Wetland,2.4212048187114488
+Southern Asia,Boreal,Moist,Low Activity Clay,2.3990933649623685
+South-Eastern Asia,Tropical,Dry,Volcanic,2.3257291759929224
+Southern Asia,Cool Temperate,Dry,Low Activity Clay,2.32034264030554
+Central America,Tropical,Wet,Spodic,2.3151859160106723
+South America,Tropical,Moist,Low Activity Clay,2.2909953576498205
+Caribbean,Cool Temperate,Moist,Volcanic,2.2899585571750416
+Southern Asia,Warm Temperate,Moist,Wetland,2.2612150112870193
+Southern Asia,Tropical Montane,Dry,Sandy,2.2415565492248613
+South America,Boreal,Moist,High Activity Clay,2.21289135365691
+Southern Asia,Cool Temperate,Dry,Wetland,2.200263750395804
+Europe,Boreal,Moist,Wetland,2.196502499382004
+Caribbean,Tropical,Dry,Wetland,2.181092675176557
+South-Eastern Asia,Warm Temperate,Dry,Low Activity Clay,2.1751455733867298
+Northern Africa,Tropical Montane,Dry,Volcanic,2.175051074974239
+Southern Asia,Tropical,Dry,Volcanic,2.1678331212619804
+Southern Asia,Tropical Montane,Dry,Low Activity Clay,2.1557960376775513
+Central America,Warm Temperate,Moist,Wetland,2.135091057049906
+Central Asia,Cool Temperate,Dry,Sandy,2.084276547517038
+Southern Asia,Tropical,Wet,Spodic,2.0765507156940175
+Western Asia,Tropical,Moist,Spodic,2.06992888172328
+Southern Asia,Cool Temperate,Moist,Low Activity Clay,2.0617630916770118
+Caribbean,Boreal,Moist,High Activity Clay,2.040671237340104
+South America,Cool Temperate,Dry,Volcanic,2.030115186299552
+Central America,Tropical,Moist,Volcanic,1.9998344367723049
+Southern Asia,Boreal,Moist,Volcanic,1.9839009520767297
+Southern Asia,Tropical,Moist,Volcanic,1.95701203496002
+South America,Tropical,Wet,High Activity Clay,1.949996745980521
+South-Eastern Asia,Boreal,Dry,Volcanic,1.9078248882855078
+Southern Asia,Tropical Montane,Dry,Spodic,1.895862313683037
+Caribbean,Tropical,Dry,High Activity Clay,1.8813629921837862
+South America,Tropical Montane,Dry,Low Activity Clay,1.8726148527120017
+Caribbean,Cool Temperate,Dry,Low Activity Clay,1.7358224994590148
+South-Eastern Asia,Tropical,Wet,Wetland,1.7021961618286212
+Central America,Tropical Montane,Dry,Sandy,1.671860055608289
+Southern Asia,Cool Temperate,Dry,Volcanic,1.6673495719234208
+Central Africa,Warm Temperate,Moist,Low Activity Clay,1.6593775167916185
+Southern Asia,Boreal,Moist,Sandy,1.6591963983092155
+South America,Warm Temperate,Dry,Low Activity Clay,1.6574131080472985
+Southern Asia,Tropical,Dry,Low Activity Clay,1.5930723040466526
+South America,Cool Temperate,Moist,Low Activity Clay,1.5869765127801394
+Caribbean,Boreal,Dry,Low Activity Clay,1.517234018863764
+Central Asia,Warm Temperate,Dry,High Activity Clay,1.4671683889089966
+Southern Asia,Cool Temperate,Moist,Spodic,1.449735301365973
+South-Eastern Asia,Cool Temperate,Dry,Low Activity Clay,1.4261928606179672
+Southern Asia,Tropical,Wet,High Activity Clay,1.418939989644448
+South America,Warm Temperate,Dry,High Activity Clay,1.386661276754496
+South America,Cool Temperate,Dry,Spodic,1.3654753708417968
+Oceania,Cool Temperate,Dry,Volcanic,1.3468578016629391
+North America,Boreal,Dry,High Activity Clay,1.3362134426550063
+Caribbean,Warm Temperate,Moist,Low Activity Clay,1.2551100311203451
+Oceania,Cool Temperate,Moist,Spodic,1.2482774495842721
+South America,Tropical,Wet,Sandy,1.2477358060237234
+North America,Boreal,Moist,Wetland,1.2354997856175167
+Southern Asia,Warm Temperate,Dry,Low Activity Clay,1.2079048938584194
+Western Asia,Tropical,Moist,Wetland,1.1688656449487058
+Northern Africa,Warm Temperate,Dry,High Activity Clay,1.1670531707558691
+South America,Cool Temperate,Moist,Sandy,1.1457288156314698
+Central America,Tropical,Moist,High Activity Clay,1.1443953365671198
+North America,Warm Temperate,Moist,Wetland,1.1028802194030027
+Southern Asia,Boreal,Dry,High Activity Clay,1.0863045293477027
+Caribbean,Tropical,Wet,High Activity Clay,0.9968821493893489
+South-Eastern Asia,Cool Temperate,Moist,Wetland,0.9600810567198749
+Central America,Cool Temperate,Moist,Wetland,0.9579046729528835
+Caribbean,Tropical,Moist,Volcanic,0.9420406576340098
+Northern Africa,Cool Temperate,Dry,Spodic,0.9414404570758439
+Eastern Asia,Tropical,Wet,Volcanic,0.9348170928616673
+Western Asia,Warm Temperate,Dry,Spodic,0.914700748407892
+Central Asia,Tropical,Wet,Sandy,0.8824283067478644
+South-Eastern Asia,Warm Temperate,Dry,Wetland,0.8657716692839141
+Southern Asia,Warm Temperate,Dry,Sandy,0.8324761634535722
+Central America,Tropical,Dry,Volcanic,0.8123927837536489
+Europe,Boreal,Dry,Low Activity Clay,0.7865705966400056
+Northern Africa,Boreal,Moist,High Activity Clay,0.7730744558639984
+Caribbean,Tropical,Moist,Sandy,0.7701031806879297
+South America,Tropical Montane,Dry,Volcanic,0.7666705840215686
+Southern Asia,Boreal,Dry,Sandy,0.7621176270328747
+South America,Tropical Montane,Dry,Wetland,0.7031800169124698
+Europe,Boreal,Moist,Volcanic,0.6880977810000029
+Western Africa,Warm Temperate,Dry,Spodic,0.6610382944906181
+Central America,Warm Temperate,Moist,Spodic,0.6605980417964632
+Oceania,Tropical,Dry,Sandy,0.6285161657341749
+Central America,Tropical Montane,Dry,Low Activity Clay,0.5983637322648225
+Central America,Tropical,Moist,Low Activity Clay,0.5237603548237448
+Eastern Asia,Warm Temperate,Moist,Volcanic,0.485620255615655
+Southern Africa,Warm Temperate,Dry,Low Activity Clay,0.47475537520820943
+North America,Tropical,Moist,Wetland,0.4404882060950017
+Central America,Cool Temperate,Dry,Volcanic,0.3789410302472238
+Central America,Tropical,Wet,Sandy,0.3074650845259276
+Southern Africa,Warm Temperate,Dry,Volcanic,0.28868056803636577
+South America,Cool Temperate,Dry,Wetland,0.2851860778147821
+Caribbean,Boreal,Dry,High Activity Clay,0.28386730671802796
+South America,Tropical,Moist,Volcanic,0.2675551723812819
+North America,Cool Temperate,Moist,Low Activity Clay,0.24149288829752436
+Western Africa,Tropical,Dry,Spodic,0.20685253916742763
+South America,Tropical,Dry,Wetland,0.18157282823752352
+Caribbean,Tropical,Dry,Volcanic,0.16991619393126633
+South-Eastern Asia,Cool Temperate,Dry,Volcanic,0.15945961057113034
+Eastern Africa,Tropical,Dry,Sandy,0.15408060239471322
+Northern Africa,Cool Temperate,Dry,Low Activity Clay,0.14717388079205307
+Western Asia,Warm Temperate,Moist,High Activity Clay,0.13745269662008575
+North America,Tropical,Dry,High Activity Clay,0.11747549422148906
+South America,Tropical,Dry,Spodic,0.09057385963718478
+Central Asia,Cool Temperate,Dry,Volcanic,0.08624145149309737
+Central Asia,Tropical,Wet,Spodic,-0.010601913319900902
+North America,Tropical,Dry,Low Activity Clay,-0.07146397009850369
+Southern Asia,Warm Temperate,Dry,Wetland,-0.12375182288761488
+Caribbean,Tropical,Moist,High Activity Clay,-0.14075880212087466
+Southern Asia,Warm Temperate,Dry,Volcanic,-0.14094890682782735
+Caribbean,Tropical Montane,Dry,Volcanic,-0.15027394701686614
+Northern Africa,Tropical,Moist,Sandy,-0.29672816792134693
+Southern Africa,Warm Temperate,Dry,Wetland,-0.3054298787667289
+Central Asia,Boreal,Moist,Wetland,-0.3225448527940613
+Eastern Africa,Warm Temperate,Dry,Wetland,-0.3533124756995427
+Western Asia,Tropical,Wet,Low Activity Clay,-0.3540762646477704
+Northern Africa,Cool Temperate,Moist,Spodic,-0.37570267118799805
+Western Asia,Boreal,Dry,Sandy,-0.39917561392847256
+Europe,Boreal,Dry,High Activity Clay,-0.5172200079240001
+Caribbean,Tropical,Wet,Volcanic,-0.5586639204995913
+South America,Warm Temperate,Moist,Wetland,-0.5645730689645722
+Europe,Cool Temperate,Moist,Sandy,-0.5683099871774995
+Northern Africa,Tropical,Dry,Spodic,-0.5810967082168892
+Europe,Boreal,Moist,High Activity Clay,-0.5849870794280037
+Eastern Asia,Warm Temperate,Moist,High Activity Clay,-0.596781410798892
+Europe,Boreal,Moist,Low Activity Clay,-0.6002296222889978
+South America,Boreal,Dry,Wetland,-0.6630453095503855
+Central Africa,Warm Temperate,Dry,Spodic,-0.6731642729603209
+Eastern Africa,Warm Temperate,Moist,Spodic,-0.7285435002686289
+Western Africa,Tropical Montane,Dry,Spodic,-0.7395488495335485
+Western Asia,Tropical,Dry,Wetland,-0.7749194984864931
+Europe,Cool Temperate,Dry,Spodic,-0.7850750939295043
+Northern Africa,Cool Temperate,Dry,Sandy,-0.791461994089727
+Central America,Boreal,Moist,Low Activity Clay,-0.7960269585398971
+Central America,Cool Temperate,Dry,Wetland,-0.8141341723351601
+Southern Africa,Tropical Montane,Dry,Low Activity Clay,-0.8637394933369271
+Southern Asia,Warm Temperate,Dry,High Activity Clay,-0.9111776480909315
+North America,Cool Temperate,Moist,High Activity Clay,-0.921519084080979
+Central America,Boreal,Dry,Sandy,-0.95065692603021
+Europe,Boreal,Moist,Sandy,-0.956883405779998
+Western Africa,Warm Temperate,Moist,Low Activity Clay,-0.9713301383095096
+Eastern Africa,Cool Temperate,Moist,Sandy,-0.9847408822590755
+Eastern Africa,Warm Temperate,Dry,Volcanic,-1.0221959446467697
+Northern Africa,Boreal,Dry,High Activity Clay,-1.1168796064552895
+Central Africa,Cool Temperate,Moist,High Activity Clay,-1.1932029516979576
+Southern Africa,Warm Temperate,Dry,Spodic,-1.210080861344478
+Caribbean,Warm Temperate,Dry,Sandy,-1.2456659604154958
+South America,Boreal,Moist,Wetland,-1.3149633296112073
+Central America,Boreal,Moist,Wetland,-1.3307739208391216
+Western Africa,Boreal,Moist,Volcanic,-1.3518805901469362
+Oceania,Tropical,Dry,Spodic,-1.3822195742936227
+Caribbean,Warm Temperate,Moist,Volcanic,-1.4059640475989945
+Europe,Tropical,Dry,Volcanic,-1.4564457789200134
+Central America,Tropical,Dry,High Activity Clay,-1.4733326505297564
+Oceania,Tropical Montane,Dry,Volcanic,-1.4854027721380387
+Central Africa,Warm Temperate,Dry,High Activity Clay,-1.4950908509908807
+Central America,Boreal,Dry,Wetland,-1.4960122960651514
+Caribbean,Boreal,Dry,Volcanic,-1.5334026900021303
+Central Africa,Warm Temperate,Moist,High Activity Clay,-1.5447252052842582
+North America,Cool Temperate,Moist,Sandy,-1.5884238422679964
+North America,Boreal,Dry,Sandy,-1.6164072039375126
+Eastern Asia,Tropical Montane,Dry,Sandy,-1.6183530309899206
+Central Africa,Boreal,Moist,High Activity Clay,-1.63733786051657
+Western Africa,Tropical,Wet,Spodic,-1.6417250513474286
+Western Asia,Tropical,Dry,Sandy,-1.6459685290373551
+Central America,Cool Temperate,Dry,Spodic,-1.6660451398110014
+Central America,Tropical,Wet,Wetland,-1.673482104317819
+Central America,Boreal,Moist,Spodic,-1.7077899234376068
+South America,Cool Temperate,Dry,High Activity Clay,-1.7739580044303134
+Western Asia,Tropical,Wet,Sandy,-1.786241508719952
+Eastern Africa,Cool Temperate,Moist,Low Activity Clay,-1.7982239019322432
+Eastern Africa,Tropical,Dry,Low Activity Clay,-1.8131371534975478
+Western Asia,Tropical Montane,Dry,Spodic,-1.831502251918462
+Central Africa,Tropical,Moist,Spodic,-1.8369478822653402
+Central America,Cool Temperate,Moist,Low Activity Clay,-1.8519764352439159
+Europe,Warm Temperate,Moist,High Activity Clay,-1.9263093723329971
+Southern Asia,Warm Temperate,Dry,Spodic,-1.9524087994182233
+Eastern Africa,Tropical,Wet,High Activity Clay,-1.9860223562093942
+Caribbean,Boreal,Moist,Volcanic,-1.9979655329665094
+Central Asia,Tropical Montane,Dry,Wetland,-2.003396631461623
+Northern Africa,Boreal,Moist,Wetland,-2.032975576559618
+Europe,Cool Temperate,Moist,Wetland,-2.0425638589550084
+Southern Africa,Tropical,Wet,Volcanic,-2.0815965122188937
+Oceania,Cool Temperate,Dry,Low Activity Clay,-2.111340938847987
+Western Asia,Tropical,Dry,Low Activity Clay,-2.1123899164066255
+Northern Africa,Warm Temperate,Moist,Volcanic,-2.118221269969253
+Central Asia,Tropical,Dry,High Activity Clay,-2.1437648073104296
+Caribbean,Cool Temperate,Moist,Sandy,-2.1560737385944893
+Caribbean,Cool Temperate,Dry,Wetland,-2.1730471380920084
+Europe,Boreal,Dry,Spodic,-2.2889806497029994
+Caribbean,Tropical,Moist,Spodic,-2.291319469366676
+South-Eastern Asia,Tropical Montane,Dry,Sandy,-2.325215027060029
+Western Africa,Warm Temperate,Dry,Wetland,-2.330359649486226
+Northern Africa,Tropical,Dry,Volcanic,-2.335930297263035
+Central America,Tropical,Wet,High Activity Clay,-2.379263478082128
+Northern Africa,Boreal,Dry,Volcanic,-2.391097943727258
+South-Eastern Asia,Warm Temperate,Dry,Volcanic,-2.4257833277568004
+South America,Boreal,Moist,Spodic,-2.465287263292293
+Eastern Africa,Warm Temperate,Moist,Wetland,-2.4750848237660357
+South America,Warm Temperate,Moist,Sandy,-2.507767158613916
+Central America,Cool Temperate,Moist,High Activity Clay,-2.5421363033625974
+Central Africa,Warm Temperate,Dry,Volcanic,-2.5873333999252175
+South America,Warm Temperate,Moist,High Activity Clay,-2.5976965797454703
+Southern Africa,Warm Temperate,Dry,Sandy,-2.60215619787483
+Caribbean,Warm Temperate,Dry,Volcanic,-2.7257379911910755
+North America,Tropical Montane,Dry,Spodic,-2.8024463361375376
+Caribbean,Tropical Montane,Dry,Spodic,-2.809228853970188
+Europe,Boreal,Moist,Spodic,-2.8097560978800007
+Central Asia,Tropical,Moist,Volcanic,-2.8168183694659614
+Caribbean,Warm Temperate,Dry,Low Activity Clay,-2.8235892970714884
+South-Eastern Asia,Tropical,Dry,Spodic,-2.828412950926837
+Western Africa,Cool Temperate,Dry,Low Activity Clay,-2.912349810559429
+South America,Cool Temperate,Moist,Wetland,-2.919302102413811
+South America,Tropical,Dry,High Activity Clay,-2.9327079956044066
+Western Asia,Warm Temperate,Dry,Volcanic,-2.9429547531473403
+Western Asia,Tropical,Wet,Volcanic,-2.9657399226381282
+Central America,Boreal,Moist,High Activity Clay,-3.0902319518840895
+Southern Africa,Tropical,Dry,Spodic,-3.090297979037758
+Oceania,Boreal,Dry,Low Activity Clay,-3.1111707146763443
+Eastern Asia,Tropical,Dry,High Activity Clay,-3.1136469029626017
+Oceania,Tropical Montane,Dry,High Activity Clay,-3.1456069522531322
+South America,Tropical,Dry,Volcanic,-3.205289696902055
+Northern Africa,Warm Temperate,Moist,High Activity Clay,-3.2484132560364656
+South America,Warm Temperate,Moist,Low Activity Clay,-3.2486443173951702
+Caribbean,Tropical,Dry,Spodic,-3.260196707725057
+North America,Cool Temperate,Dry,High Activity Clay,-3.2844231980189775
+Oceania,Cool Temperate,Dry,Sandy,-3.2919530061253304
+Southern Africa,Warm Temperate,Dry,High Activity Clay,-3.298126832089265
+Eastern Asia,Tropical,Moist,High Activity Clay,-3.3009589784520657
+Caribbean,Cool Temperate,Dry,Spodic,-3.3065284891780653
+Central America,Warm Temperate,Moist,Low Activity Clay,-3.37459065884896
+Central America,Tropical,Moist,Sandy,-3.3951427300159756
+Central Asia,Boreal,Moist,High Activity Clay,-3.427083388635655
+South America,Tropical,Moist,Spodic,-3.4465394649689474
+Central America,Tropical,Dry,Wetland,-3.471470417934586
+Central Asia,Warm Temperate,Moist,Sandy,-3.4891681189838275
+Western Africa,Cool Temperate,Dry,Sandy,-3.5299258472549404
+Northern Africa,Boreal,Dry,Sandy,-3.5552704002575264
+South America,Boreal,Dry,Sandy,-3.558688485477003
+Western Asia,Cool Temperate,Moist,Volcanic,-3.5713653887653463
+Southern Africa,Tropical Montane,Dry,Volcanic,-3.5971354552937638
+Western Asia,Cool Temperate,Moist,Sandy,-3.665820924890795
+South-Eastern Asia,Warm Temperate,Dry,Sandy,-3.674890250351135
+North America,Boreal,Moist,Low Activity Clay,-3.702186272849989
+Oceania,Tropical,Wet,Wetland,-3.7168151440371746
+Caribbean,Cool Temperate,Dry,High Activity Clay,-3.7414422209177705
+Central America,Tropical,Moist,Spodic,-3.752842429336228
+Western Asia,Warm Temperate,Moist,Wetland,-3.761442584768973
+Central America,Tropical,Dry,Low Activity Clay,-3.788256406936002
+Western Asia,Warm Temperate,Dry,Wetland,-3.8396336092556096
+Eastern Africa,Boreal,Dry,Wetland,-3.8631914084240417
+Northern Africa,Cool Temperate,Moist,Low Activity Clay,-3.8695911182336653
+South America,Tropical,Moist,Wetland,-3.8882009421569297
+Central Asia,Tropical Montane,Dry,Volcanic,-3.8886171202995485
+South America,Boreal,Dry,Volcanic,-3.8986675591014324
+Southern Africa,Boreal,Moist,Volcanic,-3.9284316408860698
+Western Asia,Tropical,Dry,Volcanic,-3.9402683504801304
+Oceania,Tropical,Wet,Volcanic,-3.940579144512035
+North America,Cool Temperate,Dry,Spodic,-3.9508403022629834
+Western Asia,Boreal,Dry,Wetland,-3.9518605916272223
+Central America,Tropical Montane,Dry,Wetland,-3.9709084197603417
+Caribbean,Tropical,Wet,Spodic,-4.014925176912518
+Eastern Africa,Warm Temperate,Dry,Sandy,-4.095822030006593
+Western Asia,Boreal,Moist,High Activity Clay,-4.121333546099761
+South America,Warm Temperate,Dry,Sandy,-4.130046888404319
+Central Asia,Warm Temperate,Dry,Wetland,-4.141822092846162
+Central Asia,Warm Temperate,Moist,Spodic,-4.156324787926562
+South America,Cool Temperate,Dry,Low Activity Clay,-4.178095913049684
+Central Africa,Warm Temperate,Moist,Spodic,-4.259642972034742
+Eastern Africa,Tropical Montane,Dry,Wetland,-4.267846977673091
+Central Africa,Tropical,Dry,Volcanic,-4.2780778181647285
+Central America,Warm Temperate,Dry,Wetland,-4.301829857766411
+Central America,Tropical,Dry,Sandy,-4.43115822909607
+Europe,Tropical Montane,Dry,High Activity Clay,-4.433505793109992
+Europe,Cool Temperate,Dry,Sandy,-4.4465941958340025
+North America,Boreal,Moist,Sandy,-4.463484236640013
+Western Africa,Boreal,Dry,High Activity Clay,-4.4772470910558395
+Eastern Africa,Tropical,Moist,Spodic,-4.491042344187198
+Central America,Boreal,Dry,Volcanic,-4.495984941693671
+Central America,Warm Temperate,Moist,Sandy,-4.516376027082673
+Central Africa,Cool Temperate,Moist,Wetland,-4.537070617431563
+Western Asia,Boreal,Dry,High Activity Clay,-4.547581443536856
+Western Africa,Boreal,Dry,Spodic,-4.548990481700543
+North America,Warm Temperate,Dry,Sandy,-4.566529238212001
+Central America,Tropical,Wet,Low Activity Clay,-4.6095255618159765
+Northern Africa,Tropical,Moist,Volcanic,-4.628651057117431
+Eastern Africa,Tropical,Wet,Wetland,-4.666482190662599
+Western Asia,Cool Temperate,Dry,Wetland,-4.67920801081827
+Western Asia,Tropical,Moist,Low Activity Clay,-4.705581106482022
+Central Asia,Cool Temperate,Moist,Volcanic,-4.712017637924378
+Central Africa,Tropical Montane,Dry,Sandy,-4.759027653678015
+South America,Boreal,Moist,Volcanic,-4.7892560761607355
+Western Asia,Cool Temperate,Dry,Sandy,-4.8088025379371775
+Central Africa,Boreal,Dry,Sandy,-4.831053568424675
+Eastern Africa,Cool Temperate,Dry,Low Activity Clay,-4.949526747723114
+Western Asia,Tropical,Wet,Spodic,-4.955012665830058
+North America,Tropical,Dry,Sandy,-5.003705351525002
+Central Africa,Tropical,Wet,Low Activity Clay,-5.024938828607976
+Southern Africa,Tropical,Dry,Sandy,-5.049634460356973
+Eastern Asia,Cool Temperate,Moist,High Activity Clay,-5.061667816811016
+Central America,Tropical Montane,Dry,High Activity Clay,-5.070347960226508
+Eastern Asia,Tropical Montane,Dry,Low Activity Clay,-5.074762677204975
+Western Asia,Boreal,Moist,Wetland,-5.079071722163805
+Southern Africa,Cool Temperate,Dry,Low Activity Clay,-5.080650586221158
+Eastern Asia,Tropical,Dry,Sandy,-5.09962028470954
+Western Asia,Cool Temperate,Moist,Spodic,-5.146703107524338
+Central Asia,Boreal,Dry,Low Activity Clay,-5.183525230483028
+Central Asia,Warm Temperate,Dry,Low Activity Clay,-5.210677918611663
+Northern Africa,Tropical,Moist,Spodic,-5.213887354836307
+Western Africa,Tropical,Moist,High Activity Clay,-5.218854565289801
+Western Asia,Tropical,Moist,High Activity Clay,-5.3289162024134145
+Western Africa,Boreal,Moist,High Activity Clay,-5.332963863964379
+North America,Boreal,Dry,Wetland,-5.33898048079499
+Europe,Warm Temperate,Moist,Low Activity Clay,-5.401798840251001
+Eastern Asia,Cool Temperate,Dry,Low Activity Clay,-5.403202091574892
+Northern Africa,Tropical Montane,Dry,Spodic,-5.4119105179975975
+Eastern Africa,Tropical Montane,Dry,Spodic,-5.439035623629486
+Europe,Boreal,Dry,Volcanic,-5.475442051500003
+Caribbean,Cool Temperate,Moist,High Activity Clay,-5.516796423347973
+Caribbean,Warm Temperate,Moist,Spodic,-5.565330237906357
+Central Asia,Boreal,Moist,Volcanic,-5.568810217737582
+South America,Tropical,Moist,Sandy,-5.607867718758746
+Central America,Warm Temperate,Dry,Volcanic,-5.664413117248229
+South-Eastern Asia,Warm Temperate,Moist,Volcanic,-5.699021798726878
+South America,Tropical,Wet,Spodic,-5.702524647021906
+Southern Africa,Boreal,Dry,Volcanic,-5.751984849521131
+Central Asia,Warm Temperate,Dry,Volcanic,-5.771695000765816
+Central Africa,Boreal,Dry,Low Activity Clay,-5.793471111851948
+Northern Africa,Tropical,Wet,Low Activity Clay,-5.814190877918094
+Central Asia,Tropical,Wet,High Activity Clay,-5.85180916033614
+Central America,Warm Temperate,Dry,Sandy,-5.862000262887546
+Eastern Asia,Warm Temperate,Dry,Volcanic,-5.981248662891373
+North America,Warm Temperate,Dry,Spodic,-6.0561068729060015
+Europe,Warm Temperate,Moist,Sandy,-6.079721894829006
+Europe,Tropical,Dry,Spodic,-6.080971226100014
+Caribbean,Boreal,Dry,Wetland,-6.102883992248948
+North America,Cool Temperate,Dry,Sandy,-6.179029968219981
+Central Africa,Tropical,Dry,Low Activity Clay,-6.182587548438925
+Western Asia,Warm Temperate,Dry,Low Activity Clay,-6.211042172012365
+Western Africa,Tropical,Moist,Volcanic,-6.258401436896942
+North America,Boreal,Dry,Spodic,-6.279533358247492
+Northern Africa,Tropical,Dry,Sandy,-6.279628436085508
+Eastern Africa,Cool Temperate,Dry,Spodic,-6.420107101375773
+Western Asia,Tropical Montane,Dry,Wetland,-6.4627032909338595
+Western Asia,Warm Temperate,Moist,Spodic,-6.486482869799169
+Central Africa,Warm Temperate,Moist,Volcanic,-6.504237853451221
+South America,Tropical,Wet,Wetland,-6.506502649849576
+Europe,Boreal,Dry,Sandy,-6.641667905490003
+Western Asia,Tropical,Dry,Spodic,-6.6746406961762155
+Central Africa,Tropical,Wet,High Activity Clay,-6.676859992172957
+Oceania,Tropical,Dry,High Activity Clay,-6.6845015133789945
+Western Asia,Boreal,Dry,Spodic,-6.733582132240498
+Northern Africa,Tropical Montane,Dry,Low Activity Clay,-6.742911935326253
+North America,Boreal,Moist,Spodic,-6.763243348680001
+Eastern Asia,Cool Temperate,Dry,Volcanic,-6.775578740481395
+Central Africa,Boreal,Dry,Wetland,-6.777429287173684
+Central America,Warm Temperate,Dry,Spodic,-6.79274802456041
+South America,Warm Temperate,Moist,Volcanic,-6.855664096094929
+Caribbean,Boreal,Moist,Sandy,-6.893238846864578
+Southern Africa,Tropical Montane,Dry,High Activity Clay,-6.8995569945354855
+Western Africa,Tropical,Dry,Volcanic,-6.936083158356426
+Southern Africa,Cool Temperate,Moist,High Activity Clay,-6.961816930132368
+Europe,Cool Temperate,Moist,Volcanic,-6.975653153412495
+Central Africa,Tropical Montane,Dry,Low Activity Clay,-7.001819176456154
+Southern Africa,Tropical,Dry,Wetland,-7.018853900000079
+Central Asia,Tropical,Moist,Wetland,-7.124207035911923
+Western Asia,Tropical,Dry,High Activity Clay,-7.147545424780981
+Western Africa,Tropical Montane,Dry,Low Activity Clay,-7.155671279982919
+Western Africa,Cool Temperate,Moist,Wetland,-7.158391406720858
+Central Asia,Tropical,Dry,Low Activity Clay,-7.160270726402542
+Western Africa,Cool Temperate,Dry,Spodic,-7.165233187669097
+Southern Africa,Cool Temperate,Dry,Sandy,-7.167575687325778
+Central Africa,Tropical Montane,Dry,Volcanic,-7.194562713317153
+Eastern Africa,Boreal,Moist,Sandy,-7.224178134627374
+Eastern Asia,Warm Temperate,Dry,Sandy,-7.255106023187979
+Western Asia,Boreal,Moist,Volcanic,-7.262486641395737
+Western Africa,Tropical,Wet,Sandy,-7.315344367568638
+Caribbean,Warm Temperate,Dry,High Activity Clay,-7.328589541163636
+Southern Africa,Cool Temperate,Moist,Volcanic,-7.34041651343159
+Western Asia,Warm Temperate,Moist,Low Activity Clay,-7.343753951850245
+North America,Boreal,Dry,Volcanic,-7.360932670942503
+Caribbean,Tropical Montane,Dry,High Activity Clay,-7.369145995347022
+Southern Africa,Tropical,Wet,Spodic,-7.39077215215943
+Central Africa,Cool Temperate,Dry,Volcanic,-7.43236845041241
+North America,Tropical Montane,Dry,Sandy,-7.433899950407951
+Western Asia,Tropical Montane,Dry,Volcanic,-7.508826211682229
+Eastern Africa,Tropical Montane,Dry,High Activity Clay,-7.527961570406338
+Caribbean,Tropical,Wet,Sandy,-7.553492004151987
+Central Africa,Cool Temperate,Dry,Sandy,-7.590864796211144
+Central Africa,Boreal,Moist,Volcanic,-7.609766788156099
+Oceania,Warm Temperate,Dry,Sandy,-7.619933061862154
+Central Asia,Cool Temperate,Moist,Sandy,-7.655124376045352
+Northern Africa,Boreal,Moist,Spodic,-7.671949067787695
+Europe,Tropical,Wet,Sandy,-7.677896486782507
+Central Africa,Tropical,Wet,Wetland,-7.688858016091851
+Central Africa,Boreal,Moist,Low Activity Clay,-7.724737330119634
+Eastern Africa,Tropical,Moist,Low Activity Clay,-7.728767035804417
+Western Asia,Warm Temperate,Moist,Sandy,-7.738166683441434
+Western Africa,Cool Temperate,Moist,Sandy,-7.76368028011738
+Central Africa,Tropical Montane,Dry,High Activity Clay,-7.807288496920468
+Western Asia,Boreal,Dry,Volcanic,-7.814479102220938
+Central Asia,Tropical,Moist,Sandy,-7.88058699620139
+Central Asia,Tropical,Moist,High Activity Clay,-7.909224190491365
+Northern Africa,Tropical,Dry,Wetland,-7.931694118550761
+Eastern Africa,Warm Temperate,Moist,Sandy,-7.946842212692632
+Western Africa,Warm Temperate,Moist,High Activity Clay,-7.999263283406711
+Eastern Africa,Tropical,Moist,Sandy,-8.036745255067112
+Eastern Asia,Boreal,Moist,Sandy,-8.089453110205884
+Central Africa,Tropical,Dry,Wetland,-8.096118839866147
+Eastern Africa,Warm Temperate,Moist,Low Activity Clay,-8.104079577614792
+Central Africa,Warm Temperate,Dry,Low Activity Clay,-8.170897121758792
+Southern Africa,Boreal,Dry,Wetland,-8.244087495337858
+Eastern Africa,Cool Temperate,Moist,High Activity Clay,-8.299625032105043
+Western Africa,Cool Temperate,Moist,Volcanic,-8.319637573526139
+Southern Africa,Warm Temperate,Moist,High Activity Clay,-8.330229445834432
+Northern Africa,Tropical,Wet,High Activity Clay,-8.396156962991942
+Eastern Asia,Warm Temperate,Moist,Sandy,-8.400160306849287
+Europe,Tropical,Moist,Low Activity Clay,-8.421342274547982
+Central Africa,Tropical,Wet,Spodic,-8.512051949064347
+Western Africa,Tropical Montane,Dry,High Activity Clay,-8.524017068781625
+South America,Tropical Montane,Dry,Sandy,-8.538359012092355
+North America,Warm Temperate,Dry,Wetland,-8.559038293868019
+Northern Africa,Tropical,Moist,Low Activity Clay,-8.602299615450788
+Southern Africa,Tropical,Moist,Volcanic,-8.614938347219663
+Central Asia,Boreal,Moist,Spodic,-8.618312641917775
+Europe,Tropical,Wet,Spodic,-8.6383181907
+Western Africa,Tropical,Dry,Low Activity Clay,-8.643244339535816
+Southern Africa,Cool Temperate,Dry,Volcanic,-8.68088757531093
+Northern Africa,Boreal,Dry,Spodic,-8.683307331099234
+Eastern Africa,Boreal,Dry,Volcanic,-8.725750726842397
+Eastern Africa,Tropical,Dry,Volcanic,-8.753391323007484
+Eastern Africa,Tropical,Wet,Spodic,-8.764265054642664
+Central Africa,Cool Temperate,Moist,Low Activity Clay,-8.77079462172544
+Western Asia,Boreal,Moist,Low Activity Clay,-8.788436987174848
+North America,Tropical,Moist,Low Activity Clay,-8.828359483257511
+Western Africa,Tropical,Moist,Wetland,-8.8445510504801
+Southern Africa,Boreal,Moist,Spodic,-8.858772752655533
+Northern Africa,Tropical Montane,Dry,Sandy,-8.862220832505212
+Northern Africa,Warm Temperate,Moist,Sandy,-8.905637468375584
+Oceania,Warm Temperate,Moist,Volcanic,-8.938873418416165
+Central Africa,Tropical,Moist,High Activity Clay,-8.991728979413084
+Central Asia,Tropical Montane,Dry,Low Activity Clay,-9.003331865237012
+Southern Africa,Tropical Montane,Dry,Spodic,-9.034051262192623
+Western Africa,Boreal,Moist,Sandy,-9.055578238155007
+Central America,Cool Temperate,Moist,Sandy,-9.125439578833408
+Central Asia,Tropical Montane,Dry,Sandy,-9.180991041318066
+Central Asia,Tropical,Wet,Volcanic,-9.182990629833608
+Northern Africa,Tropical,Wet,Spodic,-9.230835566617818
+Western Africa,Tropical Montane,Dry,Sandy,-9.240430819313863
+North America,Tropical,Wet,Volcanic,-9.254044536046498
+Northern Africa,Warm Temperate,Moist,Low Activity Clay,-9.265968247971212
+Northern Africa,Warm Temperate,Dry,Sandy,-9.267335618005003
+Central Africa,Cool Temperate,Dry,High Activity Clay,-9.286075315821975
+Northern Africa,Boreal,Dry,Low Activity Clay,-9.346244249808151
+Western Africa,Cool Temperate,Dry,High Activity Clay,-9.34803359070544
+Central Africa,Tropical Montane,Dry,Spodic,-9.418155105890202
+Central Asia,Tropical,Dry,Wetland,-9.448759658922047
+Europe,Warm Temperate,Dry,Spodic,-9.449279117078005
+Central Africa,Tropical,Moist,Wetland,-9.45671380668184
+Central Asia,Boreal,Dry,Wetland,-9.460955166353827
+Western Africa,Boreal,Dry,Low Activity Clay,-9.54239570889545
+Central Africa,Boreal,Moist,Wetland,-9.558821201683237
+Southern Africa,Tropical,Dry,Low Activity Clay,-9.559093777091519
+Northern Africa,Boreal,Moist,Sandy,-9.605761400683324
+Western Africa,Boreal,Dry,Sandy,-9.607658989704795
+Northern Africa,Tropical,Moist,Wetland,-9.648116457608637
+Western Asia,Boreal,Dry,Low Activity Clay,-9.669204446730248
+Eastern Africa,Boreal,Moist,Volcanic,-9.78783425338475
+Europe,Warm Temperate,Dry,Volcanic,-9.828343276200002
+Central Asia,Tropical Montane,Dry,Spodic,-9.8455121638589
+Eastern Africa,Tropical,Moist,Volcanic,-9.849210506001949
+Southern Africa,Cool Temperate,Moist,Wetland,-9.89855467278235
+Central Africa,Tropical Montane,Dry,Wetland,-9.910957478265791
+Southern Africa,Boreal,Dry,Low Activity Clay,-9.914417297916945
+Caribbean,Boreal,Moist,Spodic,-9.94939839828305
+Eastern Africa,Tropical,Moist,Wetland,-10.010881210201806
+Central Africa,Boreal,Dry,Volcanic,-10.05355082461374
+Western Africa,Cool Temperate,Moist,High Activity Clay,-10.164772813841024
+Western Africa,Tropical,Wet,Wetland,-10.168880237075603
+Central America,Tropical,Dry,Spodic,-10.16950682584387
+Southern Africa,Boreal,Dry,Sandy,-10.196496644971887
+Western Asia,Cool Temperate,Moist,Low Activity Clay,-10.227472391517304
+Central Asia,Boreal,Dry,Volcanic,-10.228221437936602
+Central Africa,Cool Temperate,Moist,Spodic,-10.249486948297342
+Central Asia,Tropical,Dry,Spodic,-10.268358303367522
+Western Asia,Boreal,Moist,Spodic,-10.278839637522415
+Northern Africa,Boreal,Dry,Wetland,-10.318934964407905
+Central Asia,Tropical,Dry,Volcanic,-10.33207099143228
+Central Asia,Tropical Montane,Dry,High Activity Clay,-10.39748815448419
+Eastern Africa,Tropical,Wet,Volcanic,-10.438597610769332
+Western Africa,Tropical,Wet,Volcanic,-10.460402957916092
+Northern Africa,Tropical,Wet,Wetland,-10.47526697669116
+Europe,Tropical Montane,Dry,Spodic,-10.476928656719984
+Eastern Africa,Boreal,Moist,Low Activity Clay,-10.614980253744628
+Southern Africa,Cool Temperate,Moist,Spodic,-10.624911826633898
+Central Asia,Cool Temperate,Dry,High Activity Clay,-10.632086776896449
+Central Africa,Boreal,Moist,Spodic,-10.659124074914738
+Central Africa,Tropical,Moist,Sandy,-10.662369411745772
+Central Asia,Cool Temperate,Dry,Spodic,-10.725684214610155
+North America,Tropical,Wet,High Activity Clay,-10.765722641734504
+Central Asia,Tropical,Moist,Low Activity Clay,-10.804518972444964
+Central Africa,Tropical,Dry,Sandy,-10.842695221325345
+Central Africa,Boreal,Moist,Sandy,-10.929143122049297
+Eastern Africa,Warm Temperate,Dry,Low Activity Clay,-10.976366124949342
+Southern Africa,Cool Temperate,Moist,Sandy,-10.97903250291572
+Western Africa,Cool Temperate,Moist,Low Activity Clay,-11.052331639719565
+Eastern Africa,Cool Temperate,Moist,Wetland,-11.070608873216472
+Eastern Africa,Tropical,Moist,High Activity Clay,-11.071788812922293
+Northern Africa,Warm Temperate,Moist,Spodic,-11.086201511375712
+Western Africa,Tropical,Dry,Sandy,-11.103693271708623
+Southern Africa,Tropical Montane,Dry,Wetland,-11.167559302313004
+Western Africa,Cool Temperate,Moist,Spodic,-11.236156308613168
+Western Asia,Cool Temperate,Moist,High Activity Clay,-11.240237543527867
+Eastern Africa,Boreal,Dry,High Activity Clay,-11.27948333274593
+Eastern Africa,Cool Temperate,Dry,Sandy,-11.286198391902586
+Central Asia,Warm Temperate,Moist,Volcanic,-11.374649591668902
+Western Asia,Tropical Montane,Dry,Sandy,-11.416658282569156
+Western Africa,Cool Temperate,Dry,Volcanic,-11.466515922133816
+Southern Africa,Warm Temperate,Moist,Low Activity Clay,-11.511220931095314
+Southern Africa,Tropical,Moist,Sandy,-11.515196671268871
+Western Asia,Cool Temperate,Dry,Volcanic,-11.574710297189025
+Central Africa,Tropical,Wet,Volcanic,-11.605311090081265
+Southern Africa,Tropical,Moist,High Activity Clay,-11.680491366214268
+Southern Africa,Tropical,Wet,Wetland,-11.68268446717913
+Europe,Tropical,Moist,Spodic,-11.700101586599999
+Southern Africa,Tropical,Wet,Sandy,-11.77293573469252
+Northern Africa,Boreal,Moist,Low Activity Clay,-11.915700444237833
+Southern Africa,Tropical,Wet,High Activity Clay,-11.94689183737882
+Eastern Africa,Tropical Montane,Dry,Sandy,-12.012695433550697
+Northern Africa,Cool Temperate,Moist,Wetland,-12.039362859624875
+Western Africa,Tropical,Moist,Sandy,-12.09076620337664
+Southern Africa,Boreal,Dry,High Activity Clay,-12.103679880044126
+Southern Africa,Tropical,Dry,High Activity Clay,-12.209674377503472
+Central Africa,Boreal,Dry,High Activity Clay,-12.22667602561777
+Central Africa,Tropical,Wet,Sandy,-12.23411143812308
+Central Africa,Cool Temperate,Moist,Sandy,-12.329055154071147
+Eastern Asia,Tropical,Wet,Sandy,-12.36274203154158
+Central Asia,Warm Temperate,Dry,Sandy,-12.409147718454644
+Central Africa,Tropical,Moist,Volcanic,-12.50245411468259
+North America,Tropical,Wet,Wetland,-12.587341155079478
+Southern Africa,Cool Temperate,Dry,High Activity Clay,-12.605750144749427
+Southern Africa,Tropical,Wet,Low Activity Clay,-12.631229806560496
+Central Africa,Tropical,Dry,Spodic,-12.73263081487984
+Central Asia,Cool Temperate,Dry,Wetland,-12.757147308701818
+Southern Africa,Warm Temperate,Moist,Volcanic,-12.759712455409673
+Eastern Asia,Tropical Montane,Dry,Spodic,-12.76233125145422
+Western Asia,Cool Temperate,Dry,Low Activity Clay,-12.770307480805046
+Northern Africa,Tropical,Wet,Sandy,-12.799766584690843
+Central Asia,Warm Temperate,Moist,High Activity Clay,-12.865147429897252
+Eastern Africa,Boreal,Dry,Spodic,-12.870641762325052
+Southern Africa,Cool Temperate,Moist,Low Activity Clay,-12.928146580502894
+Western Africa,Tropical,Wet,Low Activity Clay,-12.964307400486238
+Eastern Africa,Cool Temperate,Moist,Spodic,-13.073933703966635
+Southern Africa,Boreal,Dry,Spodic,-13.116247836676528
+Eastern Asia,Warm Temperate,Dry,Wetland,-13.18829729111156
+Central Africa,Tropical,Dry,High Activity Clay,-13.215445087566408
+Eastern Africa,Boreal,Moist,Wetland,-13.241537860742472
+Northern Africa,Cool Temperate,Dry,High Activity Clay,-13.312012162552314
+Western Asia,Tropical,Moist,Sandy,-13.321149123469336
+Southern Africa,Tropical,Moist,Low Activity Clay,-13.394921690628296
+Western Africa,Boreal,Moist,Spodic,-13.45811720542689
+Eastern Africa,Warm Temperate,Moist,High Activity Clay,-13.713970984000264
+Southern Africa,Tropical,Moist,Wetland,-13.740720985591418
+Caribbean,Tropical,Wet,Wetland,-13.831751330371894
+Eastern Africa,Cool Temperate,Dry,Volcanic,-13.900945449467304
+Western Africa,Tropical Montane,Dry,Volcanic,-13.930376716576802
+Southern Africa,Warm Temperate,Moist,Sandy,-13.971236103509261
+Eastern Africa,Boreal,Moist,Spodic,-14.013349278358952
+Western Africa,Tropical,Dry,Wetland,-14.066436292862614
+Southern Africa,Boreal,Moist,Sandy,-14.066944035801255
+Northern Africa,Boreal,Moist,Volcanic,-14.10686451744607
+Western Asia,Warm Temperate,Moist,Volcanic,-14.24231557869722
+Eastern Africa,Tropical,Dry,Spodic,-14.256159379342922
+Central Africa,Cool Temperate,Dry,Wetland,-14.273743088780025
+Oceania,Warm Temperate,Dry,Spodic,-14.274298922232003
+Central Africa,Warm Temperate,Moist,Sandy,-14.528528409736502
+Eastern Africa,Boreal,Dry,Low Activity Clay,-14.556862639300272
+Southern Africa,Tropical,Moist,Spodic,-14.5980368840473
+Europe,Tropical,Wet,Wetland,-14.617801469384974
+Western Africa,Warm Temperate,Moist,Spodic,-14.651292638794066
+Eastern Asia,Boreal,Moist,Wetland,-14.73541137168601
+Northern Africa,Cool Temperate,Moist,Volcanic,-14.8976336455133
+Central Africa,Cool Temperate,Dry,Spodic,-14.912895340650376
+Central Asia,Tropical,Wet,Wetland,-14.94228091300508
+Central Asia,Boreal,Dry,High Activity Clay,-15.03877386609811
+North America,Warm Temperate,Moist,Low Activity Clay,-15.349421245653028
+Southern Africa,Warm Temperate,Moist,Spodic,-15.452236967323138
+Northern Africa,Warm Temperate,Dry,Volcanic,-15.488610992176614
+Western Africa,Boreal,Dry,Volcanic,-15.578028478787443
+Northern Africa,Cool Temperate,Dry,Wetland,-15.583459723002694
+North America,Cool Temperate,Moist,Volcanic,-15.602833641475513
+Eastern Africa,Cool Temperate,Dry,Wetland,-15.610336219001017
+Northern Africa,Cool Temperate,Moist,High Activity Clay,-15.679095412270446
+Western Africa,Tropical,Moist,Spodic,-15.875688994737951
+Western Africa,Cool Temperate,Dry,Wetland,-15.939628527050871
+Western Africa,Boreal,Moist,Wetland,-15.99104845832969
+Southern Africa,Boreal,Moist,Low Activity Clay,-16.138820572307097
+Western Asia,Tropical Montane,Dry,High Activity Clay,-16.263101405969756
+Central Africa,Tropical,Moist,Low Activity Clay,-16.348039107181453
+Europe,Tropical Montane,Dry,Sandy,-16.40043609348999
+Eastern Africa,Cool Temperate,Moist,Volcanic,-16.54421623689871
+Central Africa,Boreal,Dry,Spodic,-16.646458511136174
+Central Asia,Tropical,Dry,Sandy,-16.660768730104216
+Central Asia,Boreal,Moist,Low Activity Clay,-16.74318215881246
+Western Asia,Boreal,Moist,Sandy,-16.792108482232194
+Western Asia,Tropical,Moist,Volcanic,-16.842270225610022
+Southern Africa,Cool Temperate,Dry,Spodic,-16.858142109678635
+Eastern Africa,Warm Temperate,Moist,Volcanic,-16.86817003463403
+Central Asia,Cool Temperate,Dry,Low Activity Clay,-16.86972597684111
+Western Africa,Tropical,Wet,High Activity Clay,-16.87430294622492
+Central Asia,Warm Temperate,Moist,Wetland,-16.898150300466813
+Western Asia,Cool Temperate,Dry,High Activity Clay,-17.046635968244047
+Central Africa,Cool Temperate,Dry,Low Activity Clay,-17.205608698446028
+Southern Africa,Tropical,Dry,Volcanic,-17.25714063183807
+Western Africa,Warm Temperate,Moist,Volcanic,-17.268216756380443
+Southern Africa,Cool Temperate,Dry,Wetland,-17.290658978026464
+Oceania,Tropical Montane,Dry,Spodic,-17.292231707810043
+Central Asia,Warm Temperate,Dry,Spodic,-17.302452245462856
+Southern Africa,Boreal,Moist,Wetland,-17.304247893518735
+Eastern Africa,Tropical,Wet,Sandy,-17.409630062241362
+Western Africa,Tropical,Moist,Low Activity Clay,-17.633741194066694
+Western Asia,Cool Temperate,Moist,Wetland,-17.63586444761176
+Oceania,Cool Temperate,Moist,High Activity Clay,-17.917284069373984
+Southern Africa,Tropical Montane,Dry,Sandy,-18.336157566084857
+Europe,Warm Temperate,Dry,Sandy,-18.479014223220002
+Europe,Tropical Montane,Dry,Volcanic,-18.483852978287985
+Eastern Asia,Tropical,Dry,Spodic,-18.501046975143613
+Central Asia,Boreal,Dry,Spodic,-18.734327007337583
+Eastern Africa,Tropical Montane,Dry,Low Activity Clay,-18.77262058867715
+Southern Africa,Boreal,Moist,High Activity Clay,-18.849762773123874
+Eastern Africa,Tropical,Dry,High Activity Clay,-18.92584254311576
+Central Asia,Tropical,Wet,Low Activity Clay,-18.989186391814982
+Northern Africa,Tropical,Wet,Volcanic,-19.966092089851728
+Europe,Warm Temperate,Moist,Wetland,-20.20282110382498
+Western Africa,Tropical Montane,Dry,Wetland,-20.27316538934785
+Eastern Africa,Cool Temperate,Dry,High Activity Clay,-20.449567093098327
+Europe,Tropical,Wet,High Activity Clay,-20.518973274640004
+Western Africa,Tropical,Dry,High Activity Clay,-20.901254984761202
+Eastern Africa,Boreal,Dry,Sandy,-21.103008732441467
+Eastern Asia,Cool Temperate,Moist,Sandy,-21.27384413046067
+Eastern Asia,Warm Temperate,Dry,Low Activity Clay,-21.593461851012016
+Central Asia,Boreal,Moist,Sandy,-21.911987990369262
+Northern Africa,Tropical,Dry,High Activity Clay,-21.963086569192328
+Central Africa,Cool Temperate,Moist,Volcanic,-22.15445518023962
+Eastern Africa,Tropical,Wet,Low Activity Clay,-22.256664967690355
+Western Africa,Boreal,Moist,Low Activity Clay,-22.673162214234633
+Eastern Asia,Boreal,Dry,Volcanic,-23.132555699926236
+Europe,Tropical,Dry,Sandy,-24.188243695649984
+Oceania,Tropical,Dry,Wetland,-25.748810140338
+Europe,Tropical,Dry,High Activity Clay,-31.868128928002484
+North America,Tropical,Dry,Volcanic,-35.44829257141552
+Europe,Tropical,Wet,Volcanic,-47.273058609089986
+Eastern Asia,Warm Temperate,Dry,High Activity Clay,-53.22006066992966

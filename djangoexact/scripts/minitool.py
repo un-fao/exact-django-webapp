@@ -295,6 +295,11 @@ def django_initializer():
     logging.getLogger().setLevel(logging.CRITICAL)
     django.setup()
 
+    # Close any existing connections to start fresh
+    from django.db import connections
+
+    connections.close_all()
+
 
 def process_combinations_grassland(combo):
     """
@@ -559,7 +564,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     fields.update(
         {
             "climate_moistures": climate_moistures,
-            "soil_types": models.SoilType.objects.filter(is_coastal=False).all(),
+            "soil_types": models.SoilType.objects.filter(is_coastal=False, active=True).all(),
             "region": models.Region.objects.all(),
         }
     )
@@ -587,7 +592,7 @@ def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     data = []
     local_errors = 0
 
-    with ProcessPoolExecutor(max_workers=8, initializer=django_initializer) as executor:
+    with ProcessPoolExecutor(max_workers=4, initializer=django_initializer) as executor:
         pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations")
 
         for chunk in chunked_product(*iterables, chunk_size=chunk_size):
@@ -642,7 +647,7 @@ def run():
     import api.models as models
 
     ANNUAL_CROPLAND = False
-    FLOODED_RICE = False
+    FLOODED_RICE = True
     GRASSLAND = False
     LIVESTOCK = False
 
