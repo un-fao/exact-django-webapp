@@ -1,3 +1,34 @@
+## 1.15.15 (2025-08-20)
+
+### Feat
+
+- **minitool**: update database file with new data
+- **minitool**: add organic input types and biomass/fire periodicity attributes to perennial cropland data builder
+- add database to git lfs
+- **minitool**: add perennial cropland to computation scripts
+- **minitool**: add perennial cropland to computation script
+
+### Fix
+
+- **grassland**: remove reference to old soc tables and adjust soc logic
+- **minitool**: add perennial cropland to module type mapping and exclude 'module' from custom filter list
+- **minitool**: update country filter to use api_models
+- **minitool**: handle edge cases in quartile calculations
+- **minitool**: include country as a filter
+- change how quantiles are calculated
+- **minitool**: remove useless land use types permutations from flooded rice computations
+- update modules data
+- delete unused file
+- adjust changes json path
+- set capitalization years and implementation years to 1 and 0
+- specify different deploy configuration for minitool
+- add lfs support in deployment yaml
+- delete large files
+- remove wrong db
+- add minitool url to allowed hosts
+- remove statement timeout option from database config
+- remove large files
+
 ## 1.15.14 (2025-08-19)
 
 ### Feat
