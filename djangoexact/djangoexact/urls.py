@@ -25,5 +25,6 @@ urlpatterns = [
     path("api/ipcc/", include("ipcc.urls")),
     path("api/accounts/", include("accounts.urls")),
     path("api/blog/", include("blog.urls")),
+    path("api/minitool/", include("minitool.urls")),
     path("_ah/warmup", warmup),
 ]
