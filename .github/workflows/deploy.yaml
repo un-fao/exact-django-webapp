@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: 'Checkout Code'
       uses: actions/checkout@v4
+      with:
+        lfs: true
 
     - name: Authenticate to Google Cloud
       uses: 'google-github-actions/auth@v2'
@@ -39,17 +41,27 @@ jobs:
     - name: Deploy
       run: |
         set -x
-        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
-        sed -i 's|\$STORAGE_BUCKET|${{ vars.STORAGE_BUCKET }}|g' djangoexact/app.yaml
+        
+        # Determine which YAML file to use based on environment
+        if [ "${{ github.ref_name }}" = "feature/id-responses" ]; then
+          YAML_FILE="minitool.yaml"
+        else
+          YAML_FILE="app.yaml"
+        fi
+        
+        echo "Using deployment file: $YAML_FILE"
+        
+        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/$YAML_FILE
+        sed -i 's|\$STORAGE_BUCKET|${{ vars.STORAGE_BUCKET }}|g' djangoexact/$YAML_FILE
 
-        echo "$(cat djangoexact/app.yaml)"
+        echo "$(cat djangoexact/$YAML_FILE)"
 
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
@@ -87,7 +99,7 @@ jobs:
         sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/settings.py
 
         gcloud config set project ${{ vars.PROJECT_ID }}
-        gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
+        gcloud app deploy $YAML_FILE --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
     - name: Create Issue
