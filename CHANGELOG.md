@@ -1,3 +1,29 @@
+## 1.15.14 (2025-08-19)
+
+### Feat
+
+- **forest management**: add disturbance_percentage_fire to calculations and model
+- **minitool**: disable thread safety for local database
+- **minitool**: add endpoint returning available modules
+- add module-based /filters endpoint returning the available filters for each module
+- add module-level generalized aggregation
+- add module-level data aggregation
+- add impact analisys script
+- add per-module aggregated results endpoint and rewrite aggregation scripts
+- refactor aggregation logic
+- add first draft of aggregated module practices statistics
+- add script to generate intra-module statistics aggregated by practice
+- increase maximum page size in minitool pagination
+- add first implementation of minitool endpoint
+
+### Fix
+
+- **calculators**: add missing streamlined soc_t2 fallback references and add unit tests for validation
+- **project membership**: unlock project when deleted member is the lock holder
+- **minitool**: adjust module type string output in analyze_changes
+- **minitool**: add middleware manually handling database connections to ensure proper closing
+- merge migrations
+
 ## 1.15.13 (2025-08-14)
 
 ### Fix

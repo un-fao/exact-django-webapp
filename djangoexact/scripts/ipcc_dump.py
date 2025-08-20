@@ -4916,6 +4916,28 @@ def convert_storage_refrigerant_ef_from_kg_to_tonnes():
             print(f"Updated {ef} to {ef.value} tonnes")
 
 
+def change_aggregate_from_floodedrice_to_flooded_rice():
+    """
+    Change the aggregate from FloodedRice to Flooded Rice.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Changing aggregate from FloodedRice to Flooded Rice")
+    ChangeAggregate.objects.filter(module_type__iexact="flooded_rice").update(module_type="Flooded Rice")
+    print("Done")
+
+
+def delete_all_floodedrice_module_type_entries_from_aggregates():
+    """
+    Delete all Flooded Rice module type entries from the aggregates.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Deleting all Flooded Rice module type entries from the aggregates")
+    ChangeAggregate.objects.filter(module_type__exact="floodedrice").delete()
+    print("Done")
+
+
 def add_fi_data_for_all_grassland_management_types():
     """
     Add FI data for all grassland management types.
