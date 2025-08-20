@@ -614,9 +614,9 @@ class LandModuleCalculator(BaseCalculator):
         self.calculate_biomass_w = not (self.module.is_start() and self.module.is_with())
         self.calculate_biomass_wo = not (self.module.is_start() and self.module.is_without())
 
-        self.soc_start: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
-        self.soc_w: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
-        self.soc_wo: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
+        self.soc_start: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
+        self.soc_w: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
+        self.soc_wo: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
 
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
@@ -628,15 +628,8 @@ class LandModuleCalculator(BaseCalculator):
         moisture_flt = {"moisture": self.moisture}
 
         self.soc = ipcc.SoilOrganicCarbon.objects.filter(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type).first()
-        self.soc_start = self.soc_w = self.soc_wo = self.soc
-
-        if isinstance(self.module, Grassland):
-            if self.module.is_start():
-                self.soc_start = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_start).first()
-            if self.module.is_with():
-                self.soc_w = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_w).first()
-            if self.module.is_without():
-                self.soc_wo = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_wo).first()
+        if self.soc:
+            self.soc_start = self.soc_w = self.soc_wo = self.soc
 
         self.soc_t2_start = (
             getattr(self.module_start, "soc_t2_start")
@@ -661,11 +654,11 @@ class LandModuleCalculator(BaseCalculator):
         )
 
         missing_scenarios = []
-        if self.soc_t2_start is None and self.soc_start is None or self.soc_start.value is None:
+        if self.soc_start.value is None and self.soc_t2_start is None:
             missing_scenarios.append("Start")
-        if self.soc_t2_w is None and self.soc_w is None or self.soc_w.value is None:
+        if self.soc_w.value is None and self.soc_t2_w is None:
             missing_scenarios.append("With")
-        if self.soc_t2_wo is None and self.soc_wo is None or self.soc_wo.value is None:
+        if self.soc_wo.value is None and self.soc_t2_wo is None:
             missing_scenarios.append("Without")
 
         if missing_scenarios:
