@@ -44,7 +44,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", ".minitool-741920004150.europe-west1.run.app"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -142,7 +142,6 @@ if os.getenv("GAE_APPLICATION", None):
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
-                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
@@ -168,7 +167,6 @@ else:
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
-                "options": "-c statement_timeout=30000",  # 30 second statement timeout
             },
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
