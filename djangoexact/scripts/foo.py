@@ -60,13 +60,12 @@ def cycle_all_modules_and_invalidate_cached_results():
     """
     Cycle all modules and invalidate cached results
     """
-    models.ForestDisturbance.objects.all().delete()
     for module_type in models.ModuleType.objects.all():
         log.debug(f"Invalidating cached results for {module_type}")
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
-            if hasattr(ModuleClass, "last_cached_at"):
-                ModuleClass.history.all().update(
+            if issubclass(ModuleClass, models.CachedResultMixin):
+                ModuleClass.objects.all().update(
                     updated_at=None,
                     last_cached_at=None,
                     cached_results_total=None,
@@ -75,13 +74,6 @@ def cycle_all_modules_and_invalidate_cached_results():
                     cached_results_by_activity_by_gas=None,
                     last_modified=None,
                 )
-                for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
-                    if hasattr(module, "invalidate_cached_results"):
-                        module.invalidate_cached_results()
-                    else:
-                        log.error(f"Could not find invalidate_cached_results for {module}")
-            else:
-                log.error(f"Could not find last_cached_at for {module_type}")
         except LookupError:
             log.error(f"Could not find module class for {module_type}")
 
@@ -416,6 +408,7 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
+        cycle_all_modules_and_invalidate_cached_results()
         pass
 
     if app_mode == "review":
