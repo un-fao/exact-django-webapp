@@ -1,3 +1,10 @@
+## 1.15.16 (2025-08-21)
+
+### Fix
+
+- **oluc**: Correct fire emissions calculations
+- **general_functions**: fix cumulative maturity evaluation
+
 ## 1.15.15 (2025-08-20)
 
 ### Feat
