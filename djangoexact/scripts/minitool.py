@@ -532,6 +532,21 @@ class ModuleProcessor(ABC):
     def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
         self.data_builder_registry = data_builder_registry
 
+    def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
+        """Helper method to create a project with proper country selection"""
+        # Get a random country from the region, with fallback
+        country = region.countries.order_by("?").first()
+        if not country:
+            # Skip this combination if no country is available
+            raise ValueError(f"No countries found for region: {region}")
+
+        return factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=country,
+        )
+
     @abstractmethod
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
         """Create a module instance from combination"""
@@ -563,7 +578,18 @@ class ModuleProcessor(ABC):
         except Exception as e:
             full_traceback = traceback.format_exc()
             condensed_traceback = extract_relevant_traceback(full_traceback)
-            return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+
+            # Log specific errors for debugging
+            if "No countries found for region" in str(e):
+                # This is expected for some regions, so don't log as error
+                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+            elif "Project has no country" in str(e):
+                # This is also expected for some combinations
+                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+            else:
+                # Log unexpected errors
+                logger.warning(f"Unexpected error in combination processing: {type(e).__name__}: {str(e)}")
+                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
 
 
 class GrasslandProcessor(ModuleProcessor):
@@ -1064,12 +1090,18 @@ class PermutationComputer:
 
         logger.info(f"After SoilOrganicCarbon validation: {len(valid_climate_moistures)} climate-moisture combinations and {len(valid_soil_types)} soil types")
 
+        # Filter regions to only include those with countries
+        # Use a more efficient database query
+        regions_with_countries = list(models.Region.objects.filter(countries__isnull=False).distinct())
+
+        logger.info(f"Found {len(regions_with_countries)} regions with countries (out of {models.Region.objects.count()} total regions)")
+
         # Update fields with validated dimensions
         fields.update(
             {
                 "climate_moistures": valid_climate_moistures,
                 "soil_types": valid_soil_types,
-                "region": models.Region.objects.all(),
+                "region": regions_with_countries,
             }
         )
 
@@ -1156,6 +1188,11 @@ class PermutationComputer:
         if not data:
             logger.warning(f"No data for {model.__name__}!")
             return
+
+        # Log summary of results
+        total_processed = len(data) + len(errors_data)
+        success_rate = (len(data) / total_processed * 100) if total_processed > 0 else 0
+        logger.info(f"Completed {model.__name__}: {len(data):,} successful, {len(errors_data):,} errors ({success_rate:.1f}% success rate)")
 
         self.data_manager.save_data(data, errors_data, model.__name__)
 
