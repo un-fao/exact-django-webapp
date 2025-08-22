@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import os
 import logging
 import itertools
+import time
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 import django
@@ -934,7 +935,7 @@ class PermutationComputer:
                 break
             yield chunk
 
-    def compute_permutations(self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False) -> None:
+    def compute_permutations(self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None) -> None:
         """Compute permutations for a model"""
         import api.models as models
         import math
@@ -996,13 +997,31 @@ class PermutationComputer:
         errors_data = []
 
         try:
-            with ProcessPoolExecutor(max_workers=4, initializer=self.django_initializer) as executor:
+            # Use more workers for better CPU utilization
+            # You can adjust this based on your system's capabilities
+            # A good rule of thumb is to use CPU cores - 1 or CPU cores - 2
+            if max_workers is None:
+                max_workers = min(12, os.cpu_count() - 1) if os.cpu_count() else 8
+            logger.info(f"Using {max_workers} worker processes for computation")
+
+            # Performance monitoring
+            start_time = time.time()
+            processed_count = 0
+
+            with ProcessPoolExecutor(max_workers=max_workers, initializer=self.django_initializer) as executor:
                 pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
-                for chunk in self.chunked_product(*iterables, chunk_size=chunk_size):
-                    results_iter = executor.map(processor.process_combination, chunk)
+                # Optimize chunk size based on number of workers
+                optimal_chunk_size = max(chunk_size, chunk_size // max_workers * max_workers)
+                logger.info(f"Using chunk size: {optimal_chunk_size}")
 
-                    for result in results_iter:
+                for chunk in self.chunked_product(*iterables, chunk_size=optimal_chunk_size):
+                    # Use submit instead of map for better load balancing
+                    futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
+
+                    for future in futures:
+                        result = future.result()
+
                         if stop_at and len(data) >= stop_at:
                             # Terminate worker processes
                             for proc in executor._processes.values():
@@ -1019,6 +1038,13 @@ class PermutationComputer:
                             pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
 
                         pbar.update(1)
+                        processed_count += 1
+
+                        # Log performance every 1000 processed items
+                        if processed_count % 1000 == 0:
+                            elapsed_time = time.time() - start_time
+                            rate = processed_count / elapsed_time if elapsed_time > 0 else 0
+                            logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec")
                     else:
                         continue
                     break
@@ -1066,6 +1092,8 @@ def run():
         "PERENNIAL_CROPLAND": False,
         "FOREST_MANAGEMENT": True,
         "MAX_ROWS": 10000,
+        "MAX_WORKERS": None,  # Set to a number to override auto-detection
+        "CHUNK_SIZE": 10000,  # Adjust chunk size for better performance
     }
 
     # Module configurations
@@ -1150,7 +1178,7 @@ def run():
         for module_name, config in MODULE_CONFIGS.items():
             if config["enabled"]:
                 model_class = getattr(models, module_name)
-                permutation_computer.compute_permutations(config["fields"], model_class, stop_at=CONFIG["MAX_ROWS"])
+                permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["CHUNK_SIZE"], stop_at=CONFIG["MAX_ROWS"], max_workers=CONFIG["MAX_WORKERS"])
 
     except KeyboardInterrupt:
         logger.info(f"\nKeyboard interrupt detected in main run function!")
