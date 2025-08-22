@@ -410,6 +410,26 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
         }
 
 
+class SmallFisheryDataBuilder(ModuleDataBuilder):
+    """Data builder for Small Fishery modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("fishery_type"),
+            FieldMappingBuilder.foreign_key("gear_type"),
+        ]
+
+
+class LargeFisheryDataBuilder(ModuleDataBuilder):
+    """Data builder for Large Fishery modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("fish_type"),
+            FieldMappingBuilder.foreign_key("gear_type"),
+        ]
+
+
 # Implementation example of a more complex module
 # class ForestManagementDataBuilder(ModuleDataBuilder):
 #     """Example data builder for Forest Management modules - shows extensibility"""
@@ -486,6 +506,8 @@ class ModuleDataBuilderRegistry:
         self.register("FloodedRice", FloodedRiceDataBuilder())
         self.register("PerennialCropland", PerennialCroplandDataBuilder())
         self.register("ForestManagement", ForestManagementDataBuilder())
+        self.register("SmallFishery", SmallFisheryDataBuilder())
+        self.register("LargeFishery", LargeFisheryDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -808,6 +830,74 @@ class ForestManagementProcessor(ModuleProcessor):
         return module
 
 
+class SmallFisheryProcessor(ModuleProcessor):
+    """Processor for Small Fishery modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            gear_type_start,
+            gear_type_w,
+            fishery_type,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.SmallFisheryFactory.build(
+            activity=a,
+            fishery_type=fishery_type,
+            gear_type_start=gear_type_start,
+            gear_type_w=gear_type_w,
+            gear_type_wo=gear_type_start,
+            total_catch_yr_start=1,
+            total_catch_yr_w=1,
+            total_catch_yr_wo=1,
+        )
+        return module
+
+
+class LargeFisheryProcessor(ModuleProcessor):
+    """Processor for Large Fishery modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            gear_type_start,
+            gear_type_w,
+            fish_type,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.LargeFisheryFactory.build(
+            activity=a,
+            fish_type=fish_type,
+            gear_type_start=gear_type_start,
+            gear_type_w=gear_type_w,
+            gear_type_wo=gear_type_start,
+            total_catch_yr_start=1,
+            total_catch_yr_w=1,
+            total_catch_yr_wo=1,
+        )
+        return module
+
+
 class ProcessorRegistry:
     """Registry for module processors"""
 
@@ -824,6 +914,8 @@ class ProcessorRegistry:
         self.register("FloodedRice", FloodedRiceProcessor(self._data_builder_registry))
         self.register("PerennialCropland", PerennialCroplandProcessor(self._data_builder_registry))
         self.register("ForestManagement", ForestManagementProcessor(self._data_builder_registry))
+        self.register("SmallFishery", SmallFisheryProcessor(self._data_builder_registry))
+        self.register("LargeFishery", LargeFisheryProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -1090,7 +1182,9 @@ def run():
         "GRASSLAND": False,
         "LIVESTOCK": False,
         "PERENNIAL_CROPLAND": False,
-        "FOREST_MANAGEMENT": True,
+        "FOREST_MANAGEMENT": False,
+        "SMALL_FISHERY": True,
+        "LARGE_FISHERY": True,
         "MAX_ROWS": 10000,
         "MAX_WORKERS": None,  # Set to a number to override auto-detection
         "CHUNK_SIZE": 10000,  # Adjust chunk size for better performance
@@ -1171,6 +1265,22 @@ def run():
                 "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
             },
             "enabled": CONFIG["FOREST_MANAGEMENT"],
+        },
+        "SmallFishery": {
+            "fields": {
+                "gear_type_start": models.SmallFisheryGearType.objects.all(),
+                "gear_type_w": models.SmallFisheryGearType.objects.all(),
+                "fishery_type": models.FisheryType.objects.all(),
+            },
+            "enabled": CONFIG["SMALL_FISHERY"],
+        },
+        "LargeFishery": {
+            "fields": {
+                "gear_type_start": models.LargeFisheryGearType.objects.all(),
+                "gear_type_w": models.LargeFisheryGearType.objects.all(),
+                "fish_type": models.FishType.objects.all(),
+            },
+            "enabled": CONFIG["LARGE_FISHERY"],
         },
     }
 
