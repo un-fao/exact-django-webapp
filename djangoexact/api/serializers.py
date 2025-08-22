@@ -109,6 +109,7 @@ from django.contrib.contenttypes.models import ContentType
 import api.security as security
 from django.conf import settings
 
+
 class EmptySerializer(serializers.Serializer):
     pass
 
@@ -537,6 +538,7 @@ class ProjectTotalLivestockSerializer(serializers.Serializer):
     w = serializers.IntegerField()
     wo = serializers.IntegerField()
 
+
 class ActivityResultSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     cost = serializers.FloatField(read_only=True)
@@ -551,6 +553,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "Activity"
 
+
 class ModuleTypeIdModuleIdSerializer(serializers.Serializer):
     module_type = serializers.PrimaryKeyRelatedField(read_only=True)
     id = serializers.IntegerField(read_only=True)
@@ -558,32 +561,34 @@ class ModuleTypeIdModuleIdSerializer(serializers.Serializer):
 
     def get_endpoint_url(self, obj):
         """
-        Returns the API endpoint URL for this module type by dynamically 
+        Returns the API endpoint URL for this module type by dynamically
         looking up the URL pattern from the router configuration
         """
-        if not hasattr(obj, 'module_type') or not obj.module_type:
+        if not hasattr(obj, "module_type") or not obj.module_type:
             return None
-            
+
         module_type = obj.module_type
         class_name = module_type.class_name
-        
+
         try:
             from api.urls import router
             from django.apps import apps
+
             try:
-                model_class = apps.get_model('api', class_name)
+                model_class = apps.get_model("api", class_name)
             except LookupError:
                 return None
-            
+
             for prefix, viewset_class, basename in router.registry:
-                if hasattr(viewset_class, 'queryset') and viewset_class.queryset is not None:
+                if hasattr(viewset_class, "queryset") and viewset_class.queryset is not None:
                     if viewset_class.queryset.model == model_class:
                         return f"api/{prefix}/"
-                        
+
         except (ImportError, AttributeError):
             pass
-            
+
         return None
+
 
 class ActivitySerializerWithModules(ActivitySerializer):
     modules = serializers.SerializerMethodField(read_only=True)
@@ -1039,10 +1044,6 @@ class CommentThreadSerializer(serializers.ModelSerializer):
 
 
 class LandUseTypeSerializer(serializers.ModelSerializer):
-    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
-    climate = get_model_serializer(Climate)(many=False, read_only=True)
-    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
-
     class Meta:
         model = LandUseType
         fields = "__all__"
@@ -1069,9 +1070,6 @@ class ModuleResultSerializer(serializers.Serializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
-    # activity = ActivitySerializer(many=False, read_only=True)
-    module_type = serializers.SerializerMethodField()
-    status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
 
     last_cached_at = serializers.SerializerMethodField()
@@ -1079,15 +1077,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
     cached_results_by_activity = serializers.SerializerMethodField()
     cached_results_by_gas = serializers.SerializerMethodField()
     cached_results_by_activity_by_gas = serializers.SerializerMethodField()
-
-    class Meta:
-        extra_fields = ["module_type"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
-            raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
-        log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
 
     def get_last_cached_at(self, obj):
         return None
@@ -1111,9 +1100,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
         # return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
         return None
-
-    def get_module_type(self, obj):
-        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=self.Meta.ref_name), many=False).data
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
@@ -1352,10 +1338,6 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
 
 
 class LandModuleSeralizer(ScenarioModuleSerializer):
-    # activity = ActivitySerializer(many=False, read_only=True)
-    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
-
     class Meta:
         model = None
         fields = "__all__"
