@@ -138,10 +138,14 @@ class FieldMapping:
     without_suffix: str = "_wo"
     custom_processor: Optional[Callable] = None
     skip_processing: bool = False  # Skip automatic processing for this field
+    is_single_field: bool = False  # If True, field doesn't have start/w/wo variations
 
     def get_field_names(self) -> Dict[str, str]:
         """Get all field name variations"""
-        return {"start": f"{self.field_name}{self.start_suffix}", "with": f"{self.field_name}{self.with_suffix}", "without": f"{self.field_name}{self.without_suffix}"}
+        if self.is_single_field:
+            return {"field": self.field_name}
+        else:
+            return {"start": f"{self.field_name}{self.start_suffix}", "with": f"{self.field_name}{self.with_suffix}", "without": f"{self.field_name}{self.without_suffix}"}
 
 
 class FieldMappingBuilder:
@@ -186,6 +190,27 @@ class FieldMappingBuilder:
     def custom(field_name: str, processor: Callable, **kwargs) -> FieldMapping:
         """Create a custom field mapping"""
         return FieldMapping(field_name, FieldType.CUSTOM, custom_processor=processor, **kwargs)
+
+    # Single field convenience methods
+    @staticmethod
+    def single_foreign_key(field_name: str, **kwargs) -> FieldMapping:
+        """Create a single foreign key field mapping"""
+        return FieldMapping(field_name, FieldType.FOREIGN_KEY, is_single_field=True, **kwargs)
+
+    @staticmethod
+    def single_boolean(field_name: str, **kwargs) -> FieldMapping:
+        """Create a single boolean field mapping"""
+        return FieldMapping(field_name, FieldType.BOOLEAN, is_single_field=True, **kwargs)
+
+    @staticmethod
+    def single_numeric(field_name: str, **kwargs) -> FieldMapping:
+        """Create a single numeric field mapping"""
+        return FieldMapping(field_name, FieldType.NUMERIC, is_single_field=True, **kwargs)
+
+    @staticmethod
+    def single_string(field_name: str, **kwargs) -> FieldMapping:
+        """Create a single string field mapping"""
+        return FieldMapping(field_name, FieldType.STRING, is_single_field=True, **kwargs)
 
 
 class ModuleDataBuilder(ABC):
@@ -239,49 +264,69 @@ class ModuleDataBuilder(ABC):
 
     def _process_string_field(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
         """Process string fields"""
-        start_value = getattr(module, field_names["start"], None)
-        with_value = getattr(module, field_names["with"], None)
+        if field_mapping.is_single_field:
+            value = getattr(module, field_names["field"], None)
+            data[field_names["field"]] = value
+        else:
+            start_value = getattr(module, field_names["start"], None)
+            with_value = getattr(module, field_names["with"], None)
 
-        data[field_names["start"]] = start_value
-        data[field_names["with"]] = with_value
-        data[field_names["without"]] = start_value
+            data[field_names["start"]] = start_value
+            data[field_names["with"]] = with_value
+            data[field_names["without"]] = start_value
 
     def _process_boolean_field(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
         """Process boolean fields"""
-        start_value = getattr(module, field_names["start"], None)
-        with_value = getattr(module, field_names["with"], None)
+        if field_mapping.is_single_field:
+            value = getattr(module, field_names["field"], None)
+            data[field_names["field"]] = value
+        else:
+            start_value = getattr(module, field_names["start"], None)
+            with_value = getattr(module, field_names["with"], None)
 
-        data[field_names["start"]] = start_value
-        data[field_names["with"]] = with_value
-        data[field_names["without"]] = start_value
+            data[field_names["start"]] = start_value
+            data[field_names["with"]] = with_value
+            data[field_names["without"]] = start_value
 
     def _process_numeric_field(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
         """Process numeric fields"""
-        start_value = getattr(module, field_names["start"], None)
-        with_value = getattr(module, field_names["with"], None)
+        if field_mapping.is_single_field:
+            value = getattr(module, field_names["field"], None)
+            data[field_names["field"]] = value
+        else:
+            start_value = getattr(module, field_names["start"], None)
+            with_value = getattr(module, field_names["with"], None)
 
-        data[field_names["start"]] = start_value
-        data[field_names["with"]] = with_value
-        data[field_names["without"]] = start_value
+            data[field_names["start"]] = start_value
+            data[field_names["with"]] = with_value
+            data[field_names["without"]] = start_value
 
     def _process_foreign_key_field(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
         """Process foreign key fields (extract .name)"""
-        start_value = getattr(module, field_names["start"], None)
-        with_value = getattr(module, field_names["with"], None)
+        if field_mapping.is_single_field:
+            value = getattr(module, field_names["field"], None)
+            data[field_names["field"]] = value.name if value else None
+        else:
+            start_value = getattr(module, field_names["start"], None)
+            with_value = getattr(module, field_names["with"], None)
 
-        data[field_names["start"]] = start_value.name if start_value else None
-        data[field_names["with"]] = with_value.name if with_value else None
-        data[field_names["without"]] = start_value.name if start_value else None
+            data[field_names["start"]] = start_value.name if start_value else None
+            data[field_names["with"]] = with_value.name if with_value else None
+            data[field_names["without"]] = start_value.name if start_value else None
 
     def _process_many_to_many_field(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
         """Process many-to-many fields"""
-        start_value = getattr(module, field_names["start"], None)
-        with_value = getattr(module, field_names["with"], None)
+        if field_mapping.is_single_field:
+            value = getattr(module, field_names["field"], None)
+            data[field_names["field"]] = [item.name for item in value.all()] if value else []
+        else:
+            start_value = getattr(module, field_names["start"], None)
+            with_value = getattr(module, field_names["with"], None)
 
-        # For many-to-many, we might want to get all names
-        data[field_names["start"]] = [item.name for item in start_value.all()] if start_value else []
-        data[field_names["with"]] = [item.name for item in with_value.all()] if with_value else []
-        data[field_names["without"]] = [item.name for item in start_value.all()] if start_value else []
+            # For many-to-many, we might want to get all names
+            data[field_names["start"]] = [item.name for item in start_value.all()] if start_value else []
+            data[field_names["with"]] = [item.name for item in with_value.all()] if with_value else []
+            data[field_names["without"]] = [item.name for item in start_value.all()] if start_value else []
 
 
 class AnnualCroplandDataBuilder(ModuleDataBuilder):
@@ -303,7 +348,7 @@ class LivestockDataBuilder(ModuleDataBuilder):
         return [
             FieldMappingBuilder.foreign_key("livestock_production_type"),
             FieldMappingBuilder.foreign_key("complementary_manure_management_type"),
-            FieldMappingBuilder.foreign_key("livestock_category_type"),
+            FieldMappingBuilder.single_foreign_key("livestock_category_type"),
             FieldMappingBuilder.numeric("heads_number"),
         ]
 
@@ -350,10 +395,18 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
 
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
-            FieldMappingBuilder.foreign_key("forest_type"),
-            FieldMappingBuilder.foreign_key("forest_condition_type"),
+            # Core forest fields (single fields)
+            FieldMappingBuilder.single_foreign_key("forest_type"),
+            FieldMappingBuilder.single_foreign_key("forest_condition_type"),
+            # Degradation fields
             FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
+
+    def get_custom_fields(self, module: Any) -> Dict[str, Any]:
+        """Get custom fields that don't follow the standard pattern"""
+        return {
+            "area": getattr(module, "area", None),
+        }
 
 
 # Implementation example of a more complex module
