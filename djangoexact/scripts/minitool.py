@@ -12,6 +12,43 @@ from typing import Dict, List, Any, Optional, Tuple, Callable
 import json
 from pathlib import Path
 
+
+def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
+    """
+    Extract only the most relevant lines from a stack trace to avoid huge CSV files.
+
+    Args:
+        traceback_str: Full stack trace string
+        max_lines: Maximum number of lines to include (default: 10)
+
+    Returns:
+        Condensed stack trace with only the most relevant lines
+    """
+    if not traceback_str:
+        return ""
+
+    lines = traceback_str.strip().split("\n")
+
+    # Keep the exception type and message (first few lines)
+    relevant_lines = []
+
+    # Add exception info (usually first 2-3 lines)
+    for i, line in enumerate(lines):
+        if line.strip() and not line.startswith("  File "):
+            relevant_lines.append(line)
+            if len(relevant_lines) >= 3:  # Keep exception type, message, and maybe one more
+                break
+
+    # Add the most recent stack frames (last few lines before the exception)
+    stack_lines = [line for line in lines if line.startswith("  File ")]
+    if stack_lines:
+        # Take the last few stack frames (most recent)
+        relevant_stack = stack_lines[-max_lines:]
+        relevant_lines.extend(relevant_stack)
+
+    return "\n".join(relevant_lines)
+
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -394,6 +431,7 @@ class ModuleDataBuilderRegistry:
         self.register("Grassland", GrasslandDataBuilder())
         self.register("FloodedRice", FloodedRiceDataBuilder())
         self.register("PerennialCropland", PerennialCroplandDataBuilder())
+        self.register("ForestManagement", ForestManagementDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -447,7 +485,9 @@ class ModuleProcessor(ABC):
             return ProcessingResult.success_result(data)
 
         except Exception as e:
-            return ProcessingResult.error_result(type(e).__name__, str(e), combination, traceback.format_exc())
+            full_traceback = traceback.format_exc()
+            condensed_traceback = extract_relevant_traceback(full_traceback)
+            return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
 
 
 class GrasslandProcessor(ModuleProcessor):
@@ -904,7 +944,7 @@ class PermutationComputer:
 
         try:
             with ProcessPoolExecutor(max_workers=4, initializer=self.django_initializer) as executor:
-                pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations")
+                pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
                 for chunk in self.chunked_product(*iterables, chunk_size=chunk_size):
                     results_iter = executor.map(processor.process_combination, chunk)
@@ -920,8 +960,10 @@ class PermutationComputer:
                         if result.success:
                             if result.data.get("total", 0) != 0:
                                 data.append(result.data)
+                                pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
                         else:
                             errors_data.append(result.error)
+                            pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
 
                         pbar.update(1)
                     else:
