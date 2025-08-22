@@ -1,3 +1,67 @@
+## 1.15.16 (2025-08-21)
+
+### Fix
+
+- **oluc**: Correct fire emissions calculations
+- **general_functions**: fix cumulative maturity evaluation
+
+## 1.15.15 (2025-08-20)
+
+### Feat
+
+- **minitool**: update database file with new data
+- **minitool**: add organic input types and biomass/fire periodicity attributes to perennial cropland data builder
+- add database to git lfs
+- **minitool**: add perennial cropland to computation scripts
+- **minitool**: add perennial cropland to computation script
+
+### Fix
+
+- **grassland**: remove reference to old soc tables and adjust soc logic
+- **minitool**: add perennial cropland to module type mapping and exclude 'module' from custom filter list
+- **minitool**: update country filter to use api_models
+- **minitool**: handle edge cases in quartile calculations
+- **minitool**: include country as a filter
+- change how quantiles are calculated
+- **minitool**: remove useless land use types permutations from flooded rice computations
+- update modules data
+- delete unused file
+- adjust changes json path
+- set capitalization years and implementation years to 1 and 0
+- specify different deploy configuration for minitool
+- add lfs support in deployment yaml
+- delete large files
+- remove wrong db
+- add minitool url to allowed hosts
+- remove statement timeout option from database config
+- remove large files
+
+## 1.15.14 (2025-08-19)
+
+### Feat
+
+- **forest management**: add disturbance_percentage_fire to calculations and model
+- **minitool**: disable thread safety for local database
+- **minitool**: add endpoint returning available modules
+- add module-based /filters endpoint returning the available filters for each module
+- add module-level generalized aggregation
+- add module-level data aggregation
+- add impact analisys script
+- add per-module aggregated results endpoint and rewrite aggregation scripts
+- refactor aggregation logic
+- add first draft of aggregated module practices statistics
+- add script to generate intra-module statistics aggregated by practice
+- increase maximum page size in minitool pagination
+- add first implementation of minitool endpoint
+
+### Fix
+
+- **calculators**: add missing streamlined soc_t2 fallback references and add unit tests for validation
+- **project membership**: unlock project when deleted member is the lock holder
+- **minitool**: adjust module type string output in analyze_changes
+- **minitool**: add middleware manually handling database connections to ensure proper closing
+- merge migrations
+
 ## 1.15.13 (2025-08-14)
 
 ### Fix

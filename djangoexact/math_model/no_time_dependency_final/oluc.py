@@ -130,17 +130,13 @@ class OtherLandUseChanges(BaseModule):
 
             initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
 
-            fire_mb = initial_biomass / 0.4
+            fire_mb = initial_biomass
 
             kg_methane_fire = fire_mb * self.combustion_factor * self.emission_factor_methane if self.fire_bool else 0
-            kg_nitrous_fire = initial_biomass * 2.5 * self.combustion_factor * self.emission_factor_nitrous if self.fire_bool else 0
+            kg_nitrous_fire = initial_biomass * self.combustion_factor * self.emission_factor_nitrous if self.fire_bool else 0
 
             methane_emissions = kg_methane_fire * self.methane_constant
             nitrous_emissions = kg_nitrous_fire * self.nitrous_constant
-
-            total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
-
-            total_fire_emissions = total_em_per_hectar * self.area
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000

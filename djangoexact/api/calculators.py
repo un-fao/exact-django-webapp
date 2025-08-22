@@ -598,11 +598,9 @@ class LandModuleCalculator(BaseCalculator):
         self.project: Project = self.activity.project
         self.area = self.luc.area if self.luc else getattr(module, "parent", module).area
 
-        self.module_start = self.module_w = self.module_wo = self.module
-
-        self.module_start: LandModule | SingleBiomassModule
-        self.module_w: LandModule | SingleBiomassModule
-        self.module_wo: LandModule | SingleBiomassModule
+        self.module_start: LandModule | SingleBiomassModule = self.module
+        self.module_w: LandModule | SingleBiomassModule = self.module
+        self.module_wo: LandModule | SingleBiomassModule = self.module
 
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
 
@@ -616,9 +614,9 @@ class LandModuleCalculator(BaseCalculator):
         self.calculate_biomass_w = not (self.module.is_start() and self.module.is_with())
         self.calculate_biomass_wo = not (self.module.is_start() and self.module.is_without())
 
-        self.soc_start: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
-        self.soc_w: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
-        self.soc_wo: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC | None = None
+        self.soc_start: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
+        self.soc_w: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
+        self.soc_wo: ipcc.SoilOrganicCarbon | ipcc.GrasslandSOC = ipcc.SoilOrganicCarbon(value=None)
 
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
@@ -630,26 +628,37 @@ class LandModuleCalculator(BaseCalculator):
         moisture_flt = {"moisture": self.moisture}
 
         self.soc = ipcc.SoilOrganicCarbon.objects.filter(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type).first()
-        self.soc_start = self.soc_w = self.soc_wo = self.soc
+        if self.soc:
+            self.soc_start = self.soc_w = self.soc_wo = self.soc
 
-        if isinstance(self.module, Grassland):
-            if self.module.is_start():
-                self.soc_start = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_start).first()
-            if self.module.is_with():
-                self.soc_w = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_w).first()
-            if self.module.is_without():
-                self.soc_wo = ipcc.GrasslandSOC.objects.filter(grassland_management_type=self.module.grassland_management_type_wo).first()
-
-        self.soc_t2_start = getattr(self.module_start, "soc_t2_start", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
-        self.soc_t2_w = getattr(self.module_w, "soc_t2_w", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
-        self.soc_t2_wo = getattr(self.module_wo, "soc_t2_wo", getattr(self.activity, "soc_t2", getattr(self.project, "soc_ref_t2", None)))
+        self.soc_t2_start = (
+            getattr(self.module_start, "soc_t2_start")
+            if getattr(self.module_start, "soc_t2_start") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        self.soc_t2_w = (
+            getattr(self.module_w, "soc_t2_w")
+            if getattr(self.module_w, "soc_t2_w") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        self.soc_t2_wo = (
+            getattr(self.module_wo, "soc_t2_wo")
+            if getattr(self.module_wo, "soc_t2_wo") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
 
         missing_scenarios = []
-        if self.soc_t2_start is None and self.soc_start is None or self.soc_start.value is None:
+        if self.soc_start.value is None and self.soc_t2_start is None:
             missing_scenarios.append("Start")
-        if self.soc_t2_w is None and self.soc_w is None or self.soc_w.value is None:
+        if self.soc_w.value is None and self.soc_t2_w is None:
             missing_scenarios.append("With")
-        if self.soc_t2_wo is None and self.soc_wo is None or self.soc_wo.value is None:
+        if self.soc_wo.value is None and self.soc_t2_wo is None:
             missing_scenarios.append("Without")
 
         if missing_scenarios:
@@ -744,6 +753,28 @@ class DeforestationCalculator(BaseCalculator):
         module_start: LandModule
         module_w: LandModule
         module_wo: LandModule
+
+        soc_t2_start: float | None = (
+            getattr(module_start, "soc_t2_start")
+            if getattr(module_start, "soc_t2_start") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        soc_t2_w: float | None = (
+            getattr(module_w, "soc_t2_w")
+            if getattr(module_w, "soc_t2_w") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        soc_t2_wo: float | None = (
+            getattr(module_wo, "soc_t2_wo")
+            if getattr(module_wo, "soc_t2_wo") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
 
         # TODO: Maybe generalise this on a higher level
         if not forest:
@@ -917,8 +948,8 @@ class DeforestationCalculator(BaseCalculator):
                 "fi_end_tier_2": module.fi_t2_w,
                 "flu_start_tier_2": module.flu_t2_start,
                 "flu_end_tier_2": module.flu_t2_w,
-                "soc_start_tier_2": forest.soc_t2_start,
-                "soc_end_tier_2": module_w.soc_t2_w,
+                "soc_start_tier_2": soc_t2_start,
+                "soc_end_tier_2": soc_t2_w,
                 "fmg_start_default": fmg_start.value,
                 "fmg_end_default": fmg_w.value,
                 "fi_start_default": fi_start.value,
@@ -971,8 +1002,8 @@ class DeforestationCalculator(BaseCalculator):
                 "fi_end_tier_2": module.fi_t2_wo,
                 "flu_start_tier_2": module.flu_t2_start,
                 "flu_end_tier_2": module.flu_t2_wo,
-                "soc_start_tier_2": forest.soc_t2_start,
-                "soc_end_tier_2": module_wo.soc_t2_wo,
+                "soc_start_tier_2": soc_t2_start,
+                "soc_end_tier_2": soc_t2_wo,
                 "fmg_start_default": fmg_start.value,
                 "fmg_end_default": fmg_wo.value,
                 "fi_start_default": fi_start.value,
@@ -1037,6 +1068,28 @@ class OtherLandUseCalculator(BaseCalculator):
         module_start: SingleBiomassModule | AboveBelowGroundBiomassModule
         module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
         module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
+
+        soc_t2_start: float | None = (
+            getattr(module_start, "soc_t2_start")
+            if getattr(module_start, "soc_t2_start") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        soc_t2_w: float | None = (
+            getattr(module_w, "soc_t2_w")
+            if getattr(module_w, "soc_t2_w") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
+        soc_t2_wo: float | None = (
+            getattr(module_wo, "soc_t2_wo")
+            if getattr(module_wo, "soc_t2_wo") is not None
+            else getattr(self.activity, "soc_t2")
+            if getattr(self.activity, "soc_t2") is not None
+            else getattr(self.project, "soc_ref_t2")
+        )
 
         ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
         if not ready:
@@ -1168,8 +1221,8 @@ class OtherLandUseCalculator(BaseCalculator):
                 "fire_bool": luc.is_fire_used_w,
                 "soc_start_default": soc.value,
                 "soc_end_default": soc.value,
-                "soc_start_tier_2": module_start.soc_t2_start,
-                "soc_end_tier_2": module_w.soc_t2_w,
+                "soc_start_tier_2": soc_t2_start,
+                "soc_end_tier_2": soc_t2_w,
                 "fmg_start_default": soc_start.fmg if soc_start else fmg_start.value,
                 "fmg_end_default": fmg_final_w.value,
                 "fmg_start_tier_2": module_start.fmg_t2_start,  # TODO: Start module has 3 fmg (also fi and flu) values. What to choose?
@@ -1211,8 +1264,8 @@ class OtherLandUseCalculator(BaseCalculator):
                 "fire_bool": luc.is_fire_used_wo,
                 "soc_start_default": soc.value,
                 "soc_end_default": soc.value,
-                "soc_start_tier_2": module_start.soc_t2_start,
-                "soc_end_tier_2": module_wo.soc_t2_wo,
+                "soc_start_tier_2": soc_t2_start,
+                "soc_end_tier_2": soc_t2_wo,
                 "fmg_start_default": fmg_start.value,
                 "fmg_end_default": fmg_final_wo.value,
                 "fmg_start_tier_2": module_start.fmg_t2_start,
@@ -1487,8 +1540,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "rate_type": change_rate.name,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -1549,8 +1602,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "rate_type": change_rate.name,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -1614,8 +1667,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "rate_type": change_rate.name,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -1679,8 +1732,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "rate_type": change_rate.name,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -2507,8 +2560,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "cultivation_period_tier_2": self.module.cultivation_period_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(self.module, "soc_t2_w", None),
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module.fmg_t2_start,
@@ -2565,8 +2618,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "cultivation_period_tier_2": self.module.cultivation_period_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(self.module, "soc_t2_wo", None),
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module.fmg_t2_start,
@@ -2624,8 +2677,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "cultivation_period_tier_2": self.module.cultivation_period_t2_w,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(self.module, "soc_t2_w", None),
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module.fmg_t2_start,
@@ -2683,8 +2736,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "cultivation_period_tier_2": self.module.cultivation_period_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(self.module, "soc_t2_wo", None),
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module.fmg_t2_start,
@@ -2830,8 +2883,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": module.soc_t2_start,
-                "soc_end_tier_2": module.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -2878,8 +2931,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": module.soc_t2_start,
-                "soc_end_tier_2": module.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -2929,8 +2982,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "cf_tier_2": module.combustion_factor_t2_w,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": module.soc_t2_start,
-                "soc_end_tier_2": module.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -2980,8 +3033,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "cf_tier_2": module.combustion_factor_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": module.soc_t2_start,
-                "soc_end_tier_2": module.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -4285,8 +4338,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -4321,8 +4374,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -4358,8 +4411,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -4395,8 +4448,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -7144,6 +7197,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_start,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_start,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
@@ -7158,8 +7214,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "deadwood_20_years_tier_2": self.forest.deadwood_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_start.value,
-                "soc_start_tier_2": self.module.soc_t2_start,
-                "soc_end_tier_2": self.module.soc_t2_start,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_start,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_start.value,
                 "fmg_start_tier_2": self.forest.fmg_t2_start,
@@ -7223,6 +7279,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_w,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_w,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_w,
@@ -7237,8 +7296,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "deadwood_20_years_tier_2": self.forest.deadwood_t2_w,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module.soc_t2_start,
-                "soc_end_tier_2": self.module.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.forest.fmg_t2_start,
@@ -7300,6 +7359,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else [],
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else [],
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else [],
+                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
+                if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_wo,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_wo,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_wo,
@@ -7314,8 +7376,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "deadwood_20_years_tier_2": self.forest.deadwood_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module.soc_t2_start,
-                "soc_end_tier_2": self.module.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.forest.fmg_t2_start,
@@ -7390,8 +7452,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -7428,8 +7490,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -7467,8 +7529,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -7506,8 +7568,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -7570,8 +7632,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -7606,8 +7668,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
@@ -7643,8 +7705,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
@@ -7680,8 +7742,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
