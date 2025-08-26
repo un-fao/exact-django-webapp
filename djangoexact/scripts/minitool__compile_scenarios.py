@@ -233,6 +233,13 @@ def run():
     ]
 
     for scenario in scenarios:
+        models.EmissionScenario.objects.create(
+            name=scenario["name"],
+            module_type=scenario["module_type"],
+            changes=scenario["changes"],
+        )
+
+    for scenario in scenarios:
         q_objects = Q()
         for change in scenario["changes"]:
             q_objects |= Q(
