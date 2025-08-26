@@ -1222,3 +1222,78 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": instance, **stats})
 
         return Response(serializer.data)
+
+    @action(detail=False, methods=["post"])
+    def compute(self, request, *args, **kwargs):
+        """
+        Compute custom scenarios with provided changes and filters.
+        Expects:
+        - module_type: string
+        - changes: list of change objects with start/end field/value pairs
+        - climate, moisture, soil_type, region: optional filter parameters
+        """
+        module_type = request.data.get("module_type")
+        changes = request.data.get("changes", [])
+        climate = request.data.get("climate")
+        moisture = request.data.get("moisture")
+        soil_type = request.data.get("soil_type")
+        region = request.data.get("region")
+
+        if not module_type:
+            return Response({"error": "module_type is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not changes:
+            return Response({"error": "changes field is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate changes structure
+        for change in changes:
+            if not isinstance(change, dict):
+                return Response({"error": "Each change must be an object"}, status=status.HTTP_400_BAD_REQUEST)
+
+            start = change.get("start", {})
+            end = change.get("end", {})
+
+            if not start.get("field") or not start.get("value"):
+                return Response({"error": "Each change must have start.field and start.value"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not end.get("field") or not end.get("value"):
+                return Response({"error": "Each change must have end.field and end.value"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Apply filters
+        filtered_qs = models.ChangeRecord.objects.filter(module_type=module_type)
+
+        if climate:
+            filtered_qs = filtered_qs.filter(climate=climate)
+
+        if moisture:
+            filtered_qs = filtered_qs.filter(moisture=moisture)
+
+        if soil_type:
+            filtered_qs = filtered_qs.filter(soil_type=soil_type)
+
+        if region:
+            filtered_qs = filtered_qs.filter(region=region)
+
+        # Build query for changes
+        q_objects = Q()
+        for change in changes:
+            q_objects |= Q(
+                field=change["start"]["field"],
+                from_value=change["start"]["value"],
+                to_value=change["end"]["value"],
+            )
+
+        qs = filtered_qs.filter(q_objects)
+
+        try:
+            stats = self.stats_for(qs)
+        except Exception as e:
+            print(e)
+            stats = {"count": 0}
+
+        # Create a temporary scenario object for serialization
+        temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", module_type=module_type, changes=changes)
+
+        serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": temp_scenario, **stats})
+
+        return Response(serializer.data)
