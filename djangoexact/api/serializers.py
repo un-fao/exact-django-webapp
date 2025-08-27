@@ -3757,13 +3757,16 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         # Get all assessments
         assessments = HandInHandAssessment.objects.select_related("country__region").order_by("country__region__name", "country__name", "year", "name")
 
+        # Get all countries to ensure we include those without assessments
+        all_countries = HandInHandCountry.objects.select_related("region").order_by("region__name", "name")
+
         # Group by region, then country, then year
         grouped_data = {}
 
-        for assessment in assessments:
-            region_name = assessment.country.region.name
-            country_name = assessment.country.name
-            year = assessment.year or "Unknown Year"
+        # First, initialize all countries with empty years structure
+        for country in all_countries:
+            region_name = country.region.name
+            country_name = country.name
 
             # Initialize region if not exists
             if region_name not in grouped_data:
@@ -3771,7 +3774,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
 
             # Initialize country if not exists
             if country_name not in grouped_data[region_name]["countries"]:
-                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": assessment.country.iso_code, "years": {}}
+                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": country.iso_code, "years": {}}
+
+        # Then, add assessments to their respective countries
+        for assessment in assessments:
+            region_name = assessment.country.region.name
+            country_name = assessment.country.name
+            year = assessment.year or "Unknown Year"
 
             # Initialize year if not exists
             if year not in grouped_data[region_name]["countries"][country_name]["years"]:
