@@ -1717,7 +1717,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
 
-        serializer = ProjectInvitationWriteSerializer(data=request.data, instance=invitation, partial=True)
+        serializer = ProjectInvitationWriteSerializer(data=request.data, instance=invitation, partial=True, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
