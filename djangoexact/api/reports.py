@@ -3515,6 +3515,8 @@ class TransportReport(BaseModuleReport):
                 map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])))
             )
 
+            self.total_emissions = list(map(sum, zip(self.total_emissions, self.fuel_co2_eq, self.fuel_ch4_eq, self.fuel_n2o_eq, self.electricity_co2_eq)))
+
     def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
@@ -3536,20 +3538,16 @@ class TransportReport(BaseModuleReport):
         self.cumulative_emissions = cumulative_emissions
         self.yearly_emissions = yearly_emissions
 
-        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="Cumulative balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="Yearly balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="N2O from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CH4 from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="CO2 from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 6, column=1, value="CO2 from electricity")
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="N2O from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CH4 from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2 from electricity")
 
         for i in range(self.duration):
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.cumulative_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.yearly_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.fuel_n2o_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.fuel_ch4_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.fuel_co2_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.electricity_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fuel_n2o_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.fuel_ch4_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.fuel_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.electricity_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -3624,6 +3622,8 @@ class ProcessingReport(BaseModuleReport):
             )
             self.water_use_eq = list(map(sum, zip(self.water_use_eq, self.extract_emissions(submodules_emission_set, self.water_use_source[0], self.water_use_source[1]))))
 
+            self.total_emissions = list(map(sum, zip(self.total_emissions, self.fuel_co2_eq, self.fuel_ch4_eq, self.fuel_n2o_eq, self.electricity_co2_eq, self.water_use_eq)))
+
     def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
@@ -3649,14 +3649,12 @@ class ProcessingReport(BaseModuleReport):
         cumulative_water_use = np.cumsum(self.water_use_eq)
         yearly_water_use = self.water_use_eq
 
-        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="Cumulative balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="Yearly balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="N2O from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CH4 from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="CO2 from fuel combustion")
-        self.results_worksheet.cell(row=last_results_row + 6, column=1, value="CO2 from electricity")
-        self.results_worksheet.cell(row=last_results_row + 7, column=1, value="Cumulative water use in liters")
-        self.results_worksheet.cell(row=last_results_row + 8, column=1, value="Yearly water use in liters")
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="N2O from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CH4 from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from fuel combustion")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2 from electricity")
+        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="Cumulative water use in liters")
+        self.results_worksheet.cell(row=last_results_row + 6, column=1, value="Yearly water use in liters")
 
         print(self.duration)
         print(f"Len cumulative emissions: {len(self.cumulative_emissions)}")
@@ -3669,14 +3667,12 @@ class ProcessingReport(BaseModuleReport):
 
         for i in range(self.duration):
             print(f"i: {i}")
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.cumulative_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.yearly_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.fuel_n2o_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.fuel_ch4_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.fuel_co2_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.electricity_co2_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=cumulative_water_use[i])
-            self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=yearly_water_use[i])
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fuel_n2o_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.fuel_ch4_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.fuel_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.electricity_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=cumulative_water_use[i])
+            self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=yearly_water_use[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -3715,32 +3711,6 @@ class PackagingReport(BaseModuleReport):
         submodules: list[api_models.PackagingEntry] = self.module.submodules
 
         for submodule in submodules:
-            """
-            submodules_emission_set = submodule.cached_results_by_activity_by_gas["balance"] if submodule.cached_results_by_activity_by_gas is not None else None
-
-            if submodules_emission_set is not None:
-                print(f"Submodules emission set: {submodules_emission_set}")
-                self.storage_co2_eq = list(map(sum, zip(self.storage_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]))))
-                self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
-                continue
-
-            CalculatorClass = calculators.StorageEntryCalculator
-            submodule: api_models.StorageEntry
-
-            calculator = CalculatorClass(submodule)
-            from api.calculators import Result
-
-            try:
-                submodules_emission_set = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
-                print(f"Submodules emission set: {submodules_emission_set}")
-            except Exception as e:
-                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
-                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
-
-            self.storage_co2_eq = list(map(sum, zip(self.storage_co2_eq, self.extract_emissions(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]))))
-            self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
-
-            """
             submodules_emission_set = submodule.cached_results_by_activity_by_gas["balance"] if submodule.cached_results_by_activity_by_gas is not None else None
 
             if submodules_emission_set is not None:
@@ -3771,6 +3741,8 @@ class PackagingReport(BaseModuleReport):
             )
             self.packaging_co2_eq = list(map(sum, zip(self.packaging_co2_eq, self.extract_emissions(submodules_emission_set, self.packaging_co2_eq_source[0], self.packaging_co2_eq_source[1]))))
 
+            self.total_emissions = list(map(sum, zip(self.total_emissions, self.electricity_co2_eq, self.packaging_co2_eq)))
+
     def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
@@ -3790,16 +3762,12 @@ class PackagingReport(BaseModuleReport):
         self.cumulative_emissions = cumulative_emissions
         self.yearly_emissions = yearly_emissions
 
-        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="Cumulative balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="Yearly balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from electricity")
-        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2 from packaging")
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from electricity")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from packaging")
 
         for i in range(self.duration):
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.cumulative_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.yearly_emissions[i])
-            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.electricity_co2_eq[i])
-            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.packaging_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.electricity_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.packaging_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -3858,6 +3826,8 @@ class StorageReport(BaseModuleReport):
                 map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])))
             )
 
+            self.total_emissions = list(map(sum, zip(self.total_emissions, self.electricity_co2_eq, self.storage_co2_eq)))
+
         print(f"Storage CO2 eq: {self.storage_co2_eq}")
         print(f"Electricity CO2 eq: {self.electricity_co2_eq}")
 
@@ -3885,16 +3855,12 @@ class StorageReport(BaseModuleReport):
         print(f"Electricity CO2 eq: {self.electricity_co2_eq}")
         print(f"Storage CO2 eq: {self.storage_co2_eq}")
 
-        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="Cumulative balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="Yearly balance in TCO2-eq")
-        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from electricity")
-        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2 from storage")
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from electricity")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from storage")
 
         for i in range(self.duration):
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.cumulative_emissions[i - 1])
-            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.yearly_emissions[i - 1])
-            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.electricity_co2_eq[i - 1])
-            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.storage_co2_eq[i - 1])
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.electricity_co2_eq[i - 1])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.storage_co2_eq[i - 1])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
