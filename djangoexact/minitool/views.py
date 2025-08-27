@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from rest_framework.filters import SearchFilter
 from rest_framework import views, generics, viewsets, mixins, decorators
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 import minitool.models as models
 import minitool.serializers as serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
-from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q
+from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q, Count
 from django.db import connection
 from rest_framework.pagination import PageNumberPagination
 import api.models as api_models
@@ -123,7 +124,16 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         queryset = models.ChangeAggregate.objects.all()
 
         # Filter by module type using custom_filters
-        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
+        module_type_mapping = {
+            "livestock": "Livestock",
+            "annual-cropland": "Annual Cropland",
+            "flooded-rice": "Flooded Rice",
+            "grassland": "Grassland",
+            "perennial-cropland": "Perennial Cropland",
+            "forest-management": "Forest Management",
+            "small-fishery": "Small Fishery",
+            "large-fishery": "Large Fishery",
+        }
         module_type_value = module_type_mapping.get(module_type, module_type)
         queryset = queryset.filter(module_type=module_type_value)
 
@@ -410,6 +420,52 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response(response_data)
 
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management")
+    @close_db_connections
+    def forest_management(self, request, *args, **kwargs):
+        """
+        Get forest management emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("forest-management", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No forest management data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery")
+    @close_db_connections
+    def small_fishery(self, request, *args, **kwargs):
+        """
+        Get small fishery emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("small-fishery", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No small fishery data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
+    ##### FIELDS #####
+
     # Nested actions for livestock module
     @decorators.action(detail=False, methods=["get"], url_path="livestock/fields")
     def livestock_fields(self, request, *args, **kwargs):
@@ -417,6 +473,57 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         queryset = models.ChangeAggregate.objects.filter(module_type="Livestock")
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/fields")
+    def annual_cropland_fields(self, request, *args, **kwargs):
+        """Get available fields for annual cropland data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/fields")
+    def flooded_rice_fields(self, request, *args, **kwargs):
+        """Get available fields for flooded rice data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland/fields")
+    def grassland_fields(self, request, *args, **kwargs):
+        """Get available fields for grassland data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/fields")
+    def perennial_cropland_fields(self, request, *args, **kwargs):
+        """Get available fields for perennial cropland data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management/fields")
+    def forest_management_fields(self, request, *args, **kwargs):
+        """Get available fields for forest management data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Forest Management")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery/fields")
+    def small_fishery_fields(self, request, *args, **kwargs):
+        """Get available fields for small fishery data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Small Fishery")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery/fields")
+    def large_fishery_fields(self, request, *args, **kwargs):
+        """Get available fields for large fishery data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Large Fishery")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    ##### FILTERS #####
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/filters")
     def livestock_filters(self, request, *args, **kwargs):
@@ -431,12 +538,77 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
         return Response(filters_with_entries)
 
-    @decorators.action(detail=False, methods=["get"], url_path="livestock/categories")
-    def livestock_categories(self, request, *args, **kwargs):
-        """Get available livestock categories."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Livestock")
-        categories = queryset.values_list("custom_filters__livestock_category_type", flat=True).distinct()
-        return Response(list(categories))
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/filters")
+    def annual_cropland_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for annual cropland data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/filters")
+    def flooded_rice_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for flooded rice data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland/filters")
+    def grassland_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for grassland data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/filters")
+    def perennial_cropland_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for perennial cropland data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management/filters")
+    def forest_management_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for forest management data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Forest Management")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery/filters")
+    def small_fishery_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for small fishery data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Small Fishery")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery/filters")
+    def large_fishery_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for large fishery data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Large Fishery")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
+    ##### REGIONS #####
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/regions")
     def livestock_regions(self, request, *args, **kwargs):
@@ -445,11 +617,106 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         regions = queryset.values_list("region", flat=True).distinct()
         return Response(list(regions))
 
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/regions")
+    def annual_cropland_regions(self, request, *args, **kwargs):
+        """Get available regions for annual cropland data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/regions")
+    def flooded_rice_regions(self, request, *args, **kwargs):
+        """Get available regions for flooded rice data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland/regions")
+    def grassland_regions(self, request, *args, **kwargs):
+        """Get available regions for grassland data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/regions")
+    def perennial_cropland_regions(self, request, *args, **kwargs):
+        """Get available regions for perennial cropland data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management/regions")
+    def forest_management_regions(self, request, *args, **kwargs):
+        """Get available regions for forest management data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Forest Management")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery/regions")
+    def small_fishery_regions(self, request, *args, **kwargs):
+        """Get available regions for small fishery data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Small Fishery")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery/regions")
+    def large_fishery_regions(self, request, *args, **kwargs):
+        """Get available regions for large fishery data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Large Fishery")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
+    ##### CUSTOM FILTERS #####
+
     @decorators.action(detail=False, methods=["get"], url_path="livestock/custom-filters")
     def livestock_custom_filters(self, request, *args, **kwargs):
         """Get available custom filter fields and values for livestock data."""
         custom_filters = self.get_available_custom_filters("livestock")
         return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/custom-filters")
+    def annual_cropland_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for annual cropland data."""
+        custom_filters = self.get_available_custom_filters("annual-cropland")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/custom-filters")
+    def flooded_rice_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for flooded rice data."""
+        custom_filters = self.get_available_custom_filters("flooded-rice")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="grassland/custom-filters")
+    def grassland_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for grassland data."""
+        custom_filters = self.get_available_custom_filters("grassland")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/custom-filters")
+    def perennial_cropland_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for perennial cropland data."""
+        custom_filters = self.get_available_custom_filters("perennial-cropland")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management/custom-filters")
+    def forest_management_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for forest management data."""
+        custom_filters = self.get_available_custom_filters("forest-management")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery/custom-filters")
+    def small_fishery_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for small fishery data."""
+        custom_filters = self.get_available_custom_filters("small-fishery")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery/custom-filters")
+    def large_fishery_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for large fishery data."""
+        custom_filters = self.get_available_custom_filters("large-fishery")
+        return Response(custom_filters)
+
+    ##### STATISTICS #####
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/statistics")
     def livestock_statistics(self, request, *args, **kwargs):
@@ -462,135 +729,30 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
-    # Nested actions for annual cropland module
-    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/fields")
-    def annual_cropland_fields(self, request, *args, **kwargs):
-        """Get available fields for annual cropland data with their unique entries."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
-        fields_with_entries = self.get_fields_with_entries(queryset)
-        return Response(fields_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/filters")
-    def annual_cropland_filters(self, request, *args, **kwargs):
-        """
-        Get available filters for annual cropland data with their unique entries.
-
-        Query parameters:
-        - custom_only: If 'true', returns only custom module filters (default: false)
-        """
-        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
-        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
-        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
-        return Response(filters_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/regions")
-    def annual_cropland_regions(self, request, *args, **kwargs):
-        """Get available regions for annual cropland data."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Annual Cropland")
-        regions = queryset.values_list("region", flat=True).distinct()
-        return Response(list(regions))
-
-    @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/custom-filters")
-    def annual_cropland_custom_filters(self, request, *args, **kwargs):
-        """Get available custom filter fields and values for annual cropland data."""
-        custom_filters = self.get_available_custom_filters("annual-cropland")
-        return Response(custom_filters)
-
     @decorators.action(detail=False, methods=["get"], url_path="annual-cropland/statistics")
     def annual_cropland_statistics(self, request, *args, **kwargs):
         """Get overall statistics for annual cropland data."""
         queryset, filters = self.get_filtered_queryset("annual-cropland", request)
-
         total_records = queryset.count()
         total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
         avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
-
-    # Nested actions for flooded rice module
-    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/fields")
-    def flooded_rice_fields(self, request, *args, **kwargs):
-        """Get available fields for flooded rice data with their unique entries."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
-        fields_with_entries = self.get_fields_with_entries(queryset)
-        return Response(fields_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/filters")
-    def flooded_rice_filters(self, request, *args, **kwargs):
-        """
-        Get available filters for flooded rice data with their unique entries.
-
-        Query parameters:
-        - custom_only: If 'true', returns only custom module filters (default: false)
-        """
-        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
-        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
-        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
-        return Response(filters_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/regions")
-    def flooded_rice_regions(self, request, *args, **kwargs):
-        """Get available regions for flooded rice data."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Flooded Rice")
-        regions = queryset.values_list("region", flat=True).distinct()
-        return Response(list(regions))
-
-    @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/custom-filters")
-    def flooded_rice_custom_filters(self, request, *args, **kwargs):
-        """Get available custom filter fields and values for flooded rice data."""
-        custom_filters = self.get_available_custom_filters("flooded-rice")
-        return Response(custom_filters)
 
     @decorators.action(detail=False, methods=["get"], url_path="flooded-rice/statistics")
     def flooded_rice_statistics(self, request, *args, **kwargs):
         """Get overall statistics for flooded rice data."""
         queryset, filters = self.get_filtered_queryset("flooded-rice", request)
-
         total_records = queryset.count()
         total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
         avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
-    # Nested actions for grassland module
-    @decorators.action(detail=False, methods=["get"], url_path="grassland/fields")
-    def grassland_fields(self, request, *args, **kwargs):
-        """Get available fields for grassland data with their unique entries."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
-        fields_with_entries = self.get_fields_with_entries(queryset)
-        return Response(fields_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="grassland/filters")
-    def grassland_filters(self, request, *args, **kwargs):
-        """
-        Get available filters for grassland data with their unique entries.
-
-        Query parameters:
-        - custom_only: If 'true', returns only custom module filters (default: false)
-        """
-        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
-        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
-        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
-        return Response(filters_with_entries)
-
-    @decorators.action(detail=False, methods=["get"], url_path="grassland/regions")
-    def grassland_regions(self, request, *args, **kwargs):
-        """Get available regions for grassland data."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Grassland")
-        regions = queryset.values_list("region", flat=True).distinct()
-        return Response(list(regions))
-
-    @decorators.action(detail=False, methods=["get"], url_path="grassland/custom-filters")
-    def grassland_custom_filters(self, request, *args, **kwargs):
-        """Get available custom filter fields and values for grassland data."""
-        custom_filters = self.get_available_custom_filters("grassland")
-        return Response(custom_filters)
-
     @decorators.action(detail=False, methods=["get"], url_path="grassland/statistics")
     def grassland_statistics(self, request, *args, **kwargs):
         """Get overall statistics for grassland data."""
         queryset, filters = self.get_filtered_queryset("grassland", request)
-
         total_records = queryset.count()
         total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
         avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
@@ -607,36 +769,38 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
-    # Nested actions for perennial cropland module
-    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/fields")
-    def perennial_cropland_fields(self, request, *args, **kwargs):
-        """Get available fields for perennial cropland data with their unique entries."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
-        fields_with_entries = self.get_fields_with_entries(queryset)
-        return Response(fields_with_entries)
+    @decorators.action(detail=False, methods=["get"], url_path="forest-management/statistics")
+    def forest_management_statistics(self, request, *args, **kwargs):
+        """Get overall statistics for forest management data."""
+        queryset, filters = self.get_filtered_queryset("forest-management", request)
+        total_records = queryset.count()
+        total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
+        avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
 
-    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/filters")
-    def perennial_cropland_filters(self, request, *args, **kwargs):
-        """Get available filters for perennial cropland data with their unique entries."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
-        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
-        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
-        return Response(filters_with_entries)
+        return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
-    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/regions")
-    def perennial_cropland_regions(self, request, *args, **kwargs):
-        """Get available regions for perennial cropland data."""
-        queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
-        regions = queryset.values_list("region", flat=True).distinct()
-        return Response(list(regions))
+    @decorators.action(detail=False, methods=["get"], url_path="small-fishery/statistics")
+    def small_fishery_statistics(self, request, *args, **kwargs):
+        """Get overall statistics for small fishery data."""
+        queryset, filters = self.get_filtered_queryset("small-fishery", request)
+        total_records = queryset.count()
+        total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
+        avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
 
-    @decorators.action(detail=False, methods=["get"], url_path="perennial-cropland/custom-filters")
-    def perennial_cropland_custom_filters(self, request, *args, **kwargs):
-        """Get available custom filter fields and values for perennial cropland data."""
-        custom_filters = self.get_available_custom_filters("perennial-cropland")
-        return Response(custom_filters)
+        return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
-    # Cross-module nested actions
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery/statistics")
+    def large_fishery_statistics(self, request, *args, **kwargs):
+        """Get overall statistics for large fishery data."""
+        queryset, filters = self.get_filtered_queryset("large-fishery", request)
+        total_records = queryset.count()
+        total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
+        avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
+
+        return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
+
+    ##### COMPARE #####
+
     @decorators.action(detail=False, methods=["get"], url_path="compare")
     def compare_modules(self, request, *args, **kwargs):
         """Compare statistics across all modules."""
@@ -657,6 +821,8 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             comparison_data[module] = {"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact}
 
         return Response(comparison_data)
+
+    ##### SUMMARY #####
 
     @decorators.action(detail=False, methods=["get"], url_path="summary")
     def summary(self, request, *args, **kwargs):
@@ -694,6 +860,38 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             "total_records": grassland_queryset.count(),
             "total_changes": grassland_queryset.aggregate(total=Sum("count"))["total"] or 0,
             "unique_fields": grassland_queryset.values("field").distinct().count(),
+        }
+
+        # Perennial cropland summary
+        perennial_queryset = models.ChangeAggregate.objects.filter(module_type="Perennial Cropland")
+        summary_data["perennial_cropland"] = {
+            "total_records": perennial_queryset.count(),
+            "total_changes": perennial_queryset.aggregate(total=Sum("count"))["total"] or 0,
+            "unique_fields": perennial_queryset.values("field").distinct().count(),
+        }
+
+        # Forest management summary
+        forest_queryset = models.ChangeAggregate.objects.filter(module_type="Forest Management")
+        summary_data["forest_management"] = {
+            "total_records": forest_queryset.count(),
+            "total_changes": forest_queryset.aggregate(total=Sum("count"))["total"] or 0,
+            "unique_fields": forest_queryset.values("field").distinct().count(),
+        }
+
+        # Small fishery summary
+        small_queryset = models.ChangeAggregate.objects.filter(module_type="Small Fishery")
+        summary_data["small_fishery"] = {
+            "total_records": small_queryset.count(),
+            "total_changes": small_queryset.aggregate(total=Sum("count"))["total"] or 0,
+            "unique_fields": small_queryset.values("field").distinct().count(),
+        }
+
+        # Large fishery summary
+        large_queryset = models.ChangeAggregate.objects.filter(module_type="Large Fishery")
+        summary_data["large_fishery"] = {
+            "total_records": large_queryset.count(),
+            "total_changes": large_queryset.aggregate(total=Sum("count"))["total"] or 0,
+            "unique_fields": large_queryset.values("field").distinct().count(),
         }
 
         return Response(summary_data)
@@ -880,3 +1078,222 @@ class EmissionStatisticsByModuleViewSet(mixins.ListModelMixin, viewsets.GenericV
             results.append(data)
 
         return Response(results)
+
+
+class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = models.EmissionScenario.objects.all()
+    serializer_class = serializers.EmissionScenarioSerializer
+    filter_backends = [DjangoFilterBackend]
+
+    def stats_for(self, qs):
+        # base aggregates
+        agg = qs.aggregate(
+            n=Count("id"),
+            s=Sum("total"),
+            mean=Avg("total"),
+            minv=Min("total"),
+            maxv=Max("total"),
+        )
+        n, s = agg["n"] or 0, agg["s"] or 0.0
+        mean = agg["mean"] if n else None
+
+        if n > 0:
+            total_values = list(qs.values_list("total", flat=True))
+
+            # Sum of squares for variance
+            ss = sum(x * x for x in total_values)
+
+            # sample variance/std (n-1)
+            if n > 1:
+                var = (ss - (s * s) / n) / (n - 1)
+                std = var**0.5
+                se = std / (n**0.5)
+                ci95 = 1.96 * se
+                ci99 = 2.58 * se
+            else:
+                std = se = ci95 = ci99 = None
+
+            # Sorted values for percentile calculations
+            sorted_values = sorted(total_values)
+
+            if len(sorted_values) >= 4:
+                q1 = statistics.quantiles(sorted_values, n=4)[0]
+                median = statistics.median(sorted_values)
+                q3 = statistics.quantiles(sorted_values, n=4)[2]
+            else:
+                # For small datasets, use interpolation method
+                n_values = len(sorted_values)
+
+                if n_values % 2 == 0:
+                    median = (sorted_values[n_values // 2 - 1] + sorted_values[n_values // 2]) / 2
+                else:
+                    median = sorted_values[n_values // 2]
+
+                q1_idx = (n_values - 1) * 0.25
+                q3_idx = (n_values - 1) * 0.75
+
+                # Interpolate Q1
+                if q1_idx.is_integer():
+                    q1 = sorted_values[int(q1_idx)]
+                else:
+                    lower_idx = int(q1_idx)
+                    upper_idx = min(lower_idx + 1, n_values - 1)
+                    weight = q1_idx - lower_idx
+                    q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+
+                # Interpolate Q3
+                if q3_idx.is_integer():
+                    q3 = sorted_values[int(q3_idx)]
+                else:
+                    lower_idx = int(q3_idx)
+                    upper_idx = min(lower_idx + 1, n_values - 1)
+                    weight = q3_idx - lower_idx
+                    q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+        else:
+            std = se = ci95 = ci99 = None
+            q1 = median = q3 = None
+
+        iqr = (q3 - q1) if (q1 is not None and q3 is not None) else None
+
+        mean_minus_median = mean - median
+        is_dataset_symmetric = mean_minus_median < 0.25 * std
+
+        if is_dataset_symmetric:
+            range_min = mean - std
+            range_max = mean + std
+        else:
+            range_min = q1
+            range_max = q3
+
+        return {
+            "count": n,
+            "sum_total": s,
+            "mean": mean,
+            "median": median,
+            "min": agg["minv"],
+            "max": agg["maxv"],
+            "std": std,
+            "q1": q1,
+            "q3": q3,
+            "iqr": iqr,
+            "ci_95": ci95,
+            "ci_99": ci99,
+            "range_min": range_min,
+            "range_max": range_max,
+        }
+
+    @action(detail=True, methods=["get"])
+    def results(self, request, *args, **kwargs):
+        instance: models.EmissionScenario = self.get_object()
+        climate = request.query_params.get("climate", None)
+        moisture = request.query_params.get("moisture", None)
+        soil_type = request.query_params.get("soil_type", None)
+        region = request.query_params.get("region", None)
+        filtered_qs = models.ChangeRecord.objects.all()
+
+        if climate:
+            filtered_qs = filtered_qs.filter(climate=climate)
+
+        if moisture:
+            filtered_qs = filtered_qs.filter(moisture=moisture)
+
+        if soil_type:
+            filtered_qs = filtered_qs.filter(soil_type=soil_type)
+
+        if region:
+            filtered_qs = filtered_qs.filter(region=region)
+
+        q_objects = Q()
+        for change in instance.changes:
+            q_objects |= Q(
+                module_type=instance.module_type,
+                field=change["start"]["field"],
+                from_value=change["start"]["value"],
+                to_value=change["end"]["value"],
+            )
+
+        qs = filtered_qs.filter(q_objects)
+        try:
+            stats = self.stats_for(qs)
+        except Exception as e:
+            print(e)
+            stats = {"count": 0}
+
+        serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": instance, **stats})
+
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["post"])
+    def compute(self, request, *args, **kwargs):
+        """
+        Compute custom scenarios with provided changes and filters.
+        Expects:
+        - module_type: string
+        - changes: list of change objects with start/end field/value pairs
+        - climate, moisture, soil_type, region: optional filter parameters
+        """
+        module_type = request.data.get("module_type")
+        changes = request.data.get("changes", [])
+        climate = request.data.get("climate")
+        moisture = request.data.get("moisture")
+        soil_type = request.data.get("soil_type")
+        region = request.data.get("region")
+
+        if not module_type:
+            return Response({"error": "module_type is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not changes:
+            return Response({"error": "changes field is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate changes structure
+        for change in changes:
+            if not isinstance(change, dict):
+                return Response({"error": "Each change must be an object"}, status=status.HTTP_400_BAD_REQUEST)
+
+            start = change.get("start", {})
+            end = change.get("end", {})
+
+            if not start.get("field") or not start.get("value"):
+                return Response({"error": "Each change must have start.field and start.value"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not end.get("field") or not end.get("value"):
+                return Response({"error": "Each change must have end.field and end.value"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Apply filters
+        filtered_qs = models.ChangeRecord.objects.filter(module_type=module_type)
+
+        if climate:
+            filtered_qs = filtered_qs.filter(climate=climate)
+
+        if moisture:
+            filtered_qs = filtered_qs.filter(moisture=moisture)
+
+        if soil_type:
+            filtered_qs = filtered_qs.filter(soil_type=soil_type)
+
+        if region:
+            filtered_qs = filtered_qs.filter(region=region)
+
+        # Build query for changes
+        q_objects = Q()
+        for change in changes:
+            q_objects |= Q(
+                field=change["start"]["field"],
+                from_value=change["start"]["value"],
+                to_value=change["end"]["value"],
+            )
+
+        qs = filtered_qs.filter(q_objects)
+
+        try:
+            stats = self.stats_for(qs)
+        except Exception as e:
+            print(e)
+            stats = {"count": 0}
+
+        # Create a temporary scenario object for serialization
+        temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", module_type=module_type, changes=changes)
+
+        serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": temp_scenario, **stats})
+
+        return Response(serializer.data)

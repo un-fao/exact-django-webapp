@@ -17,7 +17,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--file", type=str, help="Path to the changes JSON file")
-        parser.add_argument("--module-type", type=str, choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland"], help="Module type to import")
+        parser.add_argument(
+            "--module-type",
+            type=str,
+            choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland", "forest-management", "small-fishery", "large-fishery"],
+            help="Module type to import",
+        )
         parser.add_argument("--clear", action="store_true", help="Clear existing data before importing")
         parser.add_argument("--aggregate-only", action="store_true", help="Only create aggregated data, skip individual records")
         parser.add_argument("--all", action="store_true", help="Import all module types from their respective files")
@@ -45,10 +50,13 @@ class Command(BaseCommand):
         """Import all module types from their respective files."""
         module_configs = [
             ("livestock", "livestock_changes.json"),
-            ("annual-cropland", "annualcropland_changes.json"),
-            ("flooded-rice", "floodedrice_changes.json"),
+            ("annualcropland", "annualcropland_changes.json"),
+            ("floodedrice", "floodedrice_changes.json"),
             ("grassland", "grassland_changes.json"),
-            ("perennial-cropland", "perennialcropland_changes.json"),
+            ("perennialcropland", "perennialcropland_changes.json"),
+            ("forestmanagement", "forestmanagement_changes.json"),
+            ("smallfishery", "smallfishery_changes.json"),
+            ("largefishery", "largefishery_changes.json"),
         ]
 
         total_modules = len(module_configs)
@@ -355,18 +363,30 @@ class Command(BaseCommand):
         sorted_values = sorted(values)
         n = len(sorted_values)
 
-        # Handle cases with insufficient data for quartiles
-        if n < 2:
-            # For single value, set quartiles to the same value
-            q1 = q3 = values[0]
+        # Use statistics.quantiles for proper quartile calculation
+        if n >= 4:
+            q1, q3 = statistics.quantiles(sorted_values, n=4)[0], statistics.quantiles(sorted_values, n=4)[2]
         else:
-            try:
-                quantiles = statistics.quantiles(values, n=4)
-                q1 = quantiles[0]
-                q3 = quantiles[2]
-            except statistics.StatisticsError:
-                # Fallback for edge cases
-                q1 = q3 = statistics.median(values)
+            # For small datasets, use interpolation method
+            q1_idx = (n - 1) * 0.25
+            q3_idx = (n - 1) * 0.75
+
+            # Interpolate if needed
+            if q1_idx.is_integer():
+                q1 = sorted_values[int(q1_idx)]
+            else:
+                lower_idx = int(q1_idx)
+                upper_idx = min(lower_idx + 1, n - 1)
+                weight = q1_idx - lower_idx
+                q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+
+            if q3_idx.is_integer():
+                q3 = sorted_values[int(q3_idx)]
+            else:
+                lower_idx = int(q3_idx)
+                upper_idx = min(lower_idx + 1, n - 1)
+                weight = q3_idx - lower_idx
+                q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
 
         return {
             "count": n,
