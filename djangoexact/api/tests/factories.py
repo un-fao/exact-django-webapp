@@ -139,7 +139,7 @@ class AnnualCroplandFactory(DjangoModelFactory):
     class Meta:
         model = AnnualCropland
 
-    area = 150
+    area = 1
 
     status = READY
 
@@ -166,7 +166,7 @@ class AnnualCroplandWithMinorSeasonFactory(DjangoModelFactory):
     class Meta:
         model = AnnualCropland
 
-    area = 150
+    area = 1
 
     status = READY
 
@@ -201,7 +201,7 @@ class PerennialCroplandFactory(DjangoModelFactory):
     class Meta:
         model = PerennialCropland
 
-    area = 150
+    area = 1
 
     status = READY
 
@@ -245,7 +245,7 @@ class GrasslandFactory(DjangoModelFactory):
     class Meta:
         model = Grassland
 
-    area = 150
+    area = 1
     status = READY
 
     grassland_management_type_start = factory.fuzzy.FuzzyChoice(grassland_management_types)
@@ -278,7 +278,7 @@ class LandUseChangeFactory(DjangoModelFactory):
     class Meta:
         model = LandUseChange
 
-    area = factory.fuzzy.FuzzyInteger(150, 150)
+    area = 1
 
     status = READY
 
@@ -310,15 +310,7 @@ class ForestManagementFactory(DjangoModelFactory):
     forest_type = ForestType.objects.get(name_en="Natural")
     forest_condition_type = ForestConditionType.objects.get(name_en="Primary")
 
-    area = factory.fuzzy.FuzzyInteger(1, 150)
-
-    rotation_length_yrs_start = 7
-    rotation_length_yrs_w = 7
-    rotation_length_yrs_wo = 7
-
-    rotation_percentage_biomass_for_energy_start = 1
-    rotation_percentage_biomass_for_energy_w = 1
-    rotation_percentage_biomass_for_energy_wo = 1
+    area = 1
 
 
 water_mgmt_types_before_cultivation = [water for water in WaterManagementTypeBeforeCultivation.objects.all()]
@@ -330,7 +322,7 @@ class FloodedRiceFactory(DjangoModelFactory):
     class Meta:
         model = FloodedRice
 
-    area = factory.fuzzy.FuzzyInteger(150, 150)
+    area = 1
     status = READY
 
     water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)

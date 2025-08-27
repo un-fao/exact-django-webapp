@@ -1069,7 +1069,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
-        log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
 
     def get_last_cached_at(self, obj):
         return None

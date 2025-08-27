@@ -664,8 +664,11 @@ class Project(Historical, DirtyFieldsMixin):
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
-    def is_ready(self):
-        for activity in self.activities.all():
+    def is_ready(self, activities: list["Activity"] = None):
+        if activities is None:
+            activities = self.activities.all()
+
+        for activity in activities:
             for module in activity.modules:
                 if not module.is_ready():
                     return False

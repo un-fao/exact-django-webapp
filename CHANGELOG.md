@@ -1,3 +1,28 @@
+## 1.16.0 (2025-08-27)
+
+### Feat
+
+- **minitool**: add compute action to EmissionScenarioViewSet for custom scenario calculations with validation and filtering
+- **minitool**: introduce EmissionScenario model and related serializers, views, and admin registration; remove legacy models
+- **minitool**: implement scenario computation script with comprehensive statistical analysis and documentation
+- **minitool**: register ChangeRecord model in admin with display and filter options
+- **minitool**: add forest management and fisheries logic and partial datasets
+- **minitool**: add Small and Large Fishery data builders and processors with configuration support
+- **minitool**: enhance error handling by extracting relevant traceback lines and improve progress bar display
+- **minitool**: add LandUseChange data aggregation and processing script
+
+### Fix
+
+- **report**: add missing total_emissions assignments causing vc modules not to be included in the activity totals
+- **report**: allow endpoint to only validate readines of filtered activities, if any
+- **minitool**: filter regions without countries to prevent "Project has no country" errors
+- **minitool**: support single fields without start/w/wo variations in field mapping system
+- **factories**: standardize area attribute to 1 for various land use factories
+
+### Perf
+
+- **minitool**: optimize permutation computation with dynamic worker scaling and performance monitoring
+
 ## 1.15.16 (2025-08-21)
 
 ### Fix
