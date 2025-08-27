@@ -1,3 +1,9 @@
+## 1.16.2 (2025-08-27)
+
+### Fix
+
+- **ProjectInvitationViewSet**: add request context to ProjectInvitationWriteSerializer
+
 ## 1.16.1 (2025-08-27)
 
 ### Fix
