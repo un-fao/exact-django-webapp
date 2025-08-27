@@ -651,19 +651,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        if not project.is_ready():
+        selected_activities = request.query_params.get("activities", "").split(",")
+        if selected_activities == [""]:
+            selected_activities = None
+        else:
+            selected_activities = project.activities.filter(pk__in=selected_activities)
+
+        if not project.is_ready(selected_activities):
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         if request.query_params.get("template", None):
             response = self.template(request, pk=pk)
             return response
-
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
-            selected_activities = None
-        else:
-            selected_activities = project.activities.filter(pk__in=selected_activities)
 
         try:
             report = reports.BaseProjectReport(project, activities=selected_activities)
