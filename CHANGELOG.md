@@ -1,3 +1,13 @@
+## 1.16.1 (2025-08-27)
+
+### Fix
+
+- **minitool**: make module_type filter optional in compute endpoint
+
+### Refactor
+
+- **hih assessment**: enhance grouping logic to include all countries, ensuring assessments are correctly associated with their respective regions and countries
+
 ## 1.16.0 (2025-08-27)
 
 ### Feat
