@@ -1239,9 +1239,6 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         soil_type = request.data.get("soil_type")
         region = request.data.get("region")
 
-        if not module_type:
-            return Response({"error": "module_type is required"}, status=status.HTTP_400_BAD_REQUEST)
-
         if not changes:
             return Response({"error": "changes field is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1260,7 +1257,10 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 return Response({"error": "Each change must have end.field and end.value"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Apply filters
-        filtered_qs = models.ChangeRecord.objects.filter(module_type=module_type)
+        filtered_qs = models.ChangeRecord.objects.all()
+
+        if module_type:
+            filtered_qs = filtered_qs.filter(module_type=module_type)
 
         if climate:
             filtered_qs = filtered_qs.filter(climate=climate)
