@@ -1,5 +1,5 @@
 import pandas as pd
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import os
 import logging
 import itertools
@@ -10,8 +10,11 @@ import django
 import traceback
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any, Optional, Tuple, Callable
-import json
 from pathlib import Path
+from enum import Enum
+import io
+import yaml
+from google.cloud import storage
 
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
@@ -109,10 +112,6 @@ class BaseData:
             "region": self.region,
             "total": self.total,
         }
-
-
-from enum import Enum
-from typing import Union, List, Dict, Any, Optional, Tuple, Callable
 
 
 class FieldType(Enum):
@@ -864,6 +863,8 @@ class SmallFisheryProcessor(ModuleProcessor):
             gear_type_start,
             gear_type_w,
             fishery_type,
+            total_catch_yr_start,
+            total_catch_yr_w,
             climate_moisture,
             soil_type,
             region,
@@ -883,9 +884,9 @@ class SmallFisheryProcessor(ModuleProcessor):
             gear_type_start=gear_type_start,
             gear_type_w=gear_type_w,
             gear_type_wo=gear_type_start,
-            total_catch_yr_start=1,
-            total_catch_yr_w=1,
-            total_catch_yr_wo=1,
+            total_catch_yr_start=total_catch_yr_start,
+            total_catch_yr_w=total_catch_yr_w,
+            total_catch_yr_wo=total_catch_yr_start,
         )
         return module
 
@@ -898,6 +899,8 @@ class LargeFisheryProcessor(ModuleProcessor):
             gear_type_start,
             gear_type_w,
             fish_type,
+            total_catch_yr_start,
+            total_catch_yr_w,
             climate_moisture,
             soil_type,
             region,
@@ -917,9 +920,9 @@ class LargeFisheryProcessor(ModuleProcessor):
             gear_type_start=gear_type_start,
             gear_type_w=gear_type_w,
             gear_type_wo=gear_type_start,
-            total_catch_yr_start=1,
-            total_catch_yr_w=1,
-            total_catch_yr_wo=1,
+            total_catch_yr_start=total_catch_yr_start,
+            total_catch_yr_w=total_catch_yr_w,
+            total_catch_yr_wo=total_catch_yr_start,
         )
         return module
 
@@ -1005,34 +1008,177 @@ class SoilOrganicCarbonValidator:
         return valid_combinations
 
 
+class ConfigurationLoader:
+    """Loads configuration from GCP storage bucket or local fallback"""
+
+    def __init__(self, bucket_name: str = None):
+        self.bucket_name = bucket_name or os.getenv("STORAGE_BUCKET")
+        self._storage_client = None
+        self._bucket = None
+
+    @property
+    def storage_client(self):
+        """Lazy initialization of storage client"""
+        if self._storage_client is None:
+            self._storage_client = storage.Client()
+        return self._storage_client
+
+    @property
+    def bucket(self):
+        """Lazy initialization of bucket"""
+        if self._bucket is None:
+            self._bucket = self.storage_client.bucket(self.bucket_name)
+        return self._bucket
+
+    def load_config(self, config_name: str = "minitool_config.yml") -> Dict[str, Any]:
+        """Load configuration from GCP storage or local fallback"""
+        config = None
+
+        # Try to load from GCP storage first
+        if self.bucket_name:
+            try:
+                blob = self.bucket.blob(f"minitool/{config_name}")
+                if blob.exists():
+                    config_content = blob.download_as_text()
+                    config = yaml.safe_load(config_content)
+                    logger.info(f"Loaded configuration from gs://{self.bucket_name}/minitool/{config_name}")
+                    return self._validate_and_merge_config(config)
+                else:
+                    logger.warning(f"Configuration file not found in bucket: gs://{self.bucket_name}/minitool/{config_name}")
+            except Exception as e:
+                logger.warning(f"Failed to load configuration from GCP storage: {e}")
+
+        # Fallback to local file
+        local_config_path = Path("djangoexact") / config_name
+        if local_config_path.exists():
+            try:
+                with open(local_config_path, "r") as f:
+                    config = yaml.safe_load(f)
+                logger.info(f"Loaded configuration from local file: {local_config_path}")
+                return self._validate_and_merge_config(config)
+            except Exception as e:
+                logger.error(f"Failed to load local configuration: {e}")
+
+        # Return default configuration if no file found
+        logger.warning("No configuration file found, using default configuration")
+        return self._get_default_config()
+
+    def _validate_and_merge_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate and merge configuration with defaults"""
+        default_config = self._get_default_config()
+
+        # Merge modules configuration
+        if "modules" in config:
+            default_config["modules"].update(config["modules"])
+
+        # Merge performance configuration
+        if "performance" in config:
+            default_config["performance"].update(config["performance"])
+
+        return default_config
+
+    def _get_default_config(self) -> Dict[str, Any]:
+        """Return default configuration"""
+        return {
+            "modules": {
+                "annual_cropland": False,
+                "flooded_rice": False,
+                "grassland": False,
+                "livestock": False,
+                "perennial_cropland": False,
+                "forest_management": False,
+                "small_fishery": False,
+                "large_fishery": False,
+                "aquaculture": False,
+                "coastal_wetland": False,
+                "waterbody": False,
+                "other_land": False,
+                "set_aside": False,
+            },
+            "performance": {
+                "max_rows": 10000,
+                "max_workers": None,
+                "chunk_size": 10000,
+            },
+        }
+
+
 class DataManager:
     """Manages data storage and retrieval"""
 
-    def __init__(self, output_dir: str = "scripts/minitool"):
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+    def __init__(self, bucket_name: str = None):
+        self.bucket_name = bucket_name or os.getenv("STORAGE_BUCKET")
+        if not self.bucket_name:
+            raise ValueError("STORAGE_BUCKET environment variable must be set or bucket_name must be provided")
+        # Don't initialize storage client here to avoid pickling issues
+        self._storage_client = None
+        self._bucket = None
+
+    @property
+    def storage_client(self):
+        """Lazy initialization of storage client to avoid pickling issues"""
+        if self._storage_client is None:
+            self._storage_client = storage.Client()
+        return self._storage_client
+
+    @property
+    def bucket(self):
+        """Lazy initialization of bucket to avoid pickling issues"""
+        if self._bucket is None:
+            self._bucket = self.storage_client.bucket(self.bucket_name)
+        return self._bucket
 
     def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str) -> None:
-        """Save data and errors to CSV files"""
+        """Save data and errors to GCP storage bucket as CSV files"""
+        try:
+            if data:
+                df = pd.DataFrame(data)
+                csv_buffer = io.StringIO()
+                df.to_csv(csv_buffer, index=False)
+
+                blob_name = f"minitool/{module_name.lower()}.csv"
+                blob = self.bucket.blob(blob_name)
+                blob.upload_from_string(csv_buffer.getvalue(), content_type="text/csv")
+                logger.info(f"Saved {len(data)} rows to gs://{self.bucket_name}/{blob_name}")
+
+            if errors:
+                errors_df = pd.DataFrame(errors)
+                errors_csv_buffer = io.StringIO()
+                errors_df.to_csv(errors_csv_buffer, index=False)
+
+                errors_blob_name = f"minitool/{module_name.lower()}_errors.csv"
+                errors_blob = self.bucket.blob(errors_blob_name)
+                errors_blob.upload_from_string(errors_csv_buffer.getvalue(), content_type="text/csv")
+                logger.info(f"Saved {len(errors)} errors to gs://{self.bucket_name}/{errors_blob_name}")
+
+        except Exception as e:
+            logger.error(f"Failed to save data to GCP storage: {e}")
+            # Fallback to local file storage if GCP storage fails
+            self._save_to_local_fallback(data, errors, module_name)
+
+    def _save_to_local_fallback(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str) -> None:
+        """Fallback method to save data locally if GCP storage fails"""
+        output_dir = Path("scripts/minitool")
+        output_dir.mkdir(exist_ok=True)
+
         if data:
             df = pd.DataFrame(data)
-            filepath = self.output_dir / f"{module_name.lower()}.csv"
+            filepath = output_dir / f"{module_name.lower()}.csv"
             df.to_csv(filepath, index=False)
-            logger.info(f"Saved {len(data)} rows to {filepath}")
+            logger.info(f"Fallback: Saved {len(data)} rows to {filepath}")
 
         if errors:
             errors_df = pd.DataFrame(errors)
-            errors_filepath = self.output_dir / f"{module_name.lower()}_errors.csv"
+            errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
             errors_df.to_csv(errors_filepath, index=False)
-            logger.info(f"Saved {len(errors)} errors to {errors_filepath}")
+            logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
 
 
 class PermutationComputer:
     """Handles permutation computation with multiprocessing"""
 
-    def __init__(self, processor_registry: ProcessorRegistry, data_manager: DataManager):
+    def __init__(self, processor_registry: ProcessorRegistry):
         self.processor_registry = processor_registry
-        self.data_manager = data_manager
 
     def django_initializer(self):
         """Initialize Django in child processes"""
@@ -1053,7 +1199,9 @@ class PermutationComputer:
                 break
             yield chunk
 
-    def compute_permutations(self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None) -> None:
+    def compute_permutations(
+        self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Compute permutations for a model"""
         import api.models as models
         import math
@@ -1176,25 +1324,23 @@ class PermutationComputer:
                 pbar.close()
 
         except KeyboardInterrupt:
-            logger.info(f"\nKeyboard interrupt detected! Saving {len(data)} computed rows...")
+            logger.info(f"\nKeyboard interrupt detected! Returning {len(data)} computed rows...")
             try:
                 pbar.close()
-            except:
+            except Exception:
                 pass
-            self.data_manager.save_data(data, errors_data, model.__name__)
-            logger.info("Data saved successfully. Exiting gracefully.")
-            return
+            return data, errors_data
 
         if not data:
             logger.warning(f"No data for {model.__name__}!")
-            return
+            return [], []
 
         # Log summary of results
         total_processed = len(data) + len(errors_data)
         success_rate = (len(data) / total_processed * 100) if total_processed > 0 else 0
         logger.info(f"Completed {model.__name__}: {len(data):,} successful, {len(errors_data):,} errors ({success_rate:.1f}% success rate)")
 
-        self.data_manager.save_data(data, errors_data, model.__name__)
+        return data, errors_data
 
 
 def run():
@@ -1206,43 +1352,33 @@ def run():
     # Initialize components
     data_builder_registry = ModuleDataBuilderRegistry()
     processor_registry = ProcessorRegistry(data_builder_registry)
-    data_manager = DataManager()
-    permutation_computer = PermutationComputer(processor_registry, data_manager)
+    data_manager = DataManager()  # Will use STORAGE_BUCKET from environment
+    permutation_computer = PermutationComputer(processor_registry)
+
+    # Load configuration
+    config_loader = ConfigurationLoader()
+    config = config_loader.load_config()
 
     # Import models
     import api.models as models
 
-    # Configuration
-    CONFIG = {
-        "ANNUAL_CROPLAND": False,
-        "FLOODED_RICE": False,
-        "GRASSLAND": False,
-        "LIVESTOCK": False,
-        "PERENNIAL_CROPLAND": False,
-        "FOREST_MANAGEMENT": False,
-        "SMALL_FISHERY": True,
-        "LARGE_FISHERY": True,
-        "MAX_ROWS": 10000,
-        "MAX_WORKERS": None,  # Set to a number to override auto-detection
-        "CHUNK_SIZE": 10000,  # Adjust chunk size for better performance
-    }
+    # Extract configuration
+    CONFIG = {**config["modules"], **config["performance"]}
 
     # Module configurations
     MODULE_CONFIGS = {
         "Grassland": {
             "fields": {
-                "grassland_management_type_start": models.GrasslandManagementType.objects.all(),
-                "grassland_management_type_w": models.GrasslandManagementType.objects.all(),
+                "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+                "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
                 "is_fire_used_start": [True, False],
                 "is_fire_used_w": [True, False],
                 "fire_periodicity_start": [1],
                 "fire_periodicity_w": [1],
                 "fire_impact_start": [1, 0],
                 "fire_impact_w": [1, 0],
-                "yield_start": [1],
-                "yield_w": [1],
             },
-            "enabled": CONFIG["GRASSLAND"],
+            "enabled": CONFIG["grassland"],
         },
         "Livestock": {
             "fields": {
@@ -1252,20 +1388,20 @@ def run():
                 "heads_number_start": [1],
                 "heads_number_w": [1],
             },
-            "enabled": CONFIG["LIVESTOCK"],
+            "enabled": CONFIG["livestock"],
         },
         "AnnualCropland": {
             "fields": {
-                "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
-                "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Annual Cropland").all(),
-                "tillage_management_type_start": models.TillageManagementType.objects.all(),
-                "tillage_management_type_w": models.TillageManagementType.objects.all(),
-                "organic_input_type_start": models.OrganicInputType.objects.all(),
-                "organic_input_type_w": models.OrganicInputType.objects.all(),
+                "land_use_type_start": models.LandUseType.objects.get(name="Default"),
+                "land_use_type_w": models.LandUseType.objects.get(name="Default"),
+                "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+                "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+                "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+                "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
                 "residue_management_type_start": models.ResidueManagementType.objects.all(),
                 "residue_management_type_w": models.ResidueManagementType.objects.all(),
             },
-            "enabled": CONFIG["ANNUAL_CROPLAND"],
+            "enabled": CONFIG["annual_cropland"],
         },
         "FloodedRice": {
             "fields": {
@@ -1276,7 +1412,7 @@ def run():
                 "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
                 "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
             },
-            "enabled": CONFIG["FLOODED_RICE"],
+            "enabled": CONFIG["flooded_rice"],
         },
         "PerennialCropland": {
             "fields": {
@@ -1291,7 +1427,7 @@ def run():
                 "fire_periodicity_t2_start": [1],
                 "fire_periodicity_t2_w": [1],
             },
-            "enabled": CONFIG["PERENNIAL_CROPLAND"],
+            "enabled": CONFIG["perennial_cropland"],
         },
         "ForestManagement": {
             "fields": {
@@ -1301,33 +1437,100 @@ def run():
                 "average_yearly_degradation_percentage_start": [0],
                 "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
             },
-            "enabled": CONFIG["FOREST_MANAGEMENT"],
+            "enabled": CONFIG["forest_management"],
         },
         "SmallFishery": {
             "fields": {
                 "gear_type_start": models.SmallFisheryGearType.objects.all(),
                 "gear_type_w": models.SmallFisheryGearType.objects.all(),
                 "fishery_type": models.FisheryType.objects.all(),
+                "total_catch_yr_start": [1, 0],
+                "total_catch_yr_w": [1, 0],
             },
-            "enabled": CONFIG["SMALL_FISHERY"],
+            "enabled": CONFIG["small_fishery"],
         },
         "LargeFishery": {
             "fields": {
                 "gear_type_start": models.LargeFisheryGearType.objects.all(),
                 "gear_type_w": models.LargeFisheryGearType.objects.all(),
                 "fish_type": models.FishType.objects.all(),
+                "total_catch_yr_start": [1, 0],
+                "total_catch_yr_w": [1, 0],
             },
-            "enabled": CONFIG["LARGE_FISHERY"],
+            "enabled": CONFIG["large_fishery"],
         },
+        # NOTE: Not needed
+        # "Aquaculture": {
+        #     "fields": {
+        #         "annual_production_start": [1],
+        #         "annual_production_w": [1],
+        #     },
+        #     "enabled": CONFIG["aquaculture"],
+        # },
+        "CoastalWetland": {
+            "fields": {
+                "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
+                "area_under_drainage_start": [1, 0],
+                "area_under_drainage_w": [1, 0],
+                "drained_area_excavated_start": [1, 0],
+                "drained_area_excavated_w": [1, 0],
+                "area_not_drained_or_rewetted_start": [0],
+                "area_not_drained_or_rewetted_w": [0],
+                "area_w_restored_vegetation_start": [0],
+                "area_w_restored_vegetation_w": [0],
+            },
+            "enabled": CONFIG["coastal_wetland"],
+        },
+        "CoastalWetland2": {
+            "fields": {
+                "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
+                "area_under_drainage_start": [0],
+                "area_under_drainage_w": [0],
+                "drained_area_excavated_start": [0],
+                "drained_area_excavated_w": [0],
+                "area_not_drained_or_rewetted_start": [1, 0],
+                "area_not_drained_or_rewetted_w": [1, 0],
+                "area_w_restored_vegetation_start": [1, 0],
+                "area_w_restored_vegetation_w": [1, 0],
+            },
+            "enabled": CONFIG["coastal_wetland"],
+        },
+        "Waterbody": {
+            "fields": {
+                "waterbody_type": models.WaterbodyType.objects.all(),
+                "trophic_type_start": models.TrophicType.objects.all(),
+                "trophic_type_w": models.TrophicType.objects.all(),
+            },
+            "enabled": CONFIG["waterbody"],
+        },
+        # "OtherLand": {
+        #     # TODO: I don't think this makes much sense.
+        #     "fields": {
+        #         "is_degraded_land_start": [True, False],
+        #         "is_degraded_land_w": [True, False],
+        #     },
+        #     "enabled": CONFIG["other_land"],
+        # },
+        # "SetAside": {
+        #     # TODO: I don't think this makes much sense.
+        #     "fields": {
+        #         "is_set_aside_start": [True, False],
+        #         "is_set_aside_w": [True, False],
+        #     },
+        #     "enabled": CONFIG["set_aside"],
+        # },
+        # TODO: Missing all Value Chain modules.
     }
 
     try:
         for module_name, config in MODULE_CONFIGS.items():
             if config["enabled"]:
                 model_class = getattr(models, module_name)
-                permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["CHUNK_SIZE"], stop_at=CONFIG["MAX_ROWS"], max_workers=CONFIG["MAX_WORKERS"])
+                data, errors = permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"])
+                if data or errors:
+                    data_manager.save_data(data, errors, module_name)
 
     except KeyboardInterrupt:
-        logger.info(f"\nKeyboard interrupt detected in main run function!")
+        logger.info("\nKeyboard interrupt detected in main run function!")
         logger.info("Script terminated by user. Any completed computations have been saved.")
         return

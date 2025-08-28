@@ -64,3 +64,5 @@ django-dirtyfields==1.9.3
 python-slugify==8.0.4
 drf-nested-routers==0.94.1
 weasyprint==64.0
+google-cloud-storage==2.19.0
+PyYAML==6.0
