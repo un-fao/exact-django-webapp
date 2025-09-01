@@ -15,6 +15,7 @@ from enum import Enum
 import io
 import yaml
 from google.cloud import storage
+import api.models as models
 
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
@@ -1343,6 +1344,162 @@ class PermutationComputer:
         return data, errors_data
 
 
+# Module configurations
+MODULE_CONFIGS = {
+    "Grassland": {
+        "fields": {
+            "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "is_fire_used_start": [True, False],
+            "is_fire_used_w": [True, False],
+            "fire_periodicity_start": [1],
+            "fire_periodicity_w": [1],
+            "fire_impact_start": [1, 0],
+            "fire_impact_w": [1, 0],
+        },
+        "config_name": "grassland",
+    },
+    "Livestock": {
+        "fields": {
+            "livestock_category_types": models.LivestockCategoryType.objects.all(),
+            "livestock_production_type_start": models.LivestockProductionType.objects.all(),
+            "livestock_production_type_w": models.LivestockProductionType.objects.all(),
+            "heads_number_start": [1],
+            "heads_number_w": [1],
+        },
+        "config_name": "livestock",
+    },
+    "AnnualCropland": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.get(name="Default"),
+            "land_use_type_w": models.LandUseType.objects.get(name="Default"),
+            "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "residue_management_type_start": models.ResidueManagementType.objects.all(),
+            "residue_management_type_w": models.ResidueManagementType.objects.all(),
+        },
+        "config_name": "annual_cropland",
+    },
+    "FloodedRice": {
+        "fields": {
+            "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
+            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
+            "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
+            "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
+            "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
+            "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
+        },
+        "config_name": "flooded_rice",
+    },
+    "PerennialCropland": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
+            "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
+            "tillage_management_type_start": models.TillageManagementType.objects.all(),
+            "tillage_management_type_w": models.TillageManagementType.objects.all(),
+            "is_biomass_burned_start": [True, False],
+            "is_biomass_burned_w": [True, False],
+            "fire_periodicity_t2_start": [1],
+            "fire_periodicity_t2_w": [1],
+        },
+        "config_name": "perennial_cropland",
+    },
+    "ForestManagement": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            "forest_type": models.ForestType.objects.all(),
+            "forest_condition_type": models.ForestConditionType.objects.all(),
+            "average_yearly_degradation_percentage_start": [0],
+            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
+        },
+        "config_name": "forest_management",
+    },
+    "SmallFishery": {
+        "fields": {
+            "gear_type_start": models.SmallFisheryGearType.objects.all(),
+            "gear_type_w": models.SmallFisheryGearType.objects.all(),
+            "fishery_type": models.FisheryType.objects.all(),
+            "total_catch_yr_start": [1, 0],
+            "total_catch_yr_w": [1, 0],
+        },
+        "config_name": "small_fishery",
+    },
+    "LargeFishery": {
+        "fields": {
+            "gear_type_start": models.LargeFisheryGearType.objects.all(),
+            "gear_type_w": models.LargeFisheryGearType.objects.all(),
+            "fish_type": models.FishType.objects.all(),
+            "total_catch_yr_start": [1, 0],
+            "total_catch_yr_w": [1, 0],
+        },
+        "config_name": "large_fishery",
+    },
+    # NOTE: Not needed
+    # "Aquaculture": {
+    #     "fields": {
+    #         "annual_production_start": [1],
+    #         "annual_production_w": [1],
+    #     },
+    #     "enabled": CONFIG["aquaculture"],
+    # },
+    "CoastalWetland": {
+        "fields": {
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
+            "area_under_drainage_start": [1, 0],
+            "area_under_drainage_w": [1, 0],
+            "drained_area_excavated_start": [1, 0],
+            "drained_area_excavated_w": [1, 0],
+            "area_not_drained_or_rewetted_start": [0],
+            "area_not_drained_or_rewetted_w": [0],
+            "area_w_restored_vegetation_start": [0],
+            "area_w_restored_vegetation_w": [0],
+        },
+        "config_name": "coastal_wetland",
+    },
+    "CoastalWetland2": {
+        "fields": {
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
+            "area_under_drainage_start": [0],
+            "area_under_drainage_w": [0],
+            "drained_area_excavated_start": [0],
+            "drained_area_excavated_w": [0],
+            "area_not_drained_or_rewetted_start": [1, 0],
+            "area_not_drained_or_rewetted_w": [1, 0],
+            "area_w_restored_vegetation_start": [1, 0],
+            "area_w_restored_vegetation_w": [1, 0],
+        },
+        "config_name": "coastal_wetland",
+    },
+    "Waterbody": {
+        "fields": {
+            "waterbody_type": models.WaterbodyType.objects.all(),
+            "trophic_type_start": models.TrophicType.objects.all(),
+            "trophic_type_w": models.TrophicType.objects.all(),
+        },
+        "config_name": "waterbody",
+    },
+    # "OtherLand": {
+    #     # TODO: I don't think this makes much sense.
+    #     "fields": {
+    #         "is_degraded_land_start": [True, False],
+    #         "is_degraded_land_w": [True, False],
+    #     },
+    # },
+    # "SetAside": {
+    #     # TODO: I don't think this makes much sense.
+    #     "fields": {
+    #         "is_set_aside_start": [True, False],
+    #         "is_set_aside_w": [True, False],
+    #     },
+    # },
+    # TODO: Missing all Value Chain modules.
+}
+
+
 def run():
     """Main execution function"""
     # Suppress log noise
@@ -1359,172 +1516,12 @@ def run():
     config_loader = ConfigurationLoader()
     config = config_loader.load_config()
 
-    # Import models
-    import api.models as models
-
     # Extract configuration
     CONFIG = {**config["modules"], **config["performance"]}
 
-    # Module configurations
-    MODULE_CONFIGS = {
-        "Grassland": {
-            "fields": {
-                "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "is_fire_used_start": [True, False],
-                "is_fire_used_w": [True, False],
-                "fire_periodicity_start": [1],
-                "fire_periodicity_w": [1],
-                "fire_impact_start": [1, 0],
-                "fire_impact_w": [1, 0],
-            },
-            "enabled": CONFIG["grassland"],
-        },
-        "Livestock": {
-            "fields": {
-                "livestock_category_types": models.LivestockCategoryType.objects.all(),
-                "livestock_production_type_start": models.LivestockProductionType.objects.all(),
-                "livestock_production_type_w": models.LivestockProductionType.objects.all(),
-                "heads_number_start": [1],
-                "heads_number_w": [1],
-            },
-            "enabled": CONFIG["livestock"],
-        },
-        "AnnualCropland": {
-            "fields": {
-                "land_use_type_start": models.LandUseType.objects.get(name="Default"),
-                "land_use_type_w": models.LandUseType.objects.get(name="Default"),
-                "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-                "residue_management_type_start": models.ResidueManagementType.objects.all(),
-                "residue_management_type_w": models.ResidueManagementType.objects.all(),
-            },
-            "enabled": CONFIG["annual_cropland"],
-        },
-        "FloodedRice": {
-            "fields": {
-                "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
-                "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
-                "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
-                "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
-                "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
-                "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
-            },
-            "enabled": CONFIG["flooded_rice"],
-        },
-        "PerennialCropland": {
-            "fields": {
-                "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-                "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-                "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
-                "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
-                "tillage_management_type_start": models.TillageManagementType.objects.all(),
-                "tillage_management_type_w": models.TillageManagementType.objects.all(),
-                "is_biomass_burned_start": [True, False],
-                "is_biomass_burned_w": [True, False],
-                "fire_periodicity_t2_start": [1],
-                "fire_periodicity_t2_w": [1],
-            },
-            "enabled": CONFIG["perennial_cropland"],
-        },
-        "ForestManagement": {
-            "fields": {
-                "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
-                "forest_type": models.ForestType.objects.all(),
-                "forest_condition_type": models.ForestConditionType.objects.all(),
-                "average_yearly_degradation_percentage_start": [0],
-                "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
-            },
-            "enabled": CONFIG["forest_management"],
-        },
-        "SmallFishery": {
-            "fields": {
-                "gear_type_start": models.SmallFisheryGearType.objects.all(),
-                "gear_type_w": models.SmallFisheryGearType.objects.all(),
-                "fishery_type": models.FisheryType.objects.all(),
-                "total_catch_yr_start": [1, 0],
-                "total_catch_yr_w": [1, 0],
-            },
-            "enabled": CONFIG["small_fishery"],
-        },
-        "LargeFishery": {
-            "fields": {
-                "gear_type_start": models.LargeFisheryGearType.objects.all(),
-                "gear_type_w": models.LargeFisheryGearType.objects.all(),
-                "fish_type": models.FishType.objects.all(),
-                "total_catch_yr_start": [1, 0],
-                "total_catch_yr_w": [1, 0],
-            },
-            "enabled": CONFIG["large_fishery"],
-        },
-        # NOTE: Not needed
-        # "Aquaculture": {
-        #     "fields": {
-        #         "annual_production_start": [1],
-        #         "annual_production_w": [1],
-        #     },
-        #     "enabled": CONFIG["aquaculture"],
-        # },
-        "CoastalWetland": {
-            "fields": {
-                "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-                "area_under_drainage_start": [1, 0],
-                "area_under_drainage_w": [1, 0],
-                "drained_area_excavated_start": [1, 0],
-                "drained_area_excavated_w": [1, 0],
-                "area_not_drained_or_rewetted_start": [0],
-                "area_not_drained_or_rewetted_w": [0],
-                "area_w_restored_vegetation_start": [0],
-                "area_w_restored_vegetation_w": [0],
-            },
-            "enabled": CONFIG["coastal_wetland"],
-        },
-        "CoastalWetland2": {
-            "fields": {
-                "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-                "area_under_drainage_start": [0],
-                "area_under_drainage_w": [0],
-                "drained_area_excavated_start": [0],
-                "drained_area_excavated_w": [0],
-                "area_not_drained_or_rewetted_start": [1, 0],
-                "area_not_drained_or_rewetted_w": [1, 0],
-                "area_w_restored_vegetation_start": [1, 0],
-                "area_w_restored_vegetation_w": [1, 0],
-            },
-            "enabled": CONFIG["coastal_wetland"],
-        },
-        "Waterbody": {
-            "fields": {
-                "waterbody_type": models.WaterbodyType.objects.all(),
-                "trophic_type_start": models.TrophicType.objects.all(),
-                "trophic_type_w": models.TrophicType.objects.all(),
-            },
-            "enabled": CONFIG["waterbody"],
-        },
-        # "OtherLand": {
-        #     # TODO: I don't think this makes much sense.
-        #     "fields": {
-        #         "is_degraded_land_start": [True, False],
-        #         "is_degraded_land_w": [True, False],
-        #     },
-        #     "enabled": CONFIG["other_land"],
-        # },
-        # "SetAside": {
-        #     # TODO: I don't think this makes much sense.
-        #     "fields": {
-        #         "is_set_aside_start": [True, False],
-        #         "is_set_aside_w": [True, False],
-        #     },
-        #     "enabled": CONFIG["set_aside"],
-        # },
-        # TODO: Missing all Value Chain modules.
-    }
-
     try:
         for module_name, config in MODULE_CONFIGS.items():
-            if config["enabled"]:
+            if CONFIG[config["config_name"]]:
                 model_class = getattr(models, module_name)
                 data, errors = permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"])
                 if data or errors:
