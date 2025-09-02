@@ -120,6 +120,7 @@ from .serializers import (
     HandInHandCountrySerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
+    ProjectInvitationAcceptSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -1709,23 +1710,13 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
     def accept(self, request, token=None):
-        if not token:
-            return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if not utils.validate_uuid(token):
-            return utils.ErrorResponse("Invalid token", status=http_status.HTTP_400_BAD_REQUEST)
-
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
 
-        serializer = ProjectInvitationWriteSerializer(data=request.data, instance=invitation, partial=True, context={"request": request})
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+        serializer = ProjectInvitationAcceptSerializer(data=request.data, instance=invitation, partial=True, context={"token": token})
+        serializer.is_valid(raise_exception=True)
 
-        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
-
+        invitation = serializer.save()
         ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
-
-        invitation.save()
 
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
