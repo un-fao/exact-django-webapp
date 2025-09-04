@@ -2142,8 +2142,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": None,
+                "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2208,8 +2208,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": None,
+                "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2279,8 +2279,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": None,
+                "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_w,
@@ -2348,8 +2348,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_wo,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": None,
+                "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_wo,

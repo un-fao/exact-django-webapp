@@ -286,7 +286,7 @@ def import_hih_links():
     """
     Import Hand in Hand links from the database
     """
-    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "ipcc_data/HIHLinks.json"))
     for index, row in df.iterrows():
         country = models.HandInHandCountry.objects.get(name=row["country"])
         link = row["link"]
@@ -417,8 +417,6 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        find_all_countries_with_no_region()
-        find_all_countries_with_no_ipcc_region()
         pass
 
     if app_mode == "test":
