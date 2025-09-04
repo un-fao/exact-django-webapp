@@ -438,7 +438,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
             for i in range(years_impl):
                 # CREATING DELTA AGB MATRIX
                 end_index_below_20 = min(i + 20, years_total)
-                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                delta_agb_matrix[i, i + 1:end_index_below_20] = delta_agb_yearly_below_20
                 if end_index_below_20 < years_total:
                     delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
 
@@ -464,7 +464,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
             for i in range(years_impl):
                 # CREATING DELTA AGB MATRIX
                 end_index_below_20 = min(i + 20, years_total)
-                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                delta_agb_matrix[i, i + 1:end_index_below_20] = delta_agb_yearly_below_20
                 if end_index_below_20 < years_total:
                     delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
                     
