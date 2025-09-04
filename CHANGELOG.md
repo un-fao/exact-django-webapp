@@ -1,3 +1,14 @@
+## 1.16.3 (2025-09-04)
+
+### Feat
+
+- **minitool**: add complete small fishery dataset
+
+### Fix
+
+- **forest management**: create_agb_matrix function fix (growth end of year)
+- **perennial_cropland**: set tier2 values for start AGB and start BGB to None for all scenarios
+
 ## 1.16.2 (2025-08-27)
 
 ### Fix
