@@ -1,12 +1,12 @@
 import pandas as pd
 from dataclasses import dataclass
 import os
+import sys
 import logging
 import itertools
 import time
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
-import django
 import traceback
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any, Optional, Tuple, Callable
@@ -15,6 +15,15 @@ from enum import Enum
 import io
 import yaml
 from google.cloud import storage
+
+# Django setup
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoexact.settings")
+
+import django
+
+django.setup()
+
 import api.models as models
 
 
@@ -1031,12 +1040,12 @@ class ConfigurationLoader:
             self._bucket = self.storage_client.bucket(self.bucket_name)
         return self._bucket
 
-    def load_config(self, config_name: str = "minitool_config.yml") -> Dict[str, Any]:
+    def load_config(self, config_name: str = "minitool_config.yml", local: bool = False) -> Dict[str, Any]:
         """Load configuration from GCP storage or local fallback"""
         config = None
 
         # Try to load from GCP storage first
-        if self.bucket_name:
+        if self.bucket_name and not local:
             try:
                 blob = self.bucket.blob(f"minitool/{config_name}")
                 if blob.exists():
@@ -1050,7 +1059,8 @@ class ConfigurationLoader:
                 logger.warning(f"Failed to load configuration from GCP storage: {e}")
 
         # Fallback to local file
-        local_config_path = Path("djangoexact") / config_name
+        local_config_path = Path(__file__).parent.parent / config_name
+        print(local_config_path)
         if local_config_path.exists():
             try:
                 with open(local_config_path, "r") as f:
@@ -1514,7 +1524,7 @@ def run():
 
     # Load configuration
     config_loader = ConfigurationLoader()
-    config = config_loader.load_config()
+    config = config_loader.load_config(local=True)
 
     # Extract configuration
     CONFIG = {**config["modules"], **config["performance"]}

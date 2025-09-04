@@ -1,0 +1,45 @@
+# GCP Deployment specific ignores
+
+# Environment configuration
+.env
+.env.local
+.env.production
+.env.cloud
+
+# Deployment artifacts
+deployment-info.json
+*.log
+
+# Service account keys (never commit these!)
+*.json
+!cloudbuild.yaml
+!deployment-info.json
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Test files
+test_*.py
+*_test.py
+
+# Backup files
+*.bak
+*.backup

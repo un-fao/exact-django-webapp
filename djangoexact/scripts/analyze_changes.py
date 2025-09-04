@@ -207,7 +207,7 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
 def run():
     try:
         # "annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock",
-        for module_type in ["forestmanagement", "smallfishery", "largefishery"]:
+        for module_type in ["smallfishery"]:
             output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
         print(f"\nAnalysis completed successfully!")
         print(f"Output file: {output_path}")
