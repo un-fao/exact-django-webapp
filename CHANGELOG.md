@@ -1,3 +1,9 @@
+## 1.17.0 (2025-09-05)
+
+### Feat
+
+- add endpoint to run compute permutations from cloud
+
 ## 1.16.3 (2025-09-04)
 
 ### Feat
