@@ -17,6 +17,8 @@ from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import permissions, viewsets, views
 from rest_framework import status as http_status
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -2867,3 +2869,140 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
             cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
 
         return Response(response_data)
+
+
+class MinitoolProcessingView(APIView):
+    """
+    API endpoint for running minitool processing locally
+    Replicates the functionality of the GCP Cloud Function
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Check if user is staff
+        if not request.user.is_staff:
+            return Response({"error": "Access denied. Staff privileges required."}, status=http_status.HTTP_403_FORBIDDEN)
+
+        # Check for additional password
+        password = request.data.get("password")
+        if not password:
+            return Response({"error": "Additional password required for minitool processing"}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        minitool_password = os.getenv("MINITOOL_API_PASSWORD", "default_password_change_me")
+        if password != minitool_password:
+            return Response({"error": "Invalid password"}, status=http_status.HTTP_401_UNAUTHORIZED)
+
+        # Validate request data
+        is_valid, message, config = self._validate_request_data(request.data)
+        if not is_valid:
+            return Response({"error": message}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        # Run minitool processing
+        try:
+            from django.core.management import call_command
+            from django.core.management.base import CommandError
+            from io import StringIO
+
+            output = StringIO()
+            call_command("compute_minitool", stdout=output)
+            results = output.getvalue()
+            return Response({"status": "success", "message": "Processing completed successfully", "results": results})
+        except CommandError as e:
+            return Response({"error": f"Processing failed: {e}"}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.error(f"Minitool processing error: {str(e)}")
+            return Response({"error": f"Processing failed: {str(e)}"}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _validate_request_data(self, request_data):
+        """Validate and sanitize request data"""
+        if not request_data:
+            return False, "No data provided", {}
+
+        # Extract and validate parameters
+        config = {"modules": {}, "performance": {}}
+
+        # Module configuration
+        valid_modules = ["annual_cropland", "flooded_rice", "grassland", "livestock", "perennial_cropland", "forest_management", "small_fishery", "large_fishery"]
+
+        modules_config = request_data.get("modules", {})
+        if isinstance(modules_config, dict):
+            for module in valid_modules:
+                config["modules"][module] = modules_config.get(module, False)
+        else:
+            # Legacy support: single module name
+            module_name = request_data.get("module_name", "small_fishery")
+            if module_name in valid_modules:
+                config["modules"][module_name] = True
+
+        # Performance configuration
+        config["performance"] = {
+            "max_rows": min(int(request_data.get("max_rows", 10000)), 100000),  # Cap at 100k
+            "max_workers": min(int(request_data.get("max_workers", 4)), 16) if request_data.get("max_workers") else None,
+            "chunk_size": min(int(request_data.get("chunk_size", 10000)), 50000),  # Cap at 50k
+        }
+
+        return True, "Valid request", config
+
+    def _run_minitool_processing(self, config):
+        """Run minitool processing with the provided configuration"""
+        import sys
+        import os
+        import tempfile
+        import yaml
+        from pathlib import Path
+
+        # Add scripts directory to path
+        scripts_dir = Path(settings.BASE_DIR) / "scripts"
+        sys.path.insert(0, str(scripts_dir))
+
+        try:
+            # Import minitool components
+            import api.minitool as minitool
+            import api.models as models
+
+            # Initialize components
+            data_builder_registry = minitool.ModuleDataBuilderRegistry()
+            processor_registry = minitool.ProcessorRegistry(data_builder_registry)
+            data_manager = minitool.DataManager()
+            permutation_computer = minitool.PermutationComputer(processor_registry)
+
+            # Load configuration
+            config_loader = minitool.ConfigurationLoader()
+            loaded_config = config_loader.load_config(local=True)
+
+            # Extract configuration
+            runtime_config = {**loaded_config["modules"], **loaded_config["performance"]}
+
+            results_summary = {"processed_modules": [], "total_records": 0, "total_errors": 0, "files_created": []}
+
+            # Process enabled modules
+            for module_name, module_config in minitool.MODULE_CONFIGS.items():
+                if runtime_config.get(module_config["config_name"], False):
+                    try:
+                        model_class = getattr(models, module_name)
+                        data, errors = permutation_computer.compute_permutations(
+                            module_config["fields"],
+                            model_class,
+                            chunk_size=runtime_config["chunk_size"],
+                            stop_at=runtime_config["max_rows"],
+                            max_workers=runtime_config["max_workers"],
+                        )
+
+                        if data or errors:
+                            data_manager.save_data(data, errors, module_name)
+
+                            results_summary["processed_modules"].append(module_name)
+                            results_summary["total_records"] += len(data)
+                            results_summary["total_errors"] += len(errors)
+                            results_summary["files_created"].extend([f"minitool/{module_name.lower()}.csv", f"minitool/{module_name.lower()}_errors.csv"])
+
+                    except Exception as e:
+                        logger.error(f"Error processing {module_name}: {str(e)}")
+                        results_summary["total_errors"] += 1
+
+            return results_summary
+
+        except Exception as e:
+            logger.error(f"Critical error in minitool execution: {str(e)}")
+            raise
