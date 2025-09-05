@@ -2884,14 +2884,14 @@ class MinitoolProcessingView(APIView):
         if not request.user.is_staff:
             return Response({"error": "Access denied. Staff privileges required."}, status=http_status.HTTP_403_FORBIDDEN)
 
-        # Check for additional password
-        password = request.data.get("password")
-        if not password:
-            return Response({"error": "Additional password required for minitool processing"}, status=http_status.HTTP_400_BAD_REQUEST)
+        # # Check for additional password
+        # password = request.data.get("password")
+        # if not password:
+        #     return Response({"error": "Additional password required for minitool processing"}, status=http_status.HTTP_400_BAD_REQUEST)
 
-        minitool_password = os.getenv("MINITOOL_API_PASSWORD", "default_password_change_me")
-        if password != minitool_password:
-            return Response({"error": "Invalid password"}, status=http_status.HTTP_401_UNAUTHORIZED)
+        # minitool_password = os.getenv("MINITOOL_API_PASSWORD", "default_password_change_me")
+        # if password != minitool_password:
+        #     return Response({"error": "Invalid password"}, status=http_status.HTTP_401_UNAUTHORIZED)
 
         # Validate request data
         is_valid, message, config = self._validate_request_data(request.data)

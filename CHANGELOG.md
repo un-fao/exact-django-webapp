@@ -1,3 +1,9 @@
+## 1.17.1 (2025-09-05)
+
+### Fix
+
+- **minitool**: remove additional password from computation endpoint
+
 ## 1.17.0 (2025-09-05)
 
 ### Feat
