@@ -17,9 +17,9 @@ from .generalized_modules import LandModule, BaseModule
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass(kw_only=True)
 class CoastalWetland(BaseModule):
-
     maximum_area_for_water_management: float
     area_drained_start: float
     area_drained_end: float
@@ -54,12 +54,16 @@ class CoastalWetland(BaseModule):
 
         # HECTARES DRAINED
         # NOTE: set to 0 and self.area_drained_end - self.area_excavated_end as if not we have double counting. No need for checks as area_drained_end is always greater than area_excavated_end
-        self.hectares_drained_before_20, self.hectares_drained_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_drained_end - self.area_excavated_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = compute_half_year_cumulative_n_year_maturity(
+            0, self.area_drained_end - self.area_excavated_end, self.implementation_time, self.capitalization_time, self.rate_type
+        )
         self.hectares_drained = compute_yearly_or_half_year_cumulative(0, self.area_drained_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-        self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_revegated_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = compute_half_year_cumulative_n_year_maturity(
+            0, self.area_revegated_end, self.implementation_time, self.capitalization_time, self.rate_type
+        )
         self.hectares_revegated = compute_yearly_or_half_year_cumulative(0, self.area_revegated_end, self.implementation_time, self.capitalization_time, self.rate_type)
-        
+
         self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, -self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, -self.area_drained_end + self.area_drained_start)
 
@@ -69,7 +73,6 @@ class CoastalWetland(BaseModule):
         # TIER 2 VALUES
         self.agb_tier_2_default = None
         self.bgb_tier_2_default = None
-    
 
     def calculate_emissions(
         self,
@@ -112,19 +115,16 @@ class CoastalWetland(BaseModule):
                     maximum_soil_years = 1000 if EF_drainage == 0 else int(soil_1m / EF_drainage)
                     maximum_soil_emissions = soil_1m * 44 / 12
 
-                    drainage_before_n_years, drainage_after_n_years = compute_half_year_cumulative_n_year_maturity(0, 
-                                                                                                              self.area_drained_end, 
-                                                                                                              self.implementation_time, 
-                                                                                                              self.capitalization_time, 
-                                                                                                              self.rate_type, 
-                                                                                                              number_of_years=maximum_soil_years)
+                    drainage_before_n_years, drainage_after_n_years = compute_half_year_cumulative_n_year_maturity(
+                        0, self.area_drained_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=maximum_soil_years
+                    )
 
                     # NOTE: This is different to what is done in the excel, however I think it is correct this way. If we were to do it like the excel
                     # we would have to recalculate the hectares according to min(maximum_soil_years, self.implementation_time + self.capitalization_time)
                     # and multiply by sum(that) instead of what we are doing now
 
-                    # The NOTE above is kept for future reference, however the approach was changed. Now we calculate similarly to SOC emissions, as each single 
-                    # piece of land can generate emissions only for a maximum years given by the the maximum_soil_years parameter, after that the emissions are not 
+                    # The NOTE above is kept for future reference, however the approach was changed. Now we calculate similarly to SOC emissions, as each single
+                    # piece of land can generate emissions only for a maximum years given by the the maximum_soil_years parameter, after that the emissions are not
                     # generated anymore.
 
                     calculated = EF_drainage * 44 / 12 * sum(drainage_before_n_years)
@@ -172,10 +172,14 @@ class CoastalWetland(BaseModule):
                 emissions_yearly_biomass_extraction_excavation = breakdown_proportionally_to_values(total_biomass, self.hectares_excavated)
                 emissions_yearly_soil_extraction_excavation = breakdown_proportionally_to_values(total_soil, self.hectares_excavated)
 
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay)
+                biomass_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
-                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                soil_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
                 pass
@@ -185,7 +189,6 @@ class CoastalWetland(BaseModule):
             pass
 
         def calculate_rewetting_revegetation():
-
             def calculate_biomass():
                 try:
                     agb = self.agb_default * self.mangrove_factor if self.agb_tier_2 is None else self.agb_tier_2
@@ -195,9 +198,9 @@ class CoastalWetland(BaseModule):
 
                     # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
                     self.agb_tier_2_default = self.agb_default * self.mangrove_factor
-                    self.bgb_tier_2_default = self.bgb_default * agb * self.mangrove_factor if self.agb_tier_2 is None else self.bgb_default * self.agb_tier_2
+                    self.bgb_tier_2_default = self.bgb_default * agb if self.agb_tier_2 is None else self.bgb_default * self.agb_tier_2
 
-                    biomass_emissions_total = -44/12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
+                    biomass_emissions_total = -44 / 12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
 
                     yearly_biomass = breakdown_proportionally_to_values(biomass_emissions_total, self.hectares_revegetated_before_20)
 
@@ -206,24 +209,32 @@ class CoastalWetland(BaseModule):
                 except Exception as e:
                     traceback.print_exc()
                     raise e
-            
+
             try:
                 self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
                 ef_rewetting_carbon = self.ef_rewetting_carbon_default if self.ef_rewetting_carbon_tier_2 is None else self.ef_rewetting_carbon_tier_2
                 ef_rewetting_methane = self.ef_rewetting_methane_default if self.ef_rewetting_methane_tier_2 is None else self.ef_rewetting_methane_tier_2
 
-                emissions_yearly_rewetting_carbon = compute_yearly_or_half_year_cumulative(0, 44 / 12 * self.area_end_rewetting * ef_rewetting_carbon, self.implementation_time, self.capitalization_time, self.rate_type)
-                emissions_yearly_rewetting_methane = compute_yearly_or_half_year_cumulative(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_yearly_rewetting_carbon = compute_yearly_or_half_year_cumulative(
+                    0, 44 / 12 * self.area_end_rewetting * ef_rewetting_carbon, self.implementation_time, self.capitalization_time, self.rate_type
+                )
+                emissions_yearly_rewetting_methane = compute_yearly_or_half_year_cumulative(
+                    0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.implementation_time, self.capitalization_time, self.rate_type
+                )
 
                 total_emission_yearly_rewetting_carbon = sum(emissions_yearly_rewetting_carbon)
                 total_emission_yearly_rewetting_methane = sum(emissions_yearly_rewetting_methane)
 
                 emissions_total_rewetting = total_emission_yearly_rewetting_carbon + total_emission_yearly_rewetting_methane
 
-                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay)
+                rewetting_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
 
-                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay)
+                rewetting_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
 
                 biomass_emissions = calculate_biomass()
