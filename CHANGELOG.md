@@ -1,3 +1,9 @@
+## 1.17.2 (2025-09-09)
+
+### Fix
+
+- **coastal_wetlands**: remove wrong multiplication from bgb default calculations in mathematical model
+
 ## 1.17.1 (2025-09-05)
 
 ### Fix
