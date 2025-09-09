@@ -93,6 +93,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
+    "accounts.admin_auth_middleware.AdminAuthenticationMiddleware",  # Auto-authenticate as admin
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",

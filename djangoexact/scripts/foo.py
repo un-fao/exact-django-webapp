@@ -408,6 +408,15 @@ def find_all_countries_with_no_ipcc_region():
         print(f"Deleted country: {country.name}")
 
 
+def change_change_rate_D_to_linear():
+    """
+    Change change rate D to linear
+    """
+    change_rate = models.ChangeRate.objects.get(name="D")
+    change_rate.name = "linear"
+    change_rate.save()
+
+
 def run():
     import os
 
@@ -424,8 +433,7 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        find_all_countries_with_no_region()
-        find_all_countries_with_no_ipcc_region()
+        change_change_rate_D_to_linear()
         pass
 
     if app_mode == "test":

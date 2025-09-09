@@ -111,3 +111,4 @@ CHANGES.md
 djangoexact/.commitizen/openai_cache.json
 djangoexact/djangoexact/.env.minitool
 djangoexact/minitool/data/*
+ADMIN_AUTH_SETUP.md
