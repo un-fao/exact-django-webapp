@@ -34,6 +34,13 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
         return self.authenticate_credentials(request, parts[1])
 
     def authenticate_credentials(self, request, token):
+        # Check if this is the Electron API token
+        django_api_token = os.getenv("DJANGO_API_TOKEN")
+        if django_api_token and token == django_api_token:
+            # This is a valid Electron API token, return None to allow the request to proceed
+            # The permission classes will handle whether the endpoint is public or requires authentication
+            return None
+
         try:
             decoded_token = firebase_admin_auth.verify_id_token(token)
             uid = decoded_token["uid"]

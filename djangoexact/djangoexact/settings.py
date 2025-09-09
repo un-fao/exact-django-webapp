@@ -122,60 +122,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "djangoexact.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-if os.getenv("GAE_APPLICATION", None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    DATABASES = {
-        "default": {
-            "ENGINE": "$DB_ENGINE",
-            "HOST": "/cloudsql/$DB_INSTANCE_CONNECTION",
-            "USER": "$DB_USERNAME",
-            "PASSWORD": "$DB_PASSWORD",
-            "NAME": "$DB_NAME",
-            "TEST": {
-                "NAME": "$DB_NAME",
-            },
-            "OPTIONS": {
-                "connect_timeout": 30,  # Optional: set timeout
-                "application_name": "djangoexact",  # Help identify connections
-            },
-            "CONN_MAX_AGE": 0,  # Close connections immediately after use
-            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
-        },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-            "OPTIONS": {
-                "timeout": 20,
-                "check_same_thread": False,
-            },
-        },
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
-            "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
-            "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
-            "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
-            "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
-            "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
-            "OPTIONS": {
-                "connect_timeout": 30,  # Optional: set timeout
-                "application_name": "djangoexact",  # Help identify connections
-            },
-            "CONN_MAX_AGE": 0,  # Close connections immediately after use
-            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
-        },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-        },
-    }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    },
+    "minitool": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "minitool.db"),
+    },
+}
 
 DATABASE_ROUTERS = ["minitool.db_router.AppSpecificDatabaseRouter", "ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
