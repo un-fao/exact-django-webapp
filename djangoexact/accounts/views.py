@@ -1,18 +1,14 @@
-import json
-
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
-from firebase_admin import auth as firebase_admin_auth
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import accounts.utils as utils
-from djangoexact.settings import auth
 
 from .serializers import (
     LoginResponseSerializer,
@@ -59,6 +55,9 @@ class CreateNewUserView(APIView):
             email = data.get("email")
             password = data.get("password")
 
+            if not email or not password:
+                return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
             serializer = RegisterSerializer(data=data)
 
             if not serializer.is_valid():
@@ -67,23 +66,23 @@ class CreateNewUserView(APIView):
             serializer.validated_data["email"] = email.casefold().strip()
             email = serializer.validated_data["email"]
 
+            # Create Django user only (no Firebase user creation)
             db_user: User = serializer.save()
 
-            firebase_user = firebase_admin_auth.create_user(email=email, password=password)
-            firebase_uid = firebase_user.uid
-
-            db_user.firebase_uid = firebase_uid
+            # Set user as active by default (no email verification needed initially)
+            db_user.is_active = True
             db_user.save()
 
+            # Send email verification link (preserving this functionality)
             utils.send_email_verification_link(email, db_user.first_name.capitalize() + " " + db_user.last_name.capitalize())
 
             return Response(UserSummarySerializer(db_user).data, status=status.HTTP_201_CREATED)
 
         except Exception as e:
+            # Clean up only Django user if created
             try:
-                # Delete the user if it was created
-                firebase_admin_auth.delete_user(firebase_uid)
-                db_user.delete()
+                if "db_user" in locals():
+                    db_user.delete()
             except Exception:
                 pass
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -103,46 +102,40 @@ class LoginExistingUserView(APIView):
         try:
             email = data.get("email")
             password = data.get("password")
-            user = firebase_admin_auth.get_user_by_email(email)
 
-            if not user.email_verified:
-                return Response({"error": "Email not verified"}, status=status.HTTP_401_UNAUTHORIZED)
+            if not email or not password:
+                return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
             email = email.casefold().strip()
 
+            # Get user from Django database by email
             try:
-                user = auth.sign_in_with_email_and_password(email, password)
-            except Exception as e:
-                error = json.loads(e.strerror)
+                existing_user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-                if error.get("error", {}).get("message") == "INVALID_LOGIN_CREDENTIALS":
-                    return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            # Check if user is active
+            if not existing_user.is_active:
+                return Response({"error": "User account is not active"}, status=status.HTTP_401_UNAUTHORIZED)
 
-                return Response({"error": error.get("error", {}).get("message", "Bad Request")}, status=status.HTTP_400_BAD_REQUEST)
+            # Verify password using Django's built-in password checking
+            if not check_password(password, existing_user.password):
+                return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            existing_user = User.objects.get(firebase_uid=user["localId"])
-
+            # Log the user in using Django's session authentication
             login(request, existing_user)
 
-            if not check_password(password, existing_user.password):
-                # If firebase password is different from Django password, update Django password
-                existing_user.set_password(password)
-                existing_user.save()
-
+            # Prepare response data (preserving the structure but without Firebase tokens)
             extra_data = {
-                "uid": user["localId"],
-                "access_token": user["idToken"],
-                "refresh_token": user["refreshToken"],
-                "expires_in": user["expiresIn"],
-                "kind": user["kind"],
+                "uid": str(existing_user.id),  # Use Django user ID instead of Firebase UID
+                "access_token": None,  # No Firebase token needed
+                "refresh_token": None,  # No Firebase refresh token needed
+                "expires_in": None,  # No token expiration
+                "kind": "user",  # Static kind value
                 "user": UserSummarySerializer(existing_user).data,
             }
 
             return Response(extra_data, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            auth.delete_user_account(user["localId"])
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -161,11 +154,18 @@ class PasswordResetView(APIView):
 
         try:
             email = data.get("email", None)
-            if email:
-                email = email.casefold().strip()
+            if not email:
+                return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            firebase_admin_auth.get_user_by_email(email)
+            email = email.casefold().strip()
 
+            # Check if user exists in Django database
+            try:
+                User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Send password reset link using existing utility function
             utils.send_password_reset_link(email)
 
             return Response({"message": "Password reset email sent"}, status=status.HTTP_200_OK)
@@ -186,13 +186,20 @@ class VerifyUserEmail(APIView):
 
         try:
             email = data.get("email", None)
-            if email:
-                email = email.casefold
+            if not email:
+                return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            user = firebase_admin_auth.get_user_by_email(email)
+            email = email.casefold().strip()
 
-            # Verify user email
-            firebase_admin_auth.update_user(user.uid, email_verified=True)
+            # Get user from Django database
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Mark user as active/verified in Django
+            user.is_active = True
+            user.save()
 
             return Response({"message": "Email verified"}, status=status.HTTP_200_OK)
 
@@ -208,21 +215,19 @@ class TokenRefreshView(APIView):
     )
     @transaction.atomic
     def post(self, request):
-        data = request.data
-
         try:
-            refresh_token = data.get("refresh")
-
-            user = auth.refresh(refresh_token)
-
-            extra_data = {
-                "uid": user["userId"],
-                "access_token": user["idToken"],
-                "refresh_token": user["refreshToken"],
-            }
-
-            return Response(extra_data, status=status.HTTP_200_OK)
+            # Since we're not using Firebase tokens anymore, this endpoint
+            # can be simplified or may not be needed depending on the frontend
+            # For now, return a message indicating no refresh is needed
+            return Response(
+                {
+                    "message": "Token refresh not required for Django session authentication",
+                    "uid": None,
+                    "access_token": None,
+                    "refresh_token": None,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         except Exception as e:
-            foo = json.loads(e.strerror)
-            return Response({"details": foo["error"]["message"]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
