@@ -398,7 +398,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         project.lock(self.request.user)
 
-        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
+        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get_or_create(name="Admin")[0])
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
