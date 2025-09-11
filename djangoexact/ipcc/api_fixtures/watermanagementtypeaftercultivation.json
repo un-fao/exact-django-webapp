@@ -1,0 +1,68 @@
+[
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 2,
+  "fields": {
+    "name": "Irrigated, Continuously Flooded",
+    "name_en": "Irrigated, Continuously Flooded",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 3,
+  "fields": {
+    "name": "Irrigated, Single Drainage Period",
+    "name_en": "Irrigated, Single Drainage Period",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 4,
+  "fields": {
+    "name": "Irrigated, Multiple Drainage Periods",
+    "name_en": "Irrigated, Multiple Drainage Periods",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 5,
+  "fields": {
+    "name": "Rainfed, Wet Season (Regular Rainfed)",
+    "name_en": "Rainfed, Wet Season (Regular Rainfed)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 6,
+  "fields": {
+    "name": "Rainfed, Dry Season (Drought Prone)",
+    "name_en": "Rainfed, Dry Season (Drought Prone)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypeaftercultivation",
+  "pk": 7,
+  "fields": {
+    "name": "Rainfed, Deep Water",
+    "name_en": "Rainfed, Deep Water",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+}
+]

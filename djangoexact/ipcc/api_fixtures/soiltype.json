@@ -1,0 +1,119 @@
+[
+{
+  "model": "api.soiltype",
+  "pk": 1,
+  "fields": {
+    "name": "High Activity Clay",
+    "name_en": "High Activity Clay",
+    "name_fr": null,
+    "name_es": "Arcillas de Alta Intensidad",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 2,
+  "fields": {
+    "name": "Low Activity Clay",
+    "name_en": "Low Activity Clay",
+    "name_fr": null,
+    "name_es": "Arcillas de Baja Intensidad",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 3,
+  "fields": {
+    "name": "Sandy",
+    "name_en": "Sandy",
+    "name_fr": null,
+    "name_es": "Arenoso",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 4,
+  "fields": {
+    "name": "Spodic",
+    "name_en": "Spodic",
+    "name_fr": null,
+    "name_es": "Espódicos",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 5,
+  "fields": {
+    "name": "Volcanic",
+    "name_en": "Volcanic",
+    "name_fr": null,
+    "name_es": "Volcánicos",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 6,
+  "fields": {
+    "name": "Wetland",
+    "name_en": "Wetland",
+    "name_fr": null,
+    "name_es": "Humedales",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 7,
+  "fields": {
+    "name": "Organic",
+    "name_en": "Organic",
+    "name_fr": null,
+    "name_es": "Orgánico",
+    "name_ru": null,
+    "active": true,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 8,
+  "fields": {
+    "name": "Mineral",
+    "name_en": "Mineral",
+    "name_fr": null,
+    "name_es": "Mineral",
+    "name_ru": null,
+    "active": false,
+    "is_coastal": false
+  }
+},
+{
+  "model": "api.soiltype",
+  "pk": 9,
+  "fields": {
+    "name": "Aggregated",
+    "name_en": "Aggregated",
+    "name_fr": null,
+    "name_es": "Agregado",
+    "name_ru": null,
+    "active": false,
+    "is_coastal": false
+  }
+}
+]

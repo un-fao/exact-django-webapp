@@ -1,1 +1,0 @@
-[{"model": "api.sitelocationtype", "pk": 1, "fields": {"name": "On-Site"}}, {"model": "api.sitelocationtype", "pk": 2, "fields": {"name": "Off-Site"}}]

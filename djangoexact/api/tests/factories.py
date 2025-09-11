@@ -376,14 +376,6 @@ class InputEntryFactory(DjangoModelFactory):
 
     status = READY
 
-    value_start = factory.fuzzy.FuzzyFloat(0, 100)
-    value_w = factory.fuzzy.FuzzyFloat(0, 100)
-    value_wo = factory.fuzzy.FuzzyFloat(0, 100)
-
-    co2_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-    n2o_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-    co2_e_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-
 
 class AquacultureFactory(DjangoModelFactory):
     class Meta:
@@ -478,7 +470,7 @@ class WaterbodyFactory(DjangoModelFactory):
     class Meta:
         model = Waterbody
 
-    area = 150
+    area = 1
     status = READY
 
     waterbody_type = factory.fuzzy.FuzzyChoice(WaterbodyType.objects.all())
