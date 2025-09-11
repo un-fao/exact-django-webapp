@@ -439,6 +439,47 @@ class LargeFisheryDataBuilder(ModuleDataBuilder):
         ]
 
 
+class InputDataBuilder(ModuleDataBuilder):
+    """Data builder for Input modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        # Input module itself doesn't have these fields - they're in InputEntry submodules
+        return []
+
+    def get_custom_fields(self, module: Any) -> Dict[str, Any]:
+        """Get custom fields from InputEntry submodules"""
+        custom_fields = {}
+
+        # Get all input entries for this Input module
+        input_entries = module.input_entries.all()
+
+        if input_entries:
+            # For now, we'll take the first input entry's data
+            # In a more complex scenario, you might want to aggregate or handle multiple entries
+            first_entry = input_entries[0]
+
+            custom_fields.update(
+                {
+                    "input_type": first_entry.input_type.name if first_entry.input_type else None,
+                    "value_start": first_entry.value_start,
+                    "value_w": first_entry.value_w,
+                    "value_wo": first_entry.value_wo,
+                }
+            )
+
+        return custom_fields
+
+
+class WaterbodyDataBuilder(ModuleDataBuilder):
+    """Data builder for Waterbody modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("waterbody_type"),
+            FieldMappingBuilder.foreign_key("trophic_type"),
+        ]
+
+
 # Implementation example of a more complex module
 # class ForestManagementDataBuilder(ModuleDataBuilder):
 #     """Example data builder for Forest Management modules - shows extensibility"""
@@ -517,6 +558,8 @@ class ModuleDataBuilderRegistry:
         self.register("ForestManagement", ForestManagementDataBuilder())
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
+        self.register("Input", InputDataBuilder())
+        self.register("Waterbody", WaterbodyDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -536,10 +579,29 @@ class ModuleDataBuilderRegistry:
 
 
 class ModuleProcessor(ABC):
-    """Abstract base class for module processors"""
+    """Abstract base class for module processors
+
+    This class provides the base functionality for processing module combinations.
+    Some processors may need to create actual database records (projects, activities, modules)
+    when foreign key constraints are required for calculations. In such cases:
+
+    1. Set requires_project_creation = True in the processor's __init__ method
+    2. Use create_project() instead of build_project() in create_module()
+    3. Use .create() instead of .build() for factories that need database records
+    4. The created records will be automatically cleaned up after processing
+
+    Example:
+        class MyProcessor(ModuleProcessor):
+            def __init__(self, data_builder_registry):
+                super().__init__(data_builder_registry)
+                self.requires_project_creation = True  # Enable cleanup
+    """
 
     def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
         self.data_builder_registry = data_builder_registry
+        self.project = None
+        self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
+        self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
 
     def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
         """Helper method to create a project with proper country selection"""
@@ -549,12 +611,30 @@ class ModuleProcessor(ABC):
             # Skip this combination if no country is available
             raise ValueError(f"No countries found for region: {region}")
 
-        return factories.ProjectFactory.build(
+        self.project = factories.ProjectFactory.create(
+            owner=self.user,
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
             country=country,
         )
+        return self.project
+
+    def build_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
+        """Helper method to build a project (without saving to database)"""
+        # Get a random country from the region, with fallback
+        country = region.countries.order_by("?").first()
+        if not country:
+            # Skip this combination if no country is available
+            raise ValueError(f"No countries found for region: {region}")
+
+        self.project = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=country,
+        )
+        return self.project
 
     @abstractmethod
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
@@ -563,6 +643,7 @@ class ModuleProcessor(ABC):
 
     def process_combination(self, combination: Tuple) -> ProcessingResult:
         """Process a single combination"""
+        created_project = None
         try:
             # Import inside function for multiprocessing compatibility
             import api.tests.factories as factories
@@ -574,6 +655,10 @@ class ModuleProcessor(ABC):
 
             # Create module
             module = self.create_module(combination, factories, models)
+
+            # Store reference to created project if this processor creates projects
+            if self.requires_project_creation and hasattr(self, "project") and self.project:
+                created_project = self.project
 
             # Calculate result
             balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
@@ -599,6 +684,15 @@ class ModuleProcessor(ABC):
                 # Log unexpected errors
                 logger.warning(f"Unexpected error in combination processing: {type(e).__name__}: {str(e)}")
                 return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+        finally:
+            # Clean up created project if this processor creates projects
+            if created_project and self.requires_project_creation:
+                try:
+                    # Delete the project and all related objects
+                    created_project.delete()
+                except Exception as cleanup_error:
+                    # Log cleanup errors but don't fail the processing
+                    logger.warning(f"Failed to cleanup project {created_project.id}: {cleanup_error}")
 
 
 class GrasslandProcessor(ModuleProcessor):
@@ -614,8 +708,6 @@ class GrasslandProcessor(ModuleProcessor):
             fire_periodicity_w,
             fire_impact_start,
             fire_impact_w,
-            yield_start,
-            yield_w,
             climate_moisture,
             soil_type,
             region,
@@ -644,9 +736,6 @@ class GrasslandProcessor(ModuleProcessor):
             fire_impact_start=fire_impact_start,
             fire_impact_w=fire_impact_w,
             fire_impact_wo=fire_impact_start,
-            yield_start=yield_start,
-            yield_w=yield_w,
-            yield_wo=yield_start,
             land_use_type_start=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_w=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_wo=models.LandUseType.objects.get(name="Grassland"),
@@ -937,6 +1026,74 @@ class LargeFisheryProcessor(ModuleProcessor):
         return module
 
 
+class InputProcessor(ModuleProcessor):
+    """Processor for Input modules
+
+    This processor requires project creation because Input modules have foreign key
+    constraints that need actual database records to be created for proper calculation.
+    The created projects are automatically cleaned up after processing.
+    """
+
+    def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
+        super().__init__(data_builder_registry)
+        self.requires_project_creation = True  # Input modules need projects for foreign key constraints
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            input_type,
+            value_start,
+            value_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+        self.project = self.create_project(climate, moisture, soil_type, region, factories)
+        a = factories.ActivityFactory.create(project=self.project)
+        module = factories.InputFactory.create(
+            activity=a,
+        )
+        submodule = factories.InputEntryFactory.create(
+            parent=module,
+            input_type=input_type,
+            value_start=value_start,
+            value_w=value_w,
+            value_wo=value_start,
+        )
+        module.input_entries.add(submodule)
+        return module
+
+
+class WaterbodyProcessor(ModuleProcessor):
+    """Processor for Waterbody modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            waterbody_type,
+            trophic_type_start,
+            trophic_type_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.WaterbodyFactory.build(
+            activity=a,
+            waterbody_type=waterbody_type,
+            trophic_type_start=trophic_type_start,
+            trophic_type_w=trophic_type_w,
+            trophic_type_wo=trophic_type_start,
+        )
+        return module
+
+
 class ProcessorRegistry:
     """Registry for module processors"""
 
@@ -955,6 +1112,8 @@ class ProcessorRegistry:
         self.register("ForestManagement", ForestManagementProcessor(self._data_builder_registry))
         self.register("SmallFishery", SmallFisheryProcessor(self._data_builder_registry))
         self.register("LargeFishery", LargeFisheryProcessor(self._data_builder_registry))
+        self.register("Input", InputProcessor(self._data_builder_registry))
+        self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -1139,9 +1298,13 @@ class DataManager:
             self._bucket = self.storage_client.bucket(self.bucket_name)
         return self._bucket
 
-    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str) -> None:
+    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False) -> None:
         """Save data and errors to GCP storage bucket as CSV files"""
         try:
+            if local:
+                self._save_to_local_fallback(data, errors, module_name)
+                return
+
             if data:
                 df = pd.DataFrame(data)
                 csv_buffer = io.StringIO()
@@ -1313,9 +1476,8 @@ class PermutationComputer:
                             break
 
                         if result.success:
-                            if result.data.get("total", 0) != 0:
-                                data.append(result.data)
-                                pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
+                            data.append(result.data)
+                            pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
                         else:
                             errors_data.append(result.error)
                             pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
@@ -1356,7 +1518,7 @@ class PermutationComputer:
 
 # Module configurations
 MODULE_CONFIGS = {
-    "Grassland": {
+    "Grassland": {  # Compute # DONE
         "fields": {
             "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
@@ -1369,7 +1531,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "grassland",
     },
-    "Livestock": {
+    "Livestock": {  # Compute # DONE
         "fields": {
             "livestock_category_types": models.LivestockCategoryType.objects.all(),
             "livestock_production_type_start": models.LivestockProductionType.objects.all(),
@@ -1379,10 +1541,10 @@ MODULE_CONFIGS = {
         },
         "config_name": "livestock",
     },
-    "AnnualCropland": {
+    "AnnualCropland": {  # BUG:
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.get(name="Default"),
-            "land_use_type_w": models.LandUseType.objects.get(name="Default"),
+            "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
+            "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
             "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
@@ -1392,7 +1554,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "annual_cropland",
     },
-    "FloodedRice": {
+    "FloodedRice": {  # Skip
         "fields": {
             "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
             "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
@@ -1403,7 +1565,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "flooded_rice",
     },
-    "PerennialCropland": {
+    "PerennialCropland": {  # Skip
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
             "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
@@ -1418,7 +1580,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "perennial_cropland",
     },
-    "ForestManagement": {
+    "ForestManagement": {  # Compute # DONE
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
             "forest_type": models.ForestType.objects.all(),
@@ -1428,7 +1590,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "forest_management",
     },
-    "SmallFishery": {
+    "SmallFishery": {  # Compute # DONE
         "fields": {
             "gear_type_start": models.SmallFisheryGearType.objects.all(),
             "gear_type_w": models.SmallFisheryGearType.objects.all(),
@@ -1438,7 +1600,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "small_fishery",
     },
-    "LargeFishery": {
+    "LargeFishery": {  # Skip
         "fields": {
             "gear_type_start": models.LargeFisheryGearType.objects.all(),
             "gear_type_w": models.LargeFisheryGearType.objects.all(),
@@ -1448,15 +1610,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "large_fishery",
     },
-    # NOTE: Not needed
-    # "Aquaculture": {
-    #     "fields": {
-    #         "annual_production_start": [1],
-    #         "annual_production_w": [1],
-    #     },
-    #     "enabled": CONFIG["aquaculture"],
-    # },
-    "CoastalWetland": {
+    "CoastalWetland": {  # Skip
         "fields": {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
             "area_under_drainage_start": [1, 0],
@@ -1470,7 +1624,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "coastal_wetland",
     },
-    "CoastalWetland2": {
+    "CoastalWetland2": {  # Skip
         "fields": {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
             "area_under_drainage_start": [0],
@@ -1484,7 +1638,15 @@ MODULE_CONFIGS = {
         },
         "config_name": "coastal_wetland",
     },
-    "Waterbody": {
+    "Input": {  # Compute # BUG: ZERO RESULTS
+        "fields": {
+            "input_type": models.InputType.objects.all(),
+            "value_start": [1, 0],
+            "value_w": [1, 0],
+        },
+        "config_name": "input",
+    },
+    "Waterbody": {  # Compute # DONE
         "fields": {
             "waterbody_type": models.WaterbodyType.objects.all(),
             "trophic_type_start": models.TrophicType.objects.all(),
@@ -1492,22 +1654,33 @@ MODULE_CONFIGS = {
         },
         "config_name": "waterbody",
     },
-    # "OtherLand": {
-    #     # TODO: I don't think this makes much sense.
-    #     "fields": {
-    #         "is_degraded_land_start": [True, False],
-    #         "is_degraded_land_w": [True, False],
-    #     },
-    # },
-    # "SetAside": {
-    #     # TODO: I don't think this makes much sense.
-    #     "fields": {
-    #         "is_set_aside_start": [True, False],
-    #         "is_set_aside_w": [True, False],
-    #     },
-    # },
-    # TODO: Missing all Value Chain modules.
 }
+
+"""
+# NOTE: Not needed
+"Aquaculture": {
+    "fields": {
+        "annual_production_start": [1],
+        "annual_production_w": [1],
+    },
+    "enabled": CONFIG["aquaculture"],
+},
+"OtherLand": {
+    # TODO: I don't think this makes much sense.
+    "fields": {
+        "is_degraded_land_start": [True, False],
+        "is_degraded_land_w": [True, False],
+    },
+},
+"SetAside": {
+    # TODO: I don't think this makes much sense.
+    "fields": {
+        "is_set_aside_start": [True, False],
+        "is_set_aside_w": [True, False],
+    },
+},
+TODO: Missing all Value Chain modules.
+"""
 
 
 def run():
@@ -1535,7 +1708,7 @@ def run():
                 model_class = getattr(models, module_name)
                 data, errors = permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"])
                 if data or errors:
-                    data_manager.save_data(data, errors, module_name)
+                    data_manager.save_data(data, errors, module_name, local=True)
 
     except KeyboardInterrupt:
         logger.info("\nKeyboard interrupt detected in main run function!")

@@ -20,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--module-type",
             type=str,
-            choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland", "forest-management", "small-fishery", "large-fishery"],
+            choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland", "forest-management", "small-fishery", "large-fishery", "input", "waterbody"],
             help="Module type to import",
         )
         parser.add_argument("--clear", action="store_true", help="Clear existing data before importing")
@@ -57,6 +57,8 @@ class Command(BaseCommand):
             ("forestmanagement", "forestmanagement_changes.json"),
             ("smallfishery", "smallfishery_changes.json"),
             ("largefishery", "largefishery_changes.json"),
+            ("input", "input_changes.json"),
+            ("waterbody", "waterbody_changes.json"),
         ]
 
         total_modules = len(module_configs)
