@@ -1,1 +1,0 @@
-[{"model": "api.statustype", "pk": 1, "fields": {"name": "EMPTY", "value": 0.0}}, {"model": "api.statustype", "pk": 2, "fields": {"name": "READY", "value": 1.0}}]

@@ -248,26 +248,6 @@ class GrasslandFactory(DjangoModelFactory):
     area = 1
     status = READY
 
-    grassland_management_type_start = factory.fuzzy.FuzzyChoice(grassland_management_types)
-    grassland_management_type_w = factory.fuzzy.FuzzyChoice(grassland_management_types)
-    grassland_management_type_wo = factory.fuzzy.FuzzyChoice(grassland_management_types)
-
-    is_fire_used_start = factory.fuzzy.FuzzyChoice([True, False])
-    is_fire_used_w = factory.fuzzy.FuzzyChoice([True, False])
-    is_fire_used_wo = factory.fuzzy.FuzzyChoice([True, False])
-
-    fire_periodicity_start = factory.fuzzy.FuzzyInteger(1, 5)
-    fire_periodicity_w = factory.fuzzy.FuzzyInteger(1, 5)
-    fire_periodicity_wo = factory.fuzzy.FuzzyInteger(1, 5)
-
-    fire_impact_start = factory.fuzzy.FuzzyFloat(0, 1)
-    fire_impact_w = factory.fuzzy.FuzzyFloat(0, 1)
-    fire_impact_wo = factory.fuzzy.FuzzyFloat(0, 1)
-
-    yield_start = factory.fuzzy.FuzzyInteger(0, 100)
-    yield_w = factory.fuzzy.FuzzyInteger(0, 100)
-    yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
-
 
 land_modules = ModuleType.objects.filter(is_luc=True, is_submodule=False).all()
 
@@ -376,14 +356,6 @@ class InputEntryFactory(DjangoModelFactory):
 
     status = READY
 
-    value_start = factory.fuzzy.FuzzyFloat(0, 100)
-    value_w = factory.fuzzy.FuzzyFloat(0, 100)
-    value_wo = factory.fuzzy.FuzzyFloat(0, 100)
-
-    co2_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-    n2o_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-    co2_e_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
-
 
 class AquacultureFactory(DjangoModelFactory):
     class Meta:
@@ -478,7 +450,7 @@ class WaterbodyFactory(DjangoModelFactory):
     class Meta:
         model = Waterbody
 
-    area = 150
+    area = 1
     status = READY
 
     waterbody_type = factory.fuzzy.FuzzyChoice(WaterbodyType.objects.all())

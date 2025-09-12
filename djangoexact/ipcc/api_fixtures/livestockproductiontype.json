@@ -1,0 +1,35 @@
+[
+{
+  "model": "api.livestockproductiontype",
+  "pk": 6,
+  "fields": {
+    "name": "Default",
+    "name_en": "Default",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.livestockproductiontype",
+  "pk": 4,
+  "fields": {
+    "name": "High-Productivity",
+    "name_en": "High-Productivity",
+    "name_fr": null,
+    "name_es": "Alta Productividad",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.livestockproductiontype",
+  "pk": 5,
+  "fields": {
+    "name": "Low-Productivity",
+    "name_en": "Low-Productivity",
+    "name_fr": null,
+    "name_es": "Baja Productividad",
+    "name_ru": null
+  }
+}
+]

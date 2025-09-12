@@ -1,0 +1,79 @@
+[
+{
+  "model": "api.organicamendmenttype",
+  "pk": 1,
+  "fields": {
+    "name": "Straw Burnt",
+    "name_en": "Straw Burnt",
+    "name_fr": null,
+    "name_es": "Paja quemada",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 2,
+  "fields": {
+    "name": "Straw Exported",
+    "name_en": "Straw Exported",
+    "name_fr": null,
+    "name_es": "Paja exportada",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 3,
+  "fields": {
+    "name": "Compost",
+    "name_en": "Compost",
+    "name_fr": null,
+    "name_es": "Compost",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 4,
+  "fields": {
+    "name": "Farm Yard Manure",
+    "name_en": "Farm Yard Manure",
+    "name_fr": null,
+    "name_es": "Estiércol de corral",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 5,
+  "fields": {
+    "name": "Green Manure",
+    "name_en": "Green Manure",
+    "name_fr": null,
+    "name_es": "Estiércol verde",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 6,
+  "fields": {
+    "name": "Straw Incorporated Long (>30 Days) Before Cultivation",
+    "name_en": "Straw Incorporated Long (>30 Days) Before Cultivation",
+    "name_fr": null,
+    "name_es": "Paja Incorporada Mucho (>30 días) Antes del cultivo",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.organicamendmenttype",
+  "pk": 7,
+  "fields": {
+    "name": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
+    "name_en": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
+    "name_fr": null,
+    "name_es": "Paja Incorporada Poco (<30 días) Antes del cultivo",
+    "name_ru": null
+  }
+}
+]

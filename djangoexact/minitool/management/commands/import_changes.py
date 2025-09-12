@@ -20,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--module-type",
             type=str,
-            choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland", "forest-management", "small-fishery", "large-fishery"],
+            choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland", "forest-management", "small-fishery", "large-fishery", "input", "waterbody"],
             help="Module type to import",
         )
         parser.add_argument("--clear", action="store_true", help="Clear existing data before importing")
@@ -57,6 +57,8 @@ class Command(BaseCommand):
             ("forestmanagement", "forestmanagement_changes.json"),
             ("smallfishery", "smallfishery_changes.json"),
             ("largefishery", "largefishery_changes.json"),
+            ("input", "input_changes.json"),
+            ("waterbody", "waterbody_changes.json"),
         ]
 
         total_modules = len(module_configs)
@@ -196,6 +198,7 @@ class Command(BaseCommand):
                 climate = record.get("climate", "")
                 moisture = record.get("moisture", "")
                 soil_type = record.get("soil_type", "")
+                land_use_type = record.get("land_use_type", "")
                 total = record.get("total", 0)
 
                 # Extract custom filter fields
@@ -206,8 +209,8 @@ class Command(BaseCommand):
                     from_value = change.get("from", "")
                     to_value = change.get("to", "")
 
-                    # Skip if any required field is empty
-                    if not all([field, from_value, to_value]):
+                    # Skip if any required field is empty (but allow 0 values)
+                    if not field or from_value is None or to_value is None:
                         records_skipped += 1
                         continue
 
@@ -264,11 +267,20 @@ class Command(BaseCommand):
                 from_value = change.get("from", "")
                 to_value = change.get("to", "")
 
-                if not all([field, from_value, to_value]):
+                if not field or from_value is None or to_value is None:
                     continue
 
                 # Create aggregation key with standard fields
-                key_parts = [field, str(from_value), str(to_value), record.get("region"), record.get("climate"), record.get("moisture"), record.get("soil_type"), record.get("module_type")]
+                key_parts = [
+                    field,
+                    str(from_value),
+                    str(to_value),
+                    record.get("region"),
+                    record.get("climate"),
+                    record.get("moisture"),
+                    record.get("soil_type"),
+                    record.get("module_type"),
+                ]
 
                 # Add custom filter fields to the key
                 for column in filter_columns:
