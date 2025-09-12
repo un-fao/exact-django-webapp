@@ -1,3 +1,14 @@
+## 1.17.3 (2025-09-12)
+
+### Feat
+
+- **minitool**: add waterbody-related endpoints and sanitize db data
+- **minitool**: update database
+
+### Fix
+
+- **minitool**: remove grassland factory yield
+
 ## 1.17.2 (2025-09-09)
 
 ### Fix
