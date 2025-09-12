@@ -406,6 +406,7 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             # Core forest fields (single fields)
+            FieldMappingBuilder.foreign_key("land_use_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             # Degradation fields
@@ -1580,7 +1581,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "perennial_cropland",
     },
-    "ForestManagement": {  # Compute # DONE
+    "ForestManagement": {  # Compute
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
             "forest_type": models.ForestType.objects.all(),
