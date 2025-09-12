@@ -372,7 +372,6 @@ class GrasslandDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.boolean("is_fire_used"),
             FieldMappingBuilder.numeric("fire_periodicity"),
             FieldMappingBuilder.numeric("fire_impact"),
-            FieldMappingBuilder.numeric("yield"),
         ]
 
 
