@@ -133,6 +133,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             "forest-management": "Forest Management",
             "small-fishery": "Small Fishery",
             "large-fishery": "Large Fishery",
+            "waterbody": "Waterbody",
         }
         module_type_value = module_type_mapping.get(module_type, module_type)
         queryset = queryset.filter(module_type=module_type_value)
@@ -171,7 +172,17 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
     def get_available_custom_filters(self, module_type):
         """Get available custom filter fields and their values for a specific module."""
-        module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
+        module_type_mapping = {
+            "livestock": "Livestock",
+            "annual-cropland": "Annual Cropland",
+            "flooded-rice": "Flooded Rice",
+            "grassland": "Grassland",
+            "perennial-cropland": "Perennial Cropland",
+            "waterbody": "Waterbody",
+            "forest-management": "Forest Management",
+            "small-fishery": "Small Fishery",
+            "large-fishery": "Large Fishery",
+        }
         module_type_value = module_type_mapping.get(module_type, module_type)
 
         queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
@@ -464,6 +475,28 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response(response_data)
 
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody")
+    @close_db_connections
+    def waterbody(self, request, *args, **kwargs):
+        """
+        Get waterbody emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("waterbody", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No waterbody data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
     ##### FIELDS #####
 
     # Nested actions for livestock module
@@ -520,6 +553,13 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     def large_fishery_fields(self, request, *args, **kwargs):
         """Get available fields for large fishery data with their unique entries."""
         queryset = models.ChangeAggregate.objects.filter(module_type="Large Fishery")
+        fields_with_entries = self.get_fields_with_entries(queryset)
+        return Response(fields_with_entries)
+
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody/fields")
+    def waterbody_fields(self, request, *args, **kwargs):
+        """Get available fields for waterbody data with their unique entries."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Waterbody")
         fields_with_entries = self.get_fields_with_entries(queryset)
         return Response(fields_with_entries)
 
@@ -608,6 +648,16 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
         return Response(filters_with_entries)
 
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody/filters")
+    def waterbody_filters(self, request, *args, **kwargs):
+        """
+        Get available filters for waterbody data with their unique entries.
+        """
+        queryset = models.ChangeAggregate.objects.filter(module_type="Waterbody")
+        custom_only = request.query_params.get("custom_only", "false").lower() == "true"
+        filters_with_entries = self.get_filters_with_entries(queryset, custom_only=custom_only)
+        return Response(filters_with_entries)
+
     ##### REGIONS #####
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/regions")
@@ -666,6 +716,13 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         regions = queryset.values_list("region", flat=True).distinct()
         return Response(list(regions))
 
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody/regions")
+    def waterbody_regions(self, request, *args, **kwargs):
+        """Get available regions for waterbody data."""
+        queryset = models.ChangeAggregate.objects.filter(module_type="Waterbody")
+        regions = queryset.values_list("region", flat=True).distinct()
+        return Response(list(regions))
+
     ##### CUSTOM FILTERS #####
 
     @decorators.action(detail=False, methods=["get"], url_path="livestock/custom-filters")
@@ -714,6 +771,12 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
     def large_fishery_custom_filters(self, request, *args, **kwargs):
         """Get available custom filter fields and values for large fishery data."""
         custom_filters = self.get_available_custom_filters("large-fishery")
+        return Response(custom_filters)
+
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody/custom-filters")
+    def waterbody_custom_filters(self, request, *args, **kwargs):
+        """Get available custom filter fields and values for waterbody data."""
+        custom_filters = self.get_available_custom_filters("waterbody")
         return Response(custom_filters)
 
     ##### STATISTICS #####
@@ -799,6 +862,16 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
 
+    @decorators.action(detail=False, methods=["get"], url_path="waterbody/statistics")
+    def waterbody_statistics(self, request, *args, **kwargs):
+        """Get overall statistics for waterbody data."""
+        queryset, filters = self.get_filtered_queryset("waterbody", request)
+        total_records = queryset.count()
+        total_changes = queryset.aggregate(total=Sum("count"))["total"] or 0
+        avg_impact = queryset.aggregate(avg=Avg("mean"))["avg"] or 0
+
+        return Response({"total_records": total_records, "total_changes": total_changes, "average_impact": avg_impact, "filters_applied": filters})
+
     ##### COMPARE #####
 
     @decorators.action(detail=False, methods=["get"], url_path="compare")
@@ -809,7 +882,17 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         comparison_data = {}
 
         for module in modules:
-            module_type_mapping = {"livestock": "Livestock", "annual-cropland": "Annual Cropland", "flooded-rice": "Flooded Rice", "grassland": "Grassland", "perennial-cropland": "Perennial Cropland"}
+            module_type_mapping = {
+                "livestock": "Livestock",
+                "annual-cropland": "Annual Cropland",
+                "flooded-rice": "Flooded Rice",
+                "grassland": "Grassland",
+                "perennial-cropland": "Perennial Cropland",
+                "waterbody": "Waterbody",
+                "forest-management": "Forest Management",
+                "small-fishery": "Small Fishery",
+                "large-fishery": "Large Fishery",
+            }
             module_type_value = module_type_mapping.get(module, module)
 
             queryset = models.ChangeAggregate.objects.filter(module_type=module_type_value)
@@ -892,6 +975,14 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             "total_records": large_queryset.count(),
             "total_changes": large_queryset.aggregate(total=Sum("count"))["total"] or 0,
             "unique_fields": large_queryset.values("field").distinct().count(),
+        }
+
+        # Waterbody summary
+        waterbody_queryset = models.ChangeAggregate.objects.filter(module_type="Waterbody")
+        summary_data["waterbody"] = {
+            "total_records": waterbody_queryset.count(),
+            "total_changes": waterbody_queryset.aggregate(total=Sum("count"))["total"] or 0,
+            "unique_fields": waterbody_queryset.values("field").distinct().count(),
         }
 
         return Response(summary_data)
