@@ -1,5 +1,6 @@
 import firebase_admin.auth
 import api.models as models
+import minitool.models as minitool_models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
@@ -400,6 +401,22 @@ def find_all_countries_with_no_ipcc_region():
         print(f"Deleted country: {country.name}")
 
 
+def sanitize_minitool_data():
+    """
+    Get all module type waterbody change aggregates and capitalize module type
+    """
+    print("Deleting smallfishery data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="smallfishery").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="smallfishery").delete()
+    print("Deleting Flooded Rice data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Flooded Rice").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Flooded Rice").delete()
+    print("Deleting Perennial Cropland data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    print("Done")
+
+
 def run():
     import os
 
@@ -417,6 +434,7 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        sanitize_minitool_data()
         pass
 
     if app_mode == "test":
