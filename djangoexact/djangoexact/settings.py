@@ -152,7 +152,6 @@ if os.getenv("GAE_APPLICATION", None):
             "OPTIONS": {
                 "timeout": 20,
                 "check_same_thread": False,
-                "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
             },
         },
     }
