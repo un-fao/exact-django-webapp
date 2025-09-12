@@ -406,7 +406,6 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             # Core forest fields (single fields)
-            FieldMappingBuilder.foreign_key("land_use_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             # Degradation fields
@@ -416,7 +415,7 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
         """Get custom fields that don't follow the standard pattern"""
         return {
-            "area": getattr(module, "area", None),
+            "land_use_type": getattr(module, "land_use_type_start", None),
         }
 
 
