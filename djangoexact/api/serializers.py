@@ -877,6 +877,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data.get("module_types", [])]
         has_luc_module = self.validated_data.get("land_use_change", False)
+        area = self.validated_data.get("area", None)
 
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
@@ -906,7 +907,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
                         luc.organic_soil = None
                         luc.save()
                         module_instance.land_use_change = None
-                        module_instance.save()
 
                 # TODO: Maybe instead of checking the module type we can check the instance class?
 
@@ -917,10 +917,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                 if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
                     module_instance.land_use_change = luc
-                    module_instance.save()
+
                 elif module_instance:
                     module_instance.land_use_change = None
-                    module_instance.save()
+
+                if area and hasattr(module_instance, "area"):
+                    module_instance.area = area
+
+                module_instance.save()
 
             for module in added_module_types:
                 if module.class_name == "LandUseChange":

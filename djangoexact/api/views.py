@@ -1655,7 +1655,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logger.warning(f"Invitation already {new_status.name}")
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
-        if new_status.name == utils.InvitationStatus.ACCEPTED.value:
+        does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
+        if new_status.name == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
             ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
