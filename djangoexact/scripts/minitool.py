@@ -961,8 +961,6 @@ class SmallFisheryProcessor(ModuleProcessor):
             gear_type_start,
             gear_type_w,
             fishery_type,
-            total_catch_yr_start,
-            total_catch_yr_w,
             climate_moisture,
             soil_type,
             region,
@@ -982,9 +980,9 @@ class SmallFisheryProcessor(ModuleProcessor):
             gear_type_start=gear_type_start,
             gear_type_w=gear_type_w,
             gear_type_wo=gear_type_start,
-            total_catch_yr_start=total_catch_yr_start,
-            total_catch_yr_w=total_catch_yr_w,
-            total_catch_yr_wo=total_catch_yr_start,
+            total_catch_yr_start=1,
+            total_catch_yr_w=1,
+            total_catch_yr_wo=1,
         )
         return module
 
@@ -997,8 +995,6 @@ class LargeFisheryProcessor(ModuleProcessor):
             gear_type_start,
             gear_type_w,
             fish_type,
-            total_catch_yr_start,
-            total_catch_yr_w,
             climate_moisture,
             soil_type,
             region,
@@ -1018,9 +1014,9 @@ class LargeFisheryProcessor(ModuleProcessor):
             gear_type_start=gear_type_start,
             gear_type_w=gear_type_w,
             gear_type_wo=gear_type_start,
-            total_catch_yr_start=total_catch_yr_start,
-            total_catch_yr_w=total_catch_yr_w,
-            total_catch_yr_wo=total_catch_yr_start,
+            total_catch_yr_start=1,
+            total_catch_yr_w=1,
+            total_catch_yr_wo=1,
         )
         return module
 
@@ -1594,8 +1590,6 @@ MODULE_CONFIGS = {
             "gear_type_start": models.SmallFisheryGearType.objects.all(),
             "gear_type_w": models.SmallFisheryGearType.objects.all(),
             "fishery_type": models.FisheryType.objects.all(),
-            "total_catch_yr_start": [1, 0],
-            "total_catch_yr_w": [1, 0],
         },
         "config_name": "small_fishery",
     },
