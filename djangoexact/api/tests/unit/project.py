@@ -649,3 +649,53 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(unlock_project_response.status_code, status.HTTP_403_FORBIDDEN)
 
         log.info("END - test_unlock_project_as_not_superuser_and_not_lock_holder")
+
+    def test_finalized_project_allows_only_is_public_changes(self):
+        """
+        Test that finalized projects can only be modified to change the is_public field.
+
+        This test verifies the business rule that finalized projects cannot be modified
+        except for their publication status (is_public field).
+        """
+        log.info("START - test_finalized_project_allows_only_is_public_changes")
+
+        # Create and finalize a project
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        # Test 1: Allow changing is_public from False to True
+        make_public_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_response.data["is_public"])
+
+        # Test 2: Allow changing is_public from True to False
+        make_private_response = self.edit_project(project, self.user, {"is_public": False})
+        self.assertEqual(make_private_response.status_code, status.HTTP_200_OK)
+        self.assertFalse(make_private_response.data["is_public"])
+
+        # Test 3: Block changing other fields (name)
+        modify_name_response = self.edit_project(project, self.user, {"name": "New Name"})
+        self.assertEqual(modify_name_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Finalized projects cannot be modified except for their publication status", str(modify_name_response.data))
+
+        # Test 4: Block changing multiple fields including is_public
+        modify_multiple_response = self.edit_project(project, self.user, {"is_public": True, "name": "New Name"})
+        self.assertEqual(modify_multiple_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Finalized projects cannot be modified except for their publication status", str(modify_multiple_response.data))
+
+        # Test 5: Block changing other fields (last_year_of_accounting)
+        modify_year_response = self.edit_project(project, self.user, {"last_year_of_accounting": 2025})
+        self.assertEqual(modify_year_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Finalized projects cannot be modified except for their publication status", str(modify_year_response.data))
+
+        # Test 6: Allow changing is_public when no other fields are modified
+        make_public_again_response = self.edit_project(project, self.user, {"is_public": True})
+        self.assertEqual(make_public_again_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(make_public_again_response.data["is_public"])
+
+        log.info("END - test_finalized_project_allows_only_is_public_changes")
