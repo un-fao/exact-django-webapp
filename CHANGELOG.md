@@ -1,3 +1,11 @@
+## 1.17.6 (2025-09-15)
+
+### Fix
+
+- **minitool**: reimport small fishery dataset with fixes
+- **project_invitations**: issue potentially causing multiple memberships of the same type to be created
+- **activity_builder**: issue causing unmodified module types not to receive the new area if changed in the builder
+
 ## 1.17.5 (2025-09-12)
 
 ## 1.17.4 (2025-09-12)
