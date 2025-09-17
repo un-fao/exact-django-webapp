@@ -1,3 +1,13 @@
+## 1.17.8 (2025-09-17)
+
+### Feat
+
+- **perennial cropland**: add scenario-based initial biomass t2 value
+
+### Fix
+
+- add fallback fetch to default module values for initial and final biomass
+
 ## 1.17.7 (2025-09-17)
 
 ### Feat
