@@ -1496,9 +1496,17 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_t2_w")
     agb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_t2_wo")
 
+    agb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_start")
+    agb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_w")
+    agb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_wo")
+
     bgb_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_start")
     bgb_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_w")
     bgb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_wo")
+
+    bgb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_start")
+    bgb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_w")
+    bgb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_wo")
 
     class Meta:
         abstract = True
