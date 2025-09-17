@@ -1674,7 +1674,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "livestock",
     },
-    "AnnualCropland": {  # BUG:
+    "AnnualCropland": {  # DONE
         "fields": {
             "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
             "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
@@ -1731,7 +1731,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "small_fishery",
     },
-    "LargeFishery": {  # Skip
+    "LargeFishery": {  # Skip # DONE
         "fields": {
             "gear_type_start": models.LargeFisheryGearType.objects.all(),
             "gear_type_w": models.LargeFisheryGearType.objects.all(),

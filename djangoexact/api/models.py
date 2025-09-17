@@ -1695,6 +1695,16 @@ class LandModuleFixed(LandModule):
         abstract = True
 
 
+class InitialBiomassMixin(models.Model):
+    initial_biomass_t2_start = models.FloatField(null=True, blank=True)
+    initial_biomass_t2_w = models.FloatField(null=True, blank=True)
+    initial_biomass_t2_wo = models.FloatField(null=True, blank=True)
+    initial_biomass_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_initial_biomass_t2_thread")
+
+    class Meta:
+        abstract = True
+
+
 class CropType(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
@@ -1821,7 +1831,7 @@ class PerennialCrop(models.Model):
     fire_periodicity_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_periodicity_t2_wo")
 
 
-class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
+class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability, InitialBiomassMixin):
     pass
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
