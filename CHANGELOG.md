@@ -1,3 +1,14 @@
+## 1.17.7 (2025-09-17)
+
+### Feat
+
+- **minitool**: implement progress tracking for permutation processing with resume capability
+- **project**: allow modifications to finalized projects only for publication status
+
+### Fix
+
+- **energy**: set electricity ef to zero for renewables and make it scenario-dependant
+
 ## 1.17.6 (2025-09-15)
 
 ### Fix
