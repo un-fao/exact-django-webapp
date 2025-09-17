@@ -475,6 +475,28 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         return Response(response_data)
 
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery")
+    @close_db_connections
+    def large_fishery(self, request, *args, **kwargs):
+        """
+        Get large fishery emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("large-fishery", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No large fishery data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
     @decorators.action(detail=False, methods=["get"], url_path="waterbody")
     @close_db_connections
     def waterbody(self, request, *args, **kwargs):
