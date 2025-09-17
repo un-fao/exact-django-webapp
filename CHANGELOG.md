@@ -1,3 +1,118 @@
+## 1.17.7 (2025-09-17)
+
+### Feat
+
+- **minitool**: implement progress tracking for permutation processing with resume capability
+- **project**: allow modifications to finalized projects only for publication status
+
+### Fix
+
+- **energy**: set electricity ef to zero for renewables and make it scenario-dependant
+
+## 1.17.6 (2025-09-15)
+
+### Fix
+
+- **minitool**: reimport small fishery dataset with fixes
+- **project_invitations**: issue potentially causing multiple memberships of the same type to be created
+- **activity_builder**: issue causing unmodified module types not to receive the new area if changed in the builder
+
+## 1.17.5 (2025-09-12)
+
+## 1.17.4 (2025-09-12)
+
+### Feat
+
+- **minitool**: add grassland dataset to database
+
+## 1.17.3 (2025-09-12)
+
+### Feat
+
+- **minitool**: add waterbody-related endpoints and sanitize db data
+- **minitool**: update database
+
+### Fix
+
+- **minitool**: remove grassland factory yield
+
+## 1.17.2 (2025-09-09)
+
+### Fix
+
+- **coastal_wetlands**: remove wrong multiplication from bgb default calculations in mathematical model
+
+## 1.17.1 (2025-09-05)
+
+### Fix
+
+- **minitool**: remove additional password from computation endpoint
+
+## 1.17.0 (2025-09-05)
+
+### Feat
+
+- add endpoint to run compute permutations from cloud
+
+## 1.16.3 (2025-09-04)
+
+### Feat
+
+- **minitool**: add complete small fishery dataset
+
+### Fix
+
+- **forest management**: create_agb_matrix function fix (growth end of year)
+- **perennial_cropland**: set tier2 values for start AGB and start BGB to None for all scenarios
+
+## 1.16.2 (2025-08-27)
+
+### Fix
+
+- **ProjectInvitationViewSet**: add request context to ProjectInvitationWriteSerializer
+
+## 1.16.1 (2025-08-27)
+
+### Fix
+
+- **minitool**: make module_type filter optional in compute endpoint
+
+### Refactor
+
+- **hih assessment**: enhance grouping logic to include all countries, ensuring assessments are correctly associated with their respective regions and countries
+
+## 1.16.0 (2025-08-27)
+
+### Feat
+
+- **minitool**: add compute action to EmissionScenarioViewSet for custom scenario calculations with validation and filtering
+- **minitool**: introduce EmissionScenario model and related serializers, views, and admin registration; remove legacy models
+- **minitool**: implement scenario computation script with comprehensive statistical analysis and documentation
+- **minitool**: register ChangeRecord model in admin with display and filter options
+- **minitool**: add forest management and fisheries logic and partial datasets
+- **minitool**: add Small and Large Fishery data builders and processors with configuration support
+- **minitool**: enhance error handling by extracting relevant traceback lines and improve progress bar display
+- **minitool**: add LandUseChange data aggregation and processing script
+
+### Fix
+
+- **report**: add missing total_emissions assignments causing vc modules not to be included in the activity totals
+- **report**: allow endpoint to only validate readines of filtered activities, if any
+- **minitool**: filter regions without countries to prevent "Project has no country" errors
+- **minitool**: support single fields without start/w/wo variations in field mapping system
+- **factories**: standardize area attribute to 1 for various land use factories
+
+### Perf
+
+- **minitool**: optimize permutation computation with dynamic worker scaling and performance monitoring
+
+## 1.15.16 (2025-08-21)
+
+### Fix
+
+- **oluc**: Correct fire emissions calculations
+- **general_functions**: fix cumulative maturity evaluation
+
 ## 1.15.15 (2025-08-20)
 
 ### Feat

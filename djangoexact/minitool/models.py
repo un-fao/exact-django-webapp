@@ -133,73 +133,14 @@ class ChangeAggregate(models.Model):
         return f"{self.field}: {self.from_value} -> {self.to_value} (Count: {self.count})"
 
 
-# Legacy model aliases for backward compatibility
-# These can be removed after updating all references
-class BaseChange(ChangeRecord):
-    """Legacy alias for backward compatibility."""
+class EmissionScenario(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        proxy = True
+    module_type = models.CharField(max_length=255)
+    changes = models.JSONField()
 
-
-class BaseChangeAggregate(ChangeAggregate):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class LivestockChange(ChangeRecord):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class LivestockChangeAggregate(ChangeAggregate):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class AnnualCroplandChange(ChangeRecord):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class AnnualCroplandChangeAggregate(ChangeAggregate):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class FloodedRiceChange(ChangeRecord):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class FloodedRiceChangeAggregate(ChangeAggregate):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class GrasslandChange(ChangeRecord):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
-
-
-class GrasslandChangeAggregate(ChangeAggregate):
-    """Legacy alias for backward compatibility."""
-
-    class Meta:
-        proxy = True
+    def __str__(self):
+        return self.name

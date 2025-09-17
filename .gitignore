@@ -111,3 +111,10 @@ CHANGES.md
 djangoexact/.commitizen/openai_cache.json
 djangoexact/djangoexact/.env.minitool
 djangoexact/minitool/data/*
+.cursor/
+ipcc_data/
+djangoexact/minitool_config.yml
+djangoexact/docs/architecture/caching_strategy.md
+djangoexact/docs/architecture/CONNECTION_MANAGEMENT.md
+gcp-deployment/
+djangoexact/api/management/commands/run_minitool_gcp.py

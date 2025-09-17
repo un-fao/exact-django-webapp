@@ -455,8 +455,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
-            if project.is_finalized and is_finalized is not False:
-                raise serializers.ValidationError("Finalized projects cannot be modified")
+            is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+
+            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+                raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
@@ -877,6 +879,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data.get("module_types", [])]
         has_luc_module = self.validated_data.get("land_use_change", False)
+        area = self.validated_data.get("area", None)
 
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
@@ -906,7 +909,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
                         luc.organic_soil = None
                         luc.save()
                         module_instance.land_use_change = None
-                        module_instance.save()
 
                 # TODO: Maybe instead of checking the module type we can check the instance class?
 
@@ -917,10 +919,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                 if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
                     module_instance.land_use_change = luc
-                    module_instance.save()
+
                 elif module_instance:
                     module_instance.land_use_change = None
-                    module_instance.save()
+
+                if area and hasattr(module_instance, "area"):
+                    module_instance.area = area
+
+                module_instance.save()
 
             for module in added_module_types:
                 if module.class_name == "LandUseChange":
@@ -1070,7 +1076,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
-        log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
 
     def get_last_cached_at(self, obj):
         return None

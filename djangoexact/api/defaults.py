@@ -1704,9 +1704,9 @@ class EnergyEntryDefaults(Defaults):
 
         # TODO: Remove this when the naming is streamlined
         self.country_t2_default = self.defaults.country.name
-        self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected.value
-        self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected.value
-        self.electricity_ef_t2_wo_default = self.defaults.electricity_ef_selected.value
+        self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected_start.value
+        self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected_w.value
+        self.electricity_ef_t2_wo_default = self.defaults.electricity_ef_selected_wo.value
         self.transmission_loss_t2_start_default = self.defaults.TRANSMISSION_LOSS
         self.transmission_loss_t2_w_default = self.defaults.TRANSMISSION_LOSS
         self.transmission_loss_t2_wo_default = self.defaults.TRANSMISSION_LOSS

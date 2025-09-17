@@ -1,5 +1,6 @@
 import firebase_admin.auth
 import api.models as models
+import minitool.models as minitool_models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
@@ -60,13 +61,12 @@ def cycle_all_modules_and_invalidate_cached_results():
     """
     Cycle all modules and invalidate cached results
     """
-    models.ForestDisturbance.objects.all().delete()
     for module_type in models.ModuleType.objects.all():
         log.debug(f"Invalidating cached results for {module_type}")
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
-            if hasattr(ModuleClass, "last_cached_at"):
-                ModuleClass.history.all().update(
+            if issubclass(ModuleClass, models.CachedResultMixin):
+                ModuleClass.objects.all().update(
                     updated_at=None,
                     last_cached_at=None,
                     cached_results_total=None,
@@ -75,13 +75,6 @@ def cycle_all_modules_and_invalidate_cached_results():
                     cached_results_by_activity_by_gas=None,
                     last_modified=None,
                 )
-                for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
-                    if hasattr(module, "invalidate_cached_results"):
-                        module.invalidate_cached_results()
-                    else:
-                        log.error(f"Could not find invalidate_cached_results for {module}")
-            else:
-                log.error(f"Could not find last_cached_at for {module_type}")
         except LookupError:
             log.error(f"Could not find module class for {module_type}")
 
@@ -294,7 +287,7 @@ def import_hih_links():
     """
     Import Hand in Hand links from the database
     """
-    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "ipcc_data/HIHLinks.json"))
     for index, row in df.iterrows():
         country = models.HandInHandCountry.objects.get(name=row["country"])
         link = row["link"]
@@ -408,6 +401,22 @@ def find_all_countries_with_no_ipcc_region():
         print(f"Deleted country: {country.name}")
 
 
+def sanitize_minitool_data():
+    """
+    Get all module type waterbody change aggregates and capitalize module type
+    """
+    print("Deleting smallfishery data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="smallfishery").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="smallfishery").delete()
+    print("Deleting Flooded Rice data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Flooded Rice").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Flooded Rice").delete()
+    print("Deleting Perennial Cropland data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    print("Done")
+
+
 def run():
     import os
 
@@ -416,6 +425,7 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
+        cycle_all_modules_and_invalidate_cached_results()
         pass
 
     if app_mode == "review":
@@ -424,8 +434,7 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        find_all_countries_with_no_region()
-        find_all_countries_with_no_ipcc_region()
+        sanitize_minitool_data()
         pass
 
     if app_mode == "test":

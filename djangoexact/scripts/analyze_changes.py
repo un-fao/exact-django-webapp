@@ -93,6 +93,10 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
             "grassland": "Grassland",
             "floodedrice": "Flooded Rice",
             "perennialcropland": "Perennial Cropland",
+            "forestmanagement": "Forest Management",
+            "smallfishery": "Small Fishery",
+            "largefishery": "Large Fishery",
+            "input": "Input",
         }
 
         # Only add to results if there are changes
@@ -135,6 +139,10 @@ def get_module_type_from_filename(file_path: str) -> str:
         "grassland": "Grassland",
         "floodedrice": "Flooded Rice",
         "perennialcropland": "Perennial Cropland",
+        "forestmanagement": "Forest Management",
+        "smallfishery": "Small Fishery",
+        "largefishery": "Large Fishery",
+        "input": "Input",
     }
 
     for key, value in module_mapping.items():
@@ -203,7 +211,8 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
 
 def run():
     try:
-        for module_type in ["annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock"]:
+        # "annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock",
+        for module_type in ["smallfishery"]:
             output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
         print(f"\nAnalysis completed successfully!")
         print(f"Output file: {output_path}")

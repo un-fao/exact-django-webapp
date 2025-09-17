@@ -1,0 +1,662 @@
+[
+{
+  "model": "api.moduletype",
+  "pk": 39,
+  "fields": {
+    "name": "Coastal Wetland",
+    "name_en": "Coastal Wetland",
+    "name_fr": null,
+    "name_es": "Humedales costeros",
+    "name_ru": null,
+    "class_name": "CoastalWetland",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 40,
+  "fields": {
+    "name": "Land Use Change",
+    "name_en": "Land Use Change",
+    "name_fr": null,
+    "name_es": "Cambio de uso de la tierra",
+    "name_ru": null,
+    "class_name": "LandUseChange",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 41,
+  "fields": {
+    "name": "Other Infrastructure",
+    "name_en": "Other Infrastructure",
+    "name_fr": null,
+    "name_es": "Otra Infraestructura",
+    "name_ru": null,
+    "class_name": "OtherInfrastructure",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 42,
+  "fields": {
+    "name": "Electricity",
+    "name_en": "Electricity",
+    "name_fr": null,
+    "name_es": "Electricidad",
+    "name_ru": null,
+    "class_name": "Electricity",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 43,
+  "fields": {
+    "name": "Fuel",
+    "name_en": "Fuel",
+    "name_fr": null,
+    "name_es": "Combustible",
+    "name_ru": null,
+    "class_name": "Fuel",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 44,
+  "fields": {
+    "name": "Input",
+    "name_en": "Input",
+    "name_fr": null,
+    "name_es": "Insumo",
+    "name_ru": null,
+    "class_name": "Input",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 45,
+  "fields": {
+    "name": "Input Entry",
+    "name_en": "Input Entry",
+    "name_fr": null,
+    "name_es": "Entrada de Insumos",
+    "name_ru": null,
+    "class_name": "InputEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 49,
+  "fields": {
+    "name": "Forest Disturbance",
+    "name_en": "Forest Disturbance",
+    "name_fr": null,
+    "name_es": "Perturbaciones en bosques",
+    "name_ru": null,
+    "class_name": "ForestDisturbance",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 51,
+  "fields": {
+    "name": "OtherLandUse",
+    "name_en": "OtherLandUse",
+    "name_fr": null,
+    "name_es": "Otros Usos de la Tierra",
+    "name_ru": null,
+    "class_name": "OtherLandUse",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 48,
+  "fields": {
+    "name": "Flooded Rice Minor Season",
+    "name_en": "Flooded Rice Minor Season",
+    "name_fr": null,
+    "name_es": "Estación secundaria de Arroz inundado",
+    "name_ru": null,
+    "class_name": "MinorSeasonFloodedRice",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 8,
+  "fields": {
+    "name": "Livestock",
+    "name_en": "Livestock",
+    "name_fr": null,
+    "name_es": "Ganado",
+    "name_ru": null,
+    "class_name": "Livestock",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 19,
+  "fields": {
+    "name": "Waterbody",
+    "name_en": "Waterbody",
+    "name_fr": null,
+    "name_es": "Masa de Agua",
+    "name_ru": null,
+    "class_name": "Waterbody",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 20,
+  "fields": {
+    "name": "Small Fishery",
+    "name_en": "Small Fishery",
+    "name_fr": null,
+    "name_es": "Pesca Artesanal",
+    "name_ru": null,
+    "class_name": "SmallFishery",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 21,
+  "fields": {
+    "name": "Large Fishery",
+    "name_en": "Large Fishery",
+    "name_fr": null,
+    "name_es": "Pesca Industrial",
+    "name_ru": null,
+    "class_name": "LargeFishery",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 22,
+  "fields": {
+    "name": "Aquaculture",
+    "name_en": "Aquaculture",
+    "name_fr": null,
+    "name_es": "Acuicultura",
+    "name_ru": null,
+    "class_name": "Aquaculture",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 24,
+  "fields": {
+    "name": "Forest Management",
+    "name_en": "Forest Management",
+    "name_fr": null,
+    "name_es": "Gestión forestal",
+    "name_ru": null,
+    "class_name": "ForestManagement",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 31,
+  "fields": {
+    "name": "Road",
+    "name_en": "Road",
+    "name_fr": null,
+    "name_es": "Carretera",
+    "name_ru": null,
+    "class_name": "Road",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 32,
+  "fields": {
+    "name": "Building",
+    "name_en": "Building",
+    "name_fr": null,
+    "name_es": "Construcción",
+    "name_ru": null,
+    "class_name": "Building",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 34,
+  "fields": {
+    "name": "Energy",
+    "name_en": "Energy",
+    "name_fr": null,
+    "name_es": "Energía",
+    "name_ru": null,
+    "class_name": "Energy",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 35,
+  "fields": {
+    "name": "Irrigation",
+    "name_en": "Irrigation",
+    "name_fr": null,
+    "name_es": "Riego",
+    "name_ru": null,
+    "class_name": "Irrigation",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 36,
+  "fields": {
+    "name": "Irrigation System",
+    "name_en": "Irrigation System",
+    "name_fr": null,
+    "name_es": "Sistema de Riego",
+    "name_ru": null,
+    "class_name": "IrrigationSystem",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 37,
+  "fields": {
+    "name": "Operation Phase of Irrigation",
+    "name_en": "Operation Phase of Irrigation",
+    "name_fr": null,
+    "name_es": "Fase de Operación del Riego",
+    "name_ru": null,
+    "class_name": "IrrigationPhase",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 6,
+  "fields": {
+    "name": "Flooded Rice",
+    "name_en": "Flooded Rice",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "FloodedRice",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 7,
+  "fields": {
+    "name": "Grassland",
+    "name_en": "Grassland",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Grassland",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 38,
+  "fields": {
+    "name": "Organic Soil",
+    "name_en": "Organic Soil",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "OrganicSoil",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 23,
+  "fields": {
+    "name": "Settlement",
+    "name_en": "Settlement",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Settlement",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 33,
+  "fields": {
+    "name": "Set Aside",
+    "name_en": "Set Aside",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "SetAside",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 50,
+  "fields": {
+    "name": "Plantation",
+    "name_en": "Plantation",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Plantation",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 5,
+  "fields": {
+    "name": "Perennial Cropland",
+    "name_en": "Perennial Cropland",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "PerennialCropland",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 4,
+  "fields": {
+    "name": "Annual Cropland",
+    "name_en": "Annual Cropland",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "AnnualCropland",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 30,
+  "fields": {
+    "name": "Other Land",
+    "name_en": "Other Land",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "OtherLand",
+    "is_luc": true,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 47,
+  "fields": {
+    "name": "Perennial Cropland Minor Season",
+    "name_en": "Perennial Cropland Minor Season",
+    "name_fr": null,
+    "name_es": "Estación secundaria de Cultivo perenne",
+    "name_ru": null,
+    "class_name": "MinorSeasonPerennialCropland",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 52,
+  "fields": {
+    "name": "Annual Cropland Minor Season",
+    "name_en": "Annual Cropland Minor Season",
+    "name_fr": null,
+    "name_es": "Estación secundaria de cultivos anuales",
+    "name_ru": null,
+    "class_name": "MinorSeasonAnnualCropland",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 59,
+  "fields": {
+    "name": "Processing Entry",
+    "name_en": "Processing Entry",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "ProcessingEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 60,
+  "fields": {
+    "name": "Transport Entry",
+    "name_en": "Transport Entry",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "TransportEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 61,
+  "fields": {
+    "name": "Storage Entry",
+    "name_en": "Storage Entry",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "StorageEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 62,
+  "fields": {
+    "name": "Packaging Entry",
+    "name_en": "Packaging Entry",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "PackagingEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 58,
+  "fields": {
+    "name": "Transport",
+    "name_en": "Transport",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Transport",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 57,
+  "fields": {
+    "name": "Packaging",
+    "name_en": "Packaging",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Packaging",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 56,
+  "fields": {
+    "name": "Processing",
+    "name_en": "Processing",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Processing",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 55,
+  "fields": {
+    "name": "Storage",
+    "name_en": "Storage",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "Storage",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 63,
+  "fields": {
+    "name": "Energy Entry",
+    "name_en": "Energy Entry",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "class_name": "EnergyEntry",
+    "is_luc": false,
+    "is_submodule": true,
+    "is_container": false
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 53,
+  "fields": {
+    "name": "Project",
+    "name_en": "Project",
+    "name_fr": null,
+    "name_es": "Proyecto",
+    "name_ru": null,
+    "class_name": "Project",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": true
+  }
+},
+{
+  "model": "api.moduletype",
+  "pk": 54,
+  "fields": {
+    "name": "Activity",
+    "name_en": "Activity",
+    "name_fr": null,
+    "name_es": "Actividad",
+    "name_ru": null,
+    "class_name": "Activity",
+    "is_luc": false,
+    "is_submodule": false,
+    "is_container": true
+  }
+}
+]

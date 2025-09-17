@@ -1,1 +1,0 @@
-[{"model": "api.fisherytype", "pk": 1, "fields": {"name": "Marine"}}, {"model": "api.fisherytype", "pk": 2, "fields": {"name": "Inland"}}, {"model": "api.fisherytype", "pk": 3, "fields": {"name": "Unmotorized Fishing"}}]
