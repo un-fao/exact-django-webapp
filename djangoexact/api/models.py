@@ -1474,9 +1474,12 @@ class SingleBiomassModule(BiomassModule):
         try:
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
-            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
-            return BiomassModel()
+            try:
+                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=LandUseType.objects.get(class_name=self.__class__.__name__))
+            except BiomassModel.DoesNotExist:
+                if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                    raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+                return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
@@ -1695,16 +1698,6 @@ class LandModuleFixed(LandModule):
         abstract = True
 
 
-class InitialBiomassMixin(models.Model):
-    initial_biomass_t2_start = models.FloatField(null=True, blank=True)
-    initial_biomass_t2_w = models.FloatField(null=True, blank=True)
-    initial_biomass_t2_wo = models.FloatField(null=True, blank=True)
-    initial_biomass_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_initial_biomass_t2_thread")
-
-    class Meta:
-        abstract = True
-
-
 class CropType(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
@@ -1831,7 +1824,7 @@ class PerennialCrop(models.Model):
     fire_periodicity_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_periodicity_t2_wo")
 
 
-class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability, InitialBiomassMixin):
+class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
