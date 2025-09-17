@@ -455,8 +455,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
-            if project.is_finalized and is_finalized is not False:
-                raise serializers.ValidationError("Finalized projects cannot be modified")
+            is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+
+            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+                raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()

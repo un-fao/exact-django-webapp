@@ -14,6 +14,7 @@ from pathlib import Path
 from enum import Enum
 import io
 import yaml
+import json
 from google.cloud import storage
 
 # Django setup
@@ -72,6 +73,100 @@ class DataProcessorError(Exception):
     """Custom exception for data processing errors"""
 
     pass
+
+
+class ProgressTracker:
+    """Tracks and saves progress for permutation processing"""
+
+    def __init__(self, module_name: str, progress_dir: str = "scripts/minitool/progress"):
+        self.module_name = module_name
+        self.progress_dir = Path(progress_dir)
+        self.progress_dir.mkdir(parents=True, exist_ok=True)
+        self.progress_file = self.progress_dir / f"{module_name.lower()}_progress.json"
+        self.current_index = 0
+        self.total_permutations = 0
+        self.start_time = None
+        self.last_save_time = time.time()
+        self.save_interval = 10  # Save progress every 10 seconds
+
+    def load_progress(self) -> bool:
+        """Load progress from file. Returns True if progress was loaded, False otherwise."""
+        if not self.progress_file.exists():
+            return False
+
+        try:
+            with open(self.progress_file, "r") as f:
+                data = json.load(f)
+                self.current_index = data.get("current_index", 0)
+                self.total_permutations = data.get("total_permutations", 0)
+                self.start_time = data.get("start_time", time.time())
+                logger.info(f"Loaded progress for {self.module_name}: {self.current_index:,}/{self.total_permutations:,} permutations processed")
+                return True
+        except Exception as e:
+            logger.warning(f"Failed to load progress for {self.module_name}: {e}")
+            return False
+
+    def save_progress(self, force: bool = False):
+        """Save current progress to file"""
+        current_time = time.time()
+        if not force and (current_time - self.last_save_time) < self.save_interval:
+            return
+
+        try:
+            data = {
+                "current_index": self.current_index,
+                "total_permutations": self.total_permutations,
+                "start_time": self.start_time or time.time(),
+                "last_updated": current_time,
+                "module_name": self.module_name,
+            }
+            with open(self.progress_file, "w") as f:
+                json.dump(data, f, indent=2)
+            self.last_save_time = current_time
+            logger.info(f"Progress saved for {self.module_name}: {self.current_index}/{self.total_permutations}")
+        except Exception as e:
+            logger.warning(f"Failed to save progress for {self.module_name}: {e}")
+
+    def update_progress(self, index: int, total: int):
+        """Update current progress"""
+        self.current_index = index
+        self.total_permutations = total
+        if self.start_time is None:
+            self.start_time = time.time()
+        self.save_progress()
+
+    def increment_progress(self):
+        """Increment progress by 1"""
+        self.current_index += 1
+        self.save_progress()
+        # Only log every 100 increments to avoid spam
+        if self.current_index % 100 == 0:
+            logger.info(f"Progress: {self.module_name} at {self.current_index}/{self.total_permutations}")
+
+    def get_resume_index(self) -> int:
+        """Get the index to resume from"""
+        return self.current_index
+
+    def clear_progress(self):
+        """Clear progress file"""
+        if self.progress_file.exists():
+            self.progress_file.unlink()
+            logger.info(f"Cleared progress for {self.module_name}")
+
+    def get_elapsed_time(self) -> float:
+        """Get elapsed time since start"""
+        if self.start_time is None:
+            return 0
+        return time.time() - self.start_time
+
+    def get_eta(self) -> Optional[float]:
+        """Get estimated time to completion in seconds"""
+        if self.current_index == 0 or self.total_permutations == 0:
+            return None
+        elapsed = self.get_elapsed_time()
+        rate = self.current_index / elapsed if elapsed > 0 else 0
+        remaining = self.total_permutations - self.current_index
+        return remaining / rate if rate > 0 else None
 
 
 @dataclass
@@ -1359,9 +1454,16 @@ class PermutationComputer:
 
         connections.close_all()
 
-    def chunked_product(self, *iterables, chunk_size: int = 1000):
-        """Yield chunks of Cartesian product"""
+    def chunked_product(self, *iterables, chunk_size: int = 1000, start_index: int = 0):
+        """Yield chunks of Cartesian product, optionally starting from a specific index"""
         it = itertools.product(*iterables)
+
+        # Skip to the start index if specified
+        if start_index > 0:
+            logger.info(f"Skipping to index {start_index:,} in permutation generation...")
+            # Use islice to skip the first start_index items
+            it = itertools.islice(it, start_index, None)
+
         while True:
             chunk = list(itertools.islice(it, chunk_size))
             if not chunk:
@@ -1369,7 +1471,7 @@ class PermutationComputer:
             yield chunk
 
     def compute_permutations(
-        self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None
+        self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None, resume: bool = False
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Compute permutations for a model"""
         import api.models as models
@@ -1434,6 +1536,24 @@ class PermutationComputer:
         total = math.prod(len(x) for x in iterables)
         logger.info(f"Total permutations (theoretical): {total:,}")
 
+        # Initialize progress tracker
+        progress_tracker = ProgressTracker(model.__name__)
+        start_index = 0
+
+        logger.info(f"Progress tracker initialized for {model.__name__}")
+        logger.info(f"Progress file path: {progress_tracker.progress_file}")
+
+        if resume:
+            if progress_tracker.load_progress():
+                start_index = progress_tracker.get_resume_index()
+                logger.info(f"Resuming {model.__name__} from permutation {start_index:,}")
+            else:
+                logger.info(f"No previous progress found for {model.__name__}, starting from beginning")
+        else:
+            # Clear any existing progress if not resuming
+            progress_tracker.clear_progress()
+            logger.info(f"Starting fresh computation for {model.__name__}")
+
         data = []
         errors_data = []
 
@@ -1450,13 +1570,18 @@ class PermutationComputer:
             processed_count = 0
 
             with ProcessPoolExecutor(max_workers=max_workers, initializer=self.django_initializer) as executor:
-                pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
+                # Initialize progress tracker with total
+                progress_tracker.update_progress(start_index, total)
+                # Force save initial progress
+                progress_tracker.save_progress(force=True)
+
+                pbar = tqdm(total=total, initial=start_index, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
                 # Optimize chunk size based on number of workers
                 optimal_chunk_size = max(chunk_size, chunk_size // max_workers * max_workers)
                 logger.info(f"Using chunk size: {optimal_chunk_size}")
 
-                for chunk in self.chunked_product(*iterables, chunk_size=optimal_chunk_size):
+                for chunk in self.chunked_product(*iterables, chunk_size=optimal_chunk_size, start_index=start_index):
                     # Use submit instead of map for better load balancing
                     futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
 
@@ -1480,11 +1605,18 @@ class PermutationComputer:
                         pbar.update(1)
                         processed_count += 1
 
+                        # Update progress tracker
+                        progress_tracker.increment_progress()
+
                         # Log performance every 1000 processed items
                         if processed_count % 1000 == 0:
                             elapsed_time = time.time() - start_time
                             rate = processed_count / elapsed_time if elapsed_time > 0 else 0
-                            logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec")
+                            eta = progress_tracker.get_eta()
+                            eta_str = f", ETA: {eta / 60:.1f}min" if eta else ""
+                            logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec{eta_str}")
+                            # Force save progress every 1000 items
+                            progress_tracker.save_progress(force=True)
                     else:
                         continue
                     break
@@ -1493,6 +1625,9 @@ class PermutationComputer:
 
         except KeyboardInterrupt:
             logger.info(f"\nKeyboard interrupt detected! Returning {len(data)} computed rows...")
+            # Force save progress on interrupt
+            progress_tracker.save_progress(force=True)
+            logger.info(f"Progress saved at permutation {progress_tracker.current_index:,}")
             try:
                 pbar.close()
             except Exception:
@@ -1507,6 +1642,9 @@ class PermutationComputer:
         total_processed = len(data) + len(errors_data)
         success_rate = (len(data) / total_processed * 100) if total_processed > 0 else 0
         logger.info(f"Completed {model.__name__}: {len(data):,} successful, {len(errors_data):,} errors ({success_rate:.1f}% success rate)")
+
+        # Clear progress file on successful completion
+        progress_tracker.clear_progress()
 
         return data, errors_data
 
@@ -1598,8 +1736,6 @@ MODULE_CONFIGS = {
             "gear_type_start": models.LargeFisheryGearType.objects.all(),
             "gear_type_w": models.LargeFisheryGearType.objects.all(),
             "fish_type": models.FishType.objects.all(),
-            "total_catch_yr_start": [1, 0],
-            "total_catch_yr_w": [1, 0],
         },
         "config_name": "large_fishery",
     },
@@ -1676,11 +1812,11 @@ TODO: Missing all Value Chain modules.
 """
 
 
-def run():
+def run_minitool(resume: bool = False):
     """Main execution function"""
-    # Suppress log noise
-    logging.getLogger().setLevel(logging.CRITICAL)
-    logger.info("Running script without noisy logging...")
+    # Set logging level to INFO to see progress messages
+    logging.getLogger().setLevel(logging.INFO)
+    logger.info("Running script with progress logging...")
 
     # Initialize components
     data_builder_registry = ModuleDataBuilderRegistry()
@@ -1699,7 +1835,9 @@ def run():
         for module_name, config in MODULE_CONFIGS.items():
             if CONFIG[config["config_name"]]:
                 model_class = getattr(models, module_name)
-                data, errors = permutation_computer.compute_permutations(config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"])
+                data, errors = permutation_computer.compute_permutations(
+                    config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume
+                )
                 if data or errors:
                     data_manager.save_data(data, errors, module_name, local=True)
 
@@ -1707,3 +1845,36 @@ def run():
         logger.info("\nKeyboard interrupt detected in main run function!")
         logger.info("Script terminated by user. Any completed computations have been saved.")
         return
+
+
+# Django runscript entry point
+def run(*args):
+    """Django runscript entry point that handles command line arguments"""
+
+    resume = False
+
+    if len(args) > 0:
+        resume = "resume" in args
+        clear_progress = "clear-progress" in args
+
+        print(f"Resume: {resume}")
+        print(f"Clear progress: {clear_progress}")
+
+        if clear_progress:
+            clear_all_progress()
+
+        print(f"Running minitool with resume: {resume}")
+
+    return run_minitool(resume=resume)
+
+
+def clear_all_progress():
+    """Clear all progress files"""
+    progress_dir = Path("scripts/minitool/progress")
+    if progress_dir.exists():
+        for progress_file in progress_dir.glob("*_progress.json"):
+            progress_file.unlink()
+            logger.info(f"Cleared progress file: {progress_file}")
+        logger.info("All progress files cleared. Starting fresh computation.")
+    else:
+        logger.info("No progress files found to clear.")

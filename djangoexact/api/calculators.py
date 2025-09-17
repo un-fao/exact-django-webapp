@@ -3793,7 +3793,10 @@ class EnergyEntryCalculator(BaseCalculator):
 
         self.TRANSMISSION_LOSS = ApplicationParameter.objects.get(name="transmission_loss").value
         self.electricity_ef_default: ipcc.ElectricityEmission = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
+        self.electricity_ef_selected_start: DefaultValue = DefaultValue()
+        self.electricity_ef_selected_w: DefaultValue = DefaultValue()
+        self.electricity_ef_selected_wo: DefaultValue = DefaultValue()
 
         # Fuel Component
 
@@ -3867,9 +3870,20 @@ class EnergyEntryCalculator(BaseCalculator):
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
             if self.module.ef_source.name == "Operating Margin":
-                self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_start.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_w.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_wo.value = self.electricity_ef_default.operating_margin
             else:
-                self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_start.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
+
+            if self.module.fuel_type_start.name in ["Renewable"]:
+                self.electricity_ef_selected_start.value = 0
+            if self.module.fuel_type_w.name in ["Renewable"]:
+                self.electricity_ef_selected_w.value = 0
+            if self.module.fuel_type_wo.name in ["Renewable"]:
+                self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "electricity_ef_t2")
@@ -3914,7 +3928,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_start() and not self.is_fuel_start:
             log.debug("IS START - NO FUEL")
             self.inputs_start = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_start.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_start,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
@@ -3954,7 +3968,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_with() and not self.is_fuel_w:
             log.debug("IS WITH - NO FUEL")
             self.inputs_w = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_w.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
@@ -3994,7 +4008,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_without() and not self.is_fuel_wo:
             log.debug("IS WITHOUT - NO FUEL")
             self.inputs_wo = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_wo.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
