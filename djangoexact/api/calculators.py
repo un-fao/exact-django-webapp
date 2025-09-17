@@ -1842,9 +1842,11 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.soc_t2_w = getattr(self.module, "soc_t2_w", None) or self.parent.soc_t2_w
         self.soc_t2_wo = getattr(self.module, "soc_t2_wo", None) or self.parent.soc_t2_wo
 
+        self.agb_rate_t2_start = getattr(self.module, "agb_rate_t2_start", None) or self.parent.agb_rate_t2_start
+        self.agb_rate_t2_w = getattr(self.module, "agb_rate_t2_w", None) or self.parent.agb_rate_t2_w
+        self.agb_rate_t2_wo = getattr(self.module, "agb_rate_t2_wo", None) or self.parent.agb_rate_t2_wo
+
         self.agb_t2_start = getattr(self.module, "agb_t2_start", None) or self.parent.agb_t2_start
-        self.agb_t2_w = getattr(self.module, "agb_t2_w", None) or self.parent.agb_t2_w
-        self.agb_t2_wo = getattr(self.module, "agb_t2_wo", None) or self.parent.agb_t2_wo
 
         self.agb_max_t2_start = getattr(self.module, "agb_max_t2_start", None) or self.parent.agb_max_t2_start
         self.agb_max_t2_w = getattr(self.module, "agb_max_t2_w", None) or self.parent.agb_max_t2_w
@@ -1893,7 +1895,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.agb_start_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_start is None:
+                if self.agb_rate_t2_start is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_start} in {self.climate} climate does not exist for start scenario. Please provide Tier 2 values.")
 
             try:
@@ -1916,7 +1918,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.agb_w_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_w is None:
+                if self.agb_rate_t2_w is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_w} in {self.climate} climate does not exist for with scenario. Please provide Tier 2 values.")
 
             try:
@@ -1937,7 +1939,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.agb_wo_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_wo is None:
+                if self.agb_rate_t2_wo is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
@@ -2118,7 +2120,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
                 "t_biomass_tier_2": self.residue_availability_t2_start,
                 "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.agb_t2_start,
+                "agb_rate_tier_2": self.agb_rate_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_start,
@@ -2142,7 +2144,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": None,
+                "agb_start_tier_2": self.agb_t2_start,
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "agb_end_default": agb_end.value,
@@ -2184,7 +2186,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
                 "t_biomass_tier_2": self.residue_availability_t2_start,
                 "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.agb_t2_start,
+                "agb_rate_tier_2": self.agb_rate_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_start,
@@ -2208,7 +2210,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": None,
+                "agb_start_tier_2": self.agb_t2_start,
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "agb_end_default": agb_end.value,
@@ -2254,7 +2256,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_w,
                 "t_biomass_tier_2": self.residue_availability_t2_w,
                 "agb_rate_default": self.agb_w_default.value,
-                "agb_rate_tier_2": self.agb_t2_w,
+                "agb_rate_tier_2": self.agb_rate_t2_w,
                 "agb_maximum_c": self.agb_max_w_default.value,
                 "bgb_rate_default": self.bgb_w_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_w,
@@ -2279,7 +2281,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": None,
+                "agb_start_tier_2": self.agb_t2_start,
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2323,7 +2325,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_wo,
                 "t_biomass_tier_2": self.residue_availability_t2_wo,
                 "agb_rate_default": self.agb_wo_default.value,
-                "agb_rate_tier_2": self.agb_t2_wo,
+                "agb_rate_tier_2": self.agb_rate_t2_wo,
                 "agb_maximum_c": self.agb_max_wo_default.value,
                 "bgb_rate_default": self.bgb_wo_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_wo,
@@ -2348,7 +2350,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": None,
+                "agb_start_tier_2": self.agb_t2_start,
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,

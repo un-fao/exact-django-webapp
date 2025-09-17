@@ -1474,9 +1474,12 @@ class SingleBiomassModule(BiomassModule):
         try:
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
-            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
-            return BiomassModel()
+            try:
+                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=LandUseType.objects.get(class_name=self.__class__.__name__))
+            except BiomassModel.DoesNotExist:
+                if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                    raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+                return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
@@ -1493,9 +1496,17 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_t2_w")
     agb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_t2_wo")
 
+    agb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_start")
+    agb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_w")
+    agb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_wo")
+
     bgb_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_start")
     bgb_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_w")
     bgb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_wo")
+
+    bgb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_start")
+    bgb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_w")
+    bgb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_wo")
 
     class Meta:
         abstract = True
