@@ -1474,9 +1474,12 @@ class SingleBiomassModule(BiomassModule):
         try:
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
-            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
-            return BiomassModel()
+            try:
+                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=LandUseType.objects.get(class_name=self.__class__.__name__))
+            except BiomassModel.DoesNotExist:
+                if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                    raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+                return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
@@ -1493,9 +1496,17 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_t2_w")
     agb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_t2_wo")
 
+    agb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_start")
+    agb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_w")
+    agb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_wo")
+
     bgb_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_start")
     bgb_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_w")
     bgb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_wo")
+
+    bgb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_start")
+    bgb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_w")
+    bgb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_wo")
 
     class Meta:
         abstract = True
@@ -2364,19 +2375,19 @@ class Fishery(Module):
     refrigerant_pc_start = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_start")
     refrigerant_pc_w = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_w")
     refrigerant_pc_wo = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_wo")
-    refrigerant_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
+    refrigerant_pc_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
 
     refrigerant_gwp = models.FloatField(null=True, blank=True, default=1810, verbose_name="refrigerant_gwp")
 
     total_catch_yr_start = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_start")
     total_catch_yr_w = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_w")
     total_catch_yr_wo = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_wo")
-    total_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
+    total_catch_yr_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_yr_thread", on_delete=models.SET_NULL)
 
     ice_preserved_catch_pc_start = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_start")
     ice_preserved_catch_pc_w = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_w")
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_wo")
-    ice_preserved_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
+    ice_preserved_catch_pc_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_pc_thread", on_delete=models.SET_NULL)
 
     energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name="energy_emission_factor_co2_t2_start")
     energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name="energy_emission_factor_co2_t2_w")

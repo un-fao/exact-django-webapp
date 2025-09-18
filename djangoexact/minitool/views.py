@@ -10,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q, Count
 from django.db import connection
+from django.core.cache import cache
 from rest_framework.pagination import PageNumberPagination
 import api.models as api_models
 import statistics
@@ -279,6 +280,15 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         Get available module types in statistics/modules.
         Returns a list of all available module types with their details.
         """
+        # Cache settings
+        cache_key = "minitool_module_types"
+        cache_timeout = 60 * 15  # 15 minutes
+
+        # Try to get cached data first
+        cached_data = cache.get(cache_key)
+        if cached_data is not None:
+            return Response(cached_data)
+
         # Get all unique module types from the database
         module_types = models.ChangeAggregate.objects.values_list("module_type", flat=True).distinct()
 
@@ -319,7 +329,12 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
             available_modules.append(module_data)
 
-        return Response({"available_modules": available_modules, "total_modules": len(available_modules), "modules": [module["id"] for module in available_modules]})
+        response_data = {"available_modules": available_modules, "total_modules": len(available_modules), "modules": [module["id"] for module in available_modules]}
+
+        # Cache the response data
+        cache.set(cache_key, response_data, cache_timeout)
+
+        return Response(response_data)
 
     @decorators.action(detail=False, methods=["get"])
     @close_db_connections
@@ -466,6 +481,28 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
 
         if total_records == 0:
             return Response({"error": "No small fishery data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
+
+        # Aggregate by change
+        aggregated_data = self.aggregate_by_change(queryset)
+
+        # Prepare response
+        response_data = {"filters_applied": filters, "total_records_analyzed": total_records, "aggregated_results": aggregated_data}
+
+        return Response(response_data)
+
+    @decorators.action(detail=False, methods=["get"], url_path="large-fishery")
+    @close_db_connections
+    def large_fishery(self, request, *args, **kwargs):
+        """
+        Get large fishery emissions modules data with filtering and aggregation.
+        """
+        queryset, filters = self.get_filtered_queryset("large-fishery", request)
+
+        # Get total count
+        total_records = queryset.count()
+
+        if total_records == 0:
+            return Response({"error": "No large fishery data found", "filters_applied": filters, "total_records_analyzed": 0, "aggregated_results": {}}, status=status.HTTP_404_NOT_FOUND)
 
         # Aggregate by change
         aggregated_data = self.aggregate_by_change(queryset)

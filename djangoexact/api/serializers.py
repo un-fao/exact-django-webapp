@@ -804,18 +804,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
     def edit_existing_luc(self):
         luc: LandUseChange = self.instance.landusechange.first()
 
-        self.instance.module_types.remove(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id)
-
-        luc_modules = luc.get_module_types()
-        new_modules = list(self.validated_data["land_use_change"].values())
-
-        difference = list(set(luc_modules) - set(new_modules))
-
-        for module in difference:
-            module_instance = getattr(self.instance, module.class_name.lower())
-            if module_instance.exists():
-                module_instance.first().delete()
-
         luc.module_type_start = self.validated_data["land_use_change"]["module_type_start"]
         luc.module_type_w = self.validated_data["land_use_change"]["module_type_w"]
         luc.module_type_wo = self.validated_data["land_use_change"]["module_type_wo"]
@@ -823,6 +811,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         luc.save()
         self.instance.save()
+
+        return luc
 
     def delete_existing_luc(self):
         luc: LandUseChange = self.instance.landusechange.first()
@@ -873,6 +863,23 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             module.save()
 
+    def create_module(self, module_type: ModuleType, in_luc: bool = False, luc: LandUseChange = None, area: float = None):
+        ModuleClass = apps.get_model("api", module_type.class_name)
+        is_organic_soil = module_type.class_name == "OrganicSoil"
+
+        module_data = {"activity": self.instance}
+        if in_luc:
+            module_data["land_use_change"] = luc
+
+        if area and hasattr(ModuleClass, "area"):
+            module_data["area"] = area
+
+        module_instance = ModuleClass.objects.create(**module_data)
+
+        if is_organic_soil and luc:
+            luc.organic_soil = module_instance
+            luc.save()
+
     @transaction.atomic
     def save(self, **kwargs):
         self.validate_total_project_cost()
@@ -882,86 +889,84 @@ class ActivityBuilderSerializer(serializers.Serializer):
         area = self.validated_data.get("area", None)
 
         if self.instance:
-            old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
+            # LUC
+            luc: LandUseChange = self.instance.landusechange.first()
+            luc_module_type = ModuleType.objects.get(class_name="LandUseChange")
+            old_luc_module_types = list(luc.get_module_types()) + [luc_module_type] if luc else []
+            new_luc_module_types = list(self.validated_data["land_use_change"].values()) + [luc_module_type] if has_luc_module else []
+            removed_luc_module_types = list(set(old_luc_module_types) - set(new_luc_module_types))
+            final_luc_module_types = list(set(old_luc_module_types) & set(new_luc_module_types) - set(removed_luc_module_types))
+            was_luc_removed = luc and not has_luc_module
+            was_luc_added = not luc and has_luc_module
+
+            if new_luc_module_types:
+                luc = self.edit_existing_luc()
+            elif was_luc_removed:
+                self.delete_existing_luc()
+            elif was_luc_added:
+                luc = self.handle_luc_module(self.instance, create_organic_soil)
+
+            # Other modules
+            old_module_types = list(map(lambda module: module, self.instance.module_types.all())) + list(map(lambda module: module, old_luc_module_types))
+            new_module_types = list(map(lambda module: module, self.validated_data["module_types"])) + list(map(lambda module: module, new_luc_module_types))
             create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
-            luc = self.instance.landusechange.first()
-
-            luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(
-                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
-            )
-
             kept_module_types = list(set(old_module_types) & set(new_module_types))
-            removed_module_types = list(set(old_module_types) - set(new_module_types))
             added_module_types = list(set(new_module_types) - set(old_module_types))
+            final_module_types = list(set(list(kept_module_types) + list(added_module_types)))
+            removed_module_types = list(set(old_module_types) - set(final_module_types))
 
-            for module in kept_module_types:
-                if module.class_name == "LandUseChange":
+            for module_type in final_module_types:
+                module_type: ModuleType
+                if module_type.class_name == "LandUseChange":
                     continue
 
-                ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.filter(activity=self.instance).first()
-
-                if module.class_name == "OrganicSoil":
-                    if luc.module_type not in kept_module_types:
-                        luc.organic_soil = None
-                        luc.save()
-                        module_instance.land_use_change = None
-
-                # TODO: Maybe instead of checking the module type we can check the instance class?
-
-                if luc and luc.module_type not in kept_module_types:
-                    module_instance.land_use_change = None
-                    module_instance.save()
+                if module_type in added_module_types:
+                    self.create_module(module_type, in_luc=module_type in new_luc_module_types, luc=luc, area=area)
                     continue
 
-                if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
+                ModuleClass = apps.get_model("api", module_type.class_name)
+                module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
+
+                # If module is part of LUC, set the land_use_change to the new LUC
+                if module_type in final_luc_module_types:
                     module_instance.land_use_change = luc
 
-                elif module_instance:
+                    # If still part of LUC, update the area
+                    if area and hasattr(module_instance, "area"):
+                        module_instance.area = area
+
+                # If not deleted but not part of LUC anymore, set the land_use_change to None to avoid orphaned modules
+                if module_type in kept_module_types and module_type in old_luc_module_types and module_type not in final_luc_module_types:
                     module_instance.land_use_change = None
 
-                if area and hasattr(module_instance, "area"):
-                    module_instance.area = area
+                if module_type.class_name == "OrganicSoil":
+                    # If Organic Soil and LUC was removed, set the organic_soil to None
+                    if was_luc_removed:
+                        module_instance.organic_soil = None
+                    # If Organic Soil and LUC was added, set the organic_soil to the new Organic Soil
+                    else:
+                        luc.organic_soil = module_instance
+                        luc.save()
 
                 module_instance.save()
 
-            for module in added_module_types:
-                if module.class_name == "LandUseChange":
-                    if module in self.validated_data["module_types"]:
-                        raise serializers.ValidationError("Land Use Change module cannot be added manually")
-                    continue
+            for module_type in removed_module_types:
+                if module_type.class_name == "OrganicSoil":
+                    luc.organic_soil = None
+                    luc.save()
 
-                ModuleClass = apps.get_model("api", module.class_name)
-
-                module_data = {"activity": self.instance}
-                if module in luc_module_types:
-                    module_data["area"] = self.validated_data.get("area")
-
-                module_instance = ModuleClass.objects.create(**module_data)
-                if luc and module in list(luc.get_module_types()):
-                    module_instance.land_use_change = luc
-                    module_instance.save()
-
-            if luc and has_luc_module:
-                self.edit_existing_luc()
-            elif luc and not has_luc_module:
-                self.delete_existing_luc()
-            elif not luc and has_luc_module:
-                luc = self.handle_luc_module(self.instance, create_organic_soil)
-
-            for module in removed_module_types:
-                ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.filter(activity=self.instance)
-                if module_instance.exists():
-                    module_instance.first().delete()
+                ModuleClass = apps.get_model("api", module_type.class_name)
+                module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
+                if module_instance:
+                    module_instance.delete()
 
             self.sanitize_input_entries()
 
             self.instance.module_types.clear()
             self.instance.module_types.add(*new_module_types)
+            if luc:
+                self.instance.module_types.add(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id, ModuleType.objects.get(class_name="LandUseChange").id)
             self.instance.save()
 
             return self.instance

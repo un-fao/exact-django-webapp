@@ -1,3 +1,27 @@
+## 1.17.9 (2025-09-18)
+
+### Feat
+
+- **minitool**: implement caching for module types retrieval
+- **minitool**: add large fishery and annual cropland datasets
+
+### Fix
+
+- **activity_builder**: rewrite activity edit logic to avoid issues with orphaned modules
+- inconsistencies in naming of some threads compared to their reference inputs
+- correct references to selected electricity ef in value chain and irrigation modules, in accordance with new energy ef logic
+- **minitool**: add large fishery endpoint
+
+## 1.17.8 (2025-09-17)
+
+### Feat
+
+- **perennial cropland**: add scenario-based initial biomass t2 value
+
+### Fix
+
+- add fallback fetch to default module values for initial and final biomass
+
 ## 1.17.7 (2025-09-17)
 
 ### Feat
