@@ -5826,19 +5826,19 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.ef_default_start.co2 = (
             self.energy_calculator_start.energy_ef_default_start.co2
             if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"]
-            else self.energy_calculator_start.electricity_ef_selected.value
+            else self.energy_calculator_start.electricity_ef_selected_start.value
         )
         self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_w.co2 = (
-            self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+            self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected_w.value
         )
         self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_wo.co2 = (
-            self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+            self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected_wo.value
         )
         self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
@@ -8005,13 +8005,6 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         super().__init__(input)
 
         self.module: ProcessingEntry
-
-        self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
-
-        self.electricity_ef_default = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
 
         self.methane_constant_start = self.project.gwp.ch4
         self.methane_constant_w = self.project.gwp.ch4
