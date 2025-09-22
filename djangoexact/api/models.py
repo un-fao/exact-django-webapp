@@ -900,6 +900,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name="updated_at")
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
 
+    is_b_intact = models.BooleanField(default=False)
+
     @property
     def soc(self):
         return self.soc_t2 or self.project.soc_ref_t2
