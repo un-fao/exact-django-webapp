@@ -118,3 +118,6 @@ djangoexact/docs/architecture/caching_strategy.md
 djangoexact/docs/architecture/CONNECTION_MANAGEMENT.md
 gcp-deployment/
 djangoexact/api/management/commands/run_minitool_gcp.py
+
+djangoexact/scripts/minitool copy/*
+djangoexact/minitool/data copy/*

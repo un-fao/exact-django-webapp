@@ -900,6 +900,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name="updated_at")
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
 
+    is_b_intact = models.BooleanField(default=False)
+
     @property
     def soc(self):
         return self.soc_t2 or self.project.soc_ref_t2
@@ -1472,14 +1474,11 @@ class SingleBiomassModule(BiomassModule):
             raise ValueError(f"Missing land use type for {scenario.value} scenario")
 
         try:
-            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            return BiomassModel.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
-            try:
-                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=LandUseType.objects.get(class_name=self.__class__.__name__))
-            except BiomassModel.DoesNotExist:
-                if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                    raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
-                return BiomassModel()
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
