@@ -1,3 +1,9 @@
+## 1.17.11 (2025-09-22)
+
+### Feat
+
+- **activity**: add is_b_intact queryparam to activity list endpoint
+
 ## 1.17.10 (2025-09-22)
 
 ### Feat
