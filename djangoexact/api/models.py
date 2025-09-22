@@ -886,7 +886,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     cost = models.FloatField(default=0, verbose_name="cost")
 
     change_rate = models.ForeignKey(ChangeRate, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="change_rate")
-    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", verbose_name="module_types")
+    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", blank=True, null=True)
 
     climate_t2 = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True, verbose_name="climate_t2")
     moisture_t2 = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True, verbose_name="moisture_t2")
