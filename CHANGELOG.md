@@ -1,3 +1,10 @@
+## 1.17.10 (2025-09-22)
+
+### Feat
+
+- **activity**: add ability to tag activity as b-intact
+- **minitool**: add perennial cropland permutations dataset
+
 ## 1.17.9 (2025-09-18)
 
 ### Feat
