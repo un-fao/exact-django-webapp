@@ -490,9 +490,9 @@ class PerennialCroplandDataBuilder(ModuleDataBuilder):
         return [
             FieldMappingBuilder.foreign_key("land_use_type"),
             # FieldMappingBuilder.foreign_key("tillage_management_type"),
-            #FieldMappingBuilder.foreign_key("organic_input_type"),
-            #FieldMappingBuilder.boolean("is_biomass_burned"),
-            #FieldMappingBuilder.numeric("fire_periodicity_t2"),
+            # FieldMappingBuilder.foreign_key("organic_input_type"),
+            # FieldMappingBuilder.boolean("is_biomass_burned"),
+            # FieldMappingBuilder.numeric("fire_periodicity_t2"),
         ]
 
 
@@ -578,6 +578,7 @@ class WaterbodyDataBuilder(ModuleDataBuilder):
 
 class CoastalWetlandDataBuilder(ModuleDataBuilder):
     """Data builder for Coastal Wetland modules"""
+
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.single_foreign_key("land_use_type"),
@@ -586,6 +587,7 @@ class CoastalWetlandDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
             FieldMappingBuilder.numeric("area_w_restored_vegetation"),
         ]
+
 
 class ModuleDataBuilderRegistry:
     """Registry for module data builders"""
@@ -607,6 +609,7 @@ class ModuleDataBuilderRegistry:
         self.register("Input", InputDataBuilder())
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
+
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
         self._builders[module_name] = builder
@@ -947,18 +950,18 @@ class PerennialCroplandProcessor(ModuleProcessor):
             land_use_type_start=land_use_type_start,
             land_use_type_w=land_use_type_w,
             land_use_type_wo=land_use_type_start,
-            #organic_input_type_start=organic_input_type_start,
-            #organic_input_type_w=organic_input_type_w,
-            #organic_input_type_wo=organic_input_type_start,
-            #tillage_management_type_start=tillage_management_type_start,
-            #tillage_management_type_w=tillage_management_type_w,
-            #tillage_management_type_wo=tillage_management_type_start,
-            #is_biomass_burned_start=is_biomass_burned_start,
-            #is_biomass_burned_w=is_biomass_burned_w,
-            #is_biomass_burned_wo=is_biomass_burned_start,
-            #fire_periodicity_t2_start=fire_periodicity_t2_start,
-            #fire_periodicity_t2_w=fire_periodicity_t2_w,
-            #fire_periodicity_t2_wo=fire_periodicity_t2_start,
+            # organic_input_type_start=organic_input_type_start,
+            # organic_input_type_w=organic_input_type_w,
+            # organic_input_type_wo=organic_input_type_start,
+            # tillage_management_type_start=tillage_management_type_start,
+            # tillage_management_type_w=tillage_management_type_w,
+            # tillage_management_type_wo=tillage_management_type_start,
+            # is_biomass_burned_start=is_biomass_burned_start,
+            # is_biomass_burned_w=is_biomass_burned_w,
+            # is_biomass_burned_wo=is_biomass_burned_start,
+            # fire_periodicity_t2_start=fire_periodicity_t2_start,
+            # fire_periodicity_t2_w=fire_periodicity_t2_w,
+            # fire_periodicity_t2_wo=fire_periodicity_t2_start,
         )
         return module
 
@@ -1135,8 +1138,10 @@ class WaterbodyProcessor(ModuleProcessor):
         )
         return module
 
+
 class CoastalWetlandProcessor(ModuleProcessor):
     """Processor for Coastal Wetland modules"""
+
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
         (
             land_use_type,
@@ -1174,6 +1179,7 @@ class CoastalWetlandProcessor(ModuleProcessor):
         )
         return module
 
+
 class ProcessorRegistry:
     """Registry for module processors"""
 
@@ -1195,6 +1201,7 @@ class ProcessorRegistry:
         self.register("Input", InputProcessor(self._data_builder_registry))
         self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
         self.register("CoastalWetland", CoastalWetlandProcessor(self._data_builder_registry))
+
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
         self._processors[module_name] = processor
@@ -1558,7 +1565,10 @@ class HammingPermutationComputer:
                                 for field_name in fields.keys():
                                     if field_name in hamming_row:
                                         field_values.append(hamming_row[field_name])
-                                
+                                    else:
+                                        # For fields not in hamming_row (like land_use_type), use the first value
+                                        field_values.append(list(fields[field_name])[0])
+
                                 # Add environmental factors
                                 combination = tuple(field_values) + (climate_moisture, soil_type, region)
 
@@ -1746,7 +1756,6 @@ MODULE_CONFIGS = {
         },
         "config_name": "coastal_wetland",
     },
-    
     "Input": {  # Compute # BUG: ZERO RESULTS
         "fields": {
             "input_type": models.InputType.objects.all(),
