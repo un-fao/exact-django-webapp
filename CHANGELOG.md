@@ -1,3 +1,9 @@
+## 1.17.12 (2025-09-23)
+
+### Fix
+
+- **activity**: missing request context causing issue during activity creation
+
 ## 1.17.11 (2025-09-22)
 
 ### Feat

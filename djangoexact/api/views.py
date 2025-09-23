@@ -1776,7 +1776,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
 
-        serializer = WriteActivitySerializer(data=request.data)
+        serializer = WriteActivitySerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         error = security.check_permission("add_activity", self.request.user, serializer.validated_data["project"])
