@@ -576,6 +576,17 @@ class WaterbodyDataBuilder(ModuleDataBuilder):
         ]
 
 
+class CoastalWetlandDataBuilder(ModuleDataBuilder):
+    """Data builder for Coastal Wetland modules"""
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("land_use_type"),
+            FieldMappingBuilder.numeric("area_under_drainage"),
+            FieldMappingBuilder.numeric("drained_area_excavated"),
+            FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
+            FieldMappingBuilder.numeric("area_w_restored_vegetation"),
+        ]
+
 class ModuleDataBuilderRegistry:
     """Registry for module data builders"""
 
@@ -595,7 +606,7 @@ class ModuleDataBuilderRegistry:
         self.register("LargeFishery", LargeFisheryDataBuilder())
         self.register("Input", InputDataBuilder())
         self.register("Waterbody", WaterbodyDataBuilder())
-
+        self.register("CoastalWetland", CoastalWetlandDataBuilder())
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
         self._builders[module_name] = builder
@@ -1124,6 +1135,44 @@ class WaterbodyProcessor(ModuleProcessor):
         )
         return module
 
+class CoastalWetlandProcessor(ModuleProcessor):
+    """Processor for Coastal Wetland modules"""
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            land_use_type,
+            area_under_drainage_start,
+            area_under_drainage_w,
+            drained_area_excavated_start,
+            drained_area_excavated_w,
+            area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w,
+            area_w_restored_vegetation_start,
+            area_w_restored_vegetation_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.CoastalWetlandFactory.build(
+            activity=a,
+            land_use_type=land_use_type,
+            area_under_drainage_start=area_under_drainage_start,
+            area_under_drainage_w=area_under_drainage_w,
+            drained_area_excavated_start=drained_area_excavated_start,
+            drained_area_excavated_w=drained_area_excavated_w,
+            area_not_drained_or_rewetted_start=area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w=area_not_drained_or_rewetted_w,
+            area_w_restored_vegetation_start=area_w_restored_vegetation_start,
+            area_w_restored_vegetation_w=area_w_restored_vegetation_w,
+        )
+        return module
 
 class ProcessorRegistry:
     """Registry for module processors"""
@@ -1145,7 +1194,7 @@ class ProcessorRegistry:
         self.register("LargeFishery", LargeFisheryProcessor(self._data_builder_registry))
         self.register("Input", InputProcessor(self._data_builder_registry))
         self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
-
+        self.register("CoastalWetland", CoastalWetlandProcessor(self._data_builder_registry))
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
         self._processors[module_name] = processor
@@ -1690,20 +1739,6 @@ MODULE_CONFIGS = {
             "area_under_drainage_w": [1, 0],
             "drained_area_excavated_start": [1, 0],
             "drained_area_excavated_w": [1, 0],
-            "area_not_drained_or_rewetted_start": [0],
-            "area_not_drained_or_rewetted_w": [0],
-            "area_w_restored_vegetation_start": [0],
-            "area_w_restored_vegetation_w": [0],
-        },
-        "config_name": "coastal_wetland",
-    },
-    "CoastalWetland2": {  # Skip
-        "fields": {
-            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-            "area_under_drainage_start": [0],
-            "area_under_drainage_w": [0],
-            "drained_area_excavated_start": [0],
-            "drained_area_excavated_w": [0],
             "area_not_drained_or_rewetted_start": [1, 0],
             "area_not_drained_or_rewetted_w": [1, 0],
             "area_w_restored_vegetation_start": [1, 0],
@@ -1711,6 +1746,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "coastal_wetland",
     },
+    
     "Input": {  # Compute # BUG: ZERO RESULTS
         "fields": {
             "input_type": models.InputType.objects.all(),
