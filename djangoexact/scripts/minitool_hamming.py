@@ -565,6 +565,13 @@ class InputDataBuilder(ModuleDataBuilder):
 
         return custom_fields
 
+class InputEntryDataBuilder(ModuleDataBuilder):
+    """Data builder for InputEntry modules"""
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("input_type"),
+            FieldMappingBuilder.numeric("value"),
+        ]
 
 class WaterbodyDataBuilder(ModuleDataBuilder):
     """Data builder for Waterbody modules"""
@@ -607,6 +614,7 @@ class ModuleDataBuilderRegistry:
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
         self.register("Input", InputDataBuilder())
+        self.register("InputEntry", InputEntryDataBuilder())
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
 
@@ -1759,8 +1767,8 @@ MODULE_CONFIGS = {
     "Input": {  # Compute # BUG: ZERO RESULTS
         "fields": {
             "input_type": models.InputType.objects.all(),
-            "value_start": [1, 0],
-            "value_w": [1, 0],
+            "value_start": [0, 1],  # Start values: 0 and 1
+            "value_w": [0, 1],  # With values: 0 and 1
         },
         "config_name": "input",
     },

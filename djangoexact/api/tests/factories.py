@@ -352,7 +352,8 @@ class InputEntryFactory(DjangoModelFactory):
     class Meta:
         model = InputEntry
 
-    input_type = factory.fuzzy.FuzzyChoice(input_types)
+    value_start = 0
+    value_w = 1
 
     status = READY
 
