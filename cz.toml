@@ -6,5 +6,5 @@ version = "1.17.12"
 update_changelog_on_bump = true
 tag = false
 version_files = [
-  "djangoexact/djangoexact/__init__.py"
+  "djangoexact/djangoexact/__init__.py:__version__"
 ]
