@@ -1,3 +1,21 @@
+"""
+Minitool Hamming Permutations with Subset Processing
+
+This is a modified version of minitool_hamming.py that processes field subsets.
+Instead of processing all fields for a module at once, this script:
+
+1. Contains MODULE_CONFIGS with a list of subset configurations for each module
+2. Each subset has a name and specific field values tailored for focused testing
+3. Processes each subset independently and saves results with subset names
+4. Allows for more targeted analysis of specific parameter combinations
+
+Key changes from original:
+- MODULE_CONFIGS structure now contains 'subsets' list instead of direct 'fields'
+- Each subset has smaller, focused field combinations
+- Processing logic cycles through subsets
+- Output files include subset names for identification
+"""
+
 import pandas as pd
 from dataclasses import dataclass
 import os
@@ -565,13 +583,6 @@ class InputDataBuilder(ModuleDataBuilder):
 
         return custom_fields
 
-class InputEntryDataBuilder(ModuleDataBuilder):
-    """Data builder for InputEntry modules"""
-    def get_field_mappings(self) -> List[FieldMapping]:
-        return [
-            FieldMappingBuilder.single_foreign_key("input_type"),
-            FieldMappingBuilder.numeric("value"),
-        ]
 
 class WaterbodyDataBuilder(ModuleDataBuilder):
     """Data builder for Waterbody modules"""
@@ -614,7 +625,6 @@ class ModuleDataBuilderRegistry:
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
         self.register("Input", InputDataBuilder())
-        self.register("InputEntry", InputEntryDataBuilder())
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
 
@@ -1660,134 +1670,287 @@ class HammingPermutationComputer:
         return data, errors_data
 
 
-# Module configurations
+# Module configurations with subsets
+# Each module now contains a list of field subset configurations
 MODULE_CONFIGS = {
-    "Grassland": {  # Compute # DONE
-        "fields": {
-            "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "is_fire_used_start": [True, False],
-            "is_fire_used_w": [True, False],
-            "fire_periodicity_start": [1],
-            "fire_periodicity_w": [1],
-            "fire_impact_start": [1, 0],
-            "fire_impact_w": [1, 0],
-        },
+    "Grassland": {
+        "subsets": [
+            {
+                "name": "fire_management_basic",
+                "fields": {
+                    "grassland_management_type_start": [models.GrasslandManagementType.objects.filter(name__icontains="intensive").first()],
+                    "grassland_management_type_w": [models.GrasslandManagementType.objects.filter(name__icontains="moderate").first()],
+                    "is_fire_used_start": [False],
+                    "is_fire_used_w": [True],
+                    "fire_periodicity_start": [1],
+                    "fire_periodicity_w": [1],
+                    "fire_impact_start": [0],
+                    "fire_impact_w": [1],
+                },
+            },
+            {
+                "name": "fire_management_advanced",
+                "fields": {
+                    "grassland_management_type_start": [models.GrasslandManagementType.objects.filter(name__icontains="moderate").first()],
+                    "grassland_management_type_w": [models.GrasslandManagementType.objects.filter(name__icontains="intensive").first()],
+                    "is_fire_used_start": [True],
+                    "is_fire_used_w": [False],
+                    "fire_periodicity_start": [1],
+                    "fire_periodicity_w": [1],
+                    "fire_impact_start": [1],
+                    "fire_impact_w": [0],
+                },
+            },
+            {
+                "name": "no_fire_management",
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.all()[:2]),
+                    "grassland_management_type_w": list(models.GrasslandManagementType.objects.all()[:2]),
+                    "is_fire_used_start": [False],
+                    "is_fire_used_w": [False],
+                    "fire_periodicity_start": [1],
+                    "fire_periodicity_w": [1],
+                    "fire_impact_start": [0],
+                    "fire_impact_w": [0],
+                },
+            },
+        ],
         "config_name": "grassland",
     },
-    "Livestock": {  # Compute # DONE
-        "fields": {
-            "livestock_category_type": models.LivestockCategoryType.objects.all(),
-            "livestock_production_type_start": models.LivestockProductionType.objects.all(),
-            "livestock_production_type_w": models.LivestockProductionType.objects.all(),
-            "heads_number_start": [1],
-            "heads_number_w": [1],
-        },
+    "Livestock": {
+        "subsets": [
+            {
+                "name": "cattle_production",
+                "fields": {
+                    "livestock_category_type": [models.LivestockCategoryType.objects.filter(name__icontains="cattle").first()],
+                    "livestock_production_type_start": list(models.LivestockProductionType.objects.all()[:2]),
+                    "livestock_production_type_w": list(models.LivestockProductionType.objects.all()[:2]),
+                    "heads_number_start": [1],
+                    "heads_number_w": [1],
+                },
+            },
+            {
+                "name": "small_ruminants",
+                "fields": {
+                    "livestock_category_type": [
+                        models.LivestockCategoryType.objects.filter(name__icontains="sheep").first() or models.LivestockCategoryType.objects.filter(name__icontains="goat").first()
+                    ],
+                    "livestock_production_type_start": list(models.LivestockProductionType.objects.all()[2:4]),
+                    "livestock_production_type_w": list(models.LivestockProductionType.objects.all()[2:4]),
+                    "heads_number_start": [1],
+                    "heads_number_w": [1],
+                },
+            },
+            {
+                "name": "mixed_livestock",
+                "fields": {
+                    "livestock_category_type": list(models.LivestockCategoryType.objects.all()[:3]),
+                    "livestock_production_type_start": [models.LivestockProductionType.objects.first()],
+                    "livestock_production_type_w": [models.LivestockProductionType.objects.first()],
+                    "heads_number_start": [1],
+                    "heads_number_w": [1],
+                },
+            },
+        ],
         "config_name": "livestock",
     },
-    "AnnualCropland": {  # DONE
-        "fields": {
-            "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
-            "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
-            "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "residue_management_type_start": models.ResidueManagementType.objects.all(),
-            "residue_management_type_w": models.ResidueManagementType.objects.all(),
-        },
+    "AnnualCropland": {
+        "subsets": [
+            {
+                "name": "conventional_tillage",
+                "fields": {
+                    "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
+                    "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
+                    "tillage_management_type_start": [models.TillageManagementType.objects.filter(name__icontains="conventional").first()],
+                    "tillage_management_type_w": [models.TillageManagementType.objects.filter(name__icontains="conventional").first()],
+                    "organic_input_type_start": list(models.OrganicInputType.objects.all()[:2]),
+                    "organic_input_type_w": list(models.OrganicInputType.objects.all()[:2]),
+                    "residue_management_type_start": list(models.ResidueManagementType.objects.all()[:2]),
+                    "residue_management_type_w": list(models.ResidueManagementType.objects.all()[:2]),
+                },
+            },
+            {
+                "name": "reduced_tillage",
+                "fields": {
+                    "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
+                    "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
+                    "tillage_management_type_start": [models.TillageManagementType.objects.filter(name__icontains="reduced").first()],
+                    "tillage_management_type_w": [models.TillageManagementType.objects.filter(name__icontains="reduced").first()],
+                    "organic_input_type_start": list(models.OrganicInputType.objects.all()[2:4]),
+                    "organic_input_type_w": list(models.OrganicInputType.objects.all()[2:4]),
+                    "residue_management_type_start": list(models.ResidueManagementType.objects.all()[2:4]),
+                    "residue_management_type_w": list(models.ResidueManagementType.objects.all()[2:4]),
+                },
+            },
+        ],
         "config_name": "annual_cropland",
     },
-    "FloodedRice": {  # Skip
-        "fields": {
-            "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
-            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
-            "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
-            "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
-            "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
-            "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
-        },
+    "FloodedRice": {
+        "subsets": [
+            {
+                "name": "basic_water_management",
+                "fields": {
+                    "water_management_type_before_cultivation_start": list(models.WaterManagementTypeBeforeCultivation.objects.all()[:2]),
+                    "water_management_type_before_cultivation_w": list(models.WaterManagementTypeBeforeCultivation.objects.all()[:2]),
+                    "water_management_type_after_cultivation_start": list(models.WaterManagementTypeAfterCultivation.objects.all()[:2]),
+                    "water_management_type_after_cultivation_w": list(models.WaterManagementTypeAfterCultivation.objects.all()[:2]),
+                    "organic_amendment_type_start": list(models.OrganicAmendmentType.objects.all()[:2]),
+                    "organic_amendment_type_w": list(models.OrganicAmendmentType.objects.all()[:2]),
+                },
+            },
+        ],
         "config_name": "flooded_rice",
     },
-    "PerennialCropland": {  # Skip
-        "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            # "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "tillage_management_type_start": models.TillageManagementType.objects.all(),
-            # "tillage_management_type_w": models.TillageManagementType.objects.all(),
-            # "is_biomass_burned_start": [True, False],
-            # "is_biomass_burned_w": [True, False],
-            # "fire_periodicity_t2_start": [1],
-            # "fire_periodicity_t2_w": [1],
-        },
+    "PerennialCropland": {
+        "subsets": [
+            {
+                "name": "basic_perennial",
+                "fields": {
+                    "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all()[:2]),
+                    "land_use_type_w": list(models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all()[:2]),
+                },
+            },
+        ],
         "config_name": "perennial_cropland",
     },
-    "ForestManagement": {  # Compute
-        "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
-            "forest_type": models.ForestType.objects.all(),
-            "forest_condition_type": models.ForestConditionType.objects.all(),
-            "average_yearly_degradation_percentage_start": [0],
-            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
-        },
+    "ForestManagement": {
+        "subsets": [
+            {
+                "name": "low_degradation",
+                "fields": {
+                    "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()[:2]),
+                    "forest_type": list(models.ForestType.objects.all()[:3]),
+                    "forest_condition_type": list(models.ForestConditionType.objects.all()[:2]),
+                    "average_yearly_degradation_percentage_start": [0],
+                    "average_yearly_degradation_percentage_w": [0.01, 0.02],
+                },
+            },
+            {
+                "name": "medium_degradation",
+                "fields": {
+                    "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()[2:4]),
+                    "forest_type": list(models.ForestType.objects.all()[3:6]),
+                    "forest_condition_type": list(models.ForestConditionType.objects.all()[2:]),
+                    "average_yearly_degradation_percentage_start": [0],
+                    "average_yearly_degradation_percentage_w": [0.03, 0.04, 0.05],
+                },
+            },
+            {
+                "name": "high_degradation",
+                "fields": {
+                    "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()[:1]),
+                    "forest_type": list(models.ForestType.objects.all()[-2:]),
+                    "forest_condition_type": list(models.ForestConditionType.objects.all()[:1]),
+                    "average_yearly_degradation_percentage_start": [0],
+                    "average_yearly_degradation_percentage_w": [0.1, 0.2, 0.3],
+                },
+            },
+        ],
         "config_name": "forest_management",
     },
-    "SmallFishery": {  # Compute # DONE
-        "fields": {
-            "gear_type_start": models.SmallFisheryGearType.objects.all(),
-            "gear_type_w": models.SmallFisheryGearType.objects.all(),
-            "fishery_type": models.FisheryType.objects.all(),
-        },
+    "SmallFishery": {
+        "subsets": [
+            {
+                "name": "coastal_gear",
+                "fields": {
+                    "gear_type_start": list(models.SmallFisheryGearType.objects.all()[:3]),
+                    "gear_type_w": list(models.SmallFisheryGearType.objects.all()[:3]),
+                    "fishery_type": list(models.FisheryType.objects.all()[:2]),
+                },
+            },
+            {
+                "name": "offshore_gear",
+                "fields": {
+                    "gear_type_start": list(models.SmallFisheryGearType.objects.all()[3:]),
+                    "gear_type_w": list(models.SmallFisheryGearType.objects.all()[3:]),
+                    "fishery_type": list(models.FisheryType.objects.all()[2:]),
+                },
+            },
+        ],
         "config_name": "small_fishery",
     },
-    "LargeFishery": {  # Skip # DONE
-        "fields": {
-            "gear_type_start": models.LargeFisheryGearType.objects.all(),
-            "gear_type_w": models.LargeFisheryGearType.objects.all(),
-            "fish_type": models.FishType.objects.all(),
-        },
+    "LargeFishery": {
+        "subsets": [
+            {
+                "name": "basic_large_fishery",
+                "fields": {
+                    "gear_type_start": list(models.LargeFisheryGearType.objects.all()[:3]),
+                    "gear_type_w": list(models.LargeFisheryGearType.objects.all()[:3]),
+                    "fish_type": list(models.FishType.objects.all()[:2]),
+                },
+            },
+        ],
         "config_name": "large_fishery",
     },
-    "CoastalWetland": {  # Skip
-        "fields": {
-            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-            "area_under_drainage_start": [1, 0],
-            "area_under_drainage_w": [1, 0],
-            "drained_area_excavated_start": [1, 0],
-            "drained_area_excavated_w": [1, 0],
-            "area_not_drained_or_rewetted_start": [1, 0],
-            "area_not_drained_or_rewetted_w": [1, 0],
-            "area_w_restored_vegetation_start": [1, 0],
-            "area_w_restored_vegetation_w": [1, 0],
-        },
+    "CoastalWetland": {
+        "subsets": [
+            {
+                "name": "drainage_scenarios",
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all()[:2]),
+                    "area_under_drainage_start": [1, 0],
+                    "area_under_drainage_w": [1, 0],
+                    "drained_area_excavated_start": [0],
+                    "drained_area_excavated_w": [1],
+                    "area_not_drained_or_rewetted_start": [1],
+                    "area_not_drained_or_rewetted_w": [0],
+                    "area_w_restored_vegetation_start": [0],
+                    "area_w_restored_vegetation_w": [1],
+                },
+            },
+        ],
         "config_name": "coastal_wetland",
     },
-    "Input": {  # Compute # BUG: ZERO RESULTS
-        "fields": {
-            "input_type": models.InputType.objects.all(),
-            "value_start": [0, 1],  # Start values: 0 and 1
-            "value_w": [0, 1],  # With values: 0 and 1
-        },
+    "Input": {
+        "subsets": [
+            {
+                "name": "basic_inputs",
+                "fields": {
+                    "input_type": list(models.InputType.objects.all()[:3]),
+                    "value_start": [0],
+                    "value_w": [1],
+                },
+            },
+        ],
         "config_name": "input",
     },
-    "Waterbody": {  # Compute # DONE
-        "fields": {
-            "waterbody_type": models.WaterbodyType.objects.all(),
-            "trophic_type_start": models.TrophicType.objects.all(),
-            "trophic_type_w": models.TrophicType.objects.all(),
-        },
+    "Waterbody": {
+        "subsets": [
+            {
+                "name": "eutrophic_systems",
+                "fields": {
+                    "waterbody_type": list(models.WaterbodyType.objects.all()[:2]),
+                    "trophic_type_start": [models.TrophicType.objects.filter(name__icontains="eutrophic").first()],
+                    "trophic_type_w": [models.TrophicType.objects.filter(name__icontains="eutrophic").first()],
+                },
+            },
+            {
+                "name": "oligotrophic_systems",
+                "fields": {
+                    "waterbody_type": list(models.WaterbodyType.objects.all()[2:4]),
+                    "trophic_type_start": [models.TrophicType.objects.filter(name__icontains="oligotrophic").first()],
+                    "trophic_type_w": [models.TrophicType.objects.filter(name__icontains="oligotrophic").first()],
+                },
+            },
+            {
+                "name": "mixed_trophic",
+                "fields": {
+                    "waterbody_type": list(models.WaterbodyType.objects.all()[-2:]),
+                    "trophic_type_start": list(models.TrophicType.objects.all()[:2]),
+                    "trophic_type_w": list(models.TrophicType.objects.all()[:2]),
+                },
+            },
+        ],
         "config_name": "waterbody",
     },
 }
 
 
 def run_minitool_hamming(resume: bool = False):
-    """Main execution function using Hamming shell permutations"""
+    """Main execution function using Hamming shell permutations with subset processing"""
     # Set logging level to INFO to see progress messages
     logging.getLogger().setLevel(logging.INFO)
-    logger.info("Running Hamming shell permutation script with progress logging...")
+    logger.info("Running Hamming shell permutation script with subset processing and progress logging...")
 
     # Initialize components
     data_builder_registry = ModuleDataBuilderRegistry()
@@ -1803,20 +1966,37 @@ def run_minitool_hamming(resume: bool = False):
     CONFIG = {**config["modules"], **config["performance"]}
 
     try:
-        for module_name, config in MODULE_CONFIGS.items():
-            if CONFIG[config["config_name"]]:
-                logger.info(f"Processing module: {module_name}")
+        for module_name, module_config in MODULE_CONFIGS.items():
+            if CONFIG[module_config["config_name"]]:
+                logger.info(f"Processing module: {module_name} with {len(module_config['subsets'])} subset configurations")
                 model_class = getattr(models, module_name)
-                data, errors = hamming_computer.compute_hamming_permutations(
-                    config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume
-                )
-                logger.info(f"Module {module_name} completed: {len(data)} data rows, {len(errors)} error rows")
-                if data or errors:
-                    logger.info(f"Saving data for module: {module_name}")
-                    data_manager.save_data(data, errors, module_name, local=True)
-                    logger.info(f"Data saved for module: {module_name}")
-                else:
-                    logger.warning(f"No data or errors to save for module: {module_name}")
+
+                # Process each subset configuration
+                for subset_idx, subset_config in enumerate(module_config["subsets"]):
+                    subset_name = subset_config["name"]
+                    logger.info(f"Processing subset {subset_idx + 1}/{len(module_config['subsets'])}: {subset_name}")
+
+                    # Compute permutations for this subset
+                    data, errors = hamming_computer.compute_hamming_permutations(
+                        subset_config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume
+                    )
+
+                    logger.info(f"Subset {subset_name} completed: {len(data)} data rows, {len(errors)} error rows")
+
+                    # Save data with subset name included
+                    if data or errors:
+                        # Add subset name to each data row for identification
+                        for row in data:
+                            row["subset_name"] = subset_name
+                        for error in errors:
+                            error["subset_name"] = subset_name
+
+                        subset_filename = f"{module_name}_{subset_name}"
+                        logger.info(f"Saving data for subset: {subset_filename}")
+                        data_manager.save_data(data, errors, subset_filename, local=True)
+                        logger.info(f"Data saved for subset: {subset_filename}")
+                    else:
+                        logger.warning(f"No data or errors to save for subset: {subset_name}")
 
     except KeyboardInterrupt:
         logger.info("\nKeyboard interrupt detected in main run function!")

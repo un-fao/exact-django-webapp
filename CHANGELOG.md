@@ -1,3 +1,14 @@
+## 1.17.13 (2025-09-24)
+
+### Feat
+
+- **minitool**: import recomputed dataset with hamming space algorithm
+- **minitool**: add coastal wetland dataset
+
+### Fix
+
+- **defaults**: add agb rate to default return payload for perennial cropland
+
 ## 1.17.12 (2025-09-23)
 
 ### Fix
