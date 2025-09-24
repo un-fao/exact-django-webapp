@@ -2,55 +2,99 @@ from itertools import product
 import api.models as models
 from .minitool import ClimateMoistureValidator, SoilOrganicCarbonValidator
 
+
 def domains_from_fields(fields: dict):
     # pair *_start with *_w and get their (same) domain
     pairs = []
+    singles = []
+
+    # Track which fields are already processed as pairs
+    processed_fields = set()
+
     for k in sorted(fields):
-        if k.endswith('_start'):
+        if k.endswith("_start"):
             base = k[:-6]
-            s = f'{base}_start'
-            w = f'{base}_w'
+            s = f"{base}_start"
+            w = f"{base}_w"
             if w in fields:
                 dom = list(fields[s])  # materialize QuerySet once
                 pairs.append((base, s, w, dom))
-    return pairs  # list of (base, start_col, w_col, domain_list)
+                processed_fields.add(s)
+                processed_fields.add(w)
+
+    # Handle single fields that don't have _start/_w pairs
+    for k in sorted(fields):
+        if k not in processed_fields and not k.endswith("_w"):
+            dom = list(fields[k])  # materialize QuerySet once
+            singles.append((k, dom))
+
+    return pairs, singles  # (paired_fields, single_fields)
+
 
 def hamming_shell_rows(fields: dict):
     """
     fields: your dict of columns -> iterable/QuerySet
     Yields dict rows where exactly one *_w differs from *_start,
     all others have w == start (same chosen baseline value).
+    Single fields (without _start/_w pairs) are included in every combination.
     """
-    pairs = domains_from_fields(fields)
-    bases = [dom for (_, _, _, dom) in pairs]
+    pairs, singles = domains_from_fields(fields)
+
+    # Domains for paired fields and single fields
+    paired_bases = [dom for (_, _, _, dom) in pairs]
+    single_bases = [dom for (_, dom) in singles]
+
+    # All combinations: paired field baselines × single field values
+    all_bases = paired_bases + single_bases
 
     # iterate baseline assignment (choose ONE value per field)
-    for baseline_vals in product(*bases):
-        # map: field -> chosen baseline value
-        base_map = {pairs[i][0]: baseline_vals[i] for i in range(len(pairs))}
+    for baseline_vals in product(*all_bases):
+        # Split baseline values between paired and single fields
+        paired_vals = baseline_vals[: len(pairs)]
+        single_vals = baseline_vals[len(pairs) :]
 
-        # for each field, flip its _w to an alternative value
+        # map: paired field -> chosen baseline value
+        base_map = {pairs[i][0]: paired_vals[i] for i in range(len(pairs))}
+
+        # map: single field -> chosen value
+        single_map = {singles[i][0]: single_vals[i] for i in range(len(singles))}
+
+        # for each paired field, flip its _w to an alternative value
         for i, (base, s_col, w_col, dom) in enumerate(pairs):
             s_val = base_map[base]
             for alt in dom:
                 if alt == s_val:
                     continue  # must differ
                 row = {}
-                # fill all pairs: start = baseline, w = baseline (same)
-                for (b, s, w, _) in pairs:
+                # fill all paired fields: start = baseline, w = baseline (same)
+                for b, s, w, _ in pairs:
                     row[s] = base_map[b]
                     row[w] = base_map[b]
-                # flip exactly one field
+                # flip exactly one paired field
                 row[w_col] = alt
+                # add all single fields
+                for field_name, value in single_map.items():
+                    row[field_name] = value
                 yield row
 
+
 def expected_count(fields: dict) -> int:
-    pairs = domains_from_fields(fields)
-    sizes = [len(dom) for (_, _, _, dom) in pairs]
-    prod = 1
-    for s in sizes:
-        prod *= s
-    return prod * sum(s-1 for s in sizes)
+    pairs, singles = domains_from_fields(fields)
+    paired_sizes = [len(dom) for (_, _, _, dom) in pairs]
+    single_sizes = [len(dom) for (_, dom) in singles]
+
+    # Calculate baseline combinations (all paired + single fields)
+    baseline_combinations = 1
+    for s in paired_sizes + single_sizes:
+        baseline_combinations *= s
+
+    # For each baseline, we generate (sum of (size-1) for paired fields) variations
+    if paired_sizes:
+        variations_per_baseline = sum(s - 1 for s in paired_sizes)
+        return baseline_combinations * variations_per_baseline
+    else:
+        # If no paired fields, just return single field combinations
+        return baseline_combinations
 
 
 annual_cropland_climate_moistures = ClimateMoistureValidator.get_valid_combinations([models.LandUseType.objects.get(name="Default")], models)
@@ -198,6 +242,7 @@ MODULE_CONFIGS = {
         "config_name": "waterbody",
     },
 }
+
 
 def run():
     annual_cropland = MODULE_CONFIGS["AnnualCropland"]

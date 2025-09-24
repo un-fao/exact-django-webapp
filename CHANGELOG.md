@@ -1,3 +1,10 @@
+## 1.18.0 (2025-09-24)
+
+### Feat
+
+- **minitool**: import recomputed dataset with hamming space algorithm
+- **minitool**: add coastal wetland dataset
+
 ## 1.17.12 (2025-09-23)
 
 ### Fix
