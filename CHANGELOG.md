@@ -1,3 +1,9 @@
+## 1.19.0 (2025-09-24)
+
+### Feat
+
+- test version bump functionality
+
 ## 1.18.0 (2025-09-24)
 
 ### Feat
