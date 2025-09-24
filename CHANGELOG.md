@@ -1,3 +1,10 @@
+## 1.17.14 (2025-09-24)
+
+### Fix
+
+- **calculators**: send bgb_t_c_ha as agb_ref to mathematical model instead of agb_t_c_ha
+- **defaults**: send GrasslandBiomass bgb_t_c_ha as default agb t2 value instead of agb_t_c_ha
+
 ## 1.17.13 (2025-09-24)
 
 ### Feat
