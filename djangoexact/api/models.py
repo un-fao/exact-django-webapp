@@ -886,7 +886,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     cost = models.FloatField(default=0, verbose_name="cost")
 
     change_rate = models.ForeignKey(ChangeRate, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="change_rate")
-    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", verbose_name="module_types")
+    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", blank=True, null=True)
 
     climate_t2 = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True, verbose_name="climate_t2")
     moisture_t2 = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True, verbose_name="moisture_t2")
@@ -899,6 +899,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name="created_at")
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name="updated_at")
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
+
+    is_b_intact = models.BooleanField(default=False)
 
     @property
     def soc(self):
@@ -1021,14 +1023,23 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         return self.duration_t2
 
     def __get_capitalization_years(self) -> int:
-        if not self.start_year_t2 and not self.duration_t2:
+        if not self.start_year_t2 and not self.duration_t2 and not self.last_year_of_accounting:
             return self.project.capitalization_years
 
-        if not self.start_year_t2 and self.duration_t2:
+        if not self.start_year_t2 and self.duration_t2 and not self.last_year_of_accounting:
             return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
 
-        if self.start_year_t2 and not self.duration_t2:
+        if self.start_year_t2 and not self.duration_t2 and not self.last_year_of_accounting:
             return self.last_year_of_accounting - (self.start_year_t2 + self.project.implementation_years)
+
+        if not self.start_year_t2 and self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
+
+        if self.start_year_t2 and not self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.start_year_t2 + self.project.implementation_years)
+
+        if not self.start_year_t2 and not self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.project.start_year_of_activities + self.project.implementation_years)
 
         return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
@@ -1472,14 +1483,11 @@ class SingleBiomassModule(BiomassModule):
             raise ValueError(f"Missing land use type for {scenario.value} scenario")
 
         try:
-            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            return BiomassModel.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
-            try:
-                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=LandUseType.objects.get(class_name=self.__class__.__name__))
-            except BiomassModel.DoesNotExist:
-                if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                    raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
-                return BiomassModel()
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
 
 
 class ResidueAvailability(models.Model):

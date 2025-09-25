@@ -352,7 +352,8 @@ class InputEntryFactory(DjangoModelFactory):
     class Meta:
         model = InputEntry
 
-    input_type = factory.fuzzy.FuzzyChoice(input_types)
+    value_start = 0
+    value_w = 1
 
     status = READY
 
@@ -431,14 +432,7 @@ class CoastalWetlandFactory(DjangoModelFactory):
         model = CoastalWetland
 
     status = READY  # --------------> NOTE: Add to all factories if not
-
-    area = 150
-
-    land_use_type = factory.fuzzy.FuzzyChoice(coastal_vegetations)
-
-    area_under_drainage_start = factory.fuzzy.FuzzyFloat(0, area)
-    area_under_drainage_w = factory.fuzzy.FuzzyFloat(0, area)
-    area_under_drainage_wo = factory.fuzzy.FuzzyFloat(0, area)
+    area = 1
 
     avg_salinity_t2 = SalinityType.objects.get(value="<18")
 

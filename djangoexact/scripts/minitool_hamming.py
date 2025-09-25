@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import os
 import sys
 import logging
-import itertools
 import time
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
@@ -25,7 +24,10 @@ import django
 
 django.setup()
 
-import api.models as models
+import api.models as models  # noqa: E402
+
+# Import Hamming functions
+from .hamming import hamming_shell_rows  # noqa: E402
 
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
@@ -487,10 +489,10 @@ class PerennialCroplandDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.foreign_key("land_use_type"),
-            FieldMappingBuilder.foreign_key("tillage_management_type"),
-            FieldMappingBuilder.foreign_key("organic_input_type"),
-            FieldMappingBuilder.boolean("is_biomass_burned"),
-            FieldMappingBuilder.numeric("fire_periodicity_t2"),
+            # FieldMappingBuilder.foreign_key("tillage_management_type"),
+            # FieldMappingBuilder.foreign_key("organic_input_type"),
+            # FieldMappingBuilder.boolean("is_biomass_burned"),
+            # FieldMappingBuilder.numeric("fire_periodicity_t2"),
         ]
 
 
@@ -563,6 +565,13 @@ class InputDataBuilder(ModuleDataBuilder):
 
         return custom_fields
 
+class InputEntryDataBuilder(ModuleDataBuilder):
+    """Data builder for InputEntry modules"""
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("input_type"),
+            FieldMappingBuilder.numeric("value"),
+        ]
 
 class WaterbodyDataBuilder(ModuleDataBuilder):
     """Data builder for Waterbody modules"""
@@ -573,8 +582,10 @@ class WaterbodyDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.foreign_key("trophic_type"),
         ]
 
+
 class CoastalWetlandDataBuilder(ModuleDataBuilder):
     """Data builder for Coastal Wetland modules"""
+
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.single_foreign_key("land_use_type"),
@@ -583,67 +594,6 @@ class CoastalWetlandDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
             FieldMappingBuilder.numeric("area_w_restored_vegetation"),
         ]
-        
-
-# Implementation example of a more complex module
-# class ForestManagementDataBuilder(ModuleDataBuilder):
-#     """Example data builder for Forest Management modules - shows extensibility"""
-
-#     def get_field_mappings(self) -> List[FieldMapping]:
-#         return [
-#             FieldMappingBuilder.foreign_key("forest_type"),
-#             FieldMappingBuilder.foreign_key("management_type"),
-#             FieldMappingBuilder.numeric("area"),
-#             FieldMappingBuilder.boolean("is_selective_logging"),
-#             FieldMappingBuilder.numeric("logging_intensity"),
-#             # Example of a computed field that depends on other fields
-#             FieldMappingBuilder.computed("carbon_impact", self._compute_carbon_impact),
-#             # Example of a conditional field based on management type
-#             FieldMappingBuilder.conditional("management_category", self._categorize_management),
-#         ]
-
-#     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
-#         """Get custom fields that don't follow the standard pattern"""
-#         return {
-#             "forest_age": getattr(module, "forest_age", None),
-#             "biodiversity_index": getattr(module, "biodiversity_index", None),
-#         }
-
-#     def _compute_carbon_impact(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
-#         """Custom processor for computing carbon impact"""
-#         area = getattr(module, "area_start", 0) or 0
-#         logging_intensity = getattr(module, "logging_intensity_start", 0) or 0
-
-#         # Simplified carbon impact calculation
-#         carbon_impact = area * logging_intensity * 0.5
-
-#         data["carbon_impact_start"] = carbon_impact
-#         data["carbon_impact_w"] = carbon_impact * 0.8  # Assume 20% reduction with intervention
-#         data["carbon_impact_wo"] = carbon_impact
-
-#     def _categorize_management(self, module: Any, data: Dict[str, Any], field_mapping: FieldMapping, field_names: Dict[str, str]):
-#         """Custom processor for categorizing management type"""
-#         management_type = getattr(module, "management_type_start", None)
-
-#         def get_category(mgmt_type) -> str:
-#             if not mgmt_type:
-#                 return "unknown"
-#             mgmt_name = mgmt_type.name.lower()
-#             if "conservation" in mgmt_name:
-#                 return "conservation"
-#             elif "production" in mgmt_name:
-#                 return "production"
-#             elif "mixed" in mgmt_name:
-#                 return "mixed"
-#             else:
-#                 return "other"
-
-#         start_category = get_category(getattr(module, "management_type_start", None))
-#         with_category = get_category(getattr(module, "management_type_w", None))
-
-#         data["management_category_start"] = start_category
-#         data["management_category_w"] = with_category
-#         data["management_category_wo"] = start_category
 
 
 class ModuleDataBuilderRegistry:
@@ -664,6 +614,7 @@ class ModuleDataBuilderRegistry:
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
         self.register("Input", InputDataBuilder())
+        self.register("InputEntry", InputEntryDataBuilder())
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
 
@@ -977,14 +928,14 @@ class PerennialCroplandProcessor(ModuleProcessor):
         (
             land_use_type_start,
             land_use_type_w,
-            organic_input_type_start,
-            organic_input_type_w,
-            tillage_management_type_start,
-            tillage_management_type_w,
-            is_biomass_burned_start,
-            is_biomass_burned_w,
-            fire_periodicity_t2_start,
-            fire_periodicity_t2_w,
+            # organic_input_type_start,
+            # organic_input_type_w,
+            # tillage_management_type_start,
+            # tillage_management_type_w,
+            # is_biomass_burned_start,
+            # is_biomass_burned_w,
+            # fire_periodicity_t2_start,
+            # fire_periodicity_t2_w,
             climate_moisture,
             soil_type,
             region,
@@ -1007,18 +958,18 @@ class PerennialCroplandProcessor(ModuleProcessor):
             land_use_type_start=land_use_type_start,
             land_use_type_w=land_use_type_w,
             land_use_type_wo=land_use_type_start,
-            organic_input_type_start=organic_input_type_start,
-            organic_input_type_w=organic_input_type_w,
-            organic_input_type_wo=organic_input_type_start,
-            tillage_management_type_start=tillage_management_type_start,
-            tillage_management_type_w=tillage_management_type_w,
-            tillage_management_type_wo=tillage_management_type_start,
-            is_biomass_burned_start=is_biomass_burned_start,
-            is_biomass_burned_w=is_biomass_burned_w,
-            is_biomass_burned_wo=is_biomass_burned_start,
-            fire_periodicity_t2_start=fire_periodicity_t2_start,
-            fire_periodicity_t2_w=fire_periodicity_t2_w,
-            fire_periodicity_t2_wo=fire_periodicity_t2_start,
+            # organic_input_type_start=organic_input_type_start,
+            # organic_input_type_w=organic_input_type_w,
+            # organic_input_type_wo=organic_input_type_start,
+            # tillage_management_type_start=tillage_management_type_start,
+            # tillage_management_type_w=tillage_management_type_w,
+            # tillage_management_type_wo=tillage_management_type_start,
+            # is_biomass_burned_start=is_biomass_burned_start,
+            # is_biomass_burned_w=is_biomass_burned_w,
+            # is_biomass_burned_wo=is_biomass_burned_start,
+            # fire_periodicity_t2_start=fire_periodicity_t2_start,
+            # fire_periodicity_t2_w=fire_periodicity_t2_w,
+            # fire_periodicity_t2_wo=fire_periodicity_t2_start,
         )
         return module
 
@@ -1195,8 +1146,10 @@ class WaterbodyProcessor(ModuleProcessor):
         )
         return module
 
+
 class CoastalWetlandProcessor(ModuleProcessor):
     """Processor for Coastal Wetland modules"""
+
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
         (
             land_use_type,
@@ -1233,6 +1186,7 @@ class CoastalWetlandProcessor(ModuleProcessor):
             area_w_restored_vegetation_w=area_w_restored_vegetation_w,
         )
         return module
+
 
 class ProcessorRegistry:
     """Registry for module processors"""
@@ -1316,6 +1270,7 @@ class SoilOrganicCarbonValidator:
 
         logger.info(f"Found {len(valid_combinations)} valid climate-moisture-soiltype combinations out of {total_combinations} total combinations")
         return valid_combinations
+
 
 class ConfigurationLoader:
     """Loads configuration from GCP storage bucket or local fallback"""
@@ -1488,8 +1443,8 @@ class DataManager:
             logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
 
 
-class PermutationComputer:
-    """Handles permutation computation with multiprocessing"""
+class HammingPermutationComputer:
+    """Handles Hamming shell permutation computation with multiprocessing"""
 
     def __init__(self, processor_registry: ProcessorRegistry):
         self.processor_registry = processor_registry
@@ -1504,28 +1459,11 @@ class PermutationComputer:
 
         connections.close_all()
 
-    def chunked_product(self, *iterables, chunk_size: int = 1000, start_index: int = 0):
-        """Yield chunks of Cartesian product, optionally starting from a specific index"""
-        it = itertools.product(*iterables)
-
-        # Skip to the start index if specified
-        if start_index > 0:
-            logger.info(f"Skipping to index {start_index:,} in permutation generation...")
-            # Use islice to skip the first start_index items
-            it = itertools.islice(it, start_index, None)
-
-        while True:
-            chunk = list(itertools.islice(it, chunk_size))
-            if not chunk:
-                break
-            yield chunk
-
-    def compute_permutations(
+    def compute_hamming_permutations(
         self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None, resume: bool = False
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Compute permutations for a model"""
+        """Compute Hamming shell permutations for a model"""
         import api.models as models
-        import math
 
         # Get land use types for validation
         land_use_types = []
@@ -1564,27 +1502,20 @@ class PermutationComputer:
         regions_with_countries = list(models.Region.objects.filter(countries__isnull=False).distinct())
 
         logger.info(f"Found {len(regions_with_countries)} regions with countries (out of {models.Region.objects.count()} total regions)")
-
-        # Update fields with validated dimensions
-        fields.update(
-            {
-                "climate_moistures": valid_climate_moistures,
-                "soil_types": valid_soil_types,
-                "region": regions_with_countries,
-            }
-        )
-
-        logger.info(f"Computing permutations for {model.__name__}...")
+        logger.info(f"Computing Hamming shell permutations for {model.__name__}...")
 
         # Get processor
         processor = self.processor_registry.get_processor(model.__name__)
 
-        # Prepare iterables
-        iterables = [list(val) if not isinstance(val, int) else range(val) for val in fields.values()]
+        # Generate Hamming shell rows (only from module fields with _start/_w pattern)
+        hamming_rows = list(hamming_shell_rows(fields))
+        total_hamming = len(hamming_rows)
+        logger.info(f"Generated {total_hamming:,} Hamming shell rows")
 
-        # Compute total permutations
-        total = math.prod(len(x) for x in iterables)
-        logger.info(f"Total permutations (theoretical): {total:,}")
+        # Calculate total permutations (Hamming shell × environmental factors)
+        environmental_factors = len(valid_climate_moistures) * len(valid_soil_types) * len(regions_with_countries)
+        total_permutations = total_hamming * environmental_factors
+        logger.info(f"Total permutations (Hamming shell × environmental factors): {total_permutations:,}")
 
         # Initialize progress tracker
         progress_tracker = ProgressTracker(model.__name__)
@@ -1609,8 +1540,6 @@ class PermutationComputer:
 
         try:
             # Use more workers for better CPU utilization
-            # You can adjust this based on your system's capabilities
-            # A good rule of thumb is to use CPU cores - 1 or CPU cores - 2
             if max_workers is None:
                 max_workers = min(12, os.cpu_count() - 1) if os.cpu_count() else 8
             logger.info(f"Using {max_workers} worker processes for computation")
@@ -1621,57 +1550,82 @@ class PermutationComputer:
 
             with ProcessPoolExecutor(max_workers=max_workers, initializer=self.django_initializer) as executor:
                 # Initialize progress tracker with total
-                progress_tracker.update_progress(start_index, total)
+                progress_tracker.update_progress(start_index, total_permutations)
                 # Force save initial progress
                 progress_tracker.save_progress(force=True)
 
-                pbar = tqdm(total=total, initial=start_index, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
+                pbar = tqdm(total=total_permutations, initial=start_index, desc=f"Building {model.__name__} Hamming permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
-                # Optimize chunk size based on number of workers
-                optimal_chunk_size = max(chunk_size, chunk_size // max_workers * max_workers)
-                logger.info(f"Using chunk size: {optimal_chunk_size}")
+                # Process Hamming shell rows with environmental factors
+                for hamming_row in hamming_rows:
+                    # Create combinations with environmental factors
+                    for climate_moisture in valid_climate_moistures:
+                        for soil_type in valid_soil_types:
+                            for region in regions_with_countries:
+                                # Skip if we're resuming and haven't reached the start index yet
+                                if processed_count < start_index:
+                                    processed_count += 1
+                                    continue
 
-                for chunk in self.chunked_product(*iterables, chunk_size=optimal_chunk_size, start_index=start_index):
-                    # Use submit instead of map for better load balancing
-                    futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
+                                # Create the full combination tuple in the correct order
+                                # Get the field values in the order expected by the processor
+                                field_values = []
+                                for field_name in fields.keys():
+                                    if field_name in hamming_row:
+                                        field_values.append(hamming_row[field_name])
+                                    else:
+                                        # For fields not in hamming_row (like land_use_type), use the first value
+                                        field_values.append(list(fields[field_name])[0])
 
-                    for future in futures:
-                        result = future.result()
+                                # Add environmental factors
+                                combination = tuple(field_values) + (climate_moisture, soil_type, region)
 
-                        if stop_at and len(data) >= stop_at:
-                            # Terminate worker processes
-                            for proc in executor._processes.values():
-                                proc.terminate()
-                            executor.shutdown(wait=False, cancel_futures=True)
+                                # Process the combination
+                                result = processor.process_combination(combination)
+
+                                if stop_at and len(data) >= stop_at:
+                                    # Terminate worker processes
+                                    for proc in executor._processes.values():
+                                        proc.terminate()
+                                    executor.shutdown(wait=False, cancel_futures=True)
+                                    break
+
+                                if result.success:
+                                    data.append(result.data)
+                                    pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
+                                else:
+                                    errors_data.append(result.error)
+                                    pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
+
+                                pbar.update(1)
+                                processed_count += 1
+
+                                # Update progress tracker
+                                progress_tracker.increment_progress()
+
+                                # Log performance every 1000 processed items
+                                if processed_count % 1000 == 0:
+                                    elapsed_time = time.time() - start_time
+                                    rate = processed_count / elapsed_time if elapsed_time > 0 else 0
+                                    eta = progress_tracker.get_eta()
+                                    eta_str = f", ETA: {eta / 60:.1f}min" if eta else ""
+                                    logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec{eta_str}")
+                                    # Force save progress every 1000 items
+                                    progress_tracker.save_progress(force=True)
+                            else:
+                                continue
                             break
-
-                        if result.success:
-                            data.append(result.data)
-                            pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
                         else:
-                            errors_data.append(result.error)
-                            pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
-
-                        pbar.update(1)
-                        processed_count += 1
-
-                        # Update progress tracker
-                        progress_tracker.increment_progress()
-
-                        # Log performance every 1000 processed items
-                        if processed_count % 1000 == 0:
-                            elapsed_time = time.time() - start_time
-                            rate = processed_count / elapsed_time if elapsed_time > 0 else 0
-                            eta = progress_tracker.get_eta()
-                            eta_str = f", ETA: {eta / 60:.1f}min" if eta else ""
-                            logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec{eta_str}")
-                            # Force save progress every 1000 items
-                            progress_tracker.save_progress(force=True)
+                            continue
+                        break
                     else:
                         continue
                     break
 
                 pbar.close()
+                logger.info(f"Progress bar closed. Data: {len(data)}, Errors: {len(errors_data)}")
+
+            logger.info(f"ProcessPoolExecutor context exited. Data: {len(data)}, Errors: {len(errors_data)}")
 
         except KeyboardInterrupt:
             logger.info(f"\nKeyboard interrupt detected! Returning {len(data)} computed rows...")
@@ -1683,18 +1637,25 @@ class PermutationComputer:
             except Exception:
                 pass
             return data, errors_data
-
-        if not data:
-            logger.warning(f"No data for {model.__name__}!")
-            return [], []
+        except Exception as e:
+            logger.error(f"Unexpected error during computation: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.info(f"Returning partial results: {len(data)} data rows, {len(errors_data)} error rows")
+            return data, errors_data
 
         # Log summary of results
         total_processed = len(data) + len(errors_data)
         success_rate = (len(data) / total_processed * 100) if total_processed > 0 else 0
         logger.info(f"Completed {model.__name__}: {len(data):,} successful, {len(errors_data):,} errors ({success_rate:.1f}% success rate)")
 
+        if not data and not errors_data:
+            logger.warning(f"No data or errors for {model.__name__}!")
+            logger.info(f"Returning empty results for {model.__name__}")
+            return [], []
+
         # Clear progress file on successful completion
         progress_tracker.clear_progress()
+        logger.info(f"Returning {len(data)} data rows and {len(errors_data)} error rows for {model.__name__}")
 
         return data, errors_data
 
@@ -1716,7 +1677,7 @@ MODULE_CONFIGS = {
     },
     "Livestock": {  # Compute # DONE
         "fields": {
-            "livestock_category_types": models.LivestockCategoryType.objects.all(),
+            "livestock_category_type": models.LivestockCategoryType.objects.all(),
             "livestock_production_type_start": models.LivestockProductionType.objects.all(),
             "livestock_production_type_w": models.LivestockProductionType.objects.all(),
             "heads_number_start": [1],
@@ -1748,18 +1709,18 @@ MODULE_CONFIGS = {
         },
         "config_name": "flooded_rice",
     },
-    "PerennialCropland": {  # Skip # DONE
+    "PerennialCropland": {  # Skip
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
             "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
-            "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
-            "tillage_management_type_start": models.TillageManagementType.objects.all(),
-            "tillage_management_type_w": models.TillageManagementType.objects.all(),
-            "is_biomass_burned_start": [True, False],
-            "is_biomass_burned_w": [True, False],
-            "fire_periodicity_t2_start": [1],
-            "fire_periodicity_t2_w": [1],
+            # "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
+            # "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
+            # "tillage_management_type_start": models.TillageManagementType.objects.all(),
+            # "tillage_management_type_w": models.TillageManagementType.objects.all(),
+            # "is_biomass_burned_start": [True, False],
+            # "is_biomass_burned_w": [True, False],
+            # "fire_periodicity_t2_start": [1],
+            # "fire_periodicity_t2_w": [1],
         },
         "config_name": "perennial_cropland",
     },
@@ -1806,8 +1767,8 @@ MODULE_CONFIGS = {
     "Input": {  # Compute # BUG: ZERO RESULTS
         "fields": {
             "input_type": models.InputType.objects.all(),
-            "value_start": [1, 0],
-            "value_w": [1, 0],
+            "value_start": [0, 1],  # Start values: 0 and 1
+            "value_w": [0, 1],  # With values: 0 and 1
         },
         "config_name": "input",
     },
@@ -1821,44 +1782,18 @@ MODULE_CONFIGS = {
     },
 }
 
-"""
-# NOTE: Not needed
-"Aquaculture": {
-    "fields": {
-        "annual_production_start": [1],
-        "annual_production_w": [1],
-    },
-    "enabled": CONFIG["aquaculture"],
-},
-"OtherLand": {
-    # TODO: I don't think this makes much sense.
-    "fields": {
-        "is_degraded_land_start": [True, False],
-        "is_degraded_land_w": [True, False],
-    },
-},
-"SetAside": {
-    # TODO: I don't think this makes much sense.
-    "fields": {
-        "is_set_aside_start": [True, False],
-        "is_set_aside_w": [True, False],
-    },
-},
-TODO: Missing all Value Chain modules.
-"""
 
-
-def run_minitool(resume: bool = False):
-    """Main execution function"""
+def run_minitool_hamming(resume: bool = False):
+    """Main execution function using Hamming shell permutations"""
     # Set logging level to INFO to see progress messages
     logging.getLogger().setLevel(logging.INFO)
-    logger.info("Running script with progress logging...")
+    logger.info("Running Hamming shell permutation script with progress logging...")
 
     # Initialize components
     data_builder_registry = ModuleDataBuilderRegistry()
     processor_registry = ProcessorRegistry(data_builder_registry)
     data_manager = DataManager()  # Will use STORAGE_BUCKET from environment
-    permutation_computer = PermutationComputer(processor_registry)
+    hamming_computer = HammingPermutationComputer(processor_registry)
 
     # Load configuration
     config_loader = ConfigurationLoader()
@@ -1870,12 +1805,18 @@ def run_minitool(resume: bool = False):
     try:
         for module_name, config in MODULE_CONFIGS.items():
             if CONFIG[config["config_name"]]:
+                logger.info(f"Processing module: {module_name}")
                 model_class = getattr(models, module_name)
-                data, errors = permutation_computer.compute_permutations(
+                data, errors = hamming_computer.compute_hamming_permutations(
                     config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume
                 )
+                logger.info(f"Module {module_name} completed: {len(data)} data rows, {len(errors)} error rows")
                 if data or errors:
+                    logger.info(f"Saving data for module: {module_name}")
                     data_manager.save_data(data, errors, module_name, local=True)
+                    logger.info(f"Data saved for module: {module_name}")
+                else:
+                    logger.warning(f"No data or errors to save for module: {module_name}")
 
     except KeyboardInterrupt:
         logger.info("\nKeyboard interrupt detected in main run function!")
@@ -1899,9 +1840,9 @@ def run(*args):
         if clear_progress:
             clear_all_progress()
 
-        print(f"Running minitool with resume: {resume}")
+        print(f"Running minitool with Hamming shell permutations, resume: {resume}")
 
-    return run_minitool(resume=resume)
+    return run_minitool_hamming(resume=resume)
 
 
 def clear_all_progress():

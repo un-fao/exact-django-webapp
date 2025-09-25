@@ -1,3 +1,62 @@
+## 1.17.17 (2025-09-25)
+
+### Feat
+
+- **public**: add module types endpoint to public urls
+
+### Fix
+
+- **calculators**: add missing start results to ForestManagementCalculator result tuple
+
+## 1.17.16 (2025-09-25)
+
+### Fix
+
+- **forest_management**: issue caused by wrong references for flu,fi,fmg start
+
+## 1.17.15 (2025-09-25)
+
+### Fix
+
+- **activity**: issue calculating capitalization years when only last_year_of_accounting was specified
+
+## 1.17.14 (2025-09-24)
+
+### Fix
+
+- **calculators**: send bgb_t_c_ha as agb_ref to mathematical model instead of agb_t_c_ha
+- **defaults**: send GrasslandBiomass bgb_t_c_ha as default agb t2 value instead of agb_t_c_ha
+
+## 1.17.13 (2025-09-24)
+
+### Feat
+
+- **minitool**: import recomputed dataset with hamming space algorithm
+- **minitool**: add coastal wetland dataset
+
+### Fix
+
+- **defaults**: add agb rate to default return payload for perennial cropland
+
+## 1.17.12 (2025-09-23)
+
+### Fix
+
+- **activity**: missing request context causing issue during activity creation
+
+## 1.17.11 (2025-09-22)
+
+### Feat
+
+- **activity**: add is_b_intact queryparam to activity list endpoint
+
+## 1.17.10 (2025-09-22)
+
+### Feat
+
+- **activity**: add ability to tag activity as b-intact
+- **minitool**: add perennial cropland permutations dataset
+
 ## 1.17.9 (2025-09-18)
 
 ### Feat

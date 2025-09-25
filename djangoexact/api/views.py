@@ -1776,7 +1776,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
 
-        serializer = WriteActivitySerializer(data=request.data)
+        serializer = WriteActivitySerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         error = security.check_permission("add_activity", self.request.user, serializer.validated_data["project"])
@@ -1823,6 +1823,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
         is_summary = request.query_params.get("summary", False)
+        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
         SerializerClass = ActivitySerializerWithModules
         if is_summary:
             SerializerClass = ActivitySummarySerializer
@@ -1836,6 +1837,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return activity_dict
 
         activities_list = Activity.objects.filter(project__id=project_id)
+        if is_b_intact:
+            activities_list = activities_list.filter(is_b_intact=is_b_intact)
 
         # Start measuring time
         start = time.time()
