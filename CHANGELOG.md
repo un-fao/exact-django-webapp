@@ -1,3 +1,9 @@
+## 1.17.15 (2025-09-25)
+
+### Fix
+
+- **activity**: issue calculating capitalization years when only last_year_of_accounting was specified
+
 ## 1.17.14 (2025-09-24)
 
 ### Fix
