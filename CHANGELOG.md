@@ -1,3 +1,13 @@
+## 1.17.17 (2025-09-25)
+
+### Feat
+
+- **public**: add module types endpoint to public urls
+
+### Fix
+
+- **calculators**: add missing start results to ForestManagementCalculator result tuple
+
 ## 1.17.16 (2025-09-25)
 
 ### Fix
