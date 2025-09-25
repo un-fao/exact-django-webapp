@@ -7436,7 +7436,7 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.results_w.plot_emissions_and_aggregate_by_activity("forest_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
-        results_tuple = (self.results_w, self.results_wo)
+        results_tuple = (self.results_start + self.results_w, self.results_start + self.results_wo)
 
         return results_tuple
 
