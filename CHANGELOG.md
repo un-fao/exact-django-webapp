@@ -1,3 +1,9 @@
+## 1.17.16 (2025-09-25)
+
+### Fix
+
+- **forest_management**: issue caused by wrong references for flu,fi,fmg start
+
 ## 1.17.15 (2025-09-25)
 
 ### Fix
