@@ -1,3 +1,16 @@
+## 1.17.19 (2025-09-29)
+
+### Fix
+
+- **middleware**: allow public endpoints to skip authentication
+
+## 1.17.18 (2025-09-29)
+
+### Fix
+
+- **activity**: show non-b-intact activities in list endpoint for public activities endpoint
+- **activity**: return activities that are not b-intact by default
+
 ## 1.17.17 (2025-09-25)
 
 ### Feat
