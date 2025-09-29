@@ -1,3 +1,9 @@
+## 1.17.19 (2025-09-29)
+
+### Fix
+
+- **middleware**: allow public endpoints to skip authentication
+
 ## 1.17.18 (2025-09-29)
 
 ### Fix
