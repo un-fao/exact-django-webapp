@@ -1837,8 +1837,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return activity_dict
 
         activities_list = Activity.objects.filter(project__id=project_id)
-        if is_b_intact:
-            activities_list = activities_list.filter(is_b_intact=is_b_intact)
+        activities_list = activities_list.filter(is_b_intact=is_b_intact)
 
         # Start measuring time
         start = time.time()
