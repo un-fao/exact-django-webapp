@@ -45,6 +45,36 @@ lge_gear_type = random.choice(lge_gear_types)
 
 READY = StatusType.objects.get(name_en="READY")
 
+def get_factory_by_class_name(class_name):
+    return {
+        "AnnualCropland": AnnualCroplandFactory,
+        "ForestManagement": ForestManagementFactory,
+        "Grassland": GrasslandFactory,
+        "Aquaculture": AquacultureFactory,
+        "Livestock": LivestockFactory,
+        "CoastalWetland": CoastalWetlandFactory,
+        "Waterbody": WaterbodyFactory,
+        "FloodedRice": FloodedRiceFactory,
+        "Transport": TransportFactory,
+        "TransportEntry": TransportEntryFactory,
+        "Packaging": PackagingFactory,
+        "PackagingEntry": PackagingEntryFactory,
+        "Storage": StorageFactory,
+        "StorageEntry": StorageEntryFactory,
+        "Processing": ProcessingFactory,
+        "ProcessingEntry": ProcessingEntryFactory,
+        "Energy": EnergyFactory,
+        "SmallFishery": SmallFisheryFactory,
+        "LargeFishery": LargeFisheryFactory,
+        "Settlement": SettlementFactory,
+        "Irrigation": IrrigationFactory,
+        "IrrigationSystem": IrrigationSystemFactory,
+        "OtherLand": OtherLandFactory,
+        "OrganicSoil": OrganicSoilFactory,
+        "LandUseChange": LandUseChangeFactory,
+        "Project": ProjectFactory,
+        "Activity": ActivityFactory,
+    }
 
 class UserFactory(DjangoModelFactory):
     class Meta:
@@ -248,6 +278,16 @@ class GrasslandFactory(DjangoModelFactory):
     area = 1
     status = READY
 
+    is_fire_used_start = False
+    is_fire_used_w = False
+    is_fire_used_wo = False
+    fire_periodicity_start = 0
+    fire_periodicity_w = 0
+    fire_periodicity_wo = 0
+    fire_impact_start = 0
+    fire_impact_w = 0
+    fire_impact_wo = 0
+
 
 land_modules = ModuleType.objects.filter(is_luc=True, is_submodule=False).all()
 
@@ -266,13 +306,13 @@ class LandUseChangeFactory(DjangoModelFactory):
     module_type_w = factory.fuzzy.FuzzyChoice(ready_land_modules)
     module_type_wo = factory.fuzzy.FuzzyChoice(ready_land_modules)
 
-    is_fire_used_start = factory.fuzzy.FuzzyChoice([True, False])
-    is_fire_used_w = factory.fuzzy.FuzzyChoice([True, False])
-    is_fire_used_wo = factory.fuzzy.FuzzyChoice([True, False])
-
-    dry_matter_start = factory.fuzzy.FuzzyFloat(0, 1)
-    dry_matter_w = factory.fuzzy.FuzzyFloat(0, 1)
-    dry_matter_wo = factory.fuzzy.FuzzyFloat(0, 1)
+    # is_fire_used_start = factory.fuzzy.FuzzyChoice([True, False])
+    # is_fire_used_w = factory.fuzzy.FuzzyChoice([True, False])
+    # is_fire_used_wo = factory.fuzzy.FuzzyChoice([True, False])
+# 
+    # dry_matter_start = factory.fuzzy.FuzzyFloat(0, 1)
+    # dry_matter_w = factory.fuzzy.FuzzyFloat(0, 1)
+    # dry_matter_wo = factory.fuzzy.FuzzyFloat(0, 1)
 
 
 class ForestManagementFactory(DjangoModelFactory):
@@ -304,6 +344,10 @@ class FloodedRiceFactory(DjangoModelFactory):
 
     area = 1
     status = READY
+
+    land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
+    land_use_type_w = LandUseType.objects.get(name="Flooded Rice")
+    land_use_type_wo = LandUseType.objects.get(name="Flooded Rice")
 
     water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
     water_management_type_before_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
