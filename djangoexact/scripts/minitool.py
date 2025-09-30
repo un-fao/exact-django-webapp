@@ -1716,7 +1716,7 @@ MODULE_CONFIGS = {
     },
     "Livestock": {  # Compute # DONE
         "fields": {
-            "livestock_category_types": models.LivestockCategoryType.objects.all(),
+            "livestock_category_type": models.LivestockCategoryType.objects.all(),
             "livestock_production_type_start": models.LivestockProductionType.objects.all(),
             "livestock_production_type_w": models.LivestockProductionType.objects.all(),
             "heads_number_start": [1],
