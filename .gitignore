@@ -90,6 +90,7 @@ djangoexact/annual_cropland_results.xlsx
 graphs/
 /reports/
 static/
+staticfiles/
 djangoexact/scripts/ipcc_data/ForestManagementAGBRevised.csv
 djangoexact/docs/EX-ACT VC migration.docx
 docs/docs/
@@ -125,3 +126,4 @@ scripts/minitool/landusechange_errors.csv
 scripts/minitool/landusechange.csv
 scripts/minitool/progress/landusechange_progress.json
 .3b-config.json
+.branchflow
