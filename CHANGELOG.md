@@ -1,3 +1,9 @@
+## 1.17.22 (2025-10-01)
+
+### Fix
+
+- **calculators**: issue causing some forest management instances to accidentally fetch unneded biomass values, triggering a missing data error
+
 ## 1.17.21 (2025-10-01)
 
 ### Fix
