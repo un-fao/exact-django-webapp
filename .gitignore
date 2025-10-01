@@ -125,3 +125,4 @@ scripts/minitool/landusechange_errors.csv
 scripts/minitool/landusechange.csv
 scripts/minitool/progress/landusechange_progress.json
 .3b-config.json
+.branchflow-config.json
