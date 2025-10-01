@@ -1557,7 +1557,10 @@ class AboveBelowGroundBiomassModule(BiomassModule):
             raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
 
         try:
-            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            if self.__class__.__name__ == "PerennialCropland":
+                return BiomassModel.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            else:
+                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if self.get_biomass_t2(scenario) is None:
                 raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
