@@ -121,3 +121,6 @@ djangoexact/api/management/commands/run_minitool_gcp.py
 
 djangoexact/scripts/minitool copy/*
 djangoexact/minitool/data copy/*
+scripts/minitool/landusechange_errors.csv
+scripts/minitool/landusechange.csv
+scripts/minitool/progress/landusechange_progress.json

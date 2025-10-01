@@ -1393,11 +1393,11 @@ class DataManager:
             self._bucket = self.storage_client.bucket(self.bucket_name)
         return self._bucket
 
-    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False) -> None:
+    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False, resume: bool = False) -> None:
         """Save data and errors to GCP storage bucket as CSV files"""
         try:
             if local:
-                self._save_to_local_fallback(data, errors, module_name)
+                self._save_to_local_fallback(data, errors, module_name, resume)
                 return
 
             if data:
@@ -1423,9 +1423,9 @@ class DataManager:
         except Exception as e:
             logger.error(f"Failed to save data to GCP storage: {e}")
             # Fallback to local file storage if GCP storage fails
-            self._save_to_local_fallback(data, errors, module_name)
+            self._save_to_local_fallback(data, errors, module_name, resume)
 
-    def _save_to_local_fallback(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str) -> None:
+    def _save_to_local_fallback(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, resume: bool = False) -> None:
         """Fallback method to save data locally if GCP storage fails"""
         output_dir = Path("scripts/minitool")
         output_dir.mkdir(exist_ok=True)
@@ -1433,13 +1433,19 @@ class DataManager:
         if data:
             df = pd.DataFrame(data)
             filepath = output_dir / f"{module_name.lower()}.csv"
-            df.to_csv(filepath, index=False)
+            if resume:
+                df.to_csv(filepath, mode='a', header=False, index=False)
+            else:
+                df.to_csv(filepath, index=False)
             logger.info(f"Fallback: Saved {len(data)} rows to {filepath}")
 
         if errors:
             errors_df = pd.DataFrame(errors)
             errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
-            errors_df.to_csv(errors_filepath, index=False)
+            if resume:
+                errors_df.to_csv(errors_filepath, mode='a', header=False, index=False)
+            else:
+                errors_df.to_csv(errors_filepath, index=False)
             logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
 
 
@@ -1813,7 +1819,7 @@ def run_minitool_hamming(resume: bool = False):
                 logger.info(f"Module {module_name} completed: {len(data)} data rows, {len(errors)} error rows")
                 if data or errors:
                     logger.info(f"Saving data for module: {module_name}")
-                    data_manager.save_data(data, errors, module_name, local=True)
+                    data_manager.save_data(data, errors, module_name, local=True, resume=resume)
                     logger.info(f"Data saved for module: {module_name}")
                 else:
                     logger.warning(f"No data or errors to save for module: {module_name}")
