@@ -1,3 +1,9 @@
+## 1.17.20 (2025-10-01)
+
+### Fix
+
+- **calculators**: update module type check from SingleBiomassModule to BiomassModule in LandModuleCalculator
+
 ## 1.17.19 (2025-09-29)
 
 ### Fix
