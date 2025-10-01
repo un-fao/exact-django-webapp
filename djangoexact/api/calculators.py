@@ -678,7 +678,7 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if isinstance(self.module, SingleBiomassModule) and not isinstance(self.module, Settlement):  # TODO: Incorporate SettlementEF with relevant IPCC tables
+        if isinstance(self.module, BiomassModule) and not isinstance(self.module, Settlement):  # TODO: Incorporate SettlementEF with relevant IPCC tables
             if self.module.is_start() and self.module.is_with():
                 self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
             if self.module.is_start() and self.module.is_without():
