@@ -1,3 +1,10 @@
+## 1.17.21 (2025-10-01)
+
+### Fix
+
+- **reports**: issue causing any report containing the livestock module to fail
+- **reports**: issue caused by old reference to comment thread attributes for small and large fishery
+
 ## 1.17.20 (2025-10-01)
 
 ### Fix
