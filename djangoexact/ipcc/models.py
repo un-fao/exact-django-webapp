@@ -253,12 +253,15 @@ class ForestTotalBiomassManager(Manager):
                 land_use_type=land_use_type,
             )
         except ForestTotalBiomass.DoesNotExist:
-            return ForestTotalBiomass.objects.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type__name__icontains="Agroforestry - Default",
-            )
+            try:
+                return ForestTotalBiomass.objects.get(
+                    climate=climate,
+                    moisture=moisture,
+                    continent=continent,
+                    land_use_type__name__icontains="Agroforestry - Default",
+                )
+            except ForestTotalBiomass.DoesNotExist:
+                raise Exception(f"ForestTotalBiomass for {climate} climate, {moisture} moisture, {continent} continent, and {land_use_type} land use type does not exist")
 
 
 class ForestTotalBiomass(Model):
@@ -641,10 +644,13 @@ class PerennialMaxAGBManager(Manager):
                 land_use_type=land_use_type,
             )
         except PerennialMaxAGB.DoesNotExist:
-            return PerennialMaxAGB.objects.get(
-                climate=climate,
-                land_use_type__name="Agroforestry - Default",
-            )
+            try:
+                return PerennialMaxAGB.objects.get(
+                    climate=climate,
+                    land_use_type__name="Agroforestry - Default",
+                )
+            except PerennialMaxAGB.DoesNotExist:
+                raise Exception(f"PerennialMaxAGB for {climate} climate and {land_use_type} land use type does not exist")
 
 
 class PerennialMaxAGB(Model):
