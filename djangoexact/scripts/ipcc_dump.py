@@ -4415,7 +4415,19 @@ def delete_and_import_total_biomass_after_defo():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                TotalBiomassAfterDefo.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
+                    print(f"Processing {crop} {climate} {moisture} {region} {value}")
                     print(
                         crop,
                         climate,
@@ -4479,6 +4491,17 @@ def delete_and_import_forest_total_biomass():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                ForestTotalBiomass.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
                     print(f"{crop}, {climate}, {moisture}, {region}, {value}")
 
@@ -5029,6 +5052,8 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "test":
