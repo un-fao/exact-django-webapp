@@ -2161,10 +2161,10 @@ class SmallFisheryReport(FisheryReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
 
         # self.metadata_worksheet.cell(row=last_metadata_row + 1, column=6, value=self.module.fishery_type_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.gear_type_thread.format_comments())  # TODO: Rename thread attributes
-        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.total_catch_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.refrigerant_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.ice_preserved_catch_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.gear_type_thread.format_comments() if self.module.gear_type_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.total_catch_yr_thread.format_comments() if self.module.total_catch_yr_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.refrigerant_pc_thread.format_comments() if self.module.refrigerant_pc_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.ice_preserved_catch_pc_thread.format_comments() if self.module.ice_preserved_catch_pc_thread else "")
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -2233,10 +2233,10 @@ class LargeFisheryReport(FisheryReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
 
         # self.metadata_worksheet.cell(row=last_metadata_row + 1, column=6, value=self.module.fish_type_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.gear_type_thread.format_comments())  # TODO: Rename thread attributes
-        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.total_catch_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.refrigerant_thread.format_comments())
-        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.ice_preserved_catch_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.gear_type_thread.format_comments() if self.module.gear_type_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.total_catch_yr_thread.format_comments() if self.module.total_catch_yr_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.refrigerant_pc_thread.format_comments() if self.module.refrigerant_pc_thread else "")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.ice_preserved_catch_pc_thread.format_comments() if self.module.ice_preserved_catch_pc_thread else "")
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
