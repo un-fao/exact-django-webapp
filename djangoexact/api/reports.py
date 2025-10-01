@@ -2362,8 +2362,8 @@ class LivestockReport(BaseModuleReport):
                     self.manure_management_prp_direct_n2o,
                     self.manure_management_prp_leaching_indirect_n2o,
                     self.manure_management_prp_volatilization_indirect_n2o,
+                    fillvalue=0,
                 ),
-                fillvalue=0,
             )
         )
 
