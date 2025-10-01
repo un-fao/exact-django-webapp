@@ -27,6 +27,7 @@ django.setup()
 import api.models as models  # noqa: E402
 from django.apps import apps
 import ipcc.models as ipcc_models
+import api.utilities as utils
 
 # Import Hamming functions
 from .hamming import hamming_shell_rows  # noqa: E402
@@ -695,15 +696,15 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
             data[f"{prefix}grassland_management_type_wo"] = (
                 getattr(module.grassland_management_type_wo, "name", None) if hasattr(module, "grassland_management_type_wo") and module.grassland_management_type_wo else None
             )
-            data[f"{prefix}is_fire_used_start"] = getattr(module, "is_fire_used_start", None)
-            data[f"{prefix}is_fire_used_w"] = getattr(module, "is_fire_used_w", None)
-            data[f"{prefix}is_fire_used_wo"] = getattr(module, "is_fire_used_wo", None)
-            data[f"{prefix}fire_periodicity_start"] = getattr(module, "fire_periodicity_start", None)
-            data[f"{prefix}fire_periodicity_w"] = getattr(module, "fire_periodicity_w", None)
-            data[f"{prefix}fire_periodicity_wo"] = getattr(module, "fire_periodicity_wo", None)
-            data[f"{prefix}fire_impact_start"] = getattr(module, "fire_impact_start", None)
-            data[f"{prefix}fire_impact_w"] = getattr(module, "fire_impact_w", None)
-            data[f"{prefix}fire_impact_wo"] = getattr(module, "fire_impact_wo", None)
+            # data[f"{prefix}is_fire_used_start"] = getattr(module, "is_fire_used_start", None)
+            # data[f"{prefix}is_fire_used_w"] = getattr(module, "is_fire_used_w", None)
+            # data[f"{prefix}is_fire_used_wo"] = getattr(module, "is_fire_used_wo", None)
+            # data[f"{prefix}fire_periodicity_start"] = getattr(module, "fire_periodicity_start", None)
+            # data[f"{prefix}fire_periodicity_w"] = getattr(module, "fire_periodicity_w", None)
+            # data[f"{prefix}fire_periodicity_wo"] = getattr(module, "fire_periodicity_wo", None)
+            # data[f"{prefix}fire_impact_start"] = getattr(module, "fire_impact_start", None)
+            # data[f"{prefix}fire_impact_w"] = getattr(module, "fire_impact_w", None)
+            # data[f"{prefix}fire_impact_wo"] = getattr(module, "fire_impact_wo", None)
 
         elif module_type == "FloodedRice":
             data[f"{prefix}water_management_type_before_cultivation_start"] = (
@@ -745,6 +746,11 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
             data[f"{prefix}organic_amendment_type_wo"] = (
                 getattr(module.organic_amendment_type_wo, "name", None) if hasattr(module, "organic_amendment_type_wo") and module.organic_amendment_type_wo else None
             )
+        elif module_type == "ForestManagement":
+            data[f"{prefix}land_use_type_start"] = getattr(module.land_use_type_start, "name", None) if hasattr(module, "land_use_type_start") and module.land_use_type_start else None
+            data[f"{prefix}land_use_type_w"] = getattr(module.land_use_type_w, "name", None) if hasattr(module, "land_use_type_w") and module.land_use_type_w else None
+            data[f"{prefix}forest_type"] = getattr(module.forest_type, "name", None) if hasattr(module, "forest_type") and module.forest_type else None
+            data[f"{prefix}forest_condition_type"] = getattr(module.forest_condition_type, "name", None) if hasattr(module, "forest_condition_type") and module.forest_condition_type else None
 
         return data
 
@@ -814,7 +820,7 @@ class ModuleProcessor(ABC):
         self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
         self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
 
-    def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
+    def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any, last_year_of_accounting: int = 2001) -> Any:
         """Helper method to create a project with proper country selection"""
         # Get a random country from the region, with fallback
         country = region.countries.order_by("?").first()
@@ -829,13 +835,13 @@ class ModuleProcessor(ABC):
             soil_type=soil_type,
             country=country,
             implementation_years=1,
-            start_year_of_activities=2024,
-            last_year_of_accounting=2025,
+            start_year_of_activities=2000,
+            last_year_of_accounting=last_year_of_accounting,
             gw_potential=ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"),
         )
         return self.project
 
-    def build_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
+    def build_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any, last_year_of_accounting: int = 2001) -> Any:
         """Helper method to build a project (without saving to database)"""
         # Get a random country from the region, with fallback
         country = region.countries.order_by("?").first()
@@ -849,8 +855,8 @@ class ModuleProcessor(ABC):
             soil_type=soil_type,
             country=country,
             implementation_years=1,
-            start_year_of_activities=2024,
-            last_year_of_accounting=2025,
+            start_year_of_activities=2000,
+            last_year_of_accounting=last_year_of_accounting,
             gw_potential=ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"),
         )
         return self.project
@@ -1174,10 +1180,17 @@ class ForestManagementProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
-        module = factories.ForestManagementFactory.build(
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        else:
+            a = activity
+
+        method: callable = factories.ForestManagementFactory.create if create else factories.ForestManagementFactory.build
+
+        module = method(
             activity=a,
+            land_use_change=luc,
             land_use_type_start=land_use_type_start,
             land_use_type_w=land_use_type_start,
             land_use_type_wo=land_use_type_start,
@@ -1360,7 +1373,9 @@ class LandUseChangeProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = self.create_project(climate, moisture, soil_type, region, factories)
+        last_year_of_accounting = 2001 if module_start["type"][0].class_name != "ForestManagement" and module_w["type"][0].class_name != "ForestManagement" else 2020
+
+        p = self.create_project(climate, moisture, soil_type, region, factories, last_year_of_accounting=last_year_of_accounting)
         a = self.create_activity(p, factories)
         # a = factories.ActivityFactory.create(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
 
@@ -1412,6 +1427,14 @@ class LandUseChangeProcessor(ModuleProcessor):
                 fields_dict.get("water_management_type_after_cultivation_w"),
                 fields_dict.get("organic_amendment_type_start"),
                 fields_dict.get("organic_amendment_type_w"),
+            )
+        elif module_type_class_name == "ForestManagement":
+            return (
+                fields_dict.get("land_use_type_start"),
+                fields_dict.get("forest_type"),
+                fields_dict.get("forest_condition_type"),
+                fields_dict.get("average_yearly_degradation_percentage_start"),
+                fields_dict.get("average_yearly_degradation_percentage_w"),
             )
         else:
             # For other module types, we need to add their field orders
@@ -1503,6 +1526,752 @@ class SoilOrganicCarbonValidator:
 
         logger.info(f"Found {len(valid_combinations)} valid climate-moisture-soiltype combinations out of {total_combinations} total combinations")
         return valid_combinations
+
+
+class CombinationValidator(ABC):
+    """Base class for module-specific combination validation"""
+
+    @abstractmethod
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: utils.ScenarioTypes = None) -> bool:
+        """
+        Validate if a combination should be processed.
+
+        Args:
+            combination: The combination tuple to validate
+            models: Django models module for database queries
+            scenario_type: Optional scenario type to validate (e.g., "start", "w", "wo")
+
+        Returns:
+            bool: True if combination should be processed, False otherwise
+        """
+        pass
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """
+        Get a human-readable reason for why a combination was rejected.
+
+        Args:
+            combination: The combination tuple that was rejected
+            models: Django models module for database queries
+            scenario_type: Optional scenario type to validate (e.g., "start", "w", "wo")
+
+        Returns:
+            str: Reason for rejection
+        """
+        return "Combination failed module-specific validation"
+
+
+class DefaultCombinationValidator(CombinationValidator):
+    """Default validator that accepts all combinations"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """Default implementation accepts all combinations"""
+        return True
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Default implementation returns generic message"""
+        return "Combination passed default validation"
+
+
+class LandUseChangeCombinationValidator(CombinationValidator):
+    """Validator for LandUseChange module combinations"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate LandUseChange combinations.
+        Ensures that the combination has valid module relationships.
+        """
+        try:
+            # LandUseChange combination structure: (module_start, module_w, climate_moisture, soil_type, region)
+            if len(combination) < 5:
+                return False
+
+            module_start, module_w, climate_moisture, soil_type, region = combination[:5]
+
+            # Validate that climate_moisture is a tuple with climate and moisture
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate that we have valid climate and moisture objects
+            if not hasattr(climate, "id") or not hasattr(moisture, "id"):
+                return False
+
+            # Validate that we have valid soil_type and region objects
+            if not hasattr(soil_type, "id") or not hasattr(region, "id"):
+                return False
+
+            # Additional validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            # Validate associated modules (module_start and module_w)
+            if not self._validate_module_structure(module_start, "module_start"):
+                return False
+
+            if not self._validate_module_structure(module_w, "module_w"):
+                return False
+
+            # Validate that the associated modules can be processed with the environmental factors
+            if not self._validate_module_combinations(module_start, module_w, climate_moisture, soil_type, region, models, scenario_type):
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def _validate_module_structure(self, module: dict, module_name: str) -> bool:
+        """Validate the structure of a module dictionary"""
+        try:
+            # Check if module has required keys
+            if not isinstance(module, dict):
+                return False
+
+            if "type" not in module or "fields" not in module:
+                return False
+
+            # Validate type structure
+            if not isinstance(module["type"], list) or len(module["type"]) == 0:
+                return False
+
+            # Validate fields structure
+            if not isinstance(module["fields"], dict):
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def _validate_module_combinations(self, module_start: dict, module_w: dict, climate_moisture: tuple, soil_type, region, models: Any, scenario_type: str = None) -> bool:
+        """Validate that the associated modules can be processed with the environmental factors"""
+        try:
+            # Validate module_start combination
+            if not self._validate_single_module_combination(module_start, climate_moisture, soil_type, region, models, utils.ScenarioTypes.START):
+                return False
+
+            # Validate module_w combination
+            if not self._validate_single_module_combination(module_w, climate_moisture, soil_type, region, models, utils.ScenarioTypes.WITH):
+                return False
+
+            return True
+
+        except Exception:
+            return False
+
+    def _validate_single_module_combination(self, module: dict, climate_moisture: tuple, soil_type, region, models: Any, scenario_type: str = None) -> bool:
+        """Validate a single module combination"""
+        try:
+            # Get the module type class name
+            module_type_class_name = module["type"][0].class_name
+
+            # Get the appropriate validator for this module type
+            validator_registry = ValidatorRegistry()
+            validator = validator_registry.get_validator(module_type_class_name)
+
+            # Convert module fields to combination tuple format
+            module_combination = self._convert_module_to_combination(module, climate_moisture, soil_type, region)
+
+            # Validate using the module-specific validator
+            return validator.validate_combination(module_combination, models, scenario_type)
+
+        except Exception:
+            return False
+
+    def _convert_module_to_combination(self, module: dict, climate_moisture: tuple, soil_type, region) -> tuple:
+        """Convert module dictionary to combination tuple format"""
+        try:
+            # Get the fields from the module
+            fields = module["fields"]
+            module_type_class_name = module["type"][0].class_name
+
+            # Convert fields to tuple based on module type
+            if module_type_class_name == "AnnualCropland":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_w"),
+                    fields.get("tillage_management_type_start"),
+                    fields.get("tillage_management_type_w"),
+                    fields.get("organic_input_type_start"),
+                    fields.get("organic_input_type_w"),
+                    fields.get("residue_management_type_start"),
+                    fields.get("residue_management_type_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            elif module_type_class_name == "Grassland":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_w"),
+                    fields.get("grassland_type_start"),
+                    fields.get("grassland_type_w"),
+                    fields.get("grassland_condition_type_start"),
+                    fields.get("grassland_condition_type_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            elif module_type_class_name == "Livestock":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_w"),
+                    fields.get("livestock_type_start"),
+                    fields.get("livestock_type_w"),
+                    fields.get("livestock_condition_type_start"),
+                    fields.get("livestock_condition_type_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            elif module_type_class_name == "ForestManagement":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("forest_type"),
+                    fields.get("forest_condition_type"),
+                    fields.get("average_yearly_degradation_percentage_start"),
+                    fields.get("average_yearly_degradation_percentage_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            elif module_type_class_name == "SmallFishery":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_w"),
+                    fields.get("fishery_type_start"),
+                    fields.get("fishery_type_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            elif module_type_class_name == "LargeFishery":
+                return (
+                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_w"),
+                    fields.get("fishery_type_start"),
+                    fields.get("fishery_type_w"),
+                    climate_moisture,
+                    soil_type,
+                    region,
+                )
+            else:
+                # For other module types, create a basic combination
+                field_values = []
+                for key, value in fields.items():
+                    if value is not None:
+                        field_values.append(value)
+                return tuple(field_values) + (climate_moisture, soil_type, region)
+
+        except Exception:
+            # If conversion fails, return a basic combination
+            return (climate_moisture, soil_type, region)
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for LandUseChange validation failure"""
+        try:
+            if len(combination) < 5:
+                return "LandUseChange combination has insufficient elements"
+
+            module_start, module_w, climate_moisture, soil_type, region = combination[:5]
+
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure"
+
+            climate, moisture = climate_moisture
+
+            if not hasattr(climate, "id") or not hasattr(moisture, "id"):
+                return "Invalid climate or moisture objects"
+
+            if not hasattr(soil_type, "id") or not hasattr(region, "id"):
+                return "Invalid soil_type or region objects"
+
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return "Region has no associated countries"
+
+            # Check module structure validation
+            if not self._validate_module_structure(module_start, "module_start"):
+                return "Invalid module_start structure"
+
+            if not self._validate_module_structure(module_w, "module_w"):
+                return "Invalid module_w structure"
+
+            # Check module combination validation with detailed error messages
+            try:
+                if not self._validate_single_module_combination(module_start, climate_moisture, soil_type, region, models):
+                    module_type = module_start.get("type", [{}])[0].class_name if module_start.get("type") else "Unknown"
+                    return f"module_start ({module_type}) combination validation failed"
+
+                if not self._validate_single_module_combination(module_w, climate_moisture, soil_type, region, models):
+                    module_type = module_w.get("type", [{}])[0].class_name if module_w.get("type") else "Unknown"
+                    return f"module_w ({module_type}) combination validation failed"
+
+            except Exception as e:
+                return f"Module combination validation error: {str(e)}"
+
+            return "LandUseChange combination validation passed"
+
+        except Exception as e:
+            return f"LandUseChange validation error: {str(e)}"
+
+
+class GrasslandCombinationValidator(CombinationValidator):
+    """Validator for Grassland module combinations"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate Grassland combinations.
+        Ensures that grassland-specific constraints are met.
+        """
+        try:
+            # Grassland combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors (last 3 elements are typically climate_moisture, soil_type, region)
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # Grassland-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for Grassland validation failure"""
+        try:
+            if len(combination) < 3:
+                return "Grassland combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for Grassland"
+
+            return "Grassland combination validation passed"
+
+        except Exception as e:
+            return f"Grassland validation error: {str(e)}"
+
+
+class LivestockCombinationValidator(CombinationValidator):
+    """Validator for Livestock module combinations"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate Livestock combinations.
+        Ensures that livestock-specific constraints are met.
+        """
+        try:
+            # Livestock combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # Livestock-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for Livestock validation failure"""
+        try:
+            if len(combination) < 3:
+                return "Livestock combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for Livestock"
+
+            return "Livestock combination validation passed"
+
+        except Exception as e:
+            return f"Livestock validation error: {str(e)}"
+
+
+class FisheryCombinationValidator(CombinationValidator):
+    """Validator for Fishery module combinations (both Small and Large)"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate Fishery combinations.
+        Ensures that fishery-specific constraints are met.
+        """
+        try:
+            # Fishery combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # Fishery-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for Fishery validation failure"""
+        try:
+            if len(combination) < 3:
+                return "Fishery combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for Fishery"
+
+            return "Fishery combination validation passed"
+
+        except Exception as e:
+            return f"Fishery validation error: {str(e)}"
+
+
+class CroplandCombinationValidator(CombinationValidator):
+    """Validator for Cropland module combinations (Annual, Perennial, FloodedRice)"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate Cropland combinations.
+        Ensures that cropland-specific constraints are met.
+        """
+        try:
+            # Cropland combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # Cropland-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for Cropland validation failure"""
+        try:
+            if len(combination) < 3:
+                return "Cropland combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for Cropland"
+
+            return "Cropland combination validation passed"
+
+        except Exception as e:
+            return f"Cropland validation error: {str(e)}"
+
+
+class ForestManagementCombinationValidator(CombinationValidator):
+    """Validator for ForestManagement module combinations"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate ForestManagement combinations.
+        Ensures that forest management-specific constraints are met.
+        """
+        try:
+            # ForestManagement combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # ForestManagement-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            # Additional validation: test biomass data availability for ForestManagement
+            try:
+                # Import required modules for biomass validation
+                import ipcc.models as ipcc_models
+
+                # Test biomass data availability directly with IPCC models
+                if len(combination) >= 8:  # ForestManagement has 8 elements
+                    (
+                        land_use_type_start,
+                        forest_type,
+                        forest_condition_type,
+                        average_yearly_degradation_percentage_start,
+                        average_yearly_degradation_percentage_w,
+                        climate_moisture,
+                        soil_type,
+                        region,
+                    ) = combination
+
+                    # Test biomass data for START scenario (uses ForestTotalBiomass)
+                    if scenario_type is None or scenario_type == utils.ScenarioTypes.START:
+                        try:
+                            # Use get_or_default like the actual get_biomass_ef method
+                            ipcc_models.ForestTotalBiomass.objects.get_or_default(
+                                climate=climate,
+                                moisture=moisture,
+                                continent=region,  # region is used as continent
+                                land_use_type=land_use_type_start,
+                            )
+                        except (ipcc_models.ForestTotalBiomass.DoesNotExist, ValueError):
+                            # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
+                            return False
+
+                    # Test biomass data for WITH scenario (uses TotalBiomassAfterDefo)
+                    if scenario_type is None or scenario_type == utils.ScenarioTypes.WITH:
+                        try:
+                            # Use get_or_default like the actual get_biomass_ef method
+                            ipcc_models.TotalBiomassAfterDefo.objects.get_or_default(
+                                climate=climate,
+                                moisture=moisture,
+                                continent=region,  # region is used as continent
+                                land_use_type=land_use_type_start,
+                            )
+                        except (ipcc_models.TotalBiomassAfterDefo.DoesNotExist, ValueError):
+                            # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
+                            return False
+
+                    try:
+                        ipcc_models.ForestCombustionFactor.objects.get(
+                            climate=climate,
+                            forest_type=forest_type,
+                            land_use_type=land_use_type_start,
+                        )
+                    except (ipcc_models.ForestCombustionFactor.DoesNotExist, ValueError):
+                        # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
+                        return False
+
+                    if climate not in land_use_type_start.climates.all():
+                        return False
+
+                    if moisture not in land_use_type_start.moistures.all():
+                        return False
+
+            except Exception:
+                # If we can't test biomass data, consider it invalid
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for ForestManagement validation failure"""
+        try:
+            if len(combination) < 3:
+                return "ForestManagement combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for ForestManagement"
+
+            # Test biomass data availability for more specific error messages
+            try:
+                import ipcc.models as ipcc_models
+
+                if len(combination) >= 8:
+                    (
+                        land_use_type_start,
+                        forest_type,
+                        forest_condition_type,
+                        average_yearly_degradation_percentage_start,
+                        average_yearly_degradation_percentage_w,
+                        climate_moisture,
+                        soil_type,
+                        region,
+                    ) = combination
+
+                    climate, moisture = climate_moisture
+
+                    # Test biomass data for START scenario (uses ForestTotalBiomass)
+                    if scenario_type is None or scenario_type == utils.ScenarioTypes.START:
+                        try:
+                            ipcc_models.ForestTotalBiomass.objects.get_or_default(
+                                climate=climate,
+                                moisture=moisture,
+                                continent=region,
+                                land_use_type=land_use_type_start,
+                            )
+                        except (ipcc_models.ForestTotalBiomass.DoesNotExist, ValueError) as e:
+                            return f"ForestManagement missing ForestTotalBiomass data for START scenario: {climate}, {moisture}, {region}, {land_use_type_start} - {str(e)}"
+
+                    # Test biomass data for WITH scenario (uses TotalBiomassAfterDefo)
+                    if scenario_type is None or scenario_type == utils.ScenarioTypes.WITH:
+                        try:
+                            ipcc_models.TotalBiomassAfterDefo.objects.get_or_default(
+                                climate=climate,
+                                moisture=moisture,
+                                continent=region,
+                                land_use_type=land_use_type_start,
+                            )
+                        except (ipcc_models.TotalBiomassAfterDefo.DoesNotExist, ValueError) as e:
+                            return f"ForestManagement missing TotalBiomassAfterDefo data for WITH scenario: {climate}, {moisture}, {region}, {land_use_type_start} - {str(e)}"
+
+            except Exception as e:
+                return f"ForestManagement biomass validation error: {str(e)}"
+
+            return "ForestManagement combination validation passed"
+
+        except Exception as e:
+            return f"ForestManagement validation error: {str(e)}"
+
+
+class WetlandCombinationValidator(CombinationValidator):
+    """Validator for Wetland module combinations (Waterbody, CoastalWetland)"""
+
+    def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate Wetland combinations.
+        Ensures that wetland-specific constraints are met.
+        """
+        try:
+            # Wetland combination structure varies, but typically includes climate_moisture, soil_type, region
+            if len(combination) < 3:
+                return False
+
+            # Extract environmental factors
+            climate_moisture = combination[-3]
+            soil_type = combination[-2]
+            region = combination[-1]
+
+            # Validate climate_moisture structure
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return False
+
+            climate, moisture = climate_moisture
+
+            # Validate objects have required attributes
+            if not all(hasattr(obj, "id") for obj in [climate, moisture, soil_type, region]):
+                return False
+
+            # Wetland-specific validation: ensure region has countries
+            if not hasattr(region, "countries") or not region.countries.exists():
+                return False
+
+            return True
+
+        except (AttributeError, TypeError, ValueError):
+            return False
+
+    def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
+        """Get specific reason for Wetland validation failure"""
+        try:
+            if len(combination) < 3:
+                return "Wetland combination has insufficient elements"
+
+            climate_moisture = combination[-3]
+            if not isinstance(climate_moisture, tuple) or len(climate_moisture) != 2:
+                return "Invalid climate_moisture tuple structure for Wetland"
+
+            return "Wetland combination validation passed"
+
+        except Exception as e:
+            return f"Wetland validation error: {str(e)}"
+
+
+class ValidatorRegistry:
+    """Registry for module-specific combination validators"""
+
+    def __init__(self):
+        self._validators = {
+            "LandUseChange": LandUseChangeCombinationValidator(),
+            "Grassland": GrasslandCombinationValidator(),
+            "Livestock": LivestockCombinationValidator(),
+            "SmallFishery": FisheryCombinationValidator(),
+            "LargeFishery": FisheryCombinationValidator(),
+            "AnnualCropland": CroplandCombinationValidator(),
+            "FloodedRice": CroplandCombinationValidator(),
+            "PerennialCropland": CroplandCombinationValidator(),
+            "ForestManagement": ForestManagementCombinationValidator(),
+            "Input": DefaultCombinationValidator(),
+            "Waterbody": WetlandCombinationValidator(),
+            "CoastalWetland": WetlandCombinationValidator(),
+        }
+
+    def get_validator(self, module_name: str) -> CombinationValidator:
+        """Get the validator for a specific module"""
+        return self._validators.get(module_name, DefaultCombinationValidator())
+
+    def register_validator(self, module_name: str, validator: CombinationValidator):
+        """Register a custom validator for a module"""
+        self._validators[module_name] = validator
 
 
 class ConfigurationLoader:
@@ -1687,6 +2456,7 @@ class HammingPermutationComputer:
 
     def __init__(self, processor_registry: ProcessorRegistry):
         self.processor_registry = processor_registry
+        self.validator_registry = ValidatorRegistry()
 
     def django_initializer(self):
         """Initialize Django in child processes"""
@@ -1828,6 +2598,7 @@ class HammingPermutationComputer:
 
         data = []
         errors_data = []
+        validation_skipped_count = 0
 
         try:
             # Use more workers for better CPU utilization
@@ -1881,6 +2652,19 @@ class HammingPermutationComputer:
                                     # Add environmental factors
                                     combination = tuple(field_values) + (climate_moisture, soil_type, region)
 
+                                # Validate the combination before processing
+                                validator = self.validator_registry.get_validator(model.__name__)
+                                if not validator.validate_combination(combination, models, scenario_type=None):
+                                    # Skip invalid combinations
+                                    validation_skipped_count += 1
+                                    if validation_skipped_count % 100 == 0:  # Log every 100 skipped combinations
+                                        validation_reason = validator.get_validation_reason(combination, models, scenario_type=None)
+                                        logger.info(f"Skipped {validation_skipped_count} invalid combinations for {model.__name__} (latest reason: {validation_reason})")
+                                    pbar.update(1)
+                                    processed_count += 1
+                                    progress_tracker.increment_progress()
+                                    continue
+
                                 # Process the combination
                                 result = processor.process_combination(combination)
 
@@ -1924,7 +2708,7 @@ class HammingPermutationComputer:
                     break
 
                 pbar.close()
-                logger.info(f"Progress bar closed. Data: {len(data)}, Errors: {len(errors_data)}")
+                logger.info(f"Progress bar closed. Data: {len(data)}, Errors: {len(errors_data)}, Validation Skipped: {validation_skipped_count}")
 
             logger.info(f"ProcessPoolExecutor context exited. Data: {len(data)}, Errors: {len(errors_data)}")
 
@@ -2012,8 +2796,8 @@ PERENNIAL_CROPLAND = {
 GRASSLAND = {
     "type": [models.ModuleType.objects.get(class_name="Grassland")],
     "fields": {
-        "grassland_management_type_start": models.GrasslandManagementType.objects.all(),
-        "grassland_management_type_w": models.GrasslandManagementType.objects.all(),
+        "grassland_management_type_start": list(models.GrasslandManagementType.objects.all()),
+        "grassland_management_type_w": list(models.GrasslandManagementType.objects.all()),
         "is_fire_used_start": [False],
         "is_fire_used_w": [False],
         "fire_periodicity_start": [0],
@@ -2024,10 +2808,13 @@ GRASSLAND = {
 }
 
 FOREST_MANAGEMENT = {
+    "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
     "fields": {
-        "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
-        "forest_type": models.ForestType.objects.all(),
-        "forest_condition_type": models.ForestConditionType.objects.all(),
+        "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+        "forest_type": list(models.ForestType.objects.all()),
+        "forest_condition_type": list(models.ForestConditionType.objects.all()),
+        "average_yearly_degradation_percentage_start": [0],
+        "average_yearly_degradation_percentage_w": [0],
     },
 }
 # Module configurations
@@ -2152,25 +2939,36 @@ MODULE_CONFIGS = {
     },
     "LandUseChange": {
         "subsets": [
-            # Flooded Rice -> Annual Cropland
+            # # Flooded Rice -> Annual Cropland
+            # {
+            #     "fields": {
+            #         "module_w": {
+            #             **FLOODED_RICE,
+            #         },
+            #         "module_start": {
+            #             **ANNUAL_CROPLAND,
+            #         },
+            #     },
+            # },
+            # # Annual Cropland -> Flooded Rice
+            # {
+            #     "fields": {
+            #         "module_w": {
+            #             **FLOODED_RICE,
+            #         },
+            #         "module_start": {
+            #             **ANNUAL_CROPLAND,
+            #         },
+            #     },
+            # },
+            # Grassland -> Forest Management
             {
                 "fields": {
-                    "module_w": {
-                        **FLOODED_RICE,
-                    },
                     "module_start": {
-                        **ANNUAL_CROPLAND,
+                        **GRASSLAND,
                     },
-                },
-            },
-            # Annual Cropland -> Flooded Rice
-            {
-                "fields": {
                     "module_w": {
-                        **FLOODED_RICE,
-                    },
-                    "module_start": {
-                        **ANNUAL_CROPLAND,
+                        **FOREST_MANAGEMENT,
                     },
                 },
             },

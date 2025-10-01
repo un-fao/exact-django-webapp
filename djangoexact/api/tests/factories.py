@@ -311,12 +311,12 @@ class ForestManagementFactory(DjangoModelFactory):
 
     status = READY
 
-    land_use_type_start = factory.fuzzy.FuzzyChoice(forests)
-    land_use_type_w = land_use_type_start
-    land_use_type_wo = land_use_type_start
+    # land_use_type_start = factory.fuzzy.FuzzyChoice(forests)
+    # land_use_type_w = land_use_type_start
+    # land_use_type_wo = land_use_type_start
 
-    forest_type = ForestType.objects.get(name_en="Natural")
-    forest_condition_type = ForestConditionType.objects.get(name_en="Primary")
+    # forest_type = ForestType.objects.get(name_en="Natural")
+    # forest_condition_type = ForestConditionType.objects.get(name_en="Primary")
 
     area = 1
 
