@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Limestone",
+        "unit": "tonnes per year"
+    },
+    {
+        "name": "Dolomite",
+        "unit": "tonne per year"
+    },
+    {
+        "name": "Not specified",
+        "unit": "tonnes per year"
+    },
+    {
+        "name": "Urea",
+        "unit": "tonnes of Urea per year"
+    },
+    {
+        "name": "Synthetic N-fertilizers other than Urea",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "Phosphorous",
+        "unit": "tonnes of P205 per year"
+    },
+    {
+        "name": "Potassium",
+        "unit": "tonnes of K20 per year"
+    },
+    {
+        "name": "N-fertilizers in continuously irrigated rice",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "N-fertilizers in wet and dry irrigated rice",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "Sewage",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "Compost",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "Rendering waste, brewery waste, guano",
+        "unit": "tonnes of N per year"
+    },
+    {
+        "name": "Fungicides",
+        "unit": "tonnes of active ingredient"
+    },
+    {
+        "name": "Herbicides",
+        "unit": "tonnes of active ingredient"
+    },
+    {
+        "name": "Insecticides",
+        "unit": "tonnes of active ingredient"
+    }
+]
