@@ -32,6 +32,9 @@ import api.utilities as utils
 # Import Hamming functions
 from .hamming import hamming_shell_rows  # noqa: E402
 
+# Global flag to signal keyboard interrupt across all processing
+_keyboard_interrupt_flag = False
+
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
     """
@@ -755,6 +758,33 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
         return data
 
 
+class SetAsideDataBuilder(ModuleDataBuilder):
+    """Data builder for Set Aside modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.boolean("is_set_aside"),
+        ]
+
+
+class OtherLandDataBuilder(ModuleDataBuilder):
+    """Data builder for Other Land modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.boolean("is_degraded_land"),
+        ]
+
+
+class SettlementDataBuilder(ModuleDataBuilder):
+    """Data builder for Settlement modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("settlement_type"),
+        ]
+
+
 class ModuleDataBuilderRegistry:
     """Registry for module data builders"""
 
@@ -777,6 +807,9 @@ class ModuleDataBuilderRegistry:
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
         self.register("LandUseChange", LandUseChangeDataBuilder())
+        self.register("SetAside", SetAsideDataBuilder())
+        self.register("OtherLand", OtherLandDataBuilder())
+        self.register("Settlement", SettlementDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -819,6 +852,8 @@ class ModuleProcessor(ABC):
         self.project = None
         self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
         self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
+        self.change_rate = models.ChangeRate.objects.get(name="linear")
+        self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback")
 
     def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any, last_year_of_accounting: int = 2001) -> Any:
         """Helper method to create a project with proper country selection"""
@@ -837,7 +872,7 @@ class ModuleProcessor(ABC):
             implementation_years=1,
             start_year_of_activities=2000,
             last_year_of_accounting=last_year_of_accounting,
-            gw_potential=ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"),
+            gw_potential=self.gw_potential,
         )
         return self.project
 
@@ -857,17 +892,17 @@ class ModuleProcessor(ABC):
             implementation_years=1,
             start_year_of_activities=2000,
             last_year_of_accounting=last_year_of_accounting,
-            gw_potential=ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"),
+            gw_potential=self.gw_potential,
         )
         return self.project
 
     def create_activity(self, project: "models.Project", factories: Any) -> "models.Activity":
         """Helper method to create an activity with proper change rate"""
-        return factories.ActivityFactory.create(project=project, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        return factories.ActivityFactory.create(project=project, change_rate=self.change_rate)
 
     def build_activity(self, project: "models.Project", factories: Any) -> "models.Activity":
         """Helper method to build an activity with proper change rate"""
-        return factories.ActivityFactory.build(project=project, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        return factories.ActivityFactory.build(project=project, change_rate=self.change_rate)
 
     @abstractmethod
     def create_module(self, combination: Tuple, factories: Any, models: Any, luc: "models.LandUseChange" = None) -> Any:
@@ -900,8 +935,12 @@ class ModuleProcessor(ABC):
                 balance_w = calculators.CalculatorFactory().calculate_result(module_w)[0][2]
                 balance_luc = calculators.CalculatorFactory().calculate_result(module)[0][2]
                 balance = balance_start_and_wo + balance_w + balance_luc
+                if module_start.__class__.__name__ in ["ForestManagement", "PerennialCropland"] or module_w.__class__.__name__ in ["ForestManagement", "PerennialCropland"]:
+                    balance = balance / 20
             else:
                 balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
+                if module.__class__.__name__ in ["ForestManagement", "PerennialCropland"]:
+                    balance = balance / 20
 
             # Build data
             data = self.data_builder_registry.build_data(module)
@@ -956,7 +995,7 @@ class GrasslandProcessor(ModuleProcessor):
 
         if activity is None:
             p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1003,7 +1042,7 @@ class LivestockProcessor(ModuleProcessor):
 
         if activity is None:
             p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1044,7 +1083,7 @@ class AnnualCroplandProcessor(ModuleProcessor):
 
         if activity is None:
             p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1089,7 +1128,7 @@ class FloodedRiceProcessor(ModuleProcessor):
 
         if activity is None:
             p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1134,8 +1173,9 @@ class PerennialCroplandProcessor(ModuleProcessor):
         climate, moisture = climate_moisture
 
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            # NOTE: Forest Management and Perennial Cropland modules have 20 years of data (and then divide by 20)
+            p = self.build_project(climate, moisture, soil_type, region, factories, last_year_of_accounting=2020)
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1181,8 +1221,9 @@ class ForestManagementProcessor(ModuleProcessor):
         climate, moisture = climate_moisture
 
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+            # NOTE: Forest Management and Perennial Cropland modules have 20 years of data (and then divide by 20)
+            p = self.build_project(climate, moisture, soil_type, region, factories, last_year_of_accounting=2020)
+            a = self.build_activity(p, factories)
         else:
             a = activity
 
@@ -1218,7 +1259,7 @@ class SmallFisheryProcessor(ModuleProcessor):
         climate, moisture = climate_moisture
 
         p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        a = self.build_activity(p, factories)
         module = factories.SmallFisheryFactory.build(
             activity=a,
             fishery_type=fishery_type,
@@ -1247,7 +1288,7 @@ class LargeFisheryProcessor(ModuleProcessor):
         climate, moisture = climate_moisture
 
         p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        a = self.build_activity(p, factories)
         module = factories.LargeFisheryFactory.build(
             activity=a,
             fish_type=fish_type,
@@ -1284,7 +1325,7 @@ class InputProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
         self.project = self.create_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.create(project=self.project)
+        a = self.create_activity(self.project, factories)
         module = factories.InputFactory.create(
             activity=a,
         )
@@ -1313,7 +1354,7 @@ class WaterbodyProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
         p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        a = self.build_activity(p, factories)
         module = factories.WaterbodyFactory.build(
             activity=a,
             waterbody_type=waterbody_type,
@@ -1344,7 +1385,7 @@ class CoastalWetlandProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
         p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.build(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
+        a = self.build_activity(p, factories)
         module = factories.CoastalWetlandFactory.build(
             activity=a,
             land_use_type=land_use_type,
@@ -1373,11 +1414,12 @@ class LandUseChangeProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        last_year_of_accounting = 2001 if module_start["type"][0].class_name != "ForestManagement" and module_w["type"][0].class_name != "ForestManagement" else 2020
+        twenty_years_modules = ["ForestManagement", "PerennialCropland"]
+
+        last_year_of_accounting = 2001 if module_start["type"][0].class_name not in twenty_years_modules and module_w["type"][0].class_name not in twenty_years_modules else 2020
 
         p = self.create_project(climate, moisture, soil_type, region, factories, last_year_of_accounting=last_year_of_accounting)
         a = self.create_activity(p, factories)
-        # a = factories.ActivityFactory.create(project=p, change_rate=models.ChangeRate.objects.get(name="immediate"))
 
         # Get processor classes from the module type
         ProcessorStart = ProcessorRegistry(self.data_builder_registry).get_processor(module_start["type"][0].class_name)
@@ -1436,11 +1478,125 @@ class LandUseChangeProcessor(ModuleProcessor):
                 fields_dict.get("average_yearly_degradation_percentage_start"),
                 fields_dict.get("average_yearly_degradation_percentage_w"),
             )
+        elif module_type_class_name == "SetAside":
+            return (
+                fields_dict.get("is_set_aside_start"),
+                fields_dict.get("is_set_aside_w"),
+            )
+        elif module_type_class_name == "OtherLand":
+            return (
+                fields_dict.get("is_degraded_land_start"),
+                fields_dict.get("is_degraded_land_w"),
+            )
+        elif module_type_class_name == "Settlement":
+            return (
+                fields_dict.get("settlement_type_start"),
+                fields_dict.get("settlement_type_w"),
+            )
         else:
             # For other module types, we need to add their field orders
             # This is a fallback that tries to maintain some order
             field_names = sorted(fields_dict.keys())
             return tuple(fields_dict[name] for name in field_names)
+
+
+class SetAsideProcessor(ModuleProcessor):
+    """Processor for Set Aside modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any, luc: "models.LandUseChange" = None, create: bool = False, activity: "models.Activity" = None) -> Any:
+        """Create a Set Aside module"""
+        (
+            is_set_aside_start,
+            is_set_aside_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.SetAsideFactory.create if create else factories.SetAsideFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            area=1,
+            is_set_aside_start=is_set_aside_start,
+            is_set_aside_w=is_set_aside_w,
+            is_set_aside_wo=is_set_aside_start,
+        )
+        return module
+
+
+class OtherLandProcessor(ModuleProcessor):
+    """Processor for Other Land modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any, luc: "models.LandUseChange" = None, create: bool = False, activity: "models.Activity" = None) -> Any:
+        """Create a Other Land module"""
+        (
+            is_degraded_land_start,
+            is_degraded_land_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.OtherLandFactory.create if create else factories.OtherLandFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            area=1,
+            is_degraded_land_start=is_degraded_land_start,
+            is_degraded_land_w=is_degraded_land_w,
+            is_degraded_land_wo=is_degraded_land_start,
+        )
+        return module
+
+
+class SettlementProcessor(ModuleProcessor):
+    """Processor for Settlement modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any, luc: "models.LandUseChange" = None, create: bool = False, activity: "models.Activity" = None) -> Any:
+        """Create a Settlement module"""
+        (
+            settlement_type_start,
+            settlement_type_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.SettlementFactory.create if create else factories.SettlementFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            area=1,
+            settlement_type_start=settlement_type_start,
+            settlement_type_w=settlement_type_w,
+            settlement_type_wo=settlement_type_start,
+        )
+        return module
 
 
 class ProcessorRegistry:
@@ -1465,6 +1621,9 @@ class ProcessorRegistry:
         self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
         self.register("CoastalWetland", CoastalWetlandProcessor(self._data_builder_registry))
         self.register("LandUseChange", LandUseChangeProcessor(self._data_builder_registry))
+        self.register("SetAside", SetAsideProcessor(self._data_builder_registry))
+        self.register("OtherLand", OtherLandProcessor(self._data_builder_registry))
+        self.register("Settlement", SettlementProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -1756,6 +1915,21 @@ class LandUseChangeCombinationValidator(CombinationValidator):
                     climate_moisture,
                     soil_type,
                     region,
+                )
+            elif module_type_class_name == "SetAside":
+                return (
+                    fields.get("is_set_aside_start"),
+                    fields.get("is_set_aside_w"),
+                )
+            elif module_type_class_name == "OtherLand":
+                return (
+                    fields.get("is_degraded_land_start"),
+                    fields.get("is_degraded_land_w"),
+                )
+            elif module_type_class_name == "Settlement":
+                return (
+                    fields.get("settlement_type_start"),
+                    fields.get("settlement_type_w"),
                 )
             else:
                 # For other module types, create a basic combination
@@ -2435,19 +2609,25 @@ class DataManager:
         if data:
             df = pd.DataFrame(data)
             filepath = output_dir / f"{module_name.lower()}.csv"
+            logger.info(f"DEBUG: Saving {len(data)} rows to {filepath}, resume={resume}")
             if resume:
                 df.to_csv(filepath, mode="a", header=False, index=False)
+                logger.info(f"DEBUG: Appended {len(data)} rows to existing file")
             else:
                 df.to_csv(filepath, index=False)
+                logger.info(f"DEBUG: Created new file with {len(data)} rows")
             logger.info(f"Fallback: Saved {len(data)} rows to {filepath}")
 
         if errors:
             errors_df = pd.DataFrame(errors)
             errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
+            logger.info(f"DEBUG: Saving {len(errors)} errors to {errors_filepath}, resume={resume}")
             if resume:
                 errors_df.to_csv(errors_filepath, mode="a", header=False, index=False)
+                logger.info(f"DEBUG: Appended {len(errors)} errors to existing file")
             else:
                 errors_df.to_csv(errors_filepath, index=False)
+                logger.info(f"DEBUG: Created new file with {len(errors)} errors")
             logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
 
 
@@ -2713,6 +2893,8 @@ class HammingPermutationComputer:
             logger.info(f"ProcessPoolExecutor context exited. Data: {len(data)}, Errors: {len(errors_data)}")
 
         except KeyboardInterrupt:
+            global _keyboard_interrupt_flag
+            _keyboard_interrupt_flag = True
             logger.info(f"\nKeyboard interrupt detected! Returning {len(data)} computed rows...")
             # Force save progress on interrupt
             progress_tracker.save_progress(force=True)
@@ -2721,6 +2903,7 @@ class HammingPermutationComputer:
                 pbar.close()
             except Exception:
                 pass
+            # Return the data so it can be saved, and set the global flag to stop all processing
             return data, errors_data
         except Exception as e:
             logger.error(f"Unexpected error during computation: {e}")
@@ -2744,20 +2927,6 @@ class HammingPermutationComputer:
 
         return data, errors_data
 
-
-FLOODED_RICE = {
-    "type": [models.ModuleType.objects.get(class_name="FloodedRice")],
-    "fields": {
-        "water_management_type_before_cultivation_start": list(
-            models.WaterManagementTypeBeforeCultivation.objects.filter(name__in=["Non Flooded Pre-Season >180 D", "Flooded Pre-Season > 30 D"]).all()
-        ),
-        "water_management_type_before_cultivation_w": list(models.WaterManagementTypeBeforeCultivation.objects.filter(name__in=["Non Flooded Pre-Season >180 D", "Flooded Pre-Season > 30 D"]).all()),
-        "water_management_type_after_cultivation_start": list(models.WaterManagementTypeAfterCultivation.objects.filter(name__in=["Rainfed, Deep Water", "Irrigated, Continuously Flooded"]).all()),
-        "water_management_type_after_cultivation_w": list(models.WaterManagementTypeAfterCultivation.objects.filter(name__in=["Rainfed, Deep Water", "Irrigated, Continuously Flooded"]).all()),
-        "organic_amendment_type_start": list(models.OrganicAmendmentType.objects.filter(name__in=["Straw Exported", "Straw Incorporated Long (>30 Days) Before Cultivation"]).all()),
-        "organic_amendment_type_w": list(models.OrganicAmendmentType.objects.filter(name__in=["Straw Exported", "Straw Incorporated Long (>30 Days) Before Cultivation"]).all()),
-    },
-}
 
 ANNUAL_CROPLAND = {
     "type": [models.ModuleType.objects.get(class_name="AnnualCropland")],
@@ -2793,6 +2962,72 @@ PERENNIAL_CROPLAND = {
     },
 }
 
+FLOODED_RICE = {
+    "type": [models.ModuleType.objects.get(class_name="FloodedRice")],
+    "fields": {
+        "water_management_type_before_cultivation_start": list(
+            models.WaterManagementTypeBeforeCultivation.objects.filter(name__in=["Non Flooded Pre-Season >180 D", "Flooded Pre-Season > 30 D"]).all()
+        ),
+        "water_management_type_before_cultivation_w": list(models.WaterManagementTypeBeforeCultivation.objects.filter(name__in=["Non Flooded Pre-Season >180 D", "Flooded Pre-Season > 30 D"]).all()),
+        "water_management_type_after_cultivation_start": list(models.WaterManagementTypeAfterCultivation.objects.filter(name__in=["Rainfed, Deep Water", "Irrigated, Continuously Flooded"]).all()),
+        "water_management_type_after_cultivation_w": list(models.WaterManagementTypeAfterCultivation.objects.filter(name__in=["Rainfed, Deep Water", "Irrigated, Continuously Flooded"]).all()),
+        "organic_amendment_type_start": list(models.OrganicAmendmentType.objects.filter(name__in=["Straw Exported", "Straw Incorporated Long (>30 Days) Before Cultivation"]).all()),
+        "organic_amendment_type_w": list(models.OrganicAmendmentType.objects.filter(name__in=["Straw Exported", "Straw Incorporated Long (>30 Days) Before Cultivation"]).all()),
+    },
+}
+
+FOREST_MANAGEMENT = {
+    "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+    "fields": {
+        "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+        "forest_type": list(models.ForestType.objects.all()),
+        "forest_condition_type": list(models.ForestConditionType.objects.all()),
+        "average_yearly_degradation_percentage_start": [0],
+        "average_yearly_degradation_percentage_w": [0],
+    },
+}
+
+SET_ASIDE_START = {
+    "type": [models.ModuleType.objects.get(class_name="SetAside")],
+    "fields": {
+        "is_set_aside_start": [True],
+        "is_set_aside_w": [False],
+    },
+}
+
+SET_ASIDE_W = {
+    "type": [models.ModuleType.objects.get(class_name="SetAside")],
+    "fields": {
+        "is_set_aside_start": [False],
+        "is_set_aside_w": [True],
+    },
+}
+
+OTHER_LAND_START = {
+    "type": [models.ModuleType.objects.get(class_name="OtherLand")],
+    "fields": {
+        "is_degraded_land_start": [True],
+        "is_degraded_land_w": [False],
+    },
+}
+
+OTHER_LAND_W = {
+    "type": [models.ModuleType.objects.get(class_name="OtherLand")],
+    "fields": {
+        "is_degraded_land_start": [False],
+        "is_degraded_land_w": [True],
+    },
+}
+
+SETTLEMENT = {
+    "type": [models.ModuleType.objects.get(class_name="Settlement")],
+    "fields": {
+        "settlement_type_start": list(models.SettlementType.objects.all()),
+        "settlement_type_w": list(models.SettlementType.objects.all()),
+    },
+}
+
+
 GRASSLAND = {
     "type": [models.ModuleType.objects.get(class_name="Grassland")],
     "fields": {
@@ -2807,172 +3042,50 @@ GRASSLAND = {
     },
 }
 
-FOREST_MANAGEMENT = {
-    "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-    "fields": {
-        "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-        "forest_type": list(models.ForestType.objects.all()),
-        "forest_condition_type": list(models.ForestConditionType.objects.all()),
-        "average_yearly_degradation_percentage_start": [0],
-        "average_yearly_degradation_percentage_w": [0],
-    },
-}
+ALL_MODULES = [
+    SET_ASIDE_START,
+    SET_ASIDE_W,
+    OTHER_LAND_START,
+    OTHER_LAND_W,
+    SETTLEMENT,
+    GRASSLAND,
+    FOREST_MANAGEMENT,
+    ANNUAL_CROPLAND,
+    PERENNIAL_CROPLAND,
+    FLOODED_RICE,
+]
+
+ALL_POSSIBLE_COMBINATIONS = [
+    {
+        "fields": {
+            "module_start": module_start,
+            "module_w": module_w,
+        }
+    }
+    for module_start in ALL_MODULES
+    for module_w in ALL_MODULES
+]
+
+# Filter out combinations where the start module is the same as the w module
+ALL_POSSIBLE_COMBINATIONS = list(filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != x["fields"]["module_w"]["type"][0].class_name, ALL_POSSIBLE_COMBINATIONS))
+
+
+# Filter out duplicate combinations based on module types
+seen = set()
+unique_combinations = []
+for combination in ALL_POSSIBLE_COMBINATIONS:
+    module_start_type = combination["fields"]["module_start"]["type"][0].class_name
+    module_w_type = combination["fields"]["module_w"]["type"][0].class_name
+    key = (module_start_type, module_w_type)
+    if key not in seen:
+        seen.add(key)
+        unique_combinations.append(combination)
+ALL_POSSIBLE_COMBINATIONS = unique_combinations
+
 # Module configurations
 MODULE_CONFIGS = {
-    "Grassland": {  # Compute # DONE
-        "fields": {
-            "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "is_fire_used_start": [True, False],
-            "is_fire_used_w": [True, False],
-            "fire_periodicity_start": [1],
-            "fire_periodicity_w": [1],
-            "fire_impact_start": [1, 0],
-            "fire_impact_w": [1, 0],
-        },
-        "config_name": "grassland",
-    },
-    "Livestock": {  # Compute # DONE
-        "fields": {
-            "livestock_category_type": models.LivestockCategoryType.objects.all(),
-            "livestock_production_type_start": models.LivestockProductionType.objects.all(),
-            "livestock_production_type_w": models.LivestockProductionType.objects.all(),
-            "heads_number_start": [1],
-            "heads_number_w": [1],
-        },
-        "config_name": "livestock",
-    },
-    "AnnualCropland": {  # DONE
-        "fields": {
-            "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
-            "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
-            "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
-            "residue_management_type_start": models.ResidueManagementType.objects.all(),
-            "residue_management_type_w": models.ResidueManagementType.objects.all(),
-        },
-        "config_name": "annual_cropland",
-    },
-    "FloodedRice": {  # Skip
-        "fields": {
-            "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
-            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
-            "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
-            "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
-            "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
-            "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
-        },
-        "config_name": "flooded_rice",
-    },
-    "PerennialCropland": {  # Skip
-        "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            # "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "tillage_management_type_start": models.TillageManagementType.objects.all(),
-            # "tillage_management_type_w": models.TillageManagementType.objects.all(),
-            # "is_biomass_burned_start": [True, False],
-            # "is_biomass_burned_w": [True, False],
-            # "fire_periodicity_t2_start": [1],
-            # "fire_periodicity_t2_w": [1],
-        },
-        "config_name": "perennial_cropland",
-    },
-    "ForestManagement": {  # Compute
-        "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
-            "forest_type": models.ForestType.objects.all(),
-            "forest_condition_type": models.ForestConditionType.objects.all(),
-            "average_yearly_degradation_percentage_start": [0],
-            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
-        },
-        "config_name": "forest_management",
-    },
-    "SmallFishery": {  # Compute # DONE
-        "fields": {
-            "gear_type_start": models.SmallFisheryGearType.objects.all(),
-            "gear_type_w": models.SmallFisheryGearType.objects.all(),
-            "fishery_type": models.FisheryType.objects.all(),
-        },
-        "config_name": "small_fishery",
-    },
-    "LargeFishery": {  # Skip # DONE
-        "fields": {
-            "gear_type_start": models.LargeFisheryGearType.objects.all(),
-            "gear_type_w": models.LargeFisheryGearType.objects.all(),
-            "fish_type": models.FishType.objects.all(),
-        },
-        "config_name": "large_fishery",
-    },
-    "CoastalWetland": {  # Skip
-        "fields": {
-            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-            "area_under_drainage_start": [1, 0],
-            "area_under_drainage_w": [1, 0],
-            "drained_area_excavated_start": [1, 0],
-            "drained_area_excavated_w": [1, 0],
-            "area_not_drained_or_rewetted_start": [1, 0],
-            "area_not_drained_or_rewetted_w": [1, 0],
-            "area_w_restored_vegetation_start": [1, 0],
-            "area_w_restored_vegetation_w": [1, 0],
-        },
-        "config_name": "coastal_wetland",
-    },
-    "Input": {  # Compute # BUG: ZERO RESULTS
-        "fields": {
-            "input_type": models.InputType.objects.all(),
-            "value_start": [0, 1],  # Start values: 0 and 1
-            "value_w": [0, 1],  # With values: 0 and 1
-        },
-        "config_name": "input",
-    },
-    "Waterbody": {  # Compute # DONE
-        "fields": {
-            "waterbody_type": models.WaterbodyType.objects.all(),
-            "trophic_type_start": models.TrophicType.objects.all(),
-            "trophic_type_w": models.TrophicType.objects.all(),
-        },
-        "config_name": "waterbody",
-    },
     "LandUseChange": {
-        "subsets": [
-            # # Flooded Rice -> Annual Cropland
-            # {
-            #     "fields": {
-            #         "module_w": {
-            #             **FLOODED_RICE,
-            #         },
-            #         "module_start": {
-            #             **ANNUAL_CROPLAND,
-            #         },
-            #     },
-            # },
-            # # Annual Cropland -> Flooded Rice
-            # {
-            #     "fields": {
-            #         "module_w": {
-            #             **FLOODED_RICE,
-            #         },
-            #         "module_start": {
-            #             **ANNUAL_CROPLAND,
-            #         },
-            #     },
-            # },
-            # Grassland -> Forest Management
-            {
-                "fields": {
-                    "module_start": {
-                        **GRASSLAND,
-                    },
-                    "module_w": {
-                        **FOREST_MANAGEMENT,
-                    },
-                },
-            },
-        ],
+        "subsets": [*ALL_POSSIBLE_COMBINATIONS],
         "config_name": "land_use_change",
     },
 }
@@ -3157,11 +3270,136 @@ MODULE_CONFIGS = {
         },
     },
 },
+
+OTHER MODULES (NON-LUC)
+"Grassland": {  # Compute # DONE
+        "fields": {
+            "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "is_fire_used_start": [True, False],
+            "is_fire_used_w": [True, False],
+            "fire_periodicity_start": [1],
+            "fire_periodicity_w": [1],
+            "fire_impact_start": [1, 0],
+            "fire_impact_w": [1, 0],
+        },
+        "config_name": "grassland",
+    },
+    "Livestock": {  # Compute # DONE
+        "fields": {
+            "livestock_category_type": models.LivestockCategoryType.objects.all(),
+            "livestock_production_type_start": models.LivestockProductionType.objects.all(),
+            "livestock_production_type_w": models.LivestockProductionType.objects.all(),
+            "heads_number_start": [1],
+            "heads_number_w": [1],
+        },
+        "config_name": "livestock",
+    },
+    "AnnualCropland": {  # DONE
+        "fields": {
+            "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
+            "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
+            "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "organic_input_type_w": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation
+            "residue_management_type_start": models.ResidueManagementType.objects.all(),
+            "residue_management_type_w": models.ResidueManagementType.objects.all(),
+        },
+        "config_name": "annual_cropland",
+    },
+    "FloodedRice": {  # Skip
+        "fields": {
+            "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
+            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
+            "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.all(),
+            "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.all(),
+            "organic_amendment_type_start": models.OrganicAmendmentType.objects.all(),
+            "organic_amendment_type_w": models.OrganicAmendmentType.objects.all(),
+        },
+        "config_name": "flooded_rice",
+    },
+    "PerennialCropland": {  # Skip
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            # "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
+            # "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
+            # "tillage_management_type_start": models.TillageManagementType.objects.all(),
+            # "tillage_management_type_w": models.TillageManagementType.objects.all(),
+            # "is_biomass_burned_start": [True, False],
+            # "is_biomass_burned_w": [True, False],
+            # "fire_periodicity_t2_start": [1],
+            # "fire_periodicity_t2_w": [1],
+        },
+        "config_name": "perennial_cropland",
+    },
+    "ForestManagement": {  # Compute
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            "forest_type": models.ForestType.objects.all(),
+            "forest_condition_type": models.ForestConditionType.objects.all(),
+            "average_yearly_degradation_percentage_start": [0],
+            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
+        },
+        "config_name": "forest_management",
+    },
+    "SmallFishery": {  # Compute # DONE
+        "fields": {
+            "gear_type_start": models.SmallFisheryGearType.objects.all(),
+            "gear_type_w": models.SmallFisheryGearType.objects.all(),
+            "fishery_type": models.FisheryType.objects.all(),
+        },
+        "config_name": "small_fishery",
+    },
+    "LargeFishery": {  # Skip # DONE
+        "fields": {
+            "gear_type_start": models.LargeFisheryGearType.objects.all(),
+            "gear_type_w": models.LargeFisheryGearType.objects.all(),
+            "fish_type": models.FishType.objects.all(),
+        },
+        "config_name": "large_fishery",
+    },
+    "CoastalWetland": {  # Skip
+        "fields": {
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
+            "area_under_drainage_start": [1, 0],
+            "area_under_drainage_w": [1, 0],
+            "drained_area_excavated_start": [1, 0],
+            "drained_area_excavated_w": [1, 0],
+            "area_not_drained_or_rewetted_start": [1, 0],
+            "area_not_drained_or_rewetted_w": [1, 0],
+            "area_w_restored_vegetation_start": [1, 0],
+            "area_w_restored_vegetation_w": [1, 0],
+        },
+        "config_name": "coastal_wetland",
+    },
+    "Input": {  # Compute # BUG: ZERO RESULTS
+        "fields": {
+            "input_type": models.InputType.objects.all(),
+            "value_start": [0, 1],  # Start values: 0 and 1
+            "value_w": [0, 1],  # With values: 0 and 1
+        },
+        "config_name": "input",
+    },
+    "Waterbody": {  # Compute # DONE
+        "fields": {
+            "waterbody_type": models.WaterbodyType.objects.all(),
+            "trophic_type_start": models.TrophicType.objects.all(),
+            "trophic_type_w": models.TrophicType.objects.all(),
+        },
+        "config_name": "waterbody",
+    },
+}
 """
 
 
 def run_minitool_hamming(resume: bool = False):
     """Main execution function using Hamming shell permutations"""
+    # Reset the global keyboard interrupt flag
+    global _keyboard_interrupt_flag
+    _keyboard_interrupt_flag = False
+
     # Set logging level to INFO to see progress messages
     logging.getLogger().setLevel(logging.INFO)
     logger.info("Running Hamming shell permutation script with progress logging...")
@@ -3188,17 +3426,39 @@ def run_minitool_hamming(resume: bool = False):
                 if config.get("subsets", None) is None:
                     config["subsets"] = [config]
 
-                for subset in config["subsets"]:
+                for subset_index, subset in enumerate(config["subsets"]):
+                    # Check if keyboard interrupt flag has been set
+                    if _keyboard_interrupt_flag:
+                        logger.info(f"\nKeyboard interrupt detected! Stopping all subset processing for {module_name}.")
+                        break
+
                     data, errors = hamming_computer.compute_hamming_permutations(
                         subset["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume
                     )
-                    logger.info(f"Module {module_name} completed: {len(data)} data rows, {len(errors)} error rows")
+                    logger.info(f"Subset {subset_index + 1}/{len(config['subsets'])} completed: {len(data)} data rows, {len(errors)} error rows")
+
+                    # Save data immediately after each subset
+                    # For the first subset, use the resume flag from arguments
+                    # For subsequent subsets, always append (resume=True)
+                    should_append = resume if subset_index == 0 else True
+
                     if data or errors:
-                        logger.info(f"Saving data for module: {module_name}")
-                        data_manager.save_data(data, errors, module_name, local=True, resume=resume)
-                        logger.info(f"Data saved for module: {module_name}")
+                        logger.info(f"Saving data for subset {subset_index + 1} of module: {module_name} - Data: {len(data)}, Errors: {len(errors)}")
+                        logger.info(f"Append mode: {should_append}")
+                        data_manager.save_data(data, errors, module_name, local=True, resume=should_append)
+                        logger.info(f"Data saved for subset {subset_index + 1} of module: {module_name}")
                     else:
-                        logger.warning(f"No data or errors to save for module: {module_name}")
+                        logger.warning(f"No data or errors to save for subset {subset_index + 1} of module: {module_name}")
+
+                    # Check again after saving in case interrupt occurred during save
+                    if _keyboard_interrupt_flag:
+                        logger.info(f"\nKeyboard interrupt detected after saving! Stopping all processing.")
+                        break
+
+                # If keyboard interrupt flag is set, stop processing completely
+                if _keyboard_interrupt_flag:
+                    logger.info("Stopping script due to keyboard interrupt.")
+                    raise KeyboardInterrupt()
 
     except KeyboardInterrupt:
         logger.info("\nKeyboard interrupt detected in main run function!")
