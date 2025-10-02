@@ -417,6 +417,19 @@ def sanitize_minitool_data():
     print("Done")
 
 
+def import_input_types_units():
+    """
+    Import input types units
+    """
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "InputTypeUnits.json"))
+    for index, row in df.iterrows():
+        print(f"Importing input type {row['name']} with unit {row['unit']}")
+        input_type = models.InputType.objects.get(name__iexact=row["name"])
+        input_type.unit = row["unit"]
+        input_type.save()
+        print(f"Imported input type {input_type.name} with unit {input_type.unit}")
+
+
 def run():
     import os
 
@@ -425,16 +438,19 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        cycle_all_modules_and_invalidate_cached_results()
+        # cycle_all_modules_and_invalidate_cached_results()
+        import_input_types_units()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        import_input_types_units()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        sanitize_minitool_data()
+        # sanitize_minitool_data()
+        import_input_types_units()
         pass
 
     if app_mode == "test":

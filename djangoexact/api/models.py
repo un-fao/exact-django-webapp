@@ -2488,6 +2488,7 @@ class InputType(models.Model):
     has_co2_emissions = models.BooleanField(default=False)
     has_n2o_emissions = models.BooleanField(default=False)
     has_co2_e_emissions = models.BooleanField(default=False)
+    unit = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         unique_together = ("macro_input_type", "name")
