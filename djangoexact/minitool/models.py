@@ -133,8 +133,19 @@ class ChangeAggregate(models.Model):
         return f"{self.field}: {self.from_value} -> {self.to_value} (Count: {self.count})"
 
 
+class ScenarioCategory(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
 class EmissionScenario(models.Model):
     name = models.CharField(max_length=255)
+    category = models.ForeignKey(ScenarioCategory, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
