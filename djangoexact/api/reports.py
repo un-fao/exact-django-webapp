@@ -2750,7 +2750,7 @@ class ForestManagementReport(LandModuleReport):
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from biomass loss")
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from biomass gain")
 
-        for i in range(self.project_report.duration):
+        for i in range(self.activity_report.project_report.duration):
             self.results_worksheet.cell(row=self.fire_n2o_row_index, column=i + 2, value=self.fire_n2o[i])
             self.results_worksheet.cell(row=self.fire_ch4_row_index, column=i + 2, value=self.fire_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.hwp_co2[i])
