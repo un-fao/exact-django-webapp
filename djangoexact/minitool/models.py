@@ -139,6 +139,8 @@ class EmissionScenario(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    metadata = models.JSONField(default=dict, blank=True)
+
     module_type = models.CharField(max_length=255)
     changes = models.JSONField()
 
