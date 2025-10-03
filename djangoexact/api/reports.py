@@ -1787,15 +1787,18 @@ class FloodedRiceReport(LandModuleReport):
     def __post_init__(self):
         self.calculator: calculators.FloodedRiceSeasonCalculator = calculators.FloodedRiceSeasonCalculator(self.module)
         self.minor_season_calculators = []
+
+        self.rice_cultivation_ch4 = np.zeros(self.activity_report.project_report.duration)
         return super().__post_init__()
 
-    def add_minor_seasons_results(self):
+    def add_submodules_results(self):
         minor_seasons = getattr(self.module, "submodules", [])
 
-        for minor_season in minor_seasons.all():
-            log.debug(f"Building report for minor season {minor_season.name}")
+        for minor_season in minor_seasons:
+            log.debug(f"Building report for minor season {minor_season}")
 
             minor_calculator = calculators.FloodedRiceSeasonCalculator(minor_season)
+            minor_calculator.calculate()
             self.minor_season_calculators.append(minor_calculator)
             minor_emission_set = []
 
@@ -1809,11 +1812,14 @@ class FloodedRiceReport(LandModuleReport):
                 if self.calculator.results_start_wo is not None:
                     minor_emission_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
 
-            # TODO: This can be removed because it's already done in LandModuleReport
-            self.biomass_co2 = [x + y for x, y in zip_longest(self.biomass_co2, self.extract_emissions(minor_emission_set, self.biomass_co2_source[0], self.biomass_co2_source[1]), fillvalue=0)]
-            self.soil_co2 = [x + y for x, y in zip_longest(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]), fillvalue=0)]
-            self.soil_n2o = [x + y for x, y in zip_longest(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]), fillvalue=0)]
-            self.fire_n2o = [x + y for x, y in zip_longest(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]), fillvalue=0)]
+            self.biomass_co2 = list(map(sum, zip_longest(self.biomass_co2, self.extract_emissions(minor_emission_set, self.biomass_co2_source[0], self.biomass_co2_source[1]), fillvalue=0)))
+            self.soil_co2 = list(map(sum, zip_longest(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]), fillvalue=0)))
+            self.soil_n2o = list(map(sum, zip_longest(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]), fillvalue=0)))
+            self.fire_n2o = list(map(sum, zip_longest(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]), fillvalue=0)))
+
+            self.rice_cultivation_ch4 = list(
+                map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0))
+            )
 
     def populate_metadata(self):
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -1891,15 +1897,24 @@ class FloodedRiceReport(LandModuleReport):
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
-    def build_report(self):
-        super().build_report()
-
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
         last_results_row = self.results_worksheet.max_row
 
-        self.rice_cultivation_ch4 = self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1])
+        self.add_submodules_results()
+
+        self.rice_cultivation_ch4 = list(
+            map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0))
+        )
+        self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.rice_cultivation_ch4, fillvalue=0)))
+
+        yearly_emissions = list(map(sum, zip_longest(self.rice_cultivation_ch4, fillvalue=0)))
+        cumulative_emissions = np.cumsum(yearly_emissions)
+
+        self.cumulative_emissions = cumulative_emissions
+        self.yearly_emissions = yearly_emissions
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from rice cultivation")
 
@@ -1908,7 +1923,17 @@ class FloodedRiceReport(LandModuleReport):
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
-        self.populate_metadata()
+    def build_report(self):
+        try:
+            super().build_report()
+            self.populate_results()
+            self.populate_metadata()
+        except Exception as e:
+            print(f"Error building report: {e}")
+            import traceback
+
+            traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -2363,7 +2388,7 @@ class LivestockReport(BaseModuleReport):
                     self.manure_management_prp_leaching_indirect_n2o,
                     self.manure_management_prp_volatilization_indirect_n2o,
                     fillvalue=0,
-                )
+                ),
             )
         )
 
@@ -2675,8 +2700,8 @@ class ForestManagementReport(LandModuleReport):
                     self.degradation_bgb_co2,
                     self.degradation_litter_co2,
                     self.degradation_deadwood_co2,
+                    fillvalue=0,
                 ),
-                fillvalue=0,
             )
         )
         self.biomass_gain_co2 = list(map(sum, zip_longest(self.growth_agb_co2, self.growth_bgb_co2, self.litter_co2, self.deadwood_co2, fillvalue=0)))
@@ -2716,8 +2741,8 @@ class ForestManagementReport(LandModuleReport):
                     self.deadwood_co2,
                     self.degradation_litter_co2,
                     self.degradation_deadwood_co2,
+                    fillvalue=0,
                 ),
-                fillvalue=0,
             )
         )
 
@@ -2725,7 +2750,7 @@ class ForestManagementReport(LandModuleReport):
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from biomass loss")
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from biomass gain")
 
-        for i in range(self.project_report.duration):
+        for i in range(self.activity_report.project_report.duration):
             self.results_worksheet.cell(row=self.fire_n2o_row_index, column=i + 2, value=self.fire_n2o[i])
             self.results_worksheet.cell(row=self.fire_ch4_row_index, column=i + 2, value=self.fire_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.hwp_co2[i])
@@ -3924,16 +3949,11 @@ class StorageReport(BaseModuleReport):
 
         self.add_submodules_results()
 
-        yearly_emissions = list(map(sum, zip_longest(self.electricity_co2_eq, fillvalue=0)))
+        yearly_emissions = list(map(sum, zip_longest(self.electricity_co2_eq, self.storage_co2_eq, fillvalue=0)))
         cumulative_emissions = np.cumsum(yearly_emissions)
 
         self.cumulative_emissions = cumulative_emissions
         self.yearly_emissions = yearly_emissions
-
-        print(f"Cumulative emissions: {self.cumulative_emissions}")
-        print(f"Yearly emissions: {self.yearly_emissions}")
-        print(f"Electricity CO2 eq: {self.electricity_co2_eq}")
-        print(f"Storage CO2 eq: {self.storage_co2_eq}")
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from electricity")
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from storage")

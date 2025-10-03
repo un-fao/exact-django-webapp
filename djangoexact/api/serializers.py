@@ -3219,7 +3219,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()
-            if self.instance.status.name != utils.InvitationStatus.PENDING.value and (new_status and new_status.name == utils.InvitationStatus.ACCEPTED.value):
+            if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (new_status and new_status.name_en == utils.InvitationStatus.ACCEPTED.value):
                 raise serializers.ValidationError("Cannot accept an invitation that is not pending")
 
         return data
@@ -3237,13 +3237,13 @@ class ProjectInvitationAcceptSerializer(serializers.ModelSerializer):
         if uuid.UUID(self.context.get("token", None)) != self.instance.token:
             raise serializers.ValidationError("Invalid token")
 
-        if self.instance.status.name != utils.InvitationStatus.PENDING.value and (data.get("status", None) and data.get("status", None).name == utils.InvitationStatus.ACCEPTED.value):
+        if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (data.get("status", None) and data.get("status", None).name_en == utils.InvitationStatus.ACCEPTED.value):
             raise serializers.ValidationError("Cannot accept an invitation that is not pending")
 
         return data
 
     def save(self, **kwargs):
-        self.instance.status = InvitationStatusType.objects.get(name=utils.InvitationStatus.ACCEPTED.value)
+        self.instance.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
         self.instance.save()
         return self.instance
 
