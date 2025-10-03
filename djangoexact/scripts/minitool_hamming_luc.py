@@ -508,17 +508,12 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             # Core forest fields (single fields)
+            FieldMappingBuilder.foreign_key("land_use_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             # Degradation fields
-            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
-
-    def get_custom_fields(self, module: Any) -> Dict[str, Any]:
-        """Get custom fields that don't follow the standard pattern"""
-        return {
-            "land_use_type": getattr(module, "land_use_type_start", None),
-        }
 
 
 class SmallFisheryDataBuilder(ModuleDataBuilder):
@@ -749,11 +744,44 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
             data[f"{prefix}organic_amendment_type_wo"] = (
                 getattr(module.organic_amendment_type_wo, "name", None) if hasattr(module, "organic_amendment_type_wo") and module.organic_amendment_type_wo else None
             )
+
         elif module_type == "ForestManagement":
             data[f"{prefix}land_use_type_start"] = getattr(module.land_use_type_start, "name", None) if hasattr(module, "land_use_type_start") and module.land_use_type_start else None
             data[f"{prefix}land_use_type_w"] = getattr(module.land_use_type_w, "name", None) if hasattr(module, "land_use_type_w") and module.land_use_type_w else None
             data[f"{prefix}forest_type"] = getattr(module.forest_type, "name", None) if hasattr(module, "forest_type") and module.forest_type else None
             data[f"{prefix}forest_condition_type"] = getattr(module.forest_condition_type, "name", None) if hasattr(module, "forest_condition_type") and module.forest_condition_type else None
+
+        elif module_type == "SetAside":
+            data[f"{prefix}is_set_aside_start"] = getattr(module.is_set_aside_start, "name", None) if hasattr(module, "is_set_aside_start") and module.is_set_aside_start else None
+            data[f"{prefix}is_set_aside_w"] = getattr(module.is_set_aside_w, "name", None) if hasattr(module, "is_set_aside_w") and module.is_set_aside_w else None
+
+        elif module_type == "OtherLand":
+            data[f"{prefix}is_degraded_land_start"] = getattr(module.is_degraded_land_start, "name", None) if hasattr(module, "is_degraded_land_start") and module.is_degraded_land_start else None
+            data[f"{prefix}is_degraded_land_w"] = getattr(module.is_degraded_land_w, "name", None) if hasattr(module, "is_degraded_land_w") and module.is_degraded_land_w else None
+
+        elif module_type == "Settlement":
+            data[f"{prefix}settlement_type_start"] = getattr(module.settlement_type_start, "name", None) if hasattr(module, "settlement_type_start") and module.settlement_type_start else None
+            data[f"{prefix}settlement_type_w"] = getattr(module.settlement_type_w, "name", None) if hasattr(module, "settlement_type_w") and module.settlement_type_w else None
+
+        elif module_type == "PerennialCropland":
+            data[f"{prefix}land_use_type_start"] = getattr(module.land_use_type_start, "name", None) if hasattr(module, "land_use_type_start") and module.land_use_type_start else None
+            data[f"{prefix}land_use_type_w"] = getattr(module.land_use_type_w, "name", None) if hasattr(module, "land_use_type_w") and module.land_use_type_w else None
+            data[f"{prefix}tillage_management_type_start"] = (
+                getattr(module.tillage_management_type_start, "name", None) if hasattr(module, "tillage_management_type_start") and module.tillage_management_type_start else None
+            )
+            data[f"{prefix}tillage_management_type_w"] = (
+                getattr(module.tillage_management_type_w, "name", None) if hasattr(module, "tillage_management_type_w") and module.tillage_management_type_w else None
+            )
+            data[f"{prefix}organic_input_type_start"] = (
+                getattr(module.organic_input_type_start, "name", None) if hasattr(module, "organic_input_type_start") and module.organic_input_type_start else None
+            )
+            data[f"{prefix}organic_input_type_w"] = getattr(module.organic_input_type_w, "name", None) if hasattr(module, "organic_input_type_w") and module.organic_input_type_w else None
+            data[f"{prefix}residue_management_type_start"] = (
+                getattr(module.residue_management_type_start, "name", None) if hasattr(module, "residue_management_type_start") and module.residue_management_type_start else None
+            )
+            data[f"{prefix}residue_management_type_w"] = (
+                getattr(module.residue_management_type_w, "name", None) if hasattr(module, "residue_management_type_w") and module.residue_management_type_w else None
+            )
 
         return data
 
@@ -1212,8 +1240,8 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_start,
             forest_type,
             forest_condition_type,
-            average_yearly_degradation_percentage_start,
-            average_yearly_degradation_percentage_w,
+            # average_yearly_degradation_percentage_start,
+            # average_yearly_degradation_percentage_w,
             climate_moisture,
             soil_type,
             region,
@@ -1237,9 +1265,9 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_wo=land_use_type_start,
             forest_type=forest_type,
             forest_condition_type=forest_condition_type,
-            average_yearly_degradation_percentage_start=average_yearly_degradation_percentage_start,
-            average_yearly_degradation_percentage_w=average_yearly_degradation_percentage_w,
-            average_yearly_degradation_percentage_wo=average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_start=0,
+            average_yearly_degradation_percentage_w=0,
+            average_yearly_degradation_percentage_wo=0,
         )
         return module
 
@@ -1890,8 +1918,8 @@ class LandUseChangeCombinationValidator(CombinationValidator):
                     fields.get("land_use_type_start"),
                     fields.get("forest_type"),
                     fields.get("forest_condition_type"),
-                    fields.get("average_yearly_degradation_percentage_start"),
-                    fields.get("average_yearly_degradation_percentage_w"),
+                    # fields.get("average_yearly_degradation_percentage_start"),
+                    # fields.get("average_yearly_degradation_percentage_w"),
                     climate_moisture,
                     soil_type,
                     region,
@@ -2569,11 +2597,11 @@ class DataManager:
             self._bucket = self.storage_client.bucket(self.bucket_name)
         return self._bucket
 
-    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False, resume: bool = False) -> None:
+    def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False, resume: bool = False, subset_fields: Dict[str, Any] = None) -> None:
         """Save data and errors to GCP storage bucket as CSV files"""
         try:
             if local:
-                self._save_to_local_fallback(data, errors, module_name, resume)
+                self._save_to_local_fallback(data, errors, module_name, resume, subset_fields)
                 return
 
             if data:
@@ -2599,16 +2627,28 @@ class DataManager:
         except Exception as e:
             logger.error(f"Failed to save data to GCP storage: {e}")
             # Fallback to local file storage if GCP storage fails
-            self._save_to_local_fallback(data, errors, module_name, resume)
+            self._save_to_local_fallback(data, errors, module_name, resume, subset_fields)
 
-    def _save_to_local_fallback(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, resume: bool = False) -> None:
+    def _save_to_local_fallback(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, resume: bool = False, subset_fields: Dict[str, Any] = None) -> None:
         """Fallback method to save data locally if GCP storage fails"""
-        output_dir = Path("scripts/minitool")
-        output_dir.mkdir(exist_ok=True)
+        # Use @luc/ folder for subset files
+        output_dir = Path("scripts/minitool/luc")
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate filename based on module_start and module_w if subset_fields is provided
+        if subset_fields and "module_start" in subset_fields and "module_w" in subset_fields:
+            module_start_type = subset_fields["module_start"]["type"][0].class_name.casefold()
+            module_w_type = subset_fields["module_w"]["type"][0].class_name.casefold()
+            filename = f"{module_start_type}_{module_w_type}.csv"
+            errors_filename = f"{module_start_type}_{module_w_type}_errors.csv"
+        else:
+            # Fallback to original naming for non-subset saves
+            filename = f"{module_name.lower()}.csv"
+            errors_filename = f"{module_name.lower()}_errors.csv"
 
         if data:
             df = pd.DataFrame(data)
-            filepath = output_dir / f"{module_name.lower()}.csv"
+            filepath = output_dir / filename
             logger.info(f"DEBUG: Saving {len(data)} rows to {filepath}, resume={resume}")
             if resume:
                 df.to_csv(filepath, mode="a", header=False, index=False)
@@ -2620,7 +2660,7 @@ class DataManager:
 
         if errors:
             errors_df = pd.DataFrame(errors)
-            errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
+            errors_filepath = output_dir / errors_filename
             logger.info(f"DEBUG: Saving {len(errors)} errors to {errors_filepath}, resume={resume}")
             if resume:
                 errors_df.to_csv(errors_filepath, mode="a", header=False, index=False)
@@ -2982,8 +3022,8 @@ FOREST_MANAGEMENT = {
         "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
         "forest_type": list(models.ForestType.objects.all()),
         "forest_condition_type": list(models.ForestConditionType.objects.all()),
-        "average_yearly_degradation_percentage_start": [0],
-        "average_yearly_degradation_percentage_w": [0],
+        # "average_yearly_degradation_percentage_start": [0],
+        # "average_yearly_degradation_percentage_w": [0],
     },
 }
 
@@ -3069,6 +3109,19 @@ ALL_POSSIBLE_COMBINATIONS = [
 # Filter out combinations where the start module is the same as the w module
 ALL_POSSIBLE_COMBINATIONS = list(filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != x["fields"]["module_w"]["type"][0].class_name, ALL_POSSIBLE_COMBINATIONS))
 
+# Filter out: SetAside -> AnnualCropland, SetAside -> Grassland, SetAside -> OtherLand, SetAside -> ForestManagement
+ALL_POSSIBLE_COMBINATIONS = list(
+    filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != "SetAside" or x["fields"]["module_w"]["type"][0].class_name != "AnnualCropland", ALL_POSSIBLE_COMBINATIONS)
+)
+ALL_POSSIBLE_COMBINATIONS = list(
+    filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != "SetAside" or x["fields"]["module_w"]["type"][0].class_name != "Grassland", ALL_POSSIBLE_COMBINATIONS)
+)
+ALL_POSSIBLE_COMBINATIONS = list(
+    filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != "SetAside" or x["fields"]["module_w"]["type"][0].class_name != "OtherLand", ALL_POSSIBLE_COMBINATIONS)
+)
+ALL_POSSIBLE_COMBINATIONS = list(
+    filter(lambda x: x["fields"]["module_start"]["type"][0].class_name != "SetAside" or x["fields"]["module_w"]["type"][0].class_name != "ForestManagement", ALL_POSSIBLE_COMBINATIONS)
+)
 
 # Filter out duplicate combinations based on module types
 seen = set()
@@ -3445,7 +3498,7 @@ def run_minitool_hamming(resume: bool = False):
                     if data or errors:
                         logger.info(f"Saving data for subset {subset_index + 1} of module: {module_name} - Data: {len(data)}, Errors: {len(errors)}")
                         logger.info(f"Append mode: {should_append}")
-                        data_manager.save_data(data, errors, module_name, local=True, resume=should_append)
+                        data_manager.save_data(data, errors, module_name, local=True, resume=should_append, subset_fields=subset["fields"])
                         logger.info(f"Data saved for subset {subset_index + 1} of module: {module_name}")
                     else:
                         logger.warning(f"No data or errors to save for subset {subset_index + 1} of module: {module_name}")
