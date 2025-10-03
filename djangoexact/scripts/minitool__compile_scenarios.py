@@ -97,427 +97,463 @@ def run(clear: bool = False):
 
     scenarios = [
         {
-            "name": "Tillage Reduction",
-            "module_type": "Perennial Cropland",
+            "name": "Afforestation",
+            "category": "Natural Regeneration",
+            "module_type": "Land Use Change",
             "filters": {
-                "land_use_type": "Default",
+                "module_start_type": "Grassland",
+                "module_w_type": "ForestManagement",
+                "module_w_forest_type": "Secondary",
             },
             "changes": [
                 {
                     "start": {
-                        "field": "tillage_management_type",
-                        "value": "Full Tillage",
+                        "field": "module_start_grassland_management_type",
+                        "value": "Non-Degraded",
                     },
                     "end": {
-                        "field": "tillage_management_type",
-                        "value": "Reduced Tillage",
+                        "field": "module_start_grassland_management_type",
+                        "value": "Non-Degraded",
                     },
                 },
                 {
                     "start": {
-                        "field": "tillage_management_type",
-                        "value": "Reduced Tillage",
+                        "field": "module_start_grassland_management_type",
+                        "value": "High-Intensity Grazing",
                     },
                     "end": {
-                        "field": "tillage_management_type",
-                        "value": "No Tillage",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "tillage_management_type",
-                        "value": "Full Tillage",
-                    },
-                    "end": {
-                        "field": "tillage_management_type",
-                        "value": "No Tillage",
+                        "field": "module_start_grassland_management_type",
+                        "value": "High-Intensity Grazing",
                     },
                 },
             ],
-        },
-        {
-            "name": "Increasing Carbon Input",
-            "module_type": "Annual Cropland",
-            "filters": {
-                "land_use_type": "Default",
+            "metadata": {
+                "additional_information": "- Relies on natural seed banks and dispersal agents\n- Often cheaper but slower; effectiveness depends on proximity to seed sources and absence of severe degradation",
+                "assumptions": "1) practice would entail the grow of new seedlings, similar as af/re-forestation;\n2) no change in growth rate from as the preconditions for the activities are different and effectiveness is linked to context rather than the activity per se;\n3) Grassland: As it is not possible to determine the SOC it could be assumed as non-degraded or as high-intensity grazing.",
             },
-            "changes": [
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Low C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "Medium C input",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Medium C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, no manure",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "High C input, no manure",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, with manure",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Low C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, no manure",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Low C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, with manure",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Medium C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, with manure",
-                    },
-                },
-            ],
         },
-        {
-            "name": "Stopping Residue Burning",
-            "module_type": "Annual Cropland",
-            "filters": {
-                "land_use_type": "Default",
-            },
-            "changes": [
-                {
-                    "start": {
-                        "field": "residue_management_type",
-                        "value": "Burned",
-                    },
-                    "end": {
-                        "field": "residue_management_type",
-                        "value": "Retained",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "residue_management_type",
-                        "value": "Burned",
-                    },
-                    "end": {
-                        "field": "residue_management_type",
-                        "value": "Exported",
-                    },
-                },
-            ],
-        },
-        {
-            "name": "Water management before the cultivation",
-            "module_type": "Flooded Rice",
-            "filters": {},
-            "changes": [
-                {
-                    "start": {
-                        "field": "water_management_type_before_cultivation",
-                        "value": "Flooded Pre-Season > 30 D",
-                    },
-                    "end": {
-                        "field": "water_management_type_before_cultivation",
-                        "value": "Non Flooded Pre-Season >180 D",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_before_cultivation",
-                        "value": "Non Flooded Pre-Season <180 D",
-                    },
-                    "end": {
-                        "field": "water_management_type_before_cultivation",
-                        "value": "Non Flooded Pre-Season >180 D",
-                    },
-                },
-            ],
-        },
-        {
-            "name": "Water management after cultivation",
-            "module_type": "Flooded Rice",
-            "filters": {},
-            "changes": [
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Deep Water",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Dry Season (Drought Prone)",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Deep Water",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Wet Season (Regular Rainfed)",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Deep Water",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Continuously Flooded",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Deep Water",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Single Drainage Period",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Deep Water",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Multiple Drainage Periods",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Dry Season (Drought Prone)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Wet Season (Regular Rainfed)",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Dry Season (Drought Prone)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Continuously Flooded",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Dry Season (Drought Prone)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Single Drainage Period",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Dry Season (Drought Prone)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Multiple Drainage Periods",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Wet Season (Regular Rainfed)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Irrigated, Continuously Flooded",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Wet Season (Regular Rainfed)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Single Drainage Period",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Rainfed, Wet Season (Regular Rainfed)",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Multiple Drainage Periods",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Continuously Flooded",
-                    },
-                    "end": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Single Drainage Period",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Continuously Flooded",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Multiple Drainage Periods",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Single Drainage Period",
-                    },
-                },
-                {
-                    "start": {
-                        "field": "water_management_type_after_cultivation",
-                        "value": "Irrigated, Multiple Drainage Periods",
-                    },
-                },
-            ],
-        },
-        {
-            "name": "Forest degradation management",
-            "module_type": "Forest Management",
-            "filters": {},
-            "changes": [
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.01,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.02,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.03,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.04,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.05,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.1,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.15,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.2,
-                    },
-                },
-                {
-                    "start": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0,
-                    },
-                    "end": {
-                        "field": "average_yearly_degradation_percentage",
-                        "value": 0.25,
-                    },
-                },
-            ],
-        },
+        # {
+        #     "name": "Tillage Reduction",
+        #     "module_type": "Perennial Cropland",
+        #     "filters": {
+        #         "land_use_type": "Default",
+        #     },
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Full Tillage",
+        #             },
+        #             "end": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Reduced Tillage",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Reduced Tillage",
+        #             },
+        #             "end": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "No Tillage",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Full Tillage",
+        #             },
+        #             "end": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "No Tillage",
+        #             },
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Increasing Carbon Input",
+        #     "module_type": "Annual Cropland",
+        #     "filters": {
+        #         "land_use_type": "Default",
+        #     },
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Low C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Medium C input",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Medium C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, no manure",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, no manure",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, with manure",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Low C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, no manure",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Low C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, with manure",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Medium C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, with manure",
+        #             },
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Stopping Residue Burning",
+        #     "module_type": "Annual Cropland",
+        #     "filters": {
+        #         "land_use_type": "Default",
+        #     },
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Burned",
+        #             },
+        #             "end": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Retained",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Burned",
+        #             },
+        #             "end": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Exported",
+        #             },
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Water management before the cultivation",
+        #     "module_type": "Flooded Rice",
+        #     "filters": {},
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_before_cultivation",
+        #                 "value": "Flooded Pre-Season > 30 D",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_before_cultivation",
+        #                 "value": "Non Flooded Pre-Season >180 D",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_before_cultivation",
+        #                 "value": "Non Flooded Pre-Season <180 D",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_before_cultivation",
+        #                 "value": "Non Flooded Pre-Season >180 D",
+        #             },
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Water management after cultivation",
+        #     "module_type": "Flooded Rice",
+        #     "filters": {},
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Deep Water",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Dry Season (Drought Prone)",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Deep Water",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Wet Season (Regular Rainfed)",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Deep Water",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Continuously Flooded",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Deep Water",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Single Drainage Period",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Deep Water",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Multiple Drainage Periods",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Dry Season (Drought Prone)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Wet Season (Regular Rainfed)",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Dry Season (Drought Prone)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Continuously Flooded",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Dry Season (Drought Prone)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Single Drainage Period",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Dry Season (Drought Prone)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Multiple Drainage Periods",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Wet Season (Regular Rainfed)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Irrigated, Continuously Flooded",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Wet Season (Regular Rainfed)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Single Drainage Period",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Rainfed, Wet Season (Regular Rainfed)",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Multiple Drainage Periods",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Continuously Flooded",
+        #             },
+        #             "end": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Single Drainage Period",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Continuously Flooded",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Multiple Drainage Periods",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Single Drainage Period",
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "water_management_type_after_cultivation",
+        #                 "value": "Irrigated, Multiple Drainage Periods",
+        #             },
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Forest degradation management",
+        #     "module_type": "Forest Management",
+        #     "filters": {},
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.01,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.02,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.03,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.04,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.05,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.1,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.15,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.2,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.25,
+        #             },
+        #         },
+        #     ],
+        # },
     ]
 
     for scenario in scenarios:
@@ -525,6 +561,8 @@ def run(clear: bool = False):
             name=scenario["name"],
             module_type=scenario["module_type"],
             changes=scenario["changes"],
+            category=scenario["category"],
+            metadata=scenario["metadata"],
         )
 
     for scenario in scenarios:

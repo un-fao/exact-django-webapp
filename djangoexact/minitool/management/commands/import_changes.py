@@ -56,59 +56,47 @@ class Command(BaseCommand):
     def fast_clear_data(self, module_type, show_progress):
         """Fast data clearing using raw SQL instead of Django ORM."""
         module_type_formatted = module_type.replace("-", " ").title()
-        
+
         # Get actual table names from Django models
         change_record_table = ChangeRecord._meta.db_table
         change_aggregate_table = ChangeAggregate._meta.db_table
-        
+
         # Use the minitool database connection
-        minitool_connection = connections['minitool']
+        minitool_connection = connections["minitool"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting records to delete...")
-            
+
             # Count records first to show progress
-            cursor.execute(
-                f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s",
-                [f"%{module_type_formatted}%"]
-            )
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
             change_records_count = cursor.fetchone()[0]
-            
-            cursor.execute(
-                f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s",
-                [f"%{module_type_formatted}%"]
-            )
+
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
             aggregate_records_count = cursor.fetchone()[0]
-            
+
             total_to_delete = change_records_count + aggregate_records_count
-            
+
             if show_progress:
                 self.stdout.write(f"  - Found {total_to_delete:,} records to delete ({change_records_count:,} individual + {aggregate_records_count:,} aggregated)")
-            
+
             if total_to_delete == 0:
                 if show_progress:
                     self.stdout.write("  - No records to delete")
                 return
-            
+
             # Use raw SQL DELETE for much faster deletion
             if show_progress:
                 self.stdout.write("  - Deleting individual records...")
-            
+
             # Delete ChangeRecord entries
-            cursor.execute(
-                f"DELETE FROM {change_record_table} WHERE module_type LIKE %s",
-                [f"%{module_type_formatted}%"]
-            )
-            
+            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+
             if show_progress:
                 self.stdout.write("  - Deleting aggregate records...")
-            
+
             # Delete ChangeAggregate entries
-            cursor.execute(
-                f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s",
-                [f"%{module_type_formatted}%"]
-            )
-            
+            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+
             if show_progress:
                 self.stdout.write(f"  - Successfully deleted {total_to_delete:,} records")
 
@@ -117,41 +105,41 @@ class Command(BaseCommand):
         # Get actual table names from Django models
         change_record_table = ChangeRecord._meta.db_table
         change_aggregate_table = ChangeAggregate._meta.db_table
-        
+
         # Use the minitool database connection
-        minitool_connection = connections['minitool']
+        minitool_connection = connections["minitool"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting all records...")
-            
+
             # Count all records first
             cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")
             change_records_count = cursor.fetchone()[0]
-            
+
             cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")
             aggregate_records_count = cursor.fetchone()[0]
-            
+
             total_to_delete = change_records_count + aggregate_records_count
-            
+
             if show_progress:
                 self.stdout.write(f"  - Found {total_to_delete:,} total records to delete")
-            
+
             if total_to_delete == 0:
                 if show_progress:
                     self.stdout.write("  - No records to delete")
                 return
-            
+
             # Use DELETE for maximum speed (TRUNCATE doesn't work well with foreign keys)
             if show_progress:
                 self.stdout.write("  - Deleting all records (fastest method)...")
-            
+
             # Delete all records from both tables
             cursor.execute(f"DELETE FROM {change_record_table}")
             cursor.execute(f"DELETE FROM {change_aggregate_table}")
-            
+
             # For SQLite, we can also run VACUUM to reclaim space immediately
             cursor.execute("VACUUM")
-            
+
             if show_progress:
                 self.stdout.write(f"  - Successfully cleared {total_to_delete:,} records and optimized database")
 
@@ -213,10 +201,10 @@ class Command(BaseCommand):
         if clear_existing:
             if show_progress:
                 self.stdout.write("Clearing existing data...")
-            
+
             # Use faster raw SQL for bulk deletion instead of Django ORM
             self.fast_clear_data(module_type, show_progress)
-            
+
             if show_progress:
                 self.stdout.write("Existing data cleared")
 
@@ -295,7 +283,7 @@ class Command(BaseCommand):
         records_updated = 0
         records_skipped = 0
         processed_records = 0
-        
+
         # Batch processing configuration
         BATCH_SIZE = 1000
         batch_records = []
@@ -310,7 +298,7 @@ class Command(BaseCommand):
                     # First, try bulk_create with ignore_conflicts
                     created_records = ChangeRecord.objects.bulk_create(batch_records, ignore_conflicts=True)
                     records_created += len(created_records)
-                    
+
                     # For records that weren't created (conflicts), we need to update them
                     if len(created_records) < len(batch_records):
                         # Find records that need updating by checking what wasn't created
@@ -332,11 +320,11 @@ class Command(BaseCommand):
                                 records_to_update.append(existing)
                             except ChangeRecord.DoesNotExist:
                                 continue
-                        
+
                         if records_to_update:
-                            ChangeRecord.objects.bulk_update(records_to_update, ['total'])
+                            ChangeRecord.objects.bulk_update(records_to_update, ["total"])
                             records_updated += len(records_to_update)
-                            
+
                 except Exception as e:
                     # Fallback to individual processing if bulk operations fail
                     for record in batch_records:
@@ -358,7 +346,7 @@ class Command(BaseCommand):
                             change_record.total = record.total
                             change_record.save()
                             records_updated += 1
-                
+
                 batch_records.clear()
 
         # Process records in efficient batches without prefetching
@@ -476,7 +464,7 @@ class Command(BaseCommand):
         records_updated = 0
         total_aggregations = len(aggregations)
         processed_aggregations = 0
-        
+
         # Batch processing configuration
         BATCH_SIZE = 500
         batch_create_records = []
@@ -493,7 +481,7 @@ class Command(BaseCommand):
                     # First, try bulk_create with ignore_conflicts
                     created_records = ChangeAggregate.objects.bulk_create(batch_create_records, ignore_conflicts=True)
                     records_created += len(created_records)
-                    
+
                     # For records that weren't created (conflicts), we need to update them
                     if len(created_records) < len(batch_create_records):
                         # Find records that need updating
@@ -522,14 +510,11 @@ class Command(BaseCommand):
                                 records_to_update.append(existing)
                             except ChangeAggregate.DoesNotExist:
                                 continue
-                        
+
                         if records_to_update:
-                            ChangeAggregate.objects.bulk_update(
-                                records_to_update, 
-                                ['count', 'sum_total', 'mean', 'median', 'min_value', 'max_value', 'q1', 'q3']
-                            )
+                            ChangeAggregate.objects.bulk_update(records_to_update, ["count", "sum_total", "mean", "median", "min_value", "max_value", "q1", "q3"])
                             records_updated += len(records_to_update)
-                            
+
                 except Exception as e:
                     # Fallback to individual processing if bulk operations fail
                     for record in batch_create_records:
@@ -567,7 +552,7 @@ class Command(BaseCommand):
                             aggregate_record.q3 = record.q3
                             aggregate_record.save()
                             records_updated += 1
-                
+
                 batch_create_records.clear()
 
         with transaction.atomic():
