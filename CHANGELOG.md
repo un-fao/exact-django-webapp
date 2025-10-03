@@ -1,3 +1,19 @@
+## 1.17.23 (2025-10-03)
+
+### Feat
+
+- **minitool**: add scenario categories
+- **minitool**: add metadata to emissions scenario
+- add units to input types model
+
+### Fix
+
+- **project_invitations**: issue causing invitations not to be accepted for languages other than english
+- **reports**: typo in forest management report causing crash
+- **reports**: issue causing flooded rice minor season emissions not to be considered and added to total activity emissions
+- **reports**: remaining fillvalue typos causing crash
+- **bloc**: static files template pathing
+
 ## 1.17.22 (2025-10-01)
 
 ### Fix
