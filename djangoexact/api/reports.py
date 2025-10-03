@@ -2363,7 +2363,7 @@ class LivestockReport(BaseModuleReport):
                     self.manure_management_prp_leaching_indirect_n2o,
                     self.manure_management_prp_volatilization_indirect_n2o,
                     fillvalue=0,
-                )
+                ),
             )
         )
 
@@ -2675,8 +2675,8 @@ class ForestManagementReport(LandModuleReport):
                     self.degradation_bgb_co2,
                     self.degradation_litter_co2,
                     self.degradation_deadwood_co2,
+                    fillvalue=0,
                 ),
-                fillvalue=0,
             )
         )
         self.biomass_gain_co2 = list(map(sum, zip_longest(self.growth_agb_co2, self.growth_bgb_co2, self.litter_co2, self.deadwood_co2, fillvalue=0)))
@@ -2716,8 +2716,8 @@ class ForestManagementReport(LandModuleReport):
                     self.deadwood_co2,
                     self.degradation_litter_co2,
                     self.degradation_deadwood_co2,
+                    fillvalue=0,
                 ),
-                fillvalue=0,
             )
         )
 
