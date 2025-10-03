@@ -450,7 +450,6 @@ def run():
     if app_mode == "development":
         # TODO: Run in development
         # sanitize_minitool_data()
-        import_input_types_units()
         pass
 
     if app_mode == "test":
