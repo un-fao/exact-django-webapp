@@ -1,3 +1,13 @@
+## 1.17.23 (2025-10-03)
+
+### Feat
+
+- add units to input types model
+
+### Fix
+
+- **bloc**: static files template pathing
+
 ## 1.17.22 (2025-10-01)
 
 ### Fix
