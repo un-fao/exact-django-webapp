@@ -96,6 +96,124 @@ def run(clear: bool = False):
         models.EmissionScenario.objects.all().delete()
 
     scenarios = [
+        # Soil Amendments
+        # Grassland remains Grassland
+        {
+            "name": "Grassland remains Grassland",
+            "category": "Soil Amendments",
+            "module_type": "Grassland",
+            "changes": [
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Severly Degraded",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Severely Degraded",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland With Medium Inputs",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland With Medium Inputs",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland With High Inputs",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland With High Inputs",
+                    },
+                },
+            ],
+            "metadata": {
+                "additional_information": "- Biochar adds stable carbon; compost improves fertility and microbial activity",
+                "assumptions": "1) assumes the application of organic inputs (compost and biochar) in cultivated soils;\n2) assumes the application of organic inputs (compost and biochar) in grasslands;\n3) assumes that without the project there would not be application of inputs;\n4) assumes that with project increase the C input in the soil;\n5) assumes change of other practices in soil conservation: tillage to reduce tillage (in some situations zero tillage could be assumed);\n6) GRASSLAND - changes only in C input due to the biochar, no changes in tillage nor residue managment.",
+            },
+        },
+        # Soil Remediation
+        # Grassland remains Grassland
+        {
+            "name": "Grassland remains Grassland",
+            "category": "Soil Remediation",
+            "module_type": "Grassland",
+            "changes": [
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Severly Degraded",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
+                    },
+                },
+            ],
+            "metadata": {
+                "additional_information": "",
+                "assumptions": "",
+            },
+        },
+        # Soil Conservation
+        # Grassland remains Grassland
         {
             "name": "Terracing for erosion control and soil conservation",
             "category": "Soil Conservation",
@@ -661,7 +779,7 @@ def run(clear: bool = False):
             )
 
         aggregates = models.ChangeRecord.objects.filter(q_objects)
-        print(scenario["name"])
+        print(scenario["category"], "-", scenario["name"])
 
         if aggregates.count() == 0:
             print("No aggregates found")
