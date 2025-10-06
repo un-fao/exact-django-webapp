@@ -34,8 +34,15 @@ class ChangeRecordAdmin(admin.ModelAdmin):
 
 @admin.register(EmissionScenario)
 class EmissionScenarioAdmin(admin.ModelAdmin):
-    list_display = ("name", "module_type", "created_at", "updated_at")
-    search_fields = ("name", "module_type")
-    list_filter = ("module_type", "created_at", "updated_at")
-    ordering = ("name", "module_type", "created_at", "updated_at")
+    list_display = ("name", "category", "module_types_display", "created_at", "updated_at")
+    search_fields = ("name", "description")
+    list_filter = ("category", "created_at", "updated_at")
+    ordering = ("name", "created_at", "updated_at")
     list_per_page = 20
+
+    def module_types_display(self, obj):
+        """Display comma-separated list of module types used in this scenario."""
+        module_types = obj.get_module_types()
+        return ", ".join(sorted(module_types)) if module_types else "-"
+
+    module_types_display.short_description = "Module Types"

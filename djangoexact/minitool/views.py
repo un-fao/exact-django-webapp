@@ -1313,34 +1313,49 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     @action(detail=True, methods=["get"])
     def results(self, request, *args, **kwargs):
         instance: models.EmissionScenario = self.get_object()
-        climate = request.query_params.get("climate", None)
-        moisture = request.query_params.get("moisture", None)
-        soil_type = request.query_params.get("soil_type", None)
-        region = request.query_params.get("region", None)
-        filtered_qs = models.ChangeRecord.objects.all()
-
-        if climate:
-            filtered_qs = filtered_qs.filter(climate=climate)
-
-        if moisture:
-            filtered_qs = filtered_qs.filter(moisture=moisture)
-
-        if soil_type:
-            filtered_qs = filtered_qs.filter(soil_type=soil_type)
-
-        if region:
-            filtered_qs = filtered_qs.filter(region=region)
+        global_climate = request.query_params.get("climate", None)
+        global_moisture = request.query_params.get("moisture", None)
+        global_soil_type = request.query_params.get("soil_type", None)
+        global_region = request.query_params.get("region", None)
 
         q_objects = Q()
         for change in instance.changes:
-            q_objects |= Q(
-                module_type=instance.module_type,
+            module_type = change.get("module_type")
+            if not module_type:
+                continue
+
+            change_filters = change.get("filters", {})
+
+            change_q = Q(
+                module_type=module_type,
                 field=change["start"]["field"],
                 from_value=change["start"]["value"],
                 to_value=change["end"]["value"],
             )
 
-        qs = filtered_qs.filter(q_objects)
+            # Apply change-specific filters
+            if change_filters.get("region"):
+                change_q &= Q(region=change_filters["region"])
+            if change_filters.get("climate"):
+                change_q &= Q(climate=change_filters["climate"])
+            if change_filters.get("moisture"):
+                change_q &= Q(moisture=change_filters["moisture"])
+            if change_filters.get("soil_type"):
+                change_q &= Q(soil_type=change_filters["soil_type"])
+
+            # Apply global filters from query params (override change filters if specified)
+            if global_region:
+                change_q &= Q(region=global_region)
+            if global_climate:
+                change_q &= Q(climate=global_climate)
+            if global_moisture:
+                change_q &= Q(moisture=global_moisture)
+            if global_soil_type:
+                change_q &= Q(soil_type=global_soil_type)
+
+            q_objects |= change_q
+
+        qs = models.ChangeRecord.objects.filter(q_objects)
         try:
             stats = self.stats_for(qs)
         except Exception as e:
@@ -1355,22 +1370,32 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def compute(self, request, *args, **kwargs):
         """
         Compute custom scenarios with provided changes and filters.
-        Expects:
-        - module_type: string
-        - changes: list of change objects with start/end field/value pairs
+
+        Supports two modes:
+        1. Legacy mode: Provide module_type as a top-level parameter
+           - module_type: string
+           - changes: list of change objects with start/end field/value pairs
+
+        2. Multi-module mode: Provide module_type within each change
+           - changes: list of change objects with module_type, start, end, and optional filters
+
+        Additional optional filter parameters (global, applied to all changes):
         - climate, moisture, soil_type, region: optional filter parameters
+
+        Each change can also have its own "filters" object with the same fields.
+        Global filters override change-specific filters if both are provided.
         """
-        module_type = request.data.get("module_type")
+        legacy_module_type = request.data.get("module_type")
         changes = request.data.get("changes", [])
-        climate = request.data.get("climate")
-        moisture = request.data.get("moisture")
-        soil_type = request.data.get("soil_type")
-        region = request.data.get("region")
+        global_climate = request.data.get("climate")
+        global_moisture = request.data.get("moisture")
+        global_soil_type = request.data.get("soil_type")
+        global_region = request.data.get("region")
 
         if not changes:
             return Response({"error": "changes field is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate changes structure
+        # Validate changes structure and ensure module_type is present
         for change in changes:
             if not isinstance(change, dict):
                 return Response({"error": "Each change must be an object"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1384,34 +1409,51 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             if not end.get("field") or not end.get("value"):
                 return Response({"error": "Each change must have end.field and end.value"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Apply filters
-        filtered_qs = models.ChangeRecord.objects.all()
+            if not change.get("module_type") and not legacy_module_type:
+                return Response({"error": "Each change must have module_type, or provide module_type as a top-level parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if module_type:
-            filtered_qs = filtered_qs.filter(module_type=module_type)
+            if legacy_module_type and not change.get("module_type"):
+                change["module_type"] = legacy_module_type
 
-        if climate:
-            filtered_qs = filtered_qs.filter(climate=climate)
-
-        if moisture:
-            filtered_qs = filtered_qs.filter(moisture=moisture)
-
-        if soil_type:
-            filtered_qs = filtered_qs.filter(soil_type=soil_type)
-
-        if region:
-            filtered_qs = filtered_qs.filter(region=region)
-
-        # Build query for changes
+        # Build query for changes with filters
         q_objects = Q()
         for change in changes:
-            q_objects |= Q(
+            change_module_type = change.get("module_type")
+            if not change_module_type:
+                continue
+
+            change_filters = change.get("filters", {})
+
+            change_q = Q(
+                module_type=change_module_type,
                 field=change["start"]["field"],
                 from_value=change["start"]["value"],
                 to_value=change["end"]["value"],
             )
 
-        qs = filtered_qs.filter(q_objects)
+            # Apply change-specific filters
+            if change_filters.get("region"):
+                change_q &= Q(region=change_filters["region"])
+            if change_filters.get("climate"):
+                change_q &= Q(climate=change_filters["climate"])
+            if change_filters.get("moisture"):
+                change_q &= Q(moisture=change_filters["moisture"])
+            if change_filters.get("soil_type"):
+                change_q &= Q(soil_type=change_filters["soil_type"])
+
+            # Apply global filters (override change filters if specified)
+            if global_region:
+                change_q &= Q(region=global_region)
+            if global_climate:
+                change_q &= Q(climate=global_climate)
+            if global_moisture:
+                change_q &= Q(moisture=global_moisture)
+            if global_soil_type:
+                change_q &= Q(soil_type=global_soil_type)
+
+            q_objects |= change_q
+
+        qs = models.ChangeRecord.objects.filter(q_objects)
 
         try:
             stats = self.stats_for(qs)
@@ -1419,8 +1461,7 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             print(e)
             stats = {"count": 0}
 
-        # Create a temporary scenario object for serialization
-        temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", module_type=module_type, changes=changes)
+        temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", changes=changes)
 
         serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": temp_scenario, **stats})
 

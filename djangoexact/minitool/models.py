@@ -148,6 +148,31 @@ class EmissionScenarioCategory(models.Model):
 
 
 class EmissionScenario(models.Model):
+    """
+    Emission scenario model that supports changes from multiple module types.
+
+    The 'changes' field is a JSONField containing a list of change objects.
+    Each change object has the structure:
+    {
+        "module_type": "string",  # e.g., "Grassland", "Annual Cropland"
+        "start": {
+            "field": "string",
+            "value": "string"
+        },
+        "end": {
+            "field": "string",
+            "value": "string"
+        },
+        "filters": {  # optional filters to narrow down which records are affected
+            "region": "string",  # optional
+            "climate": "string",  # optional
+            "moisture": "string",  # optional
+            "soil_type": "string",  # optional
+            # can include custom filters as well
+        }
+    }
+    """
+
     name = models.CharField(max_length=255)
     category = models.ForeignKey(EmissionScenarioCategory, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField()
@@ -155,9 +180,11 @@ class EmissionScenario(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     metadata = models.JSONField(default=dict, blank=True)
-
-    module_type = models.CharField(max_length=255)
     changes = models.JSONField()
 
     def __str__(self):
         return self.name
+
+    def get_module_types(self):
+        """Returns a set of unique module types used in this scenario's changes."""
+        return set(change.get("module_type") for change in self.changes if change.get("module_type"))
