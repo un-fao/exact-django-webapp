@@ -25,6 +25,7 @@ import django
 django.setup()
 
 import api.models as models  # noqa: E402
+import ipcc.models as ipcc_models  # noqa: E402
 
 # Import Hamming functions
 from .hamming import hamming_shell_rows  # noqa: E402
@@ -565,13 +566,16 @@ class InputDataBuilder(ModuleDataBuilder):
 
         return custom_fields
 
+
 class InputEntryDataBuilder(ModuleDataBuilder):
     """Data builder for InputEntry modules"""
+
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.single_foreign_key("input_type"),
             FieldMappingBuilder.numeric("value"),
         ]
+
 
 class WaterbodyDataBuilder(ModuleDataBuilder):
     """Data builder for Waterbody modules"""
@@ -659,6 +663,9 @@ class ModuleProcessor(ABC):
         self.project = None
         self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
         self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
+        self.last_year_of_accounting = 2001
+        self.change_rate = models.ChangeRate.objects.get(name="linear")
+        self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback")
 
     def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
         """Helper method to create a project with proper country selection"""
@@ -674,6 +681,10 @@ class ModuleProcessor(ABC):
             moisture=moisture,
             soil_type=soil_type,
             country=country,
+            implementation_years=1,
+            start_year_of_activities=2000,
+            last_year_of_accounting=self.last_year_of_accounting,
+            gw_potential=self.gw_potential,
         )
         return self.project
 
@@ -690,8 +701,20 @@ class ModuleProcessor(ABC):
             moisture=moisture,
             soil_type=soil_type,
             country=country,
+            implementation_years=1,
+            start_year_of_activities=2000,
+            last_year_of_accounting=self.last_year_of_accounting,
+            gw_potential=self.gw_potential,
         )
         return self.project
+
+    def create_activity(self, project: Any, factories: Any) -> Any:
+        """Helper method to create an activity with proper change rate"""
+        return factories.ActivityFactory.create(project=project, change_rate=self.change_rate)
+
+    def build_activity(self, project: Any, factories: Any) -> Any:
+        """Helper method to build an activity (without saving to database)"""
+        return factories.ActivityFactory.build(project=project, change_rate=self.change_rate)
 
     @abstractmethod
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
@@ -719,6 +742,9 @@ class ModuleProcessor(ABC):
 
             # Calculate result
             balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
+
+            if module.__class__.__name__ in ["ForestManagement", "PerennialCropland"]:
+                balance = balance / 20
 
             # Build data
             data = self.data_builder_registry.build_data(module)
@@ -855,13 +881,8 @@ class AnnualCroplandProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.AnnualCroplandFactory.build(
             activity=a,
             area=1,
@@ -990,13 +1011,9 @@ class ForestManagementProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        self.last_year_of_accounting = 2020
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.ForestManagementFactory.build(
             activity=a,
             land_use_type_start=land_use_type_start,
@@ -1434,7 +1451,7 @@ class DataManager:
             df = pd.DataFrame(data)
             filepath = output_dir / f"{module_name.lower()}.csv"
             if resume:
-                df.to_csv(filepath, mode='a', header=False, index=False)
+                df.to_csv(filepath, mode="a", header=False, index=False)
             else:
                 df.to_csv(filepath, index=False)
             logger.info(f"Fallback: Saved {len(data)} rows to {filepath}")
@@ -1443,7 +1460,7 @@ class DataManager:
             errors_df = pd.DataFrame(errors)
             errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
             if resume:
-                errors_df.to_csv(errors_filepath, mode='a', header=False, index=False)
+                errors_df.to_csv(errors_filepath, mode="a", header=False, index=False)
             else:
                 errors_df.to_csv(errors_filepath, index=False)
             logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
@@ -1732,11 +1749,11 @@ MODULE_CONFIGS = {
     },
     "ForestManagement": {  # Compute
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
             "forest_type": models.ForestType.objects.all(),
             "forest_condition_type": models.ForestConditionType.objects.all(),
-            "average_yearly_degradation_percentage_start": [0],
-            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
+            "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],  # 1% to 5% and then 10% to 50%
+            "average_yearly_degradation_percentage_w": [0.00],
         },
         "config_name": "forest_management",
     },

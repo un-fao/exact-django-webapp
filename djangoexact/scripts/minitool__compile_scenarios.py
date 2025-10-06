@@ -97,41 +97,124 @@ def run(clear: bool = False):
 
     scenarios = [
         {
-            "name": "Afforestation",
-            "category": "Natural Regeneration",
-            "module_type": "Land Use Change",
-            "filters": {
-                "module_start_type": "Grassland",
-                "module_w_type": "ForestManagement",
-                "module_w_forest_type": "Secondary",
-            },
+            "name": "Terracing for erosion control and soil conservation",
+            "category": "Soil Conservation",
+            "module_type": "Grassland",
             "changes": [
                 {
                     "start": {
-                        "field": "module_start_grassland_management_type",
-                        "value": "Non-Degraded",
+                        "field": "grassland_management_type",
+                        "value": "Severly Degraded",
                     },
                     "end": {
-                        "field": "module_start_grassland_management_type",
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "High Intensity Grazing",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
                         "value": "Non-Degraded",
                     },
                 },
                 {
                     "start": {
-                        "field": "module_start_grassland_management_type",
-                        "value": "High-Intensity Grazing",
+                        "field": "grassland_management_type",
+                        "value": "Non-Degraded",
                     },
                     "end": {
-                        "field": "module_start_grassland_management_type",
-                        "value": "High-Intensity Grazing",
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland",
+                    },
+                },
+                {
+                    "start": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland",
+                    },
+                    "end": {
+                        "field": "grassland_management_type",
+                        "value": "Improved Grassland",
                     },
                 },
             ],
             "metadata": {
-                "additional_information": "- Relies on natural seed banks and dispersal agents\n- Often cheaper but slower; effectiveness depends on proximity to seed sources and absence of severe degradation",
-                "assumptions": "1) practice would entail the grow of new seedlings, similar as af/re-forestation;\n2) no change in growth rate from as the preconditions for the activities are different and effectiveness is linked to context rather than the activity per se;\n3) Grassland: As it is not possible to determine the SOC it could be assumed as non-degraded or as high-intensity grazing.",
+                "additional_information": "",
+                "assumptions": "",
             },
         },
+        # {
+        #     "name": "Forest Degradation Management",
+        #     "category": "Natural Regeneration",
+        #     "module_type": "Forest Management",
+        #     "filters": {
+        #         "forest_condition_type": "Secondary",
+        #     },
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.01,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.02,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #         },
+        #         {
+        #             "start": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0.03,
+        #             },
+        #             "end": {
+        #                 "field": "average_yearly_degradation_percentage",
+        #                 "value": 0,
+        #             },
+        #         },
+        #     ],
+        #     "metadata": {
+        #         "additional_information": "- Relies on natural seed banks and dispersal agents\n- Often cheaper but slower; effectiveness depends on proximity to seed sources and absence of severe degradation",
+        #         "assumptions": "1) practice would entail the grow of new seedlings, similar as af/re-forestation;\n2) no change in growth rate from as the preconditions for the activities are different and effectiveness is linked to context rather than the activity per se;\n3) Forest degradation management: As it is not possible to determine the SOC it could be assumed as non-degraded or as high-intensity grazing.",
+        #     },
+        # }
+        # {
+        #     "name": "Afforestation",
+        #     "category": "Natural Regeneration",
+        #     "module_type": "Land Use Change",
+        #     "filters": {
+        #         "module_w_forest_type": "Secondary",
+        #     },
+        #     "changes": [
+        #         {
+        #             "start": {
+        #                 "field": "module_type",
+        #                 "value": "Grassland",
+        #             },
+        #             "end": {
+        #                 "field": "module_type",
+        #                 "value": "ForestManagement",
+        #             },
+        #         },
+        #     ],
+        #     "metadata": {
+        #         "additional_information": "- Relies on natural seed banks and dispersal agents\n- Often cheaper but slower; effectiveness depends on proximity to seed sources and absence of severe degradation",
+        #         "assumptions": "1) practice would entail the grow of new seedlings, similar as af/re-forestation;\n2) no change in growth rate from as the preconditions for the activities are different and effectiveness is linked to context rather than the activity per se;\n3) Grassland: As it is not possible to determine the SOC it could be assumed as non-degraded or as high-intensity grazing.",
+        #     },
+        # },
         # {
         #     "name": "Tillage Reduction",
         #     "module_type": "Perennial Cropland",
@@ -557,11 +640,13 @@ def run(clear: bool = False):
     ]
 
     for scenario in scenarios:
+        category, created = models.EmissionScenarioCategory.objects.get_or_create(name=scenario["category"])
+
         models.EmissionScenario.objects.create(
             name=scenario["name"],
             module_type=scenario["module_type"],
             changes=scenario["changes"],
-            category=scenario["category"],
+            category=category,
             metadata=scenario["metadata"],
         )
 

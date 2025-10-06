@@ -508,12 +508,17 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             # Core forest fields (single fields)
-            FieldMappingBuilder.foreign_key("land_use_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             # Degradation fields
-            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
+
+    def get_custom_fields(self, module: Any) -> Dict[str, Any]:
+        """Get custom fields that don't follow the standard pattern"""
+        return {
+            "land_use_type": getattr(module, "land_use_type_start", None),
+        }
 
 
 class SmallFisheryDataBuilder(ModuleDataBuilder):
@@ -1240,8 +1245,8 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_start,
             forest_type,
             forest_condition_type,
-            # average_yearly_degradation_percentage_start,
-            # average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w,
             climate_moisture,
             soil_type,
             region,
@@ -1265,9 +1270,9 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_wo=land_use_type_start,
             forest_type=forest_type,
             forest_condition_type=forest_condition_type,
-            average_yearly_degradation_percentage_start=0,
-            average_yearly_degradation_percentage_w=0,
-            average_yearly_degradation_percentage_wo=0,
+            average_yearly_degradation_percentage_start=average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w=average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_wo=average_yearly_degradation_percentage_start,
         )
         return module
 
@@ -2271,8 +2276,8 @@ class ForestManagementCombinationValidator(CombinationValidator):
                         land_use_type,
                         forest_type,
                         forest_condition_type,
-                        # average_yearly_degradation_percentage_start,
-                        # average_yearly_degradation_percentage_w,
+                        average_yearly_degradation_percentage_start,
+                        average_yearly_degradation_percentage_w,
                         climate_moisture,
                         soil_type,
                         region,
@@ -3161,6 +3166,16 @@ MODULE_CONFIGS = {
     "LandUseChange": {
         "subsets": [FOREST_MANAGEMENT_TO_GRASSLAND],
         "config_name": "land_use_change",
+    },
+    "ForestManagement": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            "forest_type": models.ForestType.objects.all(),
+            "forest_condition_type": models.ForestConditionType.objects.all(),
+            "average_yearly_degradation_percentage_start": [0],
+            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
+        },
+        "config_name": "forest_management",
     },
 }
 

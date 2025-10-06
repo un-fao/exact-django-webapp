@@ -2,32 +2,38 @@ from itertools import product
 import api.models as models
 from .minitool import ClimateMoistureValidator, SoilOrganicCarbonValidator
 
+
 def domains_from_fields(fields: dict):
-    # pair *_start with *_w and get their (same) domain
+    # pair *_start with *_w and get their combined domain
     pairs = []
     single_fields = []
-    
+
     # Process fields with _start/_w pattern
     for k in sorted(fields):
-        if k.endswith('_start'):
+        if k.endswith("_start"):
             base = k[:-6]
-            s = f'{base}_start'
-            w = f'{base}_w'
+            s = f"{base}_start"
+            w = f"{base}_w"
             if w in fields:
-                dom = list(fields[s])  # materialize QuerySet once
-                pairs.append((base, s, w, dom))
-    
+                # Get domains from both _start and _w fields
+                start_dom = list(fields[s])  # materialize QuerySet once
+                w_dom = list(fields[w])  # materialize QuerySet once
+                # Combine domains and remove duplicates while preserving order
+                combined_dom = list(dict.fromkeys(start_dom + w_dom))
+                pairs.append((base, s, w, combined_dom))
+
     # Process single fields that don't have _start/_w pattern
     for k in sorted(fields):
-        if not k.endswith('_start') and not k.endswith('_w') and not k.endswith('_wo'):
+        if not k.endswith("_start") and not k.endswith("_w") and not k.endswith("_wo"):
             # Check if this field doesn't have a corresponding _start/_w version
-            base_start = f'{k}_start'
-            base_w = f'{k}_w'
+            base_start = f"{k}_start"
+            base_w = f"{k}_w"
             if base_start not in fields and base_w not in fields:
                 dom = list(fields[k])  # materialize QuerySet once
                 single_fields.append((k, dom))
-    
+
     return pairs, single_fields  # return both paired and single fields
+
 
 def hamming_shell_rows(fields: dict):
     """
@@ -37,31 +43,35 @@ def hamming_shell_rows(fields: dict):
     For single fields, we iterate through all possible values.
     """
     pairs, single_fields = domains_from_fields(fields)
-    
-    # Get all domains for baseline assignment
-    paired_bases = [dom for (_, _, _, dom) in pairs]
+
+    # Get domains for baseline assignment - use _start domains for paired fields
+    paired_bases = []
+    for _, s_col, w_col, _ in pairs:
+        paired_bases.append(list(fields[s_col]))  # Use _start domain for baseline
     single_bases = [dom for (_, dom) in single_fields]
     all_bases = paired_bases + single_bases
 
     # iterate baseline assignment (choose ONE value per field)
     for baseline_vals in product(*all_bases):
         # Split baseline values between paired and single fields
-        paired_baseline_vals = baseline_vals[:len(pairs)]
-        single_baseline_vals = baseline_vals[len(pairs):]
-        
+        paired_baseline_vals = baseline_vals[: len(pairs)]
+        single_baseline_vals = baseline_vals[len(pairs) :]
+
         # map: field -> chosen baseline value
         paired_base_map = {pairs[i][0]: paired_baseline_vals[i] for i in range(len(pairs))}
         single_base_map = {single_fields[i][0]: single_baseline_vals[i] for i in range(len(single_fields))}
 
         # For each paired field, flip its _w to an alternative value
-        for i, (base, s_col, w_col, dom) in enumerate(pairs):
+        for i, (base, s_col, w_col, combined_dom) in enumerate(pairs):
             s_val = paired_base_map[base]
-            for alt in dom:
+            # Get the _w domain specifically for this field
+            w_dom = list(fields[w_col])
+            for alt in w_dom:
                 if alt == s_val:
                     continue  # must differ
                 row = {}
                 # fill all pairs: start = baseline, w = baseline (same)
-                for (b, s, w, _) in pairs:
+                for b, s, w, _ in pairs:
                     row[s] = paired_base_map[b]
                     row[w] = paired_base_map[b]
                 # fill all single fields with baseline values
@@ -70,7 +80,7 @@ def hamming_shell_rows(fields: dict):
                 # flip exactly one paired field
                 row[w_col] = alt
                 yield row
-        
+
         # For each single field, vary its value while keeping others at baseline
         for i, (field_name, dom) in enumerate(single_fields):
             baseline_val = single_base_map[field_name]
@@ -79,7 +89,7 @@ def hamming_shell_rows(fields: dict):
                     continue  # must differ
                 row = {}
                 # fill all pairs with baseline values (start = w = baseline)
-                for (b, s, w, _) in pairs:
+                for b, s, w, _ in pairs:
                     row[s] = paired_base_map[b]
                     row[w] = paired_base_map[b]
                 # fill all single fields with baseline values
@@ -89,24 +99,31 @@ def hamming_shell_rows(fields: dict):
                 row[field_name] = alt
                 yield row
 
+
 def expected_count(fields: dict) -> int:
     pairs, single_fields = domains_from_fields(fields)
-    
-    # Get sizes for paired and single fields
-    paired_sizes = [len(dom) for (_, _, _, dom) in pairs]
+
+    # Get sizes for baseline assignment - use _start domains for paired fields
+    paired_sizes = []
+    for _, s_col, w_col, _ in pairs:
+        paired_sizes.append(len(fields[s_col]))  # Use _start domain size for baseline
     single_sizes = [len(dom) for (_, dom) in single_fields]
     all_sizes = paired_sizes + single_sizes
-    
+
     # Calculate baseline combinations
     prod = 1
     for s in all_sizes:
         prod *= s
-    
+
     # Calculate variations for each field type
-    paired_variations = sum(s-1 for s in paired_sizes)
-    single_variations = sum(s-1 for s in single_sizes)
+    # For paired fields, use _w domain size for variations
+    paired_variations = 0
+    for _, s_col, w_col, _ in pairs:
+        w_size = len(fields[w_col])
+        paired_variations += w_size - 1  # -1 because we skip the baseline value
+    single_variations = sum(s - 1 for s in single_sizes)
     total_variations = paired_variations + single_variations
-    
+
     return prod * total_variations
 
 
@@ -256,6 +273,7 @@ MODULE_CONFIGS = {
     },
 }
 
+
 def run():
     # Test with AnnualCropland (paired fields only)
     annual_cropland = MODULE_CONFIGS["AnnualCropland"]
@@ -263,24 +281,40 @@ def run():
     n = expected_count(annual_cropland["fields"])
     print(f"AnnualCropland - Hamming shell count: {n}")
     print(f"AnnualCropland - Hamming shell rows: {len(list(rows))}")
-    
+
     # Test with Input (mixed paired and single fields)
     input_config = MODULE_CONFIGS["Input"]
     input_rows = list(hamming_shell_rows(input_config["fields"]))
     input_n = expected_count(input_config["fields"])
     print(f"\nInput - Hamming shell count: {input_n}")
     print(f"Input - Hamming shell rows: {len(input_rows)}")
-    
+
     # Print a few sample rows to verify input_type is included
     print(f"\nFirst 5 Input module hamming rows:")
     for i, row in enumerate(input_rows[:5]):
-        print(f"  Row {i+1}: {row}")
-    
+        print(f"  Row {i + 1}: {row}")
+
     # Check if input_type variations are present
     input_types_found = set()
     for row in input_rows:
-        if 'input_type' in row:
-            input_types_found.add(str(row['input_type']))
+        if "input_type" in row:
+            input_types_found.add(str(row["input_type"]))
     print(f"\nUnique input_type values found in hamming rows: {len(input_types_found)}")
     if input_types_found:
-        print(f"Sample input_type values: {list(input_types_found)[:3]}")
+        print("Sample input_type values:", list(input_types_found)[:3])
+
+    # Test with ForestManagement (different _start and _w domains)
+    forest_config = MODULE_CONFIGS["ForestManagement"]
+    forest_rows = list(hamming_shell_rows(forest_config["fields"]))
+    forest_n = expected_count(forest_config["fields"])
+    print(f"\nForestManagement - Hamming shell count: {forest_n}")
+    print(f"ForestManagement - Hamming shell rows: {len(forest_rows)}")
+
+    # Check if degradation percentage variations are present
+    degradation_values_found = set()
+    for row in forest_rows:
+        if "average_yearly_degradation_percentage_w" in row:
+            degradation_values_found.add(row["average_yearly_degradation_percentage_w"])
+    print(f"\nUnique degradation percentage values found in hamming rows: {len(degradation_values_found)}")
+    if degradation_values_found:
+        print("Sample degradation values:", sorted(list(degradation_values_found))[:5])
