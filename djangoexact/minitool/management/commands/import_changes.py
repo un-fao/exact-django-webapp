@@ -249,7 +249,7 @@ class Command(BaseCommand):
             all_keys.update(record.keys())
 
         # Standard filter columns that are always included
-        standard_filters = {"module_type", "region", "climate", "moisture", "soil_type", "total", "changes"}
+        standard_filters = {"module_type", "region", "climate", "moisture", "soil_type", "total", "changes", "csv_row_data"}
 
         # Identify custom filter columns
         custom_filters = []
@@ -382,6 +382,9 @@ class Command(BaseCommand):
 
                 # Extract custom filter fields
                 filter_fields = self.extract_filter_fields(record, filter_columns)
+                
+                # Get CSV row data if available
+                csv_row_data = record.get("csv_row_data", {})
 
                 for change in record.get("changes", []):
                     field = change.get("field", "")
@@ -404,6 +407,7 @@ class Command(BaseCommand):
                         from_value=str(from_value),
                         to_value=str(to_value),
                         custom_filters=filter_fields,
+                        csv_row_data=csv_row_data,
                         total=total,
                     )
                     batch_records.append(new_record)

@@ -5,7 +5,6 @@ Generates a changes.json format similar to the existing one.
 Works with any module type that has the standard structure.
 """
 
-import csv
 import json
 import os
 import pandas as pd
@@ -103,6 +102,15 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
 
         # Only add to results if there are changes
         if row_changes:
+            # Create complete CSV row data dictionary
+            csv_row_data = {}
+            for col in columns:
+                value = row.get(col)
+                # Handle NaN values
+                if pd.isna(value):
+                    value = None
+                csv_row_data[col] = value
+
             record = {
                 "module_type": module_mapping.get(row_module_type.lower(), row_module_type),
                 "region": region,
@@ -111,6 +119,7 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
                 "soil_type": soil_type,
                 "total": total,
                 "changes": row_changes,
+                "csv_row_data": csv_row_data,
             }
 
             # Add module-specific fields
@@ -223,11 +232,11 @@ def run():
             # "livestock",
             # "waterbody",
             # "largefishery",
-            # "coastalwetland",
+            "coastalwetland",
             # "floodedrice",
-            # "annual_cropland",
+            # "annualcropland",
             # "perennial_cropland",
-            "forestmanagement",
+            # "forestmanagement",
             # "aquaculture",
             # "other_land",
             # "set_aside",
