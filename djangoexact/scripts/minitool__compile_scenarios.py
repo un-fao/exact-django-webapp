@@ -97,13 +97,118 @@ def run(clear: bool = False):
 
     scenarios = [
         # Soil Amendments
+        # Annual Cropland remains Annual Cropland
+        {
+            "name": "Annual Cropland remains Annual Cropland",
+            "category": "Soil Amendments",
+            "changes": [
+                {
+                    "module_type": "Input",
+                    "filters": {
+                        "input_type": "Compost",
+                    },
+                    "start": {
+                        "field": "value",
+                        "value": "0",
+                    },
+                    "end": {
+                        "field": "value",
+                        "value": "1",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "tillage_management_type",
+                        "value": "Full Tillage",
+                    },
+                    "end": {
+                        "field": "tillage_management_type",
+                        "value": "Full Tillage",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "organic_input_type",
+                        "value": "Low C input",
+                    },
+                    "end": {
+                        "field": "organic_input_type",
+                        "value": "Low C input",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "organic_input_type",
+                        "value": "Medium C input",
+                    },
+                    "end": {
+                        "field": "organic_input_type",
+                        "value": "Medium C input",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "organic_input_type",
+                        "value": "High C input, no manure",
+                    },
+                    "end": {
+                        "field": "organic_input_type",
+                        "value": "High C input, no manure",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "organic_input_type",
+                        "value": "High C input, with manure",
+                    },
+                    "end": {
+                        "field": "organic_input_type",
+                        "value": "High C input, with manure",
+                    },
+                },
+                {
+                    "module_type": "Annual Cropland",
+                    "start": {
+                        "field": "residue_management_type",
+                        "value": "Exported",
+                    },
+                    "end": {
+                        "field": "residue_management_type",
+                        "value": "Exported",
+                    },
+                },
+            ],
+            "metadata": {
+                "additional_information": "",
+                "assumptions": "",
+            },
+        },
         # Grassland remains Grassland
         {
             "name": "Grassland remains Grassland",
             "category": "Soil Amendments",
-            "module_type": "Grassland",
             "changes": [
                 {
+                    "module_type": "Input",
+                    "filters": {
+                        "input_type": "Compost",
+                    },
+                    "start": {
+                        "field": "value",
+                        "value": "0",
+                    },
+                    "end": {
+                        "field": "value",
+                        "value": "1",
+                    },
+                },
+                {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Severly Degraded",
@@ -114,6 +219,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "High Intensity Grazing",
@@ -124,6 +230,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Non-Degraded",
@@ -134,6 +241,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Improved Grassland",
@@ -144,6 +252,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Improved Grassland With Medium Inputs",
@@ -154,6 +263,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Improved Grassland With High Inputs",
@@ -174,9 +284,9 @@ def run(clear: bool = False):
         {
             "name": "Grassland remains Grassland",
             "category": "Soil Remediation",
-            "module_type": "Grassland",
             "changes": [
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Severly Degraded",
@@ -187,6 +297,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "High Intensity Grazing",
@@ -197,6 +308,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Non-Degraded",
@@ -217,9 +329,9 @@ def run(clear: bool = False):
         {
             "name": "Terracing for erosion control and soil conservation",
             "category": "Soil Conservation",
-            "module_type": "Grassland",
             "changes": [
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Severly Degraded",
@@ -230,6 +342,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "High Intensity Grazing",
@@ -240,6 +353,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Non-Degraded",
@@ -250,6 +364,7 @@ def run(clear: bool = False):
                     },
                 },
                 {
+                    "module_type": "Grassland",
                     "start": {
                         "field": "grassland_management_type",
                         "value": "Improved Grassland",
@@ -762,7 +877,6 @@ def run(clear: bool = False):
 
         models.EmissionScenario.objects.create(
             name=scenario["name"],
-            module_type=scenario["module_type"],
             changes=scenario["changes"],
             category=category,
             metadata=scenario["metadata"],
@@ -771,12 +885,52 @@ def run(clear: bool = False):
     for scenario in scenarios:
         q_objects = Q()
         for change in scenario["changes"]:
-            q_objects |= Q(
-                module_type=scenario["module_type"],
+            module_type = change.get("module_type")
+            if not module_type:
+                continue
+
+            change_filters = change.get("filters", {})
+
+            # Convert numeric strings to proper format (add .0 if needed)
+            from_value = str(change["start"]["value"])
+            to_value = str(change["end"]["value"])
+
+            # If the value is a numeric string without a decimal, add .0
+            try:
+                if "." not in from_value:
+                    from_value = str(float(from_value))
+            except (ValueError, TypeError):
+                pass
+
+            try:
+                if "." not in to_value:
+                    to_value = str(float(to_value))
+            except (ValueError, TypeError):
+                pass
+
+            change_q = Q(
+                module_type=module_type,
                 field=change["start"]["field"],
-                from_value=change["start"]["value"],
-                to_value=change["end"]["value"],
+                from_value=from_value,
+                to_value=to_value,
             )
+
+            # Apply standard filters
+            if change_filters.get("region"):
+                change_q &= Q(region=change_filters["region"])
+            if change_filters.get("climate"):
+                change_q &= Q(climate=change_filters["climate"])
+            if change_filters.get("moisture"):
+                change_q &= Q(moisture=change_filters["moisture"])
+            if change_filters.get("soil_type"):
+                change_q &= Q(soil_type=change_filters["soil_type"])
+
+            # Apply custom filters (stored in JSONField)
+            for filter_key, filter_value in change_filters.items():
+                if filter_key not in ["region", "climate", "moisture", "soil_type"]:
+                    change_q &= Q(**{f"custom_filters__{filter_key}": filter_value})
+
+            q_objects |= change_q
 
         aggregates = models.ChangeRecord.objects.filter(q_objects)
         print(scenario["category"], "-", scenario["name"])
