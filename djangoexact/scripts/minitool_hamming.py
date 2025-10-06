@@ -593,9 +593,9 @@ class CoastalWetlandDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.single_foreign_key("land_use_type"),
-            FieldMappingBuilder.numeric("area_under_drainage"),
-            FieldMappingBuilder.numeric("drained_area_excavated"),
-            FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
+            # FieldMappingBuilder.numeric("area_under_drainage"),
+            # FieldMappingBuilder.numeric("drained_area_excavated"),
+            # FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
             FieldMappingBuilder.numeric("area_w_restored_vegetation"),
         ]
 
@@ -1170,12 +1170,12 @@ class CoastalWetlandProcessor(ModuleProcessor):
     def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
         (
             land_use_type,
-            area_under_drainage_start,
-            area_under_drainage_w,
-            drained_area_excavated_start,
-            drained_area_excavated_w,
-            area_not_drained_or_rewetted_start,
-            area_not_drained_or_rewetted_w,
+            # area_under_drainage_start,
+            # area_under_drainage_w,
+            # drained_area_excavated_start,
+            # drained_area_excavated_w,
+            # area_not_drained_or_rewetted_start,
+            # area_not_drained_or_rewetted_w,
             area_w_restored_vegetation_start,
             area_w_restored_vegetation_w,
             climate_moisture,
@@ -1183,22 +1183,17 @@ class CoastalWetlandProcessor(ModuleProcessor):
             region,
         ) = combination
         climate, moisture = climate_moisture
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.CoastalWetlandFactory.build(
             activity=a,
             land_use_type=land_use_type,
-            area_under_drainage_start=area_under_drainage_start,
-            area_under_drainage_w=area_under_drainage_w,
-            drained_area_excavated_start=drained_area_excavated_start,
-            drained_area_excavated_w=drained_area_excavated_w,
-            area_not_drained_or_rewetted_start=area_not_drained_or_rewetted_start,
-            area_not_drained_or_rewetted_w=area_not_drained_or_rewetted_w,
+            area_under_drainage_start=0,
+            area_under_drainage_w=0,
+            drained_area_excavated_start=0,
+            drained_area_excavated_w=0,
+            area_not_drained_or_rewetted_start=0,
+            area_not_drained_or_rewetted_w=0,
             area_w_restored_vegetation_start=area_w_restored_vegetation_start,
             area_w_restored_vegetation_w=area_w_restored_vegetation_w,
         )
@@ -1396,6 +1391,50 @@ class DataManager:
         self._storage_client = None
         self._bucket = None
 
+    def deduplicate_errors(self, errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Deduplicate error messages to reduce verbosity and log file size.
+        
+        Groups errors by error_type and error_message, keeping count of occurrences
+        and a sample combination for reference.
+        
+        Args:
+            errors: List of error dictionaries with keys: error_type, error_message, traceback, combination
+            
+        Returns:
+            List of deduplicated error dictionaries with added 'count' field
+        """
+        if not errors:
+            return []
+        
+        # Group errors by (error_type, error_message)
+        error_groups = {}
+        
+        for error in errors:
+            # Create a key based on error type and message
+            key = (error.get('error_type', ''), error.get('error_message', ''))
+            
+            if key not in error_groups:
+                # First occurrence - store the full error info
+                error_groups[key] = {
+                    'error_type': error.get('error_type', ''),
+                    'error_message': error.get('error_message', ''),
+                    'traceback': error.get('traceback', ''),
+                    'sample_combination': str(error.get('combination', '')),  # Convert to string for CSV
+                    'count': 1
+                }
+            else:
+                # Subsequent occurrence - just increment count
+                error_groups[key]['count'] += 1
+        
+        # Convert back to list and sort by count (most frequent first)
+        deduplicated_errors = list(error_groups.values())
+        deduplicated_errors.sort(key=lambda x: x['count'], reverse=True)
+        
+        logger.info(f"Deduplicated {len(errors)} errors down to {len(deduplicated_errors)} unique error types")
+        
+        return deduplicated_errors
+
     @property
     def storage_client(self):
         """Lazy initialization of storage client to avoid pickling issues"""
@@ -1413,6 +1452,12 @@ class DataManager:
     def save_data(self, data: List[Dict[str, Any]], errors: List[Dict[str, Any]], module_name: str, local: bool = False, resume: bool = False) -> None:
         """Save data and errors to GCP storage bucket as CSV files"""
         try:
+            # Deduplicate errors before saving to reduce file size
+            if errors:
+                original_error_count = len(errors)
+                errors = self.deduplicate_errors(errors)
+                logger.info(f"Reduced error count from {original_error_count} to {len(errors)} after deduplication")
+            
             if local:
                 self._save_to_local_fallback(data, errors, module_name, resume)
                 return
@@ -1435,7 +1480,7 @@ class DataManager:
                 errors_blob_name = f"minitool/{module_name.lower()}_errors.csv"
                 errors_blob = self.bucket.blob(errors_blob_name)
                 errors_blob.upload_from_string(errors_csv_buffer.getvalue(), content_type="text/csv")
-                logger.info(f"Saved {len(errors)} errors to gs://{self.bucket_name}/{errors_blob_name}")
+                logger.info(f"Saved {len(errors)} deduplicated errors to gs://{self.bucket_name}/{errors_blob_name}")
 
         except Exception as e:
             logger.error(f"Failed to save data to GCP storage: {e}")
@@ -1457,13 +1502,14 @@ class DataManager:
             logger.info(f"Fallback: Saved {len(data)} rows to {filepath}")
 
         if errors:
+            # Note: errors are already deduplicated in save_data method before calling this fallback
             errors_df = pd.DataFrame(errors)
             errors_filepath = output_dir / f"{module_name.lower()}_errors.csv"
             if resume:
                 errors_df.to_csv(errors_filepath, mode="a", header=False, index=False)
             else:
                 errors_df.to_csv(errors_filepath, index=False)
-            logger.info(f"Fallback: Saved {len(errors)} errors to {errors_filepath}")
+            logger.info(f"Fallback: Saved {len(errors)} deduplicated errors to {errors_filepath}")
 
 
 class HammingPermutationComputer:
@@ -1775,15 +1821,15 @@ MODULE_CONFIGS = {
     },
     "CoastalWetland": {  # Skip
         "fields": {
-            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland").all(),
-            "area_under_drainage_start": [1, 0],
-            "area_under_drainage_w": [1, 0],
-            "drained_area_excavated_start": [1, 0],
-            "drained_area_excavated_w": [1, 0],
-            "area_not_drained_or_rewetted_start": [1, 0],
-            "area_not_drained_or_rewetted_w": [1, 0],
-            "area_w_restored_vegetation_start": [1, 0],
-            "area_w_restored_vegetation_w": [1, 0],
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name__in=["Mangrove", "Seagrass", "Tidal Marsh"]).all(),
+            # "area_under_drainage_start": [1, 0],
+            # "area_under_drainage_w": [1, 0],
+            # "drained_area_excavated_start": [1, 0],
+            # "drained_area_excavated_w": [1, 0],
+            # "area_not_drained_or_rewetted_start": [1, 0],
+            # "area_not_drained_or_rewetted_w": [1, 0],
+            "area_w_restored_vegetation_start": [0],
+            "area_w_restored_vegetation_w": [1],
         },
         "config_name": "coastal_wetland",
     },
