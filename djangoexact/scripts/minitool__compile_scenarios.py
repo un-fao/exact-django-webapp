@@ -1,6 +1,54 @@
+"""
+Compile emission scenarios script with support for per-change module types and CSV row data filtering.
+
+This script allows you to define scenarios where each change can specify its own module type
+and filters, including CSV row data filters using the 'csv_row_filters' parameter.
+
+Example scenario with CSV row filtering:
+{
+    "name": "Example Scenario with Row Filtering",
+    "category": "Example Category",
+    "changes": [
+        {
+            "module_type": "Annual Cropland",
+            "filters": {
+                "input_type": "Compost",  # Uses custom_filters JSONField
+            },
+            "csv_row_filters": {
+                "soil_type": "High Activity Clay",  # Uses csv_row_data JSONField
+                "climate": "Cool Temperate",
+                "moisture": "Moist",
+                "land_use_type_start": "Default",
+                "tillage_management_type_start": "Full Tillage"
+            },
+            "start": {"field": "organic_input_type", "value": "Low C input"},
+            "end": {"field": "organic_input_type", "value": "High C input, with manure"}
+        },
+        {
+            "module_type": "Grassland",
+            "csv_row_filters": {
+                "region": "Central Asia",  # Can filter by any CSV column
+                "grassland_management_type_start": "Non-Degraded"
+            },
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"}
+        }
+    ],
+    "metadata": {
+        "additional_information": "Description of the scenario",
+        "assumptions": "Any assumptions made"
+    }
+}
+
+Key features:
+- Each change can specify its own module_type
+- 'filters' uses the custom_filters JSONField for module-specific data
+- 'csv_row_filters' uses the csv_row_data JSONField for original CSV column data
+- Both filter types can be used together for precise targeting
+"""
+
 import minitool.models as models
 import statistics
-import math
 from django.db.models import Avg, Sum, Min, Max, Count
 from django.db.models import Q
 
@@ -90,296 +138,656 @@ def stats_for(qs):
         "ci_99": ci99,
     }
 
+COASTAL = [
+    # Mangrove Replanting and Natural Recruitment
+    {
+        "name": "Mangrove Replanting and Natural Recruitment",
+        "category": "Coastal Wetland",
+        "changes": [
+            {
+                "module_type": "Coastal Wetland",
+                "filters": {
+                    "land_use_type": "Mangrove",
+                },
+                "start": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "0",
+                },
+                "end": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "1",
+                },
+            },
+        ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
+    },
+    # Coastal Zone Stabilization (e.g. through vegetation or permeable structures)
+    {
+        "name": "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)",
+        "category": "Coastal Wetland",
+        "changes": [
+            {
+                "module_type": "Coastal Wetland",
+                "filters": {
+                    "land_use_type": "Mangrove",
+                },
+                "start": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "0",
+                },
+                "end": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "1",
+                },
+            },
+            {
+                "module_type": "Coastal Wetland",
+                "filters": {
+                    "land_use_type": "Seagrass",
+                },
+                "start": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "0",
+                },
+                "end": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "1",
+                },
+            },
+            {
+                "module_type": "Coastal Wetland",
+                "filters": {
+                    "land_use_type": "Tidal Marsh",
+                },
+                "start": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "0",
+                },
+                "end": {
+                    "field": "area_w_restored_vegetation",
+                    "value": "1",
+                },
+            },
+        ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
+    },
+]
+
+GRASSLAND = [
+    # Soil Remediation
+    {
+        "name": "Grassland remains Grassland",
+        "category": "Soil Remediation",
+        "changes": [
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "Severly Degraded",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "High Intensity Grazing",
+                },
+            },
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "High Intensity Grazing",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "Non-Degraded",
+                },
+            },
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "Non-Degraded",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "Non-Degraded",
+                },
+            },
+        ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
+    },
+    # Terracing for erosion control and soil conservation
+    {
+        "name": "Terracing for erosion control and soil conservation",
+        "category": "Soil Conservation",
+        "changes": [
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "Severly Degraded",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "High Intensity Grazing",
+                },
+            },
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "High Intensity Grazing",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "Non-Degraded",
+                },
+            },
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "Non-Degraded",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "Improved Grassland",
+                },
+            },
+            {
+                "module_type": "Grassland",
+                "start": {
+                    "field": "grassland_management_type",
+                    "value": "Improved Grassland",
+                },
+                "end": {
+                    "field": "grassland_management_type",
+                    "value": "Improved Grassland",
+                },
+                },
+            ],
+            "metadata": {
+                "additional_information": "",
+                "assumptions": "",
+            },
+    },
+]
+
+ANNUAL_CROPLAND = [
+    # Decompaction and improvement of degraded soils
+    {
+        "name": "Decompaction and improvement of degraded soils",
+        "category": "Soil and Land Restoration",
+        "changes": [
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "tillage_management_type",
+                    "value": "Full Tillage",
+                },
+                "end": {
+                    "field": "tillage_management_type",
+                    "value": "Reduced Tillage",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "tillage_management_type",
+                    "value": "Full Tillage",
+                },
+                "end": {
+                    "field": "tillage_management_type",
+                    "value": "No Tillage",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Low C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "Medium C input",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Low C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "High C input, no manure",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Low C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "High C input, with manure",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Burned",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Retained",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "filters": {
+                    "land_use_type": "Default",
+                },
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Burned",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Exported",
+                },
+            },
+        ],
+    },
+]
+
+FOREST_MANAGEMENT = [
+    # Natural regeneration: forest degradation management
+    {
+        "name": "Natural regeneration: forest degradation management",
+        "category": "Forest Restoration",
+        "changes": [
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.01,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.02,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.03,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+        ],
+    },
+    # Enrichment planting in degraded forests
+    {
+        "name": "Enrichment planting in degraded forests",
+        "category": "Forest Restoration",
+        "changes": [
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.01,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.02,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.03,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_type": "Plantation",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.01,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_type": "Plantation",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.02,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_type": "Plantation",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.03,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+        ],
+    },
+    # Reintroduction of threatened species (e.g. flora, fauna, fungi)
+    {
+        "name": "Reintroduction of threatened species (e.g. flora, fauna, fungi)",
+        "category": "Forest Restoration",
+        "changes": [
+            {
+                "module_type": "Forest Management",
+                "filters": {
+                    "forest_condition_type": "Secondary",
+                },
+                "start": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0.02,
+                },
+                "end": {
+                    "field": "average_yearly_degradation_percentage",
+                    "value": 0,
+                },
+            },
+        ],
+    },
+]
 
 def run(clear: bool = False):
     if clear:
         models.EmissionScenario.objects.all().delete()
 
     scenarios = [
-        # Soil Amendments
+        *FOREST_MANAGEMENT,
+        *GRASSLAND,
+        *ANNUAL_CROPLAND,
+        *COASTAL,
+    ]
+
+    """
+    # Soil Amendments
         # Annual Cropland remains Annual Cropland
-        {
-            "name": "Annual Cropland remains Annual Cropland",
-            "category": "Soil Amendments",
-            "changes": [
-                {
-                    "module_type": "Input",
-                    "filters": {
-                        "input_type": "Compost",
-                    },
-                    "start": {
-                        "field": "value",
-                        "value": "0",
-                    },
-                    "end": {
-                        "field": "value",
-                        "value": "1",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "tillage_management_type",
-                        "value": "Full Tillage",
-                    },
-                    "end": {
-                        "field": "tillage_management_type",
-                        "value": "Full Tillage",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Low C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "Low C input",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "Medium C input",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "Medium C input",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "High C input, no manure",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, no manure",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "organic_input_type",
-                        "value": "High C input, with manure",
-                    },
-                    "end": {
-                        "field": "organic_input_type",
-                        "value": "High C input, with manure",
-                    },
-                },
-                {
-                    "module_type": "Annual Cropland",
-                    "start": {
-                        "field": "residue_management_type",
-                        "value": "Exported",
-                    },
-                    "end": {
-                        "field": "residue_management_type",
-                        "value": "Exported",
-                    },
-                },
-            ],
-            "metadata": {
-                "additional_information": "",
-                "assumptions": "",
-            },
-        },
+        # {
+        #     "name": "Annual Cropland remains Annual Cropland",
+        #     "category": "Soil Amendments",
+        #     "changes": [
+        #         {
+        #            "module_type": "Input",
+        #            "filters": {
+        #                "input_type": "Compost",
+        #            },
+        #            "start": {
+        #                "field": "value",
+        #                "value": "0",
+        #            },
+        #            "end": {
+        #                "field": "value",
+        #                "value": "1",
+        #            },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Full Tillage",
+        #             },
+        #             "end": {
+        #                 "field": "tillage_management_type",
+        #                 "value": "Full Tillage",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Low C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Low C input",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Medium C input",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "Medium C input",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, no manure",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, no manure",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, with manure",
+        #             },
+        #             "end": {
+        #                 "field": "organic_input_type",
+        #                 "value": "High C input, with manure",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Annual Cropland",
+        #             "start": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Exported",
+        #             },
+        #             "end": {
+        #                 "field": "residue_management_type",
+        #                 "value": "Exported",
+        #             },
+        #         },
+        #     ],
+        #     "metadata": {
+        #         "additional_information": "",
+        #         "assumptions": "",
+        #     },
+        # },
         # Grassland remains Grassland
-        {
-            "name": "Grassland remains Grassland",
-            "category": "Soil Amendments",
-            "changes": [
-                {
-                    "module_type": "Input",
-                    "filters": {
-                        "input_type": "Compost",
-                    },
-                    "start": {
-                        "field": "value",
-                        "value": "0",
-                    },
-                    "end": {
-                        "field": "value",
-                        "value": "1",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Severly Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Severely Degraded",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland With Medium Inputs",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland With Medium Inputs",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland With High Inputs",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland With High Inputs",
-                    },
-                },
-            ],
-            "metadata": {
-                "additional_information": "- Biochar adds stable carbon; compost improves fertility and microbial activity",
-                "assumptions": "1) assumes the application of organic inputs (compost and biochar) in cultivated soils;\n2) assumes the application of organic inputs (compost and biochar) in grasslands;\n3) assumes that without the project there would not be application of inputs;\n4) assumes that with project increase the C input in the soil;\n5) assumes change of other practices in soil conservation: tillage to reduce tillage (in some situations zero tillage could be assumed);\n6) GRASSLAND - changes only in C input due to the biochar, no changes in tillage nor residue managment.",
-            },
-        },
-        # Soil Remediation
-        # Grassland remains Grassland
-        {
-            "name": "Grassland remains Grassland",
-            "category": "Soil Remediation",
-            "changes": [
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Severly Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                },
-            ],
-            "metadata": {
-                "additional_information": "",
-                "assumptions": "",
-            },
-        },
-        # Soil Conservation
-        # Grassland remains Grassland
-        {
-            "name": "Terracing for erosion control and soil conservation",
-            "category": "Soil Conservation",
-            "changes": [
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Severly Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "High Intensity Grazing",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Non-Degraded",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland",
-                    },
-                },
-                {
-                    "module_type": "Grassland",
-                    "start": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland",
-                    },
-                    "end": {
-                        "field": "grassland_management_type",
-                        "value": "Improved Grassland",
-                    },
-                },
-            ],
-            "metadata": {
-                "additional_information": "",
-                "assumptions": "",
-            },
-        },
+        # {
+        #     "name": "Grassland remains Grassland",
+        #     "category": "Soil Amendments",
+        #     "changes": [
+        #         {
+        #             "module_type": "Input",
+        #             "filters": {
+        #                 "input_type": "Compost",
+        #             },
+        #             "start": {
+        #                 "field": "value",
+        #                 "value": "0",
+        #             },
+        #             "end": {
+        #                 "field": "value",
+        #                 "value": "1",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Severly Degraded",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Severely Degraded",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "High Intensity Grazing",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "High Intensity Grazing",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Non-Degraded",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Non-Degraded",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland With Medium Inputs",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland With Medium Inputs",
+        #             },
+        #         },
+        #         {
+        #             "module_type": "Grassland",
+        #             "start": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland With High Inputs",
+        #             },
+        #             "end": {
+        #                 "field": "grassland_management_type",
+        #                 "value": "Improved Grassland With High Inputs",
+        #             },
+        #         },
+        #     ],
+        #     "metadata": {
+        #         "additional_information": "- Biochar adds stable carbon; compost improves fertility and microbial activity",
+        #         "assumptions": "1) assumes the application of organic inputs (compost and biochar) in cultivated soils;\n2) assumes the application of organic inputs (compost and biochar) in grasslands;\n3) assumes that without the project there would not be application of inputs;\n4) assumes that with project increase the C input in the soil;\n5) assumes change of other practices in soil conservation: tillage to reduce tillage (in some situations zero tillage could be assumed);\n6) GRASSLAND - changes only in C input due to the biochar, no changes in tillage nor residue managment.",
+        #     },
+        # },
         # {
         #     "name": "Forest Degradation Management",
         #     "category": "Natural Regeneration",
@@ -870,7 +1278,7 @@ def run(clear: bool = False):
         #         },
         #     ],
         # },
-    ]
+    """
 
     for scenario in scenarios:
         category, created = models.EmissionScenarioCategory.objects.get_or_create(name=scenario["category"])
@@ -890,23 +1298,11 @@ def run(clear: bool = False):
                 continue
 
             change_filters = change.get("filters", {})
+            csv_row_filters = change.get("csv_row_filters", {})
 
-            # Convert numeric strings to proper format (add .0 if needed)
+            # Convert values to strings (matching how they're stored in database)
             from_value = str(change["start"]["value"])
             to_value = str(change["end"]["value"])
-
-            # If the value is a numeric string without a decimal, add .0
-            try:
-                if "." not in from_value:
-                    from_value = str(float(from_value))
-            except (ValueError, TypeError):
-                pass
-
-            try:
-                if "." not in to_value:
-                    to_value = str(float(to_value))
-            except (ValueError, TypeError):
-                pass
 
             change_q = Q(
                 module_type=module_type,
@@ -925,19 +1321,59 @@ def run(clear: bool = False):
             if change_filters.get("soil_type"):
                 change_q &= Q(soil_type=change_filters["soil_type"])
 
-            # Apply custom filters (stored in JSONField)
+            # Apply custom filters (stored in custom_filters JSONField or csv_row_data JSONField)
             for filter_key, filter_value in change_filters.items():
                 if filter_key not in ["region", "climate", "moisture", "soil_type"]:
-                    change_q &= Q(**{f"custom_filters__{filter_key}": filter_value})
+                    # Try both custom_filters and csv_row_data for the filter
+                    filter_q = Q(**{f"custom_filters__{filter_key}": filter_value}) | Q(**{f"csv_row_data__{filter_key}": filter_value})
+                    change_q &= filter_q
+
+            # Apply CSV row data filters (stored in csv_row_data JSONField)
+            for filter_key, filter_value in csv_row_filters.items():
+                change_q &= Q(**{f"csv_row_data__{filter_key}": filter_value})
 
             q_objects |= change_q
 
         aggregates = models.ChangeRecord.objects.filter(q_objects)
         print(scenario["category"], "-", scenario["name"])
+        
+        # Debug: Show the query being constructed
+        print(f"Query: {q_objects}")
+        
+        # Show CSV row filters if any changes have them
+        csv_filters_used = []
+        for change in scenario["changes"]:
+            if "csv_row_filters" in change and change["csv_row_filters"]:
+                csv_filters_used.append(f"{change.get('module_type', 'Unknown')}: {change['csv_row_filters']}")
+        
+        if csv_filters_used:
+            print("CSV row filters applied:")
+            for filter_info in csv_filters_used:
+                print(f"  {filter_info}")
+
+        # Debug: Show what records exist for this module type
+        module_types_in_scenario = set()
+        for change in scenario["changes"]:
+            if change.get("module_type"):
+                module_types_in_scenario.add(change["module_type"])
+        
+        for module_type in module_types_in_scenario:
+            total_records = models.ChangeRecord.objects.filter(module_type=module_type).count()
+            print(f"Total {module_type} records in database: {total_records}")
+            
+            # Show a sample of records for debugging
+            sample_records = models.ChangeRecord.objects.filter(module_type=module_type)[:3]
+            for i, record in enumerate(sample_records):
+                print(f"  Sample {i+1}: field={record.field}, from={record.from_value}, to={record.to_value}")
+                print(f"    custom_filters: {record.custom_filters}")
+                if hasattr(record, 'csv_row_data'):
+                    print(f"    csv_row_data keys: {list(record.csv_row_data.keys()) if record.csv_row_data else 'None'}")
 
         if aggregates.count() == 0:
             print("No aggregates found")
             continue
+            
+        print(f"Found {aggregates.count()} matching records")
 
         scenario["statistics"] = stats_for(aggregates)
 
