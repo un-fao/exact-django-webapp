@@ -8,15 +8,20 @@ Example scenario with CSV row filtering:
 {
     "name": "Example Scenario with Row Filtering",
     "category": "Example Category",
+    "filters": {
+        "region": ["Central Asia", "Eastern Europe"],  # Applied to ALL changes
+    },
+    "csv_row_filters": {
+        "climate": "Cool Temperate",  # Applied to ALL changes
+    },
     "changes": [
         {
             "module_type": "Annual Cropland",
             "filters": {
-                "input_type": "Compost",  # Uses custom_filters JSONField
+                "input_type": "Compost",  # Change-specific filter
             },
             "csv_row_filters": {
-                "soil_type": "High Activity Clay",  # Uses csv_row_data JSONField
-                "climate": "Cool Temperate",
+                "soil_type": ["High Activity Clay", "Low Activity Clay"],
                 "moisture": "Moist",
                 "land_use_type_start": "Default",
                 "tillage_management_type_start": "Full Tillage"
@@ -27,7 +32,6 @@ Example scenario with CSV row filtering:
         {
             "module_type": "Grassland",
             "csv_row_filters": {
-                "region": "Central Asia",  # Can filter by any CSV column
                 "grassland_management_type_start": "Non-Degraded"
             },
             "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
@@ -45,6 +49,8 @@ Key features:
 - 'filters' uses the custom_filters JSONField for module-specific data
 - 'csv_row_filters' uses the csv_row_data JSONField for original CSV column data
 - Both filter types can be used together for precise targeting
+- All filters support both single strings and lists of strings (OR condition within each filter)
+- Scenario-level filters automatically apply to all changes (merged with change-level filters)
 """
 
 import minitool.models as models
@@ -138,11 +144,17 @@ def stats_for(qs):
         "ci_99": ci99,
     }
 
+
+DEFAULT_FILTERS = {
+    "soil_type": ["High Activity Clay", "Low Activity Clay", "Sandy"],
+}
+
 COASTAL = [
     # Mangrove Replanting and Natural Recruitment
     {
         "name": "Mangrove Replanting and Natural Recruitment",
         "category": "Coastal Wetland",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Coastal Wetland",
@@ -168,6 +180,7 @@ COASTAL = [
     {
         "name": "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)",
         "category": "Coastal Wetland",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Coastal Wetland",
@@ -224,6 +237,7 @@ GRASSLAND = [
     {
         "name": "Grassland remains Grassland",
         "category": "Soil Remediation",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Grassland",
@@ -268,6 +282,7 @@ GRASSLAND = [
     {
         "name": "Terracing for erosion control and soil conservation",
         "category": "Soil Conservation",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Grassland",
@@ -312,12 +327,12 @@ GRASSLAND = [
                     "field": "grassland_management_type",
                     "value": "Improved Grassland",
                 },
-                },
-            ],
-            "metadata": {
-                "additional_information": "",
-                "assumptions": "",
             },
+        ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
     },
 ]
 
@@ -326,6 +341,7 @@ ANNUAL_CROPLAND = [
     {
         "name": "Decompaction and improvement of degraded soils",
         "category": "Soil and Land Restoration",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Annual Cropland",
@@ -426,6 +442,10 @@ ANNUAL_CROPLAND = [
                 },
             },
         ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
     },
 ]
 
@@ -434,6 +454,7 @@ FOREST_MANAGEMENT = [
     {
         "name": "Natural regeneration: forest degradation management",
         "category": "Forest Restoration",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Forest Management",
@@ -478,11 +499,16 @@ FOREST_MANAGEMENT = [
                 },
             },
         ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
     },
     # Enrichment planting in degraded forests
     {
         "name": "Enrichment planting in degraded forests",
         "category": "Forest Restoration",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Forest Management",
@@ -569,11 +595,16 @@ FOREST_MANAGEMENT = [
                 },
             },
         ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
     },
     # Reintroduction of threatened species (e.g. flora, fauna, fungi)
     {
         "name": "Reintroduction of threatened species (e.g. flora, fauna, fungi)",
         "category": "Forest Restoration",
+        "filters": DEFAULT_FILTERS,
         "changes": [
             {
                 "module_type": "Forest Management",
@@ -590,8 +621,13 @@ FOREST_MANAGEMENT = [
                 },
             },
         ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
     },
 ]
+
 
 def run(clear: bool = False):
     if clear:
@@ -1292,17 +1328,32 @@ def run(clear: bool = False):
 
     for scenario in scenarios:
         q_objects = Q()
+
+        # Extract scenario-level filters
+        scenario_filters = scenario.get("filters", {})
+        scenario_csv_row_filters = scenario.get("csv_row_filters", {})
+
         for change in scenario["changes"]:
             module_type = change.get("module_type")
             if not module_type:
                 continue
 
-            change_filters = change.get("filters", {})
-            csv_row_filters = change.get("csv_row_filters", {})
+            # Merge scenario-level filters with change-level filters
+            change_filters = {**scenario_filters, **change.get("filters", {})}
+            csv_row_filters = {**scenario_csv_row_filters, **change.get("csv_row_filters", {})}
 
             # Convert values to strings (matching how they're stored in database)
-            from_value = str(change["start"]["value"])
-            to_value = str(change["end"]["value"])
+            # For numeric values, ensure float format (e.g., 0 -> "0.0" not "0")
+            def normalize_value(val):
+                if isinstance(val, bool):
+                    return str(val)
+                try:
+                    return str(float(val))
+                except (ValueError, TypeError):
+                    return str(val)
+
+            from_value = normalize_value(change["start"]["value"])
+            to_value = normalize_value(change["end"]["value"])
 
             change_q = Q(
                 module_type=module_type,
@@ -1313,66 +1364,59 @@ def run(clear: bool = False):
 
             # Apply standard filters
             if change_filters.get("region"):
-                change_q &= Q(region=change_filters["region"])
+                region_values = change_filters["region"] if isinstance(change_filters["region"], list) else [change_filters["region"]]
+                region_q = Q()
+                for val in region_values:
+                    region_q |= Q(region=val)
+                change_q &= region_q
+
             if change_filters.get("climate"):
-                change_q &= Q(climate=change_filters["climate"])
+                climate_values = change_filters["climate"] if isinstance(change_filters["climate"], list) else [change_filters["climate"]]
+                climate_q = Q()
+                for val in climate_values:
+                    climate_q |= Q(climate=val)
+                change_q &= climate_q
+
             if change_filters.get("moisture"):
-                change_q &= Q(moisture=change_filters["moisture"])
+                moisture_values = change_filters["moisture"] if isinstance(change_filters["moisture"], list) else [change_filters["moisture"]]
+                moisture_q = Q()
+                for val in moisture_values:
+                    moisture_q |= Q(moisture=val)
+                change_q &= moisture_q
+
             if change_filters.get("soil_type"):
-                change_q &= Q(soil_type=change_filters["soil_type"])
+                soil_type_values = change_filters["soil_type"] if isinstance(change_filters["soil_type"], list) else [change_filters["soil_type"]]
+                soil_type_q = Q()
+                for val in soil_type_values:
+                    soil_type_q |= Q(soil_type=val)
+                change_q &= soil_type_q
 
             # Apply custom filters (stored in custom_filters JSONField or csv_row_data JSONField)
             for filter_key, filter_value in change_filters.items():
                 if filter_key not in ["region", "climate", "moisture", "soil_type"]:
-                    # Try both custom_filters and csv_row_data for the filter
-                    filter_q = Q(**{f"custom_filters__{filter_key}": filter_value}) | Q(**{f"csv_row_data__{filter_key}": filter_value})
+                    filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+                    filter_q = Q()
+                    for val in filter_values:
+                        filter_q |= Q(**{f"custom_filters__{filter_key}": val}) | Q(**{f"csv_row_data__{filter_key}": val})
                     change_q &= filter_q
 
             # Apply CSV row data filters (stored in csv_row_data JSONField)
             for filter_key, filter_value in csv_row_filters.items():
-                change_q &= Q(**{f"csv_row_data__{filter_key}": filter_value})
+                filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+                csv_filter_q = Q()
+                for val in filter_values:
+                    csv_filter_q |= Q(**{f"csv_row_data__{filter_key}": val})
+                change_q &= csv_filter_q
 
             q_objects |= change_q
 
         aggregates = models.ChangeRecord.objects.filter(q_objects)
         print(scenario["category"], "-", scenario["name"])
-        
-        # Debug: Show the query being constructed
-        print(f"Query: {q_objects}")
-        
-        # Show CSV row filters if any changes have them
-        csv_filters_used = []
-        for change in scenario["changes"]:
-            if "csv_row_filters" in change and change["csv_row_filters"]:
-                csv_filters_used.append(f"{change.get('module_type', 'Unknown')}: {change['csv_row_filters']}")
-        
-        if csv_filters_used:
-            print("CSV row filters applied:")
-            for filter_info in csv_filters_used:
-                print(f"  {filter_info}")
-
-        # Debug: Show what records exist for this module type
-        module_types_in_scenario = set()
-        for change in scenario["changes"]:
-            if change.get("module_type"):
-                module_types_in_scenario.add(change["module_type"])
-        
-        for module_type in module_types_in_scenario:
-            total_records = models.ChangeRecord.objects.filter(module_type=module_type).count()
-            print(f"Total {module_type} records in database: {total_records}")
-            
-            # Show a sample of records for debugging
-            sample_records = models.ChangeRecord.objects.filter(module_type=module_type)[:3]
-            for i, record in enumerate(sample_records):
-                print(f"  Sample {i+1}: field={record.field}, from={record.from_value}, to={record.to_value}")
-                print(f"    custom_filters: {record.custom_filters}")
-                if hasattr(record, 'csv_row_data'):
-                    print(f"    csv_row_data keys: {list(record.csv_row_data.keys()) if record.csv_row_data else 'None'}")
 
         if aggregates.count() == 0:
             print("No aggregates found")
             continue
-            
+
         print(f"Found {aggregates.count()} matching records")
 
         scenario["statistics"] = stats_for(aggregates)
