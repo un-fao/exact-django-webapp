@@ -2699,7 +2699,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to edit the project", status=http_status.HTTP_403_FORBIDDEN)
 
         client = storage.Client()
-        bucket = client.bucket("fao-exact-review-uploads")
+        bucket = client.bucket(settings.STORAGE_BUCKET)
         blob = bucket.blob(f"projects/{attachment.project.id}/{attachment.name}")
 
         blob.delete()
