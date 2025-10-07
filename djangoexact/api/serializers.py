@@ -880,6 +880,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc.organic_soil = module_instance
             luc.save()
 
+        return module_instance
+
     @transaction.atomic
     def save(self, **kwargs):
         self.validate_total_project_cost()
@@ -899,7 +901,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             was_luc_removed = luc and not has_luc_module
             was_luc_added = not luc and has_luc_module
 
-            if new_luc_module_types:
+            if luc and new_luc_module_types:
                 luc = self.edit_existing_luc()
             elif was_luc_removed:
                 self.delete_existing_luc()
@@ -907,7 +909,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 luc = self.handle_luc_module(self.instance, create_organic_soil)
 
             # Other modules
-            old_module_types = list(map(lambda module: module, self.instance.module_types.all())) + list(map(lambda module: module, old_luc_module_types))
+            old_module_types = list(map(lambda module: module, old_luc_module_types))
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"])) + list(map(lambda module: module, new_luc_module_types))
             create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
@@ -922,7 +924,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     continue
 
                 if module_type in added_module_types:
-                    self.create_module(module_type, in_luc=module_type in new_luc_module_types, luc=luc, area=area)
+                    module_instance = self.create_module(module_type, in_luc=module_type in new_luc_module_types, luc=luc, area=area)
                     continue
 
                 ModuleClass = apps.get_model("api", module_type.class_name)
@@ -940,10 +942,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 if module_type in kept_module_types and module_type in old_luc_module_types and module_type not in final_luc_module_types:
                     module_instance.land_use_change = None
 
-                if module_type.class_name == "OrganicSoil":
+                if module_type.class_name == "OrganicSoil" and luc:
                     # If Organic Soil and LUC was removed, set the organic_soil to None
                     if was_luc_removed:
-                        module_instance.organic_soil = None
+                        luc.organic_soil = None
                     # If Organic Soil and LUC was added, set the organic_soil to the new Organic Soil
                     else:
                         luc.organic_soil = module_instance
@@ -952,7 +954,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance.save()
 
             for module_type in removed_module_types:
-                if module_type.class_name == "OrganicSoil":
+                if module_type.class_name == "OrganicSoil" and luc:
                     luc.organic_soil = None
                     luc.save()
 
@@ -965,8 +967,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             self.instance.module_types.clear()
             self.instance.module_types.add(*new_module_types)
-            if luc:
+            if final_luc_module_types:
                 self.instance.module_types.add(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id, ModuleType.objects.get(class_name="LandUseChange").id)
+
             self.instance.save()
 
             return self.instance
