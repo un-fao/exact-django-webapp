@@ -57,6 +57,9 @@ import minitool.models as models
 import statistics
 from django.db.models import Avg, Sum, Min, Max, Count
 from django.db.models import Q
+import pandas as pd
+from datetime import datetime
+import os
 
 
 def stats_for(qs):
@@ -150,10 +153,9 @@ DEFAULT_FILTERS = {
 }
 
 COASTAL = [
-    # Mangrove Replanting and Natural Recruitment
     {
         "name": "Mangrove Replanting and Natural Recruitment",
-        "category": "Coastal Wetland",
+        "category": "Aquatic Restoration",
         "filters": DEFAULT_FILTERS,
         "changes": [
             {
@@ -163,11 +165,11 @@ COASTAL = [
                 },
                 "start": {
                     "field": "area_w_restored_vegetation",
-                    "value": "0",
+                    "value": 0,
                 },
                 "end": {
                     "field": "area_w_restored_vegetation",
-                    "value": "1",
+                    "value": 1,
                 },
             },
         ],
@@ -176,10 +178,9 @@ COASTAL = [
             "assumptions": "",
         },
     },
-    # Coastal Zone Stabilization (e.g. through vegetation or permeable structures)
     {
         "name": "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)",
-        "category": "Coastal Wetland",
+        "category": "Aquatic Restoration",
         "filters": DEFAULT_FILTERS,
         "changes": [
             {
@@ -189,11 +190,11 @@ COASTAL = [
                 },
                 "start": {
                     "field": "area_w_restored_vegetation",
-                    "value": "0",
+                    "value": 0,
                 },
                 "end": {
                     "field": "area_w_restored_vegetation",
-                    "value": "1",
+                    "value": 1,
                 },
             },
             {
@@ -203,11 +204,11 @@ COASTAL = [
                 },
                 "start": {
                     "field": "area_w_restored_vegetation",
-                    "value": "0",
+                    "value": 0,
                 },
                 "end": {
                     "field": "area_w_restored_vegetation",
-                    "value": "1",
+                    "value": 1,
                 },
             },
             {
@@ -217,11 +218,11 @@ COASTAL = [
                 },
                 "start": {
                     "field": "area_w_restored_vegetation",
-                    "value": "0",
+                    "value": 0,
                 },
                 "end": {
                     "field": "area_w_restored_vegetation",
-                    "value": "1",
+                    "value": 1,
                 },
             },
         ],
@@ -345,9 +346,6 @@ ANNUAL_CROPLAND = [
         "changes": [
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "tillage_management_type",
                     "value": "Full Tillage",
@@ -359,9 +357,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "tillage_management_type",
                     "value": "Full Tillage",
@@ -373,9 +368,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "organic_input_type",
                     "value": "Low C input",
@@ -387,9 +379,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "organic_input_type",
                     "value": "Low C input",
@@ -401,9 +390,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "organic_input_type",
                     "value": "Low C input",
@@ -415,9 +401,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "residue_management_type",
                     "value": "Burned",
@@ -429,9 +412,6 @@ ANNUAL_CROPLAND = [
             },
             {
                 "module_type": "Annual Cropland",
-                "filters": {
-                    "land_use_type": "Default",
-                },
                 "start": {
                     "field": "residue_management_type",
                     "value": "Burned",
@@ -439,6 +419,128 @@ ANNUAL_CROPLAND = [
                 "end": {
                     "field": "residue_management_type",
                     "value": "Exported",
+                },
+            },
+        ],
+        "metadata": {
+            "additional_information": "",
+            "assumptions": "",
+        },
+    },
+    # Better crop management for annual crops
+    {
+        "name": "Better crop management for annual crops",
+        "category": "Intercropping and Crop Rotation",
+        "filters": DEFAULT_FILTERS,
+        "changes": [
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "tillage_management_type",
+                    "value": "Full Tillage",
+                },
+                "end": {
+                    "field": "tillage_management_type",
+                    "value": "Reduced Tillage",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "tillage_management_type",
+                    "value": "Full Tillage",
+                },
+                "end": {
+                    "field": "tillage_management_type",
+                    "value": "No Tillage",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "tillage_management_type",
+                    "value": "Reduced Tillage",
+                },
+                "end": {
+                    "field": "tillage_management_type",
+                    "value": "No Tillage",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Low C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "Medium C input",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Medium C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "High C input, no manure",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "organic_input_type",
+                    "value": "Low C input",
+                },
+                "end": {
+                    "field": "organic_input_type",
+                    "value": "High C input, no manure",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Burned",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Retained",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Burned",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Exported",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Retained",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Exported",
+                },
+            },
+            {
+                "module_type": "Annual Cropland",
+                "start": {
+                    "field": "residue_management_type",
+                    "value": "Exported",
+                },
+                "end": {
+                    "field": "residue_management_type",
+                    "value": "Retained",
                 },
             },
         ],
@@ -460,6 +562,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -474,6 +577,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -488,6 +592,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -514,6 +619,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -528,6 +634,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -542,6 +649,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_condition_type": "Secondary",
+                    "forest_type": "Natural",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -627,6 +735,149 @@ FOREST_MANAGEMENT = [
         },
     },
 ]
+
+
+def save_to_excel(scenarios, output_dir="reports"):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"emission_scenarios_{timestamp}.xlsx"
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    filepath = os.path.join(output_dir, filename)
+
+    with pd.ExcelWriter(filepath, engine="openpyxl") as writer:
+        summary_data = []
+
+        for scenario in scenarios:
+            stats = scenario.get("statistics")
+            if not stats:
+                continue
+
+            mean_minus_median = stats["mean"] - stats["median"] if stats.get("mean") and stats.get("median") else None
+            is_symmetric = mean_minus_median < 0.25 * stats["std"] if mean_minus_median is not None and stats.get("std") else None
+
+            if is_symmetric:
+                range_lower = stats["mean"] - stats["std"] if stats.get("mean") and stats.get("std") else None
+                range_upper = stats["mean"] + stats["std"] if stats.get("mean") and stats.get("std") else None
+                distribution_type = "Symmetric"
+            else:
+                range_lower = stats.get("q1")
+                range_upper = stats.get("q3")
+                distribution_type = "Skewed"
+
+            summary_data.append(
+                {
+                    "Category": scenario.get("category", ""),
+                    "Scenario Name": scenario.get("name", ""),
+                    "Count": stats.get("count", 0),
+                    "Sum Total": stats.get("sum_total"),
+                    "Mean": stats.get("mean"),
+                    "Median": stats.get("median"),
+                    "Min": stats.get("min"),
+                    "Max": stats.get("max"),
+                    "Std Dev": stats.get("std"),
+                    "Q1": stats.get("q1"),
+                    "Q3": stats.get("q3"),
+                    "IQR": stats.get("iqr"),
+                    "CI 95%": stats.get("ci_95"),
+                    "CI 99%": stats.get("ci_99"),
+                    "Distribution": distribution_type,
+                    "Range Lower": range_lower,
+                    "Range Upper": range_upper,
+                }
+            )
+
+        summary_df = pd.DataFrame(summary_data)
+        summary_df.to_excel(writer, sheet_name="Summary", index=False)
+
+        worksheet = writer.sheets["Summary"]
+        for idx, col in enumerate(summary_df.columns):
+            max_length = max(summary_df[col].astype(str).apply(len).max(), len(str(col))) + 2
+            worksheet.column_dimensions[chr(65 + idx)].width = min(max_length, 50)
+
+        for idx, scenario in enumerate(scenarios):
+            if not scenario.get("statistics"):
+                continue
+
+            sheet_name = f"S{idx + 1}_{scenario['name'][:25]}"
+            sheet_name = "".join(c if c.isalnum() or c in (" ", "_", "-") else "_" for c in sheet_name)
+
+            scenario_details = []
+            scenario_details.append({"Field": "Scenario Name", "Value": scenario.get("name", "")})
+            scenario_details.append({"Field": "Category", "Value": scenario.get("category", "")})
+            scenario_details.append({"Field": "", "Value": ""})
+
+            scenario_details.append({"Field": "STATISTICS", "Value": ""})
+            stats = scenario["statistics"]
+            for key, value in stats.items():
+                if value is not None:
+                    scenario_details.append({"Field": key.replace("_", " ").title(), "Value": value})
+
+            scenario_details.append({"Field": "", "Value": ""})
+            scenario_details.append({"Field": "FILTERS", "Value": ""})
+            filters = scenario.get("filters", {})
+            for key, value in filters.items():
+                scenario_details.append({"Field": key, "Value": str(value)})
+
+            csv_filters = scenario.get("csv_row_filters", {})
+            if csv_filters:
+                scenario_details.append({"Field": "", "Value": ""})
+                scenario_details.append({"Field": "CSV ROW FILTERS", "Value": ""})
+                for key, value in csv_filters.items():
+                    scenario_details.append({"Field": key, "Value": str(value)})
+
+            scenario_details.append({"Field": "", "Value": ""})
+            scenario_details.append({"Field": "CHANGES", "Value": ""})
+
+            changes_data = []
+            for change_idx, change in enumerate(scenario.get("changes", []), 1):
+                change_info = {
+                    "Change #": change_idx,
+                    "Module Type": change.get("module_type", ""),
+                    "Field": change.get("start", {}).get("field", ""),
+                    "From Value": change.get("start", {}).get("value", ""),
+                    "To Value": change.get("end", {}).get("value", ""),
+                }
+
+                change_filters = change.get("filters", {})
+                if change_filters:
+                    change_info["Filters"] = str(change_filters)
+
+                change_csv_filters = change.get("csv_row_filters", {})
+                if change_csv_filters:
+                    change_info["CSV Filters"] = str(change_csv_filters)
+
+                changes_data.append(change_info)
+
+            detail_df = pd.DataFrame(scenario_details)
+            detail_df.to_excel(writer, sheet_name=sheet_name, index=False, header=False)
+
+            if changes_data:
+                changes_df = pd.DataFrame(changes_data)
+                start_row = len(scenario_details) + 2
+                changes_df.to_excel(writer, sheet_name=sheet_name, startrow=start_row, index=False)
+
+            worksheet = writer.sheets[sheet_name]
+            worksheet.column_dimensions["A"].width = 30
+            worksheet.column_dimensions["B"].width = 50
+
+            metadata = scenario.get("metadata", {})
+            if metadata:
+                metadata_start = len(scenario_details) + len(changes_data) + 5
+                metadata_details = [{"Field": "", "Value": ""}]
+                metadata_details.append({"Field": "METADATA", "Value": ""})
+                for key, value in metadata.items():
+                    metadata_details.append({"Field": key.replace("_", " ").title(), "Value": str(value)})
+
+                metadata_df = pd.DataFrame(metadata_details)
+                metadata_df.to_excel(writer, sheet_name=sheet_name, startrow=metadata_start, index=False, header=False)
+
+    print(f"\n{'=' * 80}")
+    print(f"Excel file saved: {filepath}")
+    print(f"{'=' * 80}\n")
+
+    return filepath
 
 
 def run(clear: bool = False):
@@ -1342,24 +1593,28 @@ def run(clear: bool = False):
             change_filters = {**scenario_filters, **change.get("filters", {})}
             csv_row_filters = {**scenario_csv_row_filters, **change.get("csv_row_filters", {})}
 
-            # Convert values to strings (matching how they're stored in database)
-            # For numeric values, ensure float format (e.g., 0 -> "0.0" not "0")
-            def normalize_value(val):
-                if isinstance(val, bool):
-                    return str(val)
+            # Create flexible query that handles both integer and decimal string formats
+            # For numeric values, check both formats (e.g., "0" and "0.0", "1" and "1.0")
+            def create_flexible_value_query(field_name, value):
                 try:
-                    return str(float(val))
+                    float_val = float(value)
+                    if float_val.is_integer():
+                        # For whole numbers, check both integer and decimal formats
+                        return Q(**{field_name: str(int(float_val))}) | Q(**{field_name: str(float_val)})
+                    else:
+                        # For decimals, only check the decimal format
+                        return Q(**{field_name: str(float_val)})
                 except (ValueError, TypeError):
-                    return str(val)
+                    # For non-numeric values, use exact match
+                    return Q(**{field_name: str(value)})
 
-            from_value = normalize_value(change["start"]["value"])
-            to_value = normalize_value(change["end"]["value"])
-
-            change_q = Q(
-                module_type=module_type,
-                field=change["start"]["field"],
-                from_value=from_value,
-                to_value=to_value,
+            change_q = (
+                Q(
+                    module_type=module_type,
+                    field=change["start"]["field"],
+                )
+                & create_flexible_value_query("from_value", change["start"]["value"])
+                & create_flexible_value_query("to_value", change["end"]["value"])
             )
 
             # Apply standard filters
@@ -1433,3 +1688,8 @@ def run(clear: bool = False):
 
         print()
         print()
+
+    import os
+
+    if os.getenv("SAVE_TO_EXCEL"):
+        save_to_excel(scenarios)
