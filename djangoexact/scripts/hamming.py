@@ -5,8 +5,13 @@ from .minitool import ClimateMoistureValidator, SoilOrganicCarbonValidator
 
 def domains_from_fields(fields: dict):
     # pair *_start with *_w and get their combined domain
+    # ONLY process fields ending with _start and _w (hamming sphere fields)
+    # Exclude environmental filters (climate, soil_type, moisture, region) and custom module-based filters
     pairs = []
     single_fields = []
+
+    # Environmental filters to exclude
+    environmental_filters = {"climate", "soil_type", "moisture", "region", "climate_moisture", "soil_types"}
 
     # Process fields with _start/_w pattern
     for k in sorted(fields):
@@ -23,8 +28,9 @@ def domains_from_fields(fields: dict):
                 pairs.append((base, s, w, combined_dom))
 
     # Process single fields that don't have _start/_w pattern
+    # BUT exclude environmental filters and custom module-based filters
     for k in sorted(fields):
-        if not k.endswith("_start") and not k.endswith("_w") and not k.endswith("_wo"):
+        if not k.endswith("_start") and not k.endswith("_w") and not k.endswith("_wo") and k not in environmental_filters:
             # Check if this field doesn't have a corresponding _start/_w version
             base_start = f"{k}_start"
             base_w = f"{k}_w"
@@ -39,8 +45,8 @@ def hamming_shell_rows(fields: dict):
     """
     fields: your dict of columns -> iterable/QuerySet
     Yields dict rows where exactly one field differs from its baseline value.
-    For paired fields (*_start/*_w), we vary the _w value while keeping _start constant.
-    For single fields, we iterate through all possible values.
+    ONLY processes fields ending with _start and _w (hamming sphere permutations).
+    Other fields (environmental filters, custom module-based filters) are handled separately.
     """
     pairs, single_fields = domains_from_fields(fields)
 
@@ -62,42 +68,92 @@ def hamming_shell_rows(fields: dict):
         single_base_map = {single_fields[i][0]: single_baseline_vals[i] for i in range(len(single_fields))}
 
         # For each paired field, flip its _w to an alternative value
-        for i, (base, s_col, w_col, combined_dom) in enumerate(pairs):
-            s_val = paired_base_map[base]
-            # Get the _w domain specifically for this field
-            w_dom = list(fields[w_col])
-            for alt in w_dom:
-                if alt == s_val:
-                    continue  # must differ
-                row = {}
-                # fill all pairs: start = baseline, w = baseline (same)
-                for b, s, w, _ in pairs:
-                    row[s] = paired_base_map[b]
-                    row[w] = paired_base_map[b]
-                # fill all single fields with baseline values
-                for field_name, baseline_val in single_base_map.items():
-                    row[field_name] = baseline_val
-                # flip exactly one paired field
-                row[w_col] = alt
-                yield row
+        # IMPORTANT: Only use the FIRST baseline for single fields to avoid duplicates
+        # Single field variations are handled separately
+        should_generate_paired_variations = all(single_baseline_vals[j] == single_bases[j][0] for j in range(len(single_fields)))
+
+        if should_generate_paired_variations or len(single_fields) == 0:
+            for i, (base, s_col, w_col, combined_dom) in enumerate(pairs):
+                s_val = paired_base_map[base]
+                # Get the _w domain specifically for this field
+                w_dom = list(fields[w_col])
+                for alt in w_dom:
+                    if alt == s_val:
+                        continue  # must differ
+                    row = {}
+                    # fill all pairs: start = baseline, w = baseline (same)
+                    for b, s, w, _ in pairs:
+                        row[s] = paired_base_map[b]
+                        row[w] = paired_base_map[b]
+                    # fill all single fields with FIRST baseline values to avoid duplicates
+                    for j, (field_name, dom) in enumerate(single_fields):
+                        row[field_name] = single_bases[j][0]
+                    # flip exactly one paired field
+                    row[w_col] = alt
+
+                    # Double-check: ensure start and w values are different
+                    if row[s_col] == row[w_col]:
+                        continue  # Skip if start and w are the same
+
+                    yield row
 
         # For each single field, vary its value while keeping others at baseline
-        for i, (field_name, dom) in enumerate(single_fields):
-            baseline_val = single_base_map[field_name]
-            for alt in dom:
-                if alt == baseline_val:
-                    continue  # must differ
-                row = {}
-                # fill all pairs with baseline values (start = w = baseline)
-                for b, s, w, _ in pairs:
-                    row[s] = paired_base_map[b]
-                    row[w] = paired_base_map[b]
-                # fill all single fields with baseline values
-                for other_field_name, other_baseline_val in single_base_map.items():
-                    row[other_field_name] = other_baseline_val
-                # flip exactly one single field
-                row[field_name] = alt
-                yield row
+        # Note: We skip single field variations if they would create start==w duplicates for paired fields
+        # This is because single field variations should not generate permutations where paired fields don't change
+        # IMPORTANT: Only generate single field variations for the FIRST baseline to avoid duplicates
+        is_first_single_baseline = all(single_baseline_vals[j] == single_bases[j][0] for j in range(len(single_fields)))
+
+        if is_first_single_baseline:
+            for i, (field_name, dom) in enumerate(single_fields):
+                baseline_val = single_base_map[field_name]
+                for alt in dom:
+                    if alt == baseline_val:
+                        continue  # must differ
+
+                    # Check if varying this single field would create start==w duplicates for ANY paired field
+                    # If so, skip this permutation entirely
+                    skip_permutation = False
+                    for b, s, w, _ in pairs:
+                        # Get the baseline value for this paired field
+                        baseline_paired_val = paired_base_map[b]
+                        # Get the w domain for this paired field
+                        w_dom = list(fields[w])
+                        # Check if there's any alternative value in w_dom that differs from baseline
+                        has_alternative = any(val != baseline_paired_val for val in w_dom)
+                        # If there's no alternative, we can't avoid start==w, so skip this permutation
+                        if not has_alternative:
+                            skip_permutation = True
+                            break
+
+                    if skip_permutation:
+                        continue  # Skip this single field variation
+
+                    row = {}
+                    # fill all pairs: start = baseline, w = first valid alternative (not baseline)
+                    for b, s, w, _ in pairs:
+                        row[s] = paired_base_map[b]
+                        # For w, use the first value from w_dom that differs from baseline
+                        w_dom = list(fields[w])
+                        w_val = paired_base_map[b]  # default to baseline
+                        for potential_w in w_dom:
+                            if potential_w != paired_base_map[b]:
+                                w_val = potential_w
+                                break
+                        row[w] = w_val
+                    # fill all single fields with baseline values
+                    for other_field_name, other_baseline_val in single_base_map.items():
+                        row[other_field_name] = other_baseline_val
+                    # flip exactly one single field
+                    row[field_name] = alt
+
+                    # Final validation: ensure start != w for all paired fields
+                    has_duplicate = False
+                    for b, s, w, _ in pairs:
+                        if row[s] == row[w]:
+                            has_duplicate = True
+                            break
+                    if not has_duplicate:
+                        yield row
 
 
 def expected_count(fields: dict) -> int:
@@ -274,7 +330,77 @@ MODULE_CONFIGS = {
 }
 
 
+def test_modified_logic():
+    """Test the modified hamming logic with a simple example"""
+
+    # Create a test fields dictionary that mimics the structure
+    test_fields = {
+        # Fields that should be permuted (ending with _start and _w)
+        "grassland_management_type_start": ["Grazing", "Mowing"],
+        "grassland_management_type_w": ["Grazing", "Mowing", "Burning"],
+        "is_fire_used_start": [True, False],
+        "is_fire_used_w": [True, False],
+        # Environmental filters that should NOT be permuted
+        "climate": ["Tropical", "Temperate"],
+        "soil_type": ["Clay", "Sand"],
+        "moisture": ["Wet", "Dry"],
+        "region": ["North", "South"],
+        # Custom module-based filters that should NOT be permuted
+        "livestock_category_type": ["Cattle", "Sheep"],
+    }
+
+    print("Testing modified hamming logic...")
+    print(f"Input fields: {list(test_fields.keys())}")
+
+    # Test domains_from_fields
+    pairs, single_fields = domains_from_fields(test_fields)
+    print(f"\nFields that will be permuted:")
+    print(f"  Paired fields: {[(p[0], p[1], p[2]) for p in pairs]}")
+    print(f"  Single fields: {[(s[0], len(s[1])) for s in single_fields]}")
+
+    # Test hamming_shell_rows
+    hamming_rows = list(hamming_shell_rows(test_fields))
+    print(f"\nGenerated {len(hamming_rows)} hamming permutations")
+
+    # Show first few permutations
+    print("\nFirst 3 hamming permutations:")
+    for i, row in enumerate(hamming_rows[:3]):
+        print(f"  {i + 1}: {row}")
+
+    # Verify that environmental filters are not in the permutations
+    environmental_in_permutations = False
+    for row in hamming_rows:
+        for field in ["climate", "soil_type", "moisture", "region"]:
+            if field in row:
+                environmental_in_permutations = True
+                break
+
+    if environmental_in_permutations:
+        print("\n❌ ERROR: Environmental filters found in hamming permutations!")
+    else:
+        print("\n✅ SUCCESS: Environmental filters correctly excluded from hamming permutations")
+
+    # Verify that only _start and _w fields are permuted
+    expected_permuted_fields = {"grassland_management_type_start", "grassland_management_type_w", "is_fire_used_start", "is_fire_used_w"}
+    actual_permuted_fields = set()
+    for row in hamming_rows:
+        actual_permuted_fields.update(row.keys())
+
+    if expected_permuted_fields.issubset(actual_permuted_fields):
+        print("✅ SUCCESS: Only _start and _w fields are being permuted")
+    else:
+        print(f"❌ ERROR: Expected fields {expected_permuted_fields} not found in permutations")
+        print(f"  Actual fields: {actual_permuted_fields}")
+
+
 def run():
+    # Test the modified logic first
+    test_modified_logic()
+
+    print("\n" + "=" * 50)
+    print("ORIGINAL TESTS:")
+    print("=" * 50)
+
     # Test with AnnualCropland (paired fields only)
     annual_cropland = MODULE_CONFIGS["AnnualCropland"]
     rows = hamming_shell_rows(annual_cropland["fields"])
@@ -290,7 +416,7 @@ def run():
     print(f"Input - Hamming shell rows: {len(input_rows)}")
 
     # Print a few sample rows to verify input_type is included
-    print(f"\nFirst 5 Input module hamming rows:")
+    print("\nFirst 5 Input module hamming rows:")
     for i, row in enumerate(input_rows[:5]):
         print(f"  Row {i + 1}: {row}")
 
