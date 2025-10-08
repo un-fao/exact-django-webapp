@@ -797,13 +797,8 @@ class GrasslandProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.GrasslandFactory.build(
             activity=a,
             area=1,
@@ -1394,45 +1389,45 @@ class DataManager:
     def deduplicate_errors(self, errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Deduplicate error messages to reduce verbosity and log file size.
-        
+
         Groups errors by error_type and error_message, keeping count of occurrences
         and a sample combination for reference.
-        
+
         Args:
             errors: List of error dictionaries with keys: error_type, error_message, traceback, combination
-            
+
         Returns:
             List of deduplicated error dictionaries with added 'count' field
         """
         if not errors:
             return []
-        
+
         # Group errors by (error_type, error_message)
         error_groups = {}
-        
+
         for error in errors:
             # Create a key based on error type and message
-            key = (error.get('error_type', ''), error.get('error_message', ''))
-            
+            key = (error.get("error_type", ""), error.get("error_message", ""))
+
             if key not in error_groups:
                 # First occurrence - store the full error info
                 error_groups[key] = {
-                    'error_type': error.get('error_type', ''),
-                    'error_message': error.get('error_message', ''),
-                    'traceback': error.get('traceback', ''),
-                    'sample_combination': str(error.get('combination', '')),  # Convert to string for CSV
-                    'count': 1
+                    "error_type": error.get("error_type", ""),
+                    "error_message": error.get("error_message", ""),
+                    "traceback": error.get("traceback", ""),
+                    "sample_combination": str(error.get("combination", "")),  # Convert to string for CSV
+                    "count": 1,
                 }
             else:
                 # Subsequent occurrence - just increment count
-                error_groups[key]['count'] += 1
-        
+                error_groups[key]["count"] += 1
+
         # Convert back to list and sort by count (most frequent first)
         deduplicated_errors = list(error_groups.values())
-        deduplicated_errors.sort(key=lambda x: x['count'], reverse=True)
-        
+        deduplicated_errors.sort(key=lambda x: x["count"], reverse=True)
+
         logger.info(f"Deduplicated {len(errors)} errors down to {len(deduplicated_errors)} unique error types")
-        
+
         return deduplicated_errors
 
     @property
@@ -1457,7 +1452,7 @@ class DataManager:
                 original_error_count = len(errors)
                 errors = self.deduplicate_errors(errors)
                 logger.info(f"Reduced error count from {original_error_count} to {len(errors)} after deduplication")
-            
+
             if local:
                 self._save_to_local_fallback(data, errors, module_name, resume)
                 return
@@ -1577,14 +1572,18 @@ class HammingPermutationComputer:
         processor = self.processor_registry.get_processor(model.__name__)
 
         # Generate Hamming shell rows (only from module fields with _start/_w pattern)
+        # These are the hamming sphere permutations that will be applied to each environmental combination
         hamming_rows = list(hamming_shell_rows(fields))
         total_hamming = len(hamming_rows)
-        logger.info(f"Generated {total_hamming:,} Hamming shell rows")
+        logger.info(f"Generated {total_hamming:,} Hamming shell rows (hamming sphere permutations)")
 
-        # Calculate total permutations (Hamming shell × environmental factors)
-        environmental_factors = len(valid_climate_moistures) * len(valid_soil_types) * len(regions_with_countries)
-        total_permutations = total_hamming * environmental_factors
-        logger.info(f"Total permutations (Hamming shell × environmental factors): {total_permutations:,}")
+        # Calculate total permutations using only valid environmental combinations
+        # Instead of using all possible combinations, use only the valid ones that passed validation
+        valid_environmental_combinations = len(valid_combinations) * len(regions_with_countries)
+        total_permutations = total_hamming * valid_environmental_combinations
+        logger.info(f"Total permutations (Hamming shell × valid environmental combinations): {total_permutations:,}")
+        logger.info(f"Each hamming permutation will be applied to {valid_environmental_combinations:,} valid environmental combinations")
+        logger.info(f"Valid environmental combinations: {len(valid_combinations):,} climate-moisture-soiltype × {len(regions_with_countries):,} regions")
 
         # Initialize progress tracker
         progress_tracker = ProgressTracker(model.__name__)
@@ -1625,71 +1624,67 @@ class HammingPermutationComputer:
 
                 pbar = tqdm(total=total_permutations, initial=start_index, desc=f"Building {model.__name__} Hamming permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
-                # Process Hamming shell rows with environmental factors
+                # Process Hamming shell rows with valid environmental combinations
+                # For each hamming permutation, apply it to only the valid environmental combinations
                 for hamming_row in hamming_rows:
-                    # Create combinations with environmental factors
-                    for climate_moisture in valid_climate_moistures:
-                        for soil_type in valid_soil_types:
-                            for region in regions_with_countries:
-                                # Skip if we're resuming and haven't reached the start index yet
-                                if processed_count < start_index:
-                                    processed_count += 1
-                                    continue
+                    logger.info(f"Processing hamming permutation: {hamming_row}")
 
-                                # Create the full combination tuple in the correct order
-                                # Get the field values in the order expected by the processor
-                                field_values = []
-                                for field_name in fields.keys():
-                                    if field_name in hamming_row:
-                                        field_values.append(hamming_row[field_name])
-                                    else:
-                                        # For fields not in hamming_row (like land_use_type), use the first value
-                                        field_values.append(list(fields[field_name])[0])
-
-                                # Add environmental factors
-                                combination = tuple(field_values) + (climate_moisture, soil_type, region)
-
-                                # Process the combination
-                                result = processor.process_combination(combination)
-
-                                if stop_at and len(data) >= stop_at:
-                                    # Terminate worker processes
-                                    for proc in executor._processes.values():
-                                        proc.terminate()
-                                    executor.shutdown(wait=False, cancel_futures=True)
-                                    break
-
-                                if result.success:
-                                    data.append(result.data)
-                                    pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
-                                else:
-                                    errors_data.append(result.error)
-                                    pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
-
-                                pbar.update(1)
+                    # Use only the valid environmental combinations that passed validation
+                    for valid_combination in valid_combinations:
+                        climate, moisture, soil_type = valid_combination
+                        for region in regions_with_countries:
+                            # Skip if we're resuming and haven't reached the start index yet
+                            if processed_count < start_index:
                                 processed_count += 1
-
-                                # Update progress tracker
-                                progress_tracker.increment_progress()
-
-                                # Log performance every 1000 processed items
-                                if processed_count % 1000 == 0:
-                                    elapsed_time = time.time() - start_time
-                                    rate = processed_count / elapsed_time if elapsed_time > 0 else 0
-                                    eta = progress_tracker.get_eta()
-                                    eta_str = f", ETA: {eta / 60:.1f}min" if eta else ""
-                                    logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec{eta_str}")
-                                    # Force save progress every 1000 items
-                                    progress_tracker.save_progress(force=True)
-                            else:
                                 continue
-                            break
-                        else:
-                            continue
-                        break
-                    else:
-                        continue
-                    break
+
+                            # Create the full combination tuple in the correct order
+                            # Get the field values in the order expected by the processor
+                            field_values = []
+                            for field_name in fields.keys():
+                                if field_name in hamming_row:
+                                    # Use the hamming permutation value
+                                    field_values.append(hamming_row[field_name])
+                                else:
+                                    # For fields not in hamming_row (environmental filters), use the first value
+                                    field_values.append(list(fields[field_name])[0])
+
+                            # Add environmental factors using the valid combination
+                            climate_moisture = (climate, moisture)
+                            combination = tuple(field_values) + (climate_moisture, soil_type, region)
+
+                            # Process the combination
+                            result = processor.process_combination(combination)
+
+                            if stop_at and len(data) >= stop_at:
+                                # Terminate worker processes
+                                for proc in executor._processes.values():
+                                    proc.terminate()
+                                executor.shutdown(wait=False, cancel_futures=True)
+                                break
+
+                            if result.success:
+                                data.append(result.data)
+                                pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
+                            else:
+                                errors_data.append(result.error)
+                                pbar.set_postfix({"success": len(data), "errors": len(errors_data)})
+
+                            pbar.update(1)
+                            processed_count += 1
+
+                            # Update progress tracker
+                            progress_tracker.increment_progress()
+
+                            # Log performance every 1000 processed items
+                            if processed_count % 1000 == 0:
+                                elapsed_time = time.time() - start_time
+                                rate = processed_count / elapsed_time if elapsed_time > 0 else 0
+                                eta = progress_tracker.get_eta()
+                                eta_str = f", ETA: {eta / 60:.1f}min" if eta else ""
+                                logger.info(f"Processed {processed_count:,} items at {rate:.1f} items/sec{eta_str}")
+                                # Force save progress every 1000 items
+                                progress_tracker.save_progress(force=True)
 
                 pbar.close()
                 logger.info(f"Progress bar closed. Data: {len(data)}, Errors: {len(errors_data)}")
