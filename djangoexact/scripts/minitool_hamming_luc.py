@@ -3024,8 +3024,6 @@ FOREST_MANAGEMENT_START = {
         "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
         "forest_type": list(models.ForestType.objects.all()),
         "forest_condition_type": list(models.ForestConditionType.objects.all()),
-        # "average_yearly_degradation_percentage_start": [0],
-        # "average_yearly_degradation_percentage_w": [0],
     },
 }
 

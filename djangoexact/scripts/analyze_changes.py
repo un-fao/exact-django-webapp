@@ -98,6 +98,7 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
             "input": "Input",
             "coastalwetland": "Coastal Wetland",
             "waterbody": "Waterbody",
+            "landusechange": "Land Use Change",
         }
 
         # Only add to results if there are changes
@@ -156,6 +157,7 @@ def get_module_type_from_filename(file_path: str) -> str:
         "input": "Input",
         "coastalwetland": "Coastal Wetland",
         "waterbody": "Waterbody",
+        "landusechange": "Land Use Change",
     }
 
     for key, value in module_mapping.items():
@@ -232,7 +234,7 @@ def run():
             # "livestock",
             # "waterbody",
             # "largefishery",
-            "coastalwetland",
+            # "coastalwetland",
             # "floodedrice",
             # "annualcropland",
             # "perennial_cropland",
@@ -240,7 +242,7 @@ def run():
             # "aquaculture",
             # "other_land",
             # "set_aside",
-            # "land_use_change",
+            "landusechange",
         ]:
             output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
         print("\nAnalysis completed successfully!")

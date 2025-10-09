@@ -736,6 +736,71 @@ FOREST_MANAGEMENT = [
     },
 ]
 
+NATURAL_REGENERATION_1 = {
+    "name": "Natural regeneration: Afforestation",
+    "category": "Forest Restoration",
+    "filters": {
+        **DEFAULT_FILTERS,
+    },
+    "csv_row_filters": {
+        "module_start_grassland_management_type_start": ["Non-Degraded", "High Intensity Grazing"],
+        "module_start_type": "Grassland",
+        "module_w_type": "ForestManagement",
+        "module_w_forest_type": "Natural",
+        "module_w_forest_condition_type": "Secondary",
+    },
+    "changes": [
+        {
+            "module_type": "Land Use Change",
+            "start": {
+                "field": "module_type",
+                "value": "Grassland",
+            },
+            "end": {
+                "field": "module_type",
+                "value": "ForestManagement",
+            },
+        }
+    ],
+    "metadata": {
+        "additional_information": "",
+        "assumptions": "",
+    },
+}
+
+TERRACING_3 = {
+    "name": "Terracing for erosion control and soil conservation: LUC to some trees",
+    "category": "Soil Conservation",
+    "filters": {
+        **DEFAULT_FILTERS,
+    },
+    "csv_row_filters": {
+        "module_start_grassland_management_type_start": ["Severely Degraded", "High Intensity Grazing", "Non-Degraded"],
+        "module_start_type": "Grassland",
+        "module_w_type": "PerennialCropland",
+        "module_w_land_use_type_w": ["Perennial Fallow", "Orchard", "Short Rotation Coppice", "Hedgerow"],
+        "module_w_tillage_management_type_w": ["Reduced Tillage", "No Tillage"],
+        "module_w_organic_input_type_w": ["Medium C input", "High C input, no manure"],
+    },
+    "changes": [
+        {
+            "module_type": "Land Use Change",
+            "start": {
+                "field": "module_type",
+                "value": "Grassland",
+            },
+            "end": {
+                "field": "module_type",
+                "value": "PerennialCropland",
+            },
+        },
+    ],
+    "metadata": {
+        "additional_information": "",
+        "assumptions": "",
+    },
+}
+
 
 def save_to_excel(scenarios, output_dir="reports"):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -889,6 +954,8 @@ def run(clear: bool = False):
         *GRASSLAND,
         *ANNUAL_CROPLAND,
         *COASTAL,
+        NATURAL_REGENERATION_1,
+        TERRACING_3,
     ]
 
     """
@@ -1670,6 +1737,8 @@ def run(clear: bool = False):
 
         if aggregates.count() == 0:
             print("No aggregates found")
+            print()
+            print()
             continue
 
         print(f"Found {aggregates.count()} matching records")
