@@ -1,5 +1,9 @@
 ## 1.18.1 (2025-10-09)
 
+- **settlement**: apply conversion of km to meters for road length instead of meters to km for road width
+
+## 1.18.0 (2025-10-09)
+
 ### Feat
 
 - **minitool**: add multi-module emissions scenarios
