@@ -1,3 +1,92 @@
+## 1.18.1 (2025-10-09)
+
+### Feat
+
+- **minitool**: add multi-module emissions scenarios
+- **minitool**: add scenario categories
+- **minitool**: add metadata to emissions scenario
+- add units to input types model
+
+### Fix
+
+- **settlement**: apply conversion of km to meters for road length instead of meters to km for road width
+- **activity_builder**: issue causing some combinations of LUC and organic soil to crash
+- **roads**: conversion issue in roads area causing unexpected results
+- **ActivityBuilder**: correct handling of Organic Soil and Land Use Change logic
+- **project_attachments**: issue with cloud bucket name causing error when trying to delete an attachment in non-review environments
+- **project_invitations**: issue causing invitations not to be accepted for languages other than english
+- **reports**: typo in forest management report causing crash
+- **reports**: issue causing flooded rice minor season emissions not to be considered and added to total activity emissions
+- **reports**: remaining fillvalue typos causing crash
+- **bloc**: static files template pathing
+
+## 1.17.22 (2025-10-01)
+
+### Fix
+
+- **calculators**: issue causing some forest management instances to accidentally fetch unneded biomass values, triggering a missing data error
+
+## 1.17.21 (2025-10-01)
+
+### Fix
+
+- **reports**: issue causing any report containing the livestock module to fail
+- **reports**: issue caused by old reference to comment thread attributes for small and large fishery
+
+## 1.17.20 (2025-10-01)
+
+### Fix
+
+- **calculators**: update module type check from SingleBiomassModule to BiomassModule in LandModuleCalculator
+
+## 1.17.19 (2025-09-29)
+
+### Fix
+
+- **middleware**: allow public endpoints to skip authentication
+
+## 1.17.18 (2025-09-29)
+
+### Fix
+
+- **activity**: show non-b-intact activities in list endpoint for public activities endpoint
+- **activity**: return activities that are not b-intact by default
+
+## 1.17.17 (2025-09-25)
+
+### Feat
+
+- **public**: add module types endpoint to public urls
+
+### Fix
+
+- **calculators**: add missing start results to ForestManagementCalculator result tuple
+
+## 1.17.16 (2025-09-25)
+
+### Fix
+
+- **forest_management**: issue caused by wrong references for flu,fi,fmg start
+
+## 1.17.15 (2025-09-25)
+
+### Fix
+
+- **activity**: issue calculating capitalization years when only last_year_of_accounting was specified
+
+## 1.17.14 (2025-09-24)
+
+### Fix
+
+- **calculators**: send bgb_t_c_ha as agb_ref to mathematical model instead of agb_t_c_ha
+- **defaults**: send GrasslandBiomass bgb_t_c_ha as default agb t2 value instead of agb_t_c_ha
+
+## 1.17.13 (2025-09-24)
+
+### Fix
+
+- **defaults**: add agb rate to default return payload for perennial cropland
+
 ## 1.18.0 (2025-10-09)
 
 ### Feat
