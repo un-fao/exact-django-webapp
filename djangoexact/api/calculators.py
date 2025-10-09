@@ -4629,7 +4629,7 @@ class RoadCalculator(BaseCalculator):
             self.inputs_w = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_w,
-                "units_end": self.module.length_km_w * (self.module.width_m_w / 1000),
+                "units_end": (self.module.length_km_w * 1000) * self.module.width_m_w,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
@@ -4643,7 +4643,7 @@ class RoadCalculator(BaseCalculator):
             self.inputs_wo = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_wo,
-                "units_end": self.module.length_km_wo * (self.module.width_m_wo / 1000),
+                "units_end": (self.module.length_km_wo * 1000) * self.module.width_m_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
