@@ -59,6 +59,7 @@ class ChangeRecord(models.Model):
     """
     Generalized model to store individual change records for all module types.
     Uses custom_filters JSONField to store module-specific filter data.
+    Uses csv_row_data JSONField to store complete CSV row data.
     """
 
     module_type = models.CharField(max_length=255)
@@ -72,9 +73,11 @@ class ChangeRecord(models.Model):
     to_value = models.CharField(max_length=255)
     # Store all custom filter columns as JSON
     custom_filters = models.JSONField(default=dict, blank=True)
+    # Store complete CSV row data as JSON
+    csv_row_data = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        unique_together = ["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value", "custom_filters"]
+        unique_together = ["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value", "custom_filters", "csv_row_data"]
         indexes = [
             models.Index(fields=["module_type"]),
             models.Index(fields=["region"]),
@@ -82,8 +85,9 @@ class ChangeRecord(models.Model):
             models.Index(fields=["moisture"]),
             models.Index(fields=["soil_type"]),
             models.Index(fields=["field"]),
-            # Index the JSONField for better performance
+            # Index the JSONFields for better performance
             models.Index(fields=["custom_filters"], name="changerecord_custom_idx"),
+            models.Index(fields=["csv_row_data"], name="changerecord_csvdata_idx"),
         ]
 
     def __str__(self):
@@ -144,6 +148,31 @@ class EmissionScenarioCategory(models.Model):
 
 
 class EmissionScenario(models.Model):
+    """
+    Emission scenario model that supports changes from multiple module types.
+
+    The 'changes' field is a JSONField containing a list of change objects.
+    Each change object has the structure:
+    {
+        "module_type": "string",  # e.g., "Grassland", "Annual Cropland"
+        "start": {
+            "field": "string",
+            "value": "string"
+        },
+        "end": {
+            "field": "string",
+            "value": "string"
+        },
+        "filters": {  # optional filters to narrow down which records are affected
+            "region": "string",  # optional
+            "climate": "string",  # optional
+            "moisture": "string",  # optional
+            "soil_type": "string",  # optional
+            # can include custom filters as well
+        }
+    }
+    """
+
     name = models.CharField(max_length=255)
     category = models.ForeignKey(EmissionScenarioCategory, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField()
@@ -151,9 +180,11 @@ class EmissionScenario(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     metadata = models.JSONField(default=dict, blank=True)
-
-    module_type = models.CharField(max_length=255)
     changes = models.JSONField()
 
     def __str__(self):
         return self.name
+
+    def get_module_types(self):
+        """Returns a set of unique module types used in this scenario's changes."""
+        return set(change.get("module_type") for change in self.changes if change.get("module_type"))

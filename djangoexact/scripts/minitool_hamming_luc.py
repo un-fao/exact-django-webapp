@@ -508,12 +508,17 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             # Core forest fields (single fields)
-            FieldMappingBuilder.foreign_key("land_use_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             # Degradation fields
-            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
+
+    def get_custom_fields(self, module: Any) -> Dict[str, Any]:
+        """Get custom fields that don't follow the standard pattern"""
+        return {
+            "land_use_type": getattr(module, "land_use_type_start", None),
+        }
 
 
 class SmallFisheryDataBuilder(ModuleDataBuilder):
@@ -1033,18 +1038,18 @@ class GrasslandProcessor(ModuleProcessor):
             activity=a,
             land_use_change=luc,
             area=1,
-            grassland_management_type_start=grassland_management_type_start,
-            grassland_management_type_w=grassland_management_type_w,
-            grassland_management_type_wo=grassland_management_type_start,
-            is_fire_used_start=is_fire_used_start,
-            is_fire_used_w=is_fire_used_w,
-            is_fire_used_wo=is_fire_used_start,
-            fire_periodicity_start=fire_periodicity_start,
-            fire_periodicity_w=fire_periodicity_w,
-            fire_periodicity_wo=fire_periodicity_start,
-            fire_impact_start=fire_impact_start,
-            fire_impact_w=fire_impact_w,
-            fire_impact_wo=fire_impact_start,
+            grassland_management_type_start=grassland_management_type_start if grassland_management_type_start else None,
+            grassland_management_type_w=grassland_management_type_w if grassland_management_type_w else None,
+            grassland_management_type_wo=grassland_management_type_start if grassland_management_type_start else None,
+            is_fire_used_start=is_fire_used_start if is_fire_used_start else False,
+            is_fire_used_w=is_fire_used_w if is_fire_used_w else False,
+            is_fire_used_wo=is_fire_used_start if is_fire_used_start else False,
+            fire_periodicity_start=fire_periodicity_start if fire_periodicity_start else 0,
+            fire_periodicity_w=fire_periodicity_w if fire_periodicity_w else 0,
+            fire_periodicity_wo=fire_periodicity_start if fire_periodicity_start else 0,
+            fire_impact_start=fire_impact_start if fire_impact_start else 0,
+            fire_impact_w=fire_impact_w if fire_impact_w else 0,
+            fire_impact_wo=fire_impact_start if fire_impact_start else 0,
             land_use_type_start=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_w=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_wo=models.LandUseType.objects.get(name="Grassland"),
@@ -1240,8 +1245,8 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_start,
             forest_type,
             forest_condition_type,
-            # average_yearly_degradation_percentage_start,
-            # average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w,
             climate_moisture,
             soil_type,
             region,
@@ -1265,9 +1270,9 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_wo=land_use_type_start,
             forest_type=forest_type,
             forest_condition_type=forest_condition_type,
-            average_yearly_degradation_percentage_start=0,
-            average_yearly_degradation_percentage_w=0,
-            average_yearly_degradation_percentage_wo=0,
+            average_yearly_degradation_percentage_start=average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w=average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_wo=average_yearly_degradation_percentage_start,
         )
         return module
 
@@ -1503,8 +1508,8 @@ class LandUseChangeProcessor(ModuleProcessor):
                 fields_dict.get("land_use_type_start"),
                 fields_dict.get("forest_type"),
                 fields_dict.get("forest_condition_type"),
-                fields_dict.get("average_yearly_degradation_percentage_start"),
-                fields_dict.get("average_yearly_degradation_percentage_w"),
+                # fields_dict.get("average_yearly_degradation_percentage_start"),
+                # fields_dict.get("average_yearly_degradation_percentage_w"),
             )
         elif module_type_class_name == "SetAside":
             return (
@@ -1891,12 +1896,9 @@ class LandUseChangeCombinationValidator(CombinationValidator):
                 )
             elif module_type_class_name == "Grassland":
                 return (
-                    fields.get("land_use_type_start"),
-                    fields.get("land_use_type_w"),
-                    fields.get("grassland_type_start"),
-                    fields.get("grassland_type_w"),
-                    fields.get("grassland_condition_type_start"),
-                    fields.get("grassland_condition_type_w"),
+                    fields.get("land_use_type_start", fields.get("land_use_type_w")),
+                    fields.get("grassland_management_type_start", fields.get("grassland_management_type_w")),
+                    fields.get("grassland_condition_type_start", fields.get("grassland_condition_type_w")),
                     climate_moisture,
                     soil_type,
                     region,
@@ -1915,7 +1917,7 @@ class LandUseChangeCombinationValidator(CombinationValidator):
                 )
             elif module_type_class_name == "ForestManagement":
                 return (
-                    fields.get("land_use_type_start"),
+                    fields.get("land_use_type_start", fields.get("land_use_type_w")),
                     fields.get("forest_type"),
                     fields.get("forest_condition_type"),
                     # fields.get("average_yearly_degradation_percentage_start"),
@@ -2269,9 +2271,9 @@ class ForestManagementCombinationValidator(CombinationValidator):
                 import ipcc.models as ipcc_models
 
                 # Test biomass data availability directly with IPCC models
-                if len(combination) >= 8:  # ForestManagement has 8 elements
+                if len(combination) >= 6:  # ForestManagement has 8 elements
                     (
-                        land_use_type_start,
+                        land_use_type,
                         forest_type,
                         forest_condition_type,
                         average_yearly_degradation_percentage_start,
@@ -2282,47 +2284,47 @@ class ForestManagementCombinationValidator(CombinationValidator):
                     ) = combination
 
                     # Test biomass data for START scenario (uses ForestTotalBiomass)
-                    if scenario_type is None or scenario_type == utils.ScenarioTypes.START:
-                        try:
-                            # Use get_or_default like the actual get_biomass_ef method
-                            ipcc_models.ForestTotalBiomass.objects.get_or_default(
-                                climate=climate,
-                                moisture=moisture,
-                                continent=region,  # region is used as continent
-                                land_use_type=land_use_type_start,
-                            )
-                        except (ipcc_models.ForestTotalBiomass.DoesNotExist, ValueError):
-                            # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
-                            return False
+                    # if scenario_type is None or scenario_type == utils.ScenarioTypes.START:
+                    #     try:
+                    #         # Use get_or_default like the actual get_biomass_ef method
+                    #         ipcc_models.ForestTotalBiomass.objects.get_or_default(
+                    #             climate=climate,
+                    #             moisture=moisture,
+                    #             continent=region,  # region is used as continent
+                    #             land_use_type=land_use_type_start,
+                    #         )
+                    #     except (ipcc_models.ForestTotalBiomass.DoesNotExist, ValueError):
+                    #         # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
+                    #         return False
 
-                    # Test biomass data for WITH scenario (uses TotalBiomassAfterDefo)
-                    if scenario_type is None or scenario_type == utils.ScenarioTypes.WITH:
-                        try:
-                            # Use get_or_default like the actual get_biomass_ef method
-                            ipcc_models.TotalBiomassAfterDefo.objects.get_or_default(
-                                climate=climate,
-                                moisture=moisture,
-                                continent=region,  # region is used as continent
-                                land_use_type=land_use_type_start,
-                            )
-                        except (ipcc_models.TotalBiomassAfterDefo.DoesNotExist, ValueError):
-                            # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
-                            return False
+                    # # Test biomass data for WITH scenario (uses TotalBiomassAfterDefo)
+                    # if scenario_type is None or scenario_type == utils.ScenarioTypes.WITH:
+                    #     try:
+                    #         # Use get_or_default like the actual get_biomass_ef method
+                    #         ipcc_models.TotalBiomassAfterDefo.objects.get_or_default(
+                    #             climate=climate,
+                    #             moisture=moisture,
+                    #             continent=region,  # region is used as continent
+                    #             land_use_type=land_use_type_start,
+                    #         )
+                    #     except (ipcc_models.TotalBiomassAfterDefo.DoesNotExist, ValueError):
+                    #         # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
+                    #         return False
 
                     try:
                         ipcc_models.ForestCombustionFactor.objects.get(
                             climate=climate,
                             forest_type=forest_type,
-                            land_use_type=land_use_type_start,
+                            land_use_type=land_use_type,
                         )
                     except (ipcc_models.ForestCombustionFactor.DoesNotExist, ValueError):
                         # If biomass data doesn't exist and no tier2 fallback, this combination is invalid
                         return False
 
-                    if climate not in land_use_type_start.climates.all():
+                    if climate not in land_use_type.climates.all():
                         return False
 
-                    if moisture not in land_use_type_start.moistures.all():
+                    if moisture not in land_use_type.moistures.all():
                         return False
 
             except Exception:
@@ -2350,7 +2352,7 @@ class ForestManagementCombinationValidator(CombinationValidator):
 
                 if len(combination) >= 8:
                     (
-                        land_use_type_start,
+                        land_use_type,
                         forest_type,
                         forest_condition_type,
                         average_yearly_degradation_percentage_start,
@@ -2369,10 +2371,10 @@ class ForestManagementCombinationValidator(CombinationValidator):
                                 climate=climate,
                                 moisture=moisture,
                                 continent=region,
-                                land_use_type=land_use_type_start,
+                                land_use_type=land_use_type,
                             )
                         except (ipcc_models.ForestTotalBiomass.DoesNotExist, ValueError) as e:
-                            return f"ForestManagement missing ForestTotalBiomass data for START scenario: {climate}, {moisture}, {region}, {land_use_type_start} - {str(e)}"
+                            return f"ForestManagement missing ForestTotalBiomass data for START scenario: {climate}, {moisture}, {region}, {land_use_type} - {str(e)}"
 
                     # Test biomass data for WITH scenario (uses TotalBiomassAfterDefo)
                     if scenario_type is None or scenario_type == utils.ScenarioTypes.WITH:
@@ -2381,10 +2383,10 @@ class ForestManagementCombinationValidator(CombinationValidator):
                                 climate=climate,
                                 moisture=moisture,
                                 continent=region,
-                                land_use_type=land_use_type_start,
+                                land_use_type=land_use_type,
                             )
                         except (ipcc_models.TotalBiomassAfterDefo.DoesNotExist, ValueError) as e:
-                            return f"ForestManagement missing TotalBiomassAfterDefo data for WITH scenario: {climate}, {moisture}, {region}, {land_use_type_start} - {str(e)}"
+                            return f"ForestManagement missing TotalBiomassAfterDefo data for WITH scenario: {climate}, {moisture}, {region}, {land_use_type} - {str(e)}"
 
             except Exception as e:
                 return f"ForestManagement biomass validation error: {str(e)}"
@@ -3016,14 +3018,21 @@ FLOODED_RICE = {
     },
 }
 
-FOREST_MANAGEMENT = {
+FOREST_MANAGEMENT_START = {
     "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
     "fields": {
         "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
         "forest_type": list(models.ForestType.objects.all()),
         "forest_condition_type": list(models.ForestConditionType.objects.all()),
-        # "average_yearly_degradation_percentage_start": [0],
-        # "average_yearly_degradation_percentage_w": [0],
+    },
+}
+
+FOREST_MANAGEMENT_W = {
+    "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+    "fields": {
+        "land_use_type_start": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+        "forest_type": list(models.ForestType.objects.all()),
+        "forest_condition_type": list(models.ForestConditionType.objects.all()),
     },
 }
 
@@ -3067,18 +3076,17 @@ SETTLEMENT = {
     },
 }
 
-
-GRASSLAND = {
+GRASSLAND_START = {
     "type": [models.ModuleType.objects.get(class_name="Grassland")],
     "fields": {
         "grassland_management_type_start": list(models.GrasslandManagementType.objects.all()),
+    },
+}
+
+GRASSLAND_W = {
+    "type": [models.ModuleType.objects.get(class_name="Grassland")],
+    "fields": {
         "grassland_management_type_w": list(models.GrasslandManagementType.objects.all()),
-        "is_fire_used_start": [False],
-        "is_fire_used_w": [False],
-        "fire_periodicity_start": [0],
-        "fire_periodicity_w": [0],
-        "fire_impact_start": [0],
-        "fire_impact_w": [0],
     },
 }
 
@@ -3088,8 +3096,10 @@ ALL_MODULES = [
     OTHER_LAND_START,
     OTHER_LAND_W,
     SETTLEMENT,
-    GRASSLAND,
-    FOREST_MANAGEMENT,
+    GRASSLAND_START,
+    GRASSLAND_W,
+    FOREST_MANAGEMENT_START,
+    FOREST_MANAGEMENT_W,
     ANNUAL_CROPLAND,
     PERENNIAL_CROPLAND,
     FLOODED_RICE,
@@ -3135,11 +3145,35 @@ for combination in ALL_POSSIBLE_COMBINATIONS:
         unique_combinations.append(combination)
 ALL_POSSIBLE_COMBINATIONS = unique_combinations
 
+GRASSLAND_TO_FOREST_MANAGEMENT = {
+    "fields": {
+        "module_start": GRASSLAND_START,
+        "module_w": FOREST_MANAGEMENT_W,
+    },
+}
+
+FOREST_MANAGEMENT_TO_GRASSLAND = {
+    "fields": {
+        "module_start": FOREST_MANAGEMENT_START,
+        "module_w": GRASSLAND_W,
+    },
+}
+
 # Module configurations
 MODULE_CONFIGS = {
     "LandUseChange": {
-        "subsets": [*ALL_POSSIBLE_COMBINATIONS],
+        "subsets": [FOREST_MANAGEMENT_TO_GRASSLAND],
         "config_name": "land_use_change",
+    },
+    "ForestManagement": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            "forest_type": models.ForestType.objects.all(),
+            "forest_condition_type": models.ForestConditionType.objects.all(),
+            "average_yearly_degradation_percentage_start": [0],
+            "average_yearly_degradation_percentage_w": [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],  # 1% to 5% and then 10% to 50%
+        },
+        "config_name": "forest_management",
     },
 }
 

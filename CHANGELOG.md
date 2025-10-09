@@ -1,13 +1,18 @@
-## 1.17.23 (2025-10-03)
+## 1.18.0 (2025-10-09)
 
 ### Feat
 
+- **minitool**: add multi-module emissions scenarios
 - **minitool**: add scenario categories
 - **minitool**: add metadata to emissions scenario
 - add units to input types model
 
 ### Fix
 
+- **activity_builder**: issue causing some combinations of LUC and organic soil to crash
+- **roads**: conversion issue in roads area causing unexpected results
+- **ActivityBuilder**: correct handling of Organic Soil and Land Use Change logic
+- **project_attachments**: issue with cloud bucket name causing error when trying to delete an attachment in non-review environments
 - **project_invitations**: issue causing invitations not to be accepted for languages other than english
 - **reports**: typo in forest management report causing crash
 - **reports**: issue causing flooded rice minor season emissions not to be considered and added to total activity emissions

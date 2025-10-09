@@ -3,7 +3,7 @@ Tropical;Natural;Rainforest;0,32;1580;6,8;0,2
 Tropical;Natural;Moist Deciduous Forest;0,36;1580;6,8;0,2
 Tropical;Natural;Dry Forest;0,36;1580;6,8;0,2
 Tropical;Natural;Shrubland;0,72;1580;6,8;0,2
-Tropical;Natural;Mangrove Forest;0,32;1580;6,8;0,2
+Tropical;Natural;Mangrove;0,32;1580;6,8;0,2
 Tropical;Plantation;Rainforest;0,32;1580;6,8;0,2
 Tropical;Plantation;Moist Deciduous Forest;0,36;1580;6,8;0,2
 Tropical;Plantation;Dry Forest;0,36;1580;6,8;0,2
@@ -16,7 +16,7 @@ Warm Temperate;Plantation;Humid Forest;0,36;1569;4,7;0,26
 Warm Temperate;Plantation;Dry Forest;0,36;1569;4,7;0,26
 Warm Temperate;Plantation;Steppe;0,74;1569;4,7;0,26
 Warm Temperate;Plantation;Mountain System;0,36;1569;4,7;0,26
-Warm Temperate;Natural;Mangrove Forest;0,32;;6,8;
+Warm Temperate;Natural;Mangrove;0,32;;6,8;
 Cool Temperate;Natural;Oceanic Forest;0,45;1569;4,7;0,26
 Cool Temperate;Natural;Continental Forest;0,45;1569;4,7;0,26
 Cool Temperate;Natural;Mountain System;0,45;1569;4,7;0,26
