@@ -918,20 +918,22 @@ class ActivityBuilderSerializer(serializers.Serializer):
             final_module_types = list(set(list(kept_module_types) + list(added_module_types)))
             removed_module_types = list(set(old_module_types) - set(final_module_types))
 
-            for module_type in final_module_types:
+            for module_type in filter(lambda mt: mt.class_name != "LandUseChange", added_module_types):
+                module_instance = self.create_module(module_type, in_luc=module_type in new_luc_module_types, luc=luc, area=area)
+
+            for module_type in filter(lambda mt: mt.class_name != "LandUseChange", kept_module_types):
                 module_type: ModuleType
-                if module_type.class_name == "LandUseChange":
-                    continue
-
-                if module_type in added_module_types:
-                    module_instance = self.create_module(module_type, in_luc=module_type in new_luc_module_types, luc=luc, area=area)
-                    continue
-
                 ModuleClass = apps.get_model("api", module_type.class_name)
                 module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
 
                 # If module is part of LUC, set the land_use_change to the new LUC
                 if module_type in final_luc_module_types:
+                    # Clear existing reference to this luc from other instances of the same type
+                    existing = ModuleClass.objects.filter(land_use_change=luc).exclude(id=module_instance.id).first()
+                    if existing:
+                        existing.land_use_change = None
+                        existing.save()
+
                     module_instance.land_use_change = luc
 
                     # If still part of LUC, update the area
@@ -939,7 +941,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                         module_instance.area = area
 
                 # If not deleted but not part of LUC anymore, set the land_use_change to None to avoid orphaned modules
-                if module_type in kept_module_types and module_type in old_luc_module_types and module_type not in final_luc_module_types:
+                if module_type in old_luc_module_types and module_type not in final_luc_module_types:
                     module_instance.land_use_change = None
 
                 if module_type.class_name == "OrganicSoil" and luc:
