@@ -463,7 +463,7 @@ class CoastalWetlandFactory(DjangoModelFactory):
     class Meta:
         model = CoastalWetland
 
-    status = READY  # --------------> NOTE: Add to all factories if not
+    status = READY
     area = 1
 
     avg_salinity_t2 = SalinityType.objects.get(value="<18")
