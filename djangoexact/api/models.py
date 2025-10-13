@@ -3282,6 +3282,7 @@ class HandInHandAssessment(models.Model):
     name = models.CharField(max_length=255, unique=True)
     link = models.URLField(max_length=2000, null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
+    files_list = models.JSONField(default=list, blank=True)
 
     class Meta:
         verbose_name = "Hand in Hand Assessment"

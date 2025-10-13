@@ -3842,45 +3842,48 @@ for i, row in df.iterrows():
         bgb_t_c_ha=bgb_t_c_ha,
     )
 
-log.debug("Deleting all ForestCombustionFactor objects...")
-ForestCombustionFactor.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["gef_co2"])
-    ch4 = parse_csv_number(row["gef_ch4"])
-    n2o = parse_csv_number(row["gef_n2o"])
-    value = parse_csv_number(row["value"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.create(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
 """
+
+
+def delete_and_import_forest_combustion_factor():
+    log.debug("Deleting all ForestCombustionFactor objects...")
+    ForestCombustionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+        header=[0],
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+        co2 = parse_csv_number(row["gef_co2"])
+        ch4 = parse_csv_number(row["gef_ch4"])
+        n2o = parse_csv_number(row["gef_n2o"])
+        value = parse_csv_number(row["value"])
+
+        print(
+            land_use_type,
+            climate,
+            forest_type,
+            co2,
+            ch4,
+            n2o,
+            value,
+        )
+
+        ForestCombustionFactor.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            forest_type=forest_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+            value=value,
+        )
 
 
 def delete_and_import_litter_deadwood_carbon_stock():
@@ -4503,6 +4506,9 @@ def delete_and_import_forest_total_biomass():
                 )
 
                 for crop in crops:
+                    if crop.name == "Default":
+                        continue
+
                     print(f"{crop}, {climate}, {moisture}, {region}, {value}")
 
                     ForestTotalBiomass.objects.create(
@@ -5052,8 +5058,8 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
-        delete_and_import_total_biomass_after_defo()
         delete_and_import_forest_total_biomass()
+        delete_and_import_forest_combustion_factor()
         pass
 
     if app_mode == "test":
