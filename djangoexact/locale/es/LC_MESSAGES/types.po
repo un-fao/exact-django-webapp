@@ -1500,11 +1500,11 @@ msgstr ""
 
 #. FuelType
 msgid "LPG"
-msgstr ""
+msgstr "GLP"
 
 #. FuelType
 msgid "Gasoil/Diesel Oil"
-msgstr ""
+msgstr "Gasóleo/Diésel"
 
 #. FuelType
 msgid "Waste Oil/Lubricants"
