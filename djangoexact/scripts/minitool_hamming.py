@@ -3037,7 +3037,7 @@ NATURAL_REGENERATION_1 = {
         "module_start": {
             "type": [models.ModuleType.objects.get(class_name="Grassland")],
             "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High-Intensity Grazing"])),
+                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
             },
         },
         "module_w": {
@@ -3057,7 +3057,7 @@ TERRACING_3 = {
         "module_start": {
             "type": [models.ModuleType.objects.get(class_name="Grassland")],
             "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High-Intensity Grazing", "Non-Degraded"])),
+                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"])),
             },
         },
         "module_w": {
