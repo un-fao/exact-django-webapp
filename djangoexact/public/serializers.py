@@ -16,6 +16,8 @@ class PublicProjectSerializer(serializers.ModelSerializer):
     total_catch = serializers.SerializerMethodField()
     total_livestock = serializers.SerializerMethodField()
 
+    capitalization_years = serializers.FloatField(read_only=True)
+
     class Meta:
         model = api_models.Project
         exclude = ["owner", "created_at", "updated_at"]
