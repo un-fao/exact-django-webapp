@@ -129,3 +129,5 @@ scripts/minitool/progress/landusechange_progress.json
 .branchflow
 djangoexact/reports/*
 djangoexact/scripts/README_scenario_adaptation.md
+djangoexact/scripts/plots/*
+djangoexact/plots/*
