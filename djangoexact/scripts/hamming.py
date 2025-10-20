@@ -45,10 +45,16 @@ def hamming_shell_rows(fields: dict):
     """
     fields: your dict of columns -> iterable/QuerySet
     Yields dict rows where exactly one field differs from its baseline value.
-    ONLY processes fields ending with _start and _w (hamming sphere permutations).
-    Other fields (environmental filters, custom module-based filters) are handled separately.
+    Processes fields ending with _start and _w (hamming sphere permutations).
+    Also includes all other fields as environmental combinations.
     """
     pairs, single_fields = domains_from_fields(fields)
+
+    # Get all non-hamming fields (environmental filters, custom module-based filters)
+    environmental_fields = {}
+    for field_name, field_values in fields.items():
+        if not (field_name.endswith("_start") or field_name.endswith("_w") or field_name.endswith("_wo")):
+            environmental_fields[field_name] = list(field_values)
 
     # Get domains for baseline assignment - use _start domains for paired fields
     paired_bases = []
@@ -80,22 +86,33 @@ def hamming_shell_rows(fields: dict):
                 for alt in w_dom:
                     if alt == s_val:
                         continue  # must differ
-                    row = {}
-                    # fill all pairs: start = baseline, w = baseline (same)
-                    for b, s, w, _ in pairs:
-                        row[s] = paired_base_map[b]
-                        row[w] = paired_base_map[b]
-                    # fill all single fields with FIRST baseline values to avoid duplicates
-                    for j, (field_name, dom) in enumerate(single_fields):
-                        row[field_name] = single_bases[j][0]
-                    # flip exactly one paired field
-                    row[w_col] = alt
+                    # Generate rows for all environmental field combinations
 
-                    # Double-check: ensure start and w values are different
-                    if row[s_col] == row[w_col]:
-                        continue  # Skip if start and w are the same
+                    # Get all environmental field combinations
+                    env_field_names = list(environmental_fields.keys())
+                    env_field_values = [environmental_fields[name] for name in env_field_names]
 
-                    yield row
+                    for env_combination in product(*env_field_values):
+                        row = {}
+                        # fill all pairs: start = baseline, w = baseline (same)
+                        for b, s, w, _ in pairs:
+                            row[s] = paired_base_map[b]
+                            row[w] = paired_base_map[b]
+                        # fill all single fields with FIRST baseline values to avoid duplicates
+                        for j, (field_name, dom) in enumerate(single_fields):
+                            row[field_name] = single_bases[j][0]
+                        # flip exactly one paired field
+                        row[w_col] = alt
+
+                        # Add environmental fields
+                        for env_field_name, env_value in zip(env_field_names, env_combination):
+                            row[env_field_name] = env_value
+
+                        # Double-check: ensure start and w values are different
+                        if row[s_col] == row[w_col]:
+                            continue  # Skip if start and w are the same
+
+                        yield row
 
         # For each single field, vary its value while keeping others at baseline
         # Note: We skip single field variations if they would create start==w duplicates for paired fields
@@ -128,32 +145,41 @@ def hamming_shell_rows(fields: dict):
                     if skip_permutation:
                         continue  # Skip this single field variation
 
-                    row = {}
-                    # fill all pairs: start = baseline, w = first valid alternative (not baseline)
-                    for b, s, w, _ in pairs:
-                        row[s] = paired_base_map[b]
-                        # For w, use the first value from w_dom that differs from baseline
-                        w_dom = list(fields[w])
-                        w_val = paired_base_map[b]  # default to baseline
-                        for potential_w in w_dom:
-                            if potential_w != paired_base_map[b]:
-                                w_val = potential_w
-                                break
-                        row[w] = w_val
-                    # fill all single fields with baseline values
-                    for other_field_name, other_baseline_val in single_base_map.items():
-                        row[other_field_name] = other_baseline_val
-                    # flip exactly one single field
-                    row[field_name] = alt
+                    # Generate rows for all environmental field combinations
+                    env_field_names = list(environmental_fields.keys())
+                    env_field_values = [environmental_fields[name] for name in env_field_names]
 
-                    # Final validation: ensure start != w for all paired fields
-                    has_duplicate = False
-                    for b, s, w, _ in pairs:
-                        if row[s] == row[w]:
-                            has_duplicate = True
-                            break
-                    if not has_duplicate:
-                        yield row
+                    for env_combination in product(*env_field_values):
+                        row = {}
+                        # fill all pairs: start = baseline, w = first valid alternative (not baseline)
+                        for b, s, w, _ in pairs:
+                            row[s] = paired_base_map[b]
+                            # For w, use the first value from w_dom that differs from baseline
+                            w_dom = list(fields[w])
+                            w_val = paired_base_map[b]  # default to baseline
+                            for potential_w in w_dom:
+                                if potential_w != paired_base_map[b]:
+                                    w_val = potential_w
+                                    break
+                            row[w] = w_val
+                        # fill all single fields with baseline values
+                        for other_field_name, other_baseline_val in single_base_map.items():
+                            row[other_field_name] = other_baseline_val
+                        # flip exactly one single field
+                        row[field_name] = alt
+
+                        # Add environmental fields
+                        for env_field_name, env_value in zip(env_field_names, env_combination):
+                            row[env_field_name] = env_value
+
+                        # Final validation: ensure start != w for all paired fields
+                        has_duplicate = False
+                        for b, s, w, _ in pairs:
+                            if row[s] == row[w]:
+                                has_duplicate = True
+                                break
+                        if not has_duplicate:
+                            yield row
 
 
 def expected_count(fields: dict) -> int:
@@ -354,7 +380,7 @@ def test_modified_logic():
 
     # Test domains_from_fields
     pairs, single_fields = domains_from_fields(test_fields)
-    print(f"\nFields that will be permuted:")
+    print("\nFields that will be permuted:")
     print(f"  Paired fields: {[(p[0], p[1], p[2]) for p in pairs]}")
     print(f"  Single fields: {[(s[0], len(s[1])) for s in single_fields]}")
 

@@ -128,3 +128,4 @@ scripts/minitool/progress/landusechange_progress.json
 .3b-config.json
 .branchflow
 djangoexact/reports/*
+djangoexact/scripts/README_scenario_adaptation.md

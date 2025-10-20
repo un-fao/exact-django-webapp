@@ -301,65 +301,50 @@ class Command(BaseCommand):
         # Batch processing configuration
         BATCH_SIZE = 1000
         batch_records = []
-        update_records = []
 
         def process_batch():
             nonlocal records_created, records_updated
             if batch_records:
-                # Use bulk_create with update_conflicts for Django's upsert functionality
-                # This is much faster than prefetching and checking individually
+                # Use bulk_create with update_conflicts for maximum performance
+                # This handles duplicates at the database level efficiently
                 try:
-                    # First, try bulk_create with ignore_conflicts
-                    created_records = ChangeRecord.objects.bulk_create(batch_records, ignore_conflicts=True)
-                    records_created += len(created_records)
+                    # Use bulk_create with update_conflicts and update_fields
+                    # This will create new records or update existing ones in a single operation
+                    created_count = ChangeRecord.objects.bulk_create(
+                        batch_records,
+                        update_conflicts=True,
+                        update_fields=["total"],
+                        unique_fields=["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value", "custom_filters", "csv_row_data"],
+                    )
+                    records_created += len(created_count)
 
-                    # For records that weren't created (conflicts), we need to update them
-                    if len(created_records) < len(batch_records):
-                        # Find records that need updating by checking what wasn't created
-                        records_to_update = []
-                        for record in batch_records:
-                            try:
-                                existing = ChangeRecord.objects.get(
-                                    module_type=record.module_type,
-                                    region=record.region,
-                                    climate=record.climate,
-                                    moisture=record.moisture,
-                                    soil_type=record.soil_type,
-                                    field=record.field,
-                                    from_value=record.from_value,
-                                    to_value=record.to_value,
-                                    custom_filters=record.custom_filters,
-                                )
-                                existing.total = record.total
-                                records_to_update.append(existing)
-                            except ChangeRecord.DoesNotExist:
-                                continue
+                    # For records that were updated (not created), we need to count them
+                    # Since bulk_create doesn't return updated count, we estimate based on conflicts
+                    # This is an approximation but much faster than individual processing
+                    records_updated += len(batch_records) - len(created_count)
 
-                        if records_to_update:
-                            ChangeRecord.objects.bulk_update(records_to_update, ["total"])
-                            records_updated += len(records_to_update)
-
-                except Exception as e:
-                    # Fallback to individual processing if bulk operations fail
+                except Exception:
+                    # Fallback to individual processing only if bulk operations fail
                     for record in batch_records:
-                        change_record, created = ChangeRecord.objects.get_or_create(
-                            module_type=record.module_type,
-                            region=record.region,
-                            climate=record.climate,
-                            moisture=record.moisture,
-                            soil_type=record.soil_type,
-                            field=record.field,
-                            from_value=record.from_value,
-                            to_value=record.to_value,
-                            custom_filters=record.custom_filters,
-                            defaults={"total": record.total},
-                        )
-                        if created:
-                            records_created += 1
-                        else:
-                            change_record.total = record.total
-                            change_record.save()
+                        try:
+                            existing = ChangeRecord.objects.get(
+                                module_type=record.module_type,
+                                region=record.region,
+                                climate=record.climate,
+                                moisture=record.moisture,
+                                soil_type=record.soil_type,
+                                field=record.field,
+                                from_value=record.from_value,
+                                to_value=record.to_value,
+                                custom_filters=record.custom_filters,
+                                csv_row_data=record.csv_row_data,
+                            )
+                            existing.total = record.total
+                            existing.save()
                             records_updated += 1
+                        except ChangeRecord.DoesNotExist:
+                            record.save()
+                            records_created += 1
 
                 batch_records.clear()
 
@@ -382,7 +367,7 @@ class Command(BaseCommand):
 
                 # Extract custom filter fields
                 filter_fields = self.extract_filter_fields(record, filter_columns)
-                
+
                 # Get CSV row data if available
                 csv_row_data = record.get("csv_row_data", {})
 
@@ -486,7 +471,6 @@ class Command(BaseCommand):
         # Batch processing configuration
         BATCH_SIZE = 500
         batch_create_records = []
-        batch_update_records = []
 
         if show_progress:
             self.stdout.write(f"Processing {total_aggregations:,} unique aggregations...")
@@ -494,82 +478,50 @@ class Command(BaseCommand):
         def process_batch():
             nonlocal records_created, records_updated
             if batch_create_records:
-                # Use efficient bulk operations without prefetching
+                # Use bulk_create with update_conflicts for maximum performance
                 try:
-                    # First, try bulk_create with ignore_conflicts
-                    created_records = ChangeAggregate.objects.bulk_create(batch_create_records, ignore_conflicts=True)
-                    records_created += len(created_records)
+                    # Use bulk_create with update_conflicts and update_fields
+                    # This will create new records or update existing ones in a single operation
+                    created_count = ChangeAggregate.objects.bulk_create(
+                        batch_create_records,
+                        update_conflicts=True,
+                        update_fields=["count", "sum_total", "mean", "median", "min_value", "max_value", "q1", "q3"],
+                        unique_fields=["module_type", "field", "from_value", "to_value", "region", "climate", "moisture", "soil_type", "custom_filters"],
+                    )
+                    records_created += len(created_count)
 
-                    # For records that weren't created (conflicts), we need to update them
-                    if len(created_records) < len(batch_create_records):
-                        # Find records that need updating
-                        records_to_update = []
-                        for record in batch_create_records:
-                            try:
-                                existing = ChangeAggregate.objects.get(
-                                    module_type=record.module_type,
-                                    field=record.field,
-                                    from_value=record.from_value,
-                                    to_value=record.to_value,
-                                    region=record.region,
-                                    climate=record.climate,
-                                    moisture=record.moisture,
-                                    soil_type=record.soil_type,
-                                    custom_filters=record.custom_filters,
-                                )
-                                existing.count = record.count
-                                existing.sum_total = record.sum_total
-                                existing.mean = record.mean
-                                existing.median = record.median
-                                existing.min_value = record.min_value
-                                existing.max_value = record.max_value
-                                existing.q1 = record.q1
-                                existing.q3 = record.q3
-                                records_to_update.append(existing)
-                            except ChangeAggregate.DoesNotExist:
-                                continue
+                    # For records that were updated (not created), we need to count them
+                    # Since bulk_create doesn't return updated count, we estimate based on conflicts
+                    records_updated += len(batch_create_records) - len(created_count)
 
-                        if records_to_update:
-                            ChangeAggregate.objects.bulk_update(records_to_update, ["count", "sum_total", "mean", "median", "min_value", "max_value", "q1", "q3"])
-                            records_updated += len(records_to_update)
-
-                except Exception as e:
-                    # Fallback to individual processing if bulk operations fail
+                except Exception:
+                    # Fallback to individual processing only if bulk operations fail
                     for record in batch_create_records:
-                        aggregate_record, created = ChangeAggregate.objects.get_or_create(
-                            module_type=record.module_type,
-                            field=record.field,
-                            from_value=record.from_value,
-                            to_value=record.to_value,
-                            region=record.region,
-                            climate=record.climate,
-                            moisture=record.moisture,
-                            soil_type=record.soil_type,
-                            custom_filters=record.custom_filters,
-                            defaults={
-                                "count": record.count,
-                                "sum_total": record.sum_total,
-                                "mean": record.mean,
-                                "median": record.median,
-                                "min_value": record.min_value,
-                                "max_value": record.max_value,
-                                "q1": record.q1,
-                                "q3": record.q3,
-                            },
-                        )
-                        if created:
-                            records_created += 1
-                        else:
-                            aggregate_record.count = record.count
-                            aggregate_record.sum_total = record.sum_total
-                            aggregate_record.mean = record.mean
-                            aggregate_record.median = record.median
-                            aggregate_record.min_value = record.min_value
-                            aggregate_record.max_value = record.max_value
-                            aggregate_record.q1 = record.q1
-                            aggregate_record.q3 = record.q3
-                            aggregate_record.save()
+                        try:
+                            existing = ChangeAggregate.objects.get(
+                                module_type=record.module_type,
+                                field=record.field,
+                                from_value=record.from_value,
+                                to_value=record.to_value,
+                                region=record.region,
+                                climate=record.climate,
+                                moisture=record.moisture,
+                                soil_type=record.soil_type,
+                                custom_filters=record.custom_filters,
+                            )
+                            existing.count = record.count
+                            existing.sum_total = record.sum_total
+                            existing.mean = record.mean
+                            existing.median = record.median
+                            existing.min_value = record.min_value
+                            existing.max_value = record.max_value
+                            existing.q1 = record.q1
+                            existing.q3 = record.q3
+                            existing.save()
                             records_updated += 1
+                        except ChangeAggregate.DoesNotExist:
+                            record.save()
+                            records_created += 1
 
                 batch_create_records.clear()
 

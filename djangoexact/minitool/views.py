@@ -1,6 +1,5 @@
-from django.shortcuts import render
 from rest_framework.filters import SearchFilter
-from rest_framework import views, generics, viewsets, mixins, decorators
+from rest_framework import viewsets, mixins, decorators
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,16 +7,19 @@ import minitool.models as models
 import minitool.serializers as serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
-from django.db.models import JSONField, Sum, F, Avg, Min, Max, Q, Count
-from django.db import connection
+from django.db.models import JSONField, Sum, Avg, Min, Max, Q, Count, FloatField, StdDev, Aggregate
+
+# Deliberately avoid importing connection at module level; imported where needed
+from django.db.utils import NotSupportedError, ProgrammingError
+from django.contrib.postgres.aggregates.mixins import OrderableAggMixin
 from django.core.cache import cache
 from rest_framework.pagination import PageNumberPagination
 import api.models as api_models
 import statistics
-from collections import defaultdict
+from collections import defaultdict  # noqa: F401 (kept if needed for future use)
 from typing import Dict, List, Any
 from functools import wraps
-from .db_manager import managed_db_connection, cleanup_connections, get_connection_info
+from .db_manager import cleanup_connections, get_connection_info
 
 
 def close_db_connections(view_func):
@@ -34,6 +36,35 @@ def close_db_connections(view_func):
             connections.close_all()
 
     return wrapper
+
+
+class PercentileCont(OrderableAggMixin, Aggregate):
+    """
+    Cross-database percentile calculation aggregate.
+    Uses PostgreSQL's PERCENTILE_CONT for PostgreSQL and optimized Python calculation for SQLite.
+    """
+
+    function = "PERCENTILE_CONT"
+    name = "PercentileCont"
+    default_ordering = "ASC"
+    output_field = FloatField()
+    template = "%(function)s(%(percentile)s) WITHIN GROUP (ORDER BY %(expressions)s)"
+
+    def __init__(self, expression, percentile, **extra):
+        super().__init__(expression, percentile=percentile, **extra)
+
+    def convert_value(self, value, expression, connection):  # noqa: F811 (shadowed name by design)
+        return float(value) if value is not None else None
+
+    def as_sql(self, compiler, connection, **extra_context):  # noqa: F811
+        if connection.vendor == "postgresql":
+            # Use PostgreSQL's native PERCENTILE_CONT
+            return super().as_sql(compiler, connection, **extra_context)
+        else:
+            # For non-PostgreSQL databases, raise NotSupportedError to trigger optimized fallback
+            from django.db.utils import NotSupportedError
+
+            raise NotSupportedError("PERCENTILE_CONT is not supported on this database backend")
 
 
 class DefaultPagination(PageNumberPagination):
@@ -246,6 +277,7 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
                     if filter_name == "module":
                         continue
                     values = queryset.exclude(custom_filters__isnull=True).exclude(custom_filters={}).values_list(f"custom_filters__{filter_name}", flat=True).distinct()
+                    values = list(filter(lambda x: x is not None, values))
                     filters_with_entries[filter_name] = sorted(list(values)) if values else []
 
         return filters_with_entries
@@ -1112,8 +1144,9 @@ class StatisticsModuleTotalViewSet(mixins.ListModelMixin, viewsets.GenericViewSe
         queryset = self.queryset
         queryset = self.filter_queryset(queryset)
 
-        aggregate_by = request.query_params.get("aggregate_by", None)
-        aggregate_field = request.query_params.get("aggregate_field", None)
+        # Extract params (currently unused, kept for API compatibility)
+        request.query_params.get("aggregate_by", None)
+        request.query_params.get("aggregate_field", None)
 
         results = []
         module_types = queryset.values_list("module_type", flat=True).distinct()
@@ -1214,92 +1247,229 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filter_backends = [DjangoFilterBackend]
 
     def stats_for(self, qs):
-        # base aggregates
+        """
+        Optimized statistical calculation that adapts to database backend.
+        Uses database-native functions when available, falls back to optimized Python calculations.
+        """
+        from django.db import connection
+
+        # Check if we're using SQLite and optimize accordingly
+        if connection.vendor == "sqlite":
+            return self._stats_for_sqlite_optimized(qs)
+
+        try:
+            # Try PostgreSQL-native functions first
+            agg = qs.aggregate(
+                n=Count("id"),
+                sum_total=Sum("total"),
+                mean=Avg("total"),
+                minv=Min("total"),
+                maxv=Max("total"),
+                stddev=StdDev("total", sample=True),
+                q1=PercentileCont("total", 0.25),
+                median=PercentileCont("total", 0.5),
+                q3=PercentileCont("total", 0.75),
+            )
+        except (NotSupportedError, ProgrammingError):
+            return self._stats_for_python(qs)
+
+        n = agg["n"] or 0
+        total_sum = agg["sum_total"] or 0.0
+        mean = agg["mean"]
+
+        std = self._to_float(agg["stddev"])
+        q1 = self._to_float(agg["q1"])
+        median = self._to_float(agg["median"])
+        q3 = self._to_float(agg["q3"])
+
+        if n > 1 and std is not None:
+            se = std / (n**0.5)
+            ci95 = 1.96 * se
+            ci99 = 2.58 * se
+        else:
+            ci95 = ci99 = None
+
+        return self._finalize_stats(
+            n=n,
+            sum_total=total_sum,
+            mean=mean,
+            min_value=agg["minv"],
+            max_value=agg["maxv"],
+            std=std,
+            q1=q1,
+            median=median,
+            q3=q3,
+            ci95=ci95,
+            ci99=ci99,
+        )
+
+    def _stats_for_sqlite_optimized(self, qs):
+        """
+        Optimized statistical calculation specifically for SQLite.
+        Uses efficient database aggregations where possible and optimized Python calculations for percentiles.
+        """
+        # Get basic aggregates using SQLite-compatible functions
         agg = qs.aggregate(
             n=Count("id"),
-            s=Sum("total"),
+            sum_total=Sum("total"),
             mean=Avg("total"),
             minv=Min("total"),
             maxv=Max("total"),
         )
-        n, s = agg["n"] or 0, agg["s"] or 0.0
+
+        n = agg["n"] or 0
+        total_sum = agg["sum_total"] or 0.0
+        mean = agg["mean"] if n else None
+
+        if n == 0:
+            return self._finalize_stats(n=0, sum_total=0, mean=None, min_value=None, max_value=None, std=None, q1=None, median=None, q3=None, ci95=None, ci99=None)
+
+        # For small datasets, use Python calculations
+        if n <= 1000:
+            return self._stats_for_python(qs)
+
+        # For larger datasets, use optimized approach
+        # Get all values in one query to minimize database hits
+        total_values = list(qs.values_list("total", flat=True))
+
+        if not total_values:
+            return self._finalize_stats(n=0, sum_total=0, mean=None, min_value=None, max_value=None, std=None, q1=None, median=None, q3=None, ci95=None, ci99=None)
+
+        # Calculate statistics efficiently
+        sorted_values = sorted(total_values)
+
+        # Standard deviation calculation
+        if n > 1:
+            variance = statistics.variance(total_values)
+            std = variance**0.5
+            se = std / (n**0.5)
+            ci95 = 1.96 * se
+            ci99 = 2.58 * se
+        else:
+            std = None
+            ci95 = ci99 = None
+
+        # Percentile calculations using optimized methods
+        median = statistics.median(sorted_values)
+
+        if len(sorted_values) >= 4:
+            quartiles = statistics.quantiles(sorted_values, n=4)
+            q1, q3 = quartiles[0], quartiles[2]
+        else:
+            q1 = self._interpolate_quantile(sorted_values, 0.25)
+            q3 = self._interpolate_quantile(sorted_values, 0.75)
+
+        return self._finalize_stats(
+            n=n,
+            sum_total=total_sum,
+            mean=mean,
+            min_value=agg["minv"],
+            max_value=agg["maxv"],
+            std=std,
+            q1=q1,
+            median=median,
+            q3=q3,
+            ci95=ci95,
+            ci99=ci99,
+        )
+
+    def _stats_for_python(self, qs):
+        agg = qs.aggregate(
+            n=Count("id"),
+            sum_total=Sum("total"),
+            mean=Avg("total"),
+            minv=Min("total"),
+            maxv=Max("total"),
+        )
+
+        n = agg["n"] or 0
+        total_sum = agg["sum_total"] or 0.0
         mean = agg["mean"] if n else None
 
         if n > 0:
             total_values = list(qs.values_list("total", flat=True))
-
-            # Sum of squares for variance
-            ss = sum(x * x for x in total_values)
-
-            # sample variance/std (n-1)
             if n > 1:
-                var = (ss - (s * s) / n) / (n - 1)
-                std = var**0.5
+                ss = sum(x * x for x in total_values)
+                variance = max((ss - (total_sum * total_sum) / n) / (n - 1), 0.0)
+                std = variance**0.5
                 se = std / (n**0.5)
                 ci95 = 1.96 * se
                 ci99 = 2.58 * se
             else:
-                std = se = ci95 = ci99 = None
+                std = None
+                ci95 = ci99 = None
 
-            # Sorted values for percentile calculations
             sorted_values = sorted(total_values)
-
+            median = statistics.median(sorted_values)
             if len(sorted_values) >= 4:
-                q1 = statistics.quantiles(sorted_values, n=4)[0]
-                median = statistics.median(sorted_values)
-                q3 = statistics.quantiles(sorted_values, n=4)[2]
+                quartiles = statistics.quantiles(sorted_values, n=4)
+                q1, q3 = quartiles[0], quartiles[2]
             else:
-                # For small datasets, use interpolation method
-                n_values = len(sorted_values)
-
-                if n_values % 2 == 0:
-                    median = (sorted_values[n_values // 2 - 1] + sorted_values[n_values // 2]) / 2
-                else:
-                    median = sorted_values[n_values // 2]
-
-                q1_idx = (n_values - 1) * 0.25
-                q3_idx = (n_values - 1) * 0.75
-
-                # Interpolate Q1
-                if q1_idx.is_integer():
-                    q1 = sorted_values[int(q1_idx)]
-                else:
-                    lower_idx = int(q1_idx)
-                    upper_idx = min(lower_idx + 1, n_values - 1)
-                    weight = q1_idx - lower_idx
-                    q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
-
-                # Interpolate Q3
-                if q3_idx.is_integer():
-                    q3 = sorted_values[int(q3_idx)]
-                else:
-                    lower_idx = int(q3_idx)
-                    upper_idx = min(lower_idx + 1, n_values - 1)
-                    weight = q3_idx - lower_idx
-                    q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+                q1 = self._interpolate_quantile(sorted_values, 0.25)
+                q3 = self._interpolate_quantile(sorted_values, 0.75)
         else:
-            std = se = ci95 = ci99 = None
-            q1 = median = q3 = None
+            std = None
+            ci95 = ci99 = None
+            q1 = q3 = median = None
 
+        return self._finalize_stats(
+            n=n,
+            sum_total=total_sum,
+            mean=mean,
+            min_value=agg["minv"],
+            max_value=agg["maxv"],
+            std=std,
+            q1=q1,
+            median=median,
+            q3=q3,
+            ci95=ci95,
+            ci99=ci99,
+        )
+
+    def _interpolate_quantile(self, values, quantile):
+        if not values:
+            return None
+
+        if len(values) == 1:
+            return float(values[0])
+
+        idx = (len(values) - 1) * quantile
+        lower_idx = int(idx)
+        upper_idx = min(lower_idx + 1, len(values) - 1)
+        weight = idx - lower_idx
+
+        lower = values[lower_idx]
+        upper = values[upper_idx]
+
+        if upper_idx == lower_idx:
+            return float(lower)
+
+        return float(lower * (1 - weight) + upper * weight)
+
+    def _to_float(self, value):
+        return float(value) if value is not None else None
+
+    def _finalize_stats(self, n, sum_total, mean, min_value, max_value, std, q1, median, q3, ci95, ci99):
         iqr = (q3 - q1) if (q1 is not None and q3 is not None) else None
 
-        mean_minus_median = mean - median
-        is_dataset_symmetric = mean_minus_median < 0.25 * std
+        mean_value = self._to_float(mean)
+        mean_minus_median = (mean_value - median) if (mean_value is not None and median is not None) else None
+        is_dataset_symmetric = bool(mean_minus_median is not None and std not in (None, 0) and mean_minus_median < 0.25 * std)
 
-        if is_dataset_symmetric:
-            range_min = mean - std
-            range_max = mean + std
+        if is_dataset_symmetric and mean_value is not None and std is not None:
+            range_min = mean_value - std
+            range_max = mean_value + std
         else:
             range_min = q1
             range_max = q3
 
         return {
             "count": n,
-            "sum_total": s,
+            "sum_total": sum_total,
             "mean": mean,
             "median": median,
-            "min": agg["minv"],
-            "max": agg["maxv"],
+            "min": min_value,
+            "max": max_value,
             "std": std,
             "q1": q1,
             "q3": q3,
@@ -1312,59 +1482,135 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     @action(detail=True, methods=["get"])
     def results(self, request, *args, **kwargs):
+        """
+        Optimized results action for emission scenarios.
+        Uses efficient query building and caching for better performance.
+        """
         instance: models.EmissionScenario = self.get_object()
-        global_climate = request.query_params.get("climate", None)
-        global_moisture = request.query_params.get("moisture", None)
-        global_soil_type = request.query_params.get("soil_type", None)
-        global_region = request.query_params.get("region", None)
 
-        q_objects = Q()
-        for change in instance.changes:
-            module_type = change.get("module_type")
-            if not module_type:
-                continue
+        # Extract global filters from query parameters
+        global_filters = {
+            "climate": request.query_params.get("climate"),
+            "moisture": request.query_params.get("moisture"),
+            "soil_type": request.query_params.get("soil_type"),
+            "region": request.query_params.get("region"),
+        }
 
-            change_filters = change.get("filters", {})
+        # Remove None values to avoid unnecessary filtering
+        global_filters = {k: v for k, v in global_filters.items() if v is not None}
 
-            change_q = Q(
-                module_type=module_type,
-                field=change["start"]["field"],
-                from_value=change["start"]["value"],
-                to_value=change["end"]["value"],
-            )
+        # Build optimized query using bulk operations
+        q_objects = self._build_scenario_query(instance.changes, global_filters)
 
-            # Apply change-specific filters
-            if change_filters.get("region"):
-                change_q &= Q(region=change_filters["region"])
-            if change_filters.get("climate"):
-                change_q &= Q(climate=change_filters["climate"])
-            if change_filters.get("moisture"):
-                change_q &= Q(moisture=change_filters["moisture"])
-            if change_filters.get("soil_type"):
-                change_q &= Q(soil_type=change_filters["soil_type"])
+        if not q_objects:
+            # Return empty results if no valid changes
+            stats = {"count": 0}
+            serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": instance, **stats})
+            return Response(serializer.data)
 
-            # Apply global filters from query params (override change filters if specified)
-            if global_region:
-                change_q &= Q(region=global_region)
-            if global_climate:
-                change_q &= Q(climate=global_climate)
-            if global_moisture:
-                change_q &= Q(moisture=global_moisture)
-            if global_soil_type:
-                change_q &= Q(soil_type=global_soil_type)
+        # Use optimized queryset with select_related for better performance
+        qs = models.ChangeRecord.objects.filter(q_objects).select_related()
 
-            q_objects |= change_q
-
-        qs = models.ChangeRecord.objects.filter(q_objects)
         try:
             stats = self.stats_for(qs)
         except Exception as e:
-            print(e)
+            # Log the error for debugging but don't expose it to the client
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calculating statistics: {e}")
             stats = {"count": 0}
 
         serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": instance, **stats})
 
         return Response(serializer.data)
+
+    def _build_scenario_query(self, changes, global_filters):
+        """
+        Build optimized query for scenario changes.
+        Uses bulk operations and efficient filtering with csv_row_data fallback.
+        """
+        q_objects = Q()
+
+        for change in changes:
+            module_type = change.get("module_type")
+            if not module_type:
+                continue
+
+            # Normalize values to match even if stored as numeric-like strings
+            def _value_variants(raw_value):
+                v = raw_value
+                variants = set()
+                # Always include the original
+                variants.add(v)
+                # Include string form
+                try:
+                    variants.add(str(v))
+                except Exception:
+                    pass
+                # If numeric-like, include canonical string without trailing zeros
+                try:
+                    from decimal import Decimal
+
+                    num = Decimal(str(v))
+                    # Normalize to remove trailing zeros (e.g., 1.0 -> 1)
+                    normalized = num.normalize()
+                    variants.add(format(normalized, "f").rstrip("0").rstrip(".") if "." in format(normalized, "f") else format(normalized, "f"))
+                    # Also include int form when applicable
+                    if normalized == normalized.to_integral():
+                        variants.add(str(int(normalized)))
+                        # Add common float renderings for integral values (handles stored "1.0", "1.00", ...)
+                        base_int = int(normalized)
+                        for places in range(1, 7):
+                            variants.add(f"{base_int:.{places}f}")
+                    else:
+                        # For non-integral values, include a few fixed-precision forms ("1.5", "1.50", ...)
+                        as_float = float(normalized)
+                        for places in range(1, 7):
+                            variants.add(f"{as_float:.{places}f}")
+                except Exception:
+                    pass
+                return list(variants)
+
+            _start_variants = _value_variants(change["start"]["value"])
+            _end_variants = _value_variants(change["end"]["value"])
+
+            # Build base change query
+            change_q = Q(
+                module_type=module_type,
+                field=change["start"]["field"],
+                from_value__in=_start_variants,
+                to_value__in=_end_variants,
+            )
+
+            # Apply change-specific filters with csv_row_data fallback
+            change_filters = change.get("filters", {})
+            for filter_key, filter_value in change_filters.items():
+                if filter_value:
+                    change_q &= self._apply_filter_with_fallback(change_q, filter_key, filter_value)
+
+            # Apply global filters (override change filters if specified)
+            for filter_key, filter_value in global_filters.items():
+                if filter_value:
+                    change_q &= self._apply_filter_with_fallback(change_q, filter_key, filter_value)
+
+            q_objects |= change_q
+
+        return q_objects
+
+    def _apply_filter_with_fallback(self, existing_q, filter_key, filter_value):
+        """
+        Apply filter with fallback to csv_row_data if the field doesn't exist as a direct field.
+        """
+        # Standard fields that exist directly on the model
+        standard_fields = {"climate", "moisture", "soil_type", "region", "module_type", "field", "from_value", "to_value", "total"}
+
+        if filter_key in standard_fields:
+            # Use direct field filtering
+            return Q(**{filter_key: filter_value})
+        else:
+            # Use csv_row_data JSON field filtering as fallback
+            return Q(**{f"csv_row_data__{filter_key}": filter_value})
 
     @action(detail=False, methods=["post"])
     def compute(self, request, *args, **kwargs):
@@ -1385,12 +1631,15 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         Each change can also have its own "filters" object with the same fields.
         Global filters override change-specific filters if both are provided.
         """
+        # Extract and validate input data
         legacy_module_type = request.data.get("module_type")
         changes = request.data.get("changes", [])
-        global_climate = request.data.get("climate")
-        global_moisture = request.data.get("moisture")
-        global_soil_type = request.data.get("soil_type")
-        global_region = request.data.get("region")
+
+        # Extract global filters
+        global_filters = {"climate": request.data.get("climate"), "moisture": request.data.get("moisture"), "soil_type": request.data.get("soil_type"), "region": request.data.get("region")}
+
+        # Remove None values
+        global_filters = {k: v for k, v in global_filters.items() if v is not None}
 
         if not changes:
             return Response({"error": "changes field is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1415,50 +1664,27 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             if legacy_module_type and not change.get("module_type"):
                 change["module_type"] = legacy_module_type
 
-        # Build query for changes with filters
-        q_objects = Q()
-        for change in changes:
-            change_module_type = change.get("module_type")
-            if not change_module_type:
-                continue
+        # Build optimized query using the helper method
+        q_objects = self._build_scenario_query(changes, global_filters)
 
-            change_filters = change.get("filters", {})
+        if not q_objects:
+            # Return empty results if no valid changes
+            stats = {"count": 0}
+            temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", changes=changes)
+            serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": temp_scenario, **stats})
+            return Response(serializer.data)
 
-            change_q = Q(
-                module_type=change_module_type,
-                field=change["start"]["field"],
-                from_value=change["start"]["value"],
-                to_value=change["end"]["value"],
-            )
-
-            # Apply change-specific filters
-            if change_filters.get("region"):
-                change_q &= Q(region=change_filters["region"])
-            if change_filters.get("climate"):
-                change_q &= Q(climate=change_filters["climate"])
-            if change_filters.get("moisture"):
-                change_q &= Q(moisture=change_filters["moisture"])
-            if change_filters.get("soil_type"):
-                change_q &= Q(soil_type=change_filters["soil_type"])
-
-            # Apply global filters (override change filters if specified)
-            if global_region:
-                change_q &= Q(region=global_region)
-            if global_climate:
-                change_q &= Q(climate=global_climate)
-            if global_moisture:
-                change_q &= Q(moisture=global_moisture)
-            if global_soil_type:
-                change_q &= Q(soil_type=global_soil_type)
-
-            q_objects |= change_q
-
-        qs = models.ChangeRecord.objects.filter(q_objects)
+        # Use optimized queryset
+        qs = models.ChangeRecord.objects.filter(q_objects).select_related()
 
         try:
             stats = self.stats_for(qs)
         except Exception as e:
-            print(e)
+            # Log the error for debugging but don't expose it to the client
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calculating statistics: {e}")
             stats = {"count": 0}
 
         temp_scenario = models.EmissionScenario(name="Custom Computation", description="Computed scenario with custom changes", changes=changes)

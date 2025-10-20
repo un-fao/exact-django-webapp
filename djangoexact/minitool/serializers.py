@@ -27,6 +27,8 @@ class EmissionStatisticsByModuleSerializer(serializers.ModelSerializer):
 
 
 class EmissionScenarioSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
+
     class Meta:
         model = models.EmissionScenario
         fields = "__all__"

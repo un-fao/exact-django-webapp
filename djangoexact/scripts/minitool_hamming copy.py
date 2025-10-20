@@ -504,9 +504,8 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
         return [
             # Core forest fields (single fields)
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
-            FieldMappingBuilder.single_foreign_key("forest_type"),
             # Degradation fields
-            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
 
     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
@@ -1186,8 +1185,8 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type,
             forest_type,
             forest_condition_type,
-            # average_yearly_degradation_percentage_start,
-            # average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w,
             climate_moisture,
             soil_type,
             region,
@@ -1212,9 +1211,9 @@ class ForestManagementProcessor(ModuleProcessor):
             land_use_type_wo=land_use_type,
             forest_type=forest_type,
             forest_condition_type=forest_condition_type,
-            average_yearly_degradation_percentage_start=0,
-            average_yearly_degradation_percentage_w=0,
-            average_yearly_degradation_percentage_wo=0,
+            average_yearly_degradation_percentage_start=average_yearly_degradation_percentage_start,
+            average_yearly_degradation_percentage_w=average_yearly_degradation_percentage_w,
+            average_yearly_degradation_percentage_wo=average_yearly_degradation_percentage_start,
         )
         return module
 
@@ -1470,16 +1469,16 @@ class LandUseChangeProcessor(ModuleProcessor):
             )
         elif module_type_class_name == "PerennialCropland":
             return (
-                fields_dict.get("land_use_type_start", None),
-                fields_dict.get("land_use_type_w", None),
-                fields_dict.get("organic_input_type_start", None),
-                fields_dict.get("organic_input_type_w", None),
-                fields_dict.get("tillage_management_type_start", None),
-                fields_dict.get("tillage_management_type_w", None),
-                fields_dict.get("is_biomass_burned_start", None),
-                fields_dict.get("is_biomass_burned_w", None),
-                fields_dict.get("fire_periodicity_t2_start", None),
-                fields_dict.get("fire_periodicity_t2_w", None),
+                fields_dict.get("land_use_type_start"),
+                fields_dict.get("land_use_type_w"),
+                fields_dict.get("organic_input_type_start"),
+                fields_dict.get("organic_input_type_w"),
+                fields_dict.get("tillage_management_type_start"),
+                fields_dict.get("tillage_management_type_w"),
+                fields_dict.get("is_biomass_burned_start"),
+                fields_dict.get("is_biomass_burned_w"),
+                fields_dict.get("fire_periodicity_t2_start"),
+                fields_dict.get("fire_periodicity_t2_w"),
             )
         else:
             # Default case - return all fields as tuple
@@ -2594,139 +2593,6 @@ class HammingPermutationComputer:
                 baseline[field_name] = field_values
         return baseline
 
-    def _by_key(self, items, key_fn):
-        import numpy as np
-
-        items = list(items)
-        ids = []
-        by_id = {}
-        for o in items:
-            k = key_fn(o) if callable(key_fn) else getattr(o, key_fn, o)
-            ids.append(k)
-            by_id[k] = o
-        return np.array(ids), by_id  # numpy array for vector ops
-
-    def one_change_combinations_fast(self, fields_dict, key_fn=lambda o: getattr(o, "pk", o)):
-        import numpy as np
-        import pandas as pd
-        from itertools import product
-
-        SUFFIX_START = "_start"
-        SUFFIX_W = "_w"
-
-        # Split paired vs static
-        bases, statics = {}, {}
-        for k, v in fields_dict.items():
-            if k.endswith(SUFFIX_START):
-                base = k[: -len(SUFFIX_START)]
-                bases.setdefault(base, {})["start"] = list(v)
-            elif k.endswith(SUFFIX_W):
-                base = k[: -len(SUFFIX_W)]
-                bases.setdefault(base, {})["w"] = list(v)
-            else:
-                statics[k] = list(v)
-
-        for base, pools in bases.items():
-            if "start" not in pools or "w" not in pools:
-                raise ValueError(f"Missing start/w pair for '{base}'")
-
-        # Precompute paired meta
-        meta = {}
-        for base, pools in bases.items():
-            s_ids, s_map = self._by_key(pools["start"], key_fn)
-            w_ids, w_map = self._by_key(pools["w"], key_fn)
-            # equal ids (intersection) as np array
-            eq_ids = np.intersect1d(s_ids, w_ids, assume_unique=False)
-            meta[base] = {"s_ids": s_ids, "w_ids": w_ids, "s_map": s_map, "w_map": w_map, "eq_ids": eq_ids}
-
-        names = list(bases.keys())
-
-        # Precompute static cartesian as a DataFrame (or single empty row)
-        if statics:
-            base_df = pd.DataFrame({"__k": [1]})
-            stat_maps = {}
-            for name, opts in statics.items():
-                ids, m = self._by_key(opts, key_fn)
-                if ids.size == 0:
-                    return
-                stat_maps[name] = m
-                df = pd.DataFrame({name: ids})
-                df["__k"] = 1
-                base_df = base_df.merge(df, on="__k")  # cartesian expand
-        else:
-            base_df = pd.DataFrame({"__k": [1]})
-            stat_maps = {}
-
-        # For each “changer” field
-        for changer in names:
-            non_changers = [n for n in names if n != changer]
-            # if any non-changer has no equal overlap, skip
-            if any(meta[n]["eq_ids"].size == 0 for n in non_changers):
-                continue
-
-            # Build baseline equal grid for non-changers using pandas cartesian
-            eq_frames = []
-            for n in non_changers:
-                df = pd.DataFrame({f"{n}__eq": meta[n]["eq_ids"]})
-                df["__k"] = 1
-                eq_frames.append(df)
-
-            # Start from a single key column
-            eq_grid = pd.DataFrame({"__k": [1]})
-            for df in eq_frames:
-                eq_grid = eq_grid.merge(df, on="__k")
-
-            # Cross with statics (if any)
-            eq_grid = eq_grid.merge(base_df, on="__k")
-
-            # Vectorize s!=w pairs for the changer
-            s_ids = meta[changer]["s_ids"]
-            w_ids = meta[changer]["w_ids"]
-            if s_ids.size == 0 or w_ids.size == 0:
-                continue
-
-            # All pairs via broadcasting, then mask out equal
-            S, W = np.meshgrid(s_ids, w_ids, indexing="ij")
-            mask = S != W
-            diff_pairs = np.stack([S[mask], W[mask]], axis=1)  # shape (K, 2)
-
-            # Iterate rows *once*; reuse dicts by reference map lookups
-            s_map = meta[changer]["s_map"]
-            w_map = meta[changer]["w_map"]
-
-            # Pre-resolve non-changer equal value lookups into dicts for speed
-            non_ch_eq_resolvers = {}
-            for n in non_changers:
-                # choose map (either is fine since id in eq_ids present in both)
-                s_map_n = meta[n]["s_map"]
-                w_map_n = meta[n]["w_map"]
-                fallback = w_map_n.copy()
-                fallback.update(s_map_n)  # ensure both covered
-                non_ch_eq_resolvers[n] = fallback
-
-            # Pre-resolve static lookups
-            def _emit_combo(row_vals, s_id_val, w_id_val):
-                combo = {}
-                # non-changers: same in _start/_w
-                for n in non_changers:
-                    vid = row_vals[f"{n}__eq"]
-                    obj = non_ch_eq_resolvers[n][vid]
-                    combo[f"{n}{SUFFIX_START}"] = obj
-                    combo[f"{n}{SUFFIX_W}"] = obj
-                # changer: different
-                combo[f"{changer}{SUFFIX_START}"] = s_map[s_id_val]
-                combo[f"{changer}{SUFFIX_W}"] = w_map[w_id_val]
-                # statics
-                for col in stat_maps:
-                    combo[col] = stat_maps[col][row_vals[col]]
-                return combo
-
-            # Iterate baseline once, but fill many changer pairs per row
-            # Convert eq_grid to dict records for fast access
-            for row in eq_grid.drop(columns="__k").to_dict(orient="records"):
-                for s_id_val, w_id_val in diff_pairs:
-                    yield _emit_combo(row, s_id_val, w_id_val)
-
     def compute_hamming_permutations(
         self,
         fields: Dict[str, Any],
@@ -2740,18 +2606,6 @@ class HammingPermutationComputer:
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Compute Hamming shell permutations for a model"""
         import api.models as models
-        from itertools import chain
-
-        # fields["climate"] = (
-        #     list(set(chain(*[list(x.climates.all()) for x in fields["land_use_type_start"] + fields["land_use_type_w"]])))
-        #     if "land_use_type_start" in fields and "land_use_type_w" in fields
-        #     else models.Climate.objects.filter(is_active=True).all()
-        # )
-        # fields["moisture"] = list(set(chain(*[list(x.moistures.all()) for x in fields["climate"]]))) if "climate" in fields else models.Moisture.objects.filter(is_active=True).all()
-        # fields["soil_type"] = models.SoilType.objects.filter(active=True, is_coastal=is_coastal).all()
-        # fields["region"] = list(models.Region.objects.filter(countries__isnull=False).distinct()) if "soil_type" in fields else models.Region.objects.filter(countries__isnull=False).distinct()
-
-        # pairs = list(self.one_change_combinations(fields))
 
         # Get land use types for validation
         land_use_types = []
@@ -2778,13 +2632,6 @@ class HammingPermutationComputer:
 
         # Validate climate-moisture-soiltype combinations using SoilOrganicCarbon records
         valid_combinations = SoilOrganicCarbonValidator.get_valid_combinations(climate_moistures, soil_types, models)
-
-        # fields["climate"] = list(lambda x: x[0] for x in valid_combinations)
-        # fields["moisture"] = list(lambda x: x[1] for x in valid_combinations)
-        # fields["soil_type"] = list(lambda x: x[2] for x in valid_combinations)
-        # fields["region"] = list(models.Region.objects.filter(countries__isnull=False).distinct())
-
-        # pairs = list(self.one_change_combinations_fast(fields))
 
         # Extract unique climate-moisture and soil_type combinations from valid combinations
         valid_climate_moistures = list(set((cm[0], cm[1]) for cm in valid_combinations))
@@ -3440,10 +3287,8 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
     # Extract configuration
     CONFIG = {**config["modules"], **config["performance"]}
 
-    from .minitool_hamming_scenarios import MODULE_CONFIGS as SCENARIO_MODULE_CONFIGS
-
     try:
-        for module_name, config in SCENARIO_MODULE_CONFIGS.items():
+        for module_name, config in MODULE_CONFIGS.items():
             if CONFIG[config["config_name"]]:
                 logger.info(f"Processing module: {module_name}")
                 model_class = getattr(models, module_name)

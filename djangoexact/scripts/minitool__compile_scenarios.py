@@ -611,7 +611,7 @@ FOREST_MANAGEMENT = [
     },
     # Enrichment planting in degraded forests
     {
-        "name": "Enrichment planting in degraded forests",
+        "name": "Enrichment planting in degraded forests: afforestation",
         "category": "Forest Restoration",
         "filters": DEFAULT_FILTERS,
         "changes": [
@@ -664,6 +664,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_type": "Plantation",
+                    "forest_condition_type": "Secondary",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -678,6 +679,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_type": "Plantation",
+                    "forest_condition_type": "Secondary",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -692,6 +694,7 @@ FOREST_MANAGEMENT = [
                 "module_type": "Forest Management",
                 "filters": {
                     "forest_type": "Plantation",
+                    "forest_condition_type": "Secondary",
                 },
                 "start": {
                     "field": "average_yearly_degradation_percentage",
@@ -794,6 +797,66 @@ TERRACING_3 = {
                 "value": "PerennialCropland",
             },
         },
+    ],
+    "metadata": {
+        "additional_information": "",
+        "assumptions": "",
+    },
+}
+
+INFILL_PLANTING_TO_ACCELERATE_RECOVERY = {
+    "name": "Infill planting to accelerate recovery: afforestation",
+    "category": "Forest Restoration",
+    "filters": DEFAULT_FILTERS,
+    "csv_row_filters": {
+        "module_start_grassland_management_type_start": ["High Intensity Grazing", "Non-Degraded"],
+        "module_start_type": "Grassland",
+        "module_w_type": "ForestManagement",
+        "module_w_forest_type": ["Natural", "Plantation"],
+        "module_w_forest_condition_type": "Secondary",
+    },
+    "changes": [
+        {
+            "module_type": "Land Use Change",
+            "start": {
+                "field": "module_type",
+                "value": "Grassland",
+            },
+            "end": {
+                "field": "module_type",
+                "value": "ForestManagement",
+            },
+        }
+    ],
+    "metadata": {
+        "additional_information": "",
+        "assumptions": "",
+    },
+}
+
+ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS = {
+    "name": "Enrichment planting in degraded forests: forest degradation management",
+    "category": "Forest Restoration",
+    "filters": DEFAULT_FILTERS,
+    "csv_row_filters": {
+        "module_start_grassland_management_type_start": ["High Intensity Grazing", "Non-Degraded"],
+        "module_start_type": "Grassland",
+        "module_w_type": "ForestManagement",
+        "module_w_forest_type": ["Plantation"],
+        "module_w_forest_condition_type": "Secondary",
+    },
+    "changes": [
+        {
+            "module_type": "Land Use Change",
+            "start": {
+                "field": "module_type",
+                "value": "Grassland",
+            },
+            "end": {
+                "field": "module_type",
+                "value": "ForestManagement",
+            },
+        }
     ],
     "metadata": {
         "additional_information": "",
@@ -956,6 +1019,8 @@ def run(clear: bool = False):
         *COASTAL,
         NATURAL_REGENERATION_1,
         TERRACING_3,
+        INFILL_PLANTING_TO_ACCELERATE_RECOVERY,
+        ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS,
     ]
 
     """
