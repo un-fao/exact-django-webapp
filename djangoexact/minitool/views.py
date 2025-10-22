@@ -8,6 +8,7 @@ import minitool.serializers as serializers
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.db.models import JSONField, Sum, Avg, Min, Max, Q, Count, FloatField, StdDev, Aggregate
+import logging
 
 # Deliberately avoid importing connection at module level; imported where needed
 from django.db.utils import NotSupportedError, ProgrammingError
@@ -1515,8 +1516,6 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             stats = self.stats_for(qs)
         except Exception as e:
             # Log the error for debugging but don't expose it to the client
-            import logging
-
             logger = logging.getLogger(__name__)
             logger.error(f"Error calculating statistics: {e}")
             stats = {"count": 0}
@@ -1524,6 +1523,64 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": instance, **stats})
 
         return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="results/all")
+    def all_results(self, request, *args, **kwargs):
+        """
+        Get all results for all emission scenarios.
+        """
+        scenarios = models.EmissionScenario.objects.all()
+        results = []
+
+        # Extract global filters from query parameters
+        global_filters = {
+            "climate": request.query_params.get("climate"),
+            "moisture": request.query_params.get("moisture"),
+            "soil_type": request.query_params.get("soil_type"),
+            "region": request.query_params.get("region"),
+        }
+
+        for scenario in scenarios:
+            try:
+                # Get the scenario's results using the same logic as the results method
+                scenario_results = self._get_scenario_results(scenario, global_filters)
+                results.append({"scenario_id": scenario.pk, "scenario_name": scenario.name, "results": scenario_results})
+            except Exception as e:
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error getting results for scenario {scenario.pk}: {e}")
+                results.append({"scenario_id": scenario.pk, "scenario_name": scenario.name, "results": [], "error": str(e)})
+
+        return Response(results)
+
+    def _get_scenario_results(self, scenario, global_filters):
+        """
+        Helper method to get results for a specific scenario.
+        Extracts the core logic from the results method.
+        """
+        # Remove None values to avoid unnecessary filtering
+        global_filters = {k: v for k, v in global_filters.items() if v is not None}
+
+        # Build optimized query using bulk operations
+        q_objects = self._build_scenario_query(scenario.changes, global_filters)
+
+        if not q_objects:
+            # Return empty results if no valid changes
+            return {"count": 0, "results": []}
+
+        # Use optimized queryset with select_related for better performance
+        qs = models.ChangeRecord.objects.filter(q_objects).select_related()
+
+        try:
+            stats = self.stats_for(qs)
+        except Exception as e:
+            # Log the error for debugging but don't expose it to the client
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calculating statistics: {e}")
+            stats = {"count": 0}
+
+        # Serialize the results
+        serializer = serializers.EmissionScenarioWithResultsSerializer({"emission_scenario": scenario, **stats})
+        return serializer.data
 
     def _build_scenario_query(self, changes, global_filters):
         """
@@ -1681,8 +1738,6 @@ class EmissionScenarioViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             stats = self.stats_for(qs)
         except Exception as e:
             # Log the error for debugging but don't expose it to the client
-            import logging
-
             logger = logging.getLogger(__name__)
             logger.error(f"Error calculating statistics: {e}")
             stats = {"count": 0}
