@@ -3820,9 +3820,9 @@ class EnergyEntryCalculator(BaseCalculator):
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
 
-        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
 
     def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
         try:
@@ -3883,11 +3883,11 @@ class EnergyEntryCalculator(BaseCalculator):
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
 
-            if self.module.fuel_type_start.name in ["Renewable"]:
+            if self.module.fuel_type_start.name_en in ["Renewable"]:
                 self.electricity_ef_selected_start.value = 0
-            if self.module.fuel_type_w.name in ["Renewable"]:
+            if self.module.fuel_type_w.name_en in ["Renewable"]:
                 self.electricity_ef_selected_w.value = 0
-            if self.module.fuel_type_wo.name in ["Renewable"]:
+            if self.module.fuel_type_wo.name_en in ["Renewable"]:
                 self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:
