@@ -987,10 +987,15 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         ordering = ["-created_at"]  # Orders by created_at descending
 
     def get_land_modules_area(self) -> float:
+        area = 0
+
+        if any([isinstance(module, CoastalWetland) for module in self.modules]):
+            area += max(CoastalWetland.objects.filter(activity=self).first().area, 0)
+
         for module in self.modules:
             if isinstance(module, LandModule) and module.area is not None:
-                return module.area
-        return 0
+                area += module.area
+        return area
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"

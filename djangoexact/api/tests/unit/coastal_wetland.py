@@ -37,7 +37,6 @@ class CoastalWetlandTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type"] = self.land_use_types.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
@@ -83,7 +82,6 @@ class CoastalWetlandTestCase(base_module.BaseModuleTestCase):
         self.assertNotEqual(old_balance, new_balance)
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type"] = None
         response = self.edit_module(self.module, self.user, validated_data)
@@ -92,7 +90,6 @@ class CoastalWetlandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -104,7 +101,6 @@ class CoastalWetlandTestCase(base_module.BaseModuleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -114,3 +110,35 @@ class CoastalWetlandTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(type(response.data) == dict)
+
+    def test_activity_get_land_modules_area_includes_coastal_wetland(self):
+        """
+        Test that Activity.get_land_modules_area() correctly includes the area from CoastalWetland modules.
+        """
+        # Get the current area from the coastal wetland module
+        coastal_wetland_area = self.module.area
+
+        # Get the activity's land modules area
+        activity_land_area = self.activity.get_land_modules_area()
+
+        # The activity's land area should include the coastal wetland area
+        self.assertEqual(activity_land_area, coastal_wetland_area)
+
+        # Test with a different area value
+        new_area = 150.5
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["area"] = new_area
+
+        response = self.edit_module(self.module, self.user, validated_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Refresh the module and activity from database
+        self.module.refresh_from_db()
+        self.activity.refresh_from_db()
+
+        # Check that the activity's land area now reflects the new coastal wetland area
+        updated_activity_land_area = self.activity.get_land_modules_area()
+        self.assertEqual(updated_activity_land_area, new_area)
+
+        # Verify the coastal wetland area was updated
+        self.assertEqual(self.module.area, new_area)
