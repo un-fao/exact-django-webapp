@@ -900,6 +900,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             final_luc_module_types = list(set(old_luc_module_types) & set(new_luc_module_types) - set(removed_luc_module_types))
             was_luc_removed = luc and not has_luc_module
             was_luc_added = not luc and has_luc_module
+            organic_soil = OrganicSoil.objects.filter(activity=self.instance).first()
 
             if luc and new_luc_module_types:
                 luc = self.edit_existing_luc()
@@ -910,11 +911,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             # Other modules
             old_module_types = list(map(lambda module: module, old_luc_module_types))
+            if organic_soil:
+                old_module_types.append(organic_soil.module_type)
+
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"])) + list(map(lambda module: module, new_luc_module_types))
             create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
-            added_module_types = list(set(new_module_types) - set(old_module_types))
+            added_module_types = list(set(new_module_types) - set(old_module_types) - set(kept_module_types))
             final_module_types = list(set(list(kept_module_types) + list(added_module_types)))
             removed_module_types = list(set(old_module_types) - set(final_module_types))
 
