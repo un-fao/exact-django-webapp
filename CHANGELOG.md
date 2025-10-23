@@ -1,3 +1,21 @@
+## 1.18.2 (2025-10-23)
+
+### Feat
+
+- **minitool**: add api endpoint to get results for all scenarios
+- **minitool**: add mitigation scenarios
+- **admin**: add ability to upload files to Hand In Hand Assessments from admin panel
+
+### Fix
+
+- **annual_cropland**: issue causing the flu not to be fetched correctly
+- **activity**: add coastal wetland area in total area count for activity land modules
+- **defaults**: ensure set aside biomass start is populated correctly
+- **energy**: issue causing results calculations to crash in languages other than english
+- **activity_builder**: issue causing duplication of modules when editing an activity
+- **public_project**: add missing capitalization years to PublicProjectSerializer
+- **calculators**: set default values for absent disturbances to None instead of empty list
+
 ## 1.18.1 (2025-10-09)
 
 - **settlement**: apply conversion of km to meters for road length instead of meters to km for road width
