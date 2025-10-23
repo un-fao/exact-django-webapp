@@ -322,10 +322,16 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     try:
         return ipcc.FLUData.objects.get(**filters)
     except ipcc.FLUData.DoesNotExist:
-        log.debug(f"FLUData for {[f'{v} {utils.snake_case_to_readable(k)}' for k, v in filters.items()]} does not exist")
-        pass
-
-    return SimpleNamespace(value=1)
+        class_lut = LandUseType.objects.filter(name=module.module_type.name).first()
+        if not class_lut:
+            log.debug(f"LandUseType for {module.module_type.name} does not exist")
+            return SimpleNamespace(value=1)
+        filters["land_use_type"] = class_lut
+        try:
+            return ipcc.FLUData.objects.get(**filters)
+        except ipcc.FLUData.DoesNotExist:
+            log.debug(f"FLUData for {[f'{v} {utils.snake_case_to_readable(k)}' for k, v in filters.items()]} does not exist")
+            return SimpleNamespace(value=1)
 
 
 def get_luc_modules(luc: LandUseChange) -> tuple[LandModule]:
@@ -1402,12 +1408,6 @@ class AnnualCropCalculator(LandModuleCalculator):
             lut_start = module.land_use_type_start
             minor_lut_start = module.minor_land_use_type_start
 
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_start is None:
-                    raise Exception(f"CroplandFLU for {lut_start} in {climate} climate and {moisture} moisture does not exist")
-
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(
                 ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start} does not exist", method="get_or_grains"
@@ -1442,12 +1442,6 @@ class AnnualCropCalculator(LandModuleCalculator):
             lut_w = module.land_use_type_w
             minor_lut_w = module.minor_land_use_type_w
 
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_w is None:
-                    raise Exception(f"CroplandFLU for {lut_w} in {climate} climate and {moisture} moisture does not exist")
-
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
             self.n_estimation_factor_w = utils.get_or_raise(
                 ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w} does not exist", method="get_or_grains"
@@ -1481,12 +1475,6 @@ class AnnualCropCalculator(LandModuleCalculator):
         if module.is_without():
             lut_wo = module.land_use_type_wo
             minor_lut_wo = module.minor_land_use_type_wo
-
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_wo is None:
-                    raise Exception(f"CroplandFLU for {lut_wo} in {climate} climate and {moisture} moisture does not exist")
 
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo} does not exist")
             self.n_estimation_factor_wo = utils.get_or_raise(
