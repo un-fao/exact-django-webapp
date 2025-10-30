@@ -1026,13 +1026,8 @@ class LivestockProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.LivestockFactory.build(
             activity=a,
             livestock_category_type=livestock_category_type,
@@ -1300,7 +1295,7 @@ class InputProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
         self.project = self.create_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(self.project, factories)
+        a = self.create_activity(self.project, factories)
         module = factories.InputFactory.create(
             activity=a,
         )
@@ -1469,6 +1464,29 @@ class LandUseChangeProcessor(ModuleProcessor):
         else:
             # Default case - return all fields as tuple
             return tuple(fields_dict.values())
+
+
+class AquacultureProcessor(ModuleProcessor):
+    """Processor for Aquaculture modules"""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            annual_production_start,
+            annual_production_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
+        module = factories.AquacultureFactory.build(
+            activity=a,
+            annual_production_start=annual_production_start,
+            annual_production_w=annual_production_w,
+            annual_production_wo=annual_production_start,
+        )
+        return module
 
 
 class ProcessorRegistry:
@@ -3346,7 +3364,7 @@ MODULE_CONFIGS = {
         },
         "config_name": "forest_management",
     },
-    "SmallFishery": {
+    "SmallFishery": {  #
         "filename": "small_fishery_new",
         "fields": {
             "gear_type_start": models.SmallFisheryGearType.objects.all(),
