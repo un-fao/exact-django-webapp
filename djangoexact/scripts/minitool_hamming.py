@@ -1233,13 +1233,8 @@ class SmallFisheryProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.SmallFisheryFactory.build(
             activity=a,
             fishery_type=fishery_type,
@@ -1267,13 +1262,8 @@ class LargeFisheryProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.LargeFisheryFactory.build(
             activity=a,
             fish_type=fish_type,
@@ -1310,7 +1300,7 @@ class InputProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
         self.project = self.create_project(climate, moisture, soil_type, region, factories)
-        a = factories.ActivityFactory.create(project=self.project)
+        a = self.build_activity(self.project, factories)
         module = factories.InputFactory.create(
             activity=a,
         )
@@ -1338,13 +1328,8 @@ class WaterbodyProcessor(ModuleProcessor):
             region,
         ) = combination
         climate, moisture = climate_moisture
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
+        p = self.build_project(climate, moisture, soil_type, region, factories)
+        a = self.build_activity(p, factories)
         module = factories.WaterbodyFactory.build(
             activity=a,
             waterbody_type=waterbody_type,
@@ -3292,6 +3277,7 @@ INFILL_PLANTING_TO_ACCELERATE_RECOVERY = {
 # Module configurations
 MODULE_CONFIGS = {
     "Grassland": {
+        "filename": "grassland_new",
         "fields": {
             "grassland_management_type_start": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "grassland_management_type_w": models.GrasslandManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
@@ -3305,6 +3291,7 @@ MODULE_CONFIGS = {
         "config_name": "grassland",
     },
     "Livestock": {
+        "filename": "livestock_new",
         "fields": {
             "livestock_category_type": models.LivestockCategoryType.objects.all(),
             "livestock_production_type_start": models.LivestockProductionType.objects.all(),
@@ -3315,6 +3302,7 @@ MODULE_CONFIGS = {
         "config_name": "livestock",
     },
     "AnnualCropland": {
+        "filename": "annual_cropland_new",
         "fields": {
             "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
             "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
@@ -3328,6 +3316,7 @@ MODULE_CONFIGS = {
         "config_name": "annual_cropland",
     },
     "FloodedRice": {
+        "filename": "flooded_rice_new",
         "fields": {
             "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.all(),
             "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.all(),
@@ -3339,21 +3328,15 @@ MODULE_CONFIGS = {
         "config_name": "flooded_rice",
     },
     "PerennialCropland": {
+        "filename": "perennial_cropland_new",
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
             "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            # "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
-            # "tillage_management_type_start": models.TillageManagementType.objects.all(),
-            # "tillage_management_type_w": models.TillageManagementType.objects.all(),
-            # "is_biomass_burned_start": [True, False],
-            # "is_biomass_burned_w": [True, False],
-            # "fire_periodicity_t2_start": [1],
-            # "fire_periodicity_t2_w": [1],
         },
         "config_name": "perennial_cropland",
     },
     "ForestManagement": {  #
+        "filename": "forest_management_new",
         "fields": {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
             "forest_type": models.ForestType.objects.all(),
@@ -3364,6 +3347,7 @@ MODULE_CONFIGS = {
         "config_name": "forest_management",
     },
     "SmallFishery": {
+        "filename": "small_fishery_new",
         "fields": {
             "gear_type_start": models.SmallFisheryGearType.objects.all(),
             "gear_type_w": models.SmallFisheryGearType.objects.all(),
@@ -3372,6 +3356,7 @@ MODULE_CONFIGS = {
         "config_name": "small_fishery",
     },
     "LargeFishery": {
+        "filename": "large_fishery_new",
         "fields": {
             "gear_type_start": models.LargeFisheryGearType.objects.all(),
             "gear_type_w": models.LargeFisheryGearType.objects.all(),
@@ -3380,20 +3365,16 @@ MODULE_CONFIGS = {
         "config_name": "large_fishery",
     },
     "CoastalWetland": {
+        "filename": "coastal_wetland_new",
         "fields": {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name__in=["Mangrove", "Seagrass", "Tidal Marsh"]).all(),
-            # "area_under_drainage_start": [1, 0],
-            # "area_under_drainage_w": [1, 0],
-            # "drained_area_excavated_start": [1, 0],
-            # "drained_area_excavated_w": [1, 0],
-            # "area_not_drained_or_rewetted_start": [1, 0],
-            # "area_not_drained_or_rewetted_w": [1, 0],
             "area_w_restored_vegetation_start": [0],
             "area_w_restored_vegetation_w": [1],
         },
         "config_name": "coastal_wetland",
     },
     "Input": {
+        "filename": "input_new",
         "fields": {
             "input_type": models.InputType.objects.all(),
             "value_start": [0, 1],  # Start values: 0 and 1
@@ -3402,16 +3383,13 @@ MODULE_CONFIGS = {
         "config_name": "input",
     },
     "Waterbody": {
+        "filename": "waterbody_new",
         "fields": {
             "waterbody_type": models.WaterbodyType.objects.all(),
             "trophic_type_start": models.TrophicType.objects.all(),
             "trophic_type_w": models.TrophicType.objects.all(),
         },
         "config_name": "waterbody",
-    },
-    "LandUseChange": {
-        "subsets": [INFILL_PLANTING_TO_ACCELERATE_RECOVERY],
-        "config_name": "land_use_change",
     },
 }
 
@@ -3443,7 +3421,7 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
     from .minitool_hamming_scenarios import MODULE_CONFIGS as SCENARIO_MODULE_CONFIGS
 
     try:
-        for module_name, config in SCENARIO_MODULE_CONFIGS.items():
+        for module_name, config in MODULE_CONFIGS.items():
             if CONFIG[config["config_name"]]:
                 logger.info(f"Processing module: {module_name}")
                 model_class = getattr(models, module_name)
