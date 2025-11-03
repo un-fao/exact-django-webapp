@@ -290,8 +290,22 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return self.queryset
         return self.queryset.filter(pk=self.request.user.pk)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         self.serializer_class = UserWriteSerializer
+        user = self.get_object()
+        old_email = user.email
+        new_email = request.data.get("email")
+
+        if new_email and user.firebase_uid:
+            normalized_email = new_email.casefold().strip()
+            if normalized_email != old_email:
+                try:
+                    firebase_admin_auth.update_user(user.firebase_uid, email=normalized_email, email_verified=False)
+                except Exception as e:
+                    logging.error(f"Failed to update Firebase email for user {user.pk}: {e}")
+                    raise ValidationError(f"Failed to update email in authentication system: {str(e)}")
+
         return super().update(request, *args, **kwargs)
 
     @transaction.atomic
