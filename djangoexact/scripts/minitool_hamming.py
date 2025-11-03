@@ -1132,10 +1132,10 @@ class PerennialCroplandProcessor(ModuleProcessor):
             organic_input_type_w,
             tillage_management_type_start,
             tillage_management_type_w,
-            is_biomass_burned_start,
-            is_biomass_burned_w,
-            fire_periodicity_t2_start,
-            fire_periodicity_t2_w,
+            # is_biomass_burned_start,
+            # is_biomass_burned_w,
+            # fire_periodicity_t2_start,
+            # fire_periodicity_t2_w,
             climate_moisture,
             soil_type,
             region,
@@ -1163,12 +1163,12 @@ class PerennialCroplandProcessor(ModuleProcessor):
             tillage_management_type_start=tillage_management_type_start,
             tillage_management_type_w=tillage_management_type_w,
             tillage_management_type_wo=tillage_management_type_start,
-            is_biomass_burned_start=is_biomass_burned_start,
-            is_biomass_burned_w=is_biomass_burned_w,
-            is_biomass_burned_wo=is_biomass_burned_start,
-            fire_periodicity_t2_start=fire_periodicity_t2_start,
-            fire_periodicity_t2_w=fire_periodicity_t2_w,
-            fire_periodicity_t2_wo=fire_periodicity_t2_start,
+            # is_biomass_burned_start=is_biomass_burned_start,
+            # is_biomass_burned_w=is_biomass_burned_w,
+            # is_biomass_burned_wo=is_biomass_burned_start,
+            # fire_periodicity_t2_start=fire_periodicity_t2_start,
+            # fire_periodicity_t2_w=fire_periodicity_t2_w,
+            # fire_periodicity_t2_wo=fire_periodicity_t2_start,
         )
         return module
 
@@ -1632,10 +1632,10 @@ class PerennialCroplandCombinationValidator(CombinationValidator):
             organic_input_type_w,
             tillage_management_type_start,
             tillage_management_type_w,
-            is_biomass_burned_start,
-            is_biomass_burned_w,
-            fire_periodicity_t2_start,
-            fire_periodicity_t2_w,
+            # is_biomass_burned_start,
+            # is_biomass_burned_w,
+            # fire_periodicity_t2_start,
+            # fire_periodicity_t2_w,
             climate_moisture,
             soil_type,
             region,
@@ -2886,7 +2886,13 @@ class HammingPermutationComputer:
                 # Force save initial progress
                 progress_tracker.save_progress(force=True)
 
-                pbar = tqdm(total=total_permutations, initial=start_index, desc=f"Building {model.__name__} Hamming permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
+                pbar = tqdm(
+                    total=total_permutations,
+                    initial=start_index,
+                    desc=f"Building {model.__name__} Hamming permutations ({total_permutations:,} total)",
+                    unit=" permutations",
+                    postfix={"success": 0, "errors": 0},
+                )
 
                 # Process Hamming shell rows with valid environmental combinations
                 # For each hamming permutation, apply it to only the valid environmental combinations
@@ -3350,6 +3356,14 @@ MODULE_CONFIGS = {
         "fields": {
             "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
             "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            "organic_input_type_start": models.OrganicInputType.objects.all(),
+            "organic_input_type_w": models.OrganicInputType.objects.all(),
+            "tillage_management_type_start": models.TillageManagementType.objects.all(),
+            "tillage_management_type_w": models.TillageManagementType.objects.all(),
+            # "is_biomass_burned_start": [True, False],
+            # "is_biomass_burned_w": [True, False],
+            # "fire_periodicity_t2_start": [1],
+            # "fire_periodicity_t2_w": [1],
         },
         "config_name": "perennial_cropland",
     },
@@ -3449,7 +3463,7 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
                     config["subsets"] = [config]
 
                 for subset_index, subset in enumerate(config["subsets"]):
-                    logger.info(f"Processing subset {subset_index + 1}/{len(config['subsets'])} for module: {module_name}")
+                    logger.info(f"Processing subset {subset_index + 1}/{len(config['subsets']):,} for module: {module_name}")
 
                     # Get filename for this subset if present
                     subset_filename = subset.get("filename", None)
@@ -3457,7 +3471,7 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
                     data, errors = hamming_computer.compute_hamming_permutations(
                         subset["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume, filename=subset_filename
                     )
-                    logger.info(f"Subset {subset_index + 1}/{len(config['subsets'])} completed: {len(data)} data rows, {len(errors)} error rows")
+                    logger.info(f"Subset {subset_index + 1}/{len(config['subsets']):,} completed: {len(data):,} data rows, {len(errors):,} error rows")
 
                     # Save data immediately after each subset
                     # If using custom filename, each subset has its own progress tracking
