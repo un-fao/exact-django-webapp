@@ -229,7 +229,7 @@ class AnnexedModule(BaseModule):
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=self.delay)
-                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=self.delay)
