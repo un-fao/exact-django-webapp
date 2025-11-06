@@ -153,8 +153,8 @@ class AnnexedModule(BaseModule):
                     ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
                     ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1,  self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1,  self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
@@ -201,8 +201,8 @@ class AnnexedModule(BaseModule):
                     ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
                     ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
