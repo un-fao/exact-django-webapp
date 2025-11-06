@@ -6666,9 +6666,9 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_w = MathOrganicSoil(**self.organic_soil_inputs_w)
         self.organic_soil_math_w.calculate_emissions()
 
-        if input.peat_area_start is not None and input.peat_area_w is not None:
+        if input.peat_area_w is not None:
             self.peat_extraction_inputs_w = {
-                "hectares_start": input.peat_area_start,
+                "hectares_start": input.peat_area_start if input.peat_area_start is not None else 0,
                 "hectares_end": input.peat_area_w,
                 "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
                 "percentage_ditches_end": input.peat_ditches_area_w if input.peat_ditches_area_w is not None else 0,
@@ -6764,9 +6764,9 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_wo = MathOrganicSoil(**self.organic_soil_inputs_wo)
         self.organic_soil_math_wo.calculate_emissions()
 
-        if input.peat_area_start is not None and input.peat_area_wo is not None:
+        if input.peat_area_wo is not None:
             self.peat_extraction_inputs_wo = {
-                "hectares_start": input.peat_area_start,
+                "hectares_start": input.peat_area_start if input.peat_area_start is not None else 0,
                 "hectares_end": input.peat_area_wo,
                 "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
                 "percentage_ditches_end": input.peat_ditches_area_wo if input.peat_ditches_area_wo is not None else 0,
@@ -6814,20 +6814,19 @@ class OrganicSoilCalculator(BaseCalculator):
             self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         )
 
-        if input.peat_area_start:
+        if input.peat_area_w is not None:
             self.peat_extraction_results_w = (
                 self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
             )
+            self.results_w += self.peat_extraction_results_w
+        if input.peat_area_wo is not None:
             self.peat_extraction_results_wo = (
                 self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
             )
+            self.results_wo += self.peat_extraction_results_wo
 
-            self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
-            self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
-
-        else:
-            self.results_w += self.organic_soil_results_w
-            self.results_wo += self.organic_soil_results_wo
+        self.results_w += self.organic_soil_results_w
+        self.results_wo += self.organic_soil_results_wo
 
         results_tuple = (self.results_w, self.results_wo)
 
