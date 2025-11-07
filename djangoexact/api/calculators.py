@@ -6903,7 +6903,7 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         if calculate:
             self.calculate()
-            self.bgb_max_start = self.math_start_w.max_bgb_value if self.math_start_w else self.math_start_wo.max_bgb_value if self.math_start_wo else 0
+            self.bgb_max_start = self.math_start.max_bgb_value if self.math_start else 0
             self.bgb_max_w = self.math_w.max_bgb_value if self.math_w else 0
             self.bgb_max_wo = self.math_wo.max_bgb_value if self.math_wo else 0
 
