@@ -973,7 +973,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             self.sanitize_input_entries()
 
             self.instance.module_types.clear()
-            self.instance.module_types.add(*new_module_types)
+            self.instance.module_types.add(*final_module_types)
             if final_luc_module_types:
                 self.instance.module_types.add(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id, ModuleType.objects.get(class_name="LandUseChange").id)
 
