@@ -952,7 +952,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                         module_instance.land_use_change = luc if module_type in builder_luc_module_types else None
                     module_instance.save()
 
-                if not luc and organic_soil and module_type.is_luc:
+                if (not luc or was_luc_removed) and organic_soil and module_type.is_luc:
                     module_instance: LandModule
                     module_instance.organic_soil = organic_soil
                     module_instance.save()
