@@ -907,6 +907,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
             self.instance.module_types.clear()
             module_types_to_append = []
 
+            if was_luc_removed:
+                self.delete_existing_luc()
+                luc = None
+            elif was_luc_added:
+                luc = self.handle_luc_module(self.instance, create_organic_soil)
+            elif luc:
+                self.edit_existing_luc()
+
             if not organic_soil and create_organic_soil:
                 organic_soil = OrganicSoil.objects.create(activity=self.instance, area=area)
                 if luc:
@@ -931,13 +939,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 organic_soil.area = area
                 organic_soil.save()
                 module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
-
-            if was_luc_removed:
-                self.delete_existing_luc()
-            elif was_luc_added:
-                luc = self.handle_luc_module(self.instance, create_organic_soil)
-            elif luc:
-                self.edit_existing_luc()
 
             for module_type in filter(lambda module: module.class_name != "OrganicSoil", all_builder_module_types):
                 module_type: ModuleType
@@ -964,6 +965,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
                 if module_instance:
                     module_instance.land_use_change = None
+                    module_instance.organic_soil = None
                     module_instance.save()
                     module_instance.delete()
                     if module_type.id in module_types_to_append:
