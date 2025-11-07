@@ -987,6 +987,21 @@ class ActivityBuilderSerializer(serializers.Serializer):
             self.instance.save()
 
             return self.instance
+        else:
+            if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
+                self.validated_data["name"] = self.unique_activity_name()
+
+            activity = self.create_activity()
+            activity.module_types.set(self.validated_data.get("module_types", []))
+
+            luc = None
+            if has_luc_module:
+                luc = self.handle_luc_module(activity, create_organic_soil)
+
+            self.create_modules(activity, luc, create_organic_soil, has_luc_module)
+            activity.save()
+
+            return activity
 
 
 class RecursiveField(serializers.Serializer):
