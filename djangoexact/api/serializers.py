@@ -910,16 +910,17 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 luc = self.handle_luc_module(self.instance, create_organic_soil)
 
             # Other modules
-            old_module_types = list(map(lambda module: module, old_luc_module_types))
+            old_module_types = list(map(lambda module: module, old_luc_module_types)) + list(map(lambda module: module, self.instance.module_types.all()))
             if organic_soil:
                 old_module_types.append(organic_soil.module_type)
 
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"])) + list(map(lambda module: module, new_luc_module_types))
+            new_module_types = list(set(new_module_types) - set(old_module_types))
             create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
-            kept_module_types = list(set(old_module_types) & set(new_module_types))
-            added_module_types = list(set(new_module_types) - set(old_module_types) - set(kept_module_types))
-            final_module_types = list(set(list(kept_module_types) + list(added_module_types)))
+            kept_module_types = list(set(old_module_types) - set(new_module_types))
+            added_module_types = list(set(new_module_types) - set(kept_module_types))
+            final_module_types = list(set(kept_module_types) | set(added_module_types))
             removed_module_types = list(set(old_module_types) - set(final_module_types))
 
             for module_type in filter(lambda mt: mt.class_name != "LandUseChange", added_module_types):
