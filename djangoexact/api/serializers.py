@@ -972,7 +972,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             self.sanitize_input_entries()
 
             self.instance.module_types.add(*module_types_to_append)
-            if not was_luc_removed:
+            if (luc or was_luc_added) and not was_luc_removed:
                 self.instance.module_types.add(ModuleType.objects.get(class_name="LandUseChange").id)
 
             self.instance.save()
