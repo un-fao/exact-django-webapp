@@ -931,7 +931,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     organic_soil.save()
                     luc.organic_soil = None
                     luc.save()
-                organic_soil.delete()
+                organic_soil = organic_soil.delete()
 
             for module_type in filter(lambda module: module.class_name != "OrganicSoil", all_builder_module_types):
                 module_type: ModuleType
