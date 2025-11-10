@@ -513,3 +513,16 @@ class APITestCaseMixin(APITestCase):
         )
         force_authenticate(request, user=user)
         return view(request, pk=project.id)
+
+    def copy_project(self, project, user):
+        """
+        Copy a project using the ProjectViewSet.
+        """
+        log.info("Copying project")
+        view = ProjectViewSet.as_view({"post": "copy"})
+        request = self.request_factory.post(
+            reverse("project-copy", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)

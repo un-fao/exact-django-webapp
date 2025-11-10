@@ -233,11 +233,12 @@ def copy_project(project, owner):
 
         # Add Membership to the new project
         # BUG: Membership is assigned to the original project, not the copied one
-        api_models.ProjectMembership.objects.create(
-            user=owner,
-            project=project_copy,
-            group=api_models.Group.objects.get(name="Admin"),
-        )
+        if not project.members.filter(user=owner, group__name="Admin").exists():
+            api_models.ProjectMembership.objects.create(
+                user=owner,
+                project=project_copy,
+                group=api_models.Group.objects.get(name="Admin"),
+            )
 
         for activity in project.activities.all():
             copy_activity(activity, project_copy, owner)
