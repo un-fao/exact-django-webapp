@@ -995,6 +995,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         for module in self.modules:
             if isinstance(module, LandModule) and module.area is not None:
                 area += module.area
+                break
         return area
 
     def __str__(self):
