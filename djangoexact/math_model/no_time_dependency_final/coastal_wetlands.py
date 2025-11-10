@@ -13,11 +13,9 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 from .ghg_inventory_class import InventoryPerGasperActivity
-from .generalized_modules import LandModule, BaseModule
+from .generalized_modules import BaseModule
 from dataclasses import dataclass
 from typing import Optional
-from ghg_inventory_class import InventoryPerGasperActivity
-
 
 
 @dataclass(kw_only=True)
@@ -183,9 +181,11 @@ class CoastalWetland(BaseModule):
                     0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
-                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                soil_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                
+
                 inventory_biomass = InventoryPerGasperActivity(gas_type=GasTypes.CO2, emissions=biomass_co2, activity=ActivityTypes.BIOMASS)
                 inventory_soil = InventoryPerGasperActivity(gas_type=GasTypes.CO2, emissions=soil_co2, activity=ActivityTypes.SOIL_CO2_CHANGE)
                 self.inventory.emission_by_sector_by_gas.append(inventory_biomass)
@@ -239,8 +239,10 @@ class CoastalWetland(BaseModule):
                     0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
-                
-                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay)
+
+                rewetting_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay
+                )
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
 
                 biomass_emissions = calculate_biomass()
@@ -250,7 +252,6 @@ class CoastalWetland(BaseModule):
                 self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, 0, ActivityTypes.REWETTING_REVEGETATION))
                 self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, 0, ActivityTypes.REWETTING_REVEGETATION))
                 self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, 0, ActivityTypes.BIOMASS))
-            
 
             except Exception as e:
                 traceback.print_exc()

@@ -1,9 +1,7 @@
 import math
 import traceback
 
-from .general_functions import (
-    compute_yearly_or_half_year_cumulative
-)
+from .general_functions import compute_yearly_or_half_year_cumulative
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -20,7 +18,6 @@ from ghg_inventory_class import InventoryPerGasperActivity
 
 @dataclass(kw_only=True)
 class ValueChain(BaseModule):
-
     # Emission factors
     emission_factor_start_default: float
     emission_factor_end_default: float
@@ -40,7 +37,6 @@ class ValueChain(BaseModule):
         self.emission_factor_end = self.emission_factor_end_tier_2 if self.emission_factor_end_tier_2 is not None else self.emission_factor_end_default
 
     def calculate_emissions(self):
-
         emissions_start = self.input_quantity_start * self.emission_factor_start
         emissions_end = self.input_quantity_end * self.emission_factor_end
 

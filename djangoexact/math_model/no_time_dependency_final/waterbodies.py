@@ -7,32 +7,29 @@ from dataclasses import dataclass
 from typing import Optional
 from ghg_inventory_class import InventoryPerGasperActivity
 
+
 @dataclass
 class CoastalWaterbodies(BaseModule):
+    area_start: float
+    area_end: float
+    trophic_state_default: float
+    methane_emission_factor_default: float
+    trophic_state_tier_2_start: Optional[float]
+    trophic_state_tier_2_end: Optional[float]
+    methane_emission_factor_start_tier_2: Optional[float]
+    methane_emission_factor_end_tier_2: Optional[float]
+    methane_constant: float
 
-    area_start : float
-    area_end : float
-    trophic_state_default : float
-    methane_emission_factor_default : float
-    trophic_state_tier_2_start : Optional[float]
-    trophic_state_tier_2_end : Optional[float]
-    methane_emission_factor_start_tier_2 : Optional[float]
-    methane_emission_factor_end_tier_2 : Optional[float]
-    methane_constant : float
-
-    chlo_A_start : Optional[float]
-    chlo_A_end : Optional[float]
+    chlo_A_start: Optional[float]
+    chlo_A_end: Optional[float]
 
     def __post_init__(self):
         super().__post_init__()
 
         self.hectares = compute_yearly_or_half_year_cumulative(self.area_start, self.area_end, self.implementation_time, self.capitalization_time, self.rate_type)
-    
 
-    def calculate_emissions(self, ):
-
+    def calculate_emissions(self):
         try:
-
             trophic_state_start = self.trophic_state_default if self.chlo_A_start is None else 0.26 * self.chlo_A_start
             trophic_state_start = self.trophic_state_default if self.trophic_state_tier_2_start is None else self.trophic_state_tier_2_start
 
@@ -53,9 +50,8 @@ class CoastalWaterbodies(BaseModule):
 
             emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly], ActivityTypes.COASTAL_WATERBODIES, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
-            inventory = InventoryPerGasperActivity(GasTypes.CH4,yearly_emissions_start, ActivityTypes.COASTAL_WATERBODIES)
+            inventory = InventoryPerGasperActivity(GasTypes.CH4, yearly_emissions_start, ActivityTypes.COASTAL_WATERBODIES)
             self.inventory.emissions_by_sector_by_gas(inventory)
         except Exception as e:
             traceback.print_exc()
             raise e
-        
