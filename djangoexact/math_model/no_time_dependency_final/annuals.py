@@ -8,7 +8,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
-
+from .ghg_inventory_class import InventoryPerGasperActivity
 from .generalized_modules import LandModule
 
 from dataclasses import dataclass
@@ -75,6 +75,9 @@ class AnnualCropland(LandModule):
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
+                    
+                    inventory = InventoryPerGasperActivity(GasTypes.CO2,self.soc_start*self.hectares_start , ActivityTypes.SOIL_CO2_CHANGE )
+                    self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
                 traceback.print_exc()
@@ -86,6 +89,7 @@ class AnnualCropland(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.SOM ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -169,19 +173,31 @@ class AnnualCropland(LandModule):
             total_nitrous = (sum(self.hectares_total)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.hectares_total)) * kg_methane * self.methane_constant / 1000
 
-            # Create emission sets
+            
+
+
             residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
             residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
 
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
+            
+            inventory_nitrous = self.hectares_start * kg_nitrous * self.nitrous_constant / 1000
+            inventory_methane = self.hectares_total * kg_methane * self.methane_constant / 1000            
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, inventory_nitrous, ActivityTypes.RESIDUE_BURNING ))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, inventory_methane, ActivityTypes.RESIDUE_BURNING))
 
-        def calculate_biomass_emissions():
+        def calculate_biomass_emissions(self):
             try:
                 if self.calculate_biomass:
                     emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                    
+                    #TODO Peter: Is this the half-year business
+                    inventory = InventoryPerGasperActivity(GasTypes.CO2, self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS )
+                    self.inventory.emissions_by_sector_by_gas.append(inventory)
+                    
                 else:
                     pass
 
