@@ -57,8 +57,8 @@ GRASSLAND_REMAINS_GRASSLAND = {
     "filename": "grassland_remains_grassland.json",
     "category": "Soil Remediation",
     "fields": {
-        "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severly Degraded", "High Intensity Grazing", "Non-Degraded"]),
-        "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Non-Degraded"]),
+        "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"]),
+        "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
         "is_fire_used_start": [True, False],
         "is_fire_used_w": [True, False],
         "fire_periodicity_start": [1],
@@ -74,8 +74,8 @@ GRASSLAND_TERRACING = {
     "filename": "grassland_terraging_for_erosion_control_and_soil_conservation.json",
     "category": "Soil Conservation",
     "fields": {
-        "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severly Degraded", "High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
-        "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland", "Improved Grassland"]),
+        "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
+        "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
         "is_fire_used_start": [True, False],
         "is_fire_used_w": [True, False],
         "fire_periodicity_start": [1],

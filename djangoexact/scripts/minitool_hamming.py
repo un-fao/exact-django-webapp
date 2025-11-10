@@ -3193,25 +3193,6 @@ FOREST_MANAGEMENT_TO_GRASSLAND = {
     },
 }
 
-NATURAL_REGENERATION_1 = {
-    "filename": "natural_regeneration_1",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
-            },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
-}
 
 TERRACING_3 = {
     "filename": "terracing_3",
@@ -3251,47 +3232,8 @@ AGROFORESTRY_SYSTEMS = {
             "fields": {
                 "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default", "Alley Cropping", "Hedgerow", "Silvoarable", "Multistrata", "Shaded Perennial", "Orchard"])),
                 "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage", "No Tillage"])),
-                "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "High C input, no manure"])),
-            },
-        },
-    },
-}
-
-ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS = {
-    "filename": "enrichment_planting_in_degraded_forests",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
-            },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Natural", "Plantation"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
-}
-
-INFILL_PLANTING_TO_ACCELERATE_RECOVERY = {
-    "filename": "infill_planting_to_accelerate_recovery",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
-            },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input", "High C input, no manure"])),
+                "residue_management_type_w": list(models.ResidueManagementType.objects.filter(name__in=["Exported", "Burned"]).all()),
             },
         },
     },
