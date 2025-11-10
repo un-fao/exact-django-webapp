@@ -699,3 +699,35 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertTrue(make_public_again_response.data["is_public"])
 
         log.info("END - test_finalized_project_allows_only_is_public_changes")
+
+    def test_copy_project_does_not_duplicate_admin_membership(self):
+        """
+        Test that copying a project does not duplicate the admin project membership for the project owner.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Verifies that the owner has exactly one admin membership in the original project.
+        3. Copies the project.
+        4. Verifies that the copied project has exactly one admin membership for the owner.
+
+        The test ensures that when a project is copied, only one admin membership is created
+        for the project owner in the copied project, preventing duplicate memberships.
+        """
+        log.info("START - test_copy_project_does_not_duplicate_admin_membership")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        original_project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        admin_group = models.Group.objects.get(name="Admin")
+        original_admin_memberships = models.ProjectMembership.objects.filter(project=original_project, user=self.user, group=admin_group)
+        self.assertEqual(original_admin_memberships.count(), 1, "Original project should have exactly one admin membership for the owner")
+
+        copy_response = self.copy_project(original_project, self.user)
+        self.assertEqual(copy_response.status_code, status.HTTP_201_CREATED)
+        copied_project = models.Project.objects.get(id=copy_response.data["id"])
+
+        copied_admin_memberships = models.ProjectMembership.objects.filter(project=copied_project, user=self.user, group=admin_group)
+        self.assertEqual(copied_admin_memberships.count(), 1, "Copied project should have exactly one admin membership for the owner, not duplicates")
+
+        log.info("END - test_copy_project_does_not_duplicate_admin_membership")
