@@ -525,12 +525,11 @@ class SetAsideFactory(DjangoModelFactory):
         model = SetAside
 
     status = READY
+    area = 1
 
-    is_set_aside_start = False
-    is_set_aside_w = False
-    is_set_aside_wo = False
-
-    area = 150
+    # is_set_aside_start = False
+    # is_set_aside_w = False
+    # is_set_aside_wo = False
 
 
 class IrrigationFactory(DjangoModelFactory):
@@ -657,11 +656,11 @@ class OtherLandFactory(DjangoModelFactory):
         model = OtherLand
 
     status = READY
-    area = 150
+    area = 1
 
-    is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
-    is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
-    is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
 
 
 class RoadFactory(DjangoModelFactory):
