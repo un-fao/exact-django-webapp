@@ -593,10 +593,10 @@ class CoastalWetlandDataBuilder(ModuleDataBuilder):
     def get_field_mappings(self) -> List[FieldMapping]:
         return [
             FieldMappingBuilder.single_foreign_key("land_use_type"),
-            # FieldMappingBuilder.numeric("area_under_drainage"),
+            FieldMappingBuilder.numeric("area_under_drainage"),
             # FieldMappingBuilder.numeric("drained_area_excavated"),
-            # FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
             FieldMappingBuilder.numeric("area_w_restored_vegetation"),
+            FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
         ]
 
 
@@ -771,6 +771,22 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
         return data
 
 
+class SetAsideDataBuilder(ModuleDataBuilder):
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.boolean("is_set_aside_start"),
+            FieldMappingBuilder.boolean("is_set_aside_w"),
+        ]
+
+
+class OtherLandDataBuilder(ModuleDataBuilder):
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.boolean("is_degraded_land_start"),
+            FieldMappingBuilder.boolean("is_degraded_land_w"),
+        ]
+
+
 class ModuleDataBuilderRegistry:
     """Registry for module data builders"""
 
@@ -793,6 +809,8 @@ class ModuleDataBuilderRegistry:
         self.register("Waterbody", WaterbodyDataBuilder())
         self.register("CoastalWetland", CoastalWetlandDataBuilder())
         self.register("LandUseChange", LandUseChangeDataBuilder())
+        self.register("SetAside", SetAsideDataBuilder())
+        self.register("OtherLand", OtherLandDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -835,7 +853,7 @@ class ModuleProcessor(ABC):
         self.project = None
         self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
         self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
-        self.last_year_of_accounting = 2001
+        self.last_year_of_accounting = 2020
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback")
 
@@ -919,12 +937,10 @@ class ModuleProcessor(ABC):
                 balance_w = calculators.CalculatorFactory().calculate_result(module_w)[0][2]
                 balance_luc = calculators.CalculatorFactory().calculate_result(module)[0][2]
                 balance = balance_start_and_wo + balance_w + balance_luc
-                if module_start.__class__.__name__ in ["ForestManagement", "PerennialCropland"] or module_w.__class__.__name__ in ["ForestManagement", "PerennialCropland"]:
-                    balance = balance / 20
+                balance = balance / 20
             else:
                 balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
-                if module.__class__.__name__ in ["ForestManagement", "PerennialCropland"]:
-                    balance = balance / 20
+                balance = balance / 20
 
             # Build data
             data = self.data_builder_registry.build_data(module)
@@ -965,18 +981,16 @@ class GrasslandProcessor(ModuleProcessor):
         (
             grassland_management_type_start,
             grassland_management_type_w,
-            is_fire_used_start,
-            is_fire_used_w,
-            fire_periodicity_start,
-            fire_periodicity_w,
-            fire_impact_start,
-            fire_impact_w,
+            # is_fire_used_start,
+            # is_fire_used_w,
+            # fire_periodicity_start,
+            # fire_periodicity_w,
+            # fire_impact_start,
+            # fire_impact_w,
             climate_moisture,
             soil_type,
             region,
         ) = combination
-        climate, moisture = climate_moisture
-
         climate, moisture = climate_moisture
 
         if activity is None:
@@ -994,15 +1008,15 @@ class GrasslandProcessor(ModuleProcessor):
             grassland_management_type_start=grassland_management_type_start,
             grassland_management_type_w=grassland_management_type_w,
             grassland_management_type_wo=grassland_management_type_start,
-            is_fire_used_start=0,
-            is_fire_used_w=0,
-            is_fire_used_wo=0,
-            fire_periodicity_start=0,
-            fire_periodicity_w=0,
-            fire_periodicity_wo=0,
-            fire_impact_start=0,
-            fire_impact_w=0,
-            fire_impact_wo=0,
+            # is_fire_used_start=0,
+            # is_fire_used_w=0,
+            # is_fire_used_wo=0,
+            # fire_periodicity_start=0,
+            # fire_periodicity_w=0,
+            # fire_periodicity_wo=0,
+            # fire_impact_start=0,
+            # fire_impact_w=0,
+            # fire_impact_wo=0,
             land_use_type_start=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_w=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_wo=models.LandUseType.objects.get(name="Grassland"),
@@ -1044,7 +1058,7 @@ class LivestockProcessor(ModuleProcessor):
 class AnnualCroplandProcessor(ModuleProcessor):
     """Processor for Annual Cropland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         (
             land_use_type_start,
             land_use_type_w,
@@ -1060,10 +1074,17 @@ class AnnualCroplandProcessor(ModuleProcessor):
         ) = combination
         climate, moisture = climate_moisture
 
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.AnnualCroplandFactory.build(
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.AnnualCroplandFactory.create if create else factories.AnnualCroplandFactory.build
+
+        module = method(
             activity=a,
+            land_use_change=luc,
             area=1,
             land_use_type_start=land_use_type_start,
             land_use_type_w=land_use_type_w,
@@ -1132,10 +1153,10 @@ class PerennialCroplandProcessor(ModuleProcessor):
             organic_input_type_w,
             tillage_management_type_start,
             tillage_management_type_w,
-            # is_biomass_burned_start,
-            # is_biomass_burned_w,
-            # fire_periodicity_t2_start,
-            # fire_periodicity_t2_w,
+            is_biomass_burned_start,
+            is_biomass_burned_w,
+            fire_periodicity_t2_start,
+            fire_periodicity_t2_w,
             climate_moisture,
             soil_type,
             region,
@@ -1338,34 +1359,41 @@ class WaterbodyProcessor(ModuleProcessor):
 class CoastalWetlandProcessor(ModuleProcessor):
     """Processor for Coastal Wetland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         (
             land_use_type,
-            # area_under_drainage_start,
+            # area_w_restored_vegetation_start,
+            area_w_restored_vegetation_w,
+            area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w,
+            area_under_drainage_start,
             # area_under_drainage_w,
             # drained_area_excavated_start,
             # drained_area_excavated_w,
-            # area_not_drained_or_rewetted_start,
-            # area_not_drained_or_rewetted_w,
-            area_w_restored_vegetation_start,
-            area_w_restored_vegetation_w,
             climate_moisture,
             soil_type,
             region,
         ) = combination
         climate, moisture = climate_moisture
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.CoastalWetlandFactory.build(
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.CoastalWetlandFactory.create if create else factories.CoastalWetlandFactory.build
+
+        module = method(
             activity=a,
             land_use_type=land_use_type,
-            area_under_drainage_start=0,
+            area_under_drainage_start=area_under_drainage_start,
             area_under_drainage_w=0,
             drained_area_excavated_start=0,
             drained_area_excavated_w=0,
-            area_not_drained_or_rewetted_start=0,
-            area_not_drained_or_rewetted_w=0,
-            area_w_restored_vegetation_start=area_w_restored_vegetation_start,
+            area_not_drained_or_rewetted_start=area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w=area_not_drained_or_rewetted_w,
+            area_w_restored_vegetation_start=0,
             area_w_restored_vegetation_w=area_w_restored_vegetation_w,
         )
         return module
@@ -1466,6 +1494,66 @@ class LandUseChangeProcessor(ModuleProcessor):
             return tuple(fields_dict.values())
 
 
+class OtherLandProcessor(ModuleProcessor):
+    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> models.Module:
+        (
+            is_degraded_land_start,
+            is_degraded_land_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.OtherLandFactory.create if create else factories.OtherLandFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            area=1,
+            is_degraded_land_start=is_degraded_land_start,
+            is_degraded_land_w=is_degraded_land_w,
+            is_degraded_land_wo=is_degraded_land_start,
+        )
+        return module
+
+
+class SetAsideProcessor(ModuleProcessor):
+    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> models.Module:
+        (
+            is_set_aside_start,
+            is_set_aside_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        if activity is None:
+            p = self.build_project(climate, moisture, soil_type, region, factories)
+            a = self.build_activity(p, factories)
+        else:
+            a = activity
+
+        method: callable = factories.SetAsideFactory.create if create else factories.SetAsideFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            area=1,
+            is_set_aside_start=is_set_aside_start,
+            is_set_aside_w=is_set_aside_w,
+            is_set_aside_wo=is_set_aside_start,
+        )
+        return module
+
+
 class AquacultureProcessor(ModuleProcessor):
     """Processor for Aquaculture modules"""
 
@@ -1511,6 +1599,8 @@ class ProcessorRegistry:
         self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
         self.register("CoastalWetland", CoastalWetlandProcessor(self._data_builder_registry))
         self.register("LandUseChange", LandUseChangeProcessor(self._data_builder_registry))
+        self.register("OtherLand", OtherLandProcessor(self._data_builder_registry))
+        self.register("SetAside", SetAsideProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -1632,10 +1722,10 @@ class PerennialCroplandCombinationValidator(CombinationValidator):
             organic_input_type_w,
             tillage_management_type_start,
             tillage_management_type_w,
-            # is_biomass_burned_start,
-            # is_biomass_burned_w,
-            # fire_periodicity_t2_start,
-            # fire_periodicity_t2_w,
+            is_biomass_burned_start,
+            is_biomass_burned_w,
+            fire_periodicity_t2_start,
+            fire_periodicity_t2_w,
             climate_moisture,
             soil_type,
             region,
@@ -2777,7 +2867,7 @@ class HammingPermutationComputer:
         logger.info(f"Found {len(climate_moistures)} valid climate-moisture combinations for {len(unique_land_use_types)} land use types")
 
         # Get soil types for validation
-        soil_types = models.SoilType.objects.filter(is_coastal=is_coastal, active=True).all()
+        soil_types = models.SoilType.objects.filter(is_coastal=is_coastal, active=True, name__in=["High Activity Clay", "Low Activity Clay", "Sandy"]).all()
 
         # Validate climate-moisture-soiltype combinations using SoilOrganicCarbon records
         valid_combinations = SoilOrganicCarbonValidator.get_valid_combinations(climate_moistures, soil_types, models)
@@ -3367,6 +3457,26 @@ MODULE_CONFIGS = {
     },
 }
 
+from . import minitool_scenarios as scenarios
+
+SCENARIOS_TO_RUN = [
+    # scenarios.SOIL_REMEDIATION_1,
+    # scenarios.SOIL_REMEDIATION_2,
+    scenarios.SOIL_REMEDIATION_3,
+    # scenarios.TERRACING_1,
+    # scenarios.TERRACING_2,
+    # scenarios.TERRACING_3,
+    # scenarios.DECOMPACTION_AND_IMPROVEMENT_1,
+    # scenarios.AGROFORESTRY_SYSTEMS_1,
+    # scenarios.AGROSILVOPASTURAL_SYSTEMS_1,
+    # scenarios.INTERCROPPING_AND_CROP_ROTATION_1,
+    # scenarios.INTERCROPPING_AND_CROP_ROTATION_2,  # TODO: Modify LandUseChange Processor to handle this field
+    # scenarios.MANGROVE_REPLANTING_1,
+    # scenarios.MANGROVE_REPLANTING_2,
+    # scenarios.COASTAL_ZONE_STABILIZATION_1,
+    # scenarios.RIVERBANK_RESTORATION_1,
+]
+
 
 def run_minitool_hamming(resume: bool = False, count_only: bool = False):
     """Main execution function using Hamming shell permutations"""
@@ -3392,11 +3502,9 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
     # Extract configuration
     CONFIG = {**config["modules"], **config["performance"]}
 
-    from .minitool_hamming_scenarios import MODULE_CONFIGS as SCENARIO_MODULE_CONFIGS
-
     try:
-        for module_name, config in MODULE_CONFIGS.items():
-            if CONFIG[config["config_name"]]:
+        for scenario in SCENARIOS_TO_RUN:
+            for module_name, config in scenario.items():
                 logger.info(f"Processing module: {module_name}")
                 model_class = getattr(models, module_name)
 

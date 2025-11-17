@@ -193,6 +193,12 @@ SOIL_AMENDMENTS_2 = {
             "grassland_management_type_w": list(
                 models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved With Medium Inputs", "Improved Grassland", "Improved With High Inputs"])
             ),
+            "is_fire_used_start": [False],
+            "is_fire_used_w": [False],
+            "fire_periodicity_start": [0],
+            "fire_periodicity_w": [0],
+            "fire_impact_start": [0],
+            "fire_impact_w": [0],
         },
     },
     "Input": {
@@ -207,61 +213,55 @@ SOIL_AMENDMENTS_2 = {
 }
 
 SOIL_REMEDIATION_1 = {
-    "filename": "soil_remediation_1",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="OtherLand")],
-            "fields": {
-                "is_degraded_land_start": [False],
-                "is_degraded_land_w": [False],
-            },
-        },
-    },
-    "module_w": {
-        "type": [models.ModuleType.objects.get(class_name="SetAside")],
+    "LandUseChange": {
+        "filename": "soil_remediation_1",
         "fields": {
-            "is_set_aside_start": [False],
-            "is_set_aside_w": [True],
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="OtherLand")],
+                "fields": {
+                    "is_degraded_land_start": [False],
+                    "is_degraded_land_w": [False],
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="SetAside")],
+                "fields": {
+                    "is_set_aside_start": [False],
+                    "is_set_aside_w": [True],
+                },
+            },
         },
     },
 }
 
 SOIL_REMEDIATION_2 = {
-    "filename": "soil_remediation_2",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="OtherLand")],
-            "fields": {
-                "is_degraded_land_start": [False],
-                "is_degraded_land_w": [False],
+    "LandUseChange": {
+        "filename": "soil_remediation_2",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="OtherLand")],
+                "fields": {
+                    "is_degraded_land_start": [False],
+                    "is_degraded_land_w": [False],
+                },
             },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
-                "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
+                    "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
+                },
             },
         },
     },
 }
 
 SOIL_REMEDIATION_3 = {
-    "filename": "soil_remediation_3",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="OtherLand")],
-            "fields": {
-                "is_degraded_land_start": [False],
-                "is_degraded_land_w": [False],
-            },
-        },
-    },
-    "module_w": {
-        "type": [models.ModuleType.objects.get(class_name="Grassland")],
+    "Grassland": {
+        "filename": "soil_remediation_3",
         "fields": {
-            "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"]),
-            "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
+            "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"])),
+            "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"])),
         },
     },
 }
@@ -270,8 +270,14 @@ TERRACING_1 = {
     "Grassland": {
         "filename": "terracing_1",
         "fields": {
-            "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
-            "grassland_management_type_w": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"]),
+            "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded", "Improved Grassland"])),
+            "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Improved Grassland"])),
+            "is_fire_used_start": [False],
+            "is_fire_used_w": [False],
+            "fire_periodicity_start": [0],
+            "fire_periodicity_w": [0],
+            "fire_impact_start": [0],
+            "fire_impact_w": [0],
         },
     },
 }
@@ -281,6 +287,7 @@ TERRACING_2 = {
         "filename": "terracing_2",
         "fields": {
             "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
+            "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default"])),
             "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage"])),
             "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
             "organic_input_type_start": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input"])),
@@ -292,20 +299,22 @@ TERRACING_2 = {
 }
 
 TERRACING_3 = {
-    "filename": "terracing_3",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"])),
+    "LandUseChange": {
+        "filename": "terracing_3",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Severely Degraded", "High Intensity Grazing", "Non-Degraded"])),
+                },
             },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="PerennialCropland")],
-            "fields": {
-                "land_use_type_w": list(models.LandUseType.objects.filter(module_types__name="Perennial Cropland", name__in=["Perennial Fallow", "Orchard", "Short Rotation Coppice", "Hedgerow"])),
-                "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
-                "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure"])),
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="PerennialCropland")],
+                "fields": {
+                    "land_use_type_w": list(models.LandUseType.objects.filter(module_types__name="Perennial Cropland", name__in=["Perennial Fallow", "Orchard", "Short Rotation Coppice", "Hedgerow"])),
+                    "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
+                    "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure"])),
+                },
             },
         },
     },
@@ -317,12 +326,12 @@ DECOMPACTION_AND_IMPROVEMENT_1 = {
         "fields": {
             "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
             "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
-            "tillage_management_type_start": models.TillageManagementType.objects.filter(name="Full Tillage"),
-            "tillage_management_type_w": models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"]),
-            "organic_input_type_start": models.OrganicInputType.objects.filter(name="Low C input"),
-            "organic_input_type_w": models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure", "High C input, with manure"]),
-            "residue_management_type_start": models.ResidueManagementType.objects.filter(name="Burned"),
-            "residue_management_type_w": models.ResidueManagementType.objects.filter(name__in=["Retained", "Exported"]),
+            "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name="Full Tillage")),
+            "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
+            "organic_input_type_start": list(models.OrganicInputType.objects.filter(name="Low C input")),
+            "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure", "High C input, with manure"])),
+            "residue_management_type_start": list(models.ResidueManagementType.objects.filter(name="Burned")),
+            "residue_management_type_w": list(models.ResidueManagementType.objects.filter(name__in=["Retained", "Exported"])),
         },
     },
 }
@@ -330,14 +339,6 @@ DECOMPACTION_AND_IMPROVEMENT_1 = {
 # =============================================================================
 # AGROCOLOGICAL AND PRODUCTIVE SCENARIOS
 # =============================================================================
-
-BETTER_CROP_MANAGEMENT_FOR_ANNUAL_CROPS_1 = {
-    "filename": "better_crop_management_for_annual_crops_1",
-    "fields": {
-        "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
-        "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
-    },
-}
 
 AGROFORESTRY_SYSTEMS_1 = {
     "LandUseChange": {
@@ -393,37 +394,39 @@ INTERCROPPING_AND_CROP_ROTATION_1 = {
     "AnnualCropland": {
         "filename": "intercropping_and_crop_rotation_1",
         "fields": {
-            "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
-            "land_use_type_w": [models.LandUseType.objects.get(name="Default")],
-            "tillage_management_type_start": models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage"]),
-            "tillage_management_type_w": models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"]),
-            "organic_input_type_start": models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input", "High C input, no manure"]),
-            "organic_input_type_w": models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure"]),
-            "residue_management_type_start": models.ResidueManagementType.objects.filter(name__in=["Burned", "Retained", "Exported"]),
-            "residue_management_type_w": models.ResidueManagementType.objects.filter(name__in=["Retained", "Exported", "Burned"]),
+            "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
+            "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default"])),
+            "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage"])),
+            "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
+            "organic_input_type_start": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input", "High C input, no manure"])),
+            "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure"])),
+            "residue_management_type_start": list(models.ResidueManagementType.objects.filter(name__in=["Burned", "Retained", "Exported"])),
+            "residue_management_type_w": list(models.ResidueManagementType.objects.filter(name__in=["Retained", "Exported", "Burned"])),
         },
     },
 }
 
 INTERCROPPING_AND_CROP_ROTATION_2 = {
-    "filename": "intercropping_and_crop_rotation_2",
-    "fields": {
-        "is_fire_used_w": [True, False],  # TODO: Modify LandUseChange Processor to handle this field
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="AnnualCropland")],
-            "fields": {
-                "land_use_type_start": [models.LandUseType.objects.get(name="Default")],
-                "tillage_management_type_start": models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage"]),
-                "organic_input_type_start": models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input", "High C input, no manure"]),
-                "residue_management_type_start": models.ResidueManagementType.objects.filter(name__in=["Burned", "Retained", "Exported"]),
+    "LandUseChange": {
+        "filename": "intercropping_and_crop_rotation_2",
+        "fields": {
+            "is_fire_used_w": [True, False],  # TODO: Modify LandUseChange Processor to handle this field
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="AnnualCropland")],
+                "fields": {
+                    "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
+                    "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name__in=["Full Tillage", "Reduced Tillage"])),
+                    "organic_input_type_start": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input", "High C input, no manure"])),
+                    "residue_management_type_start": list(models.ResidueManagementType.objects.filter(name__in=["Burned", "Retained", "Exported"])),
+                },
             },
-        },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="PerennialCropland")],
-            "fields": {
-                "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Alley Cropping"])),
-                "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
-                "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure", "High C input, with manure"])),
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="PerennialCropland")],
+                "fields": {
+                    "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Alley Cropping"])),
+                    "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
+                    "organic_input_type_w": list(models.OrganicInputType.objects.filter(name__in=["Medium C input", "High C input, no manure", "High C input, with manure"])),
+                },
             },
         },
     },
@@ -440,6 +443,10 @@ MANGROVE_REPLANTING_1 = {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name="Mangrove"),
             "area_w_restored_vegetation_start": [0],
             "area_w_restored_vegetation_w": [1],
+            # "area_not_drained_or_rewetted_start": [0],
+            # "area_not_drained_or_rewetted_w": [0],
+            # "area_under_drainage_start": [0],
+            # "area_under_drainage_w": [0],
         },
     },
 }
@@ -448,9 +455,13 @@ MANGROVE_REPLANTING_2 = {
     "CoastalWetland": {
         "filename": "mangrove_replanting_2",
         "fields": {
-            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name__in=["Mangrove", "Seagrass", "Tidal Marsh"]),
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name__in=["Mangrove"]),
+            # "area_w_restored_vegetation_start": [0],
+            "area_w_restored_vegetation_w": [1],
             "area_not_drained_or_rewetted_start": [0],
             "area_not_drained_or_rewetted_w": [1],
+            "area_under_drainage_start": [1],  # Rewetting
+            # "area_under_drainage_w": [0],
         },
     },
 }
@@ -460,8 +471,12 @@ COASTAL_ZONE_STABILIZATION_1 = {
         "filename": "coastal_zone_stabilization_1",
         "fields": {
             "land_use_type": models.LandUseType.objects.filter(module_types__name="Coastal Wetland", name__in=["Mangrove", "Seagrass", "Tidal Marsh"]),
-            "area_not_drained_or_rewetted_start": [0],
-            "area_not_drained_or_rewetted_w": [1],
+            # "area_w_restored_vegetation_start": [0],
+            "area_w_restored_vegetation_w": [1],
+            # "area_not_drained_or_rewetted_start": [0],
+            # "area_not_drained_or_rewetted_w": [0],
+            "area_under_drainage_start": [1],  # Rewetting
+            # "area_under_drainage_w": [0],
         },
     },
 }
@@ -473,7 +488,7 @@ RIVERBANK_RESTORATION_1 = {
             "module_start": {
                 "type": [models.ModuleType.objects.get(class_name="Grassland")],
                 "fields": {
-                    "grassland_management_type_start": models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Severely Degraded"]),
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded", "Severely Degraded"])),
                 },
             },
             "module_w": {
