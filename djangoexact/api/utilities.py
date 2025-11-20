@@ -382,6 +382,8 @@ def copy_activity(activity: "api_models.Activity", new_project=None, owner=None)
         module_copy._state.adding = True
         if luc_copy:
             module_copy.land_use_change = luc_copy
+        elif organic_soil_copy:
+            module_copy.organic_soil = organic_soil_copy
         handle_threads(module, module_copy, owner)
         module_copy.save()
 
