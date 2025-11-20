@@ -809,7 +809,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectFileReadSerializer(project.attachments.all(), many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(method="get", responses={200: ProjectLockHolderInformationSerializer})
+    @swagger_auto_schema(method="post", responses={200: ProjectLockHolderInformationSerializer, 409: "Project is already locked by another user"})
+    @action(detail=True, methods=["get", "post"])
     def lock(self, request, pk=None):
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
@@ -818,6 +820,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         project._check_lock_expiration()
 
+        if request.method == "POST":
+            if project.is_locked and project.locked_by != request.user and not request.user.is_superuser:
+                return utils.ErrorResponse("Project is already locked by another user", status=http_status.HTTP_409_CONFLICT)
+
+            project.lock(request.user)
+
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
@@ -825,12 +833,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
         project: Project = self.get_object()
-        if not request.user.is_superuser and project.locked_by != request.user:
-            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
 
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
+
+        if project.is_locked and not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
 
         project.unlock()
 

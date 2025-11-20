@@ -731,3 +731,124 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(copied_admin_memberships.count(), 1, "Copied project should have exactly one admin membership for the owner, not duplicates")
 
         log.info("END - test_copy_project_does_not_duplicate_admin_membership")
+
+    def test_lock_project_as_user_get_and_post(self):
+        """
+        Test locking a project:
+        1. Create project (locks automatically for creator)
+        2. GET lock status (should be locked by creator)
+        3. Unlock project
+        4. GET lock status (should be unlocked)
+        5. POST lock (should lock again)
+        6. GET lock status (should show locked by user)
+        """
+        log.info("START - test_lock_project_as_user_get_and_post")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        # GET lock status (initially locked by creator due to auto-lock on creation)
+        url = reverse("project-lock", args=[project.id])
+        request_get = self.request_factory.get(url)
+        force_authenticate(request_get, user=self.user)
+        view_lock = ProjectViewSet.as_view({"get": "lock", "post": "lock"})
+        response_get = view_lock(request_get, pk=project.id)
+        self.assertEqual(response_get.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_get.data["locked_by"], self.user.email)
+
+        # Unlock
+        self.unlock_project(project, self.user)
+
+        # GET lock status (should be unlocked)
+        response_get_unlocked = view_lock(request_get, pk=project.id)
+        self.assertEqual(response_get_unlocked.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response_get_unlocked.data["locked_by"])
+
+        # POST to lock
+        request_post = self.request_factory.post(url)
+        force_authenticate(request_post, user=self.user)
+        response_post = view_lock(request_post, pk=project.id)
+        self.assertEqual(response_post.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_post.data["locked_by"], self.user.email)
+
+        # GET lock status again (should be locked)
+        response_get_2 = view_lock(request_get, pk=project.id)
+        self.assertEqual(response_get_2.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_get_2.data["locked_by"], self.user.email)
+
+        log.info("END - test_lock_project_as_user_get_and_post")
+
+    def test_prevent_locking_already_locked_project(self):
+        """
+        Test that a user cannot lock a project already locked by another user.
+        1. Create project
+        2. User 1 locks it
+        3. User 2 adds membership (to view it) and attempts to lock it -> Should fail (409)
+        """
+        log.info("START - test_prevent_locking_already_locked_project")
+
+        create_project_response = self.create_project()
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        # User 1 locks project
+        url = reverse("project-lock", args=[project.id])
+        request_lock1 = self.request_factory.post(url)
+        force_authenticate(request_lock1, user=self.user)
+        view = ProjectViewSet.as_view({"post": "lock"})
+        response_lock1 = view(request_lock1, pk=project.id)
+        self.assertEqual(response_lock1.status_code, status.HTTP_200_OK)
+
+        # Add User 2 to project
+        self.create_project_membership(project, self.user2)
+
+        # User 2 attempts to lock
+        request_lock2 = self.request_factory.post(url)
+        force_authenticate(request_lock2, user=self.user2)
+        response_lock2 = view(request_lock2, pk=project.id)
+        self.assertEqual(response_lock2.status_code, status.HTTP_409_CONFLICT)
+
+        log.info("END - test_prevent_locking_already_locked_project")
+
+    def test_superuser_override_lock(self):
+        """
+        Test that a superuser can override a lock on a project.
+        1. Create project
+        2. User 2 (regular user) locks it
+        3. User 1 (superuser, assuming self.user is superuser or we make them one) locks it -> Should succeed
+        """
+        log.info("START - test_superuser_override_lock")
+
+        create_project_response = self.create_project()
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        # Unlock project
+        self.unlock_project(project, self.user)
+
+        # Add User 2 and let them lock it
+        self.create_project_membership(project, self.user2)
+
+        url = reverse("project-lock", args=[project.id])
+        view = ProjectViewSet.as_view({"post": "lock"})
+
+        # User 2 locks
+        request_lock2 = self.request_factory.post(url)
+        force_authenticate(request_lock2, user=self.user2)
+        response_lock2 = view(request_lock2, pk=project.id)
+        self.assertEqual(response_lock2.status_code, status.HTTP_200_OK)
+
+        # Ensure self.user is superuser (APITestCaseMixin typically sets up users,
+        # but check if self.user needs is_superuser=True explicitly if not default)
+        self.user.is_superuser = True
+        self.user.save()
+
+        # Superuser attempts to lock (override)
+        request_lock_su = self.request_factory.post(url)
+        force_authenticate(request_lock_su, user=self.user)
+        response_lock_su = view(request_lock_su, pk=project.id)
+
+        # Should succeed because superuser overrides
+        self.assertEqual(response_lock_su.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_lock_su.data["locked_by"], self.user.email)
+
+        log.info("END - test_superuser_override_lock")
