@@ -430,6 +430,23 @@ def import_input_types_units():
         print(f"Imported input type {input_type.name} with unit {input_type.unit}")
 
 
+def check_forest_numbers():
+    from api.models import ForestManagement
+
+    activities = models.Activity.objects.all()
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    print(f"Activities: {activities.count()}")
+    forest_management_modules = ForestManagement.objects.filter(activity__in=activities)
+    print(f"Forest management modules: {forest_management_modules.count()}")
+    secondary_forest_modules = forest_management_modules.filter(Q(forest_condition_type__name="Secondary"))
+    print(f"Secondary forest modules: {secondary_forest_modules.count()}")
+    plantation_forest_modules = secondary_forest_modules.filter(Q(forest_type__name="Plantation"))
+    print(f"Of which plantations: {plantation_forest_modules.count()}")
+
+    print(f"Percentage of secondary forest modules: {secondary_forest_modules.count() / forest_management_modules.count() * 100}%")
+    print(f"Percentage of plantation forest modules: {plantation_forest_modules.count() / secondary_forest_modules.count() * 100}%")
+
+
 def run():
     import os
 
