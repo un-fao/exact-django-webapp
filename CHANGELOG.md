@@ -1,3 +1,31 @@
+## 1.18.3 (2025-11-21)
+
+### Feat
+
+- **ci**: force results cache invalidation on new release
+- **project**: add ability to manually lock and unlock projects
+
+### Fix
+
+- **ipcc**: logical issue causing the date for forest management AGB and AGBGrowth to be wrong for most entries
+- **forest_management**: replace None with empty arrays to account for mathematical model requirements
+- **project_copy**: issue caused by stale organic soil ids causing crash when copying projects with organic soil modules
+- **math_model**: issue causing disturbances to be calculated even when only logging was present
+- **math_model**: issue causing coastal wetland rewetting area not to be calulated correctly
+- **activity**: issue causing double counting of hectares when computing total land modules area
+- **activity**: issue causing double counting of hectares when computing total land modules area
+- **project_copy**: issue causing the admin membership to be duplicated when duplicating a project
+- **activity_builder**: add back activity creation logic
+- **activity_builder**: prevent luc module type from always being added
+- **activity_builder**: rewrite edit logic
+- **activity_builder**: rewrite activity edit logic for better clarity and performance
+- **forest_management**: issue causing bgb max start to always be zero
+- **activity**: issue causing only preexisting module types to be involuntarily cleared from activity module types when editing an activity
+- **activity**: issue causing duplicate modules when editing an activity without adding or removing any module
+- **organic_soil**: issue causing peat extraction not to be calculated when area sart was lower than one
+- **accounts**: issue causing the user information on firebase not to update when users changed their email address
+- **coastal_wetland**: remove nullability from all area-related fields in coastal wetland and leave default as zero
+
 ## 1.18.2 (2025-10-23)
 
 ### Feat
