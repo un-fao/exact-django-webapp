@@ -8,7 +8,7 @@ def cycle_all_modules_and_invalidate_cached_results():
     Cycle all modules and invalidate cached results
     """
     for module_type in models.ModuleType.objects.all():
-        log.debug(f"Invalidating cached results for {module_type}")
+        log.debug(f"Invalidating cached results for {module_type.class_name}")
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
             if issubclass(ModuleClass, models.CachedResultMixin):
