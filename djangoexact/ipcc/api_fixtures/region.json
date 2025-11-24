@@ -1,0 +1,200 @@
+[
+{
+  "model": "api.region",
+  "pk": 1,
+  "fields": {
+    "name": "Eastern Africa",
+    "name_en": "Eastern Africa",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 2,
+  "fields": {
+    "name": "Central Africa",
+    "name_en": "Central Africa",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 3,
+  "fields": {
+    "name": "Northern Africa",
+    "name_en": "Northern Africa",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 4,
+  "fields": {
+    "name": "Southern Africa",
+    "name_en": "Southern Africa",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 5,
+  "fields": {
+    "name": "Western Africa",
+    "name_en": "Western Africa",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 6,
+  "fields": {
+    "name": "Central Asia",
+    "name_en": "Central Asia",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 7,
+  "fields": {
+    "name": "Eastern Asia",
+    "name_en": "Eastern Asia",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 8,
+  "fields": {
+    "name": "South-Eastern Asia",
+    "name_en": "South-Eastern Asia",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 9,
+  "fields": {
+    "name": "Southern Asia",
+    "name_en": "Southern Asia",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 10,
+  "fields": {
+    "name": "Western Asia",
+    "name_en": "Western Asia",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 11,
+  "fields": {
+    "name": "Europe",
+    "name_en": "Europe",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 12,
+  "fields": {
+    "name": "Oceania",
+    "name_en": "Oceania",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 13,
+  "fields": {
+    "name": "North America",
+    "name_en": "North America",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 14,
+  "fields": {
+    "name": "South America",
+    "name_en": "South America",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 15,
+  "fields": {
+    "name": "Central America",
+    "name_en": "Central America",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 16,
+  "fields": {
+    "name": "Caribbean",
+    "name_en": "Caribbean",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 22,
+  "fields": {
+    "name": "Western Europe",
+    "name_en": "Western Europe",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.region",
+  "pk": 23,
+  "fields": {
+    "name": "Eastern Europe",
+    "name_en": "Eastern Europe",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+}
+]

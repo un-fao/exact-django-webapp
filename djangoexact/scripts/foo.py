@@ -1,5 +1,6 @@
 import firebase_admin.auth
 import api.models as models
+import minitool.models as minitool_models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
@@ -286,7 +287,7 @@ def import_hih_links():
     """
     Import Hand in Hand links from the database
     """
-    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "ipcc_data/HIHLinks.json"))
     for index, row in df.iterrows():
         country = models.HandInHandCountry.objects.get(name=row["country"])
         link = row["link"]
@@ -400,6 +401,52 @@ def find_all_countries_with_no_ipcc_region():
         print(f"Deleted country: {country.name}")
 
 
+def sanitize_minitool_data():
+    """
+    Get all module type waterbody change aggregates and capitalize module type
+    """
+    print("Deleting smallfishery data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="smallfishery").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="smallfishery").delete()
+    print("Deleting Flooded Rice data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Flooded Rice").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Flooded Rice").delete()
+    print("Deleting Perennial Cropland data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    print("Done")
+
+
+def import_input_types_units():
+    """
+    Import input types units
+    """
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "InputTypeUnits.json"))
+    for index, row in df.iterrows():
+        print(f"Importing input type {row['name']} with unit {row['unit']}")
+        input_type = models.InputType.objects.get(name__iexact=row["name"])
+        input_type.unit = row["unit"]
+        input_type.save()
+        print(f"Imported input type {input_type.name} with unit {input_type.unit}")
+
+
+def check_forest_numbers():
+    from api.models import ForestManagement
+
+    activities = models.Activity.objects.all()
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    print(f"Activities: {activities.count()}")
+    forest_management_modules = ForestManagement.objects.filter(activity__in=activities)
+    print(f"Forest management modules: {forest_management_modules.count()}")
+    secondary_forest_modules = forest_management_modules.filter(Q(forest_condition_type__name="Secondary"))
+    print(f"Secondary forest modules: {secondary_forest_modules.count()}")
+    plantation_forest_modules = secondary_forest_modules.filter(Q(forest_type__name="Plantation"))
+    print(f"Of which plantations: {plantation_forest_modules.count()}")
+
+    print(f"Percentage of secondary forest modules: {secondary_forest_modules.count() / forest_management_modules.count() * 100}%")
+    print(f"Percentage of plantation forest modules: {plantation_forest_modules.count() / secondary_forest_modules.count() * 100}%")
+
+
 def run():
     import os
 
@@ -408,17 +455,18 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        cycle_all_modules_and_invalidate_cached_results()
+        # cycle_all_modules_and_invalidate_cached_results()
+        import_input_types_units()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        import_input_types_units()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        find_all_countries_with_no_region()
-        find_all_countries_with_no_ipcc_region()
+        # sanitize_minitool_data()
         pass
 
     if app_mode == "test":

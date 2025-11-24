@@ -1,11 +1,8 @@
 import json
 import os
 import statistics
-import sys
-import time
-from collections import defaultdict
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import transaction, connections
 from minitool.models import (
     ChangeRecord,
     ChangeAggregate,
@@ -17,17 +14,45 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--file", type=str, help="Path to the changes JSON file")
-        parser.add_argument("--module-type", type=str, choices=["livestock", "annual-cropland", "flooded-rice", "grassland", "perennial-cropland"], help="Module type to import")
+        parser.add_argument(
+            "--module-type",
+            type=str,
+            choices=[
+                "livestock",
+                "annual-cropland",
+                "flooded-rice",
+                "grassland",
+                "perennial-cropland",
+                "forest-management",
+                "small-fishery",
+                "large-fishery",
+                "input",
+                "waterbody",
+                "coastal-wetland",
+                "land-use-change",
+            ],
+            help="Module type to import",
+        )
         parser.add_argument("--clear", action="store_true", help="Clear existing data before importing")
+        parser.add_argument("--clear-all", action="store_true", help="Clear ALL data (fastest option for complete refresh)")
         parser.add_argument("--aggregate-only", action="store_true", help="Only create aggregated data, skip individual records")
         parser.add_argument("--all", action="store_true", help="Import all module types from their respective files")
         parser.add_argument("--no-progress", action="store_true", help="Disable progress bar and status updates")
 
     def handle(self, *args, **options):
         clear_existing = options["clear"]
+        clear_all = options["clear_all"]
         aggregate_only = options["aggregate_only"]
         import_all = options["all"]
         show_progress = not options["no_progress"]
+
+        # Handle clear-all option
+        if clear_all:
+            if show_progress:
+                self.stdout.write("Clearing ALL data from database...")
+            self.fast_clear_all_data(show_progress)
+            if show_progress:
+                self.stdout.write("All data cleared")
 
         if import_all:
             self.import_all_modules(clear_existing, aggregate_only, show_progress)
@@ -41,14 +66,111 @@ class Command(BaseCommand):
 
             self.import_single_module(file_path, module_type, clear_existing, aggregate_only, show_progress)
 
+    def fast_clear_data(self, module_type, show_progress):
+        """Fast data clearing using raw SQL instead of Django ORM."""
+        module_type_formatted = module_type.replace("-", " ").title()
+
+        # Get actual table names from Django models
+        change_record_table = ChangeRecord._meta.db_table
+        change_aggregate_table = ChangeAggregate._meta.db_table
+
+        # Use the minitool database connection
+        minitool_connection = connections["minitool"]
+        with minitool_connection.cursor() as cursor:
+            if show_progress:
+                self.stdout.write("  - Counting records to delete...")
+
+            # Count records first to show progress
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            change_records_count = cursor.fetchone()[0]
+
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            aggregate_records_count = cursor.fetchone()[0]
+
+            total_to_delete = change_records_count + aggregate_records_count
+
+            if show_progress:
+                self.stdout.write(f"  - Found {total_to_delete:,} records to delete ({change_records_count:,} individual + {aggregate_records_count:,} aggregated)")
+
+            if total_to_delete == 0:
+                if show_progress:
+                    self.stdout.write("  - No records to delete")
+                return
+
+            # Use raw SQL DELETE for much faster deletion
+            if show_progress:
+                self.stdout.write("  - Deleting individual records...")
+
+            # Delete ChangeRecord entries
+            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+
+            if show_progress:
+                self.stdout.write("  - Deleting aggregate records...")
+
+            # Delete ChangeAggregate entries
+            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+
+            if show_progress:
+                self.stdout.write(f"  - Successfully deleted {total_to_delete:,} records")
+
+    def fast_clear_all_data(self, show_progress):
+        """Ultra-fast clearing of ALL data using TRUNCATE (fastest possible)."""
+        # Get actual table names from Django models
+        change_record_table = ChangeRecord._meta.db_table
+        change_aggregate_table = ChangeAggregate._meta.db_table
+
+        # Use the minitool database connection
+        minitool_connection = connections["minitool"]
+        with minitool_connection.cursor() as cursor:
+            if show_progress:
+                self.stdout.write("  - Counting all records...")
+
+            # Count all records first
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")
+            change_records_count = cursor.fetchone()[0]
+
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")
+            aggregate_records_count = cursor.fetchone()[0]
+
+            total_to_delete = change_records_count + aggregate_records_count
+
+            if show_progress:
+                self.stdout.write(f"  - Found {total_to_delete:,} total records to delete")
+
+            if total_to_delete == 0:
+                if show_progress:
+                    self.stdout.write("  - No records to delete")
+                return
+
+            # Use DELETE for maximum speed (TRUNCATE doesn't work well with foreign keys)
+            if show_progress:
+                self.stdout.write("  - Deleting all records (fastest method)...")
+
+            # Delete all records from both tables
+            cursor.execute(f"DELETE FROM {change_record_table}")
+            cursor.execute(f"DELETE FROM {change_aggregate_table}")
+
+            # For SQLite, we can also run VACUUM to reclaim space immediately
+            cursor.execute("VACUUM")
+
+            if show_progress:
+                self.stdout.write(f"  - Successfully cleared {total_to_delete:,} records and optimized database")
+
     def import_all_modules(self, clear_existing, aggregate_only, show_progress):
         """Import all module types from their respective files."""
         module_configs = [
             ("livestock", "livestock_changes.json"),
-            ("annual-cropland", "annualcropland_changes.json"),
-            ("flooded-rice", "floodedrice_changes.json"),
+            ("annualcropland", "annualcropland_changes.json"),
+            ("floodedrice", "floodedrice_changes.json"),
             ("grassland", "grassland_changes.json"),
-            ("perennial-cropland", "perennialcropland_changes.json"),
+            ("perennialcropland", "perennialcropland_changes.json"),
+            ("forestmanagement", "forestmanagement_changes.json"),
+            ("smallfishery", "smallfishery_changes.json"),
+            ("largefishery", "largefishery_changes.json"),
+            ("input", "input_changes.json"),
+            ("waterbody", "waterbody_changes.json"),
+            ("coastalwetland", "coastalwetland_changes.json"),
+            ("landusechange", "landusechange_changes.json"),
         ]
 
         total_modules = len(module_configs)
@@ -93,9 +215,10 @@ class Command(BaseCommand):
         if clear_existing:
             if show_progress:
                 self.stdout.write("Clearing existing data...")
-            # Clear data for this specific module type
-            ChangeRecord.objects.filter(module_type__icontains=module_type.replace("-", " ").title()).delete()
-            ChangeAggregate.objects.filter(module_type__icontains=module_type.replace("-", " ").title()).delete()
+
+            # Use faster raw SQL for bulk deletion instead of Django ORM
+            self.fast_clear_data(module_type, show_progress)
+
             if show_progress:
                 self.stdout.write("Existing data cleared")
 
@@ -126,7 +249,7 @@ class Command(BaseCommand):
             all_keys.update(record.keys())
 
         # Standard filter columns that are always included
-        standard_filters = {"module_type", "region", "climate", "moisture", "soil_type", "total", "changes"}
+        standard_filters = {"module_type", "region", "climate", "moisture", "soil_type", "total", "changes", "csv_row_data"}
 
         # Identify custom filter columns
         custom_filters = []
@@ -161,7 +284,7 @@ class Command(BaseCommand):
         return filter_fields
 
     def import_individual_records(self, data, module_type, show_progress, total_records):
-        """Import individual change records."""
+        """Import individual change records using optimized bulk operations."""
         if show_progress:
             self.stdout.write("Importing individual records...")
 
@@ -171,9 +294,61 @@ class Command(BaseCommand):
             self.stdout.write(f"Identified filter columns: {', '.join(filter_columns)}")
 
         records_created = 0
+        records_updated = 0
         records_skipped = 0
         processed_records = 0
 
+        # Batch processing configuration
+        BATCH_SIZE = 1000
+        batch_records = []
+
+        def process_batch():
+            nonlocal records_created, records_updated
+            if batch_records:
+                # Use bulk_create with update_conflicts for maximum performance
+                # This handles duplicates at the database level efficiently
+                try:
+                    # Use bulk_create with update_conflicts and update_fields
+                    # This will create new records or update existing ones in a single operation
+                    created_count = ChangeRecord.objects.bulk_create(
+                        batch_records,
+                        update_conflicts=True,
+                        update_fields=["total"],
+                        unique_fields=["module_type", "region", "climate", "moisture", "soil_type", "field", "from_value", "to_value", "custom_filters", "csv_row_data"],
+                    )
+                    records_created += len(created_count)
+
+                    # For records that were updated (not created), we need to count them
+                    # Since bulk_create doesn't return updated count, we estimate based on conflicts
+                    # This is an approximation but much faster than individual processing
+                    records_updated += len(batch_records) - len(created_count)
+
+                except Exception:
+                    # Fallback to individual processing only if bulk operations fail
+                    for record in batch_records:
+                        try:
+                            existing = ChangeRecord.objects.get(
+                                module_type=record.module_type,
+                                region=record.region,
+                                climate=record.climate,
+                                moisture=record.moisture,
+                                soil_type=record.soil_type,
+                                field=record.field,
+                                from_value=record.from_value,
+                                to_value=record.to_value,
+                                custom_filters=record.custom_filters,
+                                csv_row_data=record.csv_row_data,
+                            )
+                            existing.total = record.total
+                            existing.save()
+                            records_updated += 1
+                        except ChangeRecord.DoesNotExist:
+                            record.save()
+                            records_created += 1
+
+                batch_records.clear()
+
+        # Process records in efficient batches without prefetching
         with transaction.atomic():
             for record in data:
                 processed_records += 1
@@ -193,18 +368,21 @@ class Command(BaseCommand):
                 # Extract custom filter fields
                 filter_fields = self.extract_filter_fields(record, filter_columns)
 
+                # Get CSV row data if available
+                csv_row_data = record.get("csv_row_data", {})
+
                 for change in record.get("changes", []):
                     field = change.get("field", "")
                     from_value = change.get("from", "")
                     to_value = change.get("to", "")
 
-                    # Skip if any required field is empty
-                    if not all([field, from_value, to_value]):
+                    # Skip if any required field is empty (but allow 0 values)
+                    if not field or from_value is None or to_value is None:
                         records_skipped += 1
                         continue
 
-                    # Create or update record
-                    change_record, created = ChangeRecord.objects.get_or_create(
+                    # Create new record for batch processing
+                    new_record = ChangeRecord(
                         module_type=module_type_value,
                         region=region,
                         climate=climate,
@@ -214,24 +392,26 @@ class Command(BaseCommand):
                         from_value=str(from_value),
                         to_value=str(to_value),
                         custom_filters=filter_fields,
-                        defaults={"total": total},
+                        csv_row_data=csv_row_data,
+                        total=total,
                     )
+                    batch_records.append(new_record)
 
-                    if created:
-                        records_created += 1
-                    else:
-                        # Update total if record already exists
-                        change_record.total = total
-                        change_record.save()
+                    # Process batch when it reaches the limit
+                    if len(batch_records) >= BATCH_SIZE:
+                        process_batch()
+
+            # Process remaining records
+            process_batch()
 
         # Final progress update
         if show_progress:
             self.update_progress("Individual Records", processed_records, total_records, records_created, records_skipped, final=True)
         else:
-            self.stdout.write(f"Individual records: {records_created:,} created, {records_skipped:,} skipped")
+            self.stdout.write(f"Individual records: {records_created:,} created, {records_updated:,} updated, {records_skipped:,} skipped")
 
     def create_aggregated_data(self, data, module_type, show_progress, total_records):
-        """Create aggregated change statistics."""
+        """Create aggregated change statistics using optimized bulk operations."""
         if show_progress:
             self.stdout.write("Creating aggregated data...")
 
@@ -256,11 +436,20 @@ class Command(BaseCommand):
                 from_value = change.get("from", "")
                 to_value = change.get("to", "")
 
-                if not all([field, from_value, to_value]):
+                if not field or from_value is None or to_value is None:
                     continue
 
                 # Create aggregation key with standard fields
-                key_parts = [field, str(from_value), str(to_value), record.get("region"), record.get("climate"), record.get("moisture"), record.get("soil_type"), record.get("module_type")]
+                key_parts = [
+                    field,
+                    str(from_value),
+                    str(to_value),
+                    record.get("region"),
+                    record.get("climate"),
+                    record.get("moisture"),
+                    record.get("soil_type"),
+                    record.get("module_type"),
+                ]
 
                 # Add custom filter fields to the key
                 for column in filter_columns:
@@ -273,14 +462,68 @@ class Command(BaseCommand):
                     aggregations[key] = []
                 aggregations[key].append(total)
 
-        # Calculate statistics and create aggregated records
+        # Calculate statistics and create aggregated records using bulk operations
         records_created = 0
         records_updated = 0
         total_aggregations = len(aggregations)
         processed_aggregations = 0
 
+        # Batch processing configuration
+        BATCH_SIZE = 500
+        batch_create_records = []
+
         if show_progress:
             self.stdout.write(f"Processing {total_aggregations:,} unique aggregations...")
+
+        def process_batch():
+            nonlocal records_created, records_updated
+            if batch_create_records:
+                # Use bulk_create with update_conflicts for maximum performance
+                try:
+                    # Use bulk_create with update_conflicts and update_fields
+                    # This will create new records or update existing ones in a single operation
+                    created_count = ChangeAggregate.objects.bulk_create(
+                        batch_create_records,
+                        update_conflicts=True,
+                        update_fields=["count", "sum_total", "mean", "median", "min_value", "max_value", "q1", "q3"],
+                        unique_fields=["module_type", "field", "from_value", "to_value", "region", "climate", "moisture", "soil_type", "custom_filters"],
+                    )
+                    records_created += len(created_count)
+
+                    # For records that were updated (not created), we need to count them
+                    # Since bulk_create doesn't return updated count, we estimate based on conflicts
+                    records_updated += len(batch_create_records) - len(created_count)
+
+                except Exception:
+                    # Fallback to individual processing only if bulk operations fail
+                    for record in batch_create_records:
+                        try:
+                            existing = ChangeAggregate.objects.get(
+                                module_type=record.module_type,
+                                field=record.field,
+                                from_value=record.from_value,
+                                to_value=record.to_value,
+                                region=record.region,
+                                climate=record.climate,
+                                moisture=record.moisture,
+                                soil_type=record.soil_type,
+                                custom_filters=record.custom_filters,
+                            )
+                            existing.count = record.count
+                            existing.sum_total = record.sum_total
+                            existing.mean = record.mean
+                            existing.median = record.median
+                            existing.min_value = record.min_value
+                            existing.max_value = record.max_value
+                            existing.q1 = record.q1
+                            existing.q3 = record.q3
+                            existing.save()
+                            records_updated += 1
+                        except ChangeAggregate.DoesNotExist:
+                            record.save()
+                            records_created += 1
+
+                batch_create_records.clear()
 
         with transaction.atomic():
             for key, values in aggregations.items():
@@ -292,7 +535,7 @@ class Command(BaseCommand):
 
                 # Extract key parts
                 base_parts = 8  # field, from_value, to_value, region, climate, moisture, soil_type, module_type
-                field, from_value, to_value, region, climate, moisture, soil_type, module_type = key[:base_parts]
+                field, from_value, to_value, region, climate, moisture, soil_type, module_type_key = key[:base_parts]
 
                 # Extract custom filter fields
                 custom_filters = {}
@@ -303,9 +546,9 @@ class Command(BaseCommand):
                 # Calculate statistics
                 stats = self.calculate_statistics(values)
 
-                # Create or update aggregated record
-                aggregate_record, created = ChangeAggregate.objects.get_or_create(
-                    module_type=module_type,
+                # Create new aggregated record for batch processing
+                new_aggregate = ChangeAggregate(
+                    module_type=module_type_key,
                     field=field,
                     from_value=from_value,
                     to_value=to_value,
@@ -314,32 +557,23 @@ class Command(BaseCommand):
                     moisture=moisture,
                     soil_type=soil_type,
                     custom_filters=custom_filters,
-                    defaults={
-                        "count": stats["count"],
-                        "sum_total": stats["sum"],
-                        "mean": stats["mean"],
-                        "median": stats["median"],
-                        "min_value": stats["min"],
-                        "max_value": stats["max"],
-                        "q1": stats["q1"],
-                        "q3": stats["q3"],
-                    },
+                    count=stats["count"],
+                    sum_total=stats["sum"],
+                    mean=stats["mean"],
+                    median=stats["median"],
+                    min_value=stats["min"],
+                    max_value=stats["max"],
+                    q1=stats["q1"],
+                    q3=stats["q3"],
                 )
+                batch_create_records.append(new_aggregate)
 
-                if created:
-                    records_created += 1
-                else:
-                    # Update statistics
-                    aggregate_record.count = stats["count"]
-                    aggregate_record.sum_total = stats["sum"]
-                    aggregate_record.mean = stats["mean"]
-                    aggregate_record.median = stats["median"]
-                    aggregate_record.min_value = stats["min"]
-                    aggregate_record.max_value = stats["max"]
-                    aggregate_record.q1 = stats["q1"]
-                    aggregate_record.q3 = stats["q3"]
-                    aggregate_record.save()
-                    records_updated += 1
+                # Process batch when it reaches the limit
+                if len(batch_create_records) >= BATCH_SIZE:
+                    process_batch()
+
+            # Process remaining records
+            process_batch()
 
         # Final progress update
         if show_progress:
@@ -355,18 +589,30 @@ class Command(BaseCommand):
         sorted_values = sorted(values)
         n = len(sorted_values)
 
-        # Handle cases with insufficient data for quartiles
-        if n < 2:
-            # For single value, set quartiles to the same value
-            q1 = q3 = values[0]
+        # Use statistics.quantiles for proper quartile calculation
+        if n >= 4:
+            q1, q3 = statistics.quantiles(sorted_values, n=4)[0], statistics.quantiles(sorted_values, n=4)[2]
         else:
-            try:
-                quantiles = statistics.quantiles(values, n=4)
-                q1 = quantiles[0]
-                q3 = quantiles[2]
-            except statistics.StatisticsError:
-                # Fallback for edge cases
-                q1 = q3 = statistics.median(values)
+            # For small datasets, use interpolation method
+            q1_idx = (n - 1) * 0.25
+            q3_idx = (n - 1) * 0.75
+
+            # Interpolate if needed
+            if q1_idx.is_integer():
+                q1 = sorted_values[int(q1_idx)]
+            else:
+                lower_idx = int(q1_idx)
+                upper_idx = min(lower_idx + 1, n - 1)
+                weight = q1_idx - lower_idx
+                q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+
+            if q3_idx.is_integer():
+                q3 = sorted_values[int(q3_idx)]
+            else:
+                lower_idx = int(q3_idx)
+                upper_idx = min(lower_idx + 1, n - 1)
+                weight = q3_idx - lower_idx
+                q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
 
         return {
             "count": n,

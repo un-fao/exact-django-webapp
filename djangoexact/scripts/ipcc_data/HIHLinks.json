@@ -24,12 +24,6 @@
         "year": 2025
     },
     {
-        "country": "Burundi",
-        "link": "https://exact.apps.fao.org/public/project/18dpo/activities",
-        "name": "Burundi HiH 2025",
-        "year": 2025
-    },
-    {
         "country": "Djibouti",
         "link": "https://exact.apps.fao.org/public/project/1nnr3/activities",
         "name": "Djibouti HiH 2025",
@@ -45,6 +39,30 @@
         "country": "Paraguay",
         "link": "https://exact.apps.fao.org/public/project/1n23i/activities",
         "name": "Paraguay HiH 2025",
+        "year": 2025
+    },
+    {
+        "country": "Burundi",
+        "link": "https://exact.apps.fao.org/public/project/2ikto/activities",
+        "name": "Burundi HiH 2025 - tomate",
+        "year": 2025
+    },
+    {
+        "country": "Burundi",
+        "link": "https://exact.apps.fao.org/public/project/2jxwq/activities",
+        "name": "Burundi HiH 2025 - lapin",
+        "year": 2025
+    },
+    {
+        "country": "Burundi",
+        "link": "https://exact.apps.fao.org/public/project/2jwgr/activities",
+        "name": "Burundi HiH 2025 - soja",
+        "year": 2025
+    },
+    {
+        "country": "Burundi",
+        "link": "https://exact.apps.fao.org/public/project/2jjh0/activities",
+        "name": "Burundi HiH 2025 - manioc",
         "year": 2025
     }
 ]

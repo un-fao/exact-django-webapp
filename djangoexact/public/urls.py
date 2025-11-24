@@ -1,6 +1,7 @@
 from rest_framework.routers import DefaultRouter
 import public.views as public_views
 import api.models as api_models
+import api.views as api_views
 
 router = DefaultRouter()
 router.register(r"projects", public_views.PublicProjectViewSet, basename="project")
@@ -45,6 +46,7 @@ router.register(r"packagings", public_views.generic_public_module_viewset(api_mo
 router.register(r"packaging-entries", public_views.generic_public_module_viewset(api_models.PackagingEntry), basename="packagingentry")
 router.register(r"transports", public_views.generic_public_module_viewset(api_models.Transport), basename="transport")
 router.register(r"transport-entries", public_views.generic_public_module_viewset(api_models.TransportEntry), basename="transportentry")
+router.register(r"module-types", api_views.ModuleTypeViewSet, basename="moduletypes")
 
 
 urlpatterns = []

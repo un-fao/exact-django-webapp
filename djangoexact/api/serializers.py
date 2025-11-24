@@ -1,5 +1,6 @@
 import logging as log
 from enum import Enum
+import uuid
 
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
@@ -398,10 +399,10 @@ class ReadProjectSerializer(serializers.ModelSerializer):
 
 
 class WriteProjectSerializer(serializers.ModelSerializer):
-    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True, write_only=True)
+    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=False, allow_null=True, write_only=True)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True, write_only=True)
-    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True, write_only=True)
-    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True, write_only=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False, allow_null=True, write_only=True)
+    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
 
     class Meta:
@@ -442,8 +443,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
-            if project.is_finalized and is_finalized is not False:
-                raise serializers.ValidationError("Finalized projects cannot be modified")
+            is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+
+            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+                raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
@@ -772,7 +775,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
         )
 
         if create_organic_soil:
-            organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+            organic_soil = OrganicSoil.objects.filter(activity=activity).first()
+            if not organic_soil:
+                organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
             organic_soil.land_use_change = luc
             organic_soil.save()
             activity.module_types.add(ModuleType.objects.get(name_en="Organic Soil").id)
@@ -782,11 +787,38 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return luc
 
     def create_modules(self, activity, luc, has_organic_soil, has_luc_module):
-        for module_type in activity.module_types.all():
+        from api.models import Module, Submodule
+
+        project = activity.project
+
+        module_types = activity.module_types.all()
+
+        if any(issubclass(module_type.class_name, (Module, Submodule)) for module_type in module_types):
+            climate = activity.climate_t2 or project.climate
+            moisture = activity.moisture_t2 or project.moisture
+            soil_type = activity.soil_type_t2 or project.soil_type
+
+            missing_fields = []
+            if climate is None:
+                missing_fields.append("climate")
+            if moisture is None:
+                missing_fields.append("moisture")
+            if soil_type is None:
+                missing_fields.append("soil_type")
+
+            if missing_fields:
+                raise serializers.ValidationError(
+                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
+                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
+                    f"on the activity or {', '.join(missing_fields)} on the project."
+                )
+
+        for module_type in module_types:
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
                 continue
 
             ModuleClass = apps.get_model("api", module_type.class_name)
+
             if module_type.is_luc:
                 module_instance = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
                 if has_organic_soil and not has_luc_module:
@@ -822,19 +854,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
 
     def edit_existing_luc(self):
-        luc: LandUseChange = self.instance.landusechange.first()
-
-        self.instance.module_types.remove(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id)
-
-        luc_modules = luc.get_module_types()
-        new_modules = list(self.validated_data["land_use_change"].values())
-
-        difference = list(set(luc_modules) - set(new_modules))
-
-        for module in difference:
-            module_instance = getattr(self.instance, module.class_name.lower())
-            if module_instance.exists():
-                module_instance.first().delete()
+        luc: LandUseChange = LandUseChange.objects.filter(activity=self.instance).first()
 
         luc.module_type_start = self.validated_data["land_use_change"]["module_type_start"]
         luc.module_type_w = self.validated_data["land_use_change"]["module_type_w"]
@@ -843,6 +863,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         luc.save()
         self.instance.save()
+
+        return luc
 
     def delete_existing_luc(self):
         luc: LandUseChange = self.instance.landusechange.first()
@@ -893,95 +915,128 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             module.save()
 
+    def create_module(self, module_type: ModuleType, in_luc: bool = False, luc: LandUseChange = None, area: float = None):
+        ModuleClass = apps.get_model("api", module_type.class_name)
+        is_organic_soil = module_type.class_name == "OrganicSoil"
+
+        module_data = {"activity": self.instance}
+        if in_luc:
+            module_data["land_use_change"] = luc
+
+        if area and hasattr(ModuleClass, "area"):
+            module_data["area"] = area
+
+        module_instance = ModuleClass.objects.create(**module_data)
+
+        if is_organic_soil and luc:
+            luc.organic_soil = module_instance
+            luc.save()
+
+        return module_instance
+
     @transaction.atomic
     def save(self, **kwargs):
         self.validate_total_project_cost()
 
         create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data.get("module_types", [])]
         has_luc_module = self.validated_data.get("land_use_change", False)
+        area = self.validated_data.get("area", None)
 
         if self.instance:
-            old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
-            create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
+            # LUC
+            luc: LandUseChange = self.instance.landusechange.first()
+            was_luc_removed = luc and not has_luc_module
+            was_luc_added = not luc and has_luc_module
 
-            luc = self.instance.landusechange.first()
+            builder_module_types = list(set([module for module in self.validated_data["module_types"] if module.class_name != "LandUseChange"]))
+            builder_luc_module_types = list(set(list(self.validated_data["land_use_change"].values()) if has_luc_module else []))
+            all_builder_module_types = builder_module_types + builder_luc_module_types
+            activity_module_types = list(set(list(map(lambda module: module, self.instance.module_types.all()))))
+            removed_module_types = list(set(list(set(activity_module_types) - set(all_builder_module_types) - set([ModuleType.objects.get(class_name="LandUseChange")]))))
 
-            luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(
-                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
-            )
+            organic_soil: OrganicSoil = OrganicSoil.objects.filter(activity=self.instance).first()
 
-            kept_module_types = list(set(old_module_types) & set(new_module_types))
-            removed_module_types = list(set(old_module_types) - set(new_module_types))
-            added_module_types = list(set(new_module_types) - set(old_module_types))
+            self.instance.module_types.clear()
+            module_types_to_append = []
 
-            for module in kept_module_types:
-                if module.class_name == "LandUseChange":
-                    continue
-
-                ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.filter(activity=self.instance).first()
-
-                if module.class_name == "OrganicSoil":
-                    if luc.module_type not in kept_module_types:
-                        luc.organic_soil = None
-                        luc.save()
-                        module_instance.land_use_change = None
-                        module_instance.save()
-
-                # TODO: Maybe instead of checking the module type we can check the instance class?
-
-                if luc and luc.module_type not in kept_module_types:
-                    module_instance.land_use_change = None
-                    module_instance.save()
-                    continue
-
-                if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
-                    module_instance.land_use_change = luc
-                    module_instance.save()
-                elif module_instance:
-                    module_instance.land_use_change = None
-                    module_instance.save()
-
-            for module in added_module_types:
-                if module.class_name == "LandUseChange":
-                    if module in self.validated_data["module_types"]:
-                        raise serializers.ValidationError("Land Use Change module cannot be added manually")
-                    continue
-
-                ModuleClass = apps.get_model("api", module.class_name)
-
-                module_data = {"activity": self.instance}
-                if module in luc_module_types:
-                    module_data["area"] = self.validated_data.get("area")
-
-                module_instance = ModuleClass.objects.create(**module_data)
-                if luc and module in list(luc.get_module_types()):
-                    module_instance.land_use_change = luc
-                    module_instance.save()
-
-            if luc and has_luc_module:
-                self.edit_existing_luc()
-            elif luc and not has_luc_module:
+            if was_luc_removed:
                 self.delete_existing_luc()
-            elif not luc and has_luc_module:
+                luc = None
+            elif was_luc_added:
                 luc = self.handle_luc_module(self.instance, create_organic_soil)
+            elif luc:
+                self.edit_existing_luc()
 
-            for module in removed_module_types:
-                ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.filter(activity=self.instance)
-                if module_instance.exists():
-                    module_instance.first().delete()
+            if not organic_soil and create_organic_soil:
+                organic_soil = OrganicSoil.objects.create(activity=self.instance, area=area)
+                if luc:
+                    organic_soil.land_use_change = luc
+                    organic_soil.save()
+                    luc.organic_soil = organic_soil
+                    luc.save()
+                module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
+            elif organic_soil and not create_organic_soil:
+                if luc:
+                    organic_soil.land_use_change = None
+                    organic_soil.save()
+                    luc.organic_soil = None
+                    luc.save()
+                organic_soil = organic_soil.delete()
+
+            for module_type in filter(lambda module: module.class_name != "OrganicSoil", all_builder_module_types):
+                module_type: ModuleType
+                ModuleClass = apps.get_model("api", module_type.class_name)
+                module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
+                if not module_instance:
+                    module_instance = self.create_module(module_type, in_luc=module_type in builder_luc_module_types, luc=luc, area=area)
+                else:
+                    if hasattr(module_instance, "area"):
+                        module_instance.area = area
+                    if hasattr(module_instance, "land_use_change") and module_instance.land_use_change is not None and module_instance.land_use_change.id != luc.id:
+                        module_instance.land_use_change = luc if module_type in builder_luc_module_types else None
+                    module_instance.save()
+
+                if (not luc or was_luc_removed) and organic_soil and module_type.is_luc:
+                    module_instance: LandModule
+                    module_instance.organic_soil = organic_soil
+                    module_instance.save()
+                else:
+                    module_instance.organic_soil = None
+                    module_instance.save()
+
+                module_types_to_append.append(module_type.id)
+
+            for module_type in removed_module_types:
+                ModuleClass = apps.get_model("api", module_type.class_name)
+                module_instance: Module = ModuleClass.objects.filter(activity=self.instance).first()
+                if module_instance:
+                    module_instance.land_use_change = None
+                    module_instance.organic_soil = None
+                    module_instance.save()
+                    module_instance.delete()
+                    if module_type.id in module_types_to_append:
+                        module_types_to_append.remove(module_type.id)
+
+            if organic_soil and create_organic_soil:
+                if luc:
+                    if organic_soil.land_use_change is not None and organic_soil.land_use_change.id != luc.id:
+                        organic_soil.land_use_change = luc
+                        organic_soil.save()
+                    luc.organic_soil = organic_soil
+                    luc.save()
+                organic_soil.area = area
+                organic_soil.save()
+                module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
 
             self.sanitize_input_entries()
 
-            self.instance.module_types.clear()
-            self.instance.module_types.add(*new_module_types)
+            self.instance.module_types.add(*module_types_to_append)
+            if (luc or was_luc_added) and not was_luc_removed:
+                self.instance.module_types.add(ModuleType.objects.get(class_name="LandUseChange").id)
+
             self.instance.save()
 
             return self.instance
-
         else:
             if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
                 self.validated_data["name"] = self.unique_activity_name()
@@ -1159,6 +1214,31 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         else:
             project.lock(self.context["request"].user)
 
+        # Validate climate/moisture/soil_type if module requires them
+        module_instance = self.instance or self.Meta.model(**{k: v for k, v in data.items() if k != "activity" and k != "parent"})
+        if hasattr(module_instance, "activity"):
+            module_instance.activity = activity
+
+        if self._module_requires_climate_moisture_soil_type(module_instance):
+            climate = activity.climate_t2 or project.climate
+            moisture = activity.moisture_t2 or project.moisture
+            soil_type = activity.soil_type_t2 or project.soil_type
+
+            missing_fields = []
+            if climate is None:
+                missing_fields.append("climate")
+            if moisture is None:
+                missing_fields.append("moisture")
+            if soil_type is None:
+                missing_fields.append("soil_type")
+
+            if missing_fields:
+                raise serializers.ValidationError(
+                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
+                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
+                    f"on the activity or {', '.join(missing_fields)} on the project."
+                )
+
         if project.is_archived:
             log.error("Modules belonging to archived projects cannot be modified")
             raise serializers.ValidationError("Modules belonging to archived projects cannot be modified")
@@ -1195,6 +1275,12 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
             self.validated_data["activity"].project.lock_updated_at = timezone.now()
             self.validated_data["activity"].project.save()
         return super().save(**kwargs)
+
+    def _module_requires_climate_moisture_soil_type(self, module):
+        """Check if module type requires climate/moisture/soil_type."""
+        from api.models import Module, Submodule
+
+        return isinstance(module, (Module, Submodule))
 
 
 class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
@@ -3208,10 +3294,33 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()
-            if self.instance.status.name != utils.InvitationStatus.PENDING.value and (new_status and new_status.name == utils.InvitationStatus.ACCEPTED.value):
+            if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (new_status and new_status.name_en == utils.InvitationStatus.ACCEPTED.value):
                 raise serializers.ValidationError("Cannot accept an invitation that is not pending")
 
         return data
+
+
+class ProjectInvitationAcceptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectInvitation
+        fields = ["status"]
+        ref_name = "ProjectInvitation"
+
+    def validate(self, data):
+        super().validate(data)
+
+        if uuid.UUID(self.context.get("token", None)) != self.instance.token:
+            raise serializers.ValidationError("Invalid token")
+
+        if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (data.get("status", None) and data.get("status", None).name_en == utils.InvitationStatus.ACCEPTED.value):
+            raise serializers.ValidationError("Cannot accept an invitation that is not pending")
+
+        return data
+
+    def save(self, **kwargs):
+        self.instance.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
+        self.instance.save()
+        return self.instance
 
 
 class NewNoteSerializer(serializers.ModelSerializer):
@@ -3757,13 +3866,16 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         # Get all assessments
         assessments = HandInHandAssessment.objects.select_related("country__region").order_by("country__region__name", "country__name", "year", "name")
 
+        # Get all countries to ensure we include those without assessments
+        all_countries = HandInHandCountry.objects.select_related("region").order_by("region__name", "name")
+
         # Group by region, then country, then year
         grouped_data = {}
 
-        for assessment in assessments:
-            region_name = assessment.country.region.name
-            country_name = assessment.country.name
-            year = assessment.year or "Unknown Year"
+        # First, initialize all countries with empty years structure
+        for country in all_countries:
+            region_name = country.region.name
+            country_name = country.name
 
             # Initialize region if not exists
             if region_name not in grouped_data:
@@ -3771,7 +3883,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
 
             # Initialize country if not exists
             if country_name not in grouped_data[region_name]["countries"]:
-                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": assessment.country.iso_code, "years": {}}
+                grouped_data[region_name]["countries"][country_name] = {"name": country_name, "iso_code": country.iso_code, "years": {}}
+
+        # Then, add assessments to their respective countries
+        for assessment in assessments:
+            region_name = assessment.country.region.name
+            country_name = assessment.country.name
+            year = assessment.year or "Unknown Year"
 
             # Initialize year if not exists
             if year not in grouped_data[region_name]["countries"][country_name]["years"]:

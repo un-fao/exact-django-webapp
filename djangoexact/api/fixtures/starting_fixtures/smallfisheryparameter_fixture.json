@@ -1,1 +1,0 @@
-[{"model": "api.smallfisheryparameter", "pk": 1, "fields": {"name": "lost_refrigerant_default", "value": 0.083, "unit": null}}, {"model": "api.smallfisheryparameter", "pk": 2, "fields": {"name": "tonnes_ice_default", "value": 2.8, "unit": null}}, {"model": "api.smallfisheryparameter", "pk": 3, "fields": {"name": "kw_tonnes", "value": 60.0, "unit": null}}]

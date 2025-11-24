@@ -30,6 +30,7 @@ the calculated emissions over time.
 import re
 import copy
 import json
+from django.core import exceptions
 import logging as log
 import math
 import statistics
@@ -322,10 +323,16 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     try:
         return ipcc.FLUData.objects.get(**filters)
     except ipcc.FLUData.DoesNotExist:
-        log.debug(f"FLUData for {[f'{v} {utils.snake_case_to_readable(k)}' for k, v in filters.items()]} does not exist")
-        pass
-
-    return SimpleNamespace(value=1)
+        class_lut = LandUseType.objects.filter(name=module.module_type.name).first()
+        if not class_lut:
+            log.debug(f"LandUseType for {module.module_type.name} does not exist")
+            return SimpleNamespace(value=1)
+        filters["land_use_type"] = class_lut
+        try:
+            return ipcc.FLUData.objects.get(**filters)
+        except ipcc.FLUData.DoesNotExist:
+            log.debug(f"FLUData for {[f'{v} {utils.snake_case_to_readable(k)}' for k, v in filters.items()]} does not exist")
+            return SimpleNamespace(value=1)
 
 
 def get_luc_modules(luc: LandUseChange) -> tuple[LandModule]:
@@ -541,12 +548,34 @@ class BaseCalculator(ABC):
         self.module: Module | Submodule = self.data
         self.area = getattr(self.module, "parent", getattr(self.module, "area", None))
 
-        self.climate: Climate = self.activity.climate_t2 or self.project.climate
-        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
-        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
+        self.climate: Climate = self._get_validated_climate()
+        self.moisture: Moisture = self._get_validated_moisture()
+        self.soil_type: SoilType = self._get_validated_soil_type()
+
         self.country: Country = getattr(self.module, "country_t2", None) if hasattr(self.module, "country_t2") and self.module.country_t2 is not None else self.project.country
         self.region: Region = self.project.country.region
         self.change_rate: ChangeRate = self.activity.change_rate
+
+    def _get_validated_climate(self) -> Climate:
+        """Get climate from activity or project, raising error if missing."""
+        climate = self.activity.climate_t2 or self.project.climate
+        if climate is None:
+            raise exceptions.ValidationError(f"Climate is required for calculations. Please set climate_t2 on activity '{self.activity.name}' or climate on project '{self.project.name}'.")
+        return climate
+
+    def _get_validated_moisture(self) -> Moisture:
+        """Get moisture from activity or project, raising error if missing."""
+        moisture = self.activity.moisture_t2 or self.project.moisture
+        if moisture is None:
+            raise exceptions.ValidationError(f"Moisture is required for calculations. Please set moisture_t2 on activity '{self.activity.name}' or moisture on project '{self.project.name}'.")
+        return moisture
+
+    def _get_validated_soil_type(self) -> SoilType:
+        """Get soil_type from activity or project, raising error if missing."""
+        soil_type = self.activity.soil_type_t2 or self.project.soil_type
+        if soil_type is None:
+            raise exceptions.ValidationError(f"Soil type is required for calculations. Please set soil_type_t2 on activity '{self.activity.name}' or soil_type on project '{self.project.name}'.")
+        return soil_type
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -678,7 +707,9 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if isinstance(self.module, SingleBiomassModule) and not isinstance(self.module, Settlement):  # TODO: Incorporate SettlementEF with relevant IPCC tables
+        if (
+            isinstance(self.module, BiomassModule) and not isinstance(self.module, Settlement) and not isinstance(self.module, ForestManagement)
+        ):  # TODO: Incorporate SettlementEF with relevant IPCC tables
             if self.module.is_start() and self.module.is_with():
                 self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
             if self.module.is_start() and self.module.is_without():
@@ -1400,12 +1431,6 @@ class AnnualCropCalculator(LandModuleCalculator):
             lut_start = module.land_use_type_start
             minor_lut_start = module.minor_land_use_type_start
 
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_start is None:
-                    raise Exception(f"CroplandFLU for {lut_start} in {climate} climate and {moisture} moisture does not exist")
-
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(
                 ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start} does not exist", method="get_or_grains"
@@ -1440,12 +1465,6 @@ class AnnualCropCalculator(LandModuleCalculator):
             lut_w = module.land_use_type_w
             minor_lut_w = module.minor_land_use_type_w
 
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_w is None:
-                    raise Exception(f"CroplandFLU for {lut_w} in {climate} climate and {moisture} moisture does not exist")
-
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
             self.n_estimation_factor_w = utils.get_or_raise(
                 ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w} does not exist", method="get_or_grains"
@@ -1479,12 +1498,6 @@ class AnnualCropCalculator(LandModuleCalculator):
         if module.is_without():
             lut_wo = module.land_use_type_wo
             minor_lut_wo = module.minor_land_use_type_wo
-
-            try:
-                self.flu = ipcc.CroplandFLU.objects.get(**cm, **long_term_cultivated_flt)
-            except ipcc.CroplandFLU.DoesNotExist:
-                if module.flu_t2_wo is None:
-                    raise Exception(f"CroplandFLU for {lut_wo} in {climate} climate and {moisture} moisture does not exist")
 
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo} does not exist")
             self.n_estimation_factor_wo = utils.get_or_raise(
@@ -1816,9 +1829,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.fires_combustion_factor_start: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
         self.fires_combustion_factor_w: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
         self.fires_combustion_factor_wo: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
-        self.agb_start_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
-        self.agb_w_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
-        self.agb_wo_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
+        self.agb_start_default: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = None
+        self.agb_rate_start_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
+        self.agb_rate_w_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
+        self.agb_rate_wo_default: ipcc.PerennialAGB = ipcc.PerennialAGB()
         self.agb_max_start_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_w_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
         self.agb_max_wo_default: ipcc.PerennialMaxAGB = ipcc.PerennialMaxAGB()
@@ -1842,9 +1856,11 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.soc_t2_w = getattr(self.module, "soc_t2_w", None) or self.parent.soc_t2_w
         self.soc_t2_wo = getattr(self.module, "soc_t2_wo", None) or self.parent.soc_t2_wo
 
+        self.agb_rate_t2_start = getattr(self.module, "agb_rate_t2_start", None) or self.parent.agb_rate_t2_start
+        self.agb_rate_t2_w = getattr(self.module, "agb_rate_t2_w", None) or self.parent.agb_rate_t2_w
+        self.agb_rate_t2_wo = getattr(self.module, "agb_rate_t2_wo", None) or self.parent.agb_rate_t2_wo
+
         self.agb_t2_start = getattr(self.module, "agb_t2_start", None) or self.parent.agb_t2_start
-        self.agb_t2_w = getattr(self.module, "agb_t2_w", None) or self.parent.agb_t2_w
-        self.agb_t2_wo = getattr(self.module, "agb_t2_wo", None) or self.parent.agb_t2_wo
 
         self.agb_max_t2_start = getattr(self.module, "agb_max_t2_start", None) or self.parent.agb_max_t2_start
         self.agb_max_t2_w = getattr(self.module, "agb_max_t2_w", None) or self.parent.agb_max_t2_w
@@ -1891,9 +1907,9 @@ class PerennialCropCalculator(LandModuleCalculator):
             )
 
             try:
-                self.agb_start_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
+                self.agb_rate_start_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_start is None:
+                if self.agb_rate_t2_start is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_start} in {self.climate} climate does not exist for start scenario. Please provide Tier 2 values.")
 
             try:
@@ -1914,9 +1930,9 @@ class PerennialCropCalculator(LandModuleCalculator):
             )
 
             try:
-                self.agb_w_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
+                self.agb_rate_w_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_w is None:
+                if self.agb_rate_t2_w is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_w} in {self.climate} climate does not exist for with scenario. Please provide Tier 2 values.")
 
             try:
@@ -1935,9 +1951,9 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {self.module.land_use_type_wo.name} does not exist")
 
             try:
-                self.agb_wo_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
+                self.agb_rate_wo_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.agb_t2_wo is None:
+                if self.agb_rate_t2_wo is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_wo} in {self.climate} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
@@ -2091,9 +2107,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.get_defaults()
 
         if self.module.is_start():
-            agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
-                self.agb_start_default,
-                self.agb_w_default,
+            self.agb_start_default, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
+                self.agb_rate_start_default,
+                self.agb_rate_w_default,
                 self.bgb_start_default,
                 self.bgb_w_default,
                 self.module.land_use_type_start != self.module.land_use_type_w if self.module.land_use_type_w is not None else False,
@@ -2117,8 +2133,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
                 "t_biomass_tier_2": self.residue_availability_t2_start,
-                "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.agb_t2_start,
+                "agb_rate_default": self.agb_rate_start_default.value,
+                "agb_rate_tier_2": self.agb_rate_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_start,
@@ -2140,10 +2156,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "delay": self.activity.delay,
-                "agb_start_default": agb_start.value,
+                "agb_start_default": self.agb_start_default.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": self.agb_t2_start,
+                "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2158,8 +2174,8 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_start_w.calculate_emissions()
 
             agb_start, agb_end, bgb_start, bgb_end = self._compute_biomass_for_maturity(
-                self.agb_start_default,
-                self.agb_wo_default,
+                self.agb_rate_start_default,
+                self.agb_rate_wo_default,
                 self.bgb_start_default,
                 self.bgb_wo_default,
                 self.module.land_use_type_start != self.module.land_use_type_wo if self.module.land_use_type_wo is not None else False,
@@ -2183,8 +2199,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
                 "t_biomass_tier_2": self.residue_availability_t2_start,
-                "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.agb_t2_start,
+                "agb_rate_default": self.agb_rate_start_default.value,
+                "agb_rate_tier_2": self.agb_rate_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_start,
@@ -2208,8 +2224,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": self.agb_t2_start,
+                "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2253,8 +2269,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_w,
                 "t_biomass_tier_2": self.residue_availability_t2_w,
-                "agb_rate_default": self.agb_w_default.value,
-                "agb_rate_tier_2": self.agb_t2_w,
+                "agb_rate_default": self.agb_rate_w_default.value,
+                "agb_rate_tier_2": self.agb_rate_t2_w,
                 "agb_maximum_c": self.agb_max_w_default.value,
                 "bgb_rate_default": self.bgb_w_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_w,
@@ -2279,8 +2295,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": self.agb_t2_start,
+                "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_w,
@@ -2322,8 +2338,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": self.fire_periodicity_t2_wo,
                 "t_biomass_tier_2": self.residue_availability_t2_wo,
-                "agb_rate_default": self.agb_wo_default.value,
-                "agb_rate_tier_2": self.agb_t2_wo,
+                "agb_rate_default": self.agb_rate_wo_default.value,
+                "agb_rate_tier_2": self.agb_rate_t2_wo,
                 "agb_maximum_c": self.agb_max_wo_default.value,
                 "bgb_rate_default": self.bgb_wo_default.value,
                 "bgb_rate_tier_2": self.bgb_t2_wo,
@@ -2348,8 +2364,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.module.agb_t2_start,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
-                "bgb_start_tier_2": self.module.bgb_t2_wo,  # NOTE: Lorenzo 2025/07/21: In LUC in cui Perennial != Start questi valori saranno sempre None, quindi self.module_start non ha senso
+                "agb_start_tier_2": self.agb_t2_start,
+                "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
                 "agb_end_tier_2": self.module.agb_t2_wo,
@@ -2877,7 +2893,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_ref": self.biomass.bgb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -2925,7 +2941,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_ref": self.biomass.bgb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -2976,7 +2992,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_w,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_ref": self.biomass.bgb_t_c_ha,
                 "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
@@ -3027,7 +3043,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_wo,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_ref": self.biomass.bgb_t_c_ha,
                 "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
@@ -3793,7 +3809,10 @@ class EnergyEntryCalculator(BaseCalculator):
 
         self.TRANSMISSION_LOSS = ApplicationParameter.objects.get(name="transmission_loss").value
         self.electricity_ef_default: ipcc.ElectricityEmission = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
+        self.electricity_ef_selected_start: DefaultValue = DefaultValue()
+        self.electricity_ef_selected_w: DefaultValue = DefaultValue()
+        self.electricity_ef_selected_wo: DefaultValue = DefaultValue()
 
         # Fuel Component
 
@@ -3812,9 +3831,9 @@ class EnergyEntryCalculator(BaseCalculator):
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
 
-        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
 
     def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
         try:
@@ -3867,9 +3886,20 @@ class EnergyEntryCalculator(BaseCalculator):
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
             if self.module.ef_source.name == "Operating Margin":
-                self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_start.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_w.value = self.electricity_ef_default.operating_margin
+                self.electricity_ef_selected_wo.value = self.electricity_ef_default.operating_margin
             else:
-                self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_start.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
+                self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
+
+            if self.module.fuel_type_start.name_en in ["Renewable"]:
+                self.electricity_ef_selected_start.value = 0
+            if self.module.fuel_type_w.name_en in ["Renewable"]:
+                self.electricity_ef_selected_w.value = 0
+            if self.module.fuel_type_wo.name_en in ["Renewable"]:
+                self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "electricity_ef_t2")
@@ -3914,7 +3944,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_start() and not self.is_fuel_start:
             log.debug("IS START - NO FUEL")
             self.inputs_start = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_start.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_start,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
@@ -3954,7 +3984,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_with() and not self.is_fuel_w:
             log.debug("IS WITH - NO FUEL")
             self.inputs_w = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_w.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
@@ -3994,7 +4024,7 @@ class EnergyEntryCalculator(BaseCalculator):
         elif self.module.is_without() and not self.is_fuel_wo:
             log.debug("IS WITHOUT - NO FUEL")
             self.inputs_wo = {
-                "emissions_factor": self.electricity_ef_selected.value,
+                "emissions_factor": self.electricity_ef_selected_wo.value,
                 "specific_factor_start": self.module.electricity_ef_t2_start,
                 "specific_factor_end": self.module.electricity_ef_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
@@ -4610,7 +4640,7 @@ class RoadCalculator(BaseCalculator):
             self.inputs_w = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_w,
-                "units_end": self.module.length_km_w * self.module.width_m_w,
+                "units_end": (self.module.length_km_w * 1000) * self.module.width_m_w,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
@@ -4624,7 +4654,7 @@ class RoadCalculator(BaseCalculator):
             self.inputs_wo = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_wo,
-                "units_end": self.module.length_km_wo * self.module.width_m_wo,
+                "units_end": (self.module.length_km_wo * 1000) * self.module.width_m_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
@@ -5810,19 +5840,19 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.ef_default_start.co2 = (
             self.energy_calculator_start.energy_ef_default_start.co2
             if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"]
-            else self.energy_calculator_start.electricity_ef_selected.value
+            else self.energy_calculator_start.electricity_ef_selected_start.value
         )
         self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_w.co2 = (
-            self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected.value
+            self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_w.electricity_ef_selected_w.value
         )
         self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en not in ["Renewable", "Electricity"] else 0
 
         self.ef_default_wo.co2 = (
-            self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected.value
+            self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else self.energy_calculator_wo.electricity_ef_selected_wo.value
         )
         self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
         self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en not in ["Renewable", "Electricity"] else 0
@@ -6659,9 +6689,9 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_w = MathOrganicSoil(**self.organic_soil_inputs_w)
         self.organic_soil_math_w.calculate_emissions()
 
-        if input.peat_area_start is not None and input.peat_area_w is not None:
+        if input.peat_area_w is not None:
             self.peat_extraction_inputs_w = {
-                "hectares_start": input.peat_area_start,
+                "hectares_start": input.peat_area_start if input.peat_area_start is not None else 0,
                 "hectares_end": input.peat_area_w,
                 "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
                 "percentage_ditches_end": input.peat_ditches_area_w if input.peat_ditches_area_w is not None else 0,
@@ -6757,9 +6787,9 @@ class OrganicSoilCalculator(BaseCalculator):
         self.organic_soil_math_wo = MathOrganicSoil(**self.organic_soil_inputs_wo)
         self.organic_soil_math_wo.calculate_emissions()
 
-        if input.peat_area_start is not None and input.peat_area_wo is not None:
+        if input.peat_area_wo is not None:
             self.peat_extraction_inputs_wo = {
-                "hectares_start": input.peat_area_start,
+                "hectares_start": input.peat_area_start if input.peat_area_start is not None else 0,
                 "hectares_end": input.peat_area_wo,
                 "percentage_ditches_start": input.peat_ditches_area_start if input.peat_ditches_area_start is not None else 0,
                 "percentage_ditches_end": input.peat_ditches_area_wo if input.peat_ditches_area_wo is not None else 0,
@@ -6807,20 +6837,19 @@ class OrganicSoilCalculator(BaseCalculator):
             self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         )
 
-        if input.peat_area_start:
+        if input.peat_area_w is not None:
             self.peat_extraction_results_w = (
                 self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
             )
+            self.results_w += self.peat_extraction_results_w
+        if input.peat_area_wo is not None:
             self.peat_extraction_results_wo = (
                 self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
             )
+            self.results_wo += self.peat_extraction_results_wo
 
-            self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
-            self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
-
-        else:
-            self.results_w += self.organic_soil_results_w
-            self.results_wo += self.organic_soil_results_wo
+        self.results_w += self.organic_soil_results_w
+        self.results_wo += self.organic_soil_results_wo
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -6897,7 +6926,7 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         if calculate:
             self.calculate()
-            self.bgb_max_start = self.math_start_w.max_bgb_value if self.math_start_w else self.math_start_wo.max_bgb_value if self.math_start_wo else 0
+            self.bgb_max_start = self.math_start.max_bgb_value if self.math_start else 0
             self.bgb_max_w = self.math_w.max_bgb_value if self.math_w else 0
             self.bgb_max_wo = self.math_wo.max_bgb_value if self.math_wo else 0
 
@@ -7218,15 +7247,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "soc_end_tier_2": self.soc_t2_start,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_start.value,
-                "fmg_start_tier_2": self.forest.fmg_t2_start,
+                "fmg_start_tier_2": self.module_start.fmg_t2_start,
                 "fmg_end_tier_2": self.forest.fmg_t2_start,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_start.value,
-                "flu_start_tier_2": self.forest.flu_t2_start,
+                "flu_start_tier_2": self.module_start.flu_t2_start,
                 "flu_end_tier_2": self.forest.flu_t2_start,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_start.value,
-                "fi_start_tier_2": self.forest.fi_t2_start,
+                "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.forest.fi_t2_start,
                 "ef_methane": self.project.gwp.ch4,
                 "ef_nitrous": self.project.gwp.n2o,
@@ -7300,15 +7329,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
-                "fmg_start_tier_2": self.forest.fmg_t2_start,
+                "fmg_start_tier_2": self.module_start.fmg_t2_start,
                 "fmg_end_tier_2": self.forest.fmg_t2_w,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_w.value,
-                "flu_start_tier_2": self.forest.flu_t2_start,
+                "flu_start_tier_2": self.module_start.flu_t2_start,
                 "flu_end_tier_2": self.forest.flu_t2_w,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_w.value,
-                "fi_start_tier_2": self.forest.fi_t2_start,
+                "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.forest.fi_t2_w,
                 "ef_methane": self.project.gwp.ch4,
                 "ef_nitrous": self.project.gwp.n2o,
@@ -7380,15 +7409,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
-                "fmg_start_tier_2": self.forest.fmg_t2_start,
+                "fmg_start_tier_2": self.module_start.fmg_t2_start,
                 "fmg_end_tier_2": self.forest.fmg_t2_wo,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_wo.value,
-                "flu_start_tier_2": self.forest.flu_t2_start,
+                "flu_start_tier_2": self.module_start.flu_t2_start,
                 "flu_end_tier_2": self.forest.flu_t2_wo,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_wo.value,
-                "fi_start_tier_2": self.forest.fi_t2_start,
+                "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.forest.fi_t2_wo,
                 "ef_methane": self.project.gwp.ch4,
                 "ef_nitrous": self.project.gwp.n2o,
@@ -7419,7 +7448,7 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.results_w.plot_emissions_and_aggregate_by_activity("forest_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
-        results_tuple = (self.results_w, self.results_wo)
+        results_tuple = (self.results_start + self.results_w, self.results_start + self.results_wo)
 
         return results_tuple
 
@@ -7989,13 +8018,6 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         super().__init__(input)
 
         self.module: ProcessingEntry
-
-        self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
-
-        self.electricity_ef_default = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
 
         self.methane_constant_start = self.project.gwp.ch4
         self.methane_constant_w = self.project.gwp.ch4

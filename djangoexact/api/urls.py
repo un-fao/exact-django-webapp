@@ -187,6 +187,7 @@ router.register(r"hih-assessments", views.HandInHandAssessmentViewSet, basename=
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     path("health/", views.APIHealthView.as_view(), name="api-health"),
+    path("minitool/process/", views.MinitoolProcessingView.as_view(), name="minitool-process"),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),

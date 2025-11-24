@@ -141,7 +141,9 @@ class ForestManagement(BaseModule):
         # Hectares at each year of the project
         self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         # Hectares which have reached and have not 20 years of maturity, necessary for soil emissions
-        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(
+            self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type
+        )
 
         # these two have to be set to absolute values, as if hectares_start > hectares_end, the matrix will have negative values
         self.hectares_matrix = compute_yearly_cumulative_matrix(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
@@ -180,28 +182,92 @@ class ForestManagement(BaseModule):
 
         if self.agb_start == 0:
             # This is the case of afforestation, as we don't have any AGB or BGB at the start
-            agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_under_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool)
+            agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(
+                self.implementation_time, self.capitalization_time, self.agb_yearly_growth_under_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool
+            )
             if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
-                bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_under_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence, affo_bool)
+                bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.bgb_yearly_growth_under_20_tier_2,
+                    self.bgb_yearly_growth_over_20_tier_2,
+                    self.bgb_start,
+                    self.rotation_recurrence,
+                    affo_bool,
+                )
             else:
-                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time)
+                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(
+                    agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time
+                )
 
         else:
             # NOTE: THIS MEANS WE ARE IN FOREST REMAINING FOREST
             # THE ONLY DIFFERENCE BETWEEN THE TWO CASES IS THAT WE DON'T UTILIZE YEARLY GROWTH UNDER 20, BUT ALWAYS OVER 20 AS THE FOREST WAS ALREADY EXISTING. SAME FOR BGB
             if not self.is_same_forest_type:
-                agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool)
+                agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(
+                    self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool
+                )
                 if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
-                    bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_over_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence, affo_bool)
+                    bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
+                        self.implementation_time,
+                        self.capitalization_time,
+                        self.bgb_yearly_growth_over_20_tier_2,
+                        self.bgb_yearly_growth_over_20_tier_2,
+                        self.bgb_start,
+                        self.rotation_recurrence,
+                        affo_bool,
+                    )
                 else:
-                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type)
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(
+                        agb_matrix,
+                        delta_agb_matrix,
+                        self.bgb_ratio_under_threshold,
+                        self.bgb_ratio_over_threshold,
+                        self.bgb_ratio_threshold,
+                        self.bgb_start,
+                        self.implementation_time,
+                        affo_bool,
+                        self.is_same_forest_type,
+                    )
             else:
                 # NOTE: This means we have the same forest type, hence we don't have to create a new agb and bgb matrix, but we can use the one from the previous forest module
-                agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool, self.is_same_forest_type, self.forest_start)
+                agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.agb_yearly_growth_over_20,
+                    self.agb_yearly_growth_over_20,
+                    self.agb_start,
+                    self.rotation_recurrence,
+                    affo_bool,
+                    self.is_same_forest_type,
+                    self.forest_start,
+                )
                 if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
-                    bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_over_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence, affo_bool, self.is_same_forest_type, self.forest_start, is_agb=False)
+                    bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
+                        self.implementation_time,
+                        self.capitalization_time,
+                        self.bgb_yearly_growth_over_20_tier_2,
+                        self.bgb_yearly_growth_over_20_tier_2,
+                        self.bgb_start,
+                        self.rotation_recurrence,
+                        affo_bool,
+                        self.is_same_forest_type,
+                        self.forest_start,
+                        is_agb=False,
+                    )
                 else:
-                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type, self.forest_start)
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(
+                        agb_matrix,
+                        delta_agb_matrix,
+                        self.bgb_ratio_under_threshold,
+                        self.bgb_ratio_over_threshold,
+                        self.bgb_ratio_threshold,
+                        self.bgb_start,
+                        self.implementation_time,
+                        affo_bool,
+                        self.is_same_forest_type,
+                        self.forest_start,
+                    )
 
         self.agb_matrix = agb_matrix
         self.bgb_matrix = bgb_matrix
@@ -220,24 +286,78 @@ class ForestManagement(BaseModule):
                 # NOTE: No emissions for Rotation are generated in the START scenario, new practices are applied. Even though the matrix is not null,
                 # the hectares are null, hence no emissions are generated. The check on affo_bool means it's not the start scenario, no rotation in start
                 if self.affo_bool:
-                    result_rotation_agb, rotation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_rotation_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year)
-                    result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_rotation_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year)
+                    result_rotation_agb, rotation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_rotation_effect(
+                        self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year
+                    )
+                    result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_rotation_effect(
+                        self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year
+                    )
 
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_for_rot_log_dis)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                    (hwp_rotation_agb, hwp_rotation_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb) = breakdown_agb_bgb_emissions(
-                        rotation_times_hectares_agb, rotation_times_hectares_bgb, self.rotation_percentage_energy, self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor, self.ef_nitrous, self.ef_methane
+                    (
+                        hwp_rotation_agb,
+                        hwp_rotation_bgb,
+                        nitrous_fire_component_agb,
+                        methane_fire_component_agb,
+                        nitrous_fire_component_bgb,
+                        methane_fire_component_bgb,
+                        co2_fire_component_agb,
+                        co2_fire_component_bgb,
+                    ) = breakdown_agb_bgb_emissions(
+                        rotation_times_hectares_agb,
+                        rotation_times_hectares_bgb,
+                        self.rotation_percentage_energy,
+                        self.forest_cf,
+                        self.forest_gef_ch4,
+                        self.forest_gef_n2o,
+                        self.forest_gef_co2,
+                        self.mangrove_factor,
+                        self.ef_nitrous,
+                        self.ef_methane,
                     )
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
 
                     # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                     self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
@@ -248,54 +368,165 @@ class ForestManagement(BaseModule):
 
         def calculate_disturbance_or_logging():
             try:
-                # CALCULATION FOR DISTURBANCE
-                for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, self.disturbance_percentage_fire, self.disturbance_year_of_start):
-                    if recurrence == 0:
-                        # NOTE: If the recurrence is 0, it means that there is no disturbance, hence we skip the calculation. This should not happen, the front-end and back-end should send None
-                        continue
-                    # NOTE: As logging and disturbance are the same, we can use the same function, however as we can see from above the percentage_fire is set to 0 for disturbance, as everything is lost and not burnt
-                    result_disturbance_agb, logging_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, recurrence, start_year, percentage)
-                    result_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, recurrence, start_year, percentage)
+                if self.disturbance_recurrence:
+                    # CALCULATION FOR DISTURBANCE
+                    for recurrence, percentage, percentage_fire, start_year in zip(
+                        self.disturbance_recurrence, self.disturbance_percentage, self.disturbance_percentage_fire, self.disturbance_year_of_start
+                    ):
+                        if recurrence == 0:
+                            # NOTE: If the recurrence is 0, it means that there is no disturbance, hence we skip the calculation. This should not happen, the front-end and back-end should send None
+                            continue
+                        # NOTE: As logging and disturbance are the same, we can use the same function, however as we can see from above the percentage_fire is set to 0 for disturbance, as everything is lost and not burnt
+                        result_disturbance_agb, logging_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(
+                            self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, recurrence, start_year, percentage
+                        )
+                        result_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(
+                            self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, recurrence, start_year, percentage
+                        )
 
-                    disturbance_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_for_rot_log_dis)
-                    disturbance_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_for_rot_log_dis)
+                        disturbance_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_for_rot_log_dis)
+                        disturbance_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                    (agb_disturbance_component, bgb_disturbance_component, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb) = breakdown_agb_bgb_emissions(
-                        disturbance_times_hectares_agb, disturbance_times_hectares_bgb, percentage_fire, self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor, self.ef_nitrous, self.ef_methane
-                    )
+                        (
+                            agb_disturbance_component,
+                            bgb_disturbance_component,
+                            nitrous_fire_component_agb,
+                            methane_fire_component_agb,
+                            nitrous_fire_component_bgb,
+                            methane_fire_component_bgb,
+                            co2_fire_component_agb,
+                            co2_fire_component_bgb,
+                        ) = breakdown_agb_bgb_emissions(
+                            disturbance_times_hectares_agb,
+                            disturbance_times_hectares_bgb,
+                            percentage_fire,
+                            self.forest_cf,
+                            self.forest_gef_ch4,
+                            self.forest_gef_n2o,
+                            self.forest_gef_co2,
+                            self.mangrove_factor,
+                            self.ef_nitrous,
+                            self.ef_methane,
+                        )
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_disturbance_component], activity=ActivityTypes.DISTURBANCE_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_disturbance_component], activity=ActivityTypes.DISTURBANCE_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay))
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_disturbance_component], activity=ActivityTypes.DISTURBANCE_AGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_disturbance_component], activity=ActivityTypes.DISTURBANCE_BGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.DISTURBANCE_FIRE_AGB, delay=self.delay
+                            )
+                        )
+                        self.result.yearly_emissions_by_sector_by_gas.append(
+                            YearlyGasActivityEmissionSet(
+                                year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay
+                            )
+                        )
 
-                    # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
-                    self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
+                        # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
+                        self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
 
                 if self.logging_recurrence:
                     # CALCULATION FOR LOGGING
-                    result_logging_agb, logging_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.logging_recurrence, self.logging_year_of_start, self.logging_percentage)
-                    result_logging_bgb, logging_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.logging_recurrence, self.logging_year_of_start, self.logging_percentage)
+                    result_logging_agb, logging_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(
+                        self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.logging_recurrence, self.logging_year_of_start, self.logging_percentage
+                    )
+                    result_logging_bgb, logging_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(
+                        self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.logging_recurrence, self.logging_year_of_start, self.logging_percentage
+                    )
 
                     logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_for_rot_log_dis)
                     logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                    (hwp_logging_agb, hwp_logging_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb) = breakdown_agb_bgb_emissions(
-                        logging_times_hectares_agb, logging_times_hectares_bgb, self.logging_percentage_energy, self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor, self.ef_nitrous, self.ef_methane
+                    (
+                        hwp_logging_agb,
+                        hwp_logging_bgb,
+                        nitrous_fire_component_agb,
+                        methane_fire_component_agb,
+                        nitrous_fire_component_bgb,
+                        methane_fire_component_bgb,
+                        co2_fire_component_agb,
+                        co2_fire_component_bgb,
+                    ) = breakdown_agb_bgb_emissions(
+                        logging_times_hectares_agb,
+                        logging_times_hectares_bgb,
+                        self.logging_percentage_energy,
+                        self.forest_cf,
+                        self.forest_gef_ch4,
+                        self.forest_gef_n2o,
+                        self.forest_gef_co2,
+                        self.mangrove_factor,
+                        self.ef_nitrous,
+                        self.ef_methane,
                     )
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_logging_agb], activity=ActivityTypes.HWP_LOGGING_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_logging_bgb], activity=ActivityTypes.HWP_LOGGING_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_logging_agb], activity=ActivityTypes.HWP_LOGGING_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_logging_bgb], activity=ActivityTypes.HWP_LOGGING_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.LOGGING_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.LOGGING_BGB, delay=self.delay
+                        )
+                    )
 
                     # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                     self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
@@ -306,8 +537,12 @@ class ForestManagement(BaseModule):
 
         def calculate_degradation():
             try:
-                result_degradation_agb, degradation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, 1, 0, self.degradation_percentage, is_degradation=True)
-                result_degradation_bgb, degradation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, 1, 0, self.degradation_percentage, is_degradation=True)
+                result_degradation_agb, degradation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_logging_effect(
+                    self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, 1, 0, self.degradation_percentage, is_degradation=True
+                )
+                result_degradation_bgb, degradation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_logging_effect(
+                    self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, 1, 0, self.degradation_percentage, is_degradation=True
+                )
 
                 degradation_times_hectares_agb = multiply_matrix_by_matrix(degradation_matrix_agb, self.hectares_for_rot_log_dis)
                 degradation_times_hectares_bgb = multiply_matrix_by_matrix(degradation_matrix_bgb, self.hectares_for_rot_log_dis)
@@ -315,8 +550,16 @@ class ForestManagement(BaseModule):
                 degradation_agb_emissions = [x * -44 / 12 for x in degradation_times_hectares_agb]
                 degradation_bgb_emissions = [x * -44 / 12 for x in degradation_times_hectares_bgb]
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_agb_emissions], activity=ActivityTypes.DEGRADATION_AGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_bgb_emissions], activity=ActivityTypes.DEGRADATION_BGB, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_agb_emissions], activity=ActivityTypes.DEGRADATION_AGB, delay=self.delay
+                    )
+                )
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_bgb_emissions], activity=ActivityTypes.DEGRADATION_BGB, delay=self.delay
+                    )
+                )
 
                 # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                 self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
@@ -339,8 +582,16 @@ class ForestManagement(BaseModule):
                 bgb_times_hectares = multiply_matrix_by_matrix(self.delta_bgb_matrix, self.hectares_matrix)
                 yearly_bgb_emissions = [x * -44 / 12 for x in bgb_times_hectares]
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_agb_emissions], activity=ActivityTypes.AGB_GROWTH, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_bgb_emissions], activity=ActivityTypes.BGB_GROWTH, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_agb_emissions], activity=ActivityTypes.AGB_GROWTH, delay=self.delay
+                    )
+                )
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_bgb_emissions], activity=ActivityTypes.BGB_GROWTH, delay=self.delay
+                    )
+                )
 
             except Exception as e:
                 traceback.print_exc()
@@ -352,18 +603,30 @@ class ForestManagement(BaseModule):
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
-                    result_litter, degradation_litter_matrix, delta_litter_matrix, litter_matrix = calculate_logging_effect(litter_matrix, delta_litter_matrix, self.litter_max, 1, 0, self.degradation_percentage, is_degradation=True)
+                    result_litter, degradation_litter_matrix, delta_litter_matrix, litter_matrix = calculate_logging_effect(
+                        litter_matrix, delta_litter_matrix, self.litter_max, 1, 0, self.degradation_percentage, is_degradation=True
+                    )
 
                     degradation_times_hectares_litter = multiply_matrix_by_matrix(degradation_litter_matrix, self.hectares_for_rot_log_dis)
                     degradation_litter_yearly_emissions = [x * -44 / 12 for x in degradation_times_hectares_litter]
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_litter_yearly_emissions], activity=ActivityTypes.DEGRADATION_LITTER, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0,
+                            gas_type=GasTypes.CO2,
+                            emissions=[Emission(e, GasTypes.CO2) for e in degradation_litter_yearly_emissions],
+                            activity=ActivityTypes.DEGRADATION_LITTER,
+                            delay=self.delay,
+                        )
+                    )
 
                 litter_matrix, delta_litter_matrix = check_agb_matrices(litter_matrix, delta_litter_matrix, self.litter_max)
 
                 yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_litter_emissions], activity=ActivityTypes.LITTER, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_litter_emissions], activity=ActivityTypes.LITTER, delay=self.delay)
+                )
 
             except Exception as e:
                 traceback.print_exc()
@@ -371,22 +634,38 @@ class ForestManagement(BaseModule):
 
         def calculate_deadwood():
             try:
-                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
+                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(
+                    self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max
+                )
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
-                    result_deadwood, degradation_deadwood_matrix, delta_deadwood_matrix, deadwood_matrix = calculate_logging_effect(deadwood_matrix, delta_deadwood_matrix, self.deadwood_max, 1, 0, self.degradation_percentage, is_degradation=True)
+                    result_deadwood, degradation_deadwood_matrix, delta_deadwood_matrix, deadwood_matrix = calculate_logging_effect(
+                        deadwood_matrix, delta_deadwood_matrix, self.deadwood_max, 1, 0, self.degradation_percentage, is_degradation=True
+                    )
 
                     degradation_times_hectares_deadwood = multiply_matrix_by_matrix(degradation_deadwood_matrix, self.hectares_for_rot_log_dis)
                     degradation_deadwood_litter_emissions = [x * -44 / 12 for x in degradation_times_hectares_deadwood]
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_deadwood_litter_emissions], activity=ActivityTypes.DEGRADATION_DEADWOOD, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0,
+                            gas_type=GasTypes.CO2,
+                            emissions=[Emission(e, GasTypes.CO2) for e in degradation_deadwood_litter_emissions],
+                            activity=ActivityTypes.DEGRADATION_DEADWOOD,
+                            delay=self.delay,
+                        )
+                    )
 
                 deadwood_matrix, delta_deadwood_matrix = check_agb_matrices(deadwood_matrix, delta_deadwood_matrix, self.deadwood_max)
 
                 yearly_deadwood_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_deadwood_emissions], activity=ActivityTypes.DEADWOOD, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_deadwood_emissions], activity=ActivityTypes.DEADWOOD, delay=self.delay
+                    )
+                )
 
             except Exception as e:
                 traceback.print_exc()
@@ -417,8 +696,8 @@ class ForestManagement(BaseModule):
         if self.rotation_recurrence:
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
-        # NOTE: This is done to fix a problem of communication between front-end and back-end. Absense of disturbance should not be seen as 0, but as None. This is a temporary fix, as we should not have this problem in the future. 
-        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0 ):
+        # NOTE: This is done to fix a problem of communication between front-end and back-end. Absense of disturbance should not be seen as 0, but as None. This is a temporary fix, as we should not have this problem in the future.
+        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0):
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None

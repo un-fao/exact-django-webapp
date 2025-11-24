@@ -1,0 +1,344 @@
+[
+{
+  "model": "api.fueltype",
+  "pk": 31,
+  "fields": {
+    "name": "Peat",
+    "name_en": "Peat",
+    "name_fr": null,
+    "name_es": "Turba",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 2,
+    "unit": 159,
+    "module_types": [
+      59
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 30,
+  "fields": {
+    "name": "Wood",
+    "name_en": "Wood",
+    "name_fr": null,
+    "name_es": "Leña",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 2,
+    "unit": 158,
+    "module_types": [
+      59
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 36,
+  "fields": {
+    "name": "Renewable",
+    "name_en": "Renewable",
+    "name_fr": null,
+    "name_es": "Solar",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": null,
+    "unit": 161,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 35,
+  "fields": {
+    "name": "Electricity",
+    "name_en": "Electricity",
+    "name_fr": null,
+    "name_es": "Electricidad",
+    "name_ru": null,
+    "parent_fuel_type": 2,
+    "fuel_use_type": 1,
+    "macro_fuel_type": null,
+    "unit": 157,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 24,
+  "fields": {
+    "name": "LPG",
+    "name_en": "LPG",
+    "name_fr": null,
+    "name_es": "GLP",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 1,
+    "unit": 155,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 23,
+  "fields": {
+    "name": "Natural Gas",
+    "name_en": "Natural Gas",
+    "name_fr": null,
+    "name_es": "Gas Natural",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 1,
+    "unit": 162,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 22,
+  "fields": {
+    "name": "Gasoil/Diesel Oil",
+    "name_en": "Gasoil/Diesel Oil",
+    "name_fr": null,
+    "name_es": "Gasóleo",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 1,
+    "unit": 156,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 44,
+  "fields": {
+    "name": "Natural Gas",
+    "name_en": "Natural Gas",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 162,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 43,
+  "fields": {
+    "name": "LPG",
+    "name_en": "LPG",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 155,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 41,
+  "fields": {
+    "name": "Gasoil/Diesel Oil",
+    "name_en": "Gasoil/Diesel Oil",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 156,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 40,
+  "fields": {
+    "name": "Motor Gasoline",
+    "name_en": "Motor Gasoline",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 152,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 49,
+  "fields": {
+    "name": "Gasoline (4-stroke)",
+    "name_en": "Gasoline (4-stroke)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 3,
+    "macro_fuel_type": null,
+    "unit": 166,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 48,
+  "fields": {
+    "name": "Gasoline (2-stroke)",
+    "name_en": "Gasoline (2-stroke)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 3,
+    "macro_fuel_type": null,
+    "unit": 167,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 47,
+  "fields": {
+    "name": "Diesel",
+    "name_en": "Diesel",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 3,
+    "macro_fuel_type": null,
+    "unit": 165,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 46,
+  "fields": {
+    "name": "Ethanol (Trucks)",
+    "name_en": "Ethanol (Trucks)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 164,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 45,
+  "fields": {
+    "name": "Ethanol (Cars)",
+    "name_en": "Ethanol (Cars)",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 2,
+    "macro_fuel_type": null,
+    "unit": 163,
+    "module_types": [
+      60
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 21,
+  "fields": {
+    "name": "Motor Gasoline",
+    "name_en": "Motor Gasoline",
+    "name_fr": null,
+    "name_es": "Motor de Gasolina",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 1,
+    "unit": 152,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 18,
+  "fields": {
+    "name": "Waste Oil/Lubricants",
+    "name_en": "Waste Oil/Lubricants",
+    "name_fr": null,
+    "name_es": "Aceite Usado/ Lubricante",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 1,
+    "unit": 153,
+    "module_types": [
+      37
+    ]
+  }
+},
+{
+  "model": "api.fueltype",
+  "pk": 32,
+  "fields": {
+    "name": "Charcoal",
+    "name_en": "Charcoal",
+    "name_fr": null,
+    "name_es": "Carbón Vegetal",
+    "name_ru": null,
+    "parent_fuel_type": 1,
+    "fuel_use_type": 1,
+    "macro_fuel_type": 2,
+    "unit": 160,
+    "module_types": [
+      59
+    ]
+  }
+}
+]

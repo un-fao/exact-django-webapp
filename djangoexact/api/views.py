@@ -17,6 +17,8 @@ from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import permissions, viewsets, views
 from rest_framework import status as http_status
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -121,6 +123,7 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ModuleTypeIdModuleIdSerializer,
+    ProjectInvitationAcceptSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -288,8 +291,22 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return self.queryset
         return self.queryset.filter(pk=self.request.user.pk)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         self.serializer_class = UserWriteSerializer
+        user = self.get_object()
+        old_email = user.email
+        new_email = request.data.get("email")
+
+        if new_email and user.firebase_uid:
+            normalized_email = new_email.casefold().strip()
+            if normalized_email != old_email:
+                try:
+                    firebase_admin_auth.update_user(user.firebase_uid, email=normalized_email, email_verified=False)
+                except Exception as e:
+                    logging.error(f"Failed to update Firebase email for user {user.pk}: {e}")
+                    raise ValidationError(f"Failed to update email in authentication system: {str(e)}")
+
         return super().update(request, *args, **kwargs)
 
     @transaction.atomic
@@ -641,19 +658,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        if not project.is_ready():
+        selected_activities = request.query_params.get("activities", "").split(",")
+        if selected_activities == [""]:
+            selected_activities = None
+        else:
+            selected_activities = project.activities.filter(pk__in=selected_activities)
+
+        if not project.is_ready(selected_activities):
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         if request.query_params.get("template", None):
             response = self.template(request, pk=pk)
             return response
-
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
-            selected_activities = None
-        else:
-            selected_activities = project.activities.filter(pk__in=selected_activities)
 
         try:
             report = reports.BaseProjectReport(project, activities=selected_activities)
@@ -782,7 +799,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectFileReadSerializer(project.attachments.all(), many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(method="get", responses={200: ProjectLockHolderInformationSerializer})
+    @swagger_auto_schema(method="post", responses={200: ProjectLockHolderInformationSerializer, 409: "Project is already locked by another user"})
+    @action(detail=True, methods=["get", "post"])
     def lock(self, request, pk=None):
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
@@ -791,6 +810,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         project._check_lock_expiration()
 
+        if request.method == "POST":
+            if project.is_locked and project.locked_by != request.user and not request.user.is_superuser:
+                return utils.ErrorResponse("Project is already locked by another user", status=http_status.HTTP_409_CONFLICT)
+
+            project.lock(request.user)
+
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
@@ -798,12 +823,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(responses={200: ProjectLockHolderInformationSerializer, 403: "Only superusers can unlock projects"})
     def unlock(self, request, pk=None):
         project: Project = self.get_object()
-        if not request.user.is_superuser and project.locked_by != request.user:
-            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
 
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
+
+        if project.is_locked and not request.user.is_superuser and project.locked_by != request.user:
+            return utils.ErrorResponse("Only superusers and the project lock holder can unlock projects", status=http_status.HTTP_403_FORBIDDEN)
 
         project.unlock()
 
@@ -1710,7 +1736,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logger.warning(f"Invitation already {new_status.name}")
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
-        if new_status.name == utils.InvitationStatus.ACCEPTED.value:
+        does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
+        if new_status.name == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
             ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
@@ -1767,23 +1794,13 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
     def accept(self, request, token=None):
-        if not token:
-            return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if not utils.validate_uuid(token):
-            return utils.ErrorResponse("Invalid token", status=http_status.HTTP_400_BAD_REQUEST)
-
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
 
-        serializer = ProjectInvitationWriteSerializer(data=request.data, instance=invitation, partial=True)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+        serializer = ProjectInvitationAcceptSerializer(data=request.data, instance=invitation, partial=True, context={"token": token})
+        serializer.is_valid(raise_exception=True)
 
-        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
-
+        invitation = serializer.save()
         ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
-
-        invitation.save()
 
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
@@ -1840,7 +1857,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
 
-        serializer = WriteActivitySerializer(data=request.data)
+        serializer = WriteActivitySerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         error = security.check_permission("add_activity", self.request.user, serializer.validated_data["project"])
@@ -1887,12 +1904,14 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
         modules = self.request.query_params.get("modules", False)
+        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
             return error
 
         activities_list = Activity.objects.filter(project__id=project_id)
+        activities_list = activities_list.filter(is_b_intact=is_b_intact)
 
         SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
 
@@ -2743,7 +2762,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to edit the project", status=http_status.HTTP_403_FORBIDDEN)
 
         client = storage.Client()
-        bucket = client.bucket("fao-exact-review-uploads")
+        bucket = client.bucket(settings.STORAGE_BUCKET)
         blob = bucket.blob(f"projects/{attachment.project.id}/{attachment.name}")
 
         blob.delete()
@@ -2916,3 +2935,140 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
             cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
 
         return Response(response_data)
+
+
+class MinitoolProcessingView(APIView):
+    """
+    API endpoint for running minitool processing locally
+    Replicates the functionality of the GCP Cloud Function
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Check if user is staff
+        if not request.user.is_staff:
+            return Response({"error": "Access denied. Staff privileges required."}, status=http_status.HTTP_403_FORBIDDEN)
+
+        # # Check for additional password
+        # password = request.data.get("password")
+        # if not password:
+        #     return Response({"error": "Additional password required for minitool processing"}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        # minitool_password = os.getenv("MINITOOL_API_PASSWORD", "default_password_change_me")
+        # if password != minitool_password:
+        #     return Response({"error": "Invalid password"}, status=http_status.HTTP_401_UNAUTHORIZED)
+
+        # Validate request data
+        is_valid, message, config = self._validate_request_data(request.data)
+        if not is_valid:
+            return Response({"error": message}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        # Run minitool processing
+        try:
+            from django.core.management import call_command
+            from django.core.management.base import CommandError
+            from io import StringIO
+
+            output = StringIO()
+            call_command("compute_minitool", stdout=output)
+            results = output.getvalue()
+            return Response({"status": "success", "message": "Processing completed successfully", "results": results})
+        except CommandError as e:
+            return Response({"error": f"Processing failed: {e}"}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.error(f"Minitool processing error: {str(e)}")
+            return Response({"error": f"Processing failed: {str(e)}"}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _validate_request_data(self, request_data):
+        """Validate and sanitize request data"""
+        if not request_data:
+            return False, "No data provided", {}
+
+        # Extract and validate parameters
+        config = {"modules": {}, "performance": {}}
+
+        # Module configuration
+        valid_modules = ["annual_cropland", "flooded_rice", "grassland", "livestock", "perennial_cropland", "forest_management", "small_fishery", "large_fishery"]
+
+        modules_config = request_data.get("modules", {})
+        if isinstance(modules_config, dict):
+            for module in valid_modules:
+                config["modules"][module] = modules_config.get(module, False)
+        else:
+            # Legacy support: single module name
+            module_name = request_data.get("module_name", "small_fishery")
+            if module_name in valid_modules:
+                config["modules"][module_name] = True
+
+        # Performance configuration
+        config["performance"] = {
+            "max_rows": min(int(request_data.get("max_rows", 10000)), 100000),  # Cap at 100k
+            "max_workers": min(int(request_data.get("max_workers", 4)), 16) if request_data.get("max_workers") else None,
+            "chunk_size": min(int(request_data.get("chunk_size", 10000)), 50000),  # Cap at 50k
+        }
+
+        return True, "Valid request", config
+
+    def _run_minitool_processing(self, config):
+        """Run minitool processing with the provided configuration"""
+        import sys
+        import os
+        import tempfile
+        import yaml
+        from pathlib import Path
+
+        # Add scripts directory to path
+        scripts_dir = Path(settings.BASE_DIR) / "scripts"
+        sys.path.insert(0, str(scripts_dir))
+
+        try:
+            # Import minitool components
+            import api.minitool as minitool
+            import api.models as models
+
+            # Initialize components
+            data_builder_registry = minitool.ModuleDataBuilderRegistry()
+            processor_registry = minitool.ProcessorRegistry(data_builder_registry)
+            data_manager = minitool.DataManager()
+            permutation_computer = minitool.PermutationComputer(processor_registry)
+
+            # Load configuration
+            config_loader = minitool.ConfigurationLoader()
+            loaded_config = config_loader.load_config(local=True)
+
+            # Extract configuration
+            runtime_config = {**loaded_config["modules"], **loaded_config["performance"]}
+
+            results_summary = {"processed_modules": [], "total_records": 0, "total_errors": 0, "files_created": []}
+
+            # Process enabled modules
+            for module_name, module_config in minitool.MODULE_CONFIGS.items():
+                if runtime_config.get(module_config["config_name"], False):
+                    try:
+                        model_class = getattr(models, module_name)
+                        data, errors = permutation_computer.compute_permutations(
+                            module_config["fields"],
+                            model_class,
+                            chunk_size=runtime_config["chunk_size"],
+                            stop_at=runtime_config["max_rows"],
+                            max_workers=runtime_config["max_workers"],
+                        )
+
+                        if data or errors:
+                            data_manager.save_data(data, errors, module_name)
+
+                            results_summary["processed_modules"].append(module_name)
+                            results_summary["total_records"] += len(data)
+                            results_summary["total_errors"] += len(errors)
+                            results_summary["files_created"].extend([f"minitool/{module_name.lower()}.csv", f"minitool/{module_name.lower()}_errors.csv"])
+
+                    except Exception as e:
+                        logger.error(f"Error processing {module_name}: {str(e)}")
+                        results_summary["total_errors"] += 1
+
+            return results_summary
+
+        except Exception as e:
+            logger.error(f"Critical error in minitool execution: {str(e)}")
+            raise

@@ -641,6 +641,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         log.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         is_summary = request.query_params.get("summary", False)
+        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
 
         if is_summary:
             self.serializer_class = public_serializers.PublicActivitySummarySerializer
@@ -649,7 +650,8 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
             activity_dict = self.serializer_class(activity).data
             return activity_dict
 
-        activities_list = api_models.Activity.objects.filter(project__id=project_id, project__is_public=True).all()
+        activities_list = api_models.Activity.objects.filter(project__id=project_id, project__is_public=True)
+        activities_list = activities_list.filter(is_b_intact=is_b_intact)
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)

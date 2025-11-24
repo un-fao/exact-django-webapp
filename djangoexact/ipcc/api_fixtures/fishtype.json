@@ -1,0 +1,255 @@
+[
+{
+  "model": "api.fishtype",
+  "pk": 4,
+  "fields": {
+    "name": "Abalones, Winkles And Conchs",
+    "name_en": "Abalones, Winkles And Conchs",
+    "name_fr": null,
+    "name_es": "Abulones, Caracolas y Conchas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 5,
+  "fields": {
+    "name": "Clams, Cockles And Arkshells",
+    "name_en": "Clams, Cockles And Arkshells",
+    "name_fr": null,
+    "name_es": "Almejas, Berberechos y Árcidos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 6,
+  "fields": {
+    "name": "Cods, Hakes And Haddocks",
+    "name_en": "Cods, Hakes And Haddocks",
+    "name_fr": null,
+    "name_es": "Bacalaos, Merluzas Y Eglefino",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 7,
+  "fields": {
+    "name": "Flounders, Halibuts And Soles",
+    "name_en": "Flounders, Halibuts And Soles",
+    "name_fr": null,
+    "name_es": "Lenguados y Halibut",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 8,
+  "fields": {
+    "name": "Herrings, Sardines And Anchovies",
+    "name_en": "Herrings, Sardines And Anchovies",
+    "name_fr": null,
+    "name_es": "Arenques, Sardinas y Anchoas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 9,
+  "fields": {
+    "name": "Jacks, Mullets And Sauries",
+    "name_en": "Jacks, Mullets And Sauries",
+    "name_fr": null,
+    "name_es": "Jurel, Salmonetes y Papardas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 10,
+  "fields": {
+    "name": "Krill And Plankton",
+    "name_en": "Krill And Plankton",
+    "name_fr": null,
+    "name_es": "Kril y Plancton",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 12,
+  "fields": {
+    "name": "Mackerels, Snoeks And Cutlassfish",
+    "name_en": "Mackerels, Snoeks And Cutlassfish",
+    "name_fr": null,
+    "name_es": "Caballa, Barracuda  y Papardas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 13,
+  "fields": {
+    "name": "Miscellaneous Marine Crustaceans",
+    "name_en": "Miscellaneous Marine Crustaceans",
+    "name_fr": null,
+    "name_es": "Varios crustáceos marinos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 14,
+  "fields": {
+    "name": "Miscellaneous Marine Fishes",
+    "name_en": "Miscellaneous Marine Fishes",
+    "name_fr": null,
+    "name_es": "Peces marinos varios",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 15,
+  "fields": {
+    "name": "Miscellaneous Marine Molluscs",
+    "name_en": "Miscellaneous Marine Molluscs",
+    "name_fr": null,
+    "name_es": "Varios moluscos marinos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 16,
+  "fields": {
+    "name": "Mussels",
+    "name_en": "Mussels",
+    "name_fr": null,
+    "name_es": "Mejillones",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 17,
+  "fields": {
+    "name": "Redfish, Basses And Congers",
+    "name_en": "Redfish, Basses And Congers",
+    "name_fr": null,
+    "name_es": "Gallineta, Lubinas y Congrios",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 18,
+  "fields": {
+    "name": "Salmons, Trots And Smelts",
+    "name_en": "Salmons, Trots And Smelts",
+    "name_fr": null,
+    "name_es": "Salmones, Truchas y Capellanes ",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 19,
+  "fields": {
+    "name": "Scallops And Pectens",
+    "name_en": "Scallops And Pectens",
+    "name_fr": null,
+    "name_es": "Vieiras y Pecten",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 21,
+  "fields": {
+    "name": "Shads",
+    "name_en": "Shads",
+    "name_fr": null,
+    "name_es": "Sábalos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 22,
+  "fields": {
+    "name": "Sharks And Rays",
+    "name_en": "Sharks And Rays",
+    "name_fr": null,
+    "name_es": "Tiburones y Rayas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 23,
+  "fields": {
+    "name": "Shrimps And Prawns",
+    "name_en": "Shrimps And Prawns",
+    "name_fr": null,
+    "name_es": "Gambas y Camarones",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 24,
+  "fields": {
+    "name": "Squat Lobsters",
+    "name_en": "Squat Lobsters",
+    "name_fr": null,
+    "name_es": "Langosta rechoncha",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 25,
+  "fields": {
+    "name": "Squids, Cuttlefish And Octopuses",
+    "name_en": "Squids, Cuttlefish And Octopuses",
+    "name_fr": null,
+    "name_es": "Calamares, Sepias Y Pulpos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 26,
+  "fields": {
+    "name": "Tunas, Bonitos And Billfishes",
+    "name_en": "Tunas, Bonitos And Billfishes",
+    "name_fr": null,
+    "name_es": "Atunes, Bonitos Y Picudos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 28,
+  "fields": {
+    "name": "Lobsters And Spiny-rock Lobsters",
+    "name_en": "Lobsters And Spiny-rock Lobsters",
+    "name_fr": null,
+    "name_es": "Langostas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.fishtype",
+  "pk": 29,
+  "fields": {
+    "name": "Sea-spiders And Crabs",
+    "name_en": "Sea-spiders And Crabs",
+    "name_fr": null,
+    "name_es": "Arañas marinas y cangrejos",
+    "name_ru": null
+  }
+}
+]

@@ -3842,45 +3842,48 @@ for i, row in df.iterrows():
         bgb_t_c_ha=bgb_t_c_ha,
     )
 
-log.debug("Deleting all ForestCombustionFactor objects...")
-ForestCombustionFactor.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["gef_co2"])
-    ch4 = parse_csv_number(row["gef_ch4"])
-    n2o = parse_csv_number(row["gef_n2o"])
-    value = parse_csv_number(row["value"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.create(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
 """
+
+
+def delete_and_import_forest_combustion_factor():
+    log.debug("Deleting all ForestCombustionFactor objects...")
+    ForestCombustionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+        header=[0],
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+        co2 = parse_csv_number(row["gef_co2"])
+        ch4 = parse_csv_number(row["gef_ch4"])
+        n2o = parse_csv_number(row["gef_n2o"])
+        value = parse_csv_number(row["value"])
+
+        print(
+            land_use_type,
+            climate,
+            forest_type,
+            co2,
+            ch4,
+            n2o,
+            value,
+        )
+
+        ForestCombustionFactor.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            forest_type=forest_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+            value=value,
+        )
 
 
 def delete_and_import_litter_deadwood_carbon_stock():
@@ -4079,12 +4082,6 @@ def delete_and_import_forest_management_agb():
                         # Primary forest plantations are not possible
                         continue
 
-                    if type.name == "Plantation":
-                        agb_min = agb_range_min_plantation
-                        agb_max = agb_range_max_plantation
-                        agb_growth_min = agb_growth_min_plantation
-                        agb_growth_max = agb_growth_max_plantation
-
                     print(
                         land_use_type,
                         region,
@@ -4095,24 +4092,42 @@ def delete_and_import_forest_management_agb():
                         agb_range_max,
                         agb_growth_min,
                         agb_growth_max,
-                        agb_range_min_plantation,
-                        agb_range_max_plantation,
-                        agb_growth_min_plantation,
-                        agb_growth_max_plantation,
                     )
 
-                    ForestManagementAGB.objects.create(
-                        land_use_type=land_use_type,
-                        region=region,
-                        climate=climate,
-                        forest_condition_type=forest_condition_type,
-                        from_year=from_year,
-                        forest_type=type,
-                        agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
-                        agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
-                        agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
-                        agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
-                    )
+                    if type.name == "Plantation":
+                        if agb_range_min_plantation is None or agb_range_max_plantation is None or agb_growth_min_plantation is None or agb_growth_max_plantation is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
+                    else:
+                        if agb_range_min is None or agb_range_max is None or agb_growth_min is None or agb_growth_max is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
 
 
 def import_irrigation_system_types():
@@ -4415,7 +4430,19 @@ def delete_and_import_total_biomass_after_defo():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                TotalBiomassAfterDefo.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
+                    print(f"Processing {crop} {climate} {moisture} {region} {value}")
                     print(
                         crop,
                         climate,
@@ -4479,7 +4506,21 @@ def delete_and_import_forest_total_biomass():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                ForestTotalBiomass.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
+                    if crop.name == "Default":
+                        continue
+
                     print(f"{crop}, {climate}, {moisture}, {region}, {value}")
 
                     ForestTotalBiomass.objects.create(
@@ -5029,6 +5070,9 @@ def run():
 
     if app_mode == "development":
         # TODO: Run in development
+        delete_and_import_forest_management_agb()
+        # delete_and_import_forest_total_biomass()
+        # delete_and_import_forest_combustion_factor()
         pass
 
     if app_mode == "test":

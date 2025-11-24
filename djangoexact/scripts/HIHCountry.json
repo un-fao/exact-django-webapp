@@ -1,0 +1,152 @@
+[
+    {
+        "name": "Angola",
+        "code": "AO",
+        "region": "Africa"
+    },
+    {
+        "name": "Burundi",
+        "code": "BI",
+        "region": "Africa"
+    },
+    {
+        "name": "Cabo Verde",
+        "code": "CV",
+        "region": "Africa"
+    },
+    {
+        "name": "Chad",
+        "code": "TD",
+        "region": "Africa"
+    },
+    {
+        "name": "Djibouti",
+        "code": "DJ",
+        "region": "Africa"
+    },
+    {
+        "name": "Eritrea",
+        "code": "ER",
+        "region": "Africa"
+    },
+    {
+        "name": "Ethiopia",
+        "code": "ET",
+        "region": "Africa"
+    },
+    {
+        "name": "Gambia",
+        "code": "GM",
+        "region": "Africa"
+    },
+    {
+        "name": "Somalia",
+        "code": "SO",
+        "region": "Africa"
+    },
+    {
+        "name": "South Sudan",
+        "code": "SS",
+        "region": "Africa"
+    },
+    {
+        "name": "Uganda",
+        "code": "UG",
+        "region": "Africa"
+    },
+    {
+        "name": "Zambia",
+        "code": "ZM",
+        "region": "Africa"
+    },
+    {
+        "name": "Bangladesh",
+        "code": "BD",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Lao People's Democratic Republic",
+        "code": "LA",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Mongolia",
+        "code": "MN",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Nepal",
+        "code": "NP",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Philippines",
+        "code": "PH",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Papua New Guinea",
+        "code": "PG",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Tuvalu",
+        "code": "TV",
+        "region": "Asia and the Pacific"
+    },
+    {
+        "name": "Tajikistan",
+        "code": "TJ",
+        "region": "Europe and Central Asia"
+    },
+    {
+        "name": "Bolivia",
+        "code": "BO",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Colombia",
+        "code": "CO",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Dominican Republic",
+        "code": "DO",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "El Salvador",
+        "code": "SV",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Guatemala",
+        "code": "GT",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Mexico",
+        "code": "MX",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Paraguay",
+        "code": "PY",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Peru",
+        "code": "PE",
+        "region": "Latin America and the Caribbean"
+    },
+    {
+        "name": "Iraq",
+        "code": "IQ",
+        "region": "Near East and North Africa"
+    },
+    {
+        "name": "Mauritania",
+        "code": "MR",
+        "region": "Near East and North Africa"
+    }
+]
