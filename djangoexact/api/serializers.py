@@ -2961,21 +2961,13 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipReadSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    group = GroupSerializer(many=False, read_only=True)
-
     class Meta:
         model = ProjectMembership
-        fields = "__all__"
+        fields = ["project", "user", "group"]
         ref_name = "ProjectMembership"
 
 
 class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-
     class Meta:
         model = ProjectNotificationPreference
         fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
