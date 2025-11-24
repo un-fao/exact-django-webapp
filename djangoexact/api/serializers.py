@@ -411,10 +411,10 @@ class ReadProjectSerializer(serializers.ModelSerializer):
 
 
 class WriteProjectSerializer(serializers.ModelSerializer):
-    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True, write_only=True)
+    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=False, allow_null=True, write_only=True)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True, write_only=True)
-    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True, write_only=True)
-    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True, write_only=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False, allow_null=True, write_only=True)
+    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
 
     class Meta:
@@ -764,11 +764,38 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return luc
 
     def create_modules(self, activity, luc, has_organic_soil, has_luc_module):
-        for module_type in activity.module_types.all():
+        from api.models import Module, Submodule
+
+        project = activity.project
+
+        module_types = activity.module_types.all()
+
+        if any(issubclass(module_type.class_name, (Module, Submodule)) for module_type in module_types):
+            climate = activity.climate_t2 or project.climate
+            moisture = activity.moisture_t2 or project.moisture
+            soil_type = activity.soil_type_t2 or project.soil_type
+
+            missing_fields = []
+            if climate is None:
+                missing_fields.append("climate")
+            if moisture is None:
+                missing_fields.append("moisture")
+            if soil_type is None:
+                missing_fields.append("soil_type")
+
+            if missing_fields:
+                raise serializers.ValidationError(
+                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
+                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
+                    f"on the activity or {', '.join(missing_fields)} on the project."
+                )
+
+        for module_type in module_types:
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
                 continue
 
             ModuleClass = apps.get_model("api", module_type.class_name)
+
             if module_type.is_luc:
                 module_instance = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
                 if has_organic_soil and not has_luc_module:
@@ -1182,6 +1209,31 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         else:
             project.lock(self.context["request"].user)
 
+        # Validate climate/moisture/soil_type if module requires them
+        module_instance = self.instance or self.Meta.model(**{k: v for k, v in data.items() if k != "activity" and k != "parent"})
+        if hasattr(module_instance, "activity"):
+            module_instance.activity = activity
+
+        if self._module_requires_climate_moisture_soil_type(module_instance):
+            climate = activity.climate_t2 or project.climate
+            moisture = activity.moisture_t2 or project.moisture
+            soil_type = activity.soil_type_t2 or project.soil_type
+
+            missing_fields = []
+            if climate is None:
+                missing_fields.append("climate")
+            if moisture is None:
+                missing_fields.append("moisture")
+            if soil_type is None:
+                missing_fields.append("soil_type")
+
+            if missing_fields:
+                raise serializers.ValidationError(
+                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
+                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
+                    f"on the activity or {', '.join(missing_fields)} on the project."
+                )
+
         if project.is_archived:
             log.error("Modules belonging to archived projects cannot be modified")
             raise serializers.ValidationError("Modules belonging to archived projects cannot be modified")
@@ -1218,6 +1270,12 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
             self.validated_data["activity"].project.lock_updated_at = timezone.now()
             self.validated_data["activity"].project.save()
         return super().save(**kwargs)
+
+    def _module_requires_climate_moisture_soil_type(self, module):
+        """Check if module type requires climate/moisture/soil_type."""
+        from api.models import Module, Submodule
+
+        return isinstance(module, (Module, Submodule))
 
 
 class BaseSubmoduleSerializer(BaseGenericModuleSerializer):

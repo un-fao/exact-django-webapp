@@ -30,6 +30,7 @@ the calculated emissions over time.
 import re
 import copy
 import json
+from django.core import exceptions
 import logging as log
 import math
 import statistics
@@ -547,12 +548,34 @@ class BaseCalculator(ABC):
         self.module: Module | Submodule = self.data
         self.area = getattr(self.module, "parent", getattr(self.module, "area", None))
 
-        self.climate: Climate = self.activity.climate_t2 or self.project.climate
-        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
-        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
+        self.climate: Climate = self._get_validated_climate()
+        self.moisture: Moisture = self._get_validated_moisture()
+        self.soil_type: SoilType = self._get_validated_soil_type()
+
         self.country: Country = getattr(self.module, "country_t2", None) if hasattr(self.module, "country_t2") and self.module.country_t2 is not None else self.project.country
         self.region: Region = self.project.country.region
         self.change_rate: ChangeRate = self.activity.change_rate
+
+    def _get_validated_climate(self) -> Climate:
+        """Get climate from activity or project, raising error if missing."""
+        climate = self.activity.climate_t2 or self.project.climate
+        if climate is None:
+            raise exceptions.ValidationError(f"Climate is required for calculations. Please set climate_t2 on activity '{self.activity.name}' or climate on project '{self.project.name}'.")
+        return climate
+
+    def _get_validated_moisture(self) -> Moisture:
+        """Get moisture from activity or project, raising error if missing."""
+        moisture = self.activity.moisture_t2 or self.project.moisture
+        if moisture is None:
+            raise exceptions.ValidationError(f"Moisture is required for calculations. Please set moisture_t2 on activity '{self.activity.name}' or moisture on project '{self.project.name}'.")
+        return moisture
+
+    def _get_validated_soil_type(self) -> SoilType:
+        """Get soil_type from activity or project, raising error if missing."""
+        soil_type = self.activity.soil_type_t2 or self.project.soil_type
+        if soil_type is None:
+            raise exceptions.ValidationError(f"Soil type is required for calculations. Please set soil_type_t2 on activity '{self.activity.name}' or soil_type on project '{self.project.name}'.")
+        return soil_type
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
