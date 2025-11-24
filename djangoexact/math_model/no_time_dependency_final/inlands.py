@@ -153,8 +153,8 @@ class AnnexedModule(BaseModule):
                     ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
                     ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1,  self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1,  self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
@@ -201,8 +201,8 @@ class AnnexedModule(BaseModule):
                     ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
                     ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
@@ -229,7 +229,7 @@ class AnnexedModule(BaseModule):
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=self.delay)
-                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=self.delay)
