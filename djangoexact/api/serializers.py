@@ -561,6 +561,10 @@ class ModuleTypeIdModuleIdSerializer(serializers.Serializer):
     module_type = serializers.PrimaryKeyRelatedField(read_only=True)
     id = serializers.IntegerField(read_only=True)
     endpoint_url = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.status.pk if obj.status else None
 
     def get_endpoint_url(self, obj):
         """
