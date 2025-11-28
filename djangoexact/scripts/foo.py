@@ -502,6 +502,33 @@ def check_how_many_users_logged_in_last_time_period_have_been_forest_management_
     return users_last_time_period_with_forest_management_activities
 
 
+def get_projects_with_forest_management_activities():
+    projects = models.Project.objects.filter(activities__module_types__name__icontains="Forest Management").distinct()
+    return projects
+
+
+def get_users_with_projects_with_forest_management_activities():
+    users = models.CustomUser.objects.filter(projects__activities__module_types__name__icontains="Forest Management").distinct()
+    return users
+
+
+def get_forest_management_modules_in_plantation_projects():
+    """
+    Get the number of forest management modules in activities in projects with forest type 'Plantation'
+    """
+    projects = get_projects_with_forest_management_activities()
+    forests = models.ForestManagement.objects.filter(activity__project__in=projects, forest_condition_type__name__iexact="Secondary")
+    print(f"Forest management modules in secondary forests or plantation projects: {forests.count()}")
+
+    # How many of them have users that logged in last 90 days?
+    users_last_90_days = check_how_many_users_logged_in_last_month(time_period=90)
+    print(f"Active users last 90 days: {users_last_90_days.count()}")
+    forests_with_users_last_90_days = forests.filter(activity__project__members__user__in=users_last_90_days).distinct("activity__project__members__user")
+    print(f"Active users with Forest management modules in secondary forests or plantations in the last 90 days: {forests_with_users_last_90_days.count()}")
+
+    return forests
+
+
 def run():
     import os
 
@@ -513,6 +540,7 @@ def run():
         # cycle_all_modules_and_invalidate_cached_results()
         # import_input_types_units()
         # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
+        get_forest_management_modules_in_plantation_projects()
         pass
 
     if app_mode == "review":
