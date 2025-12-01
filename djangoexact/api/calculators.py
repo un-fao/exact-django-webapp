@@ -7223,9 +7223,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "max_agb_value_tier_2": self.forest.agb_max_t2_start,
                 "max_bgb_value_default": self.bgb_max_start,
                 "max_bgb_value_tier_2": self.forest.bgb_max_t2_start,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else [],
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else [],
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else [],
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else None,
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else None,
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
                 else [],
@@ -7305,9 +7305,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "max_agb_value_tier_2": self.forest.agb_max_t2_w,
                 "max_bgb_value_default": self.bgb_max_w,
                 "max_bgb_value_tier_2": self.forest.bgb_max_t2_w,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else [],
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else [],
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else [],
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else None,
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else None,
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
                 else [],
@@ -7385,9 +7385,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "max_agb_value_tier_2": self.forest.agb_max_t2_wo,
                 "max_bgb_value_default": self.bgb_max_wo,
                 "max_bgb_value_tier_2": self.forest.bgb_max_t2_wo,
-                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else [],
-                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else [],
-                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else [],
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else None,
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else None,
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
                 else [],
