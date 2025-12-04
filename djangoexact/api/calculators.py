@@ -747,6 +747,18 @@ class LandUseChangeCalculator(BaseCalculator):
             missing_modules = ["Start" if not module_start else "With" if not module_w else "Without" for module in [module_start, module_w, module_wo] if not module].join(", ")
             raise Exception(f"LandUseChange module must have a start with and without module. Missing {missing_modules} module(s).")
 
+        # BUG: Some modules don't have land_use_change set. Likely an issue in ActivityBuilderSerializer
+        # WORKAROUND: Sanitizes any bugged missing land_use_change, making sure all modules are properly set
+        if not module_start.land_use_change:
+            module_start.land_use_change = luc
+            module_start.save()
+        if not module_w.land_use_change:
+            module_w.land_use_change = luc
+            module_w.save()
+        if not module_wo.land_use_change:
+            module_wo.land_use_change = luc
+            module_wo.save()
+
         self.results_w, self.results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
 
         return (self.results_w, self.results_wo)
