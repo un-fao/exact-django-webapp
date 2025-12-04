@@ -1,3 +1,9 @@
+## 1.18.3a0 (2025-12-04)
+
+### Fix
+
+- **calculators**: add a workaround that sanitizes any modules with missing land_use_change references due to bug in ActivityBuilderSerializer
+
 ## 1.18.3 (2025-11-21)
 
 ### Feat
