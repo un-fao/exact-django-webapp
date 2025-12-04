@@ -496,7 +496,7 @@ RIVERBANK_RESTORATION_1 = {
 
 WETLAND_HYDROLOGICAL_RESTORATION_1 = {
     "AnnualCropland": {
-        "filename": "wetland_hydrological_restoration_1_annual_cropland",
+        "filename": "wetland_hydrological_restoration_1__annual_cropland",
         "fields": {
             "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
             "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default"])),
@@ -509,7 +509,7 @@ WETLAND_HYDROLOGICAL_RESTORATION_1 = {
         },
     },
     "OrganicSoil": {
-        "filename": "wetland_hydrological_restoration_1_organic_soil",
+        "filename": "wetland_hydrological_restoration_1__organic_soil",
         "fields": {
             "drainage_area_start": [1],
             "drainage_area_w": [0],
@@ -521,14 +521,14 @@ WETLAND_HYDROLOGICAL_RESTORATION_1 = {
 
 WETLAND_HYDROLOGICAL_RESTORATION_2 = {
     "Grassland": {
-        "filename": "wetland_hydrological_restoration_2_grassland",
+        "filename": "wetland_hydrological_restoration_2__grassland",
         "fields": {
             "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
             "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
         },
     },
     "OrganicSoil": {
-        "filename": "wetland_hydrological_restoration_2_organic_soil",
+        "filename": "wetland_hydrological_restoration_2__organic_soil",
         "fields": {
             "drainage_area_start": [1],
             "drainage_area_w": [0],

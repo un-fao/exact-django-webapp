@@ -716,10 +716,7 @@ def run(clear: bool = False):
                     return Q(**{field_name: str(value)})
 
             change_q = (
-                Q(
-                    module_type=module_type,
-                    field=change["start"]["field"],
-                )
+                Q(module_type=module_type, field=change["start"]["field"])
                 & create_flexible_value_query("from_value", change["start"]["value"])
                 & create_flexible_value_query("to_value", change["end"]["value"])
             )
@@ -760,12 +757,18 @@ def run(clear: bool = False):
                         filter_q |= Q(**{f"custom_filters__{filter_key}": val}) | Q(**{f"csv_row_data__{filter_key}": val})
                     change_q &= filter_q
 
-            # for filter_key, filter_value in csv_row_filters.items():
-            #     filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
-            #     csv_filter_q = Q()
-            #     for val in filter_values:
-            #         csv_filter_q |= Q(**{f"csv_row_data__{filter_key}": val})
-            #     change_q &= csv_filter_q
+            for filter_key, filter_value in csv_row_filters.items():
+                if filter_key in ["module_start_type", "module_w_type"]:
+                    continue
+
+                filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+                csv_filter_q = Q()
+
+                prefix = "module_w_" if "w" in filter_key else "module_start_" if "start" in filter_key else ""
+
+                for val in filter_values:
+                    csv_filter_q |= Q(**{f"csv_row_data__{prefix}{filter_key}": val})
+                change_q &= csv_filter_q
 
             q_objects |= change_q
 

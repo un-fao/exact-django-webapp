@@ -222,6 +222,403 @@ class BaseData:
         }
 
 
+# =============================================================================
+# MODULE INPUT DATACLASSES
+# =============================================================================
+
+
+@dataclass
+class EnvironmentContext:
+    """Environmental context shared by all modules"""
+
+    climate: Any = None
+    moisture: Any = None
+    soil_type: Any = None
+    region: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "EnvironmentContext":
+        return cls(
+            climate=data.get("climate"),
+            moisture=data.get("moisture"),
+            soil_type=data.get("soil_type"),
+            region=data.get("region"),
+        )
+
+    def to_tuple(self) -> Tuple:
+        return ((self.climate, self.moisture), self.soil_type, self.region)
+
+
+@dataclass
+class ModuleInput(ABC):
+    """Base class for all module inputs. Provides composable, type-safe input handling."""
+
+    env: EnvironmentContext = None
+
+    def __post_init__(self):
+        if self.env is None:
+            self.env = EnvironmentContext()
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "ModuleInput":
+        """Create input from dictionary. Override in subclasses."""
+        pass
+
+    @property
+    def climate(self) -> Any:
+        return self.env.climate
+
+    @property
+    def moisture(self) -> Any:
+        return self.env.moisture
+
+    @property
+    def soil_type(self) -> Any:
+        return self.env.soil_type
+
+    @property
+    def region(self) -> Any:
+        return self.env.region
+
+
+@dataclass
+class GrasslandInput(ModuleInput):
+    grassland_management_type_start: Any = None
+    grassland_management_type_w: Any = None
+    is_fire_used_start: Any = None
+    is_fire_used_w: Any = None
+    fire_periodicity_start: Any = None
+    fire_periodicity_w: Any = None
+    fire_impact_start: Any = None
+    fire_impact_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "GrasslandInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            grassland_management_type_start=data.get("grassland_management_type_start"),
+            grassland_management_type_w=data.get("grassland_management_type_w"),
+            is_fire_used_start=data.get("is_fire_used_start"),
+            is_fire_used_w=data.get("is_fire_used_w"),
+            fire_periodicity_start=data.get("fire_periodicity_start"),
+            fire_periodicity_w=data.get("fire_periodicity_w"),
+            fire_impact_start=data.get("fire_impact_start"),
+            fire_impact_w=data.get("fire_impact_w"),
+        )
+
+
+@dataclass
+class LivestockInput(ModuleInput):
+    livestock_category_type: Any = None
+    livestock_production_type_start: Any = None
+    livestock_production_type_w: Any = None
+    heads_number_start: Any = None
+    heads_number_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "LivestockInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            livestock_category_type=data.get("livestock_category_type"),
+            livestock_production_type_start=data.get("livestock_production_type_start"),
+            livestock_production_type_w=data.get("livestock_production_type_w"),
+            heads_number_start=data.get("heads_number_start"),
+            heads_number_w=data.get("heads_number_w"),
+        )
+
+
+@dataclass
+class AnnualCroplandInput(ModuleInput):
+    land_use_type_start: Any = None
+    land_use_type_w: Any = None
+    tillage_management_type_start: Any = None
+    tillage_management_type_w: Any = None
+    organic_input_type_start: Any = None
+    organic_input_type_w: Any = None
+    residue_management_type_start: Any = None
+    residue_management_type_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "AnnualCroplandInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            land_use_type_start=data.get("land_use_type_start"),
+            land_use_type_w=data.get("land_use_type_w"),
+            tillage_management_type_start=data.get("tillage_management_type_start"),
+            tillage_management_type_w=data.get("tillage_management_type_w"),
+            organic_input_type_start=data.get("organic_input_type_start"),
+            organic_input_type_w=data.get("organic_input_type_w"),
+            residue_management_type_start=data.get("residue_management_type_start"),
+            residue_management_type_w=data.get("residue_management_type_w"),
+        )
+
+
+@dataclass
+class FloodedRiceInput(ModuleInput):
+    water_management_type_before_cultivation_start: Any = None
+    water_management_type_before_cultivation_w: Any = None
+    water_management_type_after_cultivation_start: Any = None
+    water_management_type_after_cultivation_w: Any = None
+    organic_amendment_type_start: Any = None
+    organic_amendment_type_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "FloodedRiceInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            water_management_type_before_cultivation_start=data.get("water_management_type_before_cultivation_start"),
+            water_management_type_before_cultivation_w=data.get("water_management_type_before_cultivation_w"),
+            water_management_type_after_cultivation_start=data.get("water_management_type_after_cultivation_start"),
+            water_management_type_after_cultivation_w=data.get("water_management_type_after_cultivation_w"),
+            organic_amendment_type_start=data.get("organic_amendment_type_start"),
+            organic_amendment_type_w=data.get("organic_amendment_type_w"),
+        )
+
+
+@dataclass
+class PerennialCroplandInput(ModuleInput):
+    land_use_type_start: Any = None
+    land_use_type_w: Any = None
+    organic_input_type_start: Any = None
+    organic_input_type_w: Any = None
+    tillage_management_type_start: Any = None
+    tillage_management_type_w: Any = None
+    is_biomass_burned_start: Any = None
+    is_biomass_burned_w: Any = None
+    fire_periodicity_t2_start: Any = None
+    fire_periodicity_t2_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "PerennialCroplandInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            land_use_type_start=data.get("land_use_type_start"),
+            land_use_type_w=data.get("land_use_type_w"),
+            organic_input_type_start=data.get("organic_input_type_start"),
+            organic_input_type_w=data.get("organic_input_type_w"),
+            tillage_management_type_start=data.get("tillage_management_type_start"),
+            tillage_management_type_w=data.get("tillage_management_type_w"),
+            is_biomass_burned_start=data.get("is_biomass_burned_start"),
+            is_biomass_burned_w=data.get("is_biomass_burned_w"),
+            fire_periodicity_t2_start=data.get("fire_periodicity_t2_start"),
+            fire_periodicity_t2_w=data.get("fire_periodicity_t2_w"),
+        )
+
+
+@dataclass
+class ForestManagementInput(ModuleInput):
+    land_use_type: Any = None
+    forest_type: Any = None
+    forest_condition_type: Any = None
+    average_yearly_degradation_percentage_start: Any = None
+    average_yearly_degradation_percentage_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "ForestManagementInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            land_use_type=data.get("land_use_type"),
+            forest_type=data.get("forest_type"),
+            forest_condition_type=data.get("forest_condition_type"),
+            average_yearly_degradation_percentage_start=data.get("average_yearly_degradation_percentage_start"),
+            average_yearly_degradation_percentage_w=data.get("average_yearly_degradation_percentage_w"),
+        )
+
+
+@dataclass
+class SmallFisheryInput(ModuleInput):
+    gear_type_start: Any = None
+    gear_type_w: Any = None
+    fishery_type: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "SmallFisheryInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            gear_type_start=data.get("gear_type_start"),
+            gear_type_w=data.get("gear_type_w"),
+            fishery_type=data.get("fishery_type"),
+        )
+
+
+@dataclass
+class LargeFisheryInput(ModuleInput):
+    gear_type_start: Any = None
+    gear_type_w: Any = None
+    fish_type: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "LargeFisheryInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            gear_type_start=data.get("gear_type_start"),
+            gear_type_w=data.get("gear_type_w"),
+            fish_type=data.get("fish_type"),
+        )
+
+
+@dataclass
+class InputModuleInput(ModuleInput):
+    input_type: Any = None
+    value_start: Any = None
+    value_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "InputModuleInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            input_type=data.get("input_type"),
+            value_start=data.get("value_start"),
+            value_w=data.get("value_w"),
+        )
+
+
+@dataclass
+class WaterbodyInput(ModuleInput):
+    waterbody_type: Any = None
+    trophic_type_start: Any = None
+    trophic_type_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "WaterbodyInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            waterbody_type=data.get("waterbody_type"),
+            trophic_type_start=data.get("trophic_type_start"),
+            trophic_type_w=data.get("trophic_type_w"),
+        )
+
+
+@dataclass
+class CoastalWetlandInput(ModuleInput):
+    land_use_type: Any = None
+    area_w_restored_vegetation_start: Any = None
+    area_w_restored_vegetation_w: Any = None
+    area_not_drained_or_rewetted_start: Any = None
+    area_not_drained_or_rewetted_w: Any = None
+    area_under_drainage_start: Any = None
+    area_under_drainage_w: Any = None
+    drained_area_excavated_start: Any = None
+    drained_area_excavated_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "CoastalWetlandInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            land_use_type=data.get("land_use_type"),
+            area_w_restored_vegetation_start=data.get("area_w_restored_vegetation_start"),
+            area_w_restored_vegetation_w=data.get("area_w_restored_vegetation_w"),
+            area_not_drained_or_rewetted_start=data.get("area_not_drained_or_rewetted_start"),
+            area_not_drained_or_rewetted_w=data.get("area_not_drained_or_rewetted_w"),
+            area_under_drainage_start=data.get("area_under_drainage_start"),
+            area_under_drainage_w=data.get("area_under_drainage_w"),
+            drained_area_excavated_start=data.get("drained_area_excavated_start"),
+            drained_area_excavated_w=data.get("drained_area_excavated_w"),
+        )
+
+
+@dataclass
+class OtherLandInput(ModuleInput):
+    is_degraded_land_start: Any = None
+    is_degraded_land_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "OtherLandInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            is_degraded_land_start=data.get("is_degraded_land_start"),
+            is_degraded_land_w=data.get("is_degraded_land_w"),
+        )
+
+
+@dataclass
+class SetAsideInput(ModuleInput):
+    is_set_aside_start: Any = None
+    is_set_aside_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "SetAsideInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            is_set_aside_start=data.get("is_set_aside_start"),
+            is_set_aside_w=data.get("is_set_aside_w"),
+        )
+
+
+@dataclass
+class AquacultureInput(ModuleInput):
+    annual_production_start: Any = None
+    annual_production_w: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "AquacultureInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            annual_production_start=data.get("annual_production_start"),
+            annual_production_w=data.get("annual_production_w"),
+        )
+
+
+@dataclass
+class LandUseChangeInput(ModuleInput):
+    module_start: Dict[str, Any] = None
+    module_w: Dict[str, Any] = None
+    module_wo: Dict[str, Any] = None
+    is_fire_used_start: Any = None
+    is_fire_used_w: Any = None
+    is_fire_used_wo: Any = None
+    dry_matter_start: Any = None
+    dry_matter_w: Any = None
+    dry_matter_wo: Any = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "LandUseChangeInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            module_start=data.get("module_start"),
+            module_w=data.get("module_w"),
+            module_wo=data.get("module_wo"),
+            is_fire_used_start=data.get("is_fire_used_start"),
+            is_fire_used_w=data.get("is_fire_used_w"),
+            is_fire_used_wo=data.get("is_fire_used_wo"),
+            dry_matter_start=data.get("dry_matter_start"),
+            dry_matter_w=data.get("dry_matter_w"),
+            dry_matter_wo=data.get("dry_matter_wo"),
+        )
+
+
+MODULE_INPUT_REGISTRY: Dict[str, type] = {
+    "Grassland": GrasslandInput,
+    "Livestock": LivestockInput,
+    "AnnualCropland": AnnualCroplandInput,
+    "FloodedRice": FloodedRiceInput,
+    "PerennialCropland": PerennialCroplandInput,
+    "ForestManagement": ForestManagementInput,
+    "SmallFishery": SmallFisheryInput,
+    "LargeFishery": LargeFisheryInput,
+    "Input": InputModuleInput,
+    "Waterbody": WaterbodyInput,
+    "CoastalWetland": CoastalWetlandInput,
+    "OtherLand": OtherLandInput,
+    "SetAside": SetAsideInput,
+    "Aquaculture": AquacultureInput,
+    "LandUseChange": LandUseChangeInput,
+}
+
+
+def create_module_input(module_name: str, data: Dict[str, Any], env: EnvironmentContext = None) -> ModuleInput:
+    """Factory function to create the appropriate ModuleInput from a dictionary"""
+    if module_name not in MODULE_INPUT_REGISTRY:
+        raise ValueError(f"Unknown module type: {module_name}")
+    return MODULE_INPUT_REGISTRY[module_name].from_dict(data, env)
+
+
+# =============================================================================
+# END MODULE INPUT DATACLASSES
+# =============================================================================
+
+
 class FieldType(Enum):
     """Enumeration of field types for automatic processing"""
 
@@ -604,7 +1001,9 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
     """Data builder for Land Use Change modules"""
 
     def get_field_mappings(self) -> List[FieldMapping]:
-        return []
+        return [
+            FieldMappingBuilder.boolean("is_fire_used"),
+        ]
 
     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
         data = {}
@@ -833,6 +1232,8 @@ class ModuleProcessor(ABC):
     """Abstract base class for module processors
 
     This class provides the base functionality for processing module combinations.
+    Supports both legacy tuple-based combinations and new ModuleInput dataclasses.
+
     Some processors may need to create actual database records (projects, activities, modules)
     when foreign key constraints are required for calculations. In such cases:
 
@@ -845,24 +1246,44 @@ class ModuleProcessor(ABC):
         class MyProcessor(ModuleProcessor):
             def __init__(self, data_builder_registry):
                 super().__init__(data_builder_registry)
-                self.requires_project_creation = True  # Enable cleanup
+                self.requires_project_creation = True
     """
 
     def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
         self.data_builder_registry = data_builder_registry
         self.project = None
         self.user = models.CustomUser.objects.get_or_create(email="test@test.com")[0]
-        self.requires_project_creation = False  # Flag to indicate if this processor needs to create projects for foreign key constraints
+        self.requires_project_creation = False
         self.last_year_of_accounting = 2020
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name="IPCC Fifth Assessment Report (AR5) without Climate Change Feedback")
 
+    def create_project_from_env(self, env: EnvironmentContext, factories: Any, save: bool = False) -> Any:
+        """Create/build project from EnvironmentContext"""
+        country = env.region.countries.order_by("?").first()
+        if not country:
+            raise ValueError(f"No countries found for region: {env.region}")
+
+        factory_method = factories.ProjectFactory.create if save else factories.ProjectFactory.build
+        kwargs = {
+            "climate": env.climate,
+            "moisture": env.moisture,
+            "soil_type": env.soil_type,
+            "country": country,
+            "implementation_years": 1,
+            "start_year_of_activities": 2000,
+            "last_year_of_accounting": self.last_year_of_accounting,
+            "gw_potential": self.gw_potential,
+        }
+        if save:
+            kwargs["owner"] = self.user
+        self.project = factory_method(**kwargs)
+        return self.project
+
     def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
         """Helper method to create a project with proper country selection"""
-        # Get a random country from the region, with fallback
         country = region.countries.order_by("?").first()
         if not country:
-            # Skip this combination if no country is available
             raise ValueError(f"No countries found for region: {region}")
 
         self.project = factories.ProjectFactory.create(
@@ -880,10 +1301,8 @@ class ModuleProcessor(ABC):
 
     def build_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
         """Helper method to build a project (without saving to database)"""
-        # Get a random country from the region, with fallback
         country = region.countries.order_by("?").first()
         if not country:
-            # Skip this combination if no country is available
             raise ValueError(f"No countries found for region: {region}")
 
         self.project = factories.ProjectFactory.build(
@@ -907,26 +1326,22 @@ class ModuleProcessor(ABC):
         return factories.ActivityFactory.build(project=project, change_rate=self.change_rate)
 
     @abstractmethod
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        """Create a module instance from combination"""
+    def create_module_from_input(self, inp: ModuleInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        """Create a module instance from a ModuleInput dataclass"""
         pass
 
-    def process_combination(self, combination: Tuple) -> ProcessingResult:
-        """Process a single combination"""
+    def process_input(self, inp: ModuleInput) -> ProcessingResult:
+        """Process a ModuleInput dataclass"""
         created_project = None
         try:
-            # Import inside function for multiprocessing compatibility
             import api.tests.factories as factories
             import api.calculators as calculators
             import api.models as models
 
-            # Suppress logging in worker processes
             logging.getLogger().setLevel(logging.CRITICAL)
 
-            # Create module
-            module = self.create_module(combination, factories, models)
+            module = self.create_module_from_input(inp, factories, models)
 
-            # Store reference to created project if this processor creates projects
             if self.requires_project_creation and hasattr(self, "project") and self.project:
                 created_project = self.project
 
@@ -942,7 +1357,6 @@ class ModuleProcessor(ABC):
                 balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
                 balance = balance / 20
 
-            # Build data
             data = self.data_builder_registry.build_data(module)
             data["total"] = balance
 
@@ -952,345 +1366,228 @@ class ModuleProcessor(ABC):
             full_traceback = traceback.format_exc()
             condensed_traceback = extract_relevant_traceback(full_traceback)
 
-            # Log specific errors for debugging
-            if "No countries found for region" in str(e):
-                # This is expected for some regions, so don't log as error
-                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
-            elif "Project has no country" in str(e):
-                # This is also expected for some combinations
-                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+            if "No countries found for region" in str(e) or "Project has no country" in str(e):
+                return ProcessingResult.error_result(type(e).__name__, str(e), inp, condensed_traceback)
             else:
-                # Log unexpected errors
-                logger.warning(f"Unexpected error in combination processing: {type(e).__name__}: {str(e)}")
-                return ProcessingResult.error_result(type(e).__name__, str(e), combination, condensed_traceback)
+                logger.warning(f"Unexpected error in input processing: {type(e).__name__}: {str(e)}")
+                return ProcessingResult.error_result(type(e).__name__, str(e), inp, condensed_traceback)
         finally:
-            # Clean up created project if this processor creates projects
             if created_project and self.requires_project_creation:
                 try:
-                    # Delete the project and all related objects
                     created_project.delete()
                 except Exception as cleanup_error:
-                    # Log cleanup errors but don't fail the processing
                     logger.warning(f"Failed to cleanup project {created_project.id}: {cleanup_error}")
 
 
 class GrasslandProcessor(ModuleProcessor):
     """Processor for Grassland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        (
-            grassland_management_type_start,
-            grassland_management_type_w,
-            # is_fire_used_start,
-            # is_fire_used_w,
-            # fire_periodicity_start,
-            # fire_periodicity_w,
-            # fire_impact_start,
-            # fire_impact_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: GrasslandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.GrasslandFactory.create if create else factories.GrasslandFactory.build
+        method = factories.GrasslandFactory.create if create else factories.GrasslandFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
             area=1,
-            grassland_management_type_start=grassland_management_type_start,
-            grassland_management_type_w=grassland_management_type_w,
-            grassland_management_type_wo=grassland_management_type_start,
-            # is_fire_used_start=0,
-            # is_fire_used_w=0,
-            # is_fire_used_wo=0,
-            # fire_periodicity_start=0,
-            # fire_periodicity_w=0,
-            # fire_periodicity_wo=0,
-            # fire_impact_start=0,
-            # fire_impact_w=0,
-            # fire_impact_wo=0,
+            grassland_management_type_start=inp.grassland_management_type_start,
+            grassland_management_type_w=inp.grassland_management_type_w,
+            grassland_management_type_wo=inp.grassland_management_type_start,
             land_use_type_start=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_w=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_wo=models.LandUseType.objects.get(name="Grassland"),
         )
-        return module
 
 
 class LivestockProcessor(ModuleProcessor):
     """Processor for Livestock modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            livestock_category_type,
-            livestock_production_type_start,
-            livestock_production_type_w,
-            heads_number_start,
-            heads_number_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
+    def create_module_from_input(self, inp: LivestockInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
 
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.LivestockFactory.build(
+        method = factories.LivestockFactory.create if create else factories.LivestockFactory.build
+
+        return method(
             activity=a,
-            livestock_category_type=livestock_category_type,
-            livestock_production_type_start=livestock_production_type_start,
-            livestock_production_type_w=livestock_production_type_w,
-            livestock_production_type_wo=livestock_production_type_start,
-            heads_number_start=heads_number_start,
-            heads_number_w=heads_number_w,
-            heads_number_wo=heads_number_start,
+            livestock_category_type=inp.livestock_category_type,
+            livestock_production_type_start=inp.livestock_production_type_start,
+            livestock_production_type_w=inp.livestock_production_type_w,
+            livestock_production_type_wo=inp.livestock_production_type_start,
+            heads_number_start=inp.heads_number_start,
+            heads_number_w=inp.heads_number_w,
+            heads_number_wo=inp.heads_number_start,
         )
-        return module
 
 
 class AnnualCroplandProcessor(ModuleProcessor):
     """Processor for Annual Cropland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        (
-            land_use_type_start,
-            land_use_type_w,
-            tillage_management_start,
-            tillage_management_w,
-            organic_input_type_start,
-            organic_input_type_w,
-            residue_management_type_start,
-            residue_management_type_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: AnnualCroplandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.AnnualCroplandFactory.create if create else factories.AnnualCroplandFactory.build
+        method = factories.AnnualCroplandFactory.create if create else factories.AnnualCroplandFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
             area=1,
-            land_use_type_start=land_use_type_start,
-            land_use_type_w=land_use_type_w,
-            land_use_type_wo=land_use_type_start,
-            tillage_management_type_start=tillage_management_start,
-            tillage_management_type_w=tillage_management_w,
-            tillage_management_type_wo=tillage_management_start,
-            organic_input_type_start=organic_input_type_start,
-            organic_input_type_w=organic_input_type_w,
-            organic_input_type_wo=organic_input_type_start,
-            residue_management_type_start=residue_management_type_start,
-            residue_management_type_w=residue_management_type_w,
-            residue_management_type_wo=residue_management_type_start,
+            land_use_type_start=inp.land_use_type_start,
+            land_use_type_w=inp.land_use_type_w,
+            land_use_type_wo=inp.land_use_type_start,
+            tillage_management_type_start=inp.tillage_management_type_start,
+            tillage_management_type_w=inp.tillage_management_type_w,
+            tillage_management_type_wo=inp.tillage_management_type_start,
+            organic_input_type_start=inp.organic_input_type_start,
+            organic_input_type_w=inp.organic_input_type_w,
+            organic_input_type_wo=inp.organic_input_type_start,
+            residue_management_type_start=inp.residue_management_type_start,
+            residue_management_type_w=inp.residue_management_type_w,
+            residue_management_type_wo=inp.residue_management_type_start,
         )
-        return module
 
 
 class FloodedRiceProcessor(ModuleProcessor):
     """Processor for Flooded Rice modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            water_management_type_before_cultivation_start,
-            water_management_type_before_cultivation_w,
-            water_management_type_after_cultivation_start,
-            water_management_type_after_cultivation_w,
-            organic_amendment_type_start,
-            organic_amendment_type_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
+    def create_module_from_input(self, inp: FloodedRiceInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
 
-        p = factories.ProjectFactory.build(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
-        )
-        a = factories.ActivityFactory.build(project=p)
-        module = factories.FloodedRiceFactory.build(
+        method = factories.FloodedRiceFactory.create if create else factories.FloodedRiceFactory.build
+
+        return method(
             activity=a,
             area=1,
-            water_management_type_before_cultivation_start=water_management_type_before_cultivation_start,
-            water_management_type_before_cultivation_w=water_management_type_before_cultivation_w,
-            water_management_type_before_cultivation_wo=water_management_type_before_cultivation_start,
-            water_management_type_after_cultivation_start=water_management_type_after_cultivation_start,
-            water_management_type_after_cultivation_w=water_management_type_after_cultivation_w,
-            water_management_type_after_cultivation_wo=water_management_type_after_cultivation_start,
-            organic_amendment_type_start=organic_amendment_type_start,
-            organic_amendment_type_w=organic_amendment_type_w,
-            organic_amendment_type_wo=organic_amendment_type_start,
+            water_management_type_before_cultivation_start=inp.water_management_type_before_cultivation_start,
+            water_management_type_before_cultivation_w=inp.water_management_type_before_cultivation_w,
+            water_management_type_before_cultivation_wo=inp.water_management_type_before_cultivation_start,
+            water_management_type_after_cultivation_start=inp.water_management_type_after_cultivation_start,
+            water_management_type_after_cultivation_w=inp.water_management_type_after_cultivation_w,
+            water_management_type_after_cultivation_wo=inp.water_management_type_after_cultivation_start,
+            organic_amendment_type_start=inp.organic_amendment_type_start,
+            organic_amendment_type_w=inp.organic_amendment_type_w,
+            organic_amendment_type_wo=inp.organic_amendment_type_start,
         )
-        return module
 
 
 class PerennialCroplandProcessor(ModuleProcessor):
     """Processor for Perennial Cropland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        (
-            land_use_type_start,
-            land_use_type_w,
-            organic_input_type_start,
-            organic_input_type_w,
-            tillage_management_type_start,
-            tillage_management_type_w,
-            is_biomass_burned_start,
-            is_biomass_burned_w,
-            fire_periodicity_t2_start,
-            fire_periodicity_t2_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: PerennialCroplandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.PerennialCroplandFactory.create if create else factories.PerennialCroplandFactory.build
+        method = factories.PerennialCroplandFactory.create if create else factories.PerennialCroplandFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
             area=1,
-            land_use_type_start=land_use_type_start,
-            land_use_type_w=land_use_type_w,
-            land_use_type_wo=land_use_type_start,
-            organic_input_type_start=organic_input_type_start,
-            organic_input_type_w=organic_input_type_w,
-            organic_input_type_wo=organic_input_type_start,
-            tillage_management_type_start=tillage_management_type_start,
-            tillage_management_type_w=tillage_management_type_w,
-            tillage_management_type_wo=tillage_management_type_start,
-            # is_biomass_burned_start=is_biomass_burned_start,
-            # is_biomass_burned_w=is_biomass_burned_w,
-            # is_biomass_burned_wo=is_biomass_burned_start,
-            # fire_periodicity_t2_start=fire_periodicity_t2_start,
-            # fire_periodicity_t2_w=fire_periodicity_t2_w,
-            # fire_periodicity_t2_wo=fire_periodicity_t2_start,
+            land_use_type_start=inp.land_use_type_start,
+            land_use_type_w=inp.land_use_type_w,
+            land_use_type_wo=inp.land_use_type_start,
+            organic_input_type_start=inp.organic_input_type_start,
+            organic_input_type_w=inp.organic_input_type_w,
+            organic_input_type_wo=inp.organic_input_type_start,
+            tillage_management_type_start=inp.tillage_management_type_start,
+            tillage_management_type_w=inp.tillage_management_type_w,
+            tillage_management_type_wo=inp.tillage_management_type_start,
         )
-        return module
 
 
 class ForestManagementProcessor(ModuleProcessor):
     """Processor for Forest Management modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        (
-            land_use_type,
-            forest_type,
-            forest_condition_type,
-            # average_yearly_degradation_percentage_start,
-            # average_yearly_degradation_percentage_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: ForestManagementInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         self.last_year_of_accounting = 2020
 
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.ForestManagementFactory.create if create else factories.ForestManagementFactory.build
+        method = factories.ForestManagementFactory.create if create else factories.ForestManagementFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
-            land_use_type_start=land_use_type,
-            land_use_type_w=land_use_type,
-            land_use_type_wo=land_use_type,
-            forest_type=forest_type,
-            forest_condition_type=forest_condition_type,
-            average_yearly_degradation_percentage_start=0,
-            average_yearly_degradation_percentage_w=0,
-            average_yearly_degradation_percentage_wo=0,
+            land_use_type_start=inp.land_use_type,
+            land_use_type_w=inp.land_use_type,
+            land_use_type_wo=inp.land_use_type,
+            forest_type=inp.forest_type,
+            forest_condition_type=inp.forest_condition_type,
+            average_yearly_degradation_percentage_start=inp.average_yearly_degradation_percentage_start or 0,
+            average_yearly_degradation_percentage_w=inp.average_yearly_degradation_percentage_w or 0,
+            average_yearly_degradation_percentage_wo=inp.average_yearly_degradation_percentage_start or 0,
         )
-        return module
 
 
 class SmallFisheryProcessor(ModuleProcessor):
     """Processor for Small Fishery modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            gear_type_start,
-            gear_type_w,
-            fishery_type,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
+    def create_module_from_input(self, inp: SmallFisheryInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
 
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.SmallFisheryFactory.build(
+        method = factories.SmallFisheryFactory.create if create else factories.SmallFisheryFactory.build
+
+        return method(
             activity=a,
-            fishery_type=fishery_type,
-            gear_type_start=gear_type_start,
-            gear_type_w=gear_type_w,
-            gear_type_wo=gear_type_start,
+            fishery_type=inp.fishery_type,
+            gear_type_start=inp.gear_type_start,
+            gear_type_w=inp.gear_type_w,
+            gear_type_wo=inp.gear_type_start,
             total_catch_yr_start=1,
             total_catch_yr_w=1,
             total_catch_yr_wo=1,
         )
-        return module
 
 
 class LargeFisheryProcessor(ModuleProcessor):
     """Processor for Large Fishery modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            gear_type_start,
-            gear_type_w,
-            fish_type,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
+    def create_module_from_input(self, inp: LargeFisheryInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
 
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.LargeFisheryFactory.build(
+        method = factories.LargeFisheryFactory.create if create else factories.LargeFisheryFactory.build
+
+        return method(
             activity=a,
-            fish_type=fish_type,
-            gear_type_start=gear_type_start,
-            gear_type_w=gear_type_w,
-            gear_type_wo=gear_type_start,
+            fish_type=inp.fish_type,
+            gear_type_start=inp.gear_type_start,
+            gear_type_w=inp.gear_type_w,
+            gear_type_wo=inp.gear_type_start,
             total_catch_yr_start=1,
             total_catch_yr_w=1,
             total_catch_yr_wo=1,
         )
-        return module
 
 
 class InputProcessor(ModuleProcessor):
@@ -1303,29 +1600,18 @@ class InputProcessor(ModuleProcessor):
 
     def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
         super().__init__(data_builder_registry)
-        self.requires_project_creation = True  # Input modules need projects for foreign key constraints
+        self.requires_project_creation = True
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            input_type,
-            value_start,
-            value_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-        self.project = self.create_project(climate, moisture, soil_type, region, factories)
+    def create_module_from_input(self, inp: InputModuleInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        self.project = self.create_project_from_env(inp.env, factories, save=True)
         a = self.create_activity(self.project, factories)
-        module = factories.InputFactory.create(
-            activity=a,
-        )
+        module = factories.InputFactory.create(activity=a)
         submodule = factories.InputEntryFactory.create(
             parent=module,
-            input_type=input_type,
-            value_start=value_start,
-            value_w=value_w,
-            value_wo=value_start,
+            input_type=inp.input_type,
+            value_start=inp.value_start,
+            value_w=inp.value_w,
+            value_wo=inp.value_start,
         )
         module.input_entries.add(submodule)
         return module
@@ -1334,245 +1620,138 @@ class InputProcessor(ModuleProcessor):
 class WaterbodyProcessor(ModuleProcessor):
     """Processor for Waterbody modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            waterbody_type,
-            trophic_type_start,
-            trophic_type_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.WaterbodyFactory.build(
+    def create_module_from_input(self, inp: WaterbodyInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
+
+        method = factories.WaterbodyFactory.create if create else factories.WaterbodyFactory.build
+
+        return method(
             activity=a,
-            waterbody_type=waterbody_type,
-            trophic_type_start=trophic_type_start,
-            trophic_type_w=trophic_type_w,
-            trophic_type_wo=trophic_type_start,
+            waterbody_type=inp.waterbody_type,
+            trophic_type_start=inp.trophic_type_start,
+            trophic_type_w=inp.trophic_type_w,
+            trophic_type_wo=inp.trophic_type_start,
         )
-        return module
 
 
 class CoastalWetlandProcessor(ModuleProcessor):
     """Processor for Coastal Wetland modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
-        (
-            land_use_type,
-            # area_w_restored_vegetation_start,
-            area_w_restored_vegetation_w,
-            area_not_drained_or_rewetted_start,
-            area_not_drained_or_rewetted_w,
-            area_under_drainage_start,
-            # area_under_drainage_w,
-            # drained_area_excavated_start,
-            # drained_area_excavated_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: CoastalWetlandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.CoastalWetlandFactory.create if create else factories.CoastalWetlandFactory.build
+        method = factories.CoastalWetlandFactory.create if create else factories.CoastalWetlandFactory.build
 
-        module = method(
+        return method(
             activity=a,
-            land_use_type=land_use_type,
-            area_under_drainage_start=area_under_drainage_start,
-            area_under_drainage_w=0,
-            drained_area_excavated_start=0,
-            drained_area_excavated_w=0,
-            area_not_drained_or_rewetted_start=area_not_drained_or_rewetted_start,
-            area_not_drained_or_rewetted_w=area_not_drained_or_rewetted_w,
-            area_w_restored_vegetation_start=0,
-            area_w_restored_vegetation_w=area_w_restored_vegetation_w,
+            land_use_type=inp.land_use_type,
+            area_under_drainage_start=inp.area_under_drainage_start or 0,
+            area_under_drainage_w=inp.area_under_drainage_w or 0,
+            drained_area_excavated_start=inp.drained_area_excavated_start or 0,
+            drained_area_excavated_w=inp.drained_area_excavated_w or 0,
+            area_not_drained_or_rewetted_start=inp.area_not_drained_or_rewetted_start or 0,
+            area_not_drained_or_rewetted_w=inp.area_not_drained_or_rewetted_w or 0,
+            area_w_restored_vegetation_start=inp.area_w_restored_vegetation_start or 0,
+            area_w_restored_vegetation_w=inp.area_w_restored_vegetation_w or 0,
         )
-        return module
 
 
 class LandUseChangeProcessor(ModuleProcessor):
     """Processor for Land Use Change modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any, luc: "models.LandUseChange" = None, create: bool = False, activity: "models.Activity" = None) -> Any:
-        (
-            module_start,
-            module_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
+    def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
+        super().__init__(data_builder_registry)
+        self.requires_project_creation = True
+
+    def create_module_from_input(self, inp: LandUseChangeInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        module_start = inp.module_start
+        module_w = inp.module_w
 
         twenty_years_modules = ["ForestManagement", "PerennialCropland"]
+        self.last_year_of_accounting = 2001 if (module_start["type"][0].class_name not in twenty_years_modules and module_w["type"][0].class_name not in twenty_years_modules) else 2020
 
-        self.last_year_of_accounting = 2001 if module_start["type"][0].class_name not in twenty_years_modules and module_w["type"][0].class_name not in twenty_years_modules else 2020
+        self.project = self.create_project_from_env(inp.env, factories, save=True)
+        a = self.create_activity(self.project, factories)
 
-        p = self.create_project(climate, moisture, soil_type, region, factories)
-        a = self.create_activity(p, factories)
+        processor_start = ProcessorRegistry(self.data_builder_registry).get_processor(module_start["type"][0].class_name)
+        processor_with = ProcessorRegistry(self.data_builder_registry).get_processor(module_w["type"][0].class_name)
 
-        # Get processor classes from the module type
-        ProcessorStart = ProcessorRegistry(self.data_builder_registry).get_processor(module_start["type"][0].class_name)
-        ProcessorWith = ProcessorRegistry(self.data_builder_registry).get_processor(module_w["type"][0].class_name)
+        luc_instance = factories.LandUseChangeFactory.create(activity=a, module_type_start=module_start["type"][0], module_type_w=module_w["type"][0], module_type_wo=module_start["type"][0])
 
-        # Convert field dictionaries to tuples in the order expected by the sub-processors
-        start_fields = self._convert_fields_to_tuple(module_start["fields"], module_start["type"][0].class_name)
-        with_fields = self._convert_fields_to_tuple(module_w["fields"], module_w["type"][0].class_name)
+        start_input = create_module_input(module_start["type"][0].class_name, module_start["fields"], inp.env)
+        with_input = create_module_input(module_w["type"][0].class_name, module_w["fields"], inp.env)
 
-        luc = factories.LandUseChangeFactory.create(activity=a, module_type_start=module_start["type"][0], module_type_w=module_w["type"][0], module_type_wo=module_start["type"][0])
+        processor_start.create_module_from_input(start_input, factories, models, activity=a, create=True, luc=luc_instance)
+        processor_with.create_module_from_input(with_input, factories, models, activity=a, create=True, luc=luc_instance)
 
-        # Create the sub-modules
-        ProcessorStart.create_module((*start_fields, climate_moisture, soil_type, region), factories, models, activity=a, create=True, luc=luc)
-        ProcessorWith.create_module((*with_fields, climate_moisture, soil_type, region), factories, models, activity=a, create=True, luc=luc)
-
-        return luc
-
-    def _convert_fields_to_tuple(self, fields_dict: dict, module_type_class_name: str) -> tuple:
-        """Convert field dictionary to tuple based on module type"""
-        if module_type_class_name == "AnnualCropland":
-            return (
-                fields_dict.get("land_use_type_start"),
-                fields_dict.get("land_use_type_w"),
-                fields_dict.get("tillage_management_type_start"),
-                fields_dict.get("tillage_management_type_w"),
-                fields_dict.get("organic_input_type_start"),
-                fields_dict.get("organic_input_type_w"),
-                fields_dict.get("residue_management_type_start"),
-                fields_dict.get("residue_management_type_w"),
-            )
-        elif module_type_class_name == "Grassland":
-            return (
-                fields_dict.get("grassland_management_type_start", None),
-                fields_dict.get("grassland_management_type_w", None),
-                fields_dict.get("is_fire_used_start", None),
-                fields_dict.get("is_fire_used_w", None),
-                fields_dict.get("fire_periodicity_start", None),
-                fields_dict.get("fire_periodicity_w", None),
-                fields_dict.get("fire_impact_start", None),
-                fields_dict.get("fire_impact_w", None),
-            )
-        elif module_type_class_name == "FloodedRice":
-            return (
-                fields_dict.get("water_management_type_before_cultivation_start"),
-                fields_dict.get("water_management_type_before_cultivation_w"),
-                fields_dict.get("water_management_type_after_cultivation_start"),
-                fields_dict.get("water_management_type_after_cultivation_w"),
-                fields_dict.get("organic_amendment_type_start"),
-                fields_dict.get("organic_amendment_type_w"),
-            )
-        elif module_type_class_name == "ForestManagement":
-            return (
-                fields_dict.get("land_use_type"),
-                fields_dict.get("forest_type"),
-                fields_dict.get("forest_condition_type"),
-                # fields_dict.get("average_yearly_degradation_percentage_start"),
-                # fields_dict.get("average_yearly_degradation_percentage_w"),
-            )
-        elif module_type_class_name == "PerennialCropland":
-            return (
-                fields_dict.get("land_use_type_start", None),
-                fields_dict.get("land_use_type_w", None),
-                fields_dict.get("organic_input_type_start", None),
-                fields_dict.get("organic_input_type_w", None),
-                fields_dict.get("tillage_management_type_start", None),
-                fields_dict.get("tillage_management_type_w", None),
-                fields_dict.get("is_biomass_burned_start", None),
-                fields_dict.get("is_biomass_burned_w", None),
-                fields_dict.get("fire_periodicity_t2_start", None),
-                fields_dict.get("fire_periodicity_t2_w", None),
-            )
-        else:
-            # Default case - return all fields as tuple
-            return tuple(fields_dict.values())
+        return luc_instance
 
 
 class OtherLandProcessor(ModuleProcessor):
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> models.Module:
-        (
-            is_degraded_land_start,
-            is_degraded_land_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: OtherLandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.OtherLandFactory.create if create else factories.OtherLandFactory.build
+        method = factories.OtherLandFactory.create if create else factories.OtherLandFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
             area=1,
-            is_degraded_land_start=is_degraded_land_start,
-            is_degraded_land_w=is_degraded_land_w,
-            is_degraded_land_wo=is_degraded_land_start,
+            is_degraded_land_start=inp.is_degraded_land_start,
+            is_degraded_land_w=inp.is_degraded_land_w,
+            is_degraded_land_wo=inp.is_degraded_land_start,
         )
-        return module
 
 
 class SetAsideProcessor(ModuleProcessor):
-    def create_module(self, combination: Tuple, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> models.Module:
-        (
-            is_set_aside_start,
-            is_set_aside_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-
+    def create_module_from_input(self, inp: SetAsideInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
         if activity is None:
-            p = self.build_project(climate, moisture, soil_type, region, factories)
-            a = self.build_activity(p, factories)
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
         else:
             a = activity
 
-        method: callable = factories.SetAsideFactory.create if create else factories.SetAsideFactory.build
+        method = factories.SetAsideFactory.create if create else factories.SetAsideFactory.build
 
-        module = method(
+        return method(
             activity=a,
             land_use_change=luc,
             area=1,
-            is_set_aside_start=is_set_aside_start,
-            is_set_aside_w=is_set_aside_w,
-            is_set_aside_wo=is_set_aside_start,
+            is_set_aside_start=inp.is_set_aside_start,
+            is_set_aside_w=inp.is_set_aside_w,
+            is_set_aside_wo=inp.is_set_aside_start,
         )
-        return module
 
 
 class AquacultureProcessor(ModuleProcessor):
     """Processor for Aquaculture modules"""
 
-    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
-        (
-            annual_production_start,
-            annual_production_w,
-            climate_moisture,
-            soil_type,
-            region,
-        ) = combination
-        climate, moisture = climate_moisture
-        p = self.build_project(climate, moisture, soil_type, region, factories)
-        a = self.build_activity(p, factories)
-        module = factories.AquacultureFactory.build(
+    def create_module_from_input(self, inp: AquacultureInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
+
+        method = factories.AquacultureFactory.create if create else factories.AquacultureFactory.build
+
+        module = method(
             activity=a,
-            annual_production_start=annual_production_start,
-            annual_production_w=annual_production_w,
-            annual_production_wo=annual_production_start,
+            annual_production_start=inp.annual_production_start,
+            annual_production_w=inp.annual_production_w,
+            annual_production_wo=inp.annual_production_start,
         )
         return module
 
@@ -1665,56 +1844,54 @@ class SoilOrganicCarbonValidator:
 
 
 class CombinationValidator(ABC):
-    """Base class for module-specific combination validation"""
+    """Base class for module-specific validation. Supports both ModuleInput dataclasses and legacy tuples."""
+
+    def validate_input(self, inp: ModuleInput, models: Any, scenario_type: str = None) -> bool:
+        """
+        Validate a ModuleInput dataclass. Override for module-specific validation.
+        Default implementation returns True (accepts all).
+        """
+        return True
 
     @abstractmethod
     def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
-        """
-        Validate if a combination should be processed.
-
-        Args:
-            combination: The combination tuple to validate
-            models: Django models module for database queries
-            scenario_type: Optional scenario type to validate (e.g., "start", "w", "wo")
-
-        Returns:
-            bool: True if combination should be processed, False otherwise
-        """
+        """Legacy method for tuple-based validation."""
         pass
 
     def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
-        """
-        Get a human-readable reason for why a combination was rejected.
-
-        Args:
-            combination: The combination tuple that was rejected
-            models: Django models module for database queries
-            scenario_type: Optional scenario type to validate (e.g., "start", "w", "wo")
-
-        Returns:
-            str: Reason for rejection
-        """
         return "Combination failed module-specific validation"
 
 
 class DefaultCombinationValidator(CombinationValidator):
-    """Default validator that accepts all combinations"""
+    """Default validator that accepts all inputs"""
+
+    def validate_input(self, inp: ModuleInput, models: Any, scenario_type: str = None) -> bool:
+        return True
 
     def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
-        """Default implementation accepts all combinations"""
         return True
 
     def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
-        """Default implementation returns generic message"""
         return "Combination passed default validation"
 
 
 class PerennialCroplandCombinationValidator(CombinationValidator):
-    """Validator for PerennialCropland module combinations"""
+    """Validator for PerennialCropland module"""
+
+    def validate_input(self, inp: PerennialCroplandInput, models: Any, scenario_type: str = None) -> bool:
+        import ipcc.models as ipcc_models
+
+        try:
+            if inp.land_use_type_start is not None:
+                ipcc_models.PerennialAGB.objects.get(climate=inp.climate, moisture=inp.moisture, continent=inp.region, land_use_type=inp.land_use_type_start)
+            if inp.land_use_type_w is not None:
+                ipcc_models.PerennialAGB.objects.get(climate=inp.climate, moisture=inp.moisture, continent=inp.region, land_use_type=inp.land_use_type_w)
+        except ipcc_models.PerennialAGB.DoesNotExist:
+            return False
+        return True
 
     def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
-        """Validate a PerennialCropland combination"""
-
+        # Legacy support
         (
             land_use_type_start,
             land_use_type_w,
@@ -1730,7 +1907,6 @@ class PerennialCroplandCombinationValidator(CombinationValidator):
             soil_type,
             region,
         ) = combination
-
         climate, moisture = climate_moisture
 
         import ipcc.models as ipcc_models
@@ -1742,11 +1918,9 @@ class PerennialCroplandCombinationValidator(CombinationValidator):
                 ipcc_models.PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=region, land_use_type=land_use_type_w)
         except ipcc_models.PerennialAGB.DoesNotExist:
             return False
-
         return True
 
     def get_validation_reason(self, combination: Tuple, models: Any, scenario_type: str = None) -> str:
-        """Default implementation returns generic message"""
         return "Combination passed default validation"
 
 
@@ -1754,16 +1928,37 @@ class LandUseChangeCombinationValidator(CombinationValidator):
     """Validator for LandUseChange module combinations"""
 
     def __init__(self):
-        # Don't create ValidatorRegistry here to avoid circular dependency
-        # We'll create it lazily when needed
         self._validator_registry = None
 
     @property
     def validator_registry(self):
-        """Lazy initialization of ValidatorRegistry to avoid circular dependency"""
         if self._validator_registry is None:
             self._validator_registry = ValidatorRegistry()
         return self._validator_registry
+
+    def validate_input(self, inp: LandUseChangeInput, models: Any, scenario_type: str = None) -> bool:
+        try:
+            if not inp.module_start or not inp.module_w:
+                return False
+            if not self._validate_module_structure(inp.module_start, "module_start"):
+                return False
+            if not self._validate_module_structure(inp.module_w, "module_w"):
+                return False
+
+            # Validate sub-modules using their specific validators
+            start_type = inp.module_start["type"][0].class_name
+            w_type = inp.module_w["type"][0].class_name
+
+            start_input = create_module_input(start_type, inp.module_start["fields"], inp.env)
+            w_input = create_module_input(w_type, inp.module_w["fields"], inp.env)
+
+            start_validator = self.validator_registry.get_validator(start_type)
+            w_validator = self.validator_registry.get_validator(w_type)
+
+            return start_validator.validate_input(start_input, models, scenario_type) and w_validator.validate_input(w_input, models, scenario_type)
+        except Exception as e:
+            logger.warning(f"Error validating LandUseChange input: {e}")
+            return False
 
     def validate_combination(self, combination: Tuple, models: Any, scenario_type: str = None) -> bool:
         """Validate a LandUseChange combination"""
@@ -2904,6 +3099,72 @@ class HammingPermutationComputer:
         total_hamming = len(hamming_rows)
         logger.info(f"Generated {total_hamming:,} Hamming shell rows (hamming sphere permutations)")
 
+        # ===================================================================
+        # MATHEMATICAL FORMALIZATION OF PERMUTATION CALCULATION
+        # ===================================================================
+        #
+        # The total number of permutations P for a module is calculated as:
+        #
+        #   P = H × E
+        #
+        # where:
+        #   H = |hamming_rows| = number of Hamming shell permutations
+        #   E = |valid_combinations| × |regions_with_countries| = environmental combinations
+        #
+        # HAMMING SHELL PERMUTATIONS (H):
+        # --------------------------------
+        # For standard modules (non-LandUseChange):
+        #   H = Σ_{baseline ∈ B} [Σ_{p ∈ P} (|D_w(p)| - 1) + Σ_{s ∈ S} (|D(s)| - 1)]
+        #
+        #   where:
+        #     B = cartesian product of all baseline domains
+        #         B = ∏_{p ∈ P} D_start(p) × ∏_{s ∈ S} D(s)
+        #     P = set of paired fields (fields with _start and _w suffixes)
+        #     S = set of single fields (fields without _start/_w pattern)
+        #     D_start(p) = domain of field p_start (baseline domain)
+        #     D_w(p) = domain of field p_w (variation domain)
+        #     D(s) = domain of single field s
+        #
+        #   Note: The actual implementation generates permutations where exactly one field
+        #   differs from baseline, following Hamming distance = 1 principle.
+        #
+        # For LandUseChange modules:
+        #   H = 1 + Σ_{f ∈ F_w} (|D_w(f)| - 1) + Σ_{f ∈ F_start} (|D_start(f)| - 1)
+        #
+        #   where:
+        #     F_w = fields in module_w configuration
+        #     F_start = fields in module_start configuration
+        #     D_w(f) = domain of field f in module_w
+        #     D_start(f) = domain of field f in module_start
+        #     The "+1" accounts for the baseline scenario (no change)
+        #
+        # ENVIRONMENTAL COMBINATIONS (E):
+        # ---------------------------------
+        #   E = |V| × |R|
+        #
+        #   where:
+        #     V = set of valid (climate, moisture, soil_type) combinations
+        #         validated through SoilOrganicCarbonValidator
+        #     R = set of regions with associated countries
+        #
+        #   The validation process ensures:
+        #     V = {(c, m, s) | (c, m) ∈ CM_valid ∧ s ∈ S_valid ∧
+        #                       ∃ record in SoilOrganicCarbon matching (c, m, s)}
+        #
+        #     where:
+        #       CM_valid = valid climate-moisture pairs from ClimateMoistureValidator
+        #       S_valid = valid soil types (filtered by active=True, is_coastal flag)
+        #
+        # TOTAL PERMUTATIONS:
+        # --------------------
+        #   P = H × E = H × |V| × |R|
+        #
+        # This represents the total number of unique parameter combinations where:
+        #   - Each Hamming shell permutation (module field variations) is combined with
+        #   - Each valid environmental combination (climate, moisture, soil_type, region)
+        #
+        # ===================================================================
+
         # Calculate total permutations using only valid environmental combinations
         # Instead of using all possible combinations, use only the valid ones that passed validation
         valid_environmental_combinations = len(valid_combinations) * len(regions_with_countries)
@@ -2999,32 +3260,30 @@ class HammingPermutationComputer:
                                 pbar.update(1)
                                 continue
 
-                            # Create the full combination tuple in the correct order
-                            # Get the field values in the order expected by the processor
-                            field_values = []
+                            # Build environment context
+                            env = EnvironmentContext(climate=climate, moisture=moisture, soil_type=soil_type, region=region)
+
+                            # Build field data from hamming row
+                            field_data = {}
                             for field_name in fields.keys():
                                 if field_name in hamming_row:
-                                    # Use the hamming permutation value
-                                    field_values.append(hamming_row[field_name])
+                                    field_data[field_name] = hamming_row[field_name]
                                 else:
-                                    # For fields not in hamming_row (environmental filters), use the first value
-                                    field_values.append(list(fields[field_name])[0])
+                                    field_data[field_name] = list(fields[field_name])[0]
 
-                            # Add environmental factors using the valid combination
-                            climate_moisture = (climate, moisture)
-                            combination = tuple(field_values) + (climate_moisture, soil_type, region)
+                            # Create typed module input
+                            module_input = create_module_input(model.__name__, field_data, env)
 
-                            # Validate the combination before processing
+                            # Validate the input before processing
                             validator = self.validator_registry.get_validator(model.__name__)
-                            if not validator.validate_combination(combination, models, scenario_type=None):
-                                # Skip this combination if validation fails
+                            if not validator.validate_input(module_input, models, scenario_type=None):
                                 validation_skipped_count += 1
                                 pbar.update(1)
                                 processed_count += 1
                                 continue
 
-                            # Process the combination
-                            result = processor.process_combination(combination)
+                            # Process the input
+                            result = processor.process_input(module_input)
 
                             if stop_at and len(data) >= stop_at:
                                 # Terminate worker processes
@@ -3462,7 +3721,7 @@ from . import minitool_scenarios as scenarios
 SCENARIOS_TO_RUN = [
     # scenarios.SOIL_REMEDIATION_1,
     # scenarios.SOIL_REMEDIATION_2,
-    scenarios.SOIL_REMEDIATION_3,
+    # scenarios.SOIL_REMEDIATION_3,
     # scenarios.TERRACING_1,
     # scenarios.TERRACING_2,
     # scenarios.TERRACING_3,
@@ -3475,6 +3734,8 @@ SCENARIOS_TO_RUN = [
     # scenarios.MANGROVE_REPLANTING_2,
     # scenarios.COASTAL_ZONE_STABILIZATION_1,
     # scenarios.RIVERBANK_RESTORATION_1,
+    scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1,  # TODO: No processor for OrganicSoil
+    scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
 ]
 
 
@@ -3615,6 +3876,8 @@ def run_minitool_hamming_count_only():
                         hamming_rows = list(hamming_shell_rows(subset["fields"]))
 
                     # Calculate total permutations
+                    # Formula: P = H × E, where H = |hamming_rows|, E = |valid_combinations| × |regions|
+                    # See compute_hamming_permutations() for detailed mathematical formalization
                     environmental_factors = len(valid_combinations) * len(regions_with_countries)
                     module_permutations = len(hamming_rows) * environmental_factors
                     total_permutations += module_permutations
