@@ -495,29 +495,29 @@ class OrganicSoilFactory(DjangoModelFactory):
 
     status = READY
 
-    drainage_area_start = factory.fuzzy.FuzzyFloat(0, 100)
-    drainage_area_w = factory.fuzzy.FuzzyFloat(0, 100)
-    drainage_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    area_not_drained_start = factory.fuzzy.FuzzyFloat(0, 100)
-    area_not_drained_w = factory.fuzzy.FuzzyFloat(0, 100)
-    area_not_drained_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    ditches_area_start = factory.fuzzy.FuzzyFloat(0, 100)
-    ditches_area_w = factory.fuzzy.FuzzyFloat(0, 100)
-    ditches_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    fire_type_start = factory.fuzzy.FuzzyChoice(fire_types)
-    fire_type_w = factory.fuzzy.FuzzyChoice(fire_types)
-    fire_type_wo = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_start = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_w = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_wo = factory.fuzzy.FuzzyChoice(fire_types)
 
-    soil_fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 10)
-    soil_fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 10)
-    soil_fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 10)
 
-    soil_fire_impact_percentage_start = factory.fuzzy.FuzzyFloat(0, 1)
-    soil_fire_impact_percentage_w = factory.fuzzy.FuzzyFloat(0, 1)
-    soil_fire_impact_percentage_wo = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_start = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_w = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_wo = factory.fuzzy.FuzzyFloat(0, 1)
 
 
 class SetAsideFactory(DjangoModelFactory):

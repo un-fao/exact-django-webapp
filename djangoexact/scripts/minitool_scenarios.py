@@ -498,8 +498,8 @@ WETLAND_HYDROLOGICAL_RESTORATION_1 = {
     "AnnualCropland": {
         "filename": "wetland_hydrological_restoration_1__annual_cropland",
         "fields": {
-            "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
-            "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default"])),
+            "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default", "Alley Cropping"])),
+            "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default", "Alley Cropping"])),
             "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage"])),
             "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage"])),
             "organic_input_type_start": list(models.OrganicInputType.objects.filter(name__in=["Low C input"])),
@@ -507,14 +507,13 @@ WETLAND_HYDROLOGICAL_RESTORATION_1 = {
             "residue_management_type_start": list(models.ResidueManagementType.objects.filter(name__in=["Exported"])),
             "residue_management_type_w": list(models.ResidueManagementType.objects.filter(name__in=["Exported"])),
         },
-    },
-    "OrganicSoil": {
-        "filename": "wetland_hydrological_restoration_1__organic_soil",
-        "fields": {
-            "drainage_area_start": [1],
-            "drainage_area_w": [0],
-            "area_not_drained_start": [0],
-            "area_not_drained_w": [1],
+        "organic_soil": {
+            "fields": {
+                "drainage_area_start": [1],
+                "drainage_area_w": [0],
+                "area_not_drained_start": [0],
+                "area_not_drained_w": [1],
+            },
         },
     },
 }
@@ -526,14 +525,13 @@ WETLAND_HYDROLOGICAL_RESTORATION_2 = {
             "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
             "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
         },
-    },
-    "OrganicSoil": {
-        "filename": "wetland_hydrological_restoration_2__organic_soil",
-        "fields": {
-            "drainage_area_start": [1],
-            "drainage_area_w": [0],
-            "area_not_drained_start": [0],
-            "area_not_drained_w": [1],
+        "organic_soil": {
+            "fields": {
+                "drainage_area_start": [1],
+                "drainage_area_w": [0],
+                "area_not_drained_start": [0],
+                "area_not_drained_w": [1],
+            },
         },
     },
 }
