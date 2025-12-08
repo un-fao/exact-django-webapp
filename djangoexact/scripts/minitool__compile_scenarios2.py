@@ -527,6 +527,8 @@ AQUATIC_RESTORATION = [
     convert_scenario_from_minitool_format(scenarios.MANGROVE_REPLANTING_2, "Mangrove Replanting: and Natural Recruitment: assuming full restoration of hydrology and biomass", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.COASTAL_ZONE_STABILIZATION_1, "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.RIVERBANK_RESTORATION_1, "Riverbank or Riparian Restoration: Grassland to perennial", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1, "Wetland Hydrological Restoration: Annual Cropland (organic soil rewetting)", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2, "Wetland Hydrological Restoration: Grassland (organic soil rewetting)", "Aquatic Restoration"),
 ]
 
 

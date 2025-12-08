@@ -5,150 +5,168 @@ from api import models
 # =============================================================================
 
 NATURAL_REGENERATION_1 = {
-    "filename": "afforestation",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+    "LandUseChange": {
+        "filename": "afforestation",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+                    "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+                    "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                },
             },
         },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
+    }
 }
 
 # Same as ASSISTED_NATURAL_REGENERATION_2
 NATURAL_REGENERATION_2 = {
-    "filename": "forest_degradation_management",
-    "fields": {
-        "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-        "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-        "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-        "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
-        "average_yearly_degradation_percentage_w": [0.0],
+    "ForestManagement": {
+        "filename": "forest_degradation_management",
+        "fields": {
+            "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+            "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+            "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+            "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
+            "average_yearly_degradation_percentage_w": [0.0],
+        },
     },
 }
 
 ASSISTED_NATURAL_REGENERATION_1 = {
-    "filename": "afforestation",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+    "LandUseChange": {
+        "filename": "afforestation",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+                    "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+                    "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                },
             },
         },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
+    }
 }
 
 DIRECT_PLANTING_1 = {
-    "filename": "direct_planting_1",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+    "LandUseChange": {
+        "filename": "direct_planting_1",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+                    "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
+                    "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                },
             },
         },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
+    }
 }
 
 ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1 = {
-    "filename": "enrichment_planting_in_degraded_forests_1",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
+    "Grassland": {
+        "filename": "enrichment_planting_in_degraded_forests_1",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+                    "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
+                    "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                },
             },
         },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
+    }
 }
 
 # TODO: Needs tier2 values before computation
 ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2 = {
-    "filename": "enrichment_planting_in_degraded_forests_2",
-    "fields": {
-        "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-        "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-        "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-        "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
-        "average_yearly_degradation_percentage_w": [0.0],
-    },
+    "ForestManagement": {
+        "filename": "enrichment_planting_in_degraded_forests_2",
+        "fields": {
+            "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+            "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+            "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+            "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
+            "average_yearly_degradation_percentage_w": [0.0],
+        },
+    }
 }
 
 INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1 = {
-    "filename": "infill_planting_to_accelerate_recovery",
-    "fields": {
-        "module_start": {
-            "type": [models.ModuleType.objects.get(class_name="Grassland")],
-            "fields": {
-                "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
+    "LandUseChange": {
+        "filename": "infill_planting_to_accelerate_recovery",
+        "fields": {
+            "module_start": {
+                "type": [models.ModuleType.objects.get(class_name="Grassland")],
+                "fields": {
+                    "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
+                },
+            },
+            "module_w": {
+                "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
+                "fields": {
+                    "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+                    "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
+                    "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+                },
             },
         },
-        "module_w": {
-            "type": [models.ModuleType.objects.get(class_name="ForestManagement")],
-            "fields": {
-                "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(models.ForestType.objects.filter(name__in=["Plantation"])),
-                "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-            },
-        },
-    },
+    }
 }
 
 # TODO: Needs tier2 values before computation
 INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2 = {
-    "filename": "infill_planting_to_accelerate_recovery_2",
-    "fields": {
-        "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-        "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-        "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-        "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
-        "average_yearly_degradation_percentage_w": [0.0],
-    },
+    "ForestManagement": {
+        "filename": "infill_planting_to_accelerate_recovery_2",
+        "fields": {
+            "land_use_type": list(models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
+            "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+            "forest_condition_type": list(models.ForestConditionType.objects.filter(name__in=["Secondary"])),
+            "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
+            "average_yearly_degradation_percentage_w": [0.0],
+        },
+    }
 }
 
 REINTRODUCTION_OF_THREATENED_SPECIES_1 = {
-    "filename": "reintroduction_of_threatened_species_1",
-    "fields": {
-        "land_use_type": models.LandUseType.objects.filter(module_types__name="Forest Management"),
-        "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
-        "forest_condition_type": models.ForestConditionType.objects.filter(name="Secondary"),
-        "average_yearly_degradation_percentage_start": [0.02],
-        "average_yearly_degradation_percentage_w": [0.0],
-    },
+    "ForestManagement": {
+        "filename": "reintroduction_of_threatened_species_1",
+        "fields": {
+            "land_use_type": models.LandUseType.objects.filter(module_types__name="Forest Management"),
+            "forest_type": list(models.ForestType.objects.filter(name__in=["Natural"])),
+            "forest_condition_type": models.ForestConditionType.objects.filter(name="Secondary"),
+            "average_yearly_degradation_percentage_start": [0.02],
+            "average_yearly_degradation_percentage_w": [0.0],
+        },
+    }
 }
 
 # =============================================================================
@@ -522,8 +540,8 @@ WETLAND_HYDROLOGICAL_RESTORATION_2 = {
     "Grassland": {
         "filename": "wetland_hydrological_restoration_2__grassland",
         "fields": {
-            "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
-            "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded"])),
+            "grassland_management_type_start": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "Severely Degraded"])),
+            "grassland_management_type_w": list(models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "Severely Degraded"])),
         },
         "organic_soil": {
             "fields": {
