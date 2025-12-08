@@ -1,3 +1,10 @@
+## v1.18.4 (2025-12-08)
+
+### Fix
+
+- **activity_builder**: wrong type in issubclass check
+- **scripts**: exclude finalized project from cache reset in invalidate_results_cache
+
 ## 1.18.4 (2025-12-08)
 
 ### Feat
