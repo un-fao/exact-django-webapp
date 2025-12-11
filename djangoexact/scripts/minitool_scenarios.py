@@ -85,7 +85,7 @@ DIRECT_PLANTING_1 = {
 }
 
 ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1 = {
-    "Grassland": {
+    "LandUseChange": {
         "filename": "enrichment_planting_in_degraded_forests_1",
         "fields": {
             "module_start": {
@@ -179,6 +179,7 @@ SOIL_AMENDMENTS_1 = {
         "filename": "soil_amendments__annual_cropland_1",
         "fields": {
             "land_use_type_start": list(models.LandUseType.objects.filter(name__in=["Default"])),
+            "land_use_type_w": list(models.LandUseType.objects.filter(name__in=["Default"])),
             "tillage_management_type_start": list(models.TillageManagementType.objects.filter(name__in=["Full Tillage"])),
             "tillage_management_type_w": list(models.TillageManagementType.objects.filter(name__in=["Reduced Tillage", "No Tillage"])),
             "organic_input_type_start": list(models.OrganicInputType.objects.filter(name__in=["Low C input", "Medium C input"])),

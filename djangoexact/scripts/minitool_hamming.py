@@ -988,7 +988,7 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             # Degradation fields
-            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
 
     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
@@ -3916,17 +3916,17 @@ SCENARIOS_TO_RUN = [
     # scenarios.RIVERBANK_RESTORATION_1,
     # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1,
     # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
-    scenarios.NATURAL_REGENERATION_1,
+    # scenarios.NATURAL_REGENERATION_1,
     scenarios.NATURAL_REGENERATION_2,
-    scenarios.ASSISTED_NATURAL_REGENERATION_1,
-    scenarios.DIRECT_PLANTING_1,
+    # scenarios.ASSISTED_NATURAL_REGENERATION_1,
+    # scenarios.DIRECT_PLANTING_1,
     scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1,
-    scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2,
-    scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1,
-    scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2,
+    # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2,
+    # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1,
+    # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2,
     scenarios.REINTRODUCTION_OF_THREATENED_SPECIES_1,
-    scenarios.SOIL_AMENDMENTS_1,
-    scenarios.SOIL_AMENDMENTS_2,
+    # scenarios.SOIL_AMENDMENTS_1,
+    # scenarios.SOIL_AMENDMENTS_2,
 ]
 
 
