@@ -318,7 +318,6 @@ class AnnexedModule(BaseModule):
 
 @dataclass
 class PeatExtraction(BaseModule):
-
     hectares_end: float
     hectares_start: float
     percentage_ditches_start: float
@@ -336,9 +335,9 @@ class PeatExtraction(BaseModule):
     methane_constant: float
     nitrous_constant: float
     weight_peat: float
-    mass_tonnes_tier_2: Optional[float]
-    conversion_factor_volume: float
-    c_fraction_ref: float
+    mass_tonnes_tier_2: Optional[float] 
+    c_fraction_volume: float            
+    volume_air_dried_peat_per_hectare_tier_2: Optional[float]
     extraction_height_start: float
     extraction_height_end: float
 
@@ -386,19 +385,18 @@ class PeatExtraction(BaseModule):
                 return mass_tonnes * hectares_start * height_of_extraction_start * 100, mass_tonnes * hectares_end * height_of_extraction_end * 100
 
             try:
-                mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if self.mass_tonnes_tier_2 is None else self.mass_tonnes_tier_2
-                air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(mass_tonnes, self.hectares_start, self.hectares_end, self.extraction_height_start, self.extraction_height_end)
+                if self.volume_air_dried_peat_per_hectare_tier_2 is None: 
+                    volume = abs(self.hectares_start - self.hectares_end) * abs(self.extraction_height_start - self.extraction_height_end) * 100
+                else:
+                    volume = self.volume_air_dried_peat_per_hectare_tier_2 * abs(self.hectares_start - self.hectares_end)
 
-                em_start = air_dry_weight_start * self.c_fraction_ref * 44 / 12
-                em_end = air_dry_weight_end * self.c_fraction_ref * 44 / 12
-
-                offsite_emissions_yearly = compute_yearly_or_half_year_cumulative(em_start, em_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
-                offsite_emissions_total = sum(offsite_emissions_yearly)
+                total_offsite_peat_emission = self.c_fraction_volume * volume * (44/12)
+                
+                offsite_emissions_yearly = compute_yearly_or_half_year_cumulative(0, total_offsite_peat_emission, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
+                offsite_emissions_yearly = [offsite_emissions_yearly[i+1] - offsite_emissions_yearly[i] for i in range(len(offsite_emissions_yearly))]
 
                 offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
-
-                self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity
+                self.result.yearly_emissions_by_sector_by_gas.append(total_offsite_peat_emission)
 
             except Exception as e:
                 traceback.print_exc()
