@@ -40,11 +40,11 @@ class Fishery(BaseModule):
     percentage_refrigerant_start: float
     percentage_refrigerant_end: float
     tonnes_ice_default: float
-    tonnes_ice_start_tier_2: Optional[float]
-    tonnes_ice_end_tier_2: Optional[float]
+    tonnes_ice_start_tier_2: Optional[float] = None
+    tonnes_ice_end_tier_2: Optional[float] = None
     kwh_ice_per_tonne_default: float
-    kwh_ice_per_tonne_start_tier_2: Optional[float]
-    kwh_ice_per_tonne_end_tier_2: Optional[float]
+    kwh_ice_per_tonne_start_tier_2: Optional[float] = None
+    kwh_ice_per_tonne_end_tier_2: Optional[float] = None
     operating_margin: float
     percentage_ice_start: float
     percentage_ice_end: float

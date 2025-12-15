@@ -13,14 +13,14 @@ class CoastalWaterbodies(BaseModule):
     area_end : float
     trophic_state_default : float
     methane_emission_factor_default : float
-    trophic_state_tier_2_start : Optional[float]
-    trophic_state_tier_2_end : Optional[float]
-    methane_emission_factor_start_tier_2 : Optional[float]
-    methane_emission_factor_end_tier_2 : Optional[float]
+    trophic_state_tier_2_start : Optional[float] = None
+    trophic_state_tier_2_end : Optional[float] = None
+    methane_emission_factor_start_tier_2 : Optional[float] = None
+    methane_emission_factor_end_tier_2 : Optional[float] = None
     methane_constant : float
 
-    chlo_A_start : Optional[float]
-    chlo_A_end : Optional[float]
+    chlo_A_start : Optional[float] = None
+    chlo_A_end : Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()

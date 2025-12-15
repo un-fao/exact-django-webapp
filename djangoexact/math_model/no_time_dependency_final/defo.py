@@ -48,17 +48,17 @@ class Defo(BaseModule):
     agb_t_c_per_ha_default: float
     bgb_t_c_per_ha_default_input_parameter: float
     c_n_ratio: float
-    soc_after_defo_tier_2: Optional[float]
+    soc_after_defo_tier_2: Optional[float] = None
     soc_reference_default: float
-    soc_reference_tier_2: Optional[float]
-    fmg_start_tier_2: Optional[float]
-    fmg_end_tier_2: Optional[float]
-    fi_start_tier_2: Optional[float]
-    fi_end_tier_2: Optional[float]
-    flu_start_tier_2: Optional[float]
-    flu_end_tier_2: Optional[float]
-    soc_start_tier_2: Optional[float]
-    soc_end_tier_2: Optional[float]
+    soc_reference_tier_2: Optional[float] = None
+    fmg_start_tier_2: Optional[float] = None
+    fmg_end_tier_2: Optional[float] = None
+    fi_start_tier_2: Optional[float] = None
+    fi_end_tier_2: Optional[float] = None
+    flu_start_tier_2: Optional[float] = None
+    flu_end_tier_2: Optional[float] = None
+    soc_start_tier_2: Optional[float] = None
+    soc_end_tier_2: Optional[float] = None
     fmg_start_default: float
     fmg_end_default: float
     fi_start_default: float

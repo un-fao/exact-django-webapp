@@ -26,56 +26,56 @@ class AnnexedModule(BaseModule):
     fire_periodicity_end: float
     area_affected_by_action_end: float
     dry_matter_ref_fire: float
-    dry_matter_tier_2_fire: Optional[float]
+    dry_matter_tier_2_fire: Optional[float] = None
     percentage_area_burned_end: float
     ef_co2_ref_fire: float
-    ef_co2_tier_2_fire: Optional[float]
+    ef_co2_tier_2_fire: Optional[float] = None
     ef_co_ref_fire: float
-    ef_co_tier_2_fire: Optional[float]
+    ef_co_tier_2_fire: Optional[float] = None
     ef_ch4_ref_fire: float
-    ef_ch4_tier_2_fire: Optional[float]
+    ef_ch4_tier_2_fire: Optional[float] = None
     methane_constant: float
     nitrous_constant: float  # GENERAL INFO
     ef_doc_ref_drainage_initial: float
-    ef_doc_tier_2_drainage_initial: Optional[float]
+    ef_doc_tier_2_drainage_initial: Optional[float] = None
     area_drained_start: float
     area_drained_end: float
     ef_co2_ref_drainage_initial: float
-    ef_co2_tier_2_drainage_initial: Optional[float]
+    ef_co2_tier_2_drainage_initial: Optional[float] = None
     percentage_ditches_start: float
     percentage_ditches_end: float
     ef_ch4_onsite_ref_drainage_initial: float
-    ef_ch4_onsite_tier_2_drainage_initial: Optional[float]
+    ef_ch4_onsite_tier_2_drainage_initial: Optional[float] = None
     ef_ch4_offsite_ref_drainage_initial: float
-    ef_ch4_offsite_tier_2_drainage_initial: Optional[float]
+    ef_ch4_offsite_tier_2_drainage_initial: Optional[float] = None
     ef_n2o_ref_drainage_initial: float
-    ef_n2o_tier_2_drainage_initial: Optional[float]  # DRAINAGE EMISSIONS INITIAL
+    ef_n2o_tier_2_drainage_initial: Optional[float] = None  # DRAINAGE EMISSIONS INITIAL
     ef_doc_ref_drainage_final: float
-    ef_doc_tier_2_drainage_final: Optional[float]
+    ef_doc_tier_2_drainage_final: Optional[float] = None
     ef_co2_ref_drainage_final: float
-    ef_co2_tier_2_drainage_final: Optional[float]
+    ef_co2_tier_2_drainage_final: Optional[float] = None
     ef_ch4_onsite_ref_drainage_final: float
-    ef_ch4_onsite_tier_2_drainage_final: Optional[float]
+    ef_ch4_onsite_tier_2_drainage_final: Optional[float] = None
     ef_ch4_offsite_ref_drainage_final: float
-    ef_ch4_offsite_tier_2_drainage_final: Optional[float]
+    ef_ch4_offsite_tier_2_drainage_final: Optional[float] = None
     ef_n2o_ref_drainage_final: float
-    ef_n2o_tier_2_drainage_final: Optional[float]  # DRAINAGE EMISSIONS FINAL
+    ef_n2o_tier_2_drainage_final: Optional[float] = None  # DRAINAGE EMISSIONS FINAL
     ef_doc_rewetting_initial: float
-    ef_doc_rewetting_initial_tier_2: Optional[float]
+    ef_doc_rewetting_initial_tier_2: Optional[float] = None
     ef_co2_rewetting_initial: float
-    ef_co2_rewetting_initial_tier_2: Optional[float]
+    ef_co2_rewetting_initial_tier_2: Optional[float] = None
     ef_ch4_rewetting_initial: float
-    ef_ch4_rewetting_initial_tier_2: Optional[float]
+    ef_ch4_rewetting_initial_tier_2: Optional[float] = None
     ef_n2o_rewetting_initial: float
-    ef_n2o_rewetting_initial_tier_2: Optional[float]  # REWETTING EMISSIONS INITIAL
+    ef_n2o_rewetting_initial_tier_2: Optional[float] = None  # REWETTING EMISSIONS INITIAL
     ef_doc_rewetting_final: float
-    ef_doc_rewetting_final_tier_2: Optional[float]
+    ef_doc_rewetting_final_tier_2: Optional[float] = None
     ef_co2_rewetting_final: float
-    ef_co2_rewetting_final_tier_2: Optional[float]
+    ef_co2_rewetting_final_tier_2: Optional[float] = None
     ef_ch4_rewetting_final: float
-    ef_ch4_rewetting_final_tier_2: Optional[float]
+    ef_ch4_rewetting_final_tier_2: Optional[float] = None
     ef_n2o_rewetting_final: float
-    ef_n2o_rewetting_final_tier_2: Optional[float]  # REWETTING EMISSIONS FINAL
+    ef_n2o_rewetting_final_tier_2: Optional[float] = None  # REWETTING EMISSIONS FINAL
     maximum_area_for_water_management: float
 
     def calculate_emissions(
@@ -323,21 +323,20 @@ class PeatExtraction(BaseModule):
     percentage_ditches_start: float
     percentage_ditches_end: float
     ef_co2_onsite_ref: float
-    ef_co2_onsite_tier_2: Optional[float]
+    ef_co2_onsite_tier_2: Optional[float] = None
     ef_ch4_onsite_ref: float
-    ef_ch4_onsite_tier_2: Optional[float]
+    ef_ch4_onsite_tier_2: Optional[float] = None
     ef_n2o_onsite_ref: float
-    ef_n2o_onsite_tier_2: Optional[float]
+    ef_n2o_onsite_tier_2: Optional[float] = None
     ef_doc_offsite_ref: float
-    ef_doc_offsite_tier_2: Optional[float]
+    ef_doc_offsite_tier_2: Optional[float] = None
     ef_ch4_offsite_ref: float
-    ef_ch4_offsite_tier_2: Optional[float]
+    ef_ch4_offsite_tier_2: Optional[float] = None
     methane_constant: float
     nitrous_constant: float
     weight_peat: float
-    mass_tonnes_tier_2: Optional[float] 
     c_fraction_volume: float            
-    volume_air_dried_peat_per_hectare_tier_2: Optional[float]
+    volume_air_dried_peat_per_hectare_tier_2: Optional[float] = None
     extraction_height_start: float
     extraction_height_end: float
 
