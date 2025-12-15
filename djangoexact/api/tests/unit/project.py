@@ -1377,3 +1377,67 @@ class ProjectTestCase(APITestCaseMixin):
             log.warning(f"Calculation failed but values were set correctly: {e}")
 
         log.info("END - test_activity_override_project_fields")
+
+    def test_cycle_all_modules_and_invalidate_cached_results_preserves_finalized_project_cache(self):
+        """
+        Test that cycle_all_modules_and_invalidate_cached_results does not invalidate
+        cached results for modules belonging to finalized projects.
+        """
+        log.info("START - test_cycle_all_modules_and_invalidate_cached_results_preserves_finalized_project_cache")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_activity_response = self.create_activity(project, self.user, [models.ModuleType.objects.filter(class_name="Grassland").first()])
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        # Get module
+        # module: models.Grassland = activity.modules[0]
+        # module.grassland_management_type_start = models.GrasslandManagementType.objects.order_by("?").first()
+        # module.save()
+        # module.refresh_from_db()
+
+        module: models.Grassland = activity.modules[0]
+        print("Module", module)
+        print("Activity", activity)
+
+        # Update module
+        view = generic_module_viewset(models.Grassland).as_view({"post": "partial_update"})
+        request = self.request_factory.post(
+            reverse(f"{models.Grassland.__name__.lower()}-detail", args=[module.pk]),
+            {
+                "grassland_management_type_start": models.GrasslandManagementType.objects.order_by("?").first().id,
+                "grassland_management_type_w": models.GrasslandManagementType.objects.order_by("?").first().id,
+                "grassland_management_type_wo": models.GrasslandManagementType.objects.order_by("?").first().id,
+            },
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=module.pk)
+        print(response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Calculate module results
+        view = generic_module_viewset(models.Grassland).as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{models.Grassland.__name__.lower()}-results", args=[module.pk]) + f"?cached=false", format="json")
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=module.pk)
+        print(response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+        cached_results_before = response.data["balance"]
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+
+        from scripts.invalidate_results_cache import cycle_all_modules_and_invalidate_cached_results
+
+        cycle_all_modules_and_invalidate_cached_results()
+
+        module.refresh_from_db()
+        self.assertIsNotNone(module.cached_results_total, "cached_results_total should NOT be invalidated for finalized projects")
+        self.assertEqual(module.cached_results_total["balance"], cached_results_before, "cached_results_total should remain unchanged")
+
+        log.info("END - test_cycle_all_modules_and_invalidate_cached_results_preserves_finalized_project_cache")

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 import traceback
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional, Tuple, Callable
+from typing import Dict, List, Any, Optional, Tuple, Callable, Iterable
 from pathlib import Path
 from enum import Enum
 import io
@@ -29,6 +29,7 @@ import ipcc.models as ipcc_models  # noqa: E402
 
 # Import Hamming functions
 from .hamming import hamming_shell_rows  # noqa: E402
+from . import minitool_scenarios as scenarios  # noqa: E402
 
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
@@ -283,18 +284,75 @@ class ModuleInput(ABC):
 
 
 @dataclass
+class OrganicSoilInput(ModuleInput):
+    drainage_area_start: float = None
+    drainage_area_w: float = None
+    drainage_area_wo: float = None
+    area_not_drained_start: float = None
+    area_not_drained_w: float = None
+    area_not_drained_wo: float = None
+    ditches_area_start: float = None
+    ditches_area_w: float = None
+    ditches_area_wo: float = None
+    fire_type_start: models.FireType = None
+    fire_type_w: models.FireType = None
+    fire_type_wo: models.FireType = None
+    soil_fire_periodicity_start: float = None
+    soil_fire_periodicity_w: float = None
+    soil_fire_periodicity_wo: float = None
+    soil_fire_impact_percentage_start: float = None
+    soil_fire_impact_percentage_w: float = None
+    soil_fire_impact_percentage_wo: float = None
+    land_use_change: models.LandUseChange = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "OrganicSoilInput":
+        return cls(
+            env=env or EnvironmentContext.from_dict(data),
+            land_use_change=data.get("land_use_change"),
+            drainage_area_start=data.get("drainage_area_start", 0),
+            drainage_area_w=data.get("drainage_area_w", 0),
+            drainage_area_wo=data.get("drainage_area_wo", 0),
+            area_not_drained_start=data.get("area_not_drained_start", 0),
+            area_not_drained_w=data.get("area_not_drained_w", 0),
+            area_not_drained_wo=data.get("area_not_drained_wo", 0),
+            ditches_area_start=data.get("ditches_area_start", 0),
+            ditches_area_w=data.get("ditches_area_w", 0),
+            ditches_area_wo=data.get("ditches_area_wo", 0),
+            fire_type_start=data.get("fire_type_start"),
+            fire_type_w=data.get("fire_type_w"),
+            fire_type_wo=data.get("fire_type_wo"),
+            soil_fire_periodicity_start=data.get("soil_fire_periodicity_start", 0),
+            soil_fire_periodicity_w=data.get("soil_fire_periodicity_w", 0),
+            soil_fire_periodicity_wo=data.get("soil_fire_periodicity_wo", 0),
+            soil_fire_impact_percentage_start=data.get("soil_fire_impact_percentage_start", 0),
+            soil_fire_impact_percentage_w=data.get("soil_fire_impact_percentage_w", 0),
+            soil_fire_impact_percentage_wo=data.get("soil_fire_impact_percentage_wo", 0),
+        )
+
+
+@dataclass
 class GrasslandInput(ModuleInput):
-    grassland_management_type_start: Any = None
-    grassland_management_type_w: Any = None
-    is_fire_used_start: Any = None
-    is_fire_used_w: Any = None
-    fire_periodicity_start: Any = None
-    fire_periodicity_w: Any = None
-    fire_impact_start: Any = None
-    fire_impact_w: Any = None
+    grassland_management_type_start: models.GrasslandManagementType = None
+    grassland_management_type_w: models.GrasslandManagementType = None
+    is_fire_used_start: bool = None
+    is_fire_used_w: bool = None
+    fire_periodicity_start: float = None
+    fire_periodicity_w: float = None
+    fire_impact_start: float = None
+    fire_impact_w: float = None
+    land_use_change: models.LandUseChange = None
+    organic_soil: OrganicSoilInput = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "GrasslandInput":
+        organic_soil_data = data.get("organic_soil")
+        organic_soil = None
+        if organic_soil_data and isinstance(organic_soil_data, dict):
+            organic_soil = OrganicSoilInput.from_dict(organic_soil_data, env or EnvironmentContext.from_dict(data))
+        elif organic_soil_data:
+            organic_soil = organic_soil_data
+
         return cls(
             env=env or EnvironmentContext.from_dict(data),
             grassland_management_type_start=data.get("grassland_management_type_start"),
@@ -305,6 +363,8 @@ class GrasslandInput(ModuleInput):
             fire_periodicity_w=data.get("fire_periodicity_w"),
             fire_impact_start=data.get("fire_impact_start"),
             fire_impact_w=data.get("fire_impact_w"),
+            land_use_change=data.get("land_use_change"),
+            organic_soil=organic_soil,
         )
 
 
@@ -338,9 +398,18 @@ class AnnualCroplandInput(ModuleInput):
     organic_input_type_w: Any = None
     residue_management_type_start: Any = None
     residue_management_type_w: Any = None
+    organic_soil: OrganicSoilInput = None
+    land_use_change: models.LandUseChange = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "AnnualCroplandInput":
+        organic_soil_data = data.get("organic_soil")
+        organic_soil = None
+        if organic_soil_data and isinstance(organic_soil_data, dict):
+            organic_soil = OrganicSoilInput.from_dict(organic_soil_data, env or EnvironmentContext.from_dict(data))
+        elif organic_soil_data:
+            organic_soil = organic_soil_data
+
         return cls(
             env=env or EnvironmentContext.from_dict(data),
             land_use_type_start=data.get("land_use_type_start"),
@@ -351,6 +420,8 @@ class AnnualCroplandInput(ModuleInput):
             organic_input_type_w=data.get("organic_input_type_w"),
             residue_management_type_start=data.get("residue_management_type_start"),
             residue_management_type_w=data.get("residue_management_type_w"),
+            organic_soil=organic_soil,
+            land_use_change=data.get("land_use_change"),
         )
 
 
@@ -413,6 +484,22 @@ class ForestManagementInput(ModuleInput):
     forest_condition_type: Any = None
     average_yearly_degradation_percentage_start: Any = None
     average_yearly_degradation_percentage_w: Any = None
+    agb_t2_start: Any = None
+    agb_t2_w: Any = None
+    agb_growth_rate_le_20_yrs_t2_start: Any = None
+    agb_growth_rate_le_20_yrs_t2_w: Any = None
+    agb_growth_rate_gt_20_yrs_t2_start: Any = None
+    agb_growth_rate_gt_20_yrs_t2_w: Any = None
+    bgb_t2_start: Any = None
+    bgb_t2_w: Any = None
+    bgb_growth_rate_le_20_yrs_t2_start: Any = None
+    bgb_growth_rate_le_20_yrs_t2_w: Any = None
+    bgb_growth_rate_gt_20_yrs_t2_start: Any = None
+    bgb_growth_rate_gt_20_yrs_t2_w: Any = None
+    litter_t2_start: Any = None
+    litter_t2_w: Any = None
+    deadwood_t2_start: Any = None
+    deadwood_t2_w: Any = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "ForestManagementInput":
@@ -423,6 +510,22 @@ class ForestManagementInput(ModuleInput):
             forest_condition_type=data.get("forest_condition_type"),
             average_yearly_degradation_percentage_start=data.get("average_yearly_degradation_percentage_start"),
             average_yearly_degradation_percentage_w=data.get("average_yearly_degradation_percentage_w"),
+            agb_t2_start=data.get("agb_t2_start"),
+            agb_t2_w=data.get("agb_t2_w"),
+            agb_growth_rate_le_20_yrs_t2_start=data.get("agb_growth_rate_le_20_yrs_t2_start"),
+            agb_growth_rate_le_20_yrs_t2_w=data.get("agb_growth_rate_le_20_yrs_t2_w"),
+            agb_growth_rate_gt_20_yrs_t2_start=data.get("agb_growth_rate_gt_20_yrs_t2_start"),
+            agb_growth_rate_gt_20_yrs_t2_w=data.get("agb_growth_rate_gt_20_yrs_t2_w"),
+            bgb_t2_start=data.get("bgb_t2_start"),
+            bgb_t2_w=data.get("bgb_t2_w"),
+            bgb_growth_rate_le_20_yrs_t2_start=data.get("bgb_growth_rate_le_20_yrs_t2_start"),
+            bgb_growth_rate_le_20_yrs_t2_w=data.get("bgb_growth_rate_le_20_yrs_t2_w"),
+            bgb_growth_rate_gt_20_yrs_t2_start=data.get("bgb_growth_rate_gt_20_yrs_t2_start"),
+            bgb_growth_rate_gt_20_yrs_t2_w=data.get("bgb_growth_rate_gt_20_yrs_t2_w"),
+            litter_t2_start=data.get("litter_t2_start"),
+            litter_t2_w=data.get("litter_t2_w"),
+            deadwood_t2_start=data.get("deadwood_t2_start"),
+            deadwood_t2_w=data.get("deadwood_t2_w"),
         )
 
 
@@ -604,6 +707,7 @@ MODULE_INPUT_REGISTRY: Dict[str, type] = {
     "SetAside": SetAsideInput,
     "Aquaculture": AquacultureInput,
     "LandUseChange": LandUseChangeInput,
+    "OrganicSoil": OrganicSoilInput,
 }
 
 
@@ -846,6 +950,20 @@ class AnnualCroplandDataBuilder(ModuleDataBuilder):
         ]
 
 
+class OrganicSoilDataBuilder(ModuleDataBuilder):
+    """Data builder for Organic Soil modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.numeric("drainage_area"),
+            FieldMappingBuilder.numeric("area_not_drained"),
+            FieldMappingBuilder.numeric("ditches_area"),
+            FieldMappingBuilder.foreign_key("fire_type"),
+            FieldMappingBuilder.numeric("soil_fire_periodicity"),
+            FieldMappingBuilder.numeric("soil_fire_impact_percentage"),
+        ]
+
+
 class LivestockDataBuilder(ModuleDataBuilder):
     """Data builder for Livestock modules"""
 
@@ -903,13 +1021,29 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
             FieldMappingBuilder.single_foreign_key("forest_condition_type"),
             FieldMappingBuilder.single_foreign_key("forest_type"),
             # Degradation fields
-            # FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
+            FieldMappingBuilder.numeric("average_yearly_degradation_percentage"),
         ]
 
     def get_custom_fields(self, module: Any) -> Dict[str, Any]:
         """Get custom fields that don't follow the standard pattern"""
         return {
             "land_use_type": getattr(module, "land_use_type_start", None),
+            "agb_t2_start": getattr(module, "agb_t2_start", None),
+            "agb_t2_w": getattr(module, "agb_t2_w", None),
+            "agb_growth_rate_le_20_yrs_t2_start": getattr(module, "agb_growth_rate_le_20_yrs_t2_start", None),
+            "agb_growth_rate_le_20_yrs_t2_w": getattr(module, "agb_growth_rate_le_20_yrs_t2_w", None),
+            "agb_growth_rate_gt_20_yrs_t2_start": getattr(module, "agb_growth_rate_gt_20_yrs_t2_start", None),
+            "agb_growth_rate_gt_20_yrs_t2_w": getattr(module, "agb_growth_rate_gt_20_yrs_t2_w", None),
+            "bgb_t2_start": getattr(module, "bgb_t2_start", None),
+            "bgb_t2_w": getattr(module, "bgb_t2_w", None),
+            "bgb_growth_rate_le_20_yrs_t2_start": getattr(module, "bgb_growth_rate_le_20_yrs_t2_start", None),
+            "bgb_growth_rate_le_20_yrs_t2_w": getattr(module, "bgb_growth_rate_le_20_yrs_t2_w", None),
+            "bgb_growth_rate_gt_20_yrs_t2_start": getattr(module, "bgb_growth_rate_gt_20_yrs_t2_start", None),
+            "bgb_growth_rate_gt_20_yrs_t2_w": getattr(module, "bgb_growth_rate_gt_20_yrs_t2_w", None),
+            "litter_t2_start": getattr(module, "litter_t2_start", None),
+            "litter_t2_w": getattr(module, "litter_t2_w", None),
+            "deadwood_t2_start": getattr(module, "deadwood_t2_start", None),
+            "deadwood_t2_w": getattr(module, "deadwood_t2_w", None),
         }
 
 
@@ -1034,11 +1168,25 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
             start_data = self._extract_module_data(start_module, "module_start_")
             data.update(start_data)
 
+            if module_start.module_type == "OtherLand":
+                data["module_start_is_degraded_land_start"] = getattr(module_start, "is_degraded_land_start", None)
+                data["module_start_is_degraded_land_w"] = getattr(module_start, "is_degraded_land_w", None)
+            elif module_start.module_type == "SetAside":
+                data["module_start_is_set_aside_start"] = getattr(module_start, "is_set_aside_start", None)
+                data["module_start_is_set_aside_w"] = getattr(module_start, "is_set_aside_w", None)
+
         # Add module_w_ prefixed fields
         if module_w:
             with_module = module_w
             with_data = self._extract_module_data(with_module, "module_w_")
             data.update(with_data)
+
+            if module_start.module_type == "OtherLand":
+                data["module_start_is_degraded_land_start"] = getattr(module_start, "is_degraded_land_start", None)
+                data["module_start_is_degraded_land_w"] = getattr(module_start, "is_degraded_land_w", None)
+            elif module_start.module_type == "SetAside":
+                data["module_start_is_set_aside_start"] = getattr(module_start, "is_set_aside_start", None)
+                data["module_start_is_set_aside_w"] = getattr(module_start, "is_set_aside_w", None)
 
         return data
 
@@ -1210,6 +1358,7 @@ class ModuleDataBuilderRegistry:
         self.register("LandUseChange", LandUseChangeDataBuilder())
         self.register("SetAside", SetAsideDataBuilder())
         self.register("OtherLand", OtherLandDataBuilder())
+        self.register("OrganicSoil", OrganicSoilDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -1357,8 +1506,21 @@ class ModuleProcessor(ABC):
                 balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
                 balance = balance / 20
 
+            organic_soil_balance = 0
+            organic_soil_module = getattr(module, "organic_soil", None)
+            if organic_soil_module:
+                organic_soil_balance = calculators.CalculatorFactory().calculate_result(organic_soil_module)[0][2]
+                organic_soil_balance = organic_soil_balance / 20
+
             data = self.data_builder_registry.build_data(module)
-            data["total"] = balance
+            data["total"] = balance + organic_soil_balance
+
+            if organic_soil_module:
+                organic_soil_data = self.data_builder_registry.build_data(organic_soil_module)
+                for key, value in organic_soil_data.items():
+                    if key not in ["module", "climate", "moisture", "soil_type", "region"]:
+                        data[f"organic_soil_{key}"] = value
+                data["organic_soil_total"] = organic_soil_balance
 
             return ProcessingResult.success_result(data)
 
@@ -1383,17 +1545,34 @@ class GrasslandProcessor(ModuleProcessor):
     """Processor for Grassland modules"""
 
     def create_module_from_input(self, inp: GrasslandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        has_organic_soil = inp.organic_soil is not None
+        if has_organic_soil:
+            self.requires_project_creation = True
+
         if activity is None:
-            p = self.create_project_from_env(inp.env, factories, save=create)
-            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+            should_create = create or has_organic_soil
+            p = self.create_project_from_env(inp.env, factories, save=should_create)
+            if has_organic_soil:
+                self.project = p
+            a = self.build_activity(p, factories) if not should_create else self.create_activity(p, factories)
         else:
             a = activity
+            should_create = create
 
-        method = factories.GrasslandFactory.create if create else factories.GrasslandFactory.build
+        organic_soil_module = None
+        if inp.organic_soil:
+            grassland_module_type = models.ModuleType.objects.get(class_name="Grassland")
+            a.module_types.add(grassland_module_type)
+
+            organic_soil_processor = OrganicSoilProcessor(self.data_builder_registry)
+            organic_soil_module = organic_soil_processor.create_module_from_input(inp.organic_soil, factories, models, activity=a, create=True)
+
+        method = factories.GrasslandFactory.create if should_create else factories.GrasslandFactory.build
 
         return method(
             activity=a,
             land_use_change=luc,
+            organic_soil=organic_soil_module,
             area=1,
             grassland_management_type_start=inp.grassland_management_type_start,
             grassland_management_type_w=inp.grassland_management_type_w,
@@ -1432,17 +1611,34 @@ class AnnualCroplandProcessor(ModuleProcessor):
     """Processor for Annual Cropland modules"""
 
     def create_module_from_input(self, inp: AnnualCroplandInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        has_organic_soil = inp.organic_soil is not None
+        if has_organic_soil:
+            self.requires_project_creation = True
+
         if activity is None:
-            p = self.create_project_from_env(inp.env, factories, save=create)
-            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+            should_create = create or has_organic_soil
+            p = self.create_project_from_env(inp.env, factories, save=should_create)
+            if has_organic_soil:
+                self.project = p
+            a = self.build_activity(p, factories) if not should_create else self.create_activity(p, factories)
         else:
             a = activity
+            should_create = create
 
-        method = factories.AnnualCroplandFactory.create if create else factories.AnnualCroplandFactory.build
+        organic_soil_module = None
+        if inp.organic_soil:
+            annual_cropland_module_type = models.ModuleType.objects.get(class_name="AnnualCropland")
+            a.module_types.add(annual_cropland_module_type)
+
+            organic_soil_processor = OrganicSoilProcessor(self.data_builder_registry)
+            organic_soil_module = organic_soil_processor.create_module_from_input(inp.organic_soil, factories, models, activity=a, create=True)
+
+        method = factories.AnnualCroplandFactory.create if should_create else factories.AnnualCroplandFactory.build
 
         return method(
             activity=a,
             land_use_change=luc,
+            organic_soil=organic_soil_module,
             area=1,
             land_use_type_start=inp.land_use_type_start,
             land_use_type_w=inp.land_use_type_w,
@@ -1539,6 +1735,30 @@ class ForestManagementProcessor(ModuleProcessor):
             average_yearly_degradation_percentage_start=inp.average_yearly_degradation_percentage_start or 0,
             average_yearly_degradation_percentage_w=inp.average_yearly_degradation_percentage_w or 0,
             average_yearly_degradation_percentage_wo=inp.average_yearly_degradation_percentage_start or 0,
+            agb_t2_start=inp.agb_t2_start,
+            agb_t2_w=inp.agb_t2_w,
+            agb_t2_wo=inp.agb_t2_start,
+            agb_growth_rate_le_20_yrs_t2_start=inp.agb_growth_rate_le_20_yrs_t2_start,
+            agb_growth_rate_le_20_yrs_t2_w=inp.agb_growth_rate_le_20_yrs_t2_w,
+            agb_growth_rate_le_20_yrs_t2_wo=inp.agb_growth_rate_le_20_yrs_t2_start,
+            agb_growth_rate_gt_20_yrs_t2_start=inp.agb_growth_rate_gt_20_yrs_t2_start,
+            agb_growth_rate_gt_20_yrs_t2_w=inp.agb_growth_rate_gt_20_yrs_t2_w,
+            agb_growth_rate_gt_20_yrs_t2_wo=inp.agb_growth_rate_gt_20_yrs_t2_start,
+            bgb_t2_start=inp.bgb_t2_start,
+            bgb_t2_w=inp.bgb_t2_w,
+            bgb_t2_wo=inp.bgb_t2_start,
+            bgb_growth_rate_le_20_yrs_t2_start=inp.bgb_growth_rate_le_20_yrs_t2_start,
+            bgb_growth_rate_le_20_yrs_t2_w=inp.bgb_growth_rate_le_20_yrs_t2_w,
+            bgb_growth_rate_le_20_yrs_t2_wo=inp.bgb_growth_rate_le_20_yrs_t2_start,
+            bgb_growth_rate_gt_20_yrs_t2_start=inp.bgb_growth_rate_gt_20_yrs_t2_start,
+            bgb_growth_rate_gt_20_yrs_t2_w=inp.bgb_growth_rate_gt_20_yrs_t2_w,
+            bgb_growth_rate_gt_20_yrs_t2_wo=inp.bgb_growth_rate_gt_20_yrs_t2_start,
+            litter_t2_start=inp.litter_t2_start,
+            litter_t2_w=inp.litter_t2_w,
+            litter_t2_wo=inp.litter_t2_start,
+            deadwood_t2_start=inp.deadwood_t2_start,
+            deadwood_t2_w=inp.deadwood_t2_w,
+            deadwood_t2_wo=inp.deadwood_t2_start,
         )
 
 
@@ -1756,6 +1976,44 @@ class AquacultureProcessor(ModuleProcessor):
         return module
 
 
+class OrganicSoilProcessor(ModuleProcessor):
+    """Processor for Organic Soil modules"""
+
+    def create_module_from_input(self, inp: OrganicSoilInput, factories: Any, models: Any, activity: "models.Activity" = None, create: bool = False, luc: "models.LandUseChange" = None) -> Any:
+        if activity is None:
+            p = self.create_project_from_env(inp.env, factories, save=create)
+            a = self.build_activity(p, factories) if not create else self.create_activity(p, factories)
+        else:
+            a = activity
+
+        method = factories.OrganicSoilFactory.create if create else factories.OrganicSoilFactory.build
+
+        module = method(
+            activity=a,
+            land_use_change=luc,
+            drainage_area_start=inp.drainage_area_start,
+            drainage_area_w=inp.drainage_area_w,
+            drainage_area_wo=inp.drainage_area_start,
+            area_not_drained_start=inp.area_not_drained_start,
+            area_not_drained_w=inp.area_not_drained_w,
+            area_not_drained_wo=inp.area_not_drained_start,
+            ditches_area_start=inp.ditches_area_start,
+            ditches_area_w=inp.ditches_area_w,
+            ditches_area_wo=inp.ditches_area_start,
+            fire_type_start=inp.fire_type_start,
+            fire_type_w=inp.fire_type_w,
+            fire_type_wo=inp.fire_type_start,
+            soil_fire_periodicity_start=inp.soil_fire_periodicity_start,
+            soil_fire_periodicity_w=inp.soil_fire_periodicity_w,
+            soil_fire_periodicity_wo=inp.soil_fire_periodicity_start,
+            soil_fire_impact_percentage_start=inp.soil_fire_impact_percentage_start,
+            soil_fire_impact_percentage_w=inp.soil_fire_impact_percentage_w,
+            soil_fire_impact_percentage_wo=inp.soil_fire_impact_percentage_start,
+        )
+
+        return module
+
+
 class ProcessorRegistry:
     """Registry for module processors"""
 
@@ -1780,6 +2038,7 @@ class ProcessorRegistry:
         self.register("LandUseChange", LandUseChangeProcessor(self._data_builder_registry))
         self.register("OtherLand", OtherLandProcessor(self._data_builder_registry))
         self.register("SetAside", SetAsideProcessor(self._data_builder_registry))
+        self.register("OrganicSoil", OrganicSoilProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -2897,7 +3156,6 @@ class HammingPermutationComputer:
     def one_change_combinations_fast(self, fields_dict, key_fn=lambda o: getattr(o, "pk", o)):
         import numpy as np
         import pandas as pd
-        from itertools import product
 
         SUFFIX_START = "_start"
         SUFFIX_W = "_w"
@@ -3025,10 +3283,18 @@ class HammingPermutationComputer:
         max_workers: Optional[int] = None,
         resume: bool = False,
         filename: Optional[str] = None,
+        organic_soil_config: Optional[Dict[str, Any]] = None,
+        environment_filters: Optional[Dict[str, Iterable[Any]]] = None,
+        static_fields: Optional[Dict[str, Any]] = None,
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Compute Hamming shell permutations for a model"""
+        """Compute Hamming shell permutations for a model
+
+        Args:
+            static_fields: Fields that are included in every permutation but don't
+                           contribute to the Hamming shell calculation. Values should
+                           be single values (not lists) or lists with one element.
+        """
         import api.models as models
-        from itertools import chain
 
         # fields["climate"] = (
         #     list(set(chain(*[list(x.climates.all()) for x in fields["land_use_type_start"] + fields["land_use_type_w"]])))
@@ -3040,6 +3306,8 @@ class HammingPermutationComputer:
         # fields["region"] = list(models.Region.objects.filter(countries__isnull=False).distinct()) if "soil_type" in fields else models.Region.objects.filter(countries__isnull=False).distinct()
 
         # pairs = list(self.one_change_combinations(fields))
+
+        environment_filters = environment_filters or {}
 
         # Get land use types for validation
         land_use_types = []
@@ -3074,6 +3342,19 @@ class HammingPermutationComputer:
 
         # pairs = list(self.one_change_combinations_fast(fields))
 
+        # Apply optional environmental filters (by object identity to avoid extra queries)
+        allowed_climates = environment_filters.get("climates")
+        allowed_moistures = environment_filters.get("moistures")
+        allowed_soil_types = environment_filters.get("soil_types")
+        allowed_regions = environment_filters.get("regions")
+
+        if allowed_climates or allowed_moistures or allowed_soil_types:
+            valid_combinations = [
+                combo
+                for combo in valid_combinations
+                if (not allowed_climates or combo[0] in allowed_climates) and (not allowed_moistures or combo[1] in allowed_moistures) and (not allowed_soil_types or combo[2] in allowed_soil_types)
+            ]
+
         # Extract unique climate-moisture and soil_type combinations from valid combinations
         valid_climate_moistures = list(set((cm[0], cm[1]) for cm in valid_combinations))
         valid_soil_types = list(set(cm[2] for cm in valid_combinations))
@@ -3083,6 +3364,9 @@ class HammingPermutationComputer:
         # Filter regions to only include those with countries
         # Use a more efficient database query
         regions_with_countries = list(models.Region.objects.filter(countries__isnull=False).distinct())
+        if allowed_regions:
+            allowed_region_ids = {r.id for r in allowed_regions}
+            regions_with_countries = [r for r in regions_with_countries if r.id in allowed_region_ids]
 
         logger.info(f"Found {len(regions_with_countries)} regions with countries (out of {models.Region.objects.count()} total regions)")
         logger.info(f"Computing Hamming shell permutations for {model.__name__}...")
@@ -3270,6 +3554,18 @@ class HammingPermutationComputer:
                                     field_data[field_name] = hamming_row[field_name]
                                 else:
                                     field_data[field_name] = list(fields[field_name])[0]
+
+                            # Include static fields (constant values for every permutation)
+                            if static_fields:
+                                for key, value in static_fields.items():
+                                    field_data[key] = value[0] if isinstance(value, list) else value
+
+                            # Include organic_soil config if present
+                            if organic_soil_config:
+                                organic_soil_fields = {}
+                                for key, values in organic_soil_config.get("fields", {}).items():
+                                    organic_soil_fields[key] = values[0] if isinstance(values, list) and values else values
+                                field_data["organic_soil"] = organic_soil_fields
 
                             # Create typed module input
                             module_input = create_module_input(model.__name__, field_data, env)
@@ -3716,8 +4012,6 @@ MODULE_CONFIGS = {
     },
 }
 
-from . import minitool_scenarios as scenarios
-
 SCENARIOS_TO_RUN = [
     # scenarios.SOIL_REMEDIATION_1,
     # scenarios.SOIL_REMEDIATION_2,
@@ -3734,8 +4028,20 @@ SCENARIOS_TO_RUN = [
     # scenarios.MANGROVE_REPLANTING_2,
     # scenarios.COASTAL_ZONE_STABILIZATION_1,
     # scenarios.RIVERBANK_RESTORATION_1,
-    scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1,  # TODO: No processor for OrganicSoil
-    scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
+    # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1,
+    # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
+    # scenarios.NATURAL_REGENERATION_1,
+    # scenarios.NATURAL_REGENERATION_2,
+    # scenarios.FOREST_T2,
+    # scenarios.ASSISTED_NATURAL_REGENERATION_1,
+    # scenarios.DIRECT_PLANTING_1,
+    # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1,
+    # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2,
+    # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1,
+    # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2,
+    # scenarios.REINTRODUCTION_OF_THREATENED_SPECIES_1,
+    # scenarios.SOIL_AMENDMENTS_1,
+    # scenarios.SOIL_AMENDMENTS_2,
 ]
 
 
@@ -3778,9 +4084,20 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
 
                     # Get filename for this subset if present
                     subset_filename = subset.get("filename", None)
+                    organic_soil_config = subset.get("organic_soil", None)
+                    static_fields = subset.get("static_fields", None)
 
                     data, errors = hamming_computer.compute_hamming_permutations(
-                        subset["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"], resume=resume, filename=subset_filename
+                        subset["fields"],
+                        model_class,
+                        chunk_size=CONFIG["chunk_size"],
+                        stop_at=CONFIG["max_rows"],
+                        max_workers=CONFIG["max_workers"],
+                        resume=resume,
+                        filename=subset_filename,
+                        organic_soil_config=organic_soil_config,
+                        environment_filters=subset.get("environment_filters"),
+                        static_fields=static_fields,
                     )
                     logger.info(f"Subset {subset_index + 1}/{len(config['subsets']):,} completed: {len(data):,} data rows, {len(errors):,} error rows")
 

@@ -12,7 +12,15 @@ def cycle_all_modules_and_invalidate_cached_results():
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
             if issubclass(ModuleClass, models.CachedResultMixin):
-                ModuleClass.objects.all().update(
+                modules = ModuleClass.objects.all()
+                if issubclass(ModuleClass, models.Submodule):
+                    modules = ModuleClass.objects.filter(parent__activity__project__is_finalized=False)
+                    log.debug(f"Skipping {ModuleClass.objects.filter(parent__activity__project__is_finalized=True).count()} finalized modules")
+                else:
+                    modules = ModuleClass.objects.filter(activity__project__is_finalized=False)
+                    log.debug(f"Skipping {ModuleClass.objects.filter(activity__project__is_finalized=True).count()} finalized modules")
+
+                modules.update(
                     updated_at=None,
                     last_cached_at=None,
                     cached_results_total=None,

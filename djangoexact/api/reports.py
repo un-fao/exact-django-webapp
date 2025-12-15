@@ -685,6 +685,27 @@ class BaseActivityReport:
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.activity_title))
         self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
+        t2_overrides = []
+        if self.activity.climate_t2:
+            t2_overrides.append(("Climate", self.activity.climate_t2.name))
+        if self.activity.moisture_t2:
+            t2_overrides.append(("Moisture", self.activity.moisture_t2.name))
+        if self.activity.soil_type_t2:
+            t2_overrides.append(("Soil type", self.activity.soil_type_t2.name))
+        if self.activity.duration_t2:
+            t2_overrides.append(("Duration", self.activity.duration_t2))
+        if self.activity.start_year_t2 is not None:
+            t2_overrides.append(("Start year", self.activity.start_year_t2))
+        if self.activity.last_year_of_accounting_t2:
+            t2_overrides.append(("Last year of accounting", self.activity.last_year_of_accounting_t2))
+        if self.activity.soc_t2:
+            t2_overrides.append(("SOC", self.activity.soc_t2))
+
+        for label, value in t2_overrides:
+            last_metadata_row += 1
+            self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=label)
+            self.metadata_worksheet.cell(row=last_metadata_row, column=5, value=value)
+
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1, value=str(self.activity_title))
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
 
