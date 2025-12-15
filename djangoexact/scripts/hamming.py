@@ -47,6 +47,10 @@ def hamming_shell_rows(fields: dict):
     Yields dict rows where exactly one field differs from its baseline value.
     Processes fields ending with _start and _w (hamming sphere permutations).
     Also includes all other fields as environmental combinations.
+
+    When there are no variations possible (no _start/_w pairs and single fields
+    have only one value each), yields a single baseline row so that environmental
+    combinations can still be generated.
     """
     pairs, single_fields = domains_from_fields(fields)
 
@@ -62,6 +66,27 @@ def hamming_shell_rows(fields: dict):
         paired_bases.append(list(fields[s_col]))  # Use _start domain for baseline
     single_bases = [dom for (_, dom) in single_fields]
     all_bases = paired_bases + single_bases
+
+    # Check if there are any variations possible
+    # Variations exist if: (1) paired fields have w values different from start, or
+    #                      (2) single fields have more than one value
+    has_paired_variations = any(len(fields[w_col]) > 1 or len(fields[s_col]) > 1 for _, s_col, w_col, _ in pairs)
+    has_single_variations = any(len(dom) > 1 for _, dom in single_fields)
+    has_variations = has_paired_variations or has_single_variations
+
+    # If no variations possible, yield baseline rows for each combination of single fields
+    if not has_variations and not pairs:
+        # Generate baseline rows for all combinations of single field values
+        if single_fields:
+            for baseline_vals in product(*single_bases):
+                row = {}
+                for i, (field_name, _) in enumerate(single_fields):
+                    row[field_name] = baseline_vals[i]
+                yield row
+        else:
+            # No fields at all - yield empty row
+            yield {}
+        return
 
     # iterate baseline assignment (choose ONE value per field)
     for baseline_vals in product(*all_bases):
@@ -206,7 +231,11 @@ def expected_count(fields: dict) -> int:
     single_variations = sum(s - 1 for s in single_sizes)
     total_variations = paired_variations + single_variations
 
-    return prod * total_variations
+    # If no variations possible but we have single fields, count is the product of single field sizes
+    if total_variations == 0 and single_fields and not pairs:
+        return prod
+
+    return prod * total_variations if total_variations > 0 else 0
 
 
 annual_cropland_climate_moistures = ClimateMoistureValidator.get_valid_combinations([models.LandUseType.objects.get(name="Default")], models)
