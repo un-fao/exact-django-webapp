@@ -8,7 +8,7 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 import traceback
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional, Tuple, Callable
+from typing import Dict, List, Any, Optional, Tuple, Callable, Iterable
 from pathlib import Path
 from enum import Enum
 import io
@@ -29,6 +29,7 @@ import ipcc.models as ipcc_models  # noqa: E402
 
 # Import Hamming functions
 from .hamming import hamming_shell_rows  # noqa: E402
+from . import minitool_scenarios as scenarios  # noqa: E402
 
 
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
@@ -483,6 +484,22 @@ class ForestManagementInput(ModuleInput):
     forest_condition_type: Any = None
     average_yearly_degradation_percentage_start: Any = None
     average_yearly_degradation_percentage_w: Any = None
+    agb_t2_start: Any = None
+    agb_t2_w: Any = None
+    agb_growth_rate_le_20_yrs_t2_start: Any = None
+    agb_growth_rate_le_20_yrs_t2_w: Any = None
+    agb_growth_rate_gt_20_yrs_t2_start: Any = None
+    agb_growth_rate_gt_20_yrs_t2_w: Any = None
+    bgb_t2_start: Any = None
+    bgb_t2_w: Any = None
+    bgb_growth_rate_le_20_yrs_t2_start: Any = None
+    bgb_growth_rate_le_20_yrs_t2_w: Any = None
+    bgb_growth_rate_gt_20_yrs_t2_start: Any = None
+    bgb_growth_rate_gt_20_yrs_t2_w: Any = None
+    litter_t2_start: Any = None
+    litter_t2_w: Any = None
+    deadwood_t2_start: Any = None
+    deadwood_t2_w: Any = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], env: EnvironmentContext = None) -> "ForestManagementInput":
@@ -493,6 +510,22 @@ class ForestManagementInput(ModuleInput):
             forest_condition_type=data.get("forest_condition_type"),
             average_yearly_degradation_percentage_start=data.get("average_yearly_degradation_percentage_start"),
             average_yearly_degradation_percentage_w=data.get("average_yearly_degradation_percentage_w"),
+            agb_t2_start=data.get("agb_t2_start"),
+            agb_t2_w=data.get("agb_t2_w"),
+            agb_growth_rate_le_20_yrs_t2_start=data.get("agb_growth_rate_le_20_yrs_t2_start"),
+            agb_growth_rate_le_20_yrs_t2_w=data.get("agb_growth_rate_le_20_yrs_t2_w"),
+            agb_growth_rate_gt_20_yrs_t2_start=data.get("agb_growth_rate_gt_20_yrs_t2_start"),
+            agb_growth_rate_gt_20_yrs_t2_w=data.get("agb_growth_rate_gt_20_yrs_t2_w"),
+            bgb_t2_start=data.get("bgb_t2_start"),
+            bgb_t2_w=data.get("bgb_t2_w"),
+            bgb_growth_rate_le_20_yrs_t2_start=data.get("bgb_growth_rate_le_20_yrs_t2_start"),
+            bgb_growth_rate_le_20_yrs_t2_w=data.get("bgb_growth_rate_le_20_yrs_t2_w"),
+            bgb_growth_rate_gt_20_yrs_t2_start=data.get("bgb_growth_rate_gt_20_yrs_t2_start"),
+            bgb_growth_rate_gt_20_yrs_t2_w=data.get("bgb_growth_rate_gt_20_yrs_t2_w"),
+            litter_t2_start=data.get("litter_t2_start"),
+            litter_t2_w=data.get("litter_t2_w"),
+            deadwood_t2_start=data.get("deadwood_t2_start"),
+            deadwood_t2_w=data.get("deadwood_t2_w"),
         )
 
 
@@ -995,6 +1028,22 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
         """Get custom fields that don't follow the standard pattern"""
         return {
             "land_use_type": getattr(module, "land_use_type_start", None),
+            "agb_t2_start": getattr(module, "agb_t2_start", None),
+            "agb_t2_w": getattr(module, "agb_t2_w", None),
+            "agb_growth_rate_le_20_yrs_t2_start": getattr(module, "agb_growth_rate_le_20_yrs_t2_start", None),
+            "agb_growth_rate_le_20_yrs_t2_w": getattr(module, "agb_growth_rate_le_20_yrs_t2_w", None),
+            "agb_growth_rate_gt_20_yrs_t2_start": getattr(module, "agb_growth_rate_gt_20_yrs_t2_start", None),
+            "agb_growth_rate_gt_20_yrs_t2_w": getattr(module, "agb_growth_rate_gt_20_yrs_t2_w", None),
+            "bgb_t2_start": getattr(module, "bgb_t2_start", None),
+            "bgb_t2_w": getattr(module, "bgb_t2_w", None),
+            "bgb_growth_rate_le_20_yrs_t2_start": getattr(module, "bgb_growth_rate_le_20_yrs_t2_start", None),
+            "bgb_growth_rate_le_20_yrs_t2_w": getattr(module, "bgb_growth_rate_le_20_yrs_t2_w", None),
+            "bgb_growth_rate_gt_20_yrs_t2_start": getattr(module, "bgb_growth_rate_gt_20_yrs_t2_start", None),
+            "bgb_growth_rate_gt_20_yrs_t2_w": getattr(module, "bgb_growth_rate_gt_20_yrs_t2_w", None),
+            "litter_t2_start": getattr(module, "litter_t2_start", None),
+            "litter_t2_w": getattr(module, "litter_t2_w", None),
+            "deadwood_t2_start": getattr(module, "deadwood_t2_start", None),
+            "deadwood_t2_w": getattr(module, "deadwood_t2_w", None),
         }
 
 
@@ -1119,11 +1168,25 @@ class LandUseChangeDataBuilder(ModuleDataBuilder):
             start_data = self._extract_module_data(start_module, "module_start_")
             data.update(start_data)
 
+            if module_start.module_type == "OtherLand":
+                data["module_start_is_degraded_land_start"] = getattr(module_start, "is_degraded_land_start", None)
+                data["module_start_is_degraded_land_w"] = getattr(module_start, "is_degraded_land_w", None)
+            elif module_start.module_type == "SetAside":
+                data["module_start_is_set_aside_start"] = getattr(module_start, "is_set_aside_start", None)
+                data["module_start_is_set_aside_w"] = getattr(module_start, "is_set_aside_w", None)
+
         # Add module_w_ prefixed fields
         if module_w:
             with_module = module_w
             with_data = self._extract_module_data(with_module, "module_w_")
             data.update(with_data)
+
+            if module_start.module_type == "OtherLand":
+                data["module_start_is_degraded_land_start"] = getattr(module_start, "is_degraded_land_start", None)
+                data["module_start_is_degraded_land_w"] = getattr(module_start, "is_degraded_land_w", None)
+            elif module_start.module_type == "SetAside":
+                data["module_start_is_set_aside_start"] = getattr(module_start, "is_set_aside_start", None)
+                data["module_start_is_set_aside_w"] = getattr(module_start, "is_set_aside_w", None)
 
         return data
 
@@ -1672,6 +1735,30 @@ class ForestManagementProcessor(ModuleProcessor):
             average_yearly_degradation_percentage_start=inp.average_yearly_degradation_percentage_start or 0,
             average_yearly_degradation_percentage_w=inp.average_yearly_degradation_percentage_w or 0,
             average_yearly_degradation_percentage_wo=inp.average_yearly_degradation_percentage_start or 0,
+            agb_t2_start=inp.agb_t2_start,
+            agb_t2_w=inp.agb_t2_w,
+            agb_t2_wo=inp.agb_t2_start,
+            agb_growth_rate_le_20_yrs_t2_start=inp.agb_growth_rate_le_20_yrs_t2_start,
+            agb_growth_rate_le_20_yrs_t2_w=inp.agb_growth_rate_le_20_yrs_t2_w,
+            agb_growth_rate_le_20_yrs_t2_wo=inp.agb_growth_rate_le_20_yrs_t2_start,
+            agb_growth_rate_gt_20_yrs_t2_start=inp.agb_growth_rate_gt_20_yrs_t2_start,
+            agb_growth_rate_gt_20_yrs_t2_w=inp.agb_growth_rate_gt_20_yrs_t2_w,
+            agb_growth_rate_gt_20_yrs_t2_wo=inp.agb_growth_rate_gt_20_yrs_t2_start,
+            bgb_t2_start=inp.bgb_t2_start,
+            bgb_t2_w=inp.bgb_t2_w,
+            bgb_t2_wo=inp.bgb_t2_start,
+            bgb_growth_rate_le_20_yrs_t2_start=inp.bgb_growth_rate_le_20_yrs_t2_start,
+            bgb_growth_rate_le_20_yrs_t2_w=inp.bgb_growth_rate_le_20_yrs_t2_w,
+            bgb_growth_rate_le_20_yrs_t2_wo=inp.bgb_growth_rate_le_20_yrs_t2_start,
+            bgb_growth_rate_gt_20_yrs_t2_start=inp.bgb_growth_rate_gt_20_yrs_t2_start,
+            bgb_growth_rate_gt_20_yrs_t2_w=inp.bgb_growth_rate_gt_20_yrs_t2_w,
+            bgb_growth_rate_gt_20_yrs_t2_wo=inp.bgb_growth_rate_gt_20_yrs_t2_start,
+            litter_t2_start=inp.litter_t2_start,
+            litter_t2_w=inp.litter_t2_w,
+            litter_t2_wo=inp.litter_t2_start,
+            deadwood_t2_start=inp.deadwood_t2_start,
+            deadwood_t2_w=inp.deadwood_t2_w,
+            deadwood_t2_wo=inp.deadwood_t2_start,
         )
 
 
@@ -3069,7 +3156,6 @@ class HammingPermutationComputer:
     def one_change_combinations_fast(self, fields_dict, key_fn=lambda o: getattr(o, "pk", o)):
         import numpy as np
         import pandas as pd
-        from itertools import product
 
         SUFFIX_START = "_start"
         SUFFIX_W = "_w"
@@ -3198,10 +3284,17 @@ class HammingPermutationComputer:
         resume: bool = False,
         filename: Optional[str] = None,
         organic_soil_config: Optional[Dict[str, Any]] = None,
+        environment_filters: Optional[Dict[str, Iterable[Any]]] = None,
+        static_fields: Optional[Dict[str, Any]] = None,
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Compute Hamming shell permutations for a model"""
+        """Compute Hamming shell permutations for a model
+
+        Args:
+            static_fields: Fields that are included in every permutation but don't
+                           contribute to the Hamming shell calculation. Values should
+                           be single values (not lists) or lists with one element.
+        """
         import api.models as models
-        from itertools import chain
 
         # fields["climate"] = (
         #     list(set(chain(*[list(x.climates.all()) for x in fields["land_use_type_start"] + fields["land_use_type_w"]])))
@@ -3213,6 +3306,8 @@ class HammingPermutationComputer:
         # fields["region"] = list(models.Region.objects.filter(countries__isnull=False).distinct()) if "soil_type" in fields else models.Region.objects.filter(countries__isnull=False).distinct()
 
         # pairs = list(self.one_change_combinations(fields))
+
+        environment_filters = environment_filters or {}
 
         # Get land use types for validation
         land_use_types = []
@@ -3247,6 +3342,19 @@ class HammingPermutationComputer:
 
         # pairs = list(self.one_change_combinations_fast(fields))
 
+        # Apply optional environmental filters (by object identity to avoid extra queries)
+        allowed_climates = environment_filters.get("climates")
+        allowed_moistures = environment_filters.get("moistures")
+        allowed_soil_types = environment_filters.get("soil_types")
+        allowed_regions = environment_filters.get("regions")
+
+        if allowed_climates or allowed_moistures or allowed_soil_types:
+            valid_combinations = [
+                combo
+                for combo in valid_combinations
+                if (not allowed_climates or combo[0] in allowed_climates) and (not allowed_moistures or combo[1] in allowed_moistures) and (not allowed_soil_types or combo[2] in allowed_soil_types)
+            ]
+
         # Extract unique climate-moisture and soil_type combinations from valid combinations
         valid_climate_moistures = list(set((cm[0], cm[1]) for cm in valid_combinations))
         valid_soil_types = list(set(cm[2] for cm in valid_combinations))
@@ -3256,6 +3364,9 @@ class HammingPermutationComputer:
         # Filter regions to only include those with countries
         # Use a more efficient database query
         regions_with_countries = list(models.Region.objects.filter(countries__isnull=False).distinct())
+        if allowed_regions:
+            allowed_region_ids = {r.id for r in allowed_regions}
+            regions_with_countries = [r for r in regions_with_countries if r.id in allowed_region_ids]
 
         logger.info(f"Found {len(regions_with_countries)} regions with countries (out of {models.Region.objects.count()} total regions)")
         logger.info(f"Computing Hamming shell permutations for {model.__name__}...")
@@ -3443,6 +3554,11 @@ class HammingPermutationComputer:
                                     field_data[field_name] = hamming_row[field_name]
                                 else:
                                     field_data[field_name] = list(fields[field_name])[0]
+
+                            # Include static fields (constant values for every permutation)
+                            if static_fields:
+                                for key, value in static_fields.items():
+                                    field_data[key] = value[0] if isinstance(value, list) else value
 
                             # Include organic_soil config if present
                             if organic_soil_config:
@@ -3896,8 +4012,6 @@ MODULE_CONFIGS = {
     },
 }
 
-from . import minitool_scenarios as scenarios
-
 SCENARIOS_TO_RUN = [
     # scenarios.SOIL_REMEDIATION_1,
     # scenarios.SOIL_REMEDIATION_2,
@@ -3917,14 +4031,15 @@ SCENARIOS_TO_RUN = [
     # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1,
     # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
     # scenarios.NATURAL_REGENERATION_1,
-    scenarios.NATURAL_REGENERATION_2,
+    # scenarios.NATURAL_REGENERATION_2,
+    # scenarios.FOREST_T2,
     # scenarios.ASSISTED_NATURAL_REGENERATION_1,
     # scenarios.DIRECT_PLANTING_1,
-    scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1,
+    # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1,
     # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2,
     # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1,
     # scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2,
-    scenarios.REINTRODUCTION_OF_THREATENED_SPECIES_1,
+    # scenarios.REINTRODUCTION_OF_THREATENED_SPECIES_1,
     # scenarios.SOIL_AMENDMENTS_1,
     # scenarios.SOIL_AMENDMENTS_2,
 ]
@@ -3970,6 +4085,7 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
                     # Get filename for this subset if present
                     subset_filename = subset.get("filename", None)
                     organic_soil_config = subset.get("organic_soil", None)
+                    static_fields = subset.get("static_fields", None)
 
                     data, errors = hamming_computer.compute_hamming_permutations(
                         subset["fields"],
@@ -3980,6 +4096,8 @@ def run_minitool_hamming(resume: bool = False, count_only: bool = False):
                         resume=resume,
                         filename=subset_filename,
                         organic_soil_config=organic_soil_config,
+                        environment_filters=subset.get("environment_filters"),
+                        static_fields=static_fields,
                     )
                     logger.info(f"Subset {subset_index + 1}/{len(config['subsets']):,} completed: {len(data):,} data rows, {len(errors):,} error rows")
 
