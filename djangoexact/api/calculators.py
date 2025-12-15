@@ -6721,9 +6721,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
                 "weight_peat": self.conversion_factor_wo.weight,
-                "mass_tonnes_tier_2": input.peat_density_t2_w,  # TODO: Change to volume of air dry peat for excavated area
-                "conversion_factor_volume": self.conversion_factor_wo.volume,
-                "c_fraction_ref": 1,  # TODO: Should be conversion_factor_w.volume,
+                "volume_air_dried_peat_per_hectare_tier_2": input.peat_density_t2_w,
+                "c_fraction_volume": self.conversion_factor_wo.volume,
                 "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
                 "extraction_height_end": input.peat_extraction_height_w if input.peat_extraction_height_w is not None else 0,
                 "delay": self.activity.delay,
@@ -6819,9 +6818,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
                 "weight_peat": self.conversion_factor_wo.weight,
-                "mass_tonnes_tier_2": input.peat_density_t2_wo,  # TODO: Change to volume of air dry peat for excavated area
-                "conversion_factor_volume": self.conversion_factor_wo.volume,
-                "c_fraction_ref": 1,  # TODO: Should be conversion_factor_wo.volume,
+                "volume_air_dried_peat_per_hectare_tier_2": input.peat_density_t2_wo,
+                "c_fraction_volume": self.conversion_factor_wo.volume,
                 "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
                 "extraction_height_end": input.peat_extraction_height_wo if input.peat_extraction_height_wo is not None else 0,
                 "delay": self.activity.delay,

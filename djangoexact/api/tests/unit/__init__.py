@@ -8,6 +8,7 @@ from .land_use_change import *
 from .land_use_change_examples import *
 from .large_fishery import *
 from .livestock import *
+from .organic_soil import *
 from .perennial_cropland import *
 from .project import *
 from .small_fishery import *
