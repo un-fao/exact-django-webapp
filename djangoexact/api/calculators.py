@@ -2024,7 +2024,18 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.biomass_ef_wo.value = 0
 
     def _compute_biomass_for_maturity(
-        self, agb_start, agb_end, bgb_start, bgb_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
+        self,
+        agb_start,
+        agb_end,
+        bgb_start,
+        bgb_end,
+        has_change_in_system,
+        scenario_type_start: utils.ScenarioTypes,
+        scenario_type_end: utils.ScenarioTypes,
+        agb_t2_start: float = None,
+        agb_t2_end: float = None,
+        bgb_t2_start: float = None,
+        bgb_t2_end: float = None,
     ) -> tuple[
         ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.PerennialBGB, ipcc.PerennialBGB
     ]:
@@ -2064,6 +2075,12 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
                 self.bgb_start.value = None
 
+            if agb_t2_start is not None:
+                self.agb_start.value = agb_t2_start
+
+            if bgb_t2_start is not None:
+                self.bgb_start.value = bgb_t2_start
+
             self.agb_end.value = 0
             self.bgb_end.value = 0
 
@@ -2081,6 +2098,12 @@ class PerennialCropCalculator(LandModuleCalculator):
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
                 self.bgb_start.value = None
+
+            if agb_t2_start is not None:
+                self.agb_start.value = agb_t2_start
+
+            if bgb_t2_start is not None:
+                self.bgb_start.value = bgb_t2_start
 
             if has_change_in_system or is_complete_renewal:
                 if scenario_type_start == utils.ScenarioTypes.START:
@@ -2152,6 +2175,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_w if self.module.land_use_type_w is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITH,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_start,
             )
 
             self.inputs_start_w = {
@@ -2195,7 +2220,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": self.agb_start_default.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "agb_end_default": agb_end.value,
@@ -2218,6 +2243,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_wo if self.module.land_use_type_wo is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITHOUT,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_start,
             )
 
             self.inputs_start_wo = {
@@ -2261,7 +2288,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "agb_end_default": agb_end.value,
@@ -2285,6 +2312,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_w,
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_w,
             )
 
             if self.module.is_complete_renewal_w:
@@ -2332,7 +2361,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2355,6 +2384,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_wo,
                 utils.ScenarioTypes.WITHOUT,
                 utils.ScenarioTypes.WITHOUT,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_wo,
             )
             if self.module.is_complete_renewal_wo:
                 self.end_module_has_growth_wo = True
@@ -2401,7 +2432,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
