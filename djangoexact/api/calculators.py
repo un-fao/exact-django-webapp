@@ -631,6 +631,12 @@ class LandModuleCalculator(BaseCalculator):
         self.module_w: LandModule | SingleBiomassModule = self.module
         self.module_wo: LandModule | SingleBiomassModule = self.module
 
+        self.calculate_soc_som_start_w = CALCULATE_SOC_SOM_START_W
+        self.calculate_soc_som_start_wo = CALCULATE_SOC_SOM_START_WO
+        self.calculate_soc_som_w = CALCULATE_SOC_SOM_W
+        self.calculate_soc_som_wo = CALCULATE_SOC_SOM_WO
+        self._apply_soc_som_rules()
+
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
 
         self.biomass_ef_start_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
@@ -650,10 +656,29 @@ class LandModuleCalculator(BaseCalculator):
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
 
+    def _has_organic_soil_module(self) -> bool:
+        try:
+            return self.activity.module_types.filter(class_name__iexact="OrganicSoil").exists()
+        except Exception:
+            return False
+
+    def _apply_soc_som_rules(self) -> None:
+        self.calculate_soc_som_start_w = CALCULATE_SOC_SOM_START_W
+        self.calculate_soc_som_start_wo = CALCULATE_SOC_SOM_START_WO
+        self.calculate_soc_som_w = CALCULATE_SOC_SOM_W
+        self.calculate_soc_som_wo = CALCULATE_SOC_SOM_WO
+
+        if self._has_organic_soil_module():
+            self.calculate_soc_som_start_w = False
+            self.calculate_soc_som_start_wo = False
+            self.calculate_soc_som_w = False
+            self.calculate_soc_som_wo = False
+
     def calculate(self, module: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         return super().calculate(module, aggregate_by)
 
     def get_defaults(self, calculate=False) -> dict:
+        self._apply_soc_som_rules()
         moisture_flt = {"moisture": self.moisture}
 
         self.soc = ipcc.SoilOrganicCarbon.objects.filter(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type).first()
@@ -1579,7 +1604,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1641,7 +1666,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1706,7 +1731,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1771,7 +1796,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -2166,7 +2191,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "delay": self.activity.delay,
                 "agb_start_default": self.agb_start_default.value,
                 "bgb_start_default": bgb_start.value,
@@ -2232,7 +2257,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
@@ -2302,7 +2327,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
@@ -2371,7 +2396,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
@@ -2602,7 +2627,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2660,7 +2685,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2719,7 +2744,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "straw_burnt": self.module.organic_amendment_type_w.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2778,7 +2803,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "straw_burnt": self.module.organic_amendment_type_wo.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2913,7 +2938,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -2961,7 +2986,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -3012,7 +3037,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -3063,7 +3088,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -4382,7 +4407,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4418,7 +4443,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4455,7 +4480,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4492,7 +4517,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7495,7 +7520,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7533,7 +7558,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7572,7 +7597,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7611,7 +7636,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7675,7 +7700,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7711,7 +7736,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7748,7 +7773,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7785,7 +7810,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
