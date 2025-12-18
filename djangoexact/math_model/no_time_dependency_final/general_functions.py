@@ -710,7 +710,6 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             # i represents the column of our matrix. When there is logging we are cutting down a percentage of the forest present in year i
-            # We are cutting down a percentage of the forest present in year i
 
             if i <= agb_matrix.shape[1]:
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence + start_year] * percentage
@@ -718,7 +717,7 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence - 1 + start_year] * percentage
 
             # Update the agb_matrix
-            agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence, recurrence, is_degradation)
+            agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence + start_year, recurrence, is_degradation)
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             # NOTE: as of now result is always empty, add necessary logic or remove it, as it's not used anywhere   

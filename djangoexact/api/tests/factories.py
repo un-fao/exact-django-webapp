@@ -495,29 +495,29 @@ class OrganicSoilFactory(DjangoModelFactory):
 
     status = READY
 
-    drainage_area_start = factory.fuzzy.FuzzyFloat(0, 100)
-    drainage_area_w = factory.fuzzy.FuzzyFloat(0, 100)
-    drainage_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # drainage_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    area_not_drained_start = factory.fuzzy.FuzzyFloat(0, 100)
-    area_not_drained_w = factory.fuzzy.FuzzyFloat(0, 100)
-    area_not_drained_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # area_not_drained_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    ditches_area_start = factory.fuzzy.FuzzyFloat(0, 100)
-    ditches_area_w = factory.fuzzy.FuzzyFloat(0, 100)
-    ditches_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # ditches_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    fire_type_start = factory.fuzzy.FuzzyChoice(fire_types)
-    fire_type_w = factory.fuzzy.FuzzyChoice(fire_types)
-    fire_type_wo = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_start = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_w = factory.fuzzy.FuzzyChoice(fire_types)
+    # fire_type_wo = factory.fuzzy.FuzzyChoice(fire_types)
 
-    soil_fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 10)
-    soil_fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 10)
-    soil_fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 10)
+    # soil_fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 10)
 
-    soil_fire_impact_percentage_start = factory.fuzzy.FuzzyFloat(0, 1)
-    soil_fire_impact_percentage_w = factory.fuzzy.FuzzyFloat(0, 1)
-    soil_fire_impact_percentage_wo = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_start = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_w = factory.fuzzy.FuzzyFloat(0, 1)
+    # soil_fire_impact_percentage_wo = factory.fuzzy.FuzzyFloat(0, 1)
 
 
 class SetAsideFactory(DjangoModelFactory):
@@ -525,12 +525,11 @@ class SetAsideFactory(DjangoModelFactory):
         model = SetAside
 
     status = READY
+    area = 1
 
-    is_set_aside_start = False
-    is_set_aside_w = False
-    is_set_aside_wo = False
-
-    area = 150
+    # is_set_aside_start = False
+    # is_set_aside_w = False
+    # is_set_aside_wo = False
 
 
 class IrrigationFactory(DjangoModelFactory):
@@ -657,11 +656,11 @@ class OtherLandFactory(DjangoModelFactory):
         model = OtherLand
 
     status = READY
-    area = 150
+    area = 1
 
-    is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
-    is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
-    is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
+    # is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
 
 
 class RoadFactory(DjangoModelFactory):

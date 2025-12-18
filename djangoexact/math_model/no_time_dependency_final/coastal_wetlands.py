@@ -64,8 +64,8 @@ class CoastalWetland(BaseModule):
         )
         self.hectares_revegated = compute_yearly_or_half_year_cumulative(0, self.area_revegated_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-        self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, -self.area_drained_end + self.area_drained_start)
-        self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, -self.area_drained_end + self.area_drained_start)
+        self.area_start_rewetting = max(0, -self.area_drained_end + self.area_drained_start)
+        self.area_end_rewetting = max(0, -self.area_drained_end + self.area_drained_start)
 
         # TODO: ask Lorenzo about this variable and how it should be split across the years
         self.hectares_excavated = compute_yearly_or_half_year_cumulative(self.area_excavated_end - self.area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)

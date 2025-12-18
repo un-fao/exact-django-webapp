@@ -430,6 +430,105 @@ def import_input_types_units():
         print(f"Imported input type {input_type.name} with unit {input_type.unit}")
 
 
+def check_forest_numbers(activities=None):
+    """
+    Check forest numbers
+    """
+    from api.models import ForestManagement
+
+    if activities is None:
+        activities = models.Activity.objects.all()
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    print(f"Activities: {activities.count()}")
+    forest_management_modules = ForestManagement.objects.filter(activity__in=activities)
+    print(f"Forest management modules: {forest_management_modules.count()}")
+    secondary_forest_modules = forest_management_modules.filter(Q(forest_condition_type__name="Secondary"))
+    print(f"Secondary forest modules: {secondary_forest_modules.count()}")
+    plantation_forest_modules = secondary_forest_modules.filter(Q(forest_type__name="Plantation"))
+    print(f"Of which plantations: {plantation_forest_modules.count()}")
+
+    print(f"Percentage of secondary forest modules: {secondary_forest_modules.count() / forest_management_modules.count() * 100}%")
+    print(f"Percentage of plantation forest modules: {plantation_forest_modules.count() / secondary_forest_modules.count() * 100}%")
+
+    # List the (unique) emails of users with the most unique projects that have activities in forest management modules
+    from django.db.models import Count
+
+    users = (
+        models.CustomUser.objects.filter(projects__activities__in=activities)
+        .distinct()
+        .annotate(project_count=Count("projects", filter=Q(projects__activities__in=activities), distinct=True))
+        .order_by("-project_count")
+    )
+    print(f"Users: {users.count()}")
+    for user in users:
+        print(f"User: {user.email} - {user.project_count} unique projects with activities in forest management modules")
+
+    # Confront users affected with total users (in percentage)
+    total_users = models.CustomUser.objects.count()
+    print(f"Total users: {total_users}")
+    print(f"Percentage of users affected: {users.count() / total_users * 100}%")
+
+
+def check_how_many_users_logged_in_last_month(time_period=30):
+    """
+    Check how many users logged in last month
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+
+    users = models.CustomUser.objects.filter(last_login__gte=timezone.now() - timedelta(days=time_period))
+    # Confront users affected with total users (in percentage)
+    total_users = models.CustomUser.objects.count()
+    print(f"Percentage of users logged in last {time_period} days: {users.count()} ({users.count() / total_users * 100:.2f}% of total userbase)")
+
+    return users
+
+
+def check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=30):
+    """
+    Check how many users logged in last time period have been forest management activities
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+
+    activities = models.Activity.objects.filter(created_at__gte=timezone.now() - timedelta(days=time_period))
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    users_last_time_period = check_how_many_users_logged_in_last_month(time_period=time_period)
+
+    users_last_time_period_with_forest_management_activities = users_last_time_period.filter(activities__in=activities)
+    print(
+        f"Amount of active users with activities in forest management in the last {time_period} days: {users_last_time_period_with_forest_management_activities.count()} ({users_last_time_period_with_forest_management_activities.count() / users_last_time_period.count() * 100:.2f}% of active users)"
+    )
+    return users_last_time_period_with_forest_management_activities
+
+
+def get_projects_with_forest_management_activities():
+    projects = models.Project.objects.filter(activities__module_types__name__icontains="Forest Management").distinct()
+    return projects
+
+
+def get_users_with_projects_with_forest_management_activities():
+    users = models.CustomUser.objects.filter(projects__activities__module_types__name__icontains="Forest Management").distinct()
+    return users
+
+
+def get_forest_management_modules_in_plantation_projects():
+    """
+    Get the number of forest management modules in activities in projects with forest type 'Plantation'
+    """
+    projects = get_projects_with_forest_management_activities()
+    forests = models.ForestManagement.objects.filter(activity__project__in=projects, forest_condition_type__name__iexact="Secondary")
+    print(f"Forest management modules in secondary forests or plantation projects: {forests.count()}")
+
+    # How many of them have users that logged in last 90 days?
+    users_last_90_days = check_how_many_users_logged_in_last_month(time_period=90)
+    print(f"Active users last 90 days: {users_last_90_days.count()}")
+    forests_with_users_last_90_days = forests.filter(activity__project__members__user__in=users_last_90_days).distinct("activity__project__members__user")
+    print(f"Active users with Forest management modules in secondary forests or plantations in the last 90 days: {forests_with_users_last_90_days.count()}")
+
+    return forests
+
+
 def run():
     import os
 
@@ -439,7 +538,9 @@ def run():
     if app_mode == "production":
         # TODO: Run in production
         # cycle_all_modules_and_invalidate_cached_results()
-        import_input_types_units()
+        # import_input_types_units()
+        # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
+        get_forest_management_modules_in_plantation_projects()
         pass
 
     if app_mode == "review":

@@ -607,10 +607,10 @@ class Project(Historical, DirtyFieldsMixin):
     start_year_of_activities = models.IntegerField(verbose_name="start_year_of_activities")
     last_year_of_accounting = models.IntegerField(verbose_name="last_year_of_accounting")
 
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name="country")
-    climate = models.ForeignKey(Climate, on_delete=models.CASCADE, verbose_name="climate")
-    moisture = models.ForeignKey(Moisture, on_delete=models.CASCADE, verbose_name="moisture")
-    soil_type = models.ForeignKey(SoilType, on_delete=models.CASCADE, verbose_name="soil_type")
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    climate = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True)
+    moisture = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True)
+    soil_type = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True)
 
     is_locked = models.BooleanField(default=False, verbose_name="is_locked")
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
@@ -641,6 +641,33 @@ class Project(Historical, DirtyFieldsMixin):
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
 
+    @property
+    def gwp(self):
+        self.gw_potential: ipcc.GlobalWarmingPotential
+
+        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
+        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
+        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
+        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
+        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+
+        if self.gwp_co2_t2 is not None:
+            self.gw_potential.co2 = self.gwp_co2_t2
+
+        if self.gwp_ch4_t2 is not None:
+            self.gw_potential.ch4 = self.gwp_ch4_t2
+
+        if self.gwp_n2o_t2 is not None:
+            self.gw_potential.n2o = self.gwp_n2o_t2
+
+        if self.gwp_ch4_fossil_t2 is not None:
+            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
+
+        return self.gw_potential
+
     def save(self, *args, **kwargs):
         if self.pk:
             if self.is_dirty(check_relationship=True):
@@ -660,6 +687,14 @@ class Project(Historical, DirtyFieldsMixin):
                     thread.start()
 
         super().save(*args, **kwargs)
+
+    def clean(self):
+        """Validate that climate, moisture, and soil_type are present if activities exist."""
+        super().clean()
+
+        # Only validate if project has activities that require these fields
+        if self.pk and self.activities.exists():
+            self._validate_climate_moisture_soil_type_for_activities()
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -719,32 +754,38 @@ class Project(Historical, DirtyFieldsMixin):
 
         return self.last_year_of_accounting - (self.start_year_of_activities + self.implementation_years)
 
-    @property
-    def gwp(self):
-        self.gw_potential: ipcc.GlobalWarmingPotential
+    def _validate_climate_moisture_soil_type_for_activities(self):
+        """Check if any activity/module requires climate, moisture, or soil_type."""
+        for activity in self.activities.all():
+            # Check if activity has modules that require these fields
+            if self._activity_requires_climate_moisture_soil_type(activity):
+                climate = activity.climate_t2 or self.climate
+                moisture = activity.moisture_t2 or self.moisture
+                soil_type = activity.soil_type_t2 or self.soil_type
 
-        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
-        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
-        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
-        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
-        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+                missing_fields = []
+                if climate is None:
+                    missing_fields.append("climate")
+                if moisture is None:
+                    missing_fields.append("moisture")
+                if soil_type is None:
+                    missing_fields.append("soil_type")
 
-        if self.gwp_co2_t2 is not None:
-            self.gw_potential.co2 = self.gwp_co2_t2
+                if missing_fields:
+                    from django.core.exceptions import ValidationError
 
-        if self.gwp_ch4_t2 is not None:
-            self.gw_potential.ch4 = self.gwp_ch4_t2
+                    raise ValidationError(
+                        f"Project must have {', '.join(missing_fields)} set when activities with calculation modules exist. Either set them on the project or on activity '{activity.name}'."
+                    )
 
-        if self.gwp_n2o_t2 is not None:
-            self.gw_potential.n2o = self.gwp_n2o_t2
+    def _activity_requires_climate_moisture_soil_type(self, activity):
+        """Check if an activity has modules that require climate/moisture/soil_type."""
+        from api.models import Module, Submodule
 
-        if self.gwp_ch4_fossil_t2 is not None:
-            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
-
-        return self.gw_potential
+        for module in activity.modules:
+            if isinstance(module, (Module, Submodule)):
+                return True
+        return False
 
 
 class ProjectFileAttachment(models.Model):
@@ -995,6 +1036,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         for module in self.modules:
             if isinstance(module, LandModule) and module.area is not None:
                 area += module.area
+                break
         return area
 
     def __str__(self):
@@ -2913,9 +2955,9 @@ class OrganicSoil(LandModuleFixed):
     offsite_ch4_peat_t2_w = models.FloatField(null=True, blank=True)
     offsite_ch4_peat_t2_wo = models.FloatField(null=True, blank=True)
 
-    peat_density_t2_start = models.FloatField(null=True, blank=True)
-    peat_density_t2_w = models.FloatField(null=True, blank=True)
-    peat_density_t2_wo = models.FloatField(null=True, blank=True)
+    peat_density_t2_start = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:

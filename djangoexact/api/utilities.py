@@ -233,11 +233,12 @@ def copy_project(project, owner):
 
         # Add Membership to the new project
         # BUG: Membership is assigned to the original project, not the copied one
-        api_models.ProjectMembership.objects.create(
-            user=owner,
-            project=project_copy,
-            group=api_models.Group.objects.get(name="Admin"),
-        )
+        if not project.members.filter(user=owner, group__name="Admin").exists():
+            api_models.ProjectMembership.objects.create(
+                user=owner,
+                project=project_copy,
+                group=api_models.Group.objects.get(name="Admin"),
+            )
 
         for activity in project.activities.all():
             copy_activity(activity, project_copy, owner)
@@ -381,6 +382,8 @@ def copy_activity(activity: "api_models.Activity", new_project=None, owner=None)
         module_copy._state.adding = True
         if luc_copy:
             module_copy.land_use_change = luc_copy
+        elif organic_soil_copy:
+            module_copy.organic_soil = organic_soil_copy
         handle_threads(module, module_copy, owner)
         module_copy.save()
 
@@ -534,11 +537,21 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
 
     parent_module = None
-    for module_type in organic_soil.activity.module_types.all():
-        module_type
-        if module_type.is_luc:
-            parent_module = getattr(organic_soil.activity, module_type.class_name.lower()).first()
+    module_type = None
+
+    for mt in organic_soil.activity.module_types.all():
+        if mt.is_luc:
+            parent_module = getattr(organic_soil.activity, mt.class_name.lower()).first()
+            module_type = mt
             break
+        else:
+            potential_parent = getattr(organic_soil.activity, mt.class_name.lower(), None)
+            if potential_parent:
+                parent = potential_parent.first()
+                if parent and getattr(parent, "organic_soil", None) == organic_soil:
+                    parent_module = parent
+                    module_type = mt
+                    break
 
     if parent_module is None:
         raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")

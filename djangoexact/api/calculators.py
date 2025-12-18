@@ -30,6 +30,7 @@ the calculated emissions over time.
 import re
 import copy
 import json
+from django.core import exceptions
 import logging as log
 import math
 import statistics
@@ -547,12 +548,34 @@ class BaseCalculator(ABC):
         self.module: Module | Submodule = self.data
         self.area = getattr(self.module, "parent", getattr(self.module, "area", None))
 
-        self.climate: Climate = self.activity.climate_t2 or self.project.climate
-        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
-        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
+        self.climate: Climate = self._get_validated_climate()
+        self.moisture: Moisture = self._get_validated_moisture()
+        self.soil_type: SoilType = self._get_validated_soil_type()
+
         self.country: Country = getattr(self.module, "country_t2", None) if hasattr(self.module, "country_t2") and self.module.country_t2 is not None else self.project.country
         self.region: Region = self.project.country.region
         self.change_rate: ChangeRate = self.activity.change_rate
+
+    def _get_validated_climate(self) -> Climate:
+        """Get climate from activity or project, raising error if missing."""
+        climate = self.activity.climate_t2 or self.project.climate
+        if climate is None:
+            raise exceptions.ValidationError(f"Climate is required for calculations. Please set climate_t2 on activity '{self.activity.name}' or climate on project '{self.project.name}'.")
+        return climate
+
+    def _get_validated_moisture(self) -> Moisture:
+        """Get moisture from activity or project, raising error if missing."""
+        moisture = self.activity.moisture_t2 or self.project.moisture
+        if moisture is None:
+            raise exceptions.ValidationError(f"Moisture is required for calculations. Please set moisture_t2 on activity '{self.activity.name}' or moisture on project '{self.project.name}'.")
+        return moisture
+
+    def _get_validated_soil_type(self) -> SoilType:
+        """Get soil_type from activity or project, raising error if missing."""
+        soil_type = self.activity.soil_type_t2 or self.project.soil_type
+        if soil_type is None:
+            raise exceptions.ValidationError(f"Soil type is required for calculations. Please set soil_type_t2 on activity '{self.activity.name}' or soil_type on project '{self.project.name}'.")
+        return soil_type
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -608,6 +631,12 @@ class LandModuleCalculator(BaseCalculator):
         self.module_w: LandModule | SingleBiomassModule = self.module
         self.module_wo: LandModule | SingleBiomassModule = self.module
 
+        self.calculate_soc_som_start_w = CALCULATE_SOC_SOM_START_W
+        self.calculate_soc_som_start_wo = CALCULATE_SOC_SOM_START_WO
+        self.calculate_soc_som_w = CALCULATE_SOC_SOM_W
+        self.calculate_soc_som_wo = CALCULATE_SOC_SOM_WO
+        self._apply_soc_som_rules()
+
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
 
         self.biomass_ef_start_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
@@ -627,10 +656,29 @@ class LandModuleCalculator(BaseCalculator):
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
 
+    def _has_organic_soil_module(self) -> bool:
+        try:
+            return self.activity.module_types.filter(class_name__iexact="OrganicSoil").exists()
+        except Exception:
+            return False
+
+    def _apply_soc_som_rules(self) -> None:
+        self.calculate_soc_som_start_w = CALCULATE_SOC_SOM_START_W
+        self.calculate_soc_som_start_wo = CALCULATE_SOC_SOM_START_WO
+        self.calculate_soc_som_w = CALCULATE_SOC_SOM_W
+        self.calculate_soc_som_wo = CALCULATE_SOC_SOM_WO
+
+        if self._has_organic_soil_module():
+            self.calculate_soc_som_start_w = False
+            self.calculate_soc_som_start_wo = False
+            self.calculate_soc_som_w = False
+            self.calculate_soc_som_wo = False
+
     def calculate(self, module: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         return super().calculate(module, aggregate_by)
 
     def get_defaults(self, calculate=False) -> dict:
+        self._apply_soc_som_rules()
         moisture_flt = {"moisture": self.moisture}
 
         self.soc = ipcc.SoilOrganicCarbon.objects.filter(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type).first()
@@ -723,6 +771,18 @@ class LandUseChangeCalculator(BaseCalculator):
         if not module_start or not module_w or not module_wo:
             missing_modules = ["Start" if not module_start else "With" if not module_w else "Without" for module in [module_start, module_w, module_wo] if not module].join(", ")
             raise Exception(f"LandUseChange module must have a start with and without module. Missing {missing_modules} module(s).")
+
+        # BUG: Some modules don't have land_use_change set. Likely an issue in ActivityBuilderSerializer
+        # WORKAROUND: Sanitizes any bugged missing land_use_change, making sure all modules are properly set
+        if not module_start.land_use_change:
+            module_start.land_use_change = luc
+            module_start.save()
+        if not module_w.land_use_change:
+            module_w.land_use_change = luc
+            module_w.save()
+        if not module_wo.land_use_change:
+            module_wo.land_use_change = luc
+            module_wo.save()
 
         self.results_w, self.results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
 
@@ -1544,7 +1604,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1606,7 +1666,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1671,7 +1731,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1736,7 +1796,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
@@ -1964,7 +2024,18 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.biomass_ef_wo.value = 0
 
     def _compute_biomass_for_maturity(
-        self, agb_start, agb_end, bgb_start, bgb_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
+        self,
+        agb_start,
+        agb_end,
+        bgb_start,
+        bgb_end,
+        has_change_in_system,
+        scenario_type_start: utils.ScenarioTypes,
+        scenario_type_end: utils.ScenarioTypes,
+        agb_t2_start: float = None,
+        agb_t2_end: float = None,
+        bgb_t2_start: float = None,
+        bgb_t2_end: float = None,
     ) -> tuple[
         ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.PerennialBGB, ipcc.PerennialBGB
     ]:
@@ -2004,6 +2075,12 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
                 self.bgb_start.value = None
 
+            if agb_t2_start is not None:
+                self.agb_start.value = agb_t2_start
+
+            if bgb_t2_start is not None:
+                self.bgb_start.value = bgb_t2_start
+
             self.agb_end.value = 0
             self.bgb_end.value = 0
 
@@ -2021,6 +2098,12 @@ class PerennialCropCalculator(LandModuleCalculator):
             else:
                 self.agb_start = copy.deepcopy(getattr(self, f"biomass_ef_start_{scenario_type_end.value}"))
                 self.bgb_start.value = None
+
+            if agb_t2_start is not None:
+                self.agb_start.value = agb_t2_start
+
+            if bgb_t2_start is not None:
+                self.bgb_start.value = bgb_t2_start
 
             if has_change_in_system or is_complete_renewal:
                 if scenario_type_start == utils.ScenarioTypes.START:
@@ -2092,6 +2175,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_w if self.module.land_use_type_w is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITH,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_start,
             )
 
             self.inputs_start_w = {
@@ -2131,11 +2216,11 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "delay": self.activity.delay,
                 "agb_start_default": self.agb_start_default.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "agb_end_default": agb_end.value,
@@ -2158,6 +2243,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_wo if self.module.land_use_type_wo is not None else False,
                 utils.ScenarioTypes.START,
                 utils.ScenarioTypes.WITHOUT,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_start,
             )
 
             self.inputs_start_wo = {
@@ -2197,11 +2284,11 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "delay": self.activity.delay,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "agb_end_default": agb_end.value,
@@ -2225,6 +2312,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_w,
                 utils.ScenarioTypes.WITH,
                 utils.ScenarioTypes.WITH,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_w,
             )
 
             if self.module.is_complete_renewal_w:
@@ -2267,12 +2356,12 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2295,6 +2384,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 self.module.land_use_type_start != self.module.land_use_type_wo,
                 utils.ScenarioTypes.WITHOUT,
                 utils.ScenarioTypes.WITHOUT,
+                agb_t2_start=self.agb_t2_start,
+                bgb_t2_start=self.bgb_t2_wo,
             )
             if self.module.is_complete_renewal_wo:
                 self.end_module_has_growth_wo = True
@@ -2336,12 +2427,12 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "delay": self.activity.delay,
                 "calculate_biomass": True,
                 "agb_start_default": agb_start.value,
                 "bgb_start_default": bgb_start.value,
-                "agb_start_tier_2": self.agb_t2_start,
+                "agb_start_tier_2": None,  # NOTE: (17/12/2025) agb_t2_start is returned as agb_start in _compute_biomass_for_maturity, if necessary
                 "bgb_start_tier_2": None,
                 "agb_end_default": agb_end.value,
                 "bgb_end_default": bgb_end.value,
@@ -2567,7 +2658,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2625,7 +2716,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2684,7 +2775,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "straw_burnt": self.module.organic_amendment_type_w.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2743,7 +2834,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "straw_burnt": self.module.organic_amendment_type_wo.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -2878,7 +2969,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -2926,7 +3017,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -2977,7 +3068,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -3028,7 +3119,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -4347,7 +4438,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4383,7 +4474,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4420,7 +4511,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4457,7 +4548,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -6686,7 +6777,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
                 "weight_peat": self.conversion_factor_wo.weight,
-                "mass_tonnes_tier_2": input.peat_density_t2_w,
+                "mass_tonnes_tier_2": input.peat_density_t2_w,  # TODO: Change to volume of air dry peat for excavated area
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_w.volume,
                 "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
@@ -6784,7 +6875,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
                 "weight_peat": self.conversion_factor_wo.weight,
-                "mass_tonnes_tier_2": input.peat_density_t2_wo,
+                "mass_tonnes_tier_2": input.peat_density_t2_wo,  # TODO: Change to volume of air dry peat for excavated area
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_wo.volume,
                 "extraction_height_start": input.peat_extraction_height_start if input.peat_extraction_height_start is not None else 0,
@@ -7205,7 +7296,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
-                else None,
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_start,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_start,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
@@ -7287,7 +7378,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
-                else None,
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_w,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_w,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_w,
@@ -7367,7 +7458,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else None,
                 "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())]
                 if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0
-                else None,
+                else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_wo,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_wo,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_wo,
@@ -7460,7 +7551,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7498,7 +7589,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7537,7 +7628,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7576,7 +7667,7 @@ class OtherLandCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7640,7 +7731,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "calculate_soc_som": self.calculate_soc_som_start_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7676,7 +7767,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "calculate_soc_som": self.calculate_soc_som_start_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7713,7 +7804,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "calculate_soc_som": self.calculate_soc_som_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -7750,7 +7841,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.soc_t2_start,
                 "soc_end_tier_2": self.soc_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "calculate_soc_som": self.calculate_soc_som_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
