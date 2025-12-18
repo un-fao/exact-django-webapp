@@ -17,7 +17,7 @@ from .generalized_modules import BaseModule
 
 from dataclasses import dataclass
 from typing import Optional, List
-from ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 
 @dataclass(kw_only=True)
@@ -115,7 +115,7 @@ class Livestock(BaseModule):
                     0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mef_emissions_yearly], ActivityTypes.METHANE_ENTERIC_FERMENTATION, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(mef_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, emissions_start, ActivityTypes.METHANE_ENTERIC_FERMENTATION))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, emissions_start, ActivityTypes.METHANE_ENTERIC_FERMENTATION))
 
             except Exception as e:
                 traceback.print_exc()
@@ -174,13 +174,13 @@ class Livestock(BaseModule):
                     0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mmm_emissions_system_yearly], ActivityTypes.METHANE_MANURE_MANAGEMENT_SYSTEM, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(mmm_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, annual_start_system, ActivityTypes.METHANE_MANURE_MANAGEMENT_SYSTEM))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_start_system, ActivityTypes.METHANE_MANURE_MANAGEMENT_SYSTEM))
 
                 mmm_emission_set_prp = YearlyGasActivityEmissionSet(
                     0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mmm_emissions_prp_yearly], ActivityTypes.METHANE_MANURE_MANAGEMENT_PRP, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(mmm_emission_set_prp)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, annual_start_prp, ActivityTypes.METHANE_MANURE_MANAGEMENT_PRP))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_start_prp, ActivityTypes.METHANE_MANURE_MANAGEMENT_PRP))
 
             except Exception as e:
                 traceback.print_exc()
@@ -232,7 +232,7 @@ class Livestock(BaseModule):
                     0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_direct_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_SYSTEM, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set_system)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, annual_start_system_n2o, ActivityTypes.NITROUS_MANURE_MANAGEMENT_SYSTEM))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start_system_n2o, ActivityTypes.NITROUS_MANURE_MANAGEMENT_SYSTEM))
 
                 annual_start_prp_n2o = n2o_prp_direct_head_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant
                 annual_end_prp_n2o = n2o_prp_direct_head_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant
@@ -243,7 +243,7 @@ class Livestock(BaseModule):
                     0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_emissions_prp_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP, delay=self.delay
                 )
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set_prp)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, annual_start_prp_n2o, ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start_prp_n2o, ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP))
 
             except Exception as e:
                 traceback.print_exc()
@@ -296,7 +296,7 @@ class Livestock(BaseModule):
                 )
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_volatization_emission_set_system)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_SYSTEM))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_SYSTEM))
 
                 annual_start_prp = n2o_head_prp_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
                 annual_end_prp = n2o_head_prp_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
@@ -314,7 +314,7 @@ class Livestock(BaseModule):
                 )
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_volatization_emission_set_prp)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP))
 
             except Exception as e:
                 traceback.print_exc()
@@ -366,7 +366,7 @@ class Livestock(BaseModule):
                 )
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_leaching_emission_set_system)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_SYSTEM))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_SYSTEM))
 
                 annual_start_prp = n2o_prp_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
                 annual_end_prp = n2o_prp_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
@@ -380,7 +380,7 @@ class Livestock(BaseModule):
                 )
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_leaching_emission_set_prp)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP))
 
             except Exception as e:
                 traceback.print_exc()

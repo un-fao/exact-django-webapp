@@ -18,7 +18,7 @@ from .ghg_emissions_classes import (
 from .generalized_modules import LandModule
 from dataclasses import dataclass
 from typing import Optional
-from ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 
 @dataclass(kw_only=True)
@@ -32,7 +32,7 @@ class SoilToAdd(LandModule):
 
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, 0, ActivityTypes.SOIL_CO2_CHANGE))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.SOIL_CO2_CHANGE))
 
         except Exception as e:
             print("Error in SoilToAdd.calculate_emissions")

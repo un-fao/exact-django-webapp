@@ -11,7 +11,7 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
-from .ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 from dataclasses import dataclass
 from typing import Optional
 
@@ -81,7 +81,7 @@ class Fishery(BaseModule):
                 emissions_co2_catch_yearly = compute_yearly_or_half_year_cumulative(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, annual_co2_start, ActivityTypes.CATCH ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_co2_start, ActivityTypes.CATCH ))
                 
                 # n2o calculation
                 ef_n2o_start = fui_start * ef_diesel_n2o_start / 1000
@@ -93,7 +93,7 @@ class Fishery(BaseModule):
                 emissions_n2o_catch_yearly = compute_yearly_or_half_year_cumulative(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, annual_n2o_start, ActivityTypes.CATCH ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_n2o_start, ActivityTypes.CATCH ))
 
                 # ch4 calculation
 
@@ -106,7 +106,7 @@ class Fishery(BaseModule):
                 emissions_ch4_catch_yearly = compute_yearly_or_half_year_cumulative(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, annual_ch4_start, ActivityTypes.CATCH ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_ch4_start, ActivityTypes.CATCH ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -129,7 +129,7 @@ class Fishery(BaseModule):
                 emissions_refrigerant_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly], activity=ActivityTypes.REFRIGERANT, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.OTHER, annual_start, ActivityTypes.OTHER ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.OTHER, annual_start, ActivityTypes.OTHER ))
                 
             except Exception as e:
                 traceback.print_exc()
@@ -155,7 +155,7 @@ class Fishery(BaseModule):
                 emissions_ice_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly], activity=ActivityTypes.ICE, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.OTHER, annual_start, ActivityTypes.OTHER ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.OTHER, annual_start, ActivityTypes.OTHER ))
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -192,7 +192,7 @@ class CoastalAquaculture(BaseModule):
                 emissions_nitrous_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, annual_start, ActivityTypes.N20_FIELD ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start, ActivityTypes.N20_FIELD ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -211,7 +211,7 @@ class CoastalAquaculture(BaseModule):
                 emissions_co2_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=self.delay))
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY ))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY ))
 
             except Exception as e:
                 traceback.print_exc()

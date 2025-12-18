@@ -3,7 +3,7 @@ import re
 import traceback
 from dataclasses import dataclass
 from typing import Optional
-from .ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 from .general_functions import (
     breakdown_proportionally_to_values,
     soil_emissions,
@@ -62,8 +62,8 @@ class GrasslandManagement(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
-                    inventory_nitrous = InventoryPerGasperActivity(GasTypes.N2O,annual_nitrous * self.hectares_start ,ActivityTypes.RESIDUE_BURNING)
-                    inventory_methane = InventoryPerGasperActivity(GasTypes.CH4,annual_methane * self.hectares_start ,ActivityTypes.RESIDUE_BURNING)
+                    inventory_nitrous = InventoryPerGasPerActivity(GasTypes.N2O,annual_nitrous * self.hectares_start ,ActivityTypes.RESIDUE_BURNING)
+                    inventory_methane = InventoryPerGasPerActivity(GasTypes.CH4,annual_methane * self.hectares_start ,ActivityTypes.RESIDUE_BURNING)
                     self.inventory.emissions_by_sector_by_gas(inventory_nitrous)
                     self.inventory.emissions_by_sector_by_gas(inventory_methane)
                     
@@ -80,7 +80,7 @@ class GrasslandManagement(LandModule):
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
                     
-                    inventory = InventoryPerGasperActivity(GasTypes.CO2,self.soc_start * self.hectares_start,ActivityTypes.SOIL_CO2_CHANGE)
+                    inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.soc_start * self.hectares_start,ActivityTypes.SOIL_CO2_CHANGE)
                     self.inventory.emissions_by_sector_by_gas(inventory)
  
             except Exception as e:
@@ -94,7 +94,7 @@ class GrasslandManagement(LandModule):
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
 
-                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.N2O,0 ,ActivityTypes.RESIDUE_BURNING))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O,0 ,ActivityTypes.RESIDUE_BURNING))
 
             except Exception as e:
                 traceback.print_exc()
@@ -107,7 +107,7 @@ class GrasslandManagement(LandModule):
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
-                    inventory = InventoryPerGasperActivity(GasTypes.CO2,self.biomass_start*self.hectares_start,ActivityTypes.BIOMASS)
+                    inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start*self.hectares_start,ActivityTypes.BIOMASS)
                     self.inventory.emissions_by_sector_by_gas(inventory)
  
                 else:

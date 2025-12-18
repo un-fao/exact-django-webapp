@@ -20,7 +20,7 @@ from .ghg_emissions_classes import (
 )
 
 from .generalized_modules import LandModule
-from ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 
 @dataclass(kw_only=True)
@@ -38,7 +38,7 @@ class NotCultivatedLand(LandModule):
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    inventory = InventoryPerGasperActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
+                    inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
                     self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
@@ -52,7 +52,7 @@ class NotCultivatedLand(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
 
             except Exception as e:
                 traceback.print_exc()
@@ -66,7 +66,7 @@ class NotCultivatedLand(LandModule):
                     )
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
-                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS))
 
                 else:
                     pass

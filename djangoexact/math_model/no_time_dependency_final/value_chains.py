@@ -13,7 +13,7 @@ from .ghg_emissions_classes import (
 from dataclasses import dataclass, field
 from typing import Optional
 from .generalized_modules import BaseModule
-from ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 
 @dataclass(kw_only=True)
@@ -44,5 +44,5 @@ class ValueChain(BaseModule):
 
         emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly], self.activity_type, delay=self.delay)
         self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
-        inventory = InventoryPerGasperActivity(GasTypes.CO2, emissions_start, self.activity_type)
+        inventory = InventoryPerGasPerActivity(GasTypes.CO2, emissions_start, self.activity_type)
         self.inventory.emissions_by_sector_by_gas(inventory)

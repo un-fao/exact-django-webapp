@@ -11,7 +11,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
-from .ghg_inventory_class import InventoryPerGasperActivity
+from .ghg_inventory_class import InventoryPerGasPerActivity
 from dataclasses import dataclass
 from typing import Optional
 
@@ -39,30 +39,58 @@ class Inputs(BaseModule):
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_co2_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
+                yearly_co2_emissions, total_co2_eq_emissions = input_single_calculation(
+                    self.unit_start,
+                    self.unit_end,
+                    self.ipcc_factor_co2,
+                    self.tier_2_factor_co2,
+                    self.unit_factor_co2,
+                    self.emissions_factor_co2,
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.rate_type,
+                )
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
-                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_FIELD))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_FIELD))
 
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_n2o, self.tier_2_factor_n2o, self.unit_factor_n2o, self.emissions_factor_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+                yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(
+                    self.unit_start,
+                    self.unit_end,
+                    self.ipcc_factor_n2o,
+                    self.tier_2_factor_n2o,
+                    self.unit_factor_n2o,
+                    self.emissions_factor_n2o,
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.rate_type,
+                )
                 n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_n2o_emissions], ActivityTypes.N20_FIELD, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
-                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, self.unit_start, ActivityTypes.N20_FIELD))
-
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, self.unit_start, ActivityTypes.N20_FIELD))
 
             if self.unit_factor_eq is None or self.emissions_factor_eq is None or self.ipcc_factor_eq is None:
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_co2_eq_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
+                yearly_co2_eq_emissions, total_co2_emissions = input_single_calculation(
+                    self.unit_start,
+                    self.unit_end,
+                    self.ipcc_factor_eq,
+                    self.tier_2_factor_eq,
+                    self.unit_factor_eq,
+                    self.emissions_factor_eq,
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.rate_type,
+                )
                 co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
-                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_EQUIVALENT_VC))
-
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_EQUIVALENT_VC))
 
         except Exception as e:
             traceback.print_exc()
@@ -95,7 +123,22 @@ class OperationPhaseIrrigation(BaseModule):
         self,
     ):
         def ef_calculation(
-            ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir
+            ef_co2_default,
+            ef_co2_tier_2,
+            ef_n2o_default,
+            ef_n2o_tier_2,
+            ef_ch4_default,
+            ef_ch4_tier_2,
+            total_dynamic_head_tier_2,
+            average_pressure_default,
+            average_pressure_tier_2,
+            pumping_efficiency_default,
+            pumping_efficiency_tier_2,
+            erh_electricity,
+            fuel_net_calorific_values,
+            fuel_density,
+            depth,
+            gwir,
         ):
             try:
                 pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
@@ -154,18 +197,24 @@ class OperationPhaseIrrigation(BaseModule):
             yearly_emissions_ch4, _ = input_single_calculation(self.units_start, self.units_end, ef_ch4, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
             yearly_emissions_ch4 = [x * (1 + self.transportation_loss) for x in yearly_emissions_ch4] if self.transportation_loss else yearly_emissions_ch4
 
-            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_emissions_co2], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(
+                0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_emissions_co2], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay
+            )
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
-            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_emissions_n2o], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(
+                0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_emissions_n2o], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay
+            )
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
-            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_emissions_ch4], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(
+                0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_emissions_ch4], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay
+            )
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
-            self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(0,GasTypes.CO2,ActivityTypes.IRRIGATION_OPERATIONAL))
-            self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(0,GasTypes.N2O,ActivityTypes.IRRIGATION_OPERATIONAL))
-            self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(0,GasTypes.CH4,ActivityTypes.IRRIGATION_OPERATIONAL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.CO2, ActivityTypes.IRRIGATION_OPERATIONAL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.N2O, ActivityTypes.IRRIGATION_OPERATIONAL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.CH4, ActivityTypes.IRRIGATION_OPERATIONAL))
 
         except Exception as e:
             traceback.print_exc()
@@ -177,7 +226,6 @@ class Roads(BaseModule):
     ef_ipcc: float
     ef_tier_2: Optional[float] = None
     units_end: float  # This will be used to set `units_end`
-    
 
     def calculate_emissions(self):
         try:
@@ -190,8 +238,8 @@ class Roads(BaseModule):
 
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
-            
-            self.inventory.yearly_emissions_by_sector_by_gas.append(GasTypes.CO2,0,ActivityTypes.ROADS)
+
+            self.inventory.yearly_emissions_by_sector_by_gas.append(GasTypes.CO2, 0, ActivityTypes.ROADS)
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -221,9 +269,9 @@ class ElectricityConsumption(BaseModule):
 
             electricity_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.ELECTRICITY, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(electricity_emission_set)
-            #TODO: Check with Peter
-            self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY))
-            
+            # TODO: Check with Peter
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY))
+
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -271,10 +319,10 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_co2)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
-            
-            self.inventory.emission_by_sector_by_gas.append(Emission(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
-            self.inventory.emission_by_sector_by_gas.append(Emission(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
-            self.inventory.emission_by_sector_by_gas.append(Emission(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
+
+            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
 
         except Exception as e:
             traceback.print_exc()
@@ -288,7 +336,6 @@ class NewIrrigation(BaseModule):
     units_start: float
     units_end: float
 
-
     def calculate_emissions(
         self,
     ):
@@ -299,9 +346,11 @@ class NewIrrigation(BaseModule):
             yearly_units = compute_yearly_delta(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
             self.emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
 
-            new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
+            new_irrigation_emission_set = YearlyGasActivityEmissionSet(
+                0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay
+            )
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
-            self.inventory.emission_by_sector_by_gas.append(Emission(GasTypes.CO2, self.units_start,ActivityTypes.NEW_IRRIGATION))
+            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CO2, self.units_start, ActivityTypes.NEW_IRRIGATION))
 
         except Exception as e:
             traceback.print_exc()
