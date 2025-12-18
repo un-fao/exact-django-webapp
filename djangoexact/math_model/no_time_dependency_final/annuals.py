@@ -78,12 +78,10 @@ class AnnualCropland(LandModule):
             try:
                 if self.calculate_soc_som:
                     emissions_soil_yearly, emissions_soil_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
-
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
-                    self.inventory.emissions_by_sector_by_gas.append(inventory)
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE))
 
             except Exception as e:
                 traceback.print_exc()
@@ -92,10 +90,10 @@ class AnnualCropland(LandModule):
             try:
                 if self.calculate_soc_som:
                     emissions_som_yearly, emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectares_before_20)
-
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
+
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
 
             except Exception as e:
                 traceback.print_exc()
