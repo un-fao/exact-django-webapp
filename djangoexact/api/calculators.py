@@ -65,7 +65,7 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from math_model.no_time_dependency_final.ghg_emissions_classes import (
     Result as MathResult,
 )
-from math_model.no_time_dependency_final.ghg_inventory_class import Inventory, InventoryResult
+from math_model.no_time_dependency_final.ghg_inventory_class import Inventory
 from math_model.no_time_dependency_final.grassland_management import (
     GrasslandManagement as MathGrassland,
 )
@@ -483,14 +483,12 @@ class CalculatorFactory:
             result: tuple[MathResult] = calculator.calculate()
             result_obj = Result(*result)
 
-            inventory_result = InventoryResult(calculator.inventory_w, calculator.inventory_wo)
-
             return (
                 result_obj.breakdown(by=BreakdownTypes.TOTAL),
                 result_obj.breakdown(by=BreakdownTypes.ACTIVITY),
                 result_obj.breakdown(by=BreakdownTypes.GAS),
                 result_obj.breakdown(by=BreakdownTypes.ACTIVITY_GAS),
-                inventory_result,
+                calculator.inventory,
             )
 
         except Exception as e:
@@ -584,22 +582,12 @@ class BaseCalculator(ABC):
         return soil_type
 
     @property
-    def inventory_w(self) -> Inventory:
-        """Aggregate inventory from all 'with' math modules."""
-        inv = Inventory()
-        for math_module in [self.math_start, self.math_start_w, self.math_w]:
+    def inventory(self) -> Inventory:
+        """Get inventory from the first non-None start module."""
+        for math_module in [self.math_start, self.math_start_w, self.math_start_wo]:
             if math_module and hasattr(math_module, "inventory"):
-                inv = inv + math_module.inventory
-        return inv
-
-    @property
-    def inventory_wo(self) -> Inventory:
-        """Aggregate inventory from all 'without' math modules."""
-        inv = Inventory()
-        for math_module in [self.math_start, self.math_start_wo, self.math_wo]:
-            if math_module and hasattr(math_module, "inventory"):
-                inv = inv + math_module.inventory
-        return inv
+                return math_module.inventory
+        return Inventory()
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:

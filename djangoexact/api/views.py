@@ -2404,10 +2404,10 @@ def generic_module_viewset(model: Module):
                     results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS).data
                     results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    results_total["inventory"] = inventory.to_dict(by=BreakdownTypes.TOTAL)
-                    results_by_activity["inventory"] = inventory.to_dict(by=BreakdownTypes.ACTIVITY)
-                    results_by_gas["inventory"] = inventory.to_dict(by=BreakdownTypes.GAS)
-                    results_by_activity_gas["inventory"] = inventory.to_dict(by=BreakdownTypes.ACTIVITY_GAS)
+                    results_total["inventory"] = inventory.breakdown(by=BreakdownTypes.TOTAL)
+                    results_by_activity["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY)
+                    results_by_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.GAS)
+                    results_by_activity_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
 
                     module_results = (
                         results_total

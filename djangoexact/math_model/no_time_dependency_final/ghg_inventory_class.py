@@ -1,6 +1,5 @@
 import copy
 from .ghg_emissions_classes import Emission, ActivityTypes, GasTypes, BreakdownTypes
-from typing import List
 from collections import defaultdict
 
 
@@ -93,28 +92,3 @@ class Inventory:
         for item in other.emissions_by_sector_by_gas:
             result.add_emission(item.gas_type, -item.value, item.activity)
         return result
-
-
-class InventoryResult:
-    def __init__(self, w: Inventory, wo: Inventory, balance: Inventory = None):
-        self.total_w = w
-        self.total_wo = wo
-        self.balance = copy.deepcopy(w) - copy.deepcopy(wo) if balance is None else copy.deepcopy(balance)
-
-    def to_dict(self, by=BreakdownTypes.TOTAL):
-        return {
-            "total_w": self.total_w.breakdown(by),
-            "total_wo": self.total_wo.breakdown(by),
-            "balance": self.balance.breakdown(by),
-        }
-
-    def add(self, result):
-        if not isinstance(result, self.__class__):
-            raise TypeError(f"Cannot add {type(result)} to {type(self)}.")
-        self.total_w = self.total_w + result.total_w
-        self.total_wo = self.total_wo + result.total_wo
-        self.balance = self.total_w - self.total_wo
-        return self
-
-    def __add__(self, other):
-        return self.add(other)
