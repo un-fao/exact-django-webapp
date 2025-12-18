@@ -696,7 +696,7 @@ class ForestManagement(BaseModule):
                     YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_litter_emissions], activity=ActivityTypes.LITTER, delay=self.delay)
                 )
 
-                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, emissions=self.litter_start * self.hectares_start, activity=ActivityTypes.LITTER)
+                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=self.litter_start * self.hectares_start, activity=ActivityTypes.LITTER)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:

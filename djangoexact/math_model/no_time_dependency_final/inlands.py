@@ -501,9 +501,9 @@ class PeatExtraction(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_ch4_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_n2o_emission_set)
 
-                inventory_co2 = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, emissions=co2_onsite_emissions_start + doc_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
-                inventory_ch4 = InventoryPerGasPerActivity(gas_type=GasTypes.CH4, emissions=ch4_onsite_emissions_start + ch4_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
-                inventory_n20 = InventoryPerGasPerActivity(gas_type=GasTypes.N2O, emissions=n2o_onsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_co2 = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=co2_onsite_emissions_start + doc_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_ch4 = InventoryPerGasPerActivity(gas_type=GasTypes.CH4, value=ch4_onsite_emissions_start + ch4_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_n20 = InventoryPerGasPerActivity(gas_type=GasTypes.N2O, value=n2o_onsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
 
                 self.inventory.emissions_by_sector_by_gas.append(inventory_co2)
                 self.inventory.emissions_by_sector_by_gas.append(inventory_ch4)
@@ -530,7 +530,7 @@ class PeatExtraction(BaseModule):
                 offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
 
-                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, emissions=em_start, activity=ActivityTypes.OFFSITE_PEAT)
+                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=em_start, activity=ActivityTypes.OFFSITE_PEAT)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
 
                 self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity

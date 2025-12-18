@@ -191,11 +191,11 @@ class AnnualCropland(LandModule):
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
 
             inventory_nitrous = self.hectares_start * kg_nitrous * self.nitrous_constant / 1000
-            inventory_methane = self.hectares_total * kg_methane * self.methane_constant / 1000
+            inventory_methane = self.hectares_start * kg_methane * self.methane_constant / 1000
             self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, inventory_nitrous, ActivityTypes.RESIDUE_BURNING))
             self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, inventory_methane, ActivityTypes.RESIDUE_BURNING))
 
-        def calculate_biomass_emissions(self):
+        def calculate_biomass_emissions():
             try:
                 if self.calculate_biomass:
                     emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(
