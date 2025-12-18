@@ -587,7 +587,7 @@ class BaseCalculator(ABC):
     def inventory_w(self) -> Inventory:
         """Aggregate inventory from all 'with' math modules."""
         inv = Inventory()
-        for math_module in [self.math_start_w]:
+        for math_module in [self.math_start, self.math_start_w, self.math_w]:
             if math_module and hasattr(math_module, "inventory"):
                 inv = inv + math_module.inventory
         return inv
@@ -596,7 +596,7 @@ class BaseCalculator(ABC):
     def inventory_wo(self) -> Inventory:
         """Aggregate inventory from all 'without' math modules."""
         inv = Inventory()
-        for math_module in [self.math_start_wo]:
+        for math_module in [self.math_start, self.math_start_wo, self.math_wo]:
             if math_module and hasattr(math_module, "inventory"):
                 inv = inv + math_module.inventory
         return inv
