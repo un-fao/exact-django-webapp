@@ -486,12 +486,16 @@ class ForestManagementInput(ModuleInput):
     average_yearly_degradation_percentage_w: Any = None
     agb_t2_start: Any = None
     agb_t2_w: Any = None
+    agb_max_t2_start: Any = None
+    agb_max_t2_w: Any = None
     agb_growth_rate_le_20_yrs_t2_start: Any = None
     agb_growth_rate_le_20_yrs_t2_w: Any = None
     agb_growth_rate_gt_20_yrs_t2_start: Any = None
     agb_growth_rate_gt_20_yrs_t2_w: Any = None
     bgb_t2_start: Any = None
     bgb_t2_w: Any = None
+    bgb_max_t2_start: Any = None
+    bgb_max_t2_w: Any = None
     bgb_growth_rate_le_20_yrs_t2_start: Any = None
     bgb_growth_rate_le_20_yrs_t2_w: Any = None
     bgb_growth_rate_gt_20_yrs_t2_start: Any = None
@@ -512,12 +516,16 @@ class ForestManagementInput(ModuleInput):
             average_yearly_degradation_percentage_w=data.get("average_yearly_degradation_percentage_w"),
             agb_t2_start=data.get("agb_t2_start"),
             agb_t2_w=data.get("agb_t2_w"),
+            agb_max_t2_start=data.get("agb_max_t2_start"),
+            agb_max_t2_w=data.get("agb_max_t2_w"),
             agb_growth_rate_le_20_yrs_t2_start=data.get("agb_growth_rate_le_20_yrs_t2_start"),
             agb_growth_rate_le_20_yrs_t2_w=data.get("agb_growth_rate_le_20_yrs_t2_w"),
             agb_growth_rate_gt_20_yrs_t2_start=data.get("agb_growth_rate_gt_20_yrs_t2_start"),
             agb_growth_rate_gt_20_yrs_t2_w=data.get("agb_growth_rate_gt_20_yrs_t2_w"),
             bgb_t2_start=data.get("bgb_t2_start"),
             bgb_t2_w=data.get("bgb_t2_w"),
+            bgb_max_t2_start=data.get("bgb_max_t2_start"),
+            bgb_max_t2_w=data.get("bgb_max_t2_w"),
             bgb_growth_rate_le_20_yrs_t2_start=data.get("bgb_growth_rate_le_20_yrs_t2_start"),
             bgb_growth_rate_le_20_yrs_t2_w=data.get("bgb_growth_rate_le_20_yrs_t2_w"),
             bgb_growth_rate_gt_20_yrs_t2_start=data.get("bgb_growth_rate_gt_20_yrs_t2_start"),
@@ -1030,12 +1038,16 @@ class ForestManagementDataBuilder(ModuleDataBuilder):
             "land_use_type": getattr(module, "land_use_type_start", None),
             "agb_t2_start": getattr(module, "agb_t2_start", None),
             "agb_t2_w": getattr(module, "agb_t2_w", None),
+            "agb_max_t2_start": getattr(module, "agb_max_t2_start", None),
+            "agb_max_t2_w": getattr(module, "agb_max_t2_w", None),
             "agb_growth_rate_le_20_yrs_t2_start": getattr(module, "agb_growth_rate_le_20_yrs_t2_start", None),
             "agb_growth_rate_le_20_yrs_t2_w": getattr(module, "agb_growth_rate_le_20_yrs_t2_w", None),
             "agb_growth_rate_gt_20_yrs_t2_start": getattr(module, "agb_growth_rate_gt_20_yrs_t2_start", None),
             "agb_growth_rate_gt_20_yrs_t2_w": getattr(module, "agb_growth_rate_gt_20_yrs_t2_w", None),
             "bgb_t2_start": getattr(module, "bgb_t2_start", None),
             "bgb_t2_w": getattr(module, "bgb_t2_w", None),
+            "bgb_max_t2_start": getattr(module, "bgb_max_t2_start", None),
+            "bgb_max_t2_w": getattr(module, "bgb_max_t2_w", None),
             "bgb_growth_rate_le_20_yrs_t2_start": getattr(module, "bgb_growth_rate_le_20_yrs_t2_start", None),
             "bgb_growth_rate_le_20_yrs_t2_w": getattr(module, "bgb_growth_rate_le_20_yrs_t2_w", None),
             "bgb_growth_rate_gt_20_yrs_t2_start": getattr(module, "bgb_growth_rate_gt_20_yrs_t2_start", None),
@@ -1738,6 +1750,8 @@ class ForestManagementProcessor(ModuleProcessor):
             agb_t2_start=inp.agb_t2_start,
             agb_t2_w=inp.agb_t2_w,
             agb_t2_wo=inp.agb_t2_start,
+            agb_max_t2_start=inp.agb_max_t2_start,
+            agb_max_t2_w=inp.agb_max_t2_w,
             agb_growth_rate_le_20_yrs_t2_start=inp.agb_growth_rate_le_20_yrs_t2_start,
             agb_growth_rate_le_20_yrs_t2_w=inp.agb_growth_rate_le_20_yrs_t2_w,
             agb_growth_rate_le_20_yrs_t2_wo=inp.agb_growth_rate_le_20_yrs_t2_start,
@@ -1747,6 +1761,8 @@ class ForestManagementProcessor(ModuleProcessor):
             bgb_t2_start=inp.bgb_t2_start,
             bgb_t2_w=inp.bgb_t2_w,
             bgb_t2_wo=inp.bgb_t2_start,
+            bgb_max_t2_start=inp.bgb_max_t2_start,
+            bgb_max_t2_w=inp.bgb_max_t2_w,
             bgb_growth_rate_le_20_yrs_t2_start=inp.bgb_growth_rate_le_20_yrs_t2_start,
             bgb_growth_rate_le_20_yrs_t2_w=inp.bgb_growth_rate_le_20_yrs_t2_w,
             bgb_growth_rate_le_20_yrs_t2_wo=inp.bgb_growth_rate_le_20_yrs_t2_start,
@@ -4032,7 +4048,7 @@ SCENARIOS_TO_RUN = [
     # scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2,
     # scenarios.NATURAL_REGENERATION_1,
     # scenarios.NATURAL_REGENERATION_2,
-    # scenarios.FOREST_T2,
+    scenarios.FOREST_T2,
     # scenarios.ASSISTED_NATURAL_REGENERATION_1,
     # scenarios.DIRECT_PLANTING_1,
     # scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1,
