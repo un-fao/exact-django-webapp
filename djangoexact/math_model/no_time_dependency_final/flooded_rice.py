@@ -125,7 +125,7 @@ class FloodedRice(LandModule):
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,0,ActivityTypes.SOIL_CO2_CHANGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,0,ActivityTypes.SOIL_CO2_CHANGE))
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -137,8 +137,8 @@ class FloodedRice(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-                    inventory =  InventoryPerGasPerActivity(GasTypes.N2O,self.soc_start*self.hectares_start,ActivityTypes.SOM)
-                    self.inventory.emissions_by_sector_by_gas(inventory)
+                inventory =  InventoryPerGasPerActivity(GasTypes.N2O,self.soc_start*self.hectares_start,ActivityTypes.SOM)
+                self.inventory.emissions_by_sector_by_gas(inventory)
 
             except Exception as e:
                 traceback.print_exc()

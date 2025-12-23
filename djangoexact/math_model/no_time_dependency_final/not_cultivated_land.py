@@ -38,8 +38,8 @@ class NotCultivatedLand(LandModule):
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
-                    self.inventory.emissions_by_sector_by_gas.append(inventory)
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
+                self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
                 traceback.print_exc()
@@ -51,8 +51,8 @@ class NotCultivatedLand(LandModule):
                     emissions_som_yearly, emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectares_before_20)
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
+                self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
 
             except Exception as e:
                 traceback.print_exc()
