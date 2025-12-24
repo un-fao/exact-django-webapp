@@ -65,6 +65,7 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from math_model.no_time_dependency_final.ghg_emissions_classes import (
     Result as MathResult,
 )
+from math_model.no_time_dependency_final.ghg_inventory_class import Inventory
 from math_model.no_time_dependency_final.grassland_management import (
     GrasslandManagement as MathGrassland,
 )
@@ -472,7 +473,7 @@ class CalculatorFactory:
             aggregate_by (optional): The breakdown type to aggregate the results by. Defaults to BreakdownTypes.TOTAL.
 
         Returns:
-            The calculated result, broken down by the specified breakdown type.
+            Tuple of (total, by_activity, by_gas, by_activity_gas, inventory).
 
         Raises:
             Exception: If an error occurs during the calculation.
@@ -480,11 +481,14 @@ class CalculatorFactory:
         try:
             calculator: BaseCalculator = self.get_calculator(input)(input)
             result: tuple[MathResult] = calculator.calculate()
+            result_obj = Result(*result)
+
             return (
-                Result(*result).breakdown(by=BreakdownTypes.TOTAL),
-                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY),
-                Result(*result).breakdown(by=BreakdownTypes.GAS),
-                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY_GAS),
+                result_obj.breakdown(by=BreakdownTypes.TOTAL),
+                result_obj.breakdown(by=BreakdownTypes.ACTIVITY),
+                result_obj.breakdown(by=BreakdownTypes.GAS),
+                result_obj.breakdown(by=BreakdownTypes.ACTIVITY_GAS),
+                calculator.inventory,
             )
 
         except Exception as e:
@@ -576,6 +580,14 @@ class BaseCalculator(ABC):
         if soil_type is None:
             raise exceptions.ValidationError(f"Soil type is required for calculations. Please set soil_type_t2 on activity '{self.activity.name}' or soil_type on project '{self.project.name}'.")
         return soil_type
+
+    @property
+    def inventory(self) -> Inventory:
+        """Get inventory from the first non-None start module."""
+        for math_module in [self.math_start, self.math_start_w, self.math_start_wo]:
+            if math_module and hasattr(math_module, "inventory"):
+                return math_module.inventory
+        return Inventory()
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:

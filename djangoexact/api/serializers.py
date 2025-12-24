@@ -2874,6 +2874,7 @@ class DynamicResultSerializer(serializers.Serializer):
     total_w = serializers.SerializerMethodField()
     total_wo = serializers.SerializerMethodField()
     balance = serializers.SerializerMethodField()
+    inventory = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         self.aggregate_by = kwargs.pop("aggregate_by", None)
@@ -2890,6 +2891,9 @@ class DynamicResultSerializer(serializers.Serializer):
 
     def get_balance(self, obj):
         return self._serialize_data(obj.get("balance"))
+
+    def get_inventory(self, obj):
+        return obj.get("inventory")
 
     def _serialize_data(self, data):
         match self.aggregate_by:

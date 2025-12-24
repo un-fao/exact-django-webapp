@@ -27,6 +27,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
+from .ghg_inventory_class import InventoryPerGasPerActivity
 from .generalized_modules import LandModule
 from dataclasses import dataclass, field
 import numpy as np
@@ -359,6 +360,56 @@ class ForestManagement(BaseModule):
                         )
                     )
 
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
+                        )
+                    )
+                    self.result.yearly_emissions_by_sector_by_gas.append(
+                        YearlyGasActivityEmissionSet(
+                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
+                        )
+                    )
+
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.HWP_ROTATION_AGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.HWP_ROTATION_BGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.ROTATION_AGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.ROTATION_AGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.ROTATION_BGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.ROTATION_BGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.ROTATION_AGB))
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.ROTATION_BGB))
+
                     # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                     self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
 
@@ -449,6 +500,15 @@ class ForestManagement(BaseModule):
                                 year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.DISTURBANCE_FIRE_BGB, delay=self.delay
                             )
                         )
+
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DISTURBANCE_AGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DISTURBANCE_BGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.DISTURBANCE_FIRE_AGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.DISTURBANCE_FIRE_AGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.DISTURBANCE_FIRE_BGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.DISTURBANCE_FIRE_BGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DISTURBANCE_FIRE_AGB))
+                        self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DISTURBANCE_FIRE_BGB))
 
                         # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                         self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
@@ -561,6 +621,9 @@ class ForestManagement(BaseModule):
                     )
                 )
 
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DEGRADATION_AGB))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DEGRADATION_BGB))
+
                 # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
                 self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
             except Exception as e:
@@ -592,6 +655,11 @@ class ForestManagement(BaseModule):
                         year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_bgb_emissions], activity=ActivityTypes.BGB_GROWTH, delay=self.delay
                     )
                 )
+
+                agb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.agb_start * self.hectares_start, ActivityTypes.AGB_GROWTH)
+                bgb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.bgb_start * self.hectares_start, ActivityTypes.BGB_GROWTH)
+                self.inventory.emissions_by_sector_by_gas.append(agb_inventory)
+                self.inventory.emissions_by_sector_by_gas.append(bgb_inventory)
 
             except Exception as e:
                 traceback.print_exc()
@@ -627,6 +695,9 @@ class ForestManagement(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_litter_emissions], activity=ActivityTypes.LITTER, delay=self.delay)
                 )
+
+                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=self.litter_start * self.hectares_start, activity=ActivityTypes.LITTER)
+                self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
                 traceback.print_exc()
@@ -667,6 +738,8 @@ class ForestManagement(BaseModule):
                     )
                 )
 
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.deadwood_start * self.hectares_start, ActivityTypes.DEADWOOD)
+                self.inventory.emissions_by_sector_by_gas.append(inventory)
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -678,6 +751,9 @@ class ForestManagement(BaseModule):
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
+                inventory = InventoryPerGasPerActivity(GasTypes.N2O, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
+                self.inventory.emissions_by_sector_by_gas.append(inventory)
+
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -688,6 +764,9 @@ class ForestManagement(BaseModule):
 
                 som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.SOM))
+
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -777,12 +856,13 @@ class ForestManagement(BaseModule):
 #           'delay': 0,
 #           'is_same_forest_type': False,
 #           'forest_start': None,}
-
+#
 # ao = ForestManagement(**inputs_start)
 # ao.calculate_emissions()
 # ao.result.plot_emissions_and_aggregate_by_activity('start')
+#
 # plot_matrix_with_values(ao.agb_matrix, title="AGB Matrix ao")
-
+#
 # inputs_w = {'capitalization_time': 15,
 #           'implementation_time': 10,
 #           'rate_type': 'linear',
@@ -849,8 +929,6 @@ class ForestManagement(BaseModule):
 #           'delay': 0,
 #           'is_same_forest_type': True,
 #           'forest_start': ao,}
-
 # ao2 = ForestManagement(**inputs_w)
 # ao2.calculate_emissions()
-
 # ao2.result.plot_emissions_and_aggregate_by_activity('with')
