@@ -104,7 +104,7 @@ class Command(BaseCommand):
             "LitterDeadwoodCarbonStock",
             "LandUseCarbonStockExchangeFactor",
             "SoilOrcanicCarbonCNRatio",
-            "ForestManagementBGB",
+            "ForestManagementRootToShoot",
             "SoilOrganicCarbon",
             "ForestTotalBiomass",
             "AfforestationLandUseStockExchangeFactor",

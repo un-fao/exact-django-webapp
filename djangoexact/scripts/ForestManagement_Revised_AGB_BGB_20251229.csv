@@ -1,0 +1,333 @@
+﻿climate,land_use_type,region,forest_condition_type,from_year,forest_type,agb_min,agb_max,agb_growth_min,agb_growth_max,r_shoot,litter,deadwood
+Tropical,Rainforest,Eastern Africa,Secondary,21,Natural,100.063,100.063,1.645,1.645,0.825,4.8,14.8
+Tropical,Rainforest,Central Africa,Secondary,21,Natural,100.063,100.063,2.35,3.76,0.825,4.8,14.8
+Tropical,Rainforest,Northern Africa,Secondary,21,Natural,100.063,100.063,2.35,3.76,0.825,4.8,14.8
+Tropical,Rainforest,Southern Africa,Secondary,21,Natural,100.063,100.063,2.35,3.76,0.825,4.8,14.8
+Tropical,Rainforest,Western Africa,Secondary,21,Natural,100.063,100.063,2.35,3.76,0.825,4.8,14.8
+Tropical,Rainforest,South America,Secondary,21,Natural,97.008,97.008,1.081,1.081,0.221,4.8,14.8
+Tropical,Rainforest,Central America,Secondary,21,Natural,97.008,97.008,2.35,18.8,0.221,4.8,14.8
+Tropical,Rainforest,Caribbean,Secondary,21,Natural,97.008,97.008,2.35,18.8,0.221,4.8,14.8
+Tropical,Rainforest,Central Asia,Secondary,21,Natural,61.852,61.852,1.269,1.269,0.207,4.8,14.8
+Tropical,Rainforest,Eastern Asia,Secondary,21,Natural,61.852,61.852,0.94,3.76,0.207,4.8,14.8
+Tropical,Rainforest,South-Eastern Asia,Secondary,21,Natural,61.852,61.852,0.94,3.76,0.207,4.8,14.8
+Tropical,Rainforest,Southern Asia,Secondary,21,Natural,61.852,61.852,0.94,3.76,0.207,4.8,14.8
+Tropical,Rainforest,Western Asia,Secondary,21,Natural,61.852,61.852,0.94,3.76,0.207,4.8,14.8
+Tropical,Moist Deciduous Forest,Eastern Africa,Secondary,21,Natural,34.216,34.216,0.423,0.423,0.232,5.9,8
+Tropical,Moist Deciduous Forest,Central Africa,Secondary,21,Natural,34.216,34.216,1.41,7.05,0.232,5.9,8
+Tropical,Moist Deciduous Forest,Northern Africa,Secondary,21,Natural,34.216,34.216,1.41,7.05,0.232,5.9,8
+Tropical,Moist Deciduous Forest,Southern Africa,Secondary,21,Natural,34.216,34.216,1.41,7.05,0.232,5.9,8
+Tropical,Moist Deciduous Forest,Western Africa,Secondary,21,Natural,34.216,34.216,1.41,7.05,0.232,5.9,8
+Tropical,Moist Deciduous Forest,South America,Secondary,21,Natural,61.57,61.57,1.269,1.269,0.284,5.9,8
+Tropical,Moist Deciduous Forest,Central America,Secondary,21,Natural,61.57,61.57,1.88,9.4,0.284,5.9,8
+Tropical,Moist Deciduous Forest,Caribbean,Secondary,21,Natural,61.57,61.57,1.88,9.4,0.284,5.9,8
+Tropical,Moist Deciduous Forest,Central Asia,Secondary,21,Natural,31.819,31.819,0.423,0.423,0.323,5.9,8
+Tropical,Moist Deciduous Forest,Eastern Asia,Secondary,21,Natural,31.819,31.819,3.76,3.76,0.323,5.9,8
+Tropical,Moist Deciduous Forest,South-Eastern Asia,Secondary,21,Natural,31.819,31.819,3.76,3.76,0.323,5.9,8
+Tropical,Moist Deciduous Forest,Southern Asia,Secondary,21,Natural,31.819,31.819,3.76,3.76,0.323,5.9,8
+Tropical,Moist Deciduous Forest,Western Asia,Secondary,21,Natural,31.819,31.819,3.76,3.76,0.323,5.9,8
+Tropical,Shrubland,Eastern Africa,Secondary,21,Natural,22.748,22.748,0.423,0.423,0.4,0,0
+Tropical,Shrubland,Central Africa,Secondary,21,Natural,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Northern Africa,Secondary,21,Natural,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Southern Africa,Secondary,21,Natural,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Western Africa,Secondary,21,Natural,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,South America,Secondary,21,Natural,33.605,33.605,0.47,0.47,0.348,0,0
+Tropical,Shrubland,Central America,Secondary,21,Natural,33.605,33.605,2.35,9.4,0.348,0,0
+Tropical,Shrubland,Caribbean,Secondary,21,Natural,33.605,33.605,2.35,9.4,0.348,0,0
+Tropical,Shrubland,Central Asia,Secondary,21,Natural,18.001,18.001,0.47,0.611,0.322,0,0
+Tropical,Shrubland,Eastern Asia,Secondary,21,Natural,18.001,18.001,0.47,5.64,0.322,0,0
+Tropical,Shrubland,South-Eastern Asia,Secondary,21,Natural,18.001,18.001,0.47,5.64,0.322,0,0
+Tropical,Shrubland,Southern Asia,Secondary,21,Natural,18.001,18.001,0.47,5.64,0.322,0,0
+Tropical,Shrubland,Western Asia,Secondary,21,Natural,18.001,18.001,0.47,5.64,0.322,0,0
+Tropical,Dry Forest,Eastern Africa,Secondary,21,Natural,32.712,32.712,0.752,0.752,0.332,2.4,9
+Tropical,Dry Forest,Central Africa,Secondary,21,Natural,32.712,32.712,2.82,6.11,0.332,2.4,9
+Tropical,Dry Forest,Northern Africa,Secondary,21,Natural,32.712,32.712,2.82,6.11,0.332,2.4,9
+Tropical,Dry Forest,Southern Africa,Secondary,21,Natural,32.712,32.712,2.82,6.11,0.332,2.4,9
+Tropical,Dry Forest,Western Africa,Secondary,21,Natural,32.712,32.712,2.82,6.11,0.332,2.4,9
+Tropical,Dry Forest,South America,Secondary,21,Natural,55.883,55.883,0.752,0.752,0.334,2.4,9
+Tropical,Dry Forest,Central America,Secondary,21,Natural,55.883,55.883,1.88,14.1,0.334,2.4,9
+Tropical,Dry Forest,Caribbean,Secondary,21,Natural,55.883,55.883,1.88,14.1,0.334,2.4,9
+Tropical,Dry Forest,Central Asia,Secondary,21,Natural,86.762,86.762,0.752,0.752,0.381,2.4,9
+Tropical,Dry Forest,Eastern Asia,Secondary,21,Natural,86.762,86.762,0.94,11.75,0.381,2.4,9
+Tropical,Dry Forest,South-Eastern Asia,Secondary,21,Natural,86.762,86.762,0.94,11.75,0.381,2.4,9
+Tropical,Dry Forest,Southern Asia,Secondary,21,Natural,86.762,86.762,0.94,11.75,0.381,2.4,9
+Tropical,Dry Forest,Western Asia,Secondary,21,Natural,86.762,86.762,0.94,11.75,0.381,2.4,9
+Warm Temperate,Dry Forest,Eastern Africa,Secondary,21,Natural,30.644,30.644,0.846,0.846,0.56,0,64.4
+Warm Temperate,Dry Forest,Central Africa,Secondary,21,Natural,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Northern Africa,Secondary,21,Natural,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Southern Africa,Secondary,21,Natural,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Western Africa,Secondary,21,Natural,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,South America,Secondary,21,Natural,54.473,54.473,0.47,0.47,0.336,0,64.4
+Warm Temperate,Dry Forest,Central America,Secondary,21,Natural,54.473,54.473,1.41,14.1,0.336,0,64.4
+Warm Temperate,Dry Forest,Caribbean,Secondary,21,Natural,54.473,54.473,1.41,14.1,0.336,0,64.4
+Warm Temperate,Dry Forest,Central Asia,Secondary,21,Natural,33.323,33.323,0.705,0.94,0.44,0,64.4
+Warm Temperate,Dry Forest,Eastern Asia,Secondary,21,Natural,33.323,33.323,0.94,11.75,0.44,0,64.4
+Warm Temperate,Dry Forest,South-Eastern Asia,Secondary,21,Natural,33.323,33.323,0.94,11.75,0.44,0,64.4
+Warm Temperate,Dry Forest,Southern Asia,Secondary,21,Natural,33.323,33.323,0.94,11.75,0.44,0,64.4
+Warm Temperate,Dry Forest,Western Asia,Secondary,21,Natural,33.323,33.323,0.94,11.75,0.44,0,64.4
+Warm Temperate,Humid Forest,Eastern Africa,Secondary,21,Natural,25.427,25.427,0.47,0.47,0.232,8.7,13.2
+Warm Temperate,Humid Forest,Central Africa,Secondary,21,Natural,25.427,25.427,4.7,4.7,0.232,8.7,13.2
+Warm Temperate,Humid Forest,Northern Africa,Secondary,21,Natural,25.427,25.427,4.7,4.7,0.232,8.7,13.2
+Warm Temperate,Humid Forest,Southern Africa,Secondary,21,Natural,25.427,25.427,4.7,4.7,0.232,8.7,13.2
+Warm Temperate,Humid Forest,Western Africa,Secondary,21,Natural,25.427,25.427,4.7,4.7,0.232,8.7,13.2
+Warm Temperate,Humid Forest,South America,Secondary,21,Natural,39.715,39.715,0.47,0.47,0.175,8.7,13.2
+Warm Temperate,Humid Forest,Central America,Secondary,21,Natural,39.715,39.715,1.41,15.04,0.175,8.7,13.2
+Warm Temperate,Humid Forest,Caribbean,Secondary,21,Natural,39.715,39.715,1.41,15.04,0.175,8.7,13.2
+Warm Temperate,Humid Forest,Central Asia,Secondary,21,Natural,121.448,121.448,0.47,0.47,0.23,8.7,13.2
+Warm Temperate,Humid Forest,Eastern Asia,Secondary,21,Natural,121.448,121.448,3.76,3.76,0.23,8.7,13.2
+Warm Temperate,Humid Forest,South-Eastern Asia,Secondary,21,Natural,121.448,121.448,3.76,3.76,0.23,8.7,13.2
+Warm Temperate,Humid Forest,Southern Asia,Secondary,21,Natural,121.448,121.448,3.76,3.76,0.23,8.7,13.2
+Warm Temperate,Humid Forest,Western Asia,Secondary,21,Natural,121.448,121.448,3.76,3.76,0.23,8.7,13.2
+Warm Temperate,Steppe,Eastern Africa,Secondary,21,Natural,23.735,23.735,0.423,0.423,0.32,0,6.8
+Warm Temperate,Steppe,Central Africa,Secondary,21,Natural,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Northern Africa,Secondary,21,Natural,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Southern Africa,Secondary,21,Natural,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Western Africa,Secondary,21,Natural,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,South America,Secondary,21,Natural,20.68,20.68,0.47,0.47,1.338,0,6.8
+Warm Temperate,Steppe,Central America,Secondary,21,Natural,20.68,20.68,2.35,9.4,1.338,0,6.8
+Warm Temperate,Steppe,Caribbean,Secondary,21,Natural,20.68,20.68,2.35,9.4,1.338,0,6.8
+Warm Temperate,Steppe,Central Asia,Secondary,21,Natural,19.552,19.552,0.47,0.611,0.32,0,6.8
+Warm Temperate,Steppe,Eastern Asia,Secondary,21,Natural,19.552,19.552,0.47,5.64,0.32,0,6.8
+Warm Temperate,Steppe,South-Eastern Asia,Secondary,21,Natural,19.552,19.552,0.47,5.64,0.32,0,6.8
+Warm Temperate,Steppe,Southern Asia,Secondary,21,Natural,19.552,19.552,0.47,5.64,0.32,0,6.8
+Warm Temperate,Steppe,Western Asia,Secondary,21,Natural,19.552,19.552,0.47,5.64,0.32,0,6.8
+Warm Temperate,Mountain System,Eastern Africa,Secondary,21,Natural,16.497,16.497,0.235,0.235,0.27,0,11.8
+Warm Temperate,Mountain System,Central Africa,Secondary,21,Natural,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Northern Africa,Secondary,21,Natural,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Southern Africa,Secondary,21,Natural,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Western Africa,Secondary,21,Natural,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,South America,Secondary,21,Natural,35.062,35.062,0.235,0.235,0.27,0,11.8
+Warm Temperate,Mountain System,Central America,Secondary,21,Natural,35.062,35.062,0.94,8.46,0.27,0,11.8
+Warm Temperate,Mountain System,Caribbean,Secondary,21,Natural,35.062,35.062,0.94,8.46,0.27,0,11.8
+Warm Temperate,Mountain System,Central Asia,Secondary,21,Natural,72.944,72.944,0.235,0.235,0.27,0,11.8
+Warm Temperate,Mountain System,Eastern Asia,Secondary,21,Natural,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,South-Eastern Asia,Secondary,21,Natural,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,Southern Asia,Secondary,21,Natural,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,Western Asia,Secondary,21,Natural,72.944,72.944,0.47,5.64,0.27,0,11.8
+Tropical Montane,Mountain System,Eastern Africa,Secondary,21,Natural,89.3,89.3,0.846,0.846,0.27,0,3.3
+Tropical Montane,Mountain System,Central Africa,Secondary,21,Natural,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Northern Africa,Secondary,21,Natural,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Southern Africa,Secondary,21,Natural,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Western Africa,Secondary,21,Natural,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,South America,Secondary,21,Natural,86.668,86.668,0.846,0.846,0.27,0,3.3
+Tropical Montane,Mountain System,Central America,Secondary,21,Natural,86.668,86.668,3.76,8.46,0.27,0,3.3
+Tropical Montane,Mountain System,Caribbean,Secondary,21,Natural,86.668,86.668,3.76,8.46,0.27,0,3.3
+Tropical Montane,Mountain System,Central Asia,Secondary,21,Natural,31.208,31.208,0.517,0.517,0.27,0,3.3
+Tropical Montane,Mountain System,Eastern Asia,Secondary,21,Natural,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,South-Eastern Asia,Secondary,21,Natural,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Southern Asia,Secondary,21,Natural,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Western Asia,Secondary,21,Natural,31.208,31.208,0.47,4.7,0.27,0,3.3
+Cool Temperate,Oceanic Forest,Eastern Africa,Secondary,21,Natural,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Central Africa,Secondary,21,Natural,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Northern Africa,Secondary,21,Natural,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Southern Africa,Secondary,21,Natural,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Western Africa,Secondary,21,Natural,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,South America,Secondary,21,Natural,166.427,166.427,4.277,4.277,0.402,2.9,36.8
+Cool Temperate,Oceanic Forest,Central America,Secondary,21,Natural,166.427,166.427,4.7,4.7,0.402,2.9,36.8
+Cool Temperate,Oceanic Forest,Caribbean,Secondary,21,Natural,166.427,166.427,4.7,4.7,0.402,2.9,36.8
+Cool Temperate,Oceanic Forest,Central Asia,Secondary,21,Natural,84.6,84.6,2.068,2.068,0.267,2.9,36.8
+Cool Temperate,Oceanic Forest,Eastern Asia,Secondary,21,Natural,84.6,84.6,2.068,2.068,0.267,2.9,36.8
+Cool Temperate,Oceanic Forest,South-Eastern Asia,Secondary,21,Natural,84.6,84.6,2.068,2.068,0.267,2.9,36.8
+Cool Temperate,Oceanic Forest,Southern Asia,Secondary,21,Natural,84.6,84.6,2.068,2.068,0.267,2.9,36.8
+Cool Temperate,Oceanic Forest,Western Asia,Secondary,21,Natural,84.6,84.6,2.068,2.068,0.267,2.9,36.8
+Cool Temperate,Continental Forest,Eastern Africa,Secondary,21,Natural,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Central Africa,Secondary,21,Natural,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Northern Africa,Secondary,21,Natural,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Southern Africa,Secondary,21,Natural,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Western Africa,Secondary,21,Natural,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,South America,Secondary,21,Natural,60.583,60.583,1.692,1.692,0.481,47.8,23
+Cool Temperate,Continental Forest,Central America,Secondary,21,Natural,60.583,60.583,1.88,1.88,0.481,47.8,23
+Cool Temperate,Continental Forest,Caribbean,Secondary,21,Natural,60.583,60.583,1.88,1.88,0.481,47.8,23
+Cool Temperate,Continental Forest,Central Asia,Secondary,21,Natural,56.4,56.4,1.88,1.88,0.243,47.8,23
+Cool Temperate,Continental Forest,Eastern Asia,Secondary,21,Natural,56.4,56.4,1.88,1.88,0.243,47.8,23
+Cool Temperate,Continental Forest,South-Eastern Asia,Secondary,21,Natural,56.4,56.4,1.88,1.88,0.243,47.8,23
+Cool Temperate,Continental Forest,Southern Asia,Secondary,21,Natural,56.4,56.4,1.88,1.88,0.243,47.8,23
+Cool Temperate,Continental Forest,Western Asia,Secondary,21,Natural,56.4,56.4,1.88,1.88,0.243,47.8,23
+Cool Temperate,Steppe,Central Asia,Secondary,21,Natural,55.695,55.695,1.645,1.645,0.44,28.7,21.7
+Cool Temperate,Steppe,Eastern Asia,Secondary,21,Natural,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,South-Eastern Asia,Secondary,21,Natural,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,Southern Asia,Secondary,21,Natural,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,Western Asia,Secondary,21,Natural,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Desert,Central Asia,Secondary,21,Natural,20.68,20.68,0.282,0.282,0.44,0,10.5
+Cool Temperate,Desert,Eastern Asia,Secondary,21,Natural,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,South-Eastern Asia,Secondary,21,Natural,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,Southern Asia,Secondary,21,Natural,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,Western Asia,Secondary,21,Natural,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Mountain System,Eastern Africa,Secondary,21,Natural,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Central Africa,Secondary,21,Natural,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Northern Africa,Secondary,21,Natural,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Southern Africa,Secondary,21,Natural,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Western Africa,Secondary,21,Natural,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,South America,Secondary,21,Natural,87.373,87.373,2.068,2.068,0.301,3.7,37.6
+Cool Temperate,Mountain System,Central America,Secondary,21,Natural,87.373,87.373,4.23,4.23,0.301,3.7,37.6
+Cool Temperate,Mountain System,Caribbean,Secondary,21,Natural,87.373,87.373,4.23,4.23,0.301,3.7,37.6
+Cool Temperate,Mountain System,Central Asia,Secondary,21,Natural,47,47,1.41,1.41,0.323,3.7,37.6
+Cool Temperate,Mountain System,Eastern Asia,Secondary,21,Natural,47,47,1.41,1.41,0.323,3.7,37.6
+Cool Temperate,Mountain System,South-Eastern Asia,Secondary,21,Natural,47,47,1.41,1.41,0.323,3.7,37.6
+Cool Temperate,Mountain System,Southern Asia,Secondary,21,Natural,47,47,1.41,1.41,0.323,3.7,37.6
+Cool Temperate,Mountain System,Western Asia,Secondary,21,Natural,47,47,1.41,1.41,0.323,3.7,37.6
+Tropical,Rainforest,Eastern Africa,Secondary,21,Plantation,100.063,100.063,2.35,3.76,0.37,4.8,14.8
+Tropical,Rainforest,Central Africa,Secondary,21,Plantation,100.063,100.063,2.35,3.76,0.37,4.8,14.8
+Tropical,Rainforest,Northern Africa,Secondary,21,Plantation,100.063,100.063,2.35,3.76,0.37,4.8,14.8
+Tropical,Rainforest,Southern Africa,Secondary,21,Plantation,100.063,100.063,2.35,3.76,0.37,4.8,14.8
+Tropical,Rainforest,Western Africa,Secondary,21,Plantation,100.063,100.063,2.35,3.76,0.37,4.8,14.8
+Tropical,Rainforest,South America,Secondary,21,Plantation,97.008,97.008,2.35,18.8,0.17,4.8,14.8
+Tropical,Rainforest,Central America,Secondary,21,Plantation,97.008,97.008,2.35,18.8,0.17,4.8,14.8
+Tropical,Rainforest,Caribbean,Secondary,21,Plantation,97.008,97.008,2.35,18.8,0.17,4.8,14.8
+Tropical,Rainforest,Central Asia,Secondary,21,Plantation,61.852,61.852,0.94,3.76,0.325,4.8,14.8
+Tropical,Rainforest,Eastern Asia,Secondary,21,Plantation,61.852,61.852,0.94,3.76,0.325,4.8,14.8
+Tropical,Rainforest,South-Eastern Asia,Secondary,21,Plantation,61.852,61.852,0.94,3.76,0.325,4.8,14.8
+Tropical,Rainforest,Southern Asia,Secondary,21,Plantation,61.852,61.852,0.94,3.76,0.325,4.8,14.8
+Tropical,Rainforest,Western Asia,Secondary,21,Plantation,61.852,61.852,0.94,3.76,0.325,4.8,14.8
+Tropical,Moist Deciduous Forest,Eastern Africa,Secondary,21,Plantation,34.216,34.216,1.41,7.05,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Central Africa,Secondary,21,Plantation,34.216,34.216,1.41,7.05,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Northern Africa,Secondary,21,Plantation,34.216,34.216,1.41,7.05,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Southern Africa,Secondary,21,Plantation,34.216,34.216,1.41,7.05,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Western Africa,Secondary,21,Plantation,34.216,34.216,1.41,7.05,0.2,5.9,8
+Tropical,Moist Deciduous Forest,South America,Secondary,21,Plantation,61.57,61.57,1.88,9.4,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Central America,Secondary,21,Plantation,61.57,61.57,1.88,9.4,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Caribbean,Secondary,21,Plantation,61.57,61.57,1.88,9.4,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Central Asia,Secondary,21,Plantation,31.819,31.819,3.76,3.76,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Eastern Asia,Secondary,21,Plantation,31.819,31.819,3.76,3.76,0.2,5.9,8
+Tropical,Moist Deciduous Forest,South-Eastern Asia,Secondary,21,Plantation,31.819,31.819,3.76,3.76,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Southern Asia,Secondary,21,Plantation,31.819,31.819,3.76,3.76,0.2,5.9,8
+Tropical,Moist Deciduous Forest,Western Asia,Secondary,21,Plantation,31.819,31.819,3.76,3.76,0.2,5.9,8
+Tropical,Shrubland,Eastern Africa,Secondary,21,Plantation,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Central Africa,Secondary,21,Plantation,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Northern Africa,Secondary,21,Plantation,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Southern Africa,Secondary,21,Plantation,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,Western Africa,Secondary,21,Plantation,22.748,22.748,1.175,6.58,0.4,0,0
+Tropical,Shrubland,South America,Secondary,21,Plantation,33.605,33.605,2.35,9.4,2.158,0,0
+Tropical,Shrubland,Central America,Secondary,21,Plantation,33.605,33.605,2.35,9.4,2.158,0,0
+Tropical,Shrubland,Caribbean,Secondary,21,Plantation,33.605,33.605,2.35,9.4,2.158,0,0
+Tropical,Shrubland,Central Asia,Secondary,21,Plantation,18.001,18.001,0.47,5.64,0.4,0,0
+Tropical,Shrubland,Eastern Asia,Secondary,21,Plantation,18.001,18.001,0.47,5.64,0.4,0,0
+Tropical,Shrubland,South-Eastern Asia,Secondary,21,Plantation,18.001,18.001,0.47,5.64,0.4,0,0
+Tropical,Shrubland,Southern Asia,Secondary,21,Plantation,18.001,18.001,0.47,5.64,0.4,0,0
+Tropical,Shrubland,Western Asia,Secondary,21,Plantation,18.001,18.001,0.47,5.64,0.4,0,0
+Tropical,Dry Forest,Eastern Africa,Secondary,21,Plantation,32.712,32.712,2.82,6.11,0.56,2.4,9
+Tropical,Dry Forest,Central Africa,Secondary,21,Plantation,32.712,32.712,2.82,6.11,0.56,2.4,9
+Tropical,Dry Forest,Northern Africa,Secondary,21,Plantation,32.712,32.712,2.82,6.11,0.56,2.4,9
+Tropical,Dry Forest,Southern Africa,Secondary,21,Plantation,32.712,32.712,2.82,6.11,0.56,2.4,9
+Tropical,Dry Forest,Western Africa,Secondary,21,Plantation,32.712,32.712,2.82,6.11,0.56,2.4,9
+Tropical,Dry Forest,South America,Secondary,21,Plantation,55.883,55.883,1.88,14.1,0.56,2.4,9
+Tropical,Dry Forest,Central America,Secondary,21,Plantation,55.883,55.883,1.88,14.1,0.56,2.4,9
+Tropical,Dry Forest,Caribbean,Secondary,21,Plantation,55.883,55.883,1.88,14.1,0.56,2.4,9
+Tropical,Dry Forest,Central Asia,Secondary,21,Plantation,86.762,86.762,0.94,11.75,0.56,2.4,9
+Tropical,Dry Forest,Eastern Asia,Secondary,21,Plantation,86.762,86.762,0.94,11.75,0.56,2.4,9
+Tropical,Dry Forest,South-Eastern Asia,Secondary,21,Plantation,86.762,86.762,0.94,11.75,0.56,2.4,9
+Tropical,Dry Forest,Southern Asia,Secondary,21,Plantation,86.762,86.762,0.94,11.75,0.56,2.4,9
+Tropical,Dry Forest,Western Asia,Secondary,21,Plantation,86.762,86.762,0.94,11.75,0.56,2.4,9
+Warm Temperate,Dry Forest,Eastern Africa,Secondary,21,Plantation,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Central Africa,Secondary,21,Plantation,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Northern Africa,Secondary,21,Plantation,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Southern Africa,Secondary,21,Plantation,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,Western Africa,Secondary,21,Plantation,30.644,30.644,3.76,3.76,0.56,0,64.4
+Warm Temperate,Dry Forest,South America,Secondary,21,Plantation,54.473,54.473,1.41,14.1,0.56,0,64.4
+Warm Temperate,Dry Forest,Central America,Secondary,21,Plantation,54.473,54.473,1.41,14.1,0.56,0,64.4
+Warm Temperate,Dry Forest,Caribbean,Secondary,21,Plantation,54.473,54.473,1.41,14.1,0.56,0,64.4
+Warm Temperate,Dry Forest,Central Asia,Secondary,21,Plantation,33.323,33.323,0.94,11.75,0.56,0,64.4
+Warm Temperate,Dry Forest,Eastern Asia,Secondary,21,Plantation,33.323,33.323,0.94,11.75,0.56,0,64.4
+Warm Temperate,Dry Forest,South-Eastern Asia,Secondary,21,Plantation,33.323,33.323,0.94,11.75,0.56,0,64.4
+Warm Temperate,Dry Forest,Southern Asia,Secondary,21,Plantation,33.323,33.323,0.94,11.75,0.56,0,64.4
+Warm Temperate,Dry Forest,Western Asia,Secondary,21,Plantation,33.323,33.323,0.94,11.75,0.56,0,64.4
+Warm Temperate,Humid Forest,Eastern Africa,Secondary,21,Plantation,25.427,25.427,4.7,4.7,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Central Africa,Secondary,21,Plantation,25.427,25.427,4.7,4.7,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Northern Africa,Secondary,21,Plantation,25.427,25.427,4.7,4.7,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Southern Africa,Secondary,21,Plantation,25.427,25.427,4.7,4.7,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Western Africa,Secondary,21,Plantation,25.427,25.427,4.7,4.7,0.2,8.7,13.2
+Warm Temperate,Humid Forest,South America,Secondary,21,Plantation,39.715,39.715,1.41,15.04,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Central America,Secondary,21,Plantation,39.715,39.715,1.41,15.04,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Caribbean,Secondary,21,Plantation,39.715,39.715,1.41,15.04,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Central Asia,Secondary,21,Plantation,121.448,121.448,3.76,3.76,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Eastern Asia,Secondary,21,Plantation,121.448,121.448,3.76,3.76,0.2,8.7,13.2
+Warm Temperate,Humid Forest,South-Eastern Asia,Secondary,21,Plantation,121.448,121.448,3.76,3.76,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Southern Asia,Secondary,21,Plantation,121.448,121.448,3.76,3.76,0.2,8.7,13.2
+Warm Temperate,Humid Forest,Western Asia,Secondary,21,Plantation,121.448,121.448,3.76,3.76,0.2,8.7,13.2
+Warm Temperate,Steppe,Eastern Africa,Secondary,21,Plantation,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Central Africa,Secondary,21,Plantation,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Northern Africa,Secondary,21,Plantation,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Southern Africa,Secondary,21,Plantation,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,Western Africa,Secondary,21,Plantation,23.735,23.735,1.175,6.58,0.32,0,6.8
+Warm Temperate,Steppe,South America,Secondary,21,Plantation,20.68,20.68,2.35,9.4,0.32,0,6.8
+Warm Temperate,Steppe,Central America,Secondary,21,Plantation,20.68,20.68,2.35,9.4,0.32,0,6.8
+Warm Temperate,Steppe,Caribbean,Secondary,21,Plantation,20.68,20.68,2.35,9.4,0.32,0,6.8
+Warm Temperate,Steppe,Central Asia,Secondary,21,Plantation,19.552,19.552,0.47,5.64,2.158,0,6.8
+Warm Temperate,Steppe,Eastern Asia,Secondary,21,Plantation,19.552,19.552,0.47,5.64,2.158,0,6.8
+Warm Temperate,Steppe,South-Eastern Asia,Secondary,21,Plantation,19.552,19.552,0.47,5.64,2.158,0,6.8
+Warm Temperate,Steppe,Southern Asia,Secondary,21,Plantation,19.552,19.552,0.47,5.64,2.158,0,6.8
+Warm Temperate,Steppe,Western Asia,Secondary,21,Plantation,19.552,19.552,0.47,5.64,2.158,0,6.8
+Warm Temperate,Mountain System,Eastern Africa,Secondary,21,Plantation,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Central Africa,Secondary,21,Plantation,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Northern Africa,Secondary,21,Plantation,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Southern Africa,Secondary,21,Plantation,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,Western Africa,Secondary,21,Plantation,16.497,16.497,4.7,4.7,0.27,0,11.8
+Warm Temperate,Mountain System,South America,Secondary,21,Plantation,35.062,35.062,0.94,8.46,0.27,0,11.8
+Warm Temperate,Mountain System,Central America,Secondary,21,Plantation,35.062,35.062,0.94,8.46,0.27,0,11.8
+Warm Temperate,Mountain System,Caribbean,Secondary,21,Plantation,35.062,35.062,0.94,8.46,0.27,0,11.8
+Warm Temperate,Mountain System,Central Asia,Secondary,21,Plantation,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,Eastern Asia,Secondary,21,Plantation,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,South-Eastern Asia,Secondary,21,Plantation,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,Southern Asia,Secondary,21,Plantation,72.944,72.944,0.47,5.64,0.27,0,11.8
+Warm Temperate,Mountain System,Western Asia,Secondary,21,Plantation,72.944,72.944,0.47,5.64,0.27,0,11.8
+Tropical Montane,Mountain System,Eastern Africa,Secondary,21,Plantation,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Central Africa,Secondary,21,Plantation,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Northern Africa,Secondary,21,Plantation,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Southern Africa,Secondary,21,Plantation,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Western Africa,Secondary,21,Plantation,89.3,89.3,4.7,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,South America,Secondary,21,Plantation,86.668,86.668,3.76,8.46,0.27,0,3.3
+Tropical Montane,Mountain System,Central America,Secondary,21,Plantation,86.668,86.668,3.76,8.46,0.27,0,3.3
+Tropical Montane,Mountain System,Caribbean,Secondary,21,Plantation,86.668,86.668,3.76,8.46,0.27,0,3.3
+Tropical Montane,Mountain System,Central Asia,Secondary,21,Plantation,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Eastern Asia,Secondary,21,Plantation,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,South-Eastern Asia,Secondary,21,Plantation,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Southern Asia,Secondary,21,Plantation,31.208,31.208,0.47,4.7,0.27,0,3.3
+Tropical Montane,Mountain System,Western Asia,Secondary,21,Plantation,31.208,31.208,0.47,4.7,0.27,0,3.3
+Cool Temperate,Oceanic Forest,Eastern Africa,Secondary,21,Plantation,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Central Africa,Secondary,21,Plantation,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Northern Africa,Secondary,21,Plantation,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Southern Africa,Secondary,21,Plantation,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Western Africa,Secondary,21,Plantation,136.206,136.206,2.068,2.068,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,South America,Secondary,21,Plantation,166.427,166.427,4.7,4.7,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Central America,Secondary,21,Plantation,166.427,166.427,4.7,4.7,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Caribbean,Secondary,21,Plantation,166.427,166.427,4.7,4.7,0.44,2.9,36.8
+Cool Temperate,Oceanic Forest,Central Asia,Secondary,21,Plantation,84.6,84.6,2.068,2.068,0.307,2.9,36.8
+Cool Temperate,Oceanic Forest,Eastern Asia,Secondary,21,Plantation,84.6,84.6,2.068,2.068,0.307,2.9,36.8
+Cool Temperate,Oceanic Forest,South-Eastern Asia,Secondary,21,Plantation,84.6,84.6,2.068,2.068,0.307,2.9,36.8
+Cool Temperate,Oceanic Forest,Southern Asia,Secondary,21,Plantation,84.6,84.6,2.068,2.068,0.307,2.9,36.8
+Cool Temperate,Oceanic Forest,Western Asia,Secondary,21,Plantation,84.6,84.6,2.068,2.068,0.307,2.9,36.8
+Cool Temperate,Continental Forest,Eastern Africa,Secondary,21,Plantation,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Central Africa,Secondary,21,Plantation,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Northern Africa,Secondary,21,Plantation,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Southern Africa,Secondary,21,Plantation,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,Western Africa,Secondary,21,Plantation,54.52,54.52,1.88,1.88,0.44,47.8,23
+Cool Temperate,Continental Forest,South America,Secondary,21,Plantation,60.583,60.583,1.88,1.88,0.237,47.8,23
+Cool Temperate,Continental Forest,Central America,Secondary,21,Plantation,60.583,60.583,1.88,1.88,0.237,47.8,23
+Cool Temperate,Continental Forest,Caribbean,Secondary,21,Plantation,60.583,60.583,1.88,1.88,0.237,47.8,23
+Cool Temperate,Continental Forest,Central Asia,Secondary,21,Plantation,56.4,56.4,1.88,1.88,0.305,47.8,23
+Cool Temperate,Continental Forest,Eastern Asia,Secondary,21,Plantation,56.4,56.4,1.88,1.88,0.305,47.8,23
+Cool Temperate,Continental Forest,South-Eastern Asia,Secondary,21,Plantation,56.4,56.4,1.88,1.88,0.305,47.8,23
+Cool Temperate,Continental Forest,Southern Asia,Secondary,21,Plantation,56.4,56.4,1.88,1.88,0.305,47.8,23
+Cool Temperate,Continental Forest,Western Asia,Secondary,21,Plantation,56.4,56.4,1.88,1.88,0.305,47.8,23
+Cool Temperate,Steppe,Central Asia,Secondary,21,Plantation,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,Eastern Asia,Secondary,21,Plantation,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,South-Eastern Asia,Secondary,21,Plantation,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,Southern Asia,Secondary,21,Plantation,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Steppe,Western Asia,Secondary,21,Plantation,55.695,55.695,5.17,5.17,0.44,28.7,21.7
+Cool Temperate,Desert,Central Asia,Secondary,21,Plantation,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,Eastern Asia,Secondary,21,Plantation,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,South-Eastern Asia,Secondary,21,Plantation,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,Southern Asia,Secondary,21,Plantation,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Desert,Western Asia,Secondary,21,Plantation,20.68,20.68,,,0.44,0,10.5
+Cool Temperate,Mountain System,Eastern Africa,Secondary,21,Plantation,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Central Africa,Secondary,21,Plantation,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Northern Africa,Secondary,21,Plantation,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Southern Africa,Secondary,21,Plantation,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,Western Africa,Secondary,21,Plantation,80.088,80.088,1.41,1.41,0.44,3.7,37.6
+Cool Temperate,Mountain System,South America,Secondary,21,Plantation,87.373,87.373,4.23,4.23,0.302,3.7,37.6
+Cool Temperate,Mountain System,Central America,Secondary,21,Plantation,87.373,87.373,4.23,4.23,0.302,3.7,37.6
+Cool Temperate,Mountain System,Caribbean,Secondary,21,Plantation,87.373,87.373,4.23,4.23,0.302,3.7,37.6
+Cool Temperate,Mountain System,Central Asia,Secondary,21,Plantation,47,47,1.41,1.41,0.254,3.7,37.6
+Cool Temperate,Mountain System,Eastern Asia,Secondary,21,Plantation,47,47,1.41,1.41,0.254,3.7,37.6
+Cool Temperate,Mountain System,South-Eastern Asia,Secondary,21,Plantation,47,47,1.41,1.41,0.254,3.7,37.6
+Cool Temperate,Mountain System,Southern Asia,Secondary,21,Plantation,47,47,1.41,1.41,0.254,3.7,37.6
+Cool Temperate,Mountain System,Western Asia,Secondary,21,Plantation,47,47,1.41,1.41,0.254,3.7,37.6

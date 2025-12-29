@@ -892,9 +892,13 @@ class DeforestationCalculator(BaseCalculator):
 
         mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
 
-        bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+        bgb_start = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(
+            region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type
+        )
         if not bgb_start:
-            raise Exception(f"ForestManagementBGB for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+            raise Exception(
+                f"ForestManagementRootToShoot for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist"
+            )
 
         if module_w.module_type.class_name == "ForestManagement":
             litter_dw_w = SimpleNamespace(litter=0, dw=0)
@@ -919,9 +923,11 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
 
-            bgb_w = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_w = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(
+                region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type
+            )
             if not bgb_w:
-                raise Exception(f"ForestManagementBGB for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
         if module_wo.module_type.class_name == "ForestManagement":
             litter_dw_wo = SimpleNamespace(litter=0, dw=0)
@@ -946,9 +952,11 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
 
-            bgb_wo = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_wo = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(
+                region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type
+            )
             if not bgb_wo:
-                raise Exception(f"ForestManagementBGB for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
         combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
         combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
@@ -6953,10 +6961,11 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.has_t2_growth_w = False
         self.has_t2_growth_wo = False
 
+        # TODO: Rename all BGB to RootToShoot
         self.litter_dw = ipcc.LitterDeadwoodCarbonStock()
         self.agb_growth = ipcc.ForestManagementAGBGrowth()
-        self.bgb_before_20_yrs = ipcc.ForestManagementBGB()
-        self.bgb_after_20_yrs = ipcc.ForestManagementBGB()
+        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot()
+        self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot()
         self.agb_under_20_yrs = ipcc.ForestManagementAGB()
         self.agb_over_20_yrs = ipcc.ForestManagementAGB()
 
@@ -7027,8 +7036,8 @@ class ForestManagementCalculator(LandModuleCalculator):
         }
 
         AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
-        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
-        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
+        RSHOOT_UNDER_20_NOT_FOUND = f"Root-to-shoot (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for Root-to-shoot (under 20 years) for all scenarios."
+        RSHOOT_OVER_20_NOT_FOUND = f"Root-to-shoot (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for Root-to-shoot (over 20 years) for all scenarios."
         LITTER_DW_NOT_FOUND = (
             f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
         )
@@ -7066,13 +7075,13 @@ class ForestManagementCalculator(LandModuleCalculator):
         before_2_yrs = self.agb_growth.value_upto_20_years
         after_20_yrs = self.agb_growth.value_after_20_years
 
-        self.bgb_before_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
-        if not self.bgb_before_20_yrs:
-            raise ValueError(BGB_UNDER_20_NOT_FOUND)
+        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
+        if not self.rshoot_before_20_yrs:
+            raise ValueError(RSHOOT_UNDER_20_NOT_FOUND)
 
-        self.bgb_after_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
-        if not self.bgb_after_20_yrs:
-            raise ValueError(BGB_OVER_20_NOT_FOUND)
+        self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
+        if not self.rshoot_after_20_yrs:
+            raise ValueError(RSHOOT_OVER_20_NOT_FOUND)
 
         self.agb_under_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=0)
 
@@ -7288,9 +7297,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "rotation_recurrence": self.forest.rotation_length_yrs_start,
                 "rotation_start_year": self.forest.rotation_start_year_t2_start,
                 "rotation_percentage_energy": self.forest.rotation_percentage_biomass_for_energy_start,
-                "bgb_ratio_threshold": self.bgb_before_20_yrs.threshold,
-                "bgb_ratio_under_threshold": self.bgb_before_20_yrs.value,
-                "bgb_ratio_over_threshold": self.bgb_after_20_yrs.value,
+                "bgb_ratio_threshold": self.rshoot_before_20_yrs.threshold,
+                "bgb_ratio_under_threshold": self.rshoot_before_20_yrs.value,
+                "bgb_ratio_over_threshold": self.rshoot_after_20_yrs.value,
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_start,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_start,
                 "agb_start_default": self.agb_start_start,
@@ -7370,9 +7379,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "rotation_recurrence": self.forest.rotation_length_yrs_w,
                 "rotation_start_year": self.forest.rotation_start_year_t2_w,
                 "rotation_percentage_energy": self.forest.rotation_percentage_biomass_for_energy_w,
-                "bgb_ratio_threshold": self.bgb_before_20_yrs.threshold,
-                "bgb_ratio_under_threshold": self.bgb_before_20_yrs.value,
-                "bgb_ratio_over_threshold": self.bgb_after_20_yrs.value,
+                "bgb_ratio_threshold": self.rshoot_before_20_yrs.threshold,
+                "bgb_ratio_under_threshold": self.rshoot_before_20_yrs.value,
+                "bgb_ratio_over_threshold": self.rshoot_after_20_yrs.value,
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_w,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_w,
                 "agb_start_default": self.agb_start_w,
@@ -7450,9 +7459,9 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "rotation_recurrence": self.forest.rotation_length_yrs_wo,
                 "rotation_start_year": self.forest.rotation_start_year_t2_wo,
                 "rotation_percentage_energy": self.forest.rotation_percentage_biomass_for_energy_wo,
-                "bgb_ratio_threshold": self.bgb_before_20_yrs.threshold,
-                "bgb_ratio_under_threshold": self.bgb_before_20_yrs.value,
-                "bgb_ratio_over_threshold": self.bgb_after_20_yrs.value,
+                "bgb_ratio_threshold": self.rshoot_before_20_yrs.threshold,
+                "bgb_ratio_under_threshold": self.rshoot_before_20_yrs.value,
+                "bgb_ratio_over_threshold": self.rshoot_after_20_yrs.value,
                 "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_wo,
                 "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_wo,
                 "agb_start_default": self.agb_start_wo,

@@ -1410,28 +1410,28 @@ class ForestManagementDefaults(Defaults):
         elif defaults.agb_start_wo is not None:
             agb_start = defaults.agb_start_wo
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_start_w is not None:
-            bgb_start = defaults.agb_start_w * defaults.bgb_after_20_yrs.value
-        elif defaults.bgb_after_20_yrs is not None and defaults.agb_start_wo is not None:
-            bgb_start = defaults.agb_start_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_start_w is not None:
+            bgb_start = defaults.agb_start_w * defaults.rshoot_after_20_yrs.value
+        elif defaults.rshoot_after_20_yrs is not None and defaults.agb_start_wo is not None:
+            bgb_start = defaults.agb_start_wo * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_w is not None:
-            bgb_w = defaults.agb_max_w * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_w is not None:
+            bgb_w = defaults.agb_max_w * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_wo is not None:
-            bgb_wo = defaults.agb_max_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_wo is not None:
+            bgb_wo = defaults.agb_max_wo * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
-            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.bgb_before_20_yrs.value
+        if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
+            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.rshoot_before_20_yrs.value
 
-        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
-            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.bgb_before_20_yrs.value
+        if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
+            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.rshoot_before_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
-            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
+            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
-            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
+            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.rshoot_after_20_yrs.value
 
         bgb_max_start = 0
         bgb_max_w = 0

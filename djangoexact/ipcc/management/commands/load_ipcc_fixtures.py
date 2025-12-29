@@ -502,7 +502,7 @@ class Command(BaseCommand):
             "litterdeadwoodcarbonstock",
             "landusecarbonstockexchangefactor",
             "soilorcaniccarboncnratio",
-            "forestmanagementbgb",
+            "forestmanagementroottoshoot",
             "soilorganiccarbon",
             "foresttotalbiomass",
             "afforestationlandusestockexchangefactor",

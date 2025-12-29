@@ -54,7 +54,7 @@ for model in [
     and not model.startswith("LivestockManureEF")
     and not model.startswith("FLUData")
     and not model.startswith("LivestockAWMS")
-    and not model.startswith("ForestManagementBGB")
+    and not model.startswith("ForestManagementRootToShoot")
     and not model.startswith("ForestTotalBiomass")
 ]:
     try:
@@ -211,7 +211,7 @@ class FLUDataAdmin(GenericExportModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
-class ForestManagementBGBAdmin(GenericExportModelAdmin):
+class ForestManagementRootToShootAdmin(GenericExportModelAdmin):
     list_display = [
         "climate",
         "region",
@@ -270,5 +270,5 @@ admin.site.register(LivestockVSER, LivestockVSERAdmin)
 admin.site.register(LivestockManureEF, LivestockManureEFAdmin)
 admin.site.register(ForestManagementAGB, ForestManagementAGBAdmin)
 admin.site.register(LivestockAWMS, LivestockAWMSAdmin)
-admin.site.register(ForestManagementBGB, ForestManagementBGBAdmin)
+admin.site.register(ForestManagementRootToShoot, ForestManagementRootToShootAdmin)
 admin.site.register(ForestTotalBiomass, ForestTotalBiomassAdmin)

@@ -46,7 +46,7 @@ def change_forest_bgb_tropical_mountain_system_to_tropical_montane():
     Change all Forest AGB Tropical Mountain System to Tropical Montane
     """
     tropical_montane_climate = models.Climate.objects.get(name_en="Tropical Montane")
-    agbs = ipcc_models.ForestManagementBGB.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
+    agbs = ipcc_models.ForestManagementRootToShoot.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
 
 
 def change_forest_agb_growth_tropical_mountain_system_to_tropical_montane():
