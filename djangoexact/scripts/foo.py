@@ -9,6 +9,7 @@ from djangoexact.settings import auth
 import firebase_admin
 import os
 import pandas as pd
+import csv
 
 # TODO: Run in review and prod
 
@@ -517,7 +518,7 @@ def get_forest_management_modules_in_plantation_projects():
     Get the number of forest management modules in activities in projects with forest type 'Plantation'
     """
     projects = get_projects_with_forest_management_activities()
-    forests = models.ForestManagement.objects.filter(activity__project__in=projects, forest_condition_type__name__iexact="Secondary")
+    forests = models.ForestManagement.objects.filter(activity__project__in=projects, forest_type__name__iexact="Plantation")
     print(f"Forest management modules in secondary forests or plantation projects: {forests.count()}")
 
     # How many of them have users that logged in last 90 days?
@@ -525,6 +526,19 @@ def get_forest_management_modules_in_plantation_projects():
     print(f"Active users last 90 days: {users_last_90_days.count()}")
     forests_with_users_last_90_days = forests.filter(activity__project__members__user__in=users_last_90_days).distinct("activity__project__members__user")
     print(f"Active users with Forest management modules in secondary forests or plantations in the last 90 days: {forests_with_users_last_90_days.count()}")
+
+    # Extract users emails
+    users_emails = forests_with_users_last_90_days.values_list(
+        "activity__project__members__user__email", "activity__project__members__user__first_name", "activity__project__members__user__last_name"
+    ).distinct()
+    print(f"Users emails: {users_emails.count()}")
+
+    # Save them to csv
+    with open("users_emails.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Email", "First Name", "Last Name"])
+        for user_email in users_emails:
+            writer.writerow([user_email[0], user_email[1], user_email[2]])
 
     return forests
 
