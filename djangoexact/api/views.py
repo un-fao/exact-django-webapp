@@ -2254,7 +2254,7 @@ class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
 
 def generic_module_viewset(model: Module):
-    class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    class GenericModuleViewSet(viewsets.ModelViewSet):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
         permission_classes = [api_permissions.IsPublicOrAuthenticated]
