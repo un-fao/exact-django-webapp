@@ -797,7 +797,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         module_types = activity.module_types.all()
 
-        if any(issubclass(apps.get_model("api", module_type.class_name), (Module, Submodule)) for module_type in module_types):
+        if any(issubclass(apps.get_model("api", module_type.class_name).__class__, (Module, Submodule)) for module_type in module_types):
             climate = activity.climate_t2 or project.climate
             moisture = activity.moisture_t2 or project.moisture
             soil_type = activity.soil_type_t2 or project.soil_type
