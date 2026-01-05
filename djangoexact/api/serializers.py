@@ -1155,23 +1155,19 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
 
     def get_cached_results_total(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
 
     def get_cached_results_by_activity(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
 
     def get_cached_results_by_gas(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
 
     def get_cached_results_by_activity_by_gas(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
