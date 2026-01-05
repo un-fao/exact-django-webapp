@@ -5058,7 +5058,8 @@ def update_forest_management_agb_and_rshoot_data():
     from ipcc.models import ForestManagementAGB, ForestManagementRootToShoot
 
     df = pd.read_csv(
-        os.path.join(os.path.dirname(__file__), "ForestManagement_Revised_AGB_BGB_20251229.csv"),
+        # os.path.join(os.path.dirname(__file__), "ForestManagement_Revised_AGB_BGB_20251229.csv"),
+        os.path.join(os.path.dirname(__file__), "forman_agb_revisedrevised.csv"),
         header=0,
         sep=",",
     )
@@ -5069,13 +5070,13 @@ def update_forest_management_agb_and_rshoot_data():
         forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
         forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
         land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-        threshold = 125
+        # threshold = 125
         from_year = row["from_year"]
         agb_min = parse_csv_number(row["agb_min"])
         agb_max = parse_csv_number(row["agb_max"])
         agb_growth_min = parse_csv_number(row["agb_growth_min"])
         agb_growth_max = parse_csv_number(row["agb_growth_max"])
-        rshoot = parse_csv_number(row["r_shoot"])
+        # rshoot = parse_csv_number(row["r_shoot"])
 
         agb_entry = ForestManagementAGB.objects.filter(
             climate=climate,
@@ -5108,27 +5109,27 @@ def update_forest_management_agb_and_rshoot_data():
             )
             print(f"Created {climate} {region} {forest_type} {land_use_type} {from_year} {agb_min} {agb_max} {agb_growth_min} {agb_growth_max}")
 
-        rshoot_entry = ForestManagementRootToShoot.objects.filter(
-            climate=climate,
-            region=region,
-            forest_type=forest_type,
-            land_use_type=land_use_type,
-            threshold=threshold,
-        ).first()
+        # rshoot_entry = ForestManagementRootToShoot.objects.filter(
+        #     climate=climate,
+        #     region=region,
+        #     forest_type=forest_type,
+        #     land_use_type=land_use_type,
+        #     threshold=threshold,
+        # ).first()
 
-        if rshoot_entry:
-            rshoot_entry.value = rshoot
-            rshoot_entry.save()
-        else:
-            ForestManagementRootToShoot.objects.create(
-                climate=climate,
-                region=region,
-                forest_type=forest_type,
-                land_use_type=land_use_type,
-                threshold=threshold,
-                value=rshoot,
-            )
-            print(f"Created {climate} {region} {forest_type} {land_use_type} {threshold} {rshoot}")
+        # if rshoot_entry:
+        #     rshoot_entry.value = rshoot
+        #     rshoot_entry.save()
+        # else:
+        #     ForestManagementRootToShoot.objects.create(
+        #         climate=climate,
+        #         region=region,
+        #         forest_type=forest_type,
+        #         land_use_type=land_use_type,
+        #         threshold=threshold,
+        #         value=rshoot,
+        #     )
+        #     print(f"Created {climate} {region} {forest_type} {land_use_type} {threshold} {rshoot}")
 
 
 def run():
