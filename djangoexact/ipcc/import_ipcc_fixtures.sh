@@ -124,7 +124,7 @@ else
     import_fixture "ipcc/fixtures/totalbiomassafterdefo.json" "Total biomass after deforestation data"
     
     # Forest dependent models
-    import_fixture "ipcc/fixtures/forestmanagementbgb.json" "Forest management BGB data"
+    import_fixture "ipcc/fixtures/forestmanagementroottoshoot.json" "Forest management Root-To-Shoot data"
     import_fixture "ipcc/fixtures/forestmanagementagbgrowth.json" "Forest management AGB growth data"
     import_fixture "ipcc/fixtures/forestmanagementagb.json" "Forest management AGB data"
     

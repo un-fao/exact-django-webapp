@@ -194,11 +194,38 @@ def extract_name_from_queryset(qs):
     return [str(qs)] if qs else []
 
 
-def convert_scenario_from_minitool_format(scenario_dict, scenario_name, category):
-    """Convert a scenario from minitool_scenarios.py format to compile format"""
+# Special marker to indicate a field must not be None/null
+NOT_NULL = "__notnull__"
+
+
+def convert_scenario_from_minitool_format(scenario_dict, scenario_name, category, extra_filters=None, extra_csv_row_filters=None):
+    """
+    Convert a scenario from minitool_scenarios.py format to compile format.
+
+    Args:
+        scenario_dict: The scenario definition from minitool_scenarios.py
+        scenario_name: Display name for the scenario
+        category: Category name for grouping
+        extra_filters: Additional filters to merge (applied to all changes)
+        extra_csv_row_filters: Additional csv_row_filters to merge (applied to all changes).
+                               Use NOT_NULL as value to require field is not None.
+
+    Example:
+        convert_scenario_from_minitool_format(
+            scenarios.NATURAL_REGENERATION_2,
+            "Natural regeneration",
+            "Forest Restoration",
+            extra_csv_row_filters={"agb_max_t2_w": NOT_NULL}  # Must have agb_max_t2_w
+        )
+    """
     changes = []
     csv_row_filters = {}
     filters = {}
+
+    if extra_filters:
+        filters.update(extra_filters)
+    if extra_csv_row_filters:
+        csv_row_filters.update(extra_csv_row_filters)
 
     if "fields" in scenario_dict:
         fields = scenario_dict["fields"]
@@ -411,98 +438,41 @@ def convert_scenario_from_minitool_format(scenario_dict, scenario_name, category
 
 
 FOREST_RESTORATION = [
+    convert_scenario_from_minitool_format(scenarios.NATURAL_REGENERATION_1, "Natural regeneration: Afforestation", "Forest Restoration"),
+    convert_scenario_from_minitool_format(scenarios.NATURAL_REGENERATION_2, "Natural regeneration: forest degradation management", "Forest Restoration"),
+    convert_scenario_from_minitool_format(scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_1, "Enrichment planting in degraded forests: afforestation", "Forest Restoration"),
     convert_scenario_from_minitool_format(
-        {
-            "fields": {
-                "module_start": {
-                    "type": [api_models.ModuleType.objects.get(class_name="Grassland")],
-                    "fields": {
-                        "grassland_management_type_start": list(api_models.GrasslandManagementType.objects.filter(name__in=["Non-Degraded", "High Intensity Grazing"])),
-                    },
-                },
-                "module_w": {
-                    "type": [api_models.ModuleType.objects.get(class_name="ForestManagement")],
-                    "fields": {
-                        "land_use_type": list(api_models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                        "forest_type": list(api_models.ForestType.objects.filter(name__in=["Natural"])),
-                        "forest_condition_type": list(api_models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-                    },
-                },
-            },
-        },
-        "Natural regeneration: Afforestation",
+        scenarios.ENRICHMENT_PLANTING_IN_DEGRADED_FORESTS_2,
+        "Enrichment planting in degraded forests: forest degradation management",
         "Forest Restoration",
+        extra_csv_row_filters={
+            "agb_max_t2_w": NOT_NULL,
+            "bgb_max_t2_w": NOT_NULL,
+            "agb_growth_rate_le_20_yrs_t2_w": NOT_NULL,
+            "bgb_growth_rate_le_20_yrs_t2_w": NOT_NULL,
+            "agb_growth_rate_gt_20_yrs_t2_w": NOT_NULL,
+            "bgb_growth_rate_gt_20_yrs_t2_w": NOT_NULL,
+            "litter_t2_w": NOT_NULL,
+            "deadwood_t2_w": NOT_NULL,
+        },
     ),
+    convert_scenario_from_minitool_format(scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_1, "Infill planting to accelerate recovery: afforestation", "Forest Restoration"),
     convert_scenario_from_minitool_format(
-        {
-            "fields": {
-                "land_use_type": list(api_models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(api_models.ForestType.objects.filter(name__in=["Natural"])),
-                "forest_condition_type": list(api_models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-                "average_yearly_degradation_percentage_start": [0.01, 0.02, 0.03],
-                "average_yearly_degradation_percentage_w": [0.0],
-            },
-        },
-        "Natural regeneration: forest degradation management",
+        scenarios.INFILL_PLANTING_TO_ACCELERATE_RECOVERY_2,
+        "Infill planting to accelerate recovery: forest degradation management",
         "Forest Restoration",
-    ),
-    convert_scenario_from_minitool_format(
-        {
-            "fields": {
-                "module_start": {
-                    "type": [api_models.ModuleType.objects.get(class_name="Grassland")],
-                    "fields": {
-                        "grassland_management_type_start": list(api_models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
-                    },
-                },
-                "module_w": {
-                    "type": [api_models.ModuleType.objects.get(class_name="ForestManagement")],
-                    "fields": {
-                        "land_use_type": list(api_models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                        "forest_type": list(api_models.ForestType.objects.filter(name__in=["Natural", "Plantation"])),
-                        "forest_condition_type": list(api_models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-                    },
-                },
-            },
+        extra_csv_row_filters={
+            "agb_max_t2_w": NOT_NULL,
+            "bgb_max_t2_w": NOT_NULL,
+            "agb_growth_rate_le_20_yrs_t2_w": NOT_NULL,
+            "bgb_growth_rate_le_20_yrs_t2_w": NOT_NULL,
+            "agb_growth_rate_gt_20_yrs_t2_w": NOT_NULL,
+            "bgb_growth_rate_gt_20_yrs_t2_w": NOT_NULL,
+            "litter_t2_w": NOT_NULL,
+            "deadwood_t2_w": NOT_NULL,
         },
-        "Enrichment planting in degraded forests: afforestation",
-        "Forest Restoration",
     ),
-    convert_scenario_from_minitool_format(
-        {
-            "fields": {
-                "module_start": {
-                    "type": [api_models.ModuleType.objects.get(class_name="Grassland")],
-                    "fields": {
-                        "grassland_management_type_start": list(api_models.GrasslandManagementType.objects.filter(name__in=["High Intensity Grazing", "Non-Degraded"])),
-                    },
-                },
-                "module_w": {
-                    "type": [api_models.ModuleType.objects.get(class_name="ForestManagement")],
-                    "fields": {
-                        "land_use_type": list(api_models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                        "forest_type": list(api_models.ForestType.objects.filter(name__in=["Plantation"])),
-                        "forest_condition_type": list(api_models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-                    },
-                },
-            },
-        },
-        "Infill planting to accelerate recovery: afforestation",
-        "Forest Restoration",
-    ),
-    convert_scenario_from_minitool_format(
-        {
-            "fields": {
-                "land_use_type": list(api_models.LandUseType.objects.filter(module_types__name="Forest Management").all()),
-                "forest_type": list(api_models.ForestType.objects.filter(name__in=["Natural"])),
-                "forest_condition_type": list(api_models.ForestConditionType.objects.filter(name__in=["Secondary"])),
-                "average_yearly_degradation_percentage_start": [0.02],
-                "average_yearly_degradation_percentage_w": [0.0],
-            },
-        },
-        "Reintroduction of threatened species (e.g. flora, fauna, fungi)",
-        "Forest Restoration",
-    ),
+    convert_scenario_from_minitool_format(scenarios.REINTRODUCTION_OF_THREATENED_SPECIES_1, "Reintroduction of threatened species (e.g. flora, fauna, fungi)", "Forest Restoration"),
 ]
 
 SOIL_LAND_RESTORATION = [
@@ -527,6 +497,8 @@ AQUATIC_RESTORATION = [
     convert_scenario_from_minitool_format(scenarios.MANGROVE_REPLANTING_2, "Mangrove Replanting: and Natural Recruitment: assuming full restoration of hydrology and biomass", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.COASTAL_ZONE_STABILIZATION_1, "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.RIVERBANK_RESTORATION_1, "Riverbank or Riparian Restoration: Grassland to perennial", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1, "Wetland Hydrological Restoration: Annual Cropland (organic soil rewetting)", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2, "Wetland Hydrological Restoration: Grassland (organic soil rewetting)", "Aquatic Restoration"),
 ]
 
 
@@ -679,7 +651,7 @@ def run(clear: bool = False):
     if clear:
         models.EmissionScenario.objects.all().delete()
 
-    scenarios = [scenario for scenario in (SOIL_LAND_RESTORATION + AGROECOLOGICAL_PRODUCTIVE + AQUATIC_RESTORATION) if scenario is not None]
+    scenarios = [scenario for scenario in (SOIL_LAND_RESTORATION + AGROECOLOGICAL_PRODUCTIVE + AQUATIC_RESTORATION + FOREST_RESTORATION) if scenario is not None]
 
     for scenario in scenarios:
         category, created = models.EmissionScenarioCategory.objects.get_or_create(name=scenario["category"])
@@ -716,10 +688,7 @@ def run(clear: bool = False):
                     return Q(**{field_name: str(value)})
 
             change_q = (
-                Q(
-                    module_type=module_type,
-                    field=change["start"]["field"],
-                )
+                Q(module_type=module_type, field=change["start"]["field"])
                 & create_flexible_value_query("from_value", change["start"]["value"])
                 & create_flexible_value_query("to_value", change["end"]["value"])
             )
@@ -754,18 +723,40 @@ def run(clear: bool = False):
 
             for filter_key, filter_value in change_filters.items():
                 if filter_key not in ["region", "climate", "moisture", "soil_type"]:
-                    filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
-                    filter_q = Q()
-                    for val in filter_values:
-                        filter_q |= Q(**{f"custom_filters__{filter_key}": val}) | Q(**{f"csv_row_data__{filter_key}": val})
-                    change_q &= filter_q
+                    # Handle NOT_NULL marker
+                    if filter_value == NOT_NULL:
+                        change_q &= Q(**{f"csv_row_data__{filter_key}__isnull": False}) & ~Q(**{f"csv_row_data__{filter_key}": None})
+                    else:
+                        filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+                        filter_q = Q()
+                        for val in filter_values:
+                            filter_q |= Q(**{f"csv_row_data__{filter_key}": val}) | Q(**{f"custom_filters__{filter_key}": val})
+                        change_q &= filter_q
 
-            # for filter_key, filter_value in csv_row_filters.items():
-            #     filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
-            #     csv_filter_q = Q()
-            #     for val in filter_values:
-            #         csv_filter_q |= Q(**{f"csv_row_data__{filter_key}": val})
-            #     change_q &= csv_filter_q
+            for filter_key, filter_value in csv_row_filters.items():
+                if filter_key in ["module_start_type", "module_w_type"]:
+                    continue
+
+                # Handle NOT_NULL marker
+                if filter_value == NOT_NULL:
+                    change_q &= Q(**{f"csv_row_data__{filter_key}__isnull": False}) & ~Q(**{f"csv_row_data__{filter_key}": None})
+                    continue
+
+                filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+                csv_filter_q = Q()
+
+                if filter_key.startswith("module_w_") or filter_key.startswith("module_start_"):
+                    prefix = ""
+                elif "_w" in filter_key:
+                    prefix = "module_w_"
+                elif "_start" in filter_key:
+                    prefix = "module_start_"
+                else:
+                    prefix = ""
+
+                for val in filter_values:
+                    csv_filter_q |= Q(**{f"csv_row_data__{prefix}{filter_key}": val})
+                change_q &= csv_filter_q
 
             q_objects |= change_q
 

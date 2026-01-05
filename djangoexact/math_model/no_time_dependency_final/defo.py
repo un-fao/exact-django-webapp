@@ -7,7 +7,7 @@ from .general_functions import (
     compute_half_year_cumulative_n_year_maturity,
     compute_yearly_or_half_year_cumulative,
     som_emissions,
-    compute_yearly_delta
+    compute_yearly_delta,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -21,11 +21,11 @@ from .generalized_modules import BaseModule
 
 from dataclasses import dataclass, field
 from typing import Optional
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 
 @dataclass(kw_only=True)
 class Defo(BaseModule):
-
     ha_start: float
     ha_end: float
     biomass_final_1_year_t_per_ha_default: float
@@ -85,17 +85,17 @@ class Defo(BaseModule):
         self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
         self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
 
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if self.soc_start_tier_2 is None else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        self.soc_start = (
+            self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if self.soc_start_tier_2 is None else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        )
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if self.soc_end_tier_2 is None else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
         self.total_hectares = compute_yearly_or_half_year_cumulative(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
         self.delta_hectares = compute_yearly_delta(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-        
-        
-    def calculate_emissions(self):
 
+    def calculate_emissions(self):
         def calculate_biomass():
             try:
                 # NOTE: try to make the variable names similar to OLUC
@@ -124,7 +124,12 @@ class Defo(BaseModule):
 
                 emissions_biomass_loss_yearly = breakdown_proportionally_to_values(biomass_loss, self.delta_hectares)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay
+                    )
+                )
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.BIOMASS))
 
             except Exception as e:
                 traceback.print_exc()
@@ -138,10 +143,13 @@ class Defo(BaseModule):
                 biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44 / 12)
 
                 dom_loss = biomass_forest_dom_t_co2_per_ha * self.area_deforested
-                
+
                 emissions_dom_yearly = breakdown_proportionally_to_values(dom_loss, self.delta_hectares)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay)
+                )
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.DOM))
 
             except Exception as e:
                 traceback.print_exc()
@@ -155,15 +163,21 @@ class Defo(BaseModule):
 
                 total_ch4_per_ha = fire_kg_ch4 * self.methane_constant / 1000
                 total_n2o_per_ha = fire_kg_n2o * self.nitrous_constant / 1000
-                
+
                 total_ch4 = total_ch4_per_ha * self.area_deforested
                 total_n2o = total_n2o_per_ha * self.area_deforested
 
                 emissions_ch4 = breakdown_proportionally_to_values(total_ch4, self.delta_hectares)
                 emissions_n2o = breakdown_proportionally_to_values(total_n2o, self.delta_hectares)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                )
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                )
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.RESIDUE_BURNING))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.RESIDUE_BURNING))
 
             except Exception as e:
                 traceback.print_exc()

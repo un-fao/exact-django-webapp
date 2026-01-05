@@ -9,6 +9,10 @@ import logging as log
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 import public.views as public_views
+import logging
+
+
+logging.disable(logging.ERROR)
 
 
 class APITestCaseMixin(APITestCase):
@@ -36,7 +40,7 @@ class APITestCaseMixin(APITestCase):
             - "gw_potential": The ID of a randomly selected GlobalWarmingPotential instance.
         """
         log.getLogger().setLevel(log.INFO)
-        log.info("Setting up ProjectLockTestCase")
+        log.debug("Setting up ProjectLockTestCase")
         self.request_factory = APIRequestFactory(enforce_csrf_checks=False)
         self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
@@ -69,7 +73,7 @@ class APITestCaseMixin(APITestCase):
         with the provided project data in JSON format. The request is authenticated with the test user,
         and the response is returned.
         """
-        log.info("Creating project")
+        log.debug("Creating project")
         factory = APIRequestFactory(enforce_csrf_checks=False)
         view = ProjectViewSet.as_view({"post": "create"})
 
@@ -85,7 +89,7 @@ class APITestCaseMixin(APITestCase):
         """
         Unlock a project using the ProjectViewSet.
         """
-        log.info("Unlocking project")
+        log.debug("Unlocking project")
         view = ProjectViewSet.as_view({"post": "unlock"})
         request = self.request_factory.post(
             reverse("project-unlock", args=[project.id]),
@@ -102,7 +106,7 @@ class APITestCaseMixin(APITestCase):
         with the provided project data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Sending project invitation")
+        log.debug("Sending project invitation")
         view = ProjectInvitationViewSet.as_view({"post": "create"})
         request = self.request_factory.post(
             reverse("projectinvitation-list"),
@@ -118,7 +122,7 @@ class APITestCaseMixin(APITestCase):
 
         This method creates a project membership for the provided user and project.
         """
-        log.info("Creating project membership")
+        log.debug("Creating project membership")
 
         if group is None:
             group = self.group
@@ -136,7 +140,7 @@ class APITestCaseMixin(APITestCase):
         """
         Get project memberships for a project.
         """
-        log.info("Getting project memberships")
+        log.debug("Getting project memberships")
         view = ProjectViewSet.as_view({"get": "memberships"})
         request = self.request_factory.get(reverse("project-list"), format="json")
         force_authenticate(request, user=self.user)
@@ -146,7 +150,7 @@ class APITestCaseMixin(APITestCase):
         """
         Get project memberships for a project, filtered by user.
         """
-        log.info("Getting project memberships filtered by user")
+        log.debug("Getting project memberships filtered by user")
         view = ProjectViewSet.as_view({"get": "memberships"})
         request = self.request_factory.get(reverse("project-list"), {"user": self.user.id}, format="json")
         force_authenticate(request, user=self.user)
@@ -160,7 +164,7 @@ class APITestCaseMixin(APITestCase):
         with the provided project data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Editing project")
+        log.debug("Editing project")
         view = ProjectViewSet.as_view({"patch": "partial_update"})
 
         request = self.request_factory.patch(
@@ -179,7 +183,7 @@ class APITestCaseMixin(APITestCase):
         with the provided file data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Uploading project file")
+        log.debug("Uploading project file")
         view = ProjectFileAttachmentViewSet.as_view({"post": "create"})
 
         if file is None:
@@ -202,7 +206,7 @@ class APITestCaseMixin(APITestCase):
         with the provided activity data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Creating activity")
+        log.debug("Creating activity")
 
         activity_builder_data = {
             "name": FuzzyText().fuzz(),
@@ -244,7 +248,7 @@ class APITestCaseMixin(APITestCase):
         with the provided activity data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Editing activity")
+        log.debug("Editing activity")
         view = ActivityViewSet.as_view({"patch": "partial_update"})
 
         request = self.request_factory.patch(
@@ -263,7 +267,7 @@ class APITestCaseMixin(APITestCase):
         with the provided activity ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Copying activity")
+        log.debug("Copying activity")
         view = ActivityViewSet.as_view({"post": "copy"})
 
         request = self.request_factory.post(
@@ -281,7 +285,7 @@ class APITestCaseMixin(APITestCase):
         with the provided activity ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Deleting activity")
+        log.debug("Deleting activity")
         view = ActivityViewSet.as_view({"delete": "destroy"})
 
         request = self.request_factory.delete(
@@ -295,7 +299,7 @@ class APITestCaseMixin(APITestCase):
         """
         Get module details using the ModuleViewSet.
         """
-        log.info("Getting module details")
+        log.debug("Getting module details")
         view = generic_module_viewset(module.__class__).as_view({"get": "retrieve"})
         request = self.request_factory.get(reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]), format="json")
         force_authenticate(request, user=user)
@@ -340,7 +344,7 @@ class APITestCaseMixin(APITestCase):
         with the provided submodule data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info(f"Creating submodule with data: {data}")
+        log.debug(f"Creating submodule with data: {data}")
         view = generic_module_viewset(SubmoduleClass).as_view({"post": "create"})
         request = self.request_factory.post(
             reverse(f"{SubmoduleClass.__name__.lower()}-list"),
@@ -359,7 +363,7 @@ class APITestCaseMixin(APITestCase):
         with the provided module ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Getting module defaults")
+        log.debug("Getting module defaults")
         view = generic_module_viewset(module.__class__).as_view({"get": "defaults"})
         request = self.request_factory.get(
             reverse(f"{module.__class__.__name__.lower()}-defaults", args=[module.pk]),
@@ -376,7 +380,7 @@ class APITestCaseMixin(APITestCase):
         with the provided project ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Calculating project results")
+        log.debug("Calculating project results")
         view = ProjectViewSet.as_view({"get": "results"})
         request = self.request_factory.get(
             reverse("results", args=[project.id]),
@@ -393,7 +397,7 @@ class APITestCaseMixin(APITestCase):
         with the provided activity ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Calculating activity results")
+        log.debug("Calculating activity results")
         view = ActivityViewSet.as_view({"get": "results"})
         request = self.request_factory.get(
             reverse("activities-results", args=[activity.id]),
@@ -408,7 +412,7 @@ class APITestCaseMixin(APITestCase):
         This method calculates activity results by sending a GET request to the 'activity-results' endpoint
         with the provided activity ID. The request is not authenticated, and the response is returned.
         """
-        log.info("Calculating activity results without authentication")
+        log.debug("Calculating activity results without authentication")
         view = public_views.PublicActivityViewSet.as_view({"get": "results"})
         request = self.request_factory.get(
             reverse("activity-results", args=[activity.id]),
@@ -422,7 +426,7 @@ class APITestCaseMixin(APITestCase):
         This method retrieves activity data by sending a GET request to the 'activity-detail' endpoint
         with the provided activity ID. The request is not authenticated, and the response is returned.
         """
-        log.info("Getting activity data without authentication")
+        log.debug("Getting activity data without authentication")
         view = public_views.PublicActivityViewSet.as_view({"get": "retrieve"})
         request = self.request_factory.get(
             reverse("activity-detail", args=[activity.id]),
@@ -437,7 +441,7 @@ class APITestCaseMixin(APITestCase):
         with the provided project ID. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Getting project report data")
+        log.debug("Getting project report data")
         view = ProjectViewSet.as_view({"get": "report"})
         queryparams = None
         if template:
@@ -456,7 +460,7 @@ class APITestCaseMixin(APITestCase):
         This method retrieves project report data by sending a GET request to the 'project-report' endpoint
         with the provided project ID. The request is not authenticated, and the response is returned.
         """
-        log.info("Getting project report data without authentication")
+        log.debug("Getting project report data without authentication")
         view = public_views.PublicProjectViewSet.as_view({"get": "report"})
         queryparams = None
         if templated:
@@ -474,7 +478,7 @@ class APITestCaseMixin(APITestCase):
         This method retrieves activities data by sending a GET request to the 'activities-list' endpoint
         with the provided project ID. The request is not authenticated, and the response is returned.
         """
-        log.info("Getting activities data without authentication")
+        log.debug("Getting activities data without authentication")
         view = public_views.PublicProjectViewSet.as_view({"get": "activities"})
         request = self.request_factory.get(
             reverse("project-detail", args=[project.pk]),
@@ -490,7 +494,7 @@ class APITestCaseMixin(APITestCase):
         with the provided module data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Adding comment to module")
+        log.debug("Adding comment to module")
 
         view = CommentViewSet.as_view({"post": "create"})
         request = self.request_factory.post(
@@ -505,7 +509,7 @@ class APITestCaseMixin(APITestCase):
         """
         Send a recap email using the ProjectViewSet.
         """
-        log.info("Sending recap email")
+        log.debug("Sending recap email")
         view = ProjectViewSet.as_view({"post": "recap"})
         request = self.request_factory.post(
             reverse("project-recap", args=[project.id]),
@@ -518,7 +522,7 @@ class APITestCaseMixin(APITestCase):
         """
         Copy a project using the ProjectViewSet.
         """
-        log.info("Copying project")
+        log.debug("Copying project")
         view = ProjectViewSet.as_view({"post": "copy"})
         request = self.request_factory.post(
             reverse("project-copy", args=[project.id]),

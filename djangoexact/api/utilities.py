@@ -537,11 +537,21 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
 
     parent_module = None
-    for module_type in organic_soil.activity.module_types.all():
-        module_type
-        if module_type.is_luc:
-            parent_module = getattr(organic_soil.activity, module_type.class_name.lower()).first()
+    module_type = None
+
+    for mt in organic_soil.activity.module_types.all():
+        if mt.is_luc:
+            parent_module = getattr(organic_soil.activity, mt.class_name.lower()).first()
+            module_type = mt
             break
+        else:
+            potential_parent = getattr(organic_soil.activity, mt.class_name.lower(), None)
+            if potential_parent:
+                parent = potential_parent.first()
+                if parent and getattr(parent, "organic_soil", None) == organic_soil:
+                    parent_module = parent
+                    module_type = mt
+                    break
 
     if parent_module is None:
         raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")

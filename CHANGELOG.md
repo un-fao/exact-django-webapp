@@ -1,3 +1,27 @@
+## v1.18.4 (2025-12-08)
+
+### Fix
+
+- **activity_builder**: wrong type in issubclass check
+- **scripts**: exclude finalized project from cache reset in invalidate_results_cache
+
+## 1.18.4 (2025-12-08)
+
+### Feat
+
+- **project**: make climate, moisture, and soil_type optional
+
+### Fix
+
+- **forest management**: add start year to agb matrix logging update
+- **forest calculator**: update list absence to Nones instead of []
+
+## 1.18.3a0 (2025-12-04)
+
+### Fix
+
+- **calculators**: add a workaround that sanitizes any modules with missing land_use_change references due to bug in ActivityBuilderSerializer
+
 ## 1.18.3 (2025-11-21)
 
 ### Feat

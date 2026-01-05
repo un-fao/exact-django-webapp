@@ -2955,9 +2955,9 @@ class OrganicSoil(LandModuleFixed):
     offsite_ch4_peat_t2_w = models.FloatField(null=True, blank=True)
     offsite_ch4_peat_t2_wo = models.FloatField(null=True, blank=True)
 
-    peat_density_t2_start = models.FloatField(null=True, blank=True)
-    peat_density_t2_w = models.FloatField(null=True, blank=True)
-    peat_density_t2_wo = models.FloatField(null=True, blank=True)
+    peat_density_t2_start = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
