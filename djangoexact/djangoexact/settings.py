@@ -123,14 +123,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "djangoexact.wsgi.application"
 
+# For packaged Electron apps, use writable user data directory
+# In development, use BASE_DIR (current directory)
+USER_DATA_DIR = os.getenv("EXACT_USER_DATA_DIR", None)
+if USER_DATA_DIR:
+    # Ensure the directory exists
+    os.makedirs(USER_DATA_DIR, exist_ok=True)
+    DB_DIR = USER_DATA_DIR
+else:
+    DB_DIR = BASE_DIR
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": os.path.join(DB_DIR, "db.sqlite3"),
     },
     "minitool": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "minitool.db"),
+        "NAME": os.path.join(DB_DIR, "minitool.db"),
     },
 }
 
