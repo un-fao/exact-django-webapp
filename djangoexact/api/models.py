@@ -607,10 +607,10 @@ class Project(Historical, DirtyFieldsMixin):
     start_year_of_activities = models.IntegerField(verbose_name="start_year_of_activities")
     last_year_of_accounting = models.IntegerField(verbose_name="last_year_of_accounting")
 
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name="country")
-    climate = models.ForeignKey(Climate, on_delete=models.CASCADE, verbose_name="climate")
-    moisture = models.ForeignKey(Moisture, on_delete=models.CASCADE, verbose_name="moisture")
-    soil_type = models.ForeignKey(SoilType, on_delete=models.CASCADE, verbose_name="soil_type")
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    climate = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True)
+    moisture = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True)
+    soil_type = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True)
 
     is_locked = models.BooleanField(default=False, verbose_name="is_locked")
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
@@ -641,6 +641,33 @@ class Project(Historical, DirtyFieldsMixin):
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
 
+    @property
+    def gwp(self):
+        self.gw_potential: ipcc.GlobalWarmingPotential
+
+        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
+        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
+        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
+        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
+        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+
+        if self.gwp_co2_t2 is not None:
+            self.gw_potential.co2 = self.gwp_co2_t2
+
+        if self.gwp_ch4_t2 is not None:
+            self.gw_potential.ch4 = self.gwp_ch4_t2
+
+        if self.gwp_n2o_t2 is not None:
+            self.gw_potential.n2o = self.gwp_n2o_t2
+
+        if self.gwp_ch4_fossil_t2 is not None:
+            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
+
+        return self.gw_potential
+
     def save(self, *args, **kwargs):
         if self.pk:
             if self.is_dirty(check_relationship=True):
@@ -661,11 +688,22 @@ class Project(Historical, DirtyFieldsMixin):
 
         super().save(*args, **kwargs)
 
+    def clean(self):
+        """Validate that climate, moisture, and soil_type are present if activities exist."""
+        super().clean()
+
+        # Only validate if project has activities that require these fields
+        if self.pk and self.activities.exists():
+            self._validate_climate_moisture_soil_type_for_activities()
+
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
-    def is_ready(self):
-        for activity in self.activities.all():
+    def is_ready(self, activities: list["Activity"] = None):
+        if activities is None:
+            activities = self.activities.all()
+
+        for activity in activities:
             for module in activity.modules:
                 if not module.is_ready():
                     return False
@@ -716,32 +754,38 @@ class Project(Historical, DirtyFieldsMixin):
 
         return self.last_year_of_accounting - (self.start_year_of_activities + self.implementation_years)
 
-    @property
-    def gwp(self):
-        self.gw_potential: ipcc.GlobalWarmingPotential
+    def _validate_climate_moisture_soil_type_for_activities(self):
+        """Check if any activity/module requires climate, moisture, or soil_type."""
+        for activity in self.activities.all():
+            # Check if activity has modules that require these fields
+            if self._activity_requires_climate_moisture_soil_type(activity):
+                climate = activity.climate_t2 or self.climate
+                moisture = activity.moisture_t2 or self.moisture
+                soil_type = activity.soil_type_t2 or self.soil_type
 
-        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
-        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
-        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
-        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
-        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
-            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+                missing_fields = []
+                if climate is None:
+                    missing_fields.append("climate")
+                if moisture is None:
+                    missing_fields.append("moisture")
+                if soil_type is None:
+                    missing_fields.append("soil_type")
 
-        if self.gwp_co2_t2 is not None:
-            self.gw_potential.co2 = self.gwp_co2_t2
+                if missing_fields:
+                    from django.core.exceptions import ValidationError
 
-        if self.gwp_ch4_t2 is not None:
-            self.gw_potential.ch4 = self.gwp_ch4_t2
+                    raise ValidationError(
+                        f"Project must have {', '.join(missing_fields)} set when activities with calculation modules exist. Either set them on the project or on activity '{activity.name}'."
+                    )
 
-        if self.gwp_n2o_t2 is not None:
-            self.gw_potential.n2o = self.gwp_n2o_t2
+    def _activity_requires_climate_moisture_soil_type(self, activity):
+        """Check if an activity has modules that require climate/moisture/soil_type."""
+        from api.models import Module, Submodule
 
-        if self.gwp_ch4_fossil_t2 is not None:
-            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
-
-        return self.gw_potential
+        for module in activity.modules:
+            if isinstance(module, (Module, Submodule)):
+                return True
+        return False
 
 
 class ProjectFileAttachment(models.Model):
@@ -883,7 +927,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     cost = models.FloatField(default=0, verbose_name="cost")
 
     change_rate = models.ForeignKey(ChangeRate, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="change_rate")
-    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", verbose_name="module_types")
+    module_types = models.ManyToManyField("api.ModuleType", related_name="activities", blank=True, null=True)
 
     climate_t2 = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True, verbose_name="climate_t2")
     moisture_t2 = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True, verbose_name="moisture_t2")
@@ -896,6 +940,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name="created_at")
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name="updated_at")
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
+
+    is_b_intact = models.BooleanField(default=False)
 
     @property
     def soc(self):
@@ -982,10 +1028,16 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         ordering = ["-created_at"]  # Orders by created_at descending
 
     def get_land_modules_area(self) -> float:
+        area = 0
+
+        if any([isinstance(module, CoastalWetland) for module in self.modules]):
+            area += max(CoastalWetland.objects.filter(activity=self).first().area, 0)
+
         for module in self.modules:
             if isinstance(module, LandModule) and module.area is not None:
-                return module.area
-        return 0
+                area += module.area
+                break
+        return area
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
@@ -1018,14 +1070,23 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         return self.duration_t2
 
     def __get_capitalization_years(self) -> int:
-        if not self.start_year_t2 and not self.duration_t2:
+        if not self.start_year_t2 and not self.duration_t2 and not self.last_year_of_accounting:
             return self.project.capitalization_years
 
-        if not self.start_year_t2 and self.duration_t2:
+        if not self.start_year_t2 and self.duration_t2 and not self.last_year_of_accounting:
             return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
 
-        if self.start_year_t2 and not self.duration_t2:
+        if self.start_year_t2 and not self.duration_t2 and not self.last_year_of_accounting:
             return self.last_year_of_accounting - (self.start_year_t2 + self.project.implementation_years)
+
+        if not self.start_year_t2 and self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
+
+        if self.start_year_t2 and not self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.start_year_t2 + self.project.implementation_years)
+
+        if not self.start_year_t2 and not self.duration_t2 and self.last_year_of_accounting:
+            return self.last_year_of_accounting - (self.project.start_year_of_activities + self.project.implementation_years)
 
         return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
@@ -1469,7 +1530,7 @@ class SingleBiomassModule(BiomassModule):
             raise ValueError(f"Missing land use type for {scenario.value} scenario")
 
         try:
-            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            return BiomassModel.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
                 raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
@@ -1490,9 +1551,17 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_t2_w")
     agb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_t2_wo")
 
+    agb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_start")
+    agb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_w")
+    agb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="agb_rate_t2_wo")
+
     bgb_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_start")
     bgb_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_w")
     bgb_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_t2_wo")
+
+    bgb_rate_t2_start = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_start")
+    bgb_rate_t2_w = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_w")
+    bgb_rate_t2_wo = models.FloatField(null=True, blank=True, verbose_name="bgb_rate_t2_wo")
 
     class Meta:
         abstract = True
@@ -1535,7 +1604,10 @@ class AboveBelowGroundBiomassModule(BiomassModule):
             raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
 
         try:
-            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            if self.__class__.__name__ == "PerennialCropland":
+                return BiomassModel.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+            else:
+                return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if self.get_biomass_t2(scenario) is None:
                 raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
@@ -2290,24 +2362,24 @@ class CoastalWetland(Module):
     area = models.FloatField(null=True, blank=True, verbose_name="area")
     ha_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_ha_thread")
 
-    area_under_drainage_start = models.FloatField(null=True, blank=True, default=0, verbose_name="area_under_drainage_start")
-    area_under_drainage_w = models.FloatField(null=True, blank=True, default=0, verbose_name="area_under_drainage_w")
-    area_under_drainage_wo = models.FloatField(null=True, blank=True, default=0, verbose_name="area_under_drainage_wo")
+    area_under_drainage_start = models.FloatField(default=0, verbose_name="area_under_drainage_start")
+    area_under_drainage_w = models.FloatField(default=0, verbose_name="area_under_drainage_w")
+    area_under_drainage_wo = models.FloatField(default=0, verbose_name="area_under_drainage_wo")
     area_under_drainage_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_under_drainage_thread")
 
-    drained_area_excavated_start = models.FloatField(null=True, blank=True, default=0, verbose_name="drained_area_excavated_start")
-    drained_area_excavated_w = models.FloatField(null=True, blank=True, default=0, verbose_name="drained_area_excavated_w")
-    drained_area_excavated_wo = models.FloatField(null=True, blank=True, default=0, verbose_name="drained_area_excavated_wo")
+    drained_area_excavated_start = models.FloatField(default=0, verbose_name="drained_area_excavated_start")
+    drained_area_excavated_w = models.FloatField(default=0, verbose_name="drained_area_excavated_w")
+    drained_area_excavated_wo = models.FloatField(default=0, verbose_name="drained_area_excavated_wo")
     drained_area_excavated_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_drained_area_excavated_thread")
 
-    area_not_drained_or_rewetted_start = models.FloatField(null=True, blank=True, default=0, verbose_name="area_not_drained_or_rewetted_start")
-    area_not_drained_or_rewetted_w = models.FloatField(null=True, blank=True, default=0, verbose_name="area_not_drained_or_rewetted_w")
-    area_not_drained_or_rewetted_wo = models.FloatField(null=True, blank=True, default=0, verbose_name="area_not_drained_or_rewetted_wo")
+    area_not_drained_or_rewetted_start = models.FloatField(default=0, verbose_name="area_not_drained_or_rewetted_start")
+    area_not_drained_or_rewetted_w = models.FloatField(default=0, verbose_name="area_not_drained_or_rewetted_w")
+    area_not_drained_or_rewetted_wo = models.FloatField(default=0, verbose_name="area_not_drained_or_rewetted_wo")
     area_not_drained_or_rewetted_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_not_drained_or_rewetted_thread")
 
-    area_w_restored_vegetation_start = models.FloatField(null=True, blank=True, default=0, verbose_name="area_w_restored_vegetation_start")
-    area_w_restored_vegetation_w = models.FloatField(null=True, blank=True, default=0, verbose_name="area_w_restored_vegetation_w")
-    area_w_restored_vegetation_wo = models.FloatField(null=True, blank=True, default=0, verbose_name="area_w_restored_vegetation_wo")
+    area_w_restored_vegetation_start = models.FloatField(default=0, verbose_name="area_w_restored_vegetation_start")
+    area_w_restored_vegetation_w = models.FloatField(default=0, verbose_name="area_w_restored_vegetation_w")
+    area_w_restored_vegetation_wo = models.FloatField(default=0, verbose_name="area_w_restored_vegetation_wo")
     area_w_restored_vegetation_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_w_restored_vegetation_thread")
 
     soil_type_t2 = models.ForeignKey(SoilType, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="soil_type_t2")
@@ -2361,19 +2433,19 @@ class Fishery(Module):
     refrigerant_pc_start = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_start")
     refrigerant_pc_w = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_w")
     refrigerant_pc_wo = models.FloatField(validators=[pc_as_float], default=0, verbose_name="refrigerant_pc_wo")
-    refrigerant_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
+    refrigerant_pc_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
 
     refrigerant_gwp = models.FloatField(null=True, blank=True, default=1810, verbose_name="refrigerant_gwp")
 
     total_catch_yr_start = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_start")
     total_catch_yr_w = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_w")
     total_catch_yr_wo = models.FloatField(null=True, blank=True, verbose_name="total_catch_yr_wo")
-    total_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
+    total_catch_yr_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_yr_thread", on_delete=models.SET_NULL)
 
     ice_preserved_catch_pc_start = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_start")
     ice_preserved_catch_pc_w = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_w")
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name="ice_preserved_catch_pc_wo")
-    ice_preserved_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
+    ice_preserved_catch_pc_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_pc_thread", on_delete=models.SET_NULL)
 
     energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name="energy_emission_factor_co2_t2_start")
     energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name="energy_emission_factor_co2_t2_w")
@@ -2463,6 +2535,7 @@ class InputType(models.Model):
     has_co2_emissions = models.BooleanField(default=False)
     has_n2o_emissions = models.BooleanField(default=False)
     has_co2_e_emissions = models.BooleanField(default=False)
+    unit = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         unique_together = ("macro_input_type", "name")
@@ -2882,9 +2955,9 @@ class OrganicSoil(LandModuleFixed):
     offsite_ch4_peat_t2_w = models.FloatField(null=True, blank=True)
     offsite_ch4_peat_t2_wo = models.FloatField(null=True, blank=True)
 
-    peat_density_t2_start = models.FloatField(null=True, blank=True)
-    peat_density_t2_w = models.FloatField(null=True, blank=True)
-    peat_density_t2_wo = models.FloatField(null=True, blank=True)
+    peat_density_t2_start = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+    peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
@@ -3256,6 +3329,7 @@ class HandInHandAssessment(models.Model):
     name = models.CharField(max_length=255, unique=True)
     link = models.URLField(max_length=2000, null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
+    files_list = models.JSONField(default=list, blank=True)
 
     class Meta:
         verbose_name = "Hand in Hand Assessment"

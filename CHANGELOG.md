@@ -1,3 +1,417 @@
+## v1.18.4 (2025-12-08)
+
+### Fix
+
+- **activity_builder**: wrong type in issubclass check
+- **scripts**: exclude finalized project from cache reset in invalidate_results_cache
+
+## 1.18.4 (2025-12-08)
+
+### Feat
+
+- **project**: make climate, moisture, and soil_type optional
+
+### Fix
+
+- **forest management**: add start year to agb matrix logging update
+- **forest calculator**: update list absence to Nones instead of []
+
+## 1.18.3a0 (2025-12-04)
+
+### Fix
+
+- **calculators**: add a workaround that sanitizes any modules with missing land_use_change references due to bug in ActivityBuilderSerializer
+
+## 1.18.3 (2025-11-21)
+
+### Feat
+
+- **ci**: force results cache invalidation on new release
+- **project**: add ability to manually lock and unlock projects
+
+### Fix
+
+- **ipcc**: logical issue causing the date for forest management AGB and AGBGrowth to be wrong for most entries
+- **forest_management**: replace None with empty arrays to account for mathematical model requirements
+- **project_copy**: issue caused by stale organic soil ids causing crash when copying projects with organic soil modules
+- **math_model**: issue causing disturbances to be calculated even when only logging was present
+- **math_model**: issue causing coastal wetland rewetting area not to be calulated correctly
+- **activity**: issue causing double counting of hectares when computing total land modules area
+- **activity**: issue causing double counting of hectares when computing total land modules area
+- **project_copy**: issue causing the admin membership to be duplicated when duplicating a project
+- **activity_builder**: add back activity creation logic
+- **activity_builder**: prevent luc module type from always being added
+- **activity_builder**: rewrite edit logic
+- **activity_builder**: rewrite activity edit logic for better clarity and performance
+- **forest_management**: issue causing bgb max start to always be zero
+- **activity**: issue causing only preexisting module types to be involuntarily cleared from activity module types when editing an activity
+- **activity**: issue causing duplicate modules when editing an activity without adding or removing any module
+- **organic_soil**: issue causing peat extraction not to be calculated when area sart was lower than one
+- **accounts**: issue causing the user information on firebase not to update when users changed their email address
+- **coastal_wetland**: remove nullability from all area-related fields in coastal wetland and leave default as zero
+
+## 1.18.2 (2025-10-23)
+
+### Feat
+
+- **minitool**: add api endpoint to get results for all scenarios
+- **minitool**: add mitigation scenarios
+- **admin**: add ability to upload files to Hand In Hand Assessments from admin panel
+
+### Fix
+
+- **annual_cropland**: issue causing the flu not to be fetched correctly
+- **activity**: add coastal wetland area in total area count for activity land modules
+- **defaults**: ensure set aside biomass start is populated correctly
+- **energy**: issue causing results calculations to crash in languages other than english
+- **activity_builder**: issue causing duplication of modules when editing an activity
+- **public_project**: add missing capitalization years to PublicProjectSerializer
+- **calculators**: set default values for absent disturbances to None instead of empty list
+
+## 1.18.1 (2025-10-09)
+
+- **settlement**: apply conversion of km to meters for road length instead of meters to km for road width
+
+## 1.18.0 (2025-10-09)
+
+### Feat
+
+- **minitool**: add multi-module emissions scenarios
+- **minitool**: add scenario categories
+- **minitool**: add metadata to emissions scenario
+- add units to input types model
+
+### Fix
+
+- **settlement**: apply conversion of km to meters for road length instead of meters to km for road width
+- **activity_builder**: issue causing some combinations of LUC and organic soil to crash
+- **roads**: conversion issue in roads area causing unexpected results
+- **ActivityBuilder**: correct handling of Organic Soil and Land Use Change logic
+- **project_attachments**: issue with cloud bucket name causing error when trying to delete an attachment in non-review environments
+- **project_invitations**: issue causing invitations not to be accepted for languages other than english
+- **reports**: typo in forest management report causing crash
+- **reports**: issue causing flooded rice minor season emissions not to be considered and added to total activity emissions
+- **reports**: remaining fillvalue typos causing crash
+- **bloc**: static files template pathing
+
+## 1.17.22 (2025-10-01)
+
+### Fix
+
+- **calculators**: issue causing some forest management instances to accidentally fetch unneded biomass values, triggering a missing data error
+
+## 1.17.21 (2025-10-01)
+
+### Fix
+
+- **reports**: issue causing any report containing the livestock module to fail
+- **reports**: issue caused by old reference to comment thread attributes for small and large fishery
+
+## 1.17.20 (2025-10-01)
+
+### Fix
+
+- **calculators**: update module type check from SingleBiomassModule to BiomassModule in LandModuleCalculator
+
+## 1.17.19 (2025-09-29)
+
+### Fix
+
+- **middleware**: allow public endpoints to skip authentication
+
+## 1.17.18 (2025-09-29)
+
+### Fix
+
+- **activity**: show non-b-intact activities in list endpoint for public activities endpoint
+- **activity**: return activities that are not b-intact by default
+
+## 1.17.17 (2025-09-25)
+
+### Feat
+
+- **public**: add module types endpoint to public urls
+
+### Fix
+
+- **calculators**: add missing start results to ForestManagementCalculator result tuple
+
+## 1.17.16 (2025-09-25)
+
+### Fix
+
+- **forest_management**: issue caused by wrong references for flu,fi,fmg start
+
+## 1.17.15 (2025-09-25)
+
+### Fix
+
+- **activity**: issue calculating capitalization years when only last_year_of_accounting was specified
+
+## 1.17.14 (2025-09-24)
+
+### Fix
+
+- **calculators**: send bgb_t_c_ha as agb_ref to mathematical model instead of agb_t_c_ha
+- **defaults**: send GrasslandBiomass bgb_t_c_ha as default agb t2 value instead of agb_t_c_ha
+
+## 1.17.13 (2025-09-24)
+
+### Fix
+
+- **defaults**: add agb rate to default return payload for perennial cropland
+
+## 1.18.0 (2025-10-09)
+
+### Feat
+
+- **minitool**: add multi-module emissions scenarios
+- **minitool**: add scenario categories
+- **minitool**: add metadata to emissions scenario
+- add units to input types model
+
+### Fix
+
+- **activity_builder**: issue causing some combinations of LUC and organic soil to crash
+- **roads**: conversion issue in roads area causing unexpected results
+- **ActivityBuilder**: correct handling of Organic Soil and Land Use Change logic
+- **project_attachments**: issue with cloud bucket name causing error when trying to delete an attachment in non-review environments
+- **project_invitations**: issue causing invitations not to be accepted for languages other than english
+- **reports**: typo in forest management report causing crash
+- **reports**: issue causing flooded rice minor season emissions not to be considered and added to total activity emissions
+- **reports**: remaining fillvalue typos causing crash
+- **bloc**: static files template pathing
+
+## 1.17.22 (2025-10-01)
+
+### Fix
+
+- **calculators**: issue causing some forest management instances to accidentally fetch unneded biomass values, triggering a missing data error
+
+## 1.17.21 (2025-10-01)
+
+### Fix
+
+- **reports**: issue causing any report containing the livestock module to fail
+- **reports**: issue caused by old reference to comment thread attributes for small and large fishery
+
+## 1.17.20 (2025-10-01)
+
+### Fix
+
+- **calculators**: update module type check from SingleBiomassModule to BiomassModule in LandModuleCalculator
+
+## 1.17.19 (2025-09-29)
+
+### Fix
+
+- **middleware**: allow public endpoints to skip authentication
+
+## 1.17.18 (2025-09-29)
+
+### Fix
+
+- **activity**: show non-b-intact activities in list endpoint for public activities endpoint
+- **activity**: return activities that are not b-intact by default
+
+## 1.17.17 (2025-09-25)
+
+### Feat
+
+- **public**: add module types endpoint to public urls
+
+### Fix
+
+- **calculators**: add missing start results to ForestManagementCalculator result tuple
+
+## 1.17.16 (2025-09-25)
+
+### Fix
+
+- **forest_management**: issue caused by wrong references for flu,fi,fmg start
+
+## 1.17.15 (2025-09-25)
+
+### Fix
+
+- **activity**: issue calculating capitalization years when only last_year_of_accounting was specified
+
+## 1.17.14 (2025-09-24)
+
+### Fix
+
+- **calculators**: send bgb_t_c_ha as agb_ref to mathematical model instead of agb_t_c_ha
+- **defaults**: send GrasslandBiomass bgb_t_c_ha as default agb t2 value instead of agb_t_c_ha
+
+## 1.17.13 (2025-09-24)
+
+### Feat
+
+- **minitool**: import recomputed dataset with hamming space algorithm
+- **minitool**: add coastal wetland dataset
+
+### Fix
+
+- **defaults**: add agb rate to default return payload for perennial cropland
+
+## 1.17.12 (2025-09-23)
+
+### Fix
+
+- **activity**: missing request context causing issue during activity creation
+
+## 1.17.11 (2025-09-22)
+
+### Feat
+
+- **activity**: add is_b_intact queryparam to activity list endpoint
+
+## 1.17.10 (2025-09-22)
+
+### Feat
+
+- **activity**: add ability to tag activity as b-intact
+- **minitool**: add perennial cropland permutations dataset
+
+## 1.17.9 (2025-09-18)
+
+### Feat
+
+- **minitool**: implement caching for module types retrieval
+- **minitool**: add large fishery and annual cropland datasets
+
+### Fix
+
+- **activity_builder**: rewrite activity edit logic to avoid issues with orphaned modules
+- inconsistencies in naming of some threads compared to their reference inputs
+- correct references to selected electricity ef in value chain and irrigation modules, in accordance with new energy ef logic
+- **minitool**: add large fishery endpoint
+
+## 1.17.8 (2025-09-17)
+
+### Feat
+
+- **perennial cropland**: add scenario-based initial biomass t2 value
+
+### Fix
+
+- add fallback fetch to default module values for initial and final biomass
+
+## 1.17.7 (2025-09-17)
+
+### Feat
+
+- **minitool**: implement progress tracking for permutation processing with resume capability
+- **project**: allow modifications to finalized projects only for publication status
+
+### Fix
+
+- **energy**: set electricity ef to zero for renewables and make it scenario-dependant
+
+## 1.17.6 (2025-09-15)
+
+### Fix
+
+- **minitool**: reimport small fishery dataset with fixes
+- **project_invitations**: issue potentially causing multiple memberships of the same type to be created
+- **activity_builder**: issue causing unmodified module types not to receive the new area if changed in the builder
+
+## 1.17.5 (2025-09-12)
+
+## 1.17.4 (2025-09-12)
+
+### Feat
+
+- **minitool**: add grassland dataset to database
+
+## 1.17.3 (2025-09-12)
+
+### Feat
+
+- **minitool**: add waterbody-related endpoints and sanitize db data
+- **minitool**: update database
+
+### Fix
+
+- **minitool**: remove grassland factory yield
+
+## 1.17.2 (2025-09-09)
+
+### Fix
+
+- **coastal_wetlands**: remove wrong multiplication from bgb default calculations in mathematical model
+
+## 1.17.1 (2025-09-05)
+
+### Fix
+
+- **minitool**: remove additional password from computation endpoint
+
+## 1.17.0 (2025-09-05)
+
+### Feat
+
+- add endpoint to run compute permutations from cloud
+
+## 1.16.3 (2025-09-04)
+
+### Feat
+
+- **minitool**: add complete small fishery dataset
+
+### Fix
+
+- **forest management**: create_agb_matrix function fix (growth end of year)
+- **perennial_cropland**: set tier2 values for start AGB and start BGB to None for all scenarios
+
+## 1.16.2 (2025-08-27)
+
+### Fix
+
+- **ProjectInvitationViewSet**: add request context to ProjectInvitationWriteSerializer
+
+## 1.16.1 (2025-08-27)
+
+### Fix
+
+- **minitool**: make module_type filter optional in compute endpoint
+
+### Refactor
+
+- **hih assessment**: enhance grouping logic to include all countries, ensuring assessments are correctly associated with their respective regions and countries
+
+## 1.16.0 (2025-08-27)
+
+### Feat
+
+- **minitool**: add compute action to EmissionScenarioViewSet for custom scenario calculations with validation and filtering
+- **minitool**: introduce EmissionScenario model and related serializers, views, and admin registration; remove legacy models
+- **minitool**: implement scenario computation script with comprehensive statistical analysis and documentation
+- **minitool**: register ChangeRecord model in admin with display and filter options
+- **minitool**: add forest management and fisheries logic and partial datasets
+- **minitool**: add Small and Large Fishery data builders and processors with configuration support
+- **minitool**: enhance error handling by extracting relevant traceback lines and improve progress bar display
+- **minitool**: add LandUseChange data aggregation and processing script
+
+### Fix
+
+- **report**: add missing total_emissions assignments causing vc modules not to be included in the activity totals
+- **report**: allow endpoint to only validate readines of filtered activities, if any
+- **minitool**: filter regions without countries to prevent "Project has no country" errors
+- **minitool**: support single fields without start/w/wo variations in field mapping system
+- **factories**: standardize area attribute to 1 for various land use factories
+
+### Perf
+
+- **minitool**: optimize permutation computation with dynamic worker scaling and performance monitoring
+
+## 1.15.16 (2025-08-21)
+
+### Fix
+
+- **oluc**: Correct fire emissions calculations
+- **general_functions**: fix cumulative maturity evaluation
+
 ## 1.15.15 (2025-08-20)
 
 ### Feat

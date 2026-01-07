@@ -62,6 +62,9 @@ def main():
     # Test 7: Skip validation
     success7 = run_command("python manage.py load_ipcc_fixtures --skip-validation --dry-run", "Skip validation mode")
 
+    # Test 8: Clean slate
+    success8 = run_command("python manage.py load_ipcc_fixtures --clean-slate --dry-run", "Clean slate mode")
+
     # Summary
     print(f"\n{'=' * 60}")
     print("TEST SUMMARY")
@@ -74,6 +77,7 @@ def main():
         ("Continue on error mode", success5),
         ("Help command", success6),
         ("Skip validation mode", success7),
+        ("Clean slate mode", success8),
     ]
 
     for test_name, success in tests:

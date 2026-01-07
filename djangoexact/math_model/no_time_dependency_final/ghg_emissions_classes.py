@@ -84,7 +84,6 @@ class ActivityTypes(Enum):
 
 
 class Emission:
-
     def __init__(self, value=0.0, gas_type=None):
         self.gas_type: GasTypes | None = gas_type
         self.value: float = value
@@ -100,7 +99,6 @@ class Emission:
 
 
 class YearlyGasEmissionSet:
-
     def __init__(self, year, gas_type, emissions, delay=0):
         self.year: int = year
         self.gas_type: GasTypes = gas_type
@@ -120,7 +118,6 @@ class YearlyGasEmissionSet:
 
 
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
-
     def __init__(self, year, gas_type, emissions, activity, delay=0):
         super().__init__(year, gas_type, emissions, delay)
         # Can be a sub-activity, e.g. "Fire on Soil"
@@ -137,7 +134,6 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
 
 class YearlyActivityEmissionSet:
-
     def __init__(self, year, emissions, activity):
         self.year: int = year
         self.emissions: list[Emission] = emissions
@@ -152,10 +148,10 @@ class BreakdownTypes(Enum):
     ACTIVITY = "activity"
     ACTIVITY_GAS = "activity_gas"
     GAS = "gas"
+    INVENTORY = "inventory"
 
 
 class Result:
-
     def __init__(self, time_impl, time_cap, delay):
         self.yearly_emissions_by_sector_by_gas: list[YearlyGasActivityEmissionSet] = []
         self.balance = 0
@@ -175,11 +171,12 @@ class Result:
                 return self.breakdown_by_activity()
             case BreakdownTypes.ACTIVITY_GAS:
                 return self.breakdown_by_activity_by_gas()
+            case BreakdownTypes.INVENTORY:
+                return self.breakdown_by_inventory()
             case _:
                 raise Exception("Invalid breakdown type")
 
     def breakdown_by_gas(self):
-
         aggregated_emissions = {gas_type: YearlyGasEmissionSet(0, gas_type, [Emission(gas_type=gas_type) for i in range(self.time_tot)]) for gas_type in GasTypes}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
@@ -188,8 +185,9 @@ class Result:
         return aggregated_emissions.values()
 
     def breakdown_by_activity(self):
-
-        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {
+            activity: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]
+        }
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             aggregated_emissions[yearly_emission.activity].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
@@ -197,14 +195,21 @@ class Result:
         return aggregated_emissions.values()
 
     def breakdown_by_activity_by_gas(self):
-
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             yearly_emission.activity = ActivityTypes(yearly_emission.activity).value
 
         return self.yearly_emissions_by_sector_by_gas
 
-    def compute_balance(self):
+    def breakdown_by_inventory(self):
+        from .ghg_inventory_class import Inventory
 
+        inventory = Inventory()
+        for yearly_emission in self.yearly_emissions_by_sector_by_gas:
+            total_value = sum(e.value for e in yearly_emission.emissions)
+            inventory.add_emission(yearly_emission.gas_type, total_value, yearly_emission.activity)
+        return inventory
+
+    def compute_balance(self):
         self.balance = 0
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
@@ -218,7 +223,11 @@ class Result:
         for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
             match_found = False
             for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
-                if other_yearly_emission.year == self_yearly_emission.year and other_yearly_emission.gas_type == self_yearly_emission.gas_type and other_yearly_emission.activity == self_yearly_emission.activity:
+                if (
+                    other_yearly_emission.year == self_yearly_emission.year
+                    and other_yearly_emission.gas_type == self_yearly_emission.gas_type
+                    and other_yearly_emission.activity == self_yearly_emission.activity
+                ):
                     self_yearly_emission.emissions = [x + y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
                     match_found = True
                     break
@@ -234,20 +243,25 @@ class Result:
         for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
             match_found = False
             for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
-                if other_yearly_emission.year == self_yearly_emission.year and other_yearly_emission.gas_type == self_yearly_emission.gas_type and other_yearly_emission.activity == self_yearly_emission.activity:
+                if (
+                    other_yearly_emission.year == self_yearly_emission.year
+                    and other_yearly_emission.gas_type == self_yearly_emission.gas_type
+                    and other_yearly_emission.activity == self_yearly_emission.activity
+                ):
                     self_yearly_emission.emissions = [x - y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
                     match_found = True
                     break
 
             if not match_found:
                 negated_emissions = [Emission(-emission.value, emission.gas_type) for emission in other_yearly_emission.emissions]
-                result_obj.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(other_yearly_emission.year, other_yearly_emission.gas_type, negated_emissions, other_yearly_emission.activity))
+                result_obj.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(other_yearly_emission.year, other_yearly_emission.gas_type, negated_emissions, other_yearly_emission.activity)
+                )
 
         return result_obj
 
     def plot_emissions_and_aggregate_by_activity(self, with_or_without_string):
         def save_emission_graphs_with_totals(save_path, emissions_data, with_or_without_string):
-
             activity_data = defaultdict(lambda: defaultdict(list))
             total_emissions_by_activity = defaultdict(float)
 

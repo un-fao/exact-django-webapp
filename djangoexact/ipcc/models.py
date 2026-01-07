@@ -157,7 +157,7 @@ class SoilOrcanicCarbonCNRatio(Model):
     value = FloatField()
 
 
-class ForestManagementBGBManager(Manager):
+class ForestManagementRootToShootManager(Manager):
     def get_max_below_threshold(self, climate, forest_type, region, land_use_type, threshold):
         """
         Returns the highest value below the threshold.
@@ -175,7 +175,7 @@ class ForestManagementBGBManager(Manager):
             .first()
         )
 
-    def get_first_above_threshold(self, climate, forest_type, region, land_use_type, threshold) -> "ForestManagementBGB":
+    def get_first_above_threshold(self, climate, forest_type, region, land_use_type, threshold) -> "ForestManagementRootToShoot":
         """
         Returns the first value above the threshold.
         """
@@ -218,10 +218,10 @@ class ForestManagementBGBManager(Manager):
         )
 
 
-class ForestManagementBGB(Model):
+class ForestManagementRootToShoot(Model):
     class Meta:
-        verbose_name = "Forest Management BGB"
-        verbose_name_plural = "Forest Management BGB"
+        verbose_name = "Forest Management Root-To-Shoot"
+        verbose_name_plural = "Forest Management Root-To-Shoot"
 
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     region = ForeignKey("api.Region", on_delete=CASCADE)
@@ -229,7 +229,7 @@ class ForestManagementBGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     threshold = FloatField(null=True, blank=True)  # Maximum acceptable ag_biomass needed for this value to be chosen
     value = FloatField()
-    objects = ForestManagementBGBManager()
+    objects = ForestManagementRootToShootManager()
 
 
 class SoilOrganicCarbon(Model):
@@ -253,12 +253,15 @@ class ForestTotalBiomassManager(Manager):
                 land_use_type=land_use_type,
             )
         except ForestTotalBiomass.DoesNotExist:
-            return ForestTotalBiomass.objects.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type__name__icontains="Agroforestry - Default",
-            )
+            try:
+                return ForestTotalBiomass.objects.get(
+                    climate=climate,
+                    moisture=moisture,
+                    continent=continent,
+                    land_use_type__name__icontains="Agroforestry - Default",
+                )
+            except ForestTotalBiomass.DoesNotExist:
+                raise Exception(f"ForestTotalBiomass for {climate} climate, {moisture} moisture, {continent} continent, and {land_use_type} land use type does not exist")
 
 
 class ForestTotalBiomass(Model):
@@ -641,10 +644,13 @@ class PerennialMaxAGBManager(Manager):
                 land_use_type=land_use_type,
             )
         except PerennialMaxAGB.DoesNotExist:
-            return PerennialMaxAGB.objects.get(
-                climate=climate,
-                land_use_type__name="Agroforestry - Default",
-            )
+            try:
+                return PerennialMaxAGB.objects.get(
+                    climate=climate,
+                    land_use_type__name="Agroforestry - Default",
+                )
+            except PerennialMaxAGB.DoesNotExist:
+                raise Exception(f"PerennialMaxAGB for {climate} climate and {land_use_type} land use type does not exist")
 
 
 class PerennialMaxAGB(Model):

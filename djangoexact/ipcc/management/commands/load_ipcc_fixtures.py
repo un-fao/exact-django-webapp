@@ -405,15 +405,15 @@ class Command(BaseCommand):
             "fisherytype",
             "fishtype",
             # Fuel-related models in dependency order
-            "macrofueltype",   # Must come before fueltype
-            "fuelusetype",     # Must come before fueltype
-            "unit",            # Must come before fueltype
+            "macrofueltype",  # Must come before fueltype
+            "fuelusetype",  # Must come before fueltype
+            "unit",  # Must come before fueltype
             "parentfueltype",  # Must come before fueltype
-            "fueltype",        # Depends on above models
+            "fueltype",  # Depends on above models
             "salinitytype",
             # Input-related models in dependency order
             "macroinputtype",  # Must come before inputtype
-            "inputtype",       # Depends on macroinputtype
+            "inputtype",  # Depends on macroinputtype
             "emissionfactorsource",
             "irrigationsystemtype",
             "buildingtype",
@@ -422,7 +422,7 @@ class Command(BaseCommand):
             "packagingmaterialtype",
             # Models that depend on other API models
             "ipccregion",  # Must come before country
-            "country",     # Depends on ipccregion AND gleamregion
+            "country",  # Depends on ipccregion AND gleamregion
             # Management type models (depend on core models)
             "tillagetype",
             "tillagemanagementtype",
@@ -502,7 +502,7 @@ class Command(BaseCommand):
             "litterdeadwoodcarbonstock",
             "landusecarbonstockexchangefactor",
             "soilorcaniccarboncnratio",
-            "forestmanagementbgb",
+            "forestmanagementroottoshoot",
             "soilorganiccarbon",
             "foresttotalbiomass",
             "afforestationlandusestockexchangefactor",

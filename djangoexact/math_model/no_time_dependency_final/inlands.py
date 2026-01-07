@@ -13,6 +13,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 from dataclasses import dataclass, field
 from typing import Optional
@@ -21,7 +22,6 @@ from .generalized_modules import BaseModule
 
 @dataclass
 class AnnexedModule(BaseModule):
-
     fire_boolean_end: float
     fire_periodicity_end: float
     area_affected_by_action_end: float
@@ -102,14 +102,38 @@ class AnnexedModule(BaseModule):
                 dry_matter_ref_fire = self.dry_matter_ref_fire if self.dry_matter_tier_2_fire is None else self.dry_matter_tier_2_fire
 
                 if self.fire_boolean_end and self.fire_periodicity_end < self.implementation_time + self.capitalization_time and self.area_affected_by_action_end != 0 and dry_matter_ref_fire != 0:
-                    co2, co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate_type, self.implementation_time, self.capitalization_time, self.percentage_area_burned_end, self.ef_co2_ref_fire 
-                                                   if self.ef_co2_tier_2_fire is None else self.ef_co2_tier_2_fire, self.ef_co_ref_fire 
-                                                   if self.ef_co_tier_2_fire is None else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire 
-                                                   if self.ef_ch4_tier_2_fire is None else self.ef_ch4_tier_2_fire, self.methane_constant)
+                    co2, co, ch4 = fire_co2_co_ch4(
+                        self.fire_periodicity_end,
+                        dry_matter_ref_fire,
+                        self.area_affected_by_action_end,
+                        self.rate_type,
+                        self.implementation_time,
+                        self.capitalization_time,
+                        self.percentage_area_burned_end,
+                        self.ef_co2_ref_fire if self.ef_co2_tier_2_fire is None else self.ef_co2_tier_2_fire,
+                        self.ef_co_ref_fire if self.ef_co_tier_2_fire is None else self.ef_co_tier_2_fire,
+                        self.ef_ch4_ref_fire if self.ef_ch4_tier_2_fire is None else self.ef_ch4_tier_2_fire,
+                        self.methane_constant,
+                    )
 
-                    emissions_co2_yearly = breakdown_proportionally_to_values(co2, compute_yearly_or_half_year_cumulative(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
-                    emissions_co_yearly = breakdown_proportionally_to_values(co, compute_yearly_or_half_year_cumulative(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
-                    emissions_ch4_yearly = breakdown_proportionally_to_values(ch4, compute_yearly_or_half_year_cumulative(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
+                    emissions_co2_yearly = breakdown_proportionally_to_values(
+                        co2,
+                        compute_yearly_or_half_year_cumulative(
+                            0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                        ),
+                    )
+                    emissions_co_yearly = breakdown_proportionally_to_values(
+                        co,
+                        compute_yearly_or_half_year_cumulative(
+                            0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                        ),
+                    )
+                    emissions_ch4_yearly = breakdown_proportionally_to_values(
+                        ch4,
+                        compute_yearly_or_half_year_cumulative(
+                            0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                        ),
+                    )
 
                     co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FIRE_ON_SOIL, delay=self.delay)
                     co_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO, [Emission(e, GasTypes.CO) for e in emissions_co_yearly], ActivityTypes.FIRE_ON_SOIL, delay=self.delay)
@@ -119,13 +143,19 @@ class AnnexedModule(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(co_emission_set)
                     self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
 
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.FIRE_ON_SOIL))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO, 0, ActivityTypes.FIRE_ON_SOIL))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.FIRE_ON_SOIL))
+
             except Exception as e:
                 traceback.print_exc()
                 raise e
 
         def calculate_drainage_emissions():
             def calculate_drainage_initial():
-                def calculate_emissions_start_end(ef, area_affected_by_action_start, area_affected_by_action_end, percentage_area_multiplier_start, percentage_area_multiplier_end, area_affected_by_module, multiplying_constant):
+                def calculate_emissions_start_end(
+                    ef, area_affected_by_action_start, area_affected_by_action_end, percentage_area_multiplier_start, percentage_area_multiplier_end, area_affected_by_module, multiplying_constant
+                ):
                     try:
                         em_start = ef * area_affected_by_action_start * multiplying_constant * percentage_area_multiplier_start
 
@@ -148,18 +178,38 @@ class AnnexedModule(BaseModule):
                     ef_co2 = self.ef_co2_ref_drainage_initial if self.ef_co2_tier_2_drainage_initial is None else self.ef_co2_tier_2_drainage_initial
                     ef_doc = self.ef_doc_ref_drainage_initial if self.ef_doc_tier_2_drainage_initial is None else self.ef_doc_tier_2_drainage_initial
 
-                    n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000)
+                    n2ostart, n2oend = calculate_emissions_start_end(
+                        ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000
+                    )
 
-                    ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
-                    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
+                    ch4_start, ch4_end = calculate_emissions_start_end(
+                        ef_ch4_on_site,
+                        self.area_drained_start,
+                        self.area_drained_end,
+                        1 - self.percentage_ditches_start,
+                        1 - self.percentage_ditches_end,
+                        self.area_affected_by_action_end,
+                        self.methane_constant / 1000,
+                    )
+                    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(
+                        ef_ch4_off_site,
+                        self.area_drained_start,
+                        self.area_drained_end,
+                        self.percentage_ditches_start,
+                        self.percentage_ditches_end,
+                        self.area_affected_by_action_end,
+                        self.methane_constant / 1000,
+                    )
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
                     total_ch4_onsite = compute_yearly_or_half_year_cumulative(ch4_start, ch4_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
-                    total_ch4_off_site = compute_yearly_or_half_year_cumulative(ch4_start_ditches, ch4_end_ditches, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
+                    total_ch4_off_site = compute_yearly_or_half_year_cumulative(
+                        ch4_start_ditches, ch4_end_ditches, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                    )
 
                     total_doc = compute_yearly_or_half_year_cumulative(doc_start, doc_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                     total_co2 = compute_yearly_or_half_year_cumulative(co2_start, co2_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
@@ -171,7 +221,9 @@ class AnnexedModule(BaseModule):
                     raise e
 
             def calculate_drainage_final():
-                def calculate_emissions_start_end(ef, area_affected_by_action_start, area_affected_by_action_end, percentage_area_multiplier_start, percentage_area_multiplier_end, area_affected_by_module, multiplying_constant):
+                def calculate_emissions_start_end(
+                    ef, area_affected_by_action_start, area_affected_by_action_end, percentage_area_multiplier_start, percentage_area_multiplier_end, area_affected_by_module, multiplying_constant
+                ):
                     try:
                         em_start = 0
 
@@ -196,18 +248,38 @@ class AnnexedModule(BaseModule):
                     ef_co2 = self.ef_co2_ref_drainage_final if self.ef_co2_tier_2_drainage_final is None else self.ef_co2_tier_2_drainage_final
                     ef_doc = self.ef_doc_ref_drainage_final if self.ef_doc_tier_2_drainage_final is None else self.ef_doc_tier_2_drainage_final
 
-                    n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000)
+                    n2ostart, n2oend = calculate_emissions_start_end(
+                        ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000
+                    )
 
-                    ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, self.area_drained_start, self.area_drained_end, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
-                    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, self.area_drained_start, self.area_drained_end, self.percentage_ditches_start, self.percentage_ditches_end, self.area_affected_by_action_end, self.methane_constant / 1000)
+                    ch4_start, ch4_end = calculate_emissions_start_end(
+                        ef_ch4_on_site,
+                        self.area_drained_start,
+                        self.area_drained_end,
+                        1 - self.percentage_ditches_start,
+                        1 - self.percentage_ditches_end,
+                        self.area_affected_by_action_end,
+                        self.methane_constant / 1000,
+                    )
+                    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(
+                        ef_ch4_off_site,
+                        self.area_drained_start,
+                        self.area_drained_end,
+                        self.percentage_ditches_start,
+                        self.percentage_ditches_end,
+                        self.area_affected_by_action_end,
+                        self.methane_constant / 1000,
+                    )
 
-                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
-                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44 / 12)
+                    co2_start, co2_end = calculate_emissions_start_end(ef_co2, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
+                    doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 12)
 
                     total_n2o = compute_yearly_or_half_year_cumulative(n2ostart, n2oend, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
                     total_ch4_onsite = compute_yearly_or_half_year_cumulative(ch4_start, ch4_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
-                    total_ch4_off_site = compute_yearly_or_half_year_cumulative(ch4_start_ditches, ch4_end_ditches, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
+                    total_ch4_off_site = compute_yearly_or_half_year_cumulative(
+                        ch4_start_ditches, ch4_end_ditches, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                    )
 
                     total_doc = compute_yearly_or_half_year_cumulative(doc_start, doc_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                     total_co2 = compute_yearly_or_half_year_cumulative(co2_start, co2_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
@@ -229,7 +301,7 @@ class AnnexedModule(BaseModule):
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=self.delay)
-                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
                 n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=self.delay)
@@ -239,6 +311,12 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_onsite_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
+
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2, co2_initial, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.DOC, doc_initial, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, ch4_onsite_initial, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, ch4_offsite_total, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O, n2o_initial, ActivityTypes.DRAINAGE))
 
             except Exception as e:
                 traceback.print_exc()
@@ -284,8 +362,30 @@ class AnnexedModule(BaseModule):
                 ef_ch4_rewetting_final = self.ef_ch4_rewetting_final if self.ef_ch4_rewetting_final_tier_2 is None else self.ef_ch4_rewetting_final_tier_2
                 ef_n2o_rewetting_final = self.ef_n2o_rewetting_final if self.ef_n2o_rewetting_final_tier_2 is None else self.ef_n2o_rewetting_final_tier_2
 
-                total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(area_rewet_initial, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
-                total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(area_rewet_final, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
+                total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(
+                    area_rewet_initial,
+                    ef_doc_rewetting_initial,
+                    ef_co2_rewetting_initial,
+                    ef_ch4_rewetting_initial,
+                    ef_n2o_rewetting_initial,
+                    self.methane_constant,
+                    self.nitrous_constant,
+                    self.rate_type,
+                    self.implementation_time,
+                    self.capitalization_time,
+                )
+                total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(
+                    area_rewet_final,
+                    ef_doc_rewetting_final,
+                    ef_co2_rewetting_final,
+                    ef_ch4_rewetting_final,
+                    ef_n2o_rewetting_final,
+                    self.methane_constant,
+                    self.nitrous_constant,
+                    self.rate_type,
+                    self.implementation_time,
+                    self.capitalization_time,
+                )
 
                 co2_doc_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_initial], ActivityTypes.REWETTING, delay=self.delay)
                 ch4_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_initial], ActivityTypes.REWETTING, delay=self.delay)
@@ -302,6 +402,9 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_doc_emission_set_final)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_final)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set_final)
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.REWETTING))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.REWETTING))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.REWETTING))
 
             except Exception as e:
                 traceback.print_exc()
@@ -318,7 +421,6 @@ class AnnexedModule(BaseModule):
 
 @dataclass
 class PeatExtraction(BaseModule):
-
     hectares_end: float
     hectares_start: float
     percentage_ditches_start: float
@@ -360,22 +462,52 @@ class PeatExtraction(BaseModule):
                 ef_ch4_offsite = self.ef_ch4_offsite_ref if self.ef_ch4_offsite_tier_2 is None else self.ef_ch4_offsite_tier_2
 
                 co2_onsite_emissions_start, co2_onsite_emissions_end = yearly_emissions_calculation(44 / 12, self.hectares_start, self.hectares_end, ef_co2_onsite)
-                ch4_onsite_emissions_start, ch4_onsite_emissions_end = yearly_emissions_calculation(self.methane_constant / 1000, self.hectares_start, self.hectares_end, ef_ch4_onsite, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end)
+                ch4_onsite_emissions_start, ch4_onsite_emissions_end = yearly_emissions_calculation(
+                    self.methane_constant / 1000, self.hectares_start, self.hectares_end, ef_ch4_onsite, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end
+                )
                 n2o_onsite_emissions_start, n2o_onsite_emissions_end = yearly_emissions_calculation(self.nitrous_constant / 1000 * 44 / 28, self.hectares_start, self.hectares_end, ef_n2o_onsite)
                 doc_offsite_emissions_start, doc_offsite_emissions_end = yearly_emissions_calculation(44 / 12, self.hectares_start, self.hectares_end, ef_doc_offsite)
-                ch4_offsite_emissions_start, ch4_offsite_emissions_end = yearly_emissions_calculation(self.methane_constant / 1000, self.hectares_start, self.hectares_end, ef_ch4_offsite, self.percentage_ditches_start, self.percentage_ditches_end)
+                ch4_offsite_emissions_start, ch4_offsite_emissions_end = yearly_emissions_calculation(
+                    self.methane_constant / 1000, self.hectares_start, self.hectares_end, ef_ch4_offsite, self.percentage_ditches_start, self.percentage_ditches_end
+                )
 
-                drainage_co2_doc_yearly = compute_yearly_or_half_year_cumulative(co2_onsite_emissions_start + doc_offsite_emissions_start, co2_onsite_emissions_end + doc_offsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
-                drainage_ch4_yearly = compute_yearly_or_half_year_cumulative(ch4_onsite_emissions_start + ch4_offsite_emissions_start, ch4_onsite_emissions_end + ch4_offsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
-                drainage_n2o_yearly = compute_yearly_or_half_year_cumulative(n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
+                drainage_co2_doc_yearly = compute_yearly_or_half_year_cumulative(
+                    co2_onsite_emissions_start + doc_offsite_emissions_start,
+                    co2_onsite_emissions_end + doc_offsite_emissions_end,
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.rate_type,
+                    interim_values=True,
+                )
+                drainage_ch4_yearly = compute_yearly_or_half_year_cumulative(
+                    ch4_onsite_emissions_start + ch4_offsite_emissions_start,
+                    ch4_onsite_emissions_end + ch4_offsite_emissions_end,
+                    self.implementation_time,
+                    self.capitalization_time,
+                    self.rate_type,
+                    interim_values=True,
+                )
+                drainage_n2o_yearly = compute_yearly_or_half_year_cumulative(
+                    n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True
+                )
 
-                drainage_peat_co2_doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in drainage_co2_doc_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
+                drainage_peat_co2_doc_emission_set = YearlyGasActivityEmissionSet(
+                    0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in drainage_co2_doc_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay
+                )
                 drainage_peat_ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in drainage_ch4_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
                 drainage_peat_n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in drainage_n2o_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_co2_doc_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_ch4_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_n2o_emission_set)
+
+                inventory_co2 = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=co2_onsite_emissions_start + doc_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_ch4 = InventoryPerGasPerActivity(gas_type=GasTypes.CH4, value=ch4_onsite_emissions_start + ch4_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_n20 = InventoryPerGasPerActivity(gas_type=GasTypes.N2O, value=n2o_onsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+
+                self.inventory.emissions_by_sector_by_gas.append(inventory_co2)
+                self.inventory.emissions_by_sector_by_gas.append(inventory_ch4)
+                self.inventory.emissions_by_sector_by_gas.append(inventory_n20)
 
             except Exception as e:
                 traceback.print_exc()
@@ -397,6 +529,9 @@ class PeatExtraction(BaseModule):
 
                 offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
+
+                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=em_start, activity=ActivityTypes.OFFSITE_PEAT)
+                self.inventory.emissions_by_sector_by_gas.append(inventory)
 
                 self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity
 

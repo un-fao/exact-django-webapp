@@ -23,7 +23,8 @@ from .generalized_modules import BaseModule
 
 from dataclasses import dataclass
 from typing import Optional
-
+from .ghg_inventory_class import InventoryPerGasPerActivity
+ 
 
 @dataclass(kw_only=True)
 class OtherLandUseChanges(BaseModule):
@@ -117,6 +118,8 @@ class OtherLandUseChanges(BaseModule):
                     )
                 )
 
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2,0,ActivityTypes.BIOMASS)
+                self.inventory.emissions_by_sector_by_gas(inventory)
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -130,17 +133,13 @@ class OtherLandUseChanges(BaseModule):
 
             initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
 
-            fire_mb = initial_biomass / 0.4
+            fire_mb = initial_biomass
 
             kg_methane_fire = fire_mb * self.combustion_factor * self.emission_factor_methane if self.fire_bool else 0
-            kg_nitrous_fire = initial_biomass * 2.5 * self.combustion_factor * self.emission_factor_nitrous if self.fire_bool else 0
+            kg_nitrous_fire = initial_biomass * self.combustion_factor * self.emission_factor_nitrous if self.fire_bool else 0
 
             methane_emissions = kg_methane_fire * self.methane_constant
             nitrous_emissions = kg_nitrous_fire * self.nitrous_constant
-
-            total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
-
-            total_fire_emissions = total_em_per_hectar * self.area
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
@@ -155,6 +154,8 @@ class OtherLandUseChanges(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
+            self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4,0,ActivityTypes.RESIDUE_BURNING))
+            self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O,0,ActivityTypes.RESIDUE_BURNING))
         try:
             calculate_biomass()
             calculate_fire()

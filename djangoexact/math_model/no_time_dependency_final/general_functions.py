@@ -80,7 +80,7 @@ def compute_half_year_cumulative_n_year_maturity(start_value, end_value, years_i
     # NOTE: this function is used to calculate the average yearly value of the breakdown for soil, but not it is also used for other cases, hence why number_of_years is added instead of only 20
     breakdown = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
 
-    after_20 = [0 for i in range(number_of_years + 1)]
+    after_20 = [0 for i in range(number_of_years)]
     after_20.extend(breakdown)
 
     before_20 = [i - j for i, j in zip(breakdown, after_20[0 : len(breakdown)])]
@@ -438,7 +438,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
             for i in range(years_impl):
                 # CREATING DELTA AGB MATRIX
                 end_index_below_20 = min(i + 20, years_total)
-                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                delta_agb_matrix[i, i + 1:end_index_below_20] = delta_agb_yearly_below_20
                 if end_index_below_20 < years_total:
                     delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
 
@@ -464,7 +464,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
             for i in range(years_impl):
                 # CREATING DELTA AGB MATRIX
                 end_index_below_20 = min(i + 20, years_total)
-                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                delta_agb_matrix[i, i + 1:end_index_below_20] = delta_agb_yearly_below_20
                 if end_index_below_20 < years_total:
                     delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
                     
@@ -710,7 +710,6 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             # i represents the column of our matrix. When there is logging we are cutting down a percentage of the forest present in year i
-            # We are cutting down a percentage of the forest present in year i
 
             if i <= agb_matrix.shape[1]:
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence + start_year] * percentage
@@ -718,7 +717,7 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence - 1 + start_year] * percentage
 
             # Update the agb_matrix
-            agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence, recurrence, is_degradation)
+            agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence + start_year, recurrence, is_degradation)
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             # NOTE: as of now result is always empty, add necessary logic or remove it, as it's not used anywhere   
@@ -819,5 +818,3 @@ def plot_matrix_with_values(matrix, cmap='viridis', title="Matrix Plot"):
     
     # Save the plot
     plt.savefig(f"matrices/{title}.png")
-    
-    

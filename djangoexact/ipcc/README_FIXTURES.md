@@ -72,6 +72,15 @@ python manage.py load_ipcc_fixtures --continue-on-error
 
 # Skip pre-load validation
 python manage.py load_ipcc_fixtures --skip-validation
+
+# Force individual fixture loading (bypass combined fixtures)
+python manage.py load_ipcc_fixtures --force-individual
+
+# Clean slate: delete all existing data before loading
+python manage.py load_ipcc_fixtures --clean-slate
+
+# Complete clean reload with dependencies
+python manage.py load_ipcc_fixtures --include-dependencies --clean-slate --force-individual
 ```
 
 #### Loading Command Options
@@ -84,6 +93,8 @@ python manage.py load_ipcc_fixtures --skip-validation
 - `--skip-validation`: Skip pre-load validation checks
 - `--continue-on-error`: Continue loading other fixtures if one fails
 - `--format`: Expected fixture format - json, xml, or yaml (default: json)
+- `--force-individual`: Force loading individual fixtures even if combined fixtures exist
+- `--clean-slate`: Delete all existing data from models before loading fixtures
 
 ## Import Order
 
@@ -379,6 +390,30 @@ Warning: Consider running with --include-dependencies to dump latest API data.
    - Ensure the API app is properly configured in Django settings
    - Verify the API app is installed and accessible
 
+5. **Foreign Key Constraint Violations with Combined Fixtures**
+   - Error: "Model matching query does not exist" when loading combined fixtures
+   - **Solution**: Use `--force-individual` to load individual fixtures in correct order
+   - **Cause**: Combined fixtures may have models in wrong dependency order
+   - **Example**: `python manage.py load_ipcc_fixtures --include-dependencies --force-individual`
+
+6. **API Model Foreign Key Dependencies**
+   - Error: "invalid foreign key: api_country.ipcc_region_id contains a value that does not have a corresponding value"
+   - Error: "FOREIGN KEY constraint failed" for LandUseType
+   - Error: "FuelUseType matching query does not exist" for FuelType
+   - **Solution**: Use `--force-individual` to ensure correct loading order and regenerate fixtures with `--include-dependencies`
+   - **Cause**: API models have internal dependencies:
+     - `Country` depends on `IPCCRegion` AND `GLEAMRegion`
+     - `LandUseType` depends on `ForestType`
+     - `FuelType` depends on `FuelUseType`, `ParentFuelType`, `MacroFuelType`, `Unit`
+     - `InputType` depends on `MacroInputType`
+   - **Example**: 
+     ```bash
+     # First, generate all missing fixtures
+     python manage.py generate_ipcc_fixtures --include-dependencies
+     # Then load with correct order
+     python manage.py load_ipcc_fixtures --include-dependencies --force-individual --clean-slate
+     ```
+
 ### Validation Commands
 
 ```bash
@@ -499,10 +534,40 @@ The loading command includes extensive validation:
 
 The command automatically handles the correct loading order:
 
-1. **API Dependencies First** (if `--include-dependencies` is used)
-2. **IPCC Models in Dependency Order**
-3. **Validation Between Steps**
-4. **Error Recovery Options**
+1. **Clean Slate** (if `--clean-slate` is used)
+2. **API Dependencies First** (if `--include-dependencies` is used)
+3. **IPCC Models in Dependency Order**
+4. **Validation Between Steps**
+5. **Error Recovery Options**
+
+### Clean Slate Feature
+
+The `--clean-slate` option provides a complete reset of your database:
+
+- **Safe Deletion**: Deletes models in reverse dependency order to avoid foreign key constraint violations
+- **Comprehensive**: Removes all IPCC and API model data
+- **Transactional**: Uses database transactions for safety
+- **Detailed Logging**: Shows exactly what was deleted
+
+#### Clean Slate Process
+
+1. **IPCC Models First**: Deletes all IPCC model data (they depend on API models)
+2. **API Models in Reverse Order**: Deletes API models starting with those that other models depend on
+3. **Transaction Safety**: All deletions happen in a single transaction
+4. **Progress Reporting**: Shows count of deleted records for each model
+
+#### Usage Examples
+
+```bash
+# Clean slate with dry run to see what would be deleted
+python manage.py load_ipcc_fixtures --clean-slate --dry-run
+
+# Complete clean reload
+python manage.py load_ipcc_fixtures --include-dependencies --clean-slate --force-individual
+
+# Clean slate for specific models only
+python manage.py load_ipcc_fixtures --models GlobalWarmingPotential,SoilOrganicCarbon --clean-slate
+```
 
 ## Complete Workflow
 

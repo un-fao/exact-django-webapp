@@ -1,0 +1,112 @@
+[
+{
+  "model": "api.largefisherygeartype",
+  "pk": 17,
+  "fields": {
+    "name": "Gillnets And Entangling Nets",
+    "name_en": "Gillnets And Entangling Nets",
+    "name_fr": null,
+    "name_es": "Redes de Enmalle y Redes de Enredo",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 18,
+  "fields": {
+    "name": "Hooks And Lines",
+    "name_en": "Hooks And Lines",
+    "name_fr": null,
+    "name_es": "Sedales y Anzuelos",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 19,
+  "fields": {
+    "name": "Midwater Trawls",
+    "name_en": "Midwater Trawls",
+    "name_fr": null,
+    "name_es": "Redes de Arrastre Pelágico",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 20,
+  "fields": {
+    "name": "Traps And Lift Nets",
+    "name_en": "Traps And Lift Nets",
+    "name_fr": null,
+    "name_es": "Trampas y Redes Izadas",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 21,
+  "fields": {
+    "name": "Surrounding Nets",
+    "name_en": "Surrounding Nets",
+    "name_fr": null,
+    "name_es": "Redes de Cerco",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 22,
+  "fields": {
+    "name": "Dredges",
+    "name_en": "Dredges",
+    "name_fr": null,
+    "name_es": "Rastras",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 23,
+  "fields": {
+    "name": "Other Or Mixed",
+    "name_en": "Other Or Mixed",
+    "name_fr": null,
+    "name_es": "Otros o Mezclados",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 24,
+  "fields": {
+    "name": "Mobile Seine",
+    "name_en": "Mobile Seine",
+    "name_fr": null,
+    "name_es": "Redes de tiro mobil",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 25,
+  "fields": {
+    "name": "Not Specified",
+    "name_en": "Not Specified",
+    "name_fr": null,
+    "name_es": "Sin especificar",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.largefisherygeartype",
+  "pk": 26,
+  "fields": {
+    "name": "Bottom Trawls",
+    "name_en": "Bottom Trawls",
+    "name_fr": null,
+    "name_es": "Redes de Arrastre de Fondo",
+    "name_ru": null
+  }
+}
+]

@@ -8,6 +8,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
+from .ghg_inventory_class import Inventory
 
 from .general_functions import (
     breakdown_proportionally_to_values,
@@ -30,6 +31,7 @@ class BaseModule:
 
     def __post_init__(self):
         self.result = Result(self.implementation_time, self.capitalization_time, self.delay)
+        self.inventory = Inventory()
 
     def evaluate_tier_2_defaults(self):
         try:

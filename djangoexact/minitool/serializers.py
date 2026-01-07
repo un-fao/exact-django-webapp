@@ -24,3 +24,29 @@ class EmissionStatisticsByModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.EmissionStatisticsByModule
         fields = "__all__"
+
+
+class EmissionScenarioSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
+
+    class Meta:
+        model = models.EmissionScenario
+        fields = "__all__"
+
+
+class EmissionScenarioWithResultsSerializer(serializers.Serializer):
+    emission_scenario = EmissionScenarioSerializer()
+    count = serializers.IntegerField()
+    sum_total = serializers.FloatField(allow_null=True)
+    mean = serializers.FloatField(allow_null=True)
+    median = serializers.FloatField(allow_null=True)
+    min = serializers.FloatField(allow_null=True)
+    max = serializers.FloatField(allow_null=True)
+    std = serializers.FloatField(allow_null=True)
+    q1 = serializers.FloatField(allow_null=True)
+    q3 = serializers.FloatField(allow_null=True)
+    iqr = serializers.FloatField(allow_null=True)
+    ci_95 = serializers.FloatField(allow_null=True)
+    ci_99 = serializers.FloatField(allow_null=True)
+    range_min = serializers.FloatField(allow_null=True)
+    range_max = serializers.FloatField(allow_null=True)

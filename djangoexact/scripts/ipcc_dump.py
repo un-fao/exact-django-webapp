@@ -3501,7 +3501,7 @@ for i, row in enumerate(df_dict):
         )
 
 
-ForestManagementBGB.objects.all().delete()
+ForestManagementRootToShoot.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB.csv"),
@@ -3526,7 +3526,7 @@ for i, row in df.iterrows():
 
         print(climate, region, forest_type, land_use_type, threshold, value)
 
-        ForestManagementBGB.objects.create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
+        ForestManagementRootToShoot.objects.create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
     except Exception as e:
         print(row)
         print(e)
@@ -3842,45 +3842,48 @@ for i, row in df.iterrows():
         bgb_t_c_ha=bgb_t_c_ha,
     )
 
-log.debug("Deleting all ForestCombustionFactor objects...")
-ForestCombustionFactor.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["gef_co2"])
-    ch4 = parse_csv_number(row["gef_ch4"])
-    n2o = parse_csv_number(row["gef_n2o"])
-    value = parse_csv_number(row["value"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.create(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
 """
+
+
+def delete_and_import_forest_combustion_factor():
+    log.debug("Deleting all ForestCombustionFactor objects...")
+    ForestCombustionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+        header=[0],
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+        co2 = parse_csv_number(row["gef_co2"])
+        ch4 = parse_csv_number(row["gef_ch4"])
+        n2o = parse_csv_number(row["gef_n2o"])
+        value = parse_csv_number(row["value"])
+
+        print(
+            land_use_type,
+            climate,
+            forest_type,
+            co2,
+            ch4,
+            n2o,
+            value,
+        )
+
+        ForestCombustionFactor.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            forest_type=forest_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+            value=value,
+        )
 
 
 def delete_and_import_litter_deadwood_carbon_stock():
@@ -4079,12 +4082,6 @@ def delete_and_import_forest_management_agb():
                         # Primary forest plantations are not possible
                         continue
 
-                    if type.name == "Plantation":
-                        agb_min = agb_range_min_plantation
-                        agb_max = agb_range_max_plantation
-                        agb_growth_min = agb_growth_min_plantation
-                        agb_growth_max = agb_growth_max_plantation
-
                     print(
                         land_use_type,
                         region,
@@ -4095,24 +4092,42 @@ def delete_and_import_forest_management_agb():
                         agb_range_max,
                         agb_growth_min,
                         agb_growth_max,
-                        agb_range_min_plantation,
-                        agb_range_max_plantation,
-                        agb_growth_min_plantation,
-                        agb_growth_max_plantation,
                     )
 
-                    ForestManagementAGB.objects.create(
-                        land_use_type=land_use_type,
-                        region=region,
-                        climate=climate,
-                        forest_condition_type=forest_condition_type,
-                        from_year=from_year,
-                        forest_type=type,
-                        agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
-                        agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
-                        agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
-                        agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
-                    )
+                    if type.name == "Plantation":
+                        if agb_range_min_plantation is None or agb_range_max_plantation is None or agb_growth_min_plantation is None or agb_growth_max_plantation is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
+                    else:
+                        if agb_range_min is None or agb_range_max is None or agb_growth_min is None or agb_growth_max is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
 
 
 def import_irrigation_system_types():
@@ -4415,7 +4430,19 @@ def delete_and_import_total_biomass_after_defo():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                TotalBiomassAfterDefo.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
+                    print(f"Processing {crop} {climate} {moisture} {region} {value}")
                     print(
                         crop,
                         climate,
@@ -4479,7 +4506,21 @@ def delete_and_import_forest_total_biomass():
                 continue
 
             if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                ForestTotalBiomass.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
                 for crop in crops:
+                    if crop.name == "Default":
+                        continue
+
                     print(f"{crop}, {climate}, {moisture}, {region}, {value}")
 
                     ForestTotalBiomass.objects.create(
@@ -5010,6 +5051,87 @@ def add_fmg_data_for_all_grassland_management_types():
         print(f"Created {climate} {moisture} {grassland_management_type} {tillage_management_type} {value}")
 
 
+def update_forest_management_agb_and_rshoot_data():
+    """
+    Update the ForestManagementAGB and ForestManagementRootToShoot data.
+    """
+    from ipcc.models import ForestManagementAGB, ForestManagementRootToShoot
+
+    df = pd.read_csv(
+        # os.path.join(os.path.dirname(__file__), "ForestManagement_Revised_AGB_BGB_20251229.csv"),
+        os.path.join(os.path.dirname(__file__), "forman_agb_revisedrevised.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        region = Region.objects.get(name__iexact=row["region"])
+        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+        forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        # threshold = 125
+        from_year = row["from_year"]
+        agb_min = parse_csv_number(row["agb_min"])
+        agb_max = parse_csv_number(row["agb_max"])
+        agb_growth_min = parse_csv_number(row["agb_growth_min"])
+        agb_growth_max = parse_csv_number(row["agb_growth_max"])
+        # rshoot = parse_csv_number(row["r_shoot"])
+
+        agb_entry = ForestManagementAGB.objects.filter(
+            climate=climate,
+            region=region,
+            forest_type=forest_type,
+            forest_condition_type=forest_condition_type,
+            land_use_type=land_use_type,
+            from_year=from_year,
+        ).first()
+
+        if agb_entry:
+            agb_entry.agb_min = agb_min
+            agb_entry.agb_max = agb_max
+            agb_entry.agb_growth_min = agb_growth_min
+            agb_entry.agb_growth_max = agb_growth_max
+            agb_entry.save()
+        else:
+            ForestManagementAGB.objects.create(
+                climate=climate,
+                region=region,
+                forest_type=forest_type,
+                land_use_type=land_use_type,
+                forest_condition_type=forest_condition_type,
+                from_year=from_year,
+                agb_min=agb_min,
+                agb_max=agb_max,
+                agb_growth_min=agb_growth_min,
+                agb_growth_max=agb_growth_max,
+                agb_unit="tC/ha",
+            )
+            print(f"Created {climate} {region} {forest_type} {land_use_type} {from_year} {agb_min} {agb_max} {agb_growth_min} {agb_growth_max}")
+
+        # rshoot_entry = ForestManagementRootToShoot.objects.filter(
+        #     climate=climate,
+        #     region=region,
+        #     forest_type=forest_type,
+        #     land_use_type=land_use_type,
+        #     threshold=threshold,
+        # ).first()
+
+        # if rshoot_entry:
+        #     rshoot_entry.value = rshoot
+        #     rshoot_entry.save()
+        # else:
+        #     ForestManagementRootToShoot.objects.create(
+        #         climate=climate,
+        #         region=region,
+        #         forest_type=forest_type,
+        #         land_use_type=land_use_type,
+        #         threshold=threshold,
+        #         value=rshoot,
+        #     )
+        #     print(f"Created {climate} {region} {forest_type} {land_use_type} {threshold} {rshoot}")
+
+
 def run():
     import os
 
@@ -5025,10 +5147,18 @@ def run():
 
     if app_mode == "review":
         # TODO: Run in review
+        update_forest_management_agb_and_rshoot_data()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        delete_and_import_forest_management_agb()
+        # delete_and_import_forest_total_biomass()
+        # delete_and_import_forest_combustion_factor()
+        pass
+
+    if app_mode == "local":
+        # TODO: Run in local
         pass
 
     if app_mode == "test":

@@ -133,9 +133,9 @@ class GrasslandDefaults(Defaults):
             combustion_factor_t2_start_default=defaults.cf.value,
             combustion_factor_t2_w_default=defaults.cf.value,
             combustion_factor_t2_wo_default=defaults.cf.value,
-            agb_t2_start_default=defaults.biomass.agb_t_c_ha,
-            agb_t2_w_default=defaults.biomass.agb_t_c_ha,
-            agb_t2_wo_default=defaults.biomass.agb_t_c_ha,
+            agb_t2_start_default=defaults.biomass.bgb_t_c_ha,
+            agb_t2_w_default=defaults.biomass.bgb_t_c_ha,
+            agb_t2_wo_default=defaults.biomass.bgb_t_c_ha,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -240,6 +240,9 @@ class PerennialCroplandDefaults(Defaults):
             agb_t2_start_default=0,
             agb_t2_w_default=0,
             agb_t2_wo_default=0,
+            agb_rate_t2_start_default=0,
+            agb_rate_t2_w_default=0,
+            agb_rate_t2_wo_default=0,
             agb_max_t2_start_default=0,
             agb_max_t2_w_default=0,
             agb_max_t2_wo_default=0,
@@ -277,8 +280,11 @@ class PerennialCroplandDefaults(Defaults):
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
             soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value if self.input.is_start() else defaults.biomass_ef_start_w.value or defaults.biomass_ef_start_wo.value,
-            agb_t2_w_default=defaults.agb_w_default.value if self.input.is_with() else defaults.biomass_ef_w.value,
-            agb_t2_wo_default=defaults.agb_wo_default.value if self.input.is_without() else defaults.biomass_ef_wo.value,
+            # agb_t2_w_default=defaults.agb_start_w_default.value if self.input.is_with() else defaults.biomass_ef_w.value,
+            # agb_t2_wo_default=defaults.agb_start_wo_default.value if self.input.is_without() else defaults.biomass_ef_wo.value,
+            agb_rate_t2_start_default=defaults.agb_rate_start_default.value,
+            agb_rate_t2_w_default=defaults.agb_rate_w_default.value,
+            agb_rate_t2_wo_default=defaults.agb_rate_wo_default.value,
             agb_max_t2_start_default=defaults.agb_max_start_default.value if self.input.is_start() else defaults.agb_max_w_default.value or defaults.agb_max_wo_default.value,
             agb_max_t2_w_default=defaults.agb_max_w_default.value if self.input.is_with() else defaults.agb_max_wo_default.value,
             agb_max_t2_wo_default=defaults.agb_max_wo_default.value if self.input.is_without() else defaults.agb_max_wo_default.value,
@@ -1245,7 +1251,7 @@ class SetAsideDefaults(Defaults):
         defaults = calcs.SetAsideCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        biomass_ef_start = defaults.biomass_ef_w or defaults.biomass_ef_wo
+        biomass_ef_start = max(defaults.biomass_ef_w.value or 0, defaults.biomass_ef_wo.value or 0)
 
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
@@ -1260,7 +1266,7 @@ class SetAsideDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            biomass_t2_start_default=biomass_ef_start.value,
+            biomass_t2_start_default=biomass_ef_start,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
         )
@@ -1404,28 +1410,28 @@ class ForestManagementDefaults(Defaults):
         elif defaults.agb_start_wo is not None:
             agb_start = defaults.agb_start_wo
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_start_w is not None:
-            bgb_start = defaults.agb_start_w * defaults.bgb_after_20_yrs.value
-        elif defaults.bgb_after_20_yrs is not None and defaults.agb_start_wo is not None:
-            bgb_start = defaults.agb_start_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_start_w is not None:
+            bgb_start = defaults.agb_start_w * defaults.rshoot_after_20_yrs.value
+        elif defaults.rshoot_after_20_yrs is not None and defaults.agb_start_wo is not None:
+            bgb_start = defaults.agb_start_wo * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_w is not None:
-            bgb_w = defaults.agb_max_w * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_w is not None:
+            bgb_w = defaults.agb_max_w * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_max_wo is not None:
-            bgb_wo = defaults.agb_max_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_wo is not None:
+            bgb_wo = defaults.agb_max_wo * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
-            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.bgb_before_20_yrs.value
+        if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
+            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.rshoot_before_20_yrs.value
 
-        if defaults.bgb_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
-            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.bgb_before_20_yrs.value
+        if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
+            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.rshoot_before_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
-            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
+            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.rshoot_after_20_yrs.value
 
-        if defaults.bgb_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
-            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
+        if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
+            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.rshoot_after_20_yrs.value
 
         bgb_max_start = 0
         bgb_max_w = 0
@@ -1580,21 +1586,21 @@ class ValueChainEntryEnergyDefaultsMixin(Defaults):
 
         if self.input.is_start():
             energy_calculator_start = self.defaults.energy_calculator_w if self.input.is_with() else self.defaults.energy_calculator_wo
-            self.electricity_ef_t2_start_default = energy_calculator_start.electricity_ef_selected.value
+            self.electricity_ef_t2_start_default = energy_calculator_start.electricity_ef_selected_start.value
             self.country_t2_default = energy_calculator_start.country.name
             self.energy_ef_co2_t2_start_default = energy_calculator_start.energy_ef_default_start.co2
             self.energy_ef_ch4_t2_start_default = energy_calculator_start.energy_ef_default_start.ch4
             self.energy_ef_n2o_t2_start_default = energy_calculator_start.energy_ef_default_start.n2o
 
         if self.input.is_with():
-            self.electricity_ef_t2_w_default = self.defaults.energy_calculator_w.electricity_ef_selected.value
+            self.electricity_ef_t2_w_default = self.defaults.energy_calculator_w.electricity_ef_selected_w.value
             self.country_t2_default = self.defaults.energy_calculator_w.country.name
             self.energy_ef_co2_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.co2
             self.energy_ef_ch4_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.ch4
             self.energy_ef_n2o_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.n2o
 
         if self.input.is_without():
-            self.electricity_ef_t2_wo_default = self.defaults.energy_calculator_wo.electricity_ef_selected.value
+            self.electricity_ef_t2_wo_default = self.defaults.energy_calculator_wo.electricity_ef_selected_wo.value
             self.country_t2_default = self.defaults.energy_calculator_wo.country.name
             self.energy_ef_co2_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_wo.co2
             self.energy_ef_ch4_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_wo.ch4
@@ -1704,9 +1710,9 @@ class EnergyEntryDefaults(Defaults):
 
         # TODO: Remove this when the naming is streamlined
         self.country_t2_default = self.defaults.country.name
-        self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected.value
-        self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected.value
-        self.electricity_ef_t2_wo_default = self.defaults.electricity_ef_selected.value
+        self.electricity_ef_t2_start_default = self.defaults.electricity_ef_selected_start.value
+        self.electricity_ef_t2_w_default = self.defaults.electricity_ef_selected_w.value
+        self.electricity_ef_t2_wo_default = self.defaults.electricity_ef_selected_wo.value
         self.transmission_loss_t2_start_default = self.defaults.TRANSMISSION_LOSS
         self.transmission_loss_t2_w_default = self.defaults.TRANSMISSION_LOSS
         self.transmission_loss_t2_wo_default = self.defaults.TRANSMISSION_LOSS

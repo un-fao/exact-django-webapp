@@ -5,7 +5,6 @@ Generates a changes.json format similar to the existing one.
 Works with any module type that has the standard structure.
 """
 
-import csv
 import json
 import os
 import pandas as pd
@@ -83,6 +82,10 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
             if pd.isna(w_value):
                 w_value = None
 
+            if base_name == "module_type":
+                start_value = get_module_type_from_class_name(start_value)
+                w_value = get_module_type_from_class_name(w_value)
+
             # Check if there's a change
             if start_value != w_value:
                 row_changes.append({"field": base_name, "from": start_value, "to": w_value})
@@ -93,10 +96,34 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
             "grassland": "Grassland",
             "floodedrice": "Flooded Rice",
             "perennialcropland": "Perennial Cropland",
+            "forestmanagement": "Forest Management",
+            "smallfishery": "Small Fishery",
+            "largefishery": "Large Fishery",
+            "input": "Input",
+            "coastalwetland": "Coastal Wetland",
+            "waterbody": "Waterbody",
+            "landusechange": "Land Use Change",
+            "setaside": "Set Aside",
+            "otherland": "Other Land",
+            "irrigation": "Irrigation",
+            "settlement": "Settlement",
+            "aquaculture": "Aquaculture",
+            "energy": "Energy",
+            "organicsoil": "Organic Soil",
+            "transport": "Transport",
         }
 
         # Only add to results if there are changes
         if row_changes:
+            # Create complete CSV row data dictionary
+            csv_row_data = {}
+            for col in columns:
+                value = row.get(col)
+                # Handle NaN values
+                if pd.isna(value):
+                    value = None
+                csv_row_data[col] = value
+
             record = {
                 "module_type": module_mapping.get(row_module_type.lower(), row_module_type),
                 "region": region,
@@ -105,6 +132,7 @@ def analyze_changes(csv_file_path: str, module_type: Optional[str] = None) -> Li
                 "soil_type": soil_type,
                 "total": total,
                 "changes": row_changes,
+                "csv_row_data": csv_row_data,
             }
 
             # Add module-specific fields
@@ -135,6 +163,15 @@ def get_module_type_from_filename(file_path: str) -> str:
         "grassland": "Grassland",
         "floodedrice": "Flooded Rice",
         "perennialcropland": "Perennial Cropland",
+        "forestmanagement": "Forest Management",
+        "smallfishery": "Small Fishery",
+        "largefishery": "Large Fishery",
+        "input": "Input",
+        "coastalwetland": "Coastal Wetland",
+        "waterbody": "Waterbody",
+        "landusechange": "Land Use Change",
+        "setaside": "Set Aside",
+        "otherland": "Other Land",
     }
 
     for key, value in module_mapping.items():
@@ -143,6 +180,41 @@ def get_module_type_from_filename(file_path: str) -> str:
 
     # Default: capitalize and replace underscores with spaces
     return name_without_ext.replace("_", " ").title()
+
+
+def get_module_type_from_class_name(class_name: str) -> str:
+    """
+    Get module type from class name.
+
+    Args:
+        class_name: Class name
+
+    Returns:
+        Module type from class name
+    """
+    module_mapping = {
+        "AnnualCropland": "Annual Cropland",
+        "Grassland": "Grassland",
+        "PerennialCropland": "Perennial Cropland",
+        "FloodedRice": "Flooded Rice",
+        "Livestock": "Livestock",
+        "SmallFishery": "Small Fishery",
+        "LargeFishery": "Large Fishery",
+        "CoastalWetland": "Coastal Wetland",
+        "Waterbody": "Waterbody",
+        "LandUseChange": "Land Use Change",
+        "SetAside": "Set Aside",
+        "OtherLand": "Other Land",
+        "Input": "Input",
+        "Irrigation": "Irrigation",
+        "Settlement": "Settlement",
+        "Aquaculture": "Aquaculture",
+        "ForestManagement": "Forest Management",
+        "Energy": "Energy",
+        "OrganicSoil": "Organic Soil",
+        "Transport": "Transport",
+    }
+    return module_mapping.get(class_name, class_name)
 
 
 def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, module_type: Optional[str] = None) -> str:
@@ -160,9 +232,8 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
     if not os.path.exists(csv_file_path):
         raise FileNotFoundError(f"CSV file not found: {csv_file_path}")
 
-    # Determine module type if not provided
-    if not module_type:
-        module_type = get_module_type_from_filename(csv_file_path)
+    df = pd.read_csv(csv_file_path)
+    module_type = get_module_type_from_class_name(df.iloc[0]["module"])
 
     print(f"Analyzing changes in {csv_file_path}...")
     print(f"Module type: {module_type}")
@@ -203,9 +274,37 @@ def analyze_csv_file(csv_file_path: str, output_file: Optional[str] = None, modu
 
 def run():
     try:
-        for module_type in ["annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock"]:
-            output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
-        print(f"\nAnalysis completed successfully!")
+        # "annualcropland", "grassland", "perennialcropland", "floodedrice", "livestock",
+        # for module_type in [
+        #     # "input",
+        #     # "smallfishery",
+        #     # "grassland",
+        #     # "livestock",
+        #     # "waterbody",
+        #     # "largefishery",
+        #     # "coastalwetland",
+        #     # "floodedrice",
+        #     # "annualcropland",
+        #     # "perennial_cropland",
+        #     # "forestmanagement",
+        #     # "aquaculture",
+        #     # "other_land",
+        #     # "set_aside",
+        #     "landusechange",
+        # ]:
+        #     output_path = analyze_csv_file(f"scripts/minitool/{module_type}.csv", f"{module_type}_changes.json", module_type)
+
+        import_folder = os.path.join(os.path.dirname(__file__), "minitool", "import")
+        for file in os.listdir(import_folder):
+            if file.endswith(".csv"):
+                df = pd.read_csv(os.path.join(import_folder, file))
+                module_type = df.iloc[0]["module"]
+                print(f"Processing {file} with module type: {module_type}")
+                filename = file.replace(".csv", "")
+                output_path = analyze_csv_file(os.path.join(import_folder, file), f"{filename}_changes.json", module_type.casefold())
+                print(f"Processed {file} -> {output_path}")
+
+        print("\nAnalysis completed successfully!")
         print(f"Output file: {output_path}")
     except Exception as e:
         print(f"Error: {e}")

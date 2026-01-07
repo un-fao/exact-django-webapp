@@ -1,5 +1,6 @@
 import firebase_admin.auth
 import api.models as models
+import minitool.models as minitool_models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
@@ -8,6 +9,7 @@ from djangoexact.settings import auth
 import firebase_admin
 import os
 import pandas as pd
+import csv
 
 # TODO: Run in review and prod
 
@@ -45,7 +47,7 @@ def change_forest_bgb_tropical_mountain_system_to_tropical_montane():
     Change all Forest AGB Tropical Mountain System to Tropical Montane
     """
     tropical_montane_climate = models.Climate.objects.get(name_en="Tropical Montane")
-    agbs = ipcc_models.ForestManagementBGB.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
+    agbs = ipcc_models.ForestManagementRootToShoot.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
 
 
 def change_forest_agb_growth_tropical_mountain_system_to_tropical_montane():
@@ -60,13 +62,12 @@ def cycle_all_modules_and_invalidate_cached_results():
     """
     Cycle all modules and invalidate cached results
     """
-    models.ForestDisturbance.objects.all().delete()
     for module_type in models.ModuleType.objects.all():
         log.debug(f"Invalidating cached results for {module_type}")
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
-            if hasattr(ModuleClass, "last_cached_at"):
-                ModuleClass.history.all().update(
+            if issubclass(ModuleClass, models.CachedResultMixin):
+                ModuleClass.objects.all().update(
                     updated_at=None,
                     last_cached_at=None,
                     cached_results_total=None,
@@ -75,13 +76,6 @@ def cycle_all_modules_and_invalidate_cached_results():
                     cached_results_by_activity_by_gas=None,
                     last_modified=None,
                 )
-                for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
-                    if hasattr(module, "invalidate_cached_results"):
-                        module.invalidate_cached_results()
-                    else:
-                        log.error(f"Could not find invalidate_cached_results for {module}")
-            else:
-                log.error(f"Could not find last_cached_at for {module_type}")
         except LookupError:
             log.error(f"Could not find module class for {module_type}")
 
@@ -294,7 +288,7 @@ def import_hih_links():
     """
     Import Hand in Hand links from the database
     """
-    df = pd.read_json(os.path.join(os.path.dirname(__file__), "HIHLinks.json"))
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "ipcc_data/HIHLinks.json"))
     for index, row in df.iterrows():
         country = models.HandInHandCountry.objects.get(name=row["country"])
         link = row["link"]
@@ -408,13 +402,145 @@ def find_all_countries_with_no_ipcc_region():
         print(f"Deleted country: {country.name}")
 
 
-def change_change_rate_D_to_linear():
+def sanitize_minitool_data():
     """
-    Change change rate D to linear
+    Get all module type waterbody change aggregates and capitalize module type
     """
-    change_rate = models.ChangeRate.objects.get(name="D")
-    change_rate.name = "linear"
-    change_rate.save()
+    print("Deleting smallfishery data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="smallfishery").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="smallfishery").delete()
+    print("Deleting Flooded Rice data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Flooded Rice").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Flooded Rice").delete()
+    print("Deleting Perennial Cropland data")
+    minitool_models.ChangeRecord.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    minitool_models.ChangeAggregate.objects.filter(module_type__icontains="Perennial Cropland").delete()
+    print("Done")
+
+
+def import_input_types_units():
+    """
+    Import input types units
+    """
+    df = pd.read_json(os.path.join(os.path.dirname(__file__), "InputTypeUnits.json"))
+    for index, row in df.iterrows():
+        print(f"Importing input type {row['name']} with unit {row['unit']}")
+        input_type = models.InputType.objects.get(name__iexact=row["name"])
+        input_type.unit = row["unit"]
+        input_type.save()
+        print(f"Imported input type {input_type.name} with unit {input_type.unit}")
+
+
+def check_forest_numbers(activities=None):
+    """
+    Check forest numbers
+    """
+    from api.models import ForestManagement
+
+    if activities is None:
+        activities = models.Activity.objects.all()
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    print(f"Activities: {activities.count()}")
+    forest_management_modules = ForestManagement.objects.filter(activity__in=activities)
+    print(f"Forest management modules: {forest_management_modules.count()}")
+    secondary_forest_modules = forest_management_modules.filter(Q(forest_condition_type__name="Secondary"))
+    print(f"Secondary forest modules: {secondary_forest_modules.count()}")
+    plantation_forest_modules = secondary_forest_modules.filter(Q(forest_type__name="Plantation"))
+    print(f"Of which plantations: {plantation_forest_modules.count()}")
+
+    print(f"Percentage of secondary forest modules: {secondary_forest_modules.count() / forest_management_modules.count() * 100}%")
+    print(f"Percentage of plantation forest modules: {plantation_forest_modules.count() / secondary_forest_modules.count() * 100}%")
+
+    # List the (unique) emails of users with the most unique projects that have activities in forest management modules
+    from django.db.models import Count
+
+    users = (
+        models.CustomUser.objects.filter(projects__activities__in=activities)
+        .distinct()
+        .annotate(project_count=Count("projects", filter=Q(projects__activities__in=activities), distinct=True))
+        .order_by("-project_count")
+    )
+    print(f"Users: {users.count()}")
+    for user in users:
+        print(f"User: {user.email} - {user.project_count} unique projects with activities in forest management modules")
+
+    # Confront users affected with total users (in percentage)
+    total_users = models.CustomUser.objects.count()
+    print(f"Total users: {total_users}")
+    print(f"Percentage of users affected: {users.count() / total_users * 100}%")
+
+
+def check_how_many_users_logged_in_last_month(time_period=30):
+    """
+    Check how many users logged in last month
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+
+    users = models.CustomUser.objects.filter(last_login__gte=timezone.now() - timedelta(days=time_period))
+    # Confront users affected with total users (in percentage)
+    total_users = models.CustomUser.objects.count()
+    print(f"Percentage of users logged in last {time_period} days: {users.count()} ({users.count() / total_users * 100:.2f}% of total userbase)")
+
+    return users
+
+
+def check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=30):
+    """
+    Check how many users logged in last time period have been forest management activities
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+
+    activities = models.Activity.objects.filter(created_at__gte=timezone.now() - timedelta(days=time_period))
+    activities = activities.filter(module_types__name__icontains="Forest Management")
+    users_last_time_period = check_how_many_users_logged_in_last_month(time_period=time_period)
+
+    users_last_time_period_with_forest_management_activities = users_last_time_period.filter(activities__in=activities)
+    print(
+        f"Amount of active users with activities in forest management in the last {time_period} days: {users_last_time_period_with_forest_management_activities.count()} ({users_last_time_period_with_forest_management_activities.count() / users_last_time_period.count() * 100:.2f}% of active users)"
+    )
+    return users_last_time_period_with_forest_management_activities
+
+
+def get_projects_with_forest_management_activities():
+    projects = models.Project.objects.filter(activities__module_types__name__icontains="Forest Management").distinct()
+    return projects
+
+
+def get_users_with_projects_with_forest_management_activities():
+    users = models.CustomUser.objects.filter(projects__activities__module_types__name__icontains="Forest Management").distinct()
+    return users
+
+
+def get_forest_management_modules_in_plantation_projects():
+    """
+    Get the number of forest management modules in activities in projects with forest type 'Plantation'
+    """
+    projects = get_projects_with_forest_management_activities()
+    forests = models.ForestManagement.objects.filter(activity__project__in=projects, forest_type__name__iexact="Plantation")
+    print(f"Forest management modules in secondary forests or plantation projects: {forests.count()}")
+
+    # How many of them have users that logged in last 90 days?
+    users_last_90_days = check_how_many_users_logged_in_last_month(time_period=90)
+    print(f"Active users last 90 days: {users_last_90_days.count()}")
+    forests_with_users_last_90_days = forests.filter(activity__project__members__user__in=users_last_90_days).distinct("activity__project__members__user")
+    print(f"Active users with Forest management modules in secondary forests or plantations in the last 90 days: {forests_with_users_last_90_days.count()}")
+
+    # Extract users emails
+    users_emails = forests_with_users_last_90_days.values_list(
+        "activity__project__members__user__email", "activity__project__members__user__first_name", "activity__project__members__user__last_name"
+    ).distinct()
+    print(f"Users emails: {users_emails.count()}")
+
+    # Save them to csv
+    with open("users_emails.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Email", "First Name", "Last Name"])
+        for user_email in users_emails:
+            writer.writerow([user_email[0], user_email[1], user_email[2]])
+
+    return forests
 
 
 def run():
@@ -425,15 +551,20 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
+        # cycle_all_modules_and_invalidate_cached_results()
+        # import_input_types_units()
+        # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
+        get_forest_management_modules_in_plantation_projects()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        import_input_types_units()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        change_change_rate_D_to_linear()
+        # sanitize_minitool_data()
         pass
 
     if app_mode == "test":
