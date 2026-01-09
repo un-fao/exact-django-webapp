@@ -320,9 +320,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
 
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
 
         except Exception as e:
             traceback.print_exc()
