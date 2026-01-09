@@ -49,9 +49,8 @@ class NotCultivatedLand(LandModule):
             try:
                 if self.calculate_soc_som:
                     emissions_som_yearly, emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectares_before_20)
-
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
                 self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM))
 
             except Exception as e:
