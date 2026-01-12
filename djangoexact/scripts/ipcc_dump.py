@@ -5147,18 +5147,19 @@ def run():
 
     if app_mode == "review":
         # TODO: Run in review
-        update_forest_management_agb_and_rshoot_data()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        delete_and_import_forest_management_agb()
+        # update_forest_management_agb_and_rshoot_data()
+        # delete_and_import_forest_management_agb()
         # delete_and_import_forest_total_biomass()
         # delete_and_import_forest_combustion_factor()
         pass
 
     if app_mode == "local":
         # TODO: Run in local
+        update_forest_management_agb_and_rshoot_data()
         pass
 
     if app_mode == "test":
