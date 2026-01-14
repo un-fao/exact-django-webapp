@@ -1405,7 +1405,6 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.crop_yield_start: ipcc.CropYieldStat = ipcc.CropYieldStat()
         self.crop_yield_w: ipcc.CropYieldStat = ipcc.CropYieldStat()
         self.crop_yield_wo: ipcc.CropYieldStat = ipcc.CropYieldStat()
-        self.flu: ipcc.CroplandFLU = ipcc.CroplandFLU()
         self.burning_emission_factor: ipcc.BurningEmissionFactor = ipcc.BurningEmissionFactor()
         self.minor_burning_emission_factor: ipcc.BurningEmissionFactor = ipcc.BurningEmissionFactor()
         self.fires_start: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
@@ -1808,8 +1807,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
                 "fmg_end_tier_2": self.module_wo.fmg_t2_wo,
-                "flu_start_default": self.flu.value,
-                "flu_end_default": self.flu.value,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_wo.value,
                 "flu_start_tier_2": self.module_start.flu_t2_start,
                 "flu_end_tier_2": self.module_wo.flu_t2_wo,
                 "fi_start_default": self.fi_start.value,
