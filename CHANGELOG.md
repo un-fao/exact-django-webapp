@@ -1,3 +1,33 @@
+## 1.19.0 (2026-01-14)
+
+### Feat
+
+- add revised forest management agb, agb growth and root-to-shoot data
+- **api**: add inventory breakdown to module results endpoint
+- **organic_soil**: disable soc som of land modules when organic soil module is present in the activity
+- **reports**: display activity T2 overrides in Excel metadata
+
+### Fix
+
+- **calculators**: old flu_wo reference to mathematical model causing wrong results
+- **math_model**: wrong activity type for refrigerant inventory causing crash
+- **not_cultivated_land**: correct indentation for appending SOM emissions to results
+- **inventory**: wrong inventory class initialization throwing exception
+- **inventory**: correct activity type in inventory initialization for ice emissions
+- **inventory**: wrong inventory class initialization causing exception
+- **inventory**: updated landuse models with if calculate_soc_som
+- **inventory**: remove scenario-based logic in results and only aggregate by single start scenario
+- **inventory**: move soil and som inventory calculations outside calculate_soc_som check
+- **inventory**: update inventory aggregation to include additional math modules
+- **inventory**: various math model issues causing crashes
+- **math_model**: Updated import from ghg_inventory_class in inputs
+- **math_model**: revert some absolute imports to relative imports
+- **perennial_cropland**: account for agb_t2_start and bgb_t2_start only when it is replacing a reference value, not computed or zero
+- **activity_builder**: issue causing removal of organic soil module to reset inputs of associated land modules
+- **calculators**: revert disturbance_percentage_fire to empty list fallback
+
+## 1.18.4a0 (2025-12-08)
+
 ## v1.18.4 (2025-12-08)
 
 ### Fix
