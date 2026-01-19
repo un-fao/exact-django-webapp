@@ -239,7 +239,7 @@ class Roads(BaseModule):
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
 
-            self.inventory.yearly_emissions_by_sector_by_gas.append(GasTypes.CO2, 0, ActivityTypes.ROADS)
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.ROADS))
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -320,9 +320,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
 
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_start_co2, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_start_ch4, ActivityTypes.FUEL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start_n2o, ActivityTypes.FUEL))
 
         except Exception as e:
             traceback.print_exc()
@@ -350,7 +350,7 @@ class NewIrrigation(BaseModule):
                 0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay
             )
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
-            self.inventory.emissions_by_sector_by_gas.append(Emission(GasTypes.CO2, self.units_start, ActivityTypes.NEW_IRRIGATION))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.units_start, ActivityTypes.NEW_IRRIGATION))
 
         except Exception as e:
             traceback.print_exc()

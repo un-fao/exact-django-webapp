@@ -2,7 +2,7 @@
 name = "cz_conventional_commits"
 tag_format = "$version"
 version_scheme = "pep440"
-version = "1.18.4a0"
+version = "1.19.2"
 update_changelog_on_bump = true
 tag = false
 version_files = [
