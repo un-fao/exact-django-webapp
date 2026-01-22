@@ -816,12 +816,17 @@ def generic_public_module_viewset(model: api_models.Module):
 
                 if module_results is None or not use_cached_results:
                     log.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas = calculators.CalculatorFactory().calculate_result(module)
+                    total, by_activity, by_gas, by_activity_gas, inventory = calculators.CalculatorFactory().calculate_result(module)
 
                     results_total = api_serializers.DynamicResultFactory.create(activity, total, aggregate_by=api_serializers.BreakdownTypes.TOTAL).data
                     results_by_activity = api_serializers.DynamicResultFactory.create(activity, by_activity, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY).data
                     results_by_gas = api_serializers.DynamicResultFactory.create(activity, by_gas, aggregate_by=api_serializers.BreakdownTypes.GAS).data
                     results_by_activity_gas = api_serializers.DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY_GAS).data
+
+                    results_total["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.TOTAL)
+                    results_by_activity["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY)
+                    results_by_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.GAS)
+                    results_by_activity_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY_GAS)
 
                     module_results = (
                         results_total
