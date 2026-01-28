@@ -164,6 +164,7 @@ from .models import (
     FuelMixin,
     ValueChainSubmodule,
     EnergyEntry,
+    RefrigerantType,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -3204,6 +3205,9 @@ class SmallFisheryCalculator(BaseCalculator):
         self.fui_w: ipcc.SmallFisheryFUI = None
         self.fui_wo: ipcc.SmallFisheryFUI = None
 
+        self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
+        self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
+
         self.relevant_scenarios = self.module.get_relevant_scenarios()
 
     def get_defaults(self, calculate=False) -> dict:
@@ -3265,8 +3269,11 @@ class SmallFisheryCalculator(BaseCalculator):
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.country.name} does not exist")
         
-        if self.project.gw_potential.co2 is None:
-            raise ValueError("Project-level GWP potential for CO2 does not exist")
+        try:
+            self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
+        except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+            raise ValueError(f"Refrigerant emission factor for {self.refrigerant_type_default.name} and {self.project.gw_potential.name} does not exist")
+
 
     def calculate(self) -> list[Result]:
         """
@@ -3297,7 +3304,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "fui_default_end": self.fui_w,
                 "fui_start_tier_2": self.module.fui_t2_start,
                 "fui_end_tier_2": self.module.fui_t2_w,
-                "gwp_refrigerant_default": self.project.gw_potential.co2,
+                "gwp_refrigerant_default": self.refrigerant_gwp_ef.value,
                 "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
                 "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_w,
                 "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
@@ -3342,7 +3349,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "fui_default_end": self.fui_wo,
                 "fui_start_tier_2": self.module.fui_t2_start,
                 "fui_end_tier_2": self.module.fui_t2_wo,
-                "gwp_refrigerant_default": self.project.gw_potential.co2,
+                "gwp_refrigerant_default": self.refrigerant_gwp_ef.value,
                 "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
                 "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_wo,
                 "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
@@ -3399,6 +3406,9 @@ class LargeFisheryCalculator(BaseCalculator):
         self.kw_tonnes: float = 0
         self.electricity_country: Country = None
         self.electricity_emission: ipcc.ElectricityEmission = None
+
+        self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
+        self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
 
         self.relevant_scenarios = self.module.get_relevant_scenarios()
 
@@ -3473,8 +3483,10 @@ class LargeFisheryCalculator(BaseCalculator):
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
 
-        if self.project.gw_potential.co2 is None:
-            raise ValueError("Project-level GWP potential for CO2 does not exist")
+        try:
+            self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
+        except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+            raise ValueError(f"Refrigerant emission factor for {self.refrigerant_type_default.name} and {self.project.gw_potential.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -3505,7 +3517,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "fui_default_end": self.fui_default_w,
                 "fui_start_tier_2": self.module.fui_t2_start,
                 "fui_end_tier_2": self.module.fui_t2_w,
-                "gwp_refrigerant_default": self.project.gw_potential.co2,
+                "gwp_refrigerant_default": self.refrigerant_gwp_ef.value,
                 "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
                 "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_w,
                 "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
@@ -3550,7 +3562,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "fui_default_end": self.fui_default_wo,
                 "fui_start_tier_2": self.module.fui_t2_start,
                 "fui_end_tier_2": self.module.fui_t2_wo,
-                "gwp_refrigerant_default": self.project.gw_potential.co2,
+                "gwp_refrigerant_default": self.refrigerant_gwp_ef.value,
                 "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
                 "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_wo,
                 "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
