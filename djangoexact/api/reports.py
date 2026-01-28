@@ -1702,6 +1702,9 @@ class CoastalWetlandReport(LandModuleReport):
     module: api_models.CoastalWetland
     activity_report: BaseActivityReport = None
 
+    drainage_soil_co2: list[float] = None
+    co2_from_drainage_source = (math_utils.ActivityTypes.DRAINAGE, math_utils.GasTypes.CO2)
+
     def __post_init__(self):
         self.calculator: calculators.CoastalWetlandCalculator = calculators.CoastalWetlandCalculator(self.module)
         return super().__post_init__()
@@ -1784,6 +1787,15 @@ class CoastalWetlandReport(LandModuleReport):
         self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.area_not_drained_or_rewetted_thread.format_comments())
         self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.area_w_restored_vegetation_thread.format_comments())
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    
+    def get_result(self):
+        super().get_result()
+
+        drainage_soil_co2 = self.extract_emissions(self.emissions_set, self.co2_from_drainage_source[0], self.co2_from_drainage_source[1])
+        self.soil_co2 = list(map(sum, zip_longest(self.soil_co2, drainage_soil_co2, fillvalue=0)))
+        self.total_emissions = list(map(sum, zip_longest(self.total_emissions, drainage_soil_co2, fillvalue=0)))
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):

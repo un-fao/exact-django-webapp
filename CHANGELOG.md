@@ -1,3 +1,9 @@
+## 1.19.2a0 (2026-01-22)
+
+### Fix
+
+- **views**: add inventory breakdown to public module results
+
 ## 1.19.2 (2026-01-14)
 
 ### Fix
