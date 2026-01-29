@@ -3389,8 +3389,8 @@ class LargeFisheryCalculator(BaseCalculator):
     Calculator for large fishery.
     """
 
-    def init(self, input) -> None:
-        super().init(input)
+    def __init__(self, input) -> None:
+        super().__init__(input)
 
         self.module: LargeFishery
 
