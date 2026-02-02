@@ -89,6 +89,7 @@ from .serializers import (
     InputTypeSerializer,
     LandUseTypeSerializer,
     ProjectExportSerializer,
+    ProjectImportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -766,6 +767,108 @@ class ProjectViewSet(viewsets.ModelViewSet):
         safe_name = project.name.replace('"', '').replace('/', '-')[:50]
         response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
         return response
+
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(
+        operation_description="Import a .exactproject file",
+        request_body=ProjectImportSerializer,
+        responses={
+            200: "Project already exists",
+            201: "Project imported successfully",
+            400: "Invalid file format or compatibility mismatch"
+        }
+    )
+    def import_project(self, request):
+        """Import a project from .exactproject file data."""
+        serializer = ProjectImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return utils.ErrorResponse(
+                serializer.errors,
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        validated_data = serializer.validated_data
+        export_id = validated_data['exportId']
+        force_copy = request.query_params.get('forceCopy', 'false').lower() == 'true'
+
+        # Check if project with this export_id already exists
+        if not force_copy:
+            existing = Project.objects.filter(export_id=export_id).first()
+            if existing:
+                return Response({
+                    "exists": True,
+                    "projectId": existing.id,
+                    "projectName": existing.name
+                }, status=http_status.HTTP_200_OK)
+
+        # Create new project
+        project_data = validated_data['project'].copy()
+
+        try:
+            with transaction.atomic():
+                # Extract activities before creating project
+                activities_data = project_data.pop('activities', [])
+
+                # Filter to only valid Project fields
+                valid_project_fields = {f.name for f in Project._meta.get_fields() if hasattr(f, 'column')}
+                filtered_project_data = {k: v for k, v in project_data.items() if k in valid_project_fields}
+
+                # Create project
+                project = Project.objects.create(
+                    owner=request.user,
+                    export_id=export_id if not force_copy else uuid.uuid4(),
+                    **filtered_project_data
+                )
+
+                # Create activities and modules
+                for activity_data in activities_data:
+                    activity_data = activity_data.copy()
+                    modules_data = activity_data.pop('modules', {})
+                    module_types_data = activity_data.pop('module_types', [])
+
+                    # Filter to valid Activity fields
+                    valid_activity_fields = {f.name for f in Activity._meta.get_fields() if hasattr(f, 'column')}
+                    filtered_activity_data = {k: v for k, v in activity_data.items() if k in valid_activity_fields}
+
+                    activity = Activity.objects.create(
+                        project=project,
+                        owner=request.user,
+                        **filtered_activity_data
+                    )
+
+                    # Set module types
+                    if module_types_data:
+                        activity.module_types.set(module_types_data)
+
+                    # Create modules
+                    for module_type, modules_list in modules_data.items():
+                        model_class = self._get_module_class(module_type)
+                        if model_class:
+                            valid_module_fields = {f.name for f in model_class._meta.get_fields() if hasattr(f, 'column')}
+                            for module_data in modules_list:
+                                filtered_module_data = {k: v for k, v in module_data.items() if k in valid_module_fields}
+                                model_class.objects.create(
+                                    activity=activity,
+                                    **filtered_module_data
+                                )
+
+                return Response({
+                    "exists": False,
+                    "projectId": project.id,
+                    "projectName": project.name
+                }, status=http_status.HTTP_201_CREATED)
+
+        except Exception as e:
+            logger.error(f"Failed to import project: {str(e)}")
+            return utils.ErrorResponse(
+                f"Failed to import project: {str(e)}",
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+    def _get_module_class(self, class_name):
+        """Get module model class by name."""
+        from . import models
+        return getattr(models, class_name, None)
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
