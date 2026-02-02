@@ -537,6 +537,74 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
 
+class ModuleExportSerializer(serializers.Serializer):
+    """Generic serializer for exporting any module type."""
+
+    def to_representation(self, instance):
+        """Export all model fields except relations that will be recreated."""
+        data = {}
+        excluded_fields = (
+            'id', 'activity', 'status', 'data_source', 'note',
+            'cached_results_total', 'cached_results_by_activity',
+            'cached_results_by_gas', 'cached_results_by_activity_by_gas',
+            'last_cached_at', 'history', 'last_modified'
+        )
+        for field in instance._meta.get_fields():
+            if field.name in excluded_fields:
+                continue
+            if hasattr(field, 'get_internal_type'):
+                field_type = field.get_internal_type()
+                if field_type == 'ForeignKey':
+                    # Store FK as ID for reference data
+                    value = getattr(instance, f'{field.name}_id', None)
+                elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
+                    continue
+                else:
+                    value = getattr(instance, field.name, None)
+                if value is not None:
+                    data[field.name] = value
+        return data
+
+
+class ActivityExportSerializer(serializers.ModelSerializer):
+    """Serializer for exporting activities with their modules."""
+    modules = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        exclude = ['id', 'project', 'owner', 'created_at', 'updated_at']
+
+    def get_modules(self, obj):
+        """Group modules by their type."""
+        result = {}
+        module_serializer = ModuleExportSerializer()
+        for module in obj.modules:
+            module_type = module.__class__.__name__
+            if module_type not in result:
+                result[module_type] = []
+            result[module_type].append(module_serializer.to_representation(module))
+        return result
+
+
+class ProjectExportSerializer(serializers.ModelSerializer):
+    """Serializer for full project export."""
+    activities = ActivityExportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Convert FK fields to IDs (they come as nested objects from ModelSerializer)
+        for field in ['country', 'climate', 'moisture', 'soil_type', 'gw_potential', 'status']:
+            if field in data and data[field] is not None:
+                if isinstance(data[field], dict) and 'id' in data[field]:
+                    data[field] = data[field]['id']
+        return data
+
+
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
