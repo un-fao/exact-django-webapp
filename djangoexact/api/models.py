@@ -634,6 +634,13 @@ class Project(Historical, DirtyFieldsMixin):
 
     map_data = models.JSONField(null=True, blank=True, verbose_name="map_data")
 
+    export_id = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True,
+        help_text="UUID for identifying this project across exports/imports"
+    )
+
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
