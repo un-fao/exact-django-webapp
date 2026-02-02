@@ -78,7 +78,6 @@ class ProjectImportTests(TestCase):
                 "name": "Imported Project",
                 "implementation_years": 20,
                 "start_year_of_activities": 2024,
-                "last_year_of_accounting": 2050,
                 "activities": []
             }
         }
