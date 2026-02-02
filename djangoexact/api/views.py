@@ -1,5 +1,8 @@
+import json
 import os
 import logging
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from django.urls import reverse
 from django.conf import settings
@@ -11,6 +14,8 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
+from django.http import HttpResponse
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -83,6 +88,7 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
+    ProjectExportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -386,6 +392,20 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+
+def get_version_config():
+    """Read version config from file or environment."""
+    config_paths = [
+        Path(__file__).parent.parent.parent / 'version.config.json',
+        Path(os.environ.get('EXACT_USER_DATA_DIR', '')) / 'version.config.json',
+    ]
+    for config_path in config_paths:
+        if config_path.exists():
+            with open(config_path) as f:
+                return json.load(f)
+    # Default for development
+    return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -700,6 +720,52 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Export project as .exactproject file",
+        responses={
+            200: "Project exported successfully",
+            403: "Permission denied",
+            404: "Project not found"
+        }
+    )
+    def export(self, request, pk=None):
+        """Export a project with all its activities and modules."""
+        project: Project = get_object_or_404(Project, pk=pk)
+
+        # Check permission
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        # Generate export_id if not exists
+        if not project.export_id:
+            project.export_id = uuid.uuid4()
+            project.save(update_fields=['export_id'])
+
+        # Get version config
+        version_config = get_version_config()
+
+        # Build export data
+        serializer = ProjectExportSerializer(project)
+        export_data = {
+            "formatVersion": 1,
+            "appVersion": version_config.get("appVersion", "1.0.0"),
+            "compatibilityGroup": version_config.get("compatibilityGroup", 1),
+            "exportedAt": timezone.now().isoformat(),
+            "exportId": str(project.export_id),
+            "project": serializer.data
+        }
+
+        # Return as JSON file
+        response = HttpResponse(
+            json.dumps(export_data, indent=2, default=str),
+            content_type="application/json"
+        )
+        safe_name = project.name.replace('"', '').replace('/', '-')[:50]
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        return response
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
