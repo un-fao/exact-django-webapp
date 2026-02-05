@@ -147,6 +147,7 @@ class ExcelFileManager:
         metadata_worksheet = workbook.add_worksheet("Metadata")
         additional_indicators_worksheet = workbook.add_worksheet("Additional Indicators")
         shadow_price_of_carbon_worksheet = workbook.add_worksheet("Shadow Price of Carbon")
+        inventory_worksheet = workbook.add_worksheet("Inventory")
         # metadata_worksheet.hide()
         additional_indicators_worksheet.hide()
 
@@ -201,6 +202,7 @@ class BaseProjectReport:
     metadata_worksheet: Worksheet = None
     additional_indicators_worksheet: Worksheet = None
     shadow_price_of_carbon_worksheet: Worksheet = None
+    inventory_worksheet: Worksheet = None
     activities: list[api_models.Activity] = None
     activity_reports: list["BaseActivityReport"] = None
 
@@ -253,6 +255,7 @@ class BaseProjectReport:
         self.metadata_worksheet = self.workbook["Metadata"]
         self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
         self.shadow_price_of_carbon_worksheet = self.workbook["Shadow Price of Carbon"]
+        self.inventory_worksheet = self.workbook["Inventory"]
 
         self.results_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
@@ -327,6 +330,14 @@ class BaseProjectReport:
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(row=1, column=i + 2, value=year)
+
+        self.inventory_worksheet.cell(row=1, column=1, value="Activity")
+        self.inventory_worksheet.cell(row=1, column=2, value="Module")
+        self.inventory_worksheet.cell(row=1, column=3, value="IPCC Category")
+        self.inventory_worksheet.cell(row=1, column=4, value="Gas Type")
+        self.inventory_worksheet.cell(row=1, column=5, value="Value (tCO2-eq)")
+        for col in range(1, 6):
+            self.inventory_worksheet.cell(row=1, column=col).fill = Colors.LIGHT_ORANGE_FILL.value
 
         self.excel_manager.save_workbook(self.workbook)
 
@@ -570,7 +581,36 @@ class BaseProjectReport:
             value="* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on Shadow Price of Carbon in Economic Analysis",
         )
 
+        self._build_inventory_sheet()
+
         self.excel_manager.save_workbook(self.workbook)
+
+    def _build_inventory_sheet(self):
+        self.inventory_worksheet = self.workbook["Inventory"]
+        row = 2
+
+        for activity_report in self.activity_reports:
+            for module_report in activity_report.modules_reports:
+                if module_report.inventory is None:
+                    continue
+
+                for item in module_report.inventory.emissions_by_sector_by_gas:
+                    activity_name = activity_report.activity_title
+                    module_name = module_report.module_title
+                    ipcc_category = item.activity.value if item.activity else "N/A"
+                    gas_type = item.gas_type.name if item.gas_type else "N/A"
+                    value = item.value
+
+                    self.inventory_worksheet.cell(row=row, column=1, value=activity_name)
+                    self.inventory_worksheet.cell(row=row, column=2, value=module_name)
+                    self.inventory_worksheet.cell(row=row, column=3, value=ipcc_category)
+                    self.inventory_worksheet.cell(row=row, column=4, value=gas_type)
+                    self.inventory_worksheet.cell(row=row, column=5, value=value)
+                    row += 1
+
+        if row == 2:
+            self.inventory_worksheet.cell(row=2, column=1, value="No inventory data available for this project.")
+            self.inventory_worksheet.cell(row=2, column=1).fill = Colors.LIGHT_BEIGE_FILL.value
 
     def build_report(self):
         """
@@ -819,6 +859,7 @@ class BaseModuleReport:
     units: float = None
     calculator: calculators.BaseCalculator | calculators.LandModuleCalculator = None
     result: dict = None
+    inventory = None
     emissions_set: list[math_utils.YearlyGasActivityEmissionSet] = None
     emissions_set_w: list[math_utils.YearlyGasActivityEmissionSet] = None
     emissions_set_wo: list[math_utils.YearlyGasActivityEmissionSet] = None
@@ -839,6 +880,7 @@ class BaseModuleReport:
     def __post_init__(self):
         try:
             self.result = self.calculator.calculate()
+            self.inventory = self.calculator.inventory
         except Exception as e:
             log.error(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
             raise NotReadyError(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
