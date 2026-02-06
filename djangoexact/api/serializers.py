@@ -543,11 +543,11 @@ class ModuleExportSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Export all model fields except relations that will be recreated."""
         data = {}
+        # Include cached results for export (last_cached_at, cached_results_*)
+        # Exclude only fields that will be recreated or are auto-generated
         excluded_fields = (
             'id', 'activity', 'status', 'data_source', 'note',
-            'cached_results_total', 'cached_results_by_activity',
-            'cached_results_by_gas', 'cached_results_by_activity_by_gas',
-            'last_cached_at', 'history', 'last_modified'
+            'history', 'last_modified'
         )
         for field in instance._meta.get_fields():
             if field.name in excluded_fields:
