@@ -52,6 +52,7 @@ from django.conf import settings
 import openpyxl as pxl
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from io import BytesIO
 from rest_framework.test import APIRequestFactory
@@ -580,6 +581,59 @@ class BaseProjectReport:
             column=1,
             value="* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on Shadow Price of Carbon in Economic Analysis",
         )
+
+        # SPC with Net Present Value discounting
+        ws = self.shadow_price_of_carbon_worksheet
+        npv_start_row = 25
+
+        # Header
+        for col in range(1, 5):
+            ws.cell(row=npv_start_row, column=col, value="" if col > 1 else "SPC with Net Present Value discounting").fill = Colors.LIGHT_ORANGE_FILL.value
+
+        # Rate of discounting input
+        ws.cell(row=npv_start_row + 1, column=1, value="Insert rate of discounting")
+        rate_cell = ws.cell(row=npv_start_row + 1, column=3, value=0.05)
+        rate_cell.number_format = '0%'
+        rate_cell_ref = f"$C${npv_start_row + 1}"
+
+        # Year row + row labels
+        npv_year_row = npv_start_row + 3
+        ws.cell(row=npv_year_row, column=1, value="Year")
+        ws.cell(row=npv_year_row + 1, column=1, value="Without (tCO2-eq)")
+        ws.cell(row=npv_year_row + 2, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 3, column=1, value="High Boundary $")
+
+        ws.cell(row=npv_year_row + 5, column=1, value="With (tCO2-eq)")
+        ws.cell(row=npv_year_row + 6, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 7, column=1, value="High Boundary $")
+
+        # Map original SPC rows to NPV rows
+        # Original: row 2=year, 3=wo_tco2, 4=wo_low, 5=wo_high, 8=w_tco2, 9=w_low, 10=w_high
+        spc_to_npv = {
+            3: npv_year_row + 1,   # Without tCO2-eq
+            4: npv_year_row + 2,   # Without Low Boundary
+            5: npv_year_row + 3,   # Without High Boundary
+            8: npv_year_row + 5,   # With tCO2-eq
+            9: npv_year_row + 6,   # With Low Boundary
+            10: npv_year_row + 7,  # With High Boundary
+        }
+
+        num_years = self.last_year_of_accounting - self.start_year_of_activities
+        for i in range(num_years):
+            col = i + 2
+            col_letter = get_column_letter(col)
+            t = i + 1  # discount exponent starts at 1
+
+            # Year label (direct reference to original SPC year row)
+            ws.cell(row=npv_year_row, column=col, value=f"={col_letter}2")
+
+            # Discounted formulas for each data row
+            for spc_row, npv_row in spc_to_npv.items():
+                ws.cell(
+                    row=npv_row,
+                    column=col,
+                    value=f"={col_letter}{spc_row}/(1+{rate_cell_ref})^{t}",
+                )
 
         self._build_inventory_sheet()
 
