@@ -6,7 +6,6 @@ import json
 import base64
 
 import firebase_admin
-import pyrebase
 from dotenv import load_dotenv
 
 """
@@ -310,8 +309,8 @@ try:
         "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
     }
 
-    firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
-    auth = firebase.auth()
+    from accounts.firebase_auth import FirebaseAuth
+    auth = FirebaseAuth(FIREBASE_CONFIG["apiKey"])
     firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
