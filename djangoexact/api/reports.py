@@ -52,6 +52,7 @@ from django.conf import settings
 import openpyxl as pxl
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from io import BytesIO
 from rest_framework.test import APIRequestFactory
@@ -506,18 +507,6 @@ class BaseProjectReport:
         self.shadow_price_of_carbon_worksheet.cell(row=9, column=1, value="Low Boundary")
         self.shadow_price_of_carbon_worksheet.cell(row=10, column=1, value="High Boundary")
 
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*")
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=2, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=3, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=4, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=5, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=6, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=7, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=19, column=1, value="Year")
-        self.shadow_price_of_carbon_worksheet.cell(row=20, column=1, value="Low 2017")
-        self.shadow_price_of_carbon_worksheet.cell(row=21, column=1, value="High")
-
         last_known_shadow_price = shadow_prices.last()
 
         additional_shadow_prices = []
@@ -563,20 +552,73 @@ class BaseProjectReport:
             self.shadow_price_of_carbon_worksheet.cell(row=9, column=i + 2, value=sp_w_min)
             self.shadow_price_of_carbon_worksheet.cell(row=10, column=i + 2, value=sp_w_max)
 
+        # SPC with Net Present Value discounting
+        ws = self.shadow_price_of_carbon_worksheet
+        npv_start_row = 12
+
+        for col in range(1, 5):
+            ws.cell(row=npv_start_row, column=col, value="" if col > 1 else "SPC with Net Present Value discounting").fill = Colors.LIGHT_ORANGE_FILL.value
+
+        ws.cell(row=npv_start_row + 1, column=1, value="Insert rate of discounting")
+        rate_cell = ws.cell(row=npv_start_row + 1, column=3, value=0.05)
+        rate_cell.number_format = '0%'
+        rate_cell_ref = f"$C${npv_start_row + 1}"
+
+        npv_year_row = npv_start_row + 3
+        ws.cell(row=npv_year_row, column=1, value="Year")
+        ws.cell(row=npv_year_row + 1, column=1, value="Without (tCO2-eq)")
+        ws.cell(row=npv_year_row + 2, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 3, column=1, value="High Boundary $")
+
+        ws.cell(row=npv_year_row + 5, column=1, value="With (tCO2-eq)")
+        ws.cell(row=npv_year_row + 6, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 7, column=1, value="High Boundary $")
+
+        spc_to_npv = {
+            3: npv_year_row + 1,   # Without tCO2-eq
+            4: npv_year_row + 2,   # Without Low Boundary
+            5: npv_year_row + 3,   # Without High Boundary
+            8: npv_year_row + 5,   # With tCO2-eq
+            9: npv_year_row + 6,   # With Low Boundary
+            10: npv_year_row + 7,  # With High Boundary
+        }
+
+        num_years = self.last_year_of_accounting - self.start_year_of_activities
+        for i in range(num_years):
+            col = i + 2
+            col_letter = get_column_letter(col)
+
+            ws.cell(row=npv_year_row, column=col, value=f"={col_letter}2")
+
+            for spc_row, npv_row in spc_to_npv.items():
+                ws.cell(
+                    row=npv_row,
+                    column=col,
+                    value=f"={col_letter}{spc_row}/(1+{rate_cell_ref})^({col_letter}$2-$B$2)",
+                )
+
+        spc_nominal_row = 24
+        ws.cell(row=spc_nominal_row, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*")
+        ws.cell(row=spc_nominal_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
+        for col in range(2, 8):
+            ws.cell(row=spc_nominal_row, column=col, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        ws.cell(row=spc_nominal_row + 1, column=1, value="Year")
+        ws.cell(row=spc_nominal_row + 2, column=1, value="Low 2017")
+        ws.cell(row=spc_nominal_row + 3, column=1, value="High")
+
         for i, sp in enumerate(list(shadow_prices) + additional_shadow_prices):
-            self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2, value=sp.year)
-            self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2, value=round(sp.min_value, 2))
-            self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2, value=round(sp.max_value, 2))
+            ws.cell(row=spc_nominal_row + 1, column=i + 2, value=sp.year)
+            ws.cell(row=spc_nominal_row + 2, column=i + 2, value=round(sp.min_value, 2))
+            ws.cell(row=spc_nominal_row + 3, column=i + 2, value=round(sp.max_value, 2))
 
             if i > len(shadow_prices) - 1:
                 # Red fill for the additional shadow prices
-                self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
-                self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
-                self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 1, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 2, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 3, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
 
-        # footnote with information about the shadow price of carbon calculations beyond 2050
-        self.shadow_price_of_carbon_worksheet.cell(
-            row=23,
+        ws.cell(
+            row=spc_nominal_row + 5,
             column=1,
             value="* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on Shadow Price of Carbon in Economic Analysis",
         )
