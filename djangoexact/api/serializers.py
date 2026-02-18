@@ -601,6 +601,36 @@ class ProjectExportSerializer(serializers.ModelSerializer):
         return data
 
 
+class ProjectImportSerializer(serializers.Serializer):
+    """Serializer for validating and processing project imports."""
+    formatVersion = serializers.IntegerField()
+    appVersion = serializers.CharField()
+    compatibilityGroup = serializers.IntegerField()
+    exportedAt = serializers.DateTimeField()
+    exportId = serializers.UUIDField()
+    project = serializers.DictField()
+
+    def validate_compatibilityGroup(self, value):
+        """Ensure compatibility group matches current app."""
+        from .views import get_version_config
+        current_config = get_version_config()
+        current_group = current_config.get("compatibilityGroup", 1)
+        if value != current_group:
+            raise serializers.ValidationError(
+                f"This project was created with EX-ACT v{value} and cannot be "
+                f"imported into this version (v{current_group})."
+            )
+        return value
+
+    def validate_formatVersion(self, value):
+        """Ensure format version is supported."""
+        if value != 1:
+            raise serializers.ValidationError(
+                f"Unsupported file format version: {value}"
+            )
+        return value
+
+
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
