@@ -1,5 +1,8 @@
+import json
 import os
 import logging
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from django.urls import reverse
 from django.conf import settings
@@ -11,6 +14,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -83,6 +87,8 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
+    ProjectExportSerializer,
+    ProjectImportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -386,6 +392,20 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+
+def get_version_config():
+    """Read version config from file or environment."""
+    config_paths = [
+        Path(__file__).parent.parent.parent / 'version.config.json',
+        Path(os.environ.get('EXACT_USER_DATA_DIR', '')) / 'version.config.json',
+    ]
+    for config_path in config_paths:
+        if config_path.exists():
+            with open(config_path) as f:
+                return json.load(f)
+    # Default for development
+    return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
