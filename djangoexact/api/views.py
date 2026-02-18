@@ -721,6 +721,52 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Export project as .exactproject file",
+        responses={
+            200: "Project exported successfully",
+            403: "Permission denied",
+            404: "Project not found"
+        }
+    )
+    def export(self, request, pk=None):
+        """Export a project with all its activities and modules."""
+        project: Project = get_object_or_404(Project, pk=pk)
+
+        # Check permission
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        # Generate export_id if not exists
+        if not project.export_id:
+            project.export_id = uuid.uuid4()
+            project.save(update_fields=['export_id'])
+
+        # Get version config
+        version_config = get_version_config()
+
+        # Build export data
+        serializer = ProjectExportSerializer(project)
+        export_data = {
+            "formatVersion": 1,
+            "appVersion": version_config.get("appVersion", "1.0.0"),
+            "compatibilityGroup": version_config.get("compatibilityGroup", 1),
+            "exportedAt": timezone.now().isoformat(),
+            "exportId": str(project.export_id),
+            "project": serializer.data
+        }
+
+        # Return as JSON file
+        response = HttpResponse(
+            json.dumps(export_data, indent=2, default=str),
+            content_type="application/json"
+        )
+        safe_name = project.name.replace('"', '').replace('/', '-')[:50]
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        return response
+
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         project: Project = self.get_object()
