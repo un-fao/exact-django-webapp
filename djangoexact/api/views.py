@@ -767,6 +767,146 @@ class ProjectViewSet(viewsets.ModelViewSet):
         response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
         return response
 
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(
+        operation_description="Import a .exactproject file",
+        request_body=ProjectImportSerializer,
+        responses={
+            200: "Project already exists",
+            201: "Project imported successfully",
+            400: "Invalid file format or compatibility mismatch"
+        }
+    )
+    def import_project(self, request):
+        """Import a project from .exactproject file data."""
+        serializer = ProjectImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return utils.ErrorResponse(
+                serializer.errors,
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        validated_data = serializer.validated_data
+        export_id = validated_data['exportId']
+        force_copy = request.query_params.get('forceCopy', 'false').lower() == 'true'
+
+        # Check if project with this export_id already exists
+        if not force_copy:
+            existing = Project.objects.filter(export_id=export_id).first()
+            if existing:
+                return Response({
+                    "exists": True,
+                    "projectId": existing.id,
+                    "projectName": existing.name
+                }, status=http_status.HTTP_200_OK)
+
+        # Create new project
+        project_data = validated_data['project'].copy()
+
+        def prepare_model_data(model_class, data):
+            """
+            Filter data to valid model fields and convert FK fields to use _id suffix.
+            Django expects FK fields as either model instances or field_id=integer.
+            Since exports contain integer IDs, we need to use the _id suffix.
+            """
+            from django.db.models import ForeignKey
+
+            result = {}
+            for field in model_class._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if field_name not in data:
+                    continue
+                value = data[field_name]
+
+                # For ForeignKey fields with integer values, use field_id suffix
+                if isinstance(field, ForeignKey) and isinstance(value, int):
+                    result[f"{field_name}_id"] = value
+                else:
+                    result[field_name] = value
+            return result
+
+        try:
+            with transaction.atomic():
+                # Extract activities before creating project
+                activities_data = project_data.pop('activities', [])
+
+                # Prepare project data with proper FK handling
+                filtered_project_data = prepare_model_data(Project, project_data)
+
+                # Generate unique name if needed (unique_together on name + owner)
+                base_name = filtered_project_data.get('name', 'Imported Project')
+                name = base_name
+                counter = 1
+                while Project.objects.filter(name=name, owner=request.user).exists():
+                    counter += 1
+                    name = f"{base_name} (Copy {counter})" if counter > 2 else f"{base_name} (Copy)"
+                filtered_project_data['name'] = name
+
+                # Create project
+                project = Project.objects.create(
+                    owner=request.user,
+                    export_id=export_id if not force_copy else uuid.uuid4(),
+                    **filtered_project_data
+                )
+
+                # Lock project and create membership (same as regular create)
+                project.lock(request.user)
+                ProjectMembership.objects.create(
+                    user=request.user,
+                    project=project,
+                    group=Group.objects.get_or_create(name="Admin")[0]
+                )
+
+                # Create activities and modules
+                for activity_data in activities_data:
+                    activity_data = activity_data.copy()
+                    modules_data = activity_data.pop('modules', {})
+                    module_types_data = activity_data.pop('module_types', [])
+
+                    # Prepare activity data with proper FK handling
+                    filtered_activity_data = prepare_model_data(Activity, activity_data)
+
+                    activity = Activity.objects.create(
+                        project=project,
+                        owner=request.user,
+                        **filtered_activity_data
+                    )
+
+                    # Set module types
+                    if module_types_data:
+                        activity.module_types.set(module_types_data)
+
+                    # Create modules
+                    for module_type, modules_list in modules_data.items():
+                        model_class = self._get_module_class(module_type)
+                        if model_class:
+                            for module_data in modules_list:
+                                filtered_module_data = prepare_model_data(model_class, module_data)
+                                model_class.objects.create(
+                                    activity=activity,
+                                    **filtered_module_data
+                                )
+
+                return Response({
+                    "exists": False,
+                    "projectId": project.id,
+                    "projectName": project.name
+                }, status=http_status.HTTP_201_CREATED)
+
+        except Exception as e:
+            logger.error(f"Failed to import project: {str(e)}")
+            return utils.ErrorResponse(
+                f"Failed to import project: {str(e)}",
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+    def _get_module_class(self, class_name):
+        """Get module model class by name."""
+        from . import models
+        return getattr(models, class_name, None)
+
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         project: Project = self.get_object()
