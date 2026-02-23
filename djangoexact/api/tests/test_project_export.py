@@ -19,12 +19,12 @@ class ProjectExportTests(TestCase):
         self.project = ProjectFactory(owner=self.user, name="Test Project")
 
     def test_export_returns_json_file(self):
-        """Export endpoint returns .exactproject file."""
+        """Export endpoint returns .exactp file."""
         response = self.client.get(f'/api/projects/{self.project.id}/export/')
 
         self.assertEqual(response.status_code, http_status.HTTP_200_OK)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertIn('.exactproject', response['Content-Disposition'])
+        self.assertIn('.exactp', response['Content-Disposition'])
 
     def test_export_contains_required_fields(self):
         """Exported file contains all required metadata."""

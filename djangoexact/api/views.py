@@ -724,7 +724,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
-        operation_description="Export project as .exactproject file",
+        operation_description="Export project as .exactp file",
         responses={
             200: "Project exported successfully",
             403: "Permission denied",
@@ -765,12 +765,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
             content_type="application/json"
         )
         safe_name = project.name.replace('"', '').replace('/', '-')[:50]
-        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactp"'
         return response
 
     @action(detail=False, methods=["post"])
     @swagger_auto_schema(
-        operation_description="Import a .exactproject file",
+        operation_description="Import a .exactp file",
         request_body=ProjectImportSerializer,
         responses={
             200: "Project already exists",
@@ -779,7 +779,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         }
     )
     def import_project(self, request):
-        """Import a project from .exactproject file data."""
+        """Import a project from .exactp file data."""
         serializer = ProjectImportSerializer(data=request.data)
         if not serializer.is_valid():
             return utils.ErrorResponse(
