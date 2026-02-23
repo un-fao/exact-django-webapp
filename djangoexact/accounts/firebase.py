@@ -6,8 +6,6 @@ from api.models import CustomUser as User
 from firebase_admin import auth as firebase_admin_auth
 from firebase_admin import credentials
 from rest_framework import authentication, exceptions
-import pyrebase
-
 from djangoexact.settings import FIREBASE_CONFIG
 
 

@@ -52,6 +52,7 @@ from django.conf import settings
 import openpyxl as pxl
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from io import BytesIO
 from rest_framework.test import APIRequestFactory
@@ -147,6 +148,7 @@ class ExcelFileManager:
         metadata_worksheet = workbook.add_worksheet("Metadata")
         additional_indicators_worksheet = workbook.add_worksheet("Additional Indicators")
         shadow_price_of_carbon_worksheet = workbook.add_worksheet("Shadow Price of Carbon")
+        inventory_worksheet = workbook.add_worksheet("Inventory")
         # metadata_worksheet.hide()
         additional_indicators_worksheet.hide()
 
@@ -201,6 +203,7 @@ class BaseProjectReport:
     metadata_worksheet: Worksheet = None
     additional_indicators_worksheet: Worksheet = None
     shadow_price_of_carbon_worksheet: Worksheet = None
+    inventory_worksheet: Worksheet = None
     activities: list[api_models.Activity] = None
     activity_reports: list["BaseActivityReport"] = None
 
@@ -253,6 +256,7 @@ class BaseProjectReport:
         self.metadata_worksheet = self.workbook["Metadata"]
         self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
         self.shadow_price_of_carbon_worksheet = self.workbook["Shadow Price of Carbon"]
+        self.inventory_worksheet = self.workbook["Inventory"]
 
         self.results_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
@@ -328,6 +332,14 @@ class BaseProjectReport:
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(row=1, column=i + 2, value=year)
 
+        self.inventory_worksheet.cell(row=1, column=1, value="Activity")
+        self.inventory_worksheet.cell(row=1, column=2, value="Module")
+        self.inventory_worksheet.cell(row=1, column=3, value="IPCC Category")
+        self.inventory_worksheet.cell(row=1, column=4, value="Gas Type")
+        self.inventory_worksheet.cell(row=1, column=5, value="Value (tCO2-eq)")
+        for col in range(1, 6):
+            self.inventory_worksheet.cell(row=1, column=col).fill = Colors.LIGHT_ORANGE_FILL.value
+
         self.excel_manager.save_workbook(self.workbook)
 
         log.debug(f"Report skeleton for {self.project.name} built.")
@@ -397,11 +409,7 @@ class BaseProjectReport:
                 other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CO))
                 n2o.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))
                 ch4.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))
-                other_co2.append(
-                    module.extract_emissions(
-                        module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]
-                    )
-                )
+                other_co2.append(module.extract_emissions(module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
                 soil_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
                 biomass_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
 
@@ -495,18 +503,6 @@ class BaseProjectReport:
         self.shadow_price_of_carbon_worksheet.cell(row=9, column=1, value="Low Boundary")
         self.shadow_price_of_carbon_worksheet.cell(row=10, column=1, value="High Boundary")
 
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*")
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=2, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=3, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=4, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=5, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=6, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=18, column=7, value="").fill = Colors.LIGHT_ORANGE_FILL.value
-        self.shadow_price_of_carbon_worksheet.cell(row=19, column=1, value="Year")
-        self.shadow_price_of_carbon_worksheet.cell(row=20, column=1, value="Low 2017")
-        self.shadow_price_of_carbon_worksheet.cell(row=21, column=1, value="High")
-
         last_known_shadow_price = shadow_prices.last()
 
         additional_shadow_prices = []
@@ -552,25 +548,108 @@ class BaseProjectReport:
             self.shadow_price_of_carbon_worksheet.cell(row=9, column=i + 2, value=sp_w_min)
             self.shadow_price_of_carbon_worksheet.cell(row=10, column=i + 2, value=sp_w_max)
 
+        # SPC with Net Present Value discounting
+        ws = self.shadow_price_of_carbon_worksheet
+        npv_start_row = 12
+
+        for col in range(1, 5):
+            ws.cell(row=npv_start_row, column=col, value="" if col > 1 else "SPC with Net Present Value discounting").fill = Colors.LIGHT_ORANGE_FILL.value
+
+        ws.cell(row=npv_start_row + 1, column=1, value="Insert rate of discounting")
+        rate_cell = ws.cell(row=npv_start_row + 1, column=3, value=0.05)
+        rate_cell.number_format = "0%"
+        rate_cell_ref = f"$C${npv_start_row + 1}"
+
+        npv_year_row = npv_start_row + 3
+        ws.cell(row=npv_year_row, column=1, value="Year")
+        ws.cell(row=npv_year_row + 1, column=1, value="Without (tCO2-eq)")
+        ws.cell(row=npv_year_row + 2, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 3, column=1, value="High Boundary $")
+
+        ws.cell(row=npv_year_row + 5, column=1, value="With (tCO2-eq)")
+        ws.cell(row=npv_year_row + 6, column=1, value="Low Boundary $")
+        ws.cell(row=npv_year_row + 7, column=1, value="High Boundary $")
+
+        spc_to_npv = {
+            3: npv_year_row + 1,  # Without tCO2-eq
+            4: npv_year_row + 2,  # Without Low Boundary
+            5: npv_year_row + 3,  # Without High Boundary
+            8: npv_year_row + 5,  # With tCO2-eq
+            9: npv_year_row + 6,  # With Low Boundary
+            10: npv_year_row + 7,  # With High Boundary
+        }
+
+        num_years = self.last_year_of_accounting - self.start_year_of_activities
+        for i in range(num_years):
+            col = i + 2
+            col_letter = get_column_letter(col)
+
+            ws.cell(row=npv_year_row, column=col, value=f"={col_letter}2")
+
+            for spc_row, npv_row in spc_to_npv.items():
+                ws.cell(
+                    row=npv_row,
+                    column=col,
+                    value=f"={col_letter}{spc_row}/(1+{rate_cell_ref})^({col_letter}$2-$B$2)",
+                )
+
+        spc_nominal_row = 24
+        ws.cell(row=spc_nominal_row, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*")
+        ws.cell(row=spc_nominal_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
+        for col in range(2, 8):
+            ws.cell(row=spc_nominal_row, column=col, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        ws.cell(row=spc_nominal_row + 1, column=1, value="Year")
+        ws.cell(row=spc_nominal_row + 2, column=1, value="Low 2017")
+        ws.cell(row=spc_nominal_row + 3, column=1, value="High")
+
         for i, sp in enumerate(list(shadow_prices) + additional_shadow_prices):
-            self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2, value=sp.year)
-            self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2, value=round(sp.min_value, 2))
-            self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2, value=round(sp.max_value, 2))
+            ws.cell(row=spc_nominal_row + 1, column=i + 2, value=sp.year)
+            ws.cell(row=spc_nominal_row + 2, column=i + 2, value=round(sp.min_value, 2))
+            ws.cell(row=spc_nominal_row + 3, column=i + 2, value=round(sp.max_value, 2))
 
             if i > len(shadow_prices) - 1:
                 # Red fill for the additional shadow prices
-                self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
-                self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
-                self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 1, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 2, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                ws.cell(row=spc_nominal_row + 3, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
 
-        # footnote with information about the shadow price of carbon calculations beyond 2050
-        self.shadow_price_of_carbon_worksheet.cell(
-            row=23,
+        ws.cell(
+            row=spc_nominal_row + 5,
             column=1,
             value="* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on Shadow Price of Carbon in Economic Analysis",
         )
 
+        self._build_inventory_sheet()
+
         self.excel_manager.save_workbook(self.workbook)
+
+    def _build_inventory_sheet(self):
+        self.inventory_worksheet = self.workbook["Inventory"]
+        row = 2
+
+        for activity_report in self.activity_reports:
+            for module_report in activity_report.modules_reports:
+                if module_report.inventory is None:
+                    continue
+
+                # TODO: Create mapping ipcc_category -> custom names
+                for item in module_report.inventory.emissions_by_sector_by_gas:
+                    activity_name = activity_report.activity_title
+                    module_name = module_report.module_title
+                    ipcc_category = item.activity.value if item.activity else "N/A"
+                    gas_type = item.gas_type.name if item.gas_type else "N/A"
+                    value = item.value
+
+                    self.inventory_worksheet.cell(row=row, column=1, value=activity_name)
+                    self.inventory_worksheet.cell(row=row, column=2, value=module_name)
+                    self.inventory_worksheet.cell(row=row, column=3, value=ipcc_category)
+                    self.inventory_worksheet.cell(row=row, column=4, value=gas_type)
+                    self.inventory_worksheet.cell(row=row, column=5, value=value)
+                    row += 1
+
+        if row == 2:
+            self.inventory_worksheet.cell(row=2, column=1, value="No inventory data available for this project.")
+            self.inventory_worksheet.cell(row=2, column=1).fill = Colors.LIGHT_BEIGE_FILL.value
 
     def build_report(self):
         """
@@ -819,6 +898,7 @@ class BaseModuleReport:
     units: float = None
     calculator: calculators.BaseCalculator | calculators.LandModuleCalculator = None
     result: dict = None
+    inventory = None
     emissions_set: list[math_utils.YearlyGasActivityEmissionSet] = None
     emissions_set_w: list[math_utils.YearlyGasActivityEmissionSet] = None
     emissions_set_wo: list[math_utils.YearlyGasActivityEmissionSet] = None
@@ -839,6 +919,7 @@ class BaseModuleReport:
     def __post_init__(self):
         try:
             self.result = self.calculator.calculate()
+            self.inventory = self.calculator.inventory
         except Exception as e:
             log.error(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
             raise NotReadyError(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
@@ -1495,9 +1576,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.residue_management_type_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.crop_yield_t2_start if self.module.crop_yield_t2_start is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.minor_land_use_type_start.name if self.module.minor_land_use_type_start is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.minor_yield_start if self.module.minor_yield_start is not None else "Default")
 
         if self.module.is_with():
@@ -1508,9 +1587,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.residue_management_type_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.crop_yield_t2_w if self.module.crop_yield_t2_w is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.minor_land_use_type_w.name if self.module.minor_land_use_type_w is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.minor_yield_w if self.module.minor_yield_w is not None else "Default")
 
         if self.module.is_without():
@@ -1521,9 +1598,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.residue_management_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.minor_land_use_type_wo.name if self.module.minor_land_use_type_wo is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
@@ -1789,7 +1864,6 @@ class CoastalWetlandReport(LandModuleReport):
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
-    
     def get_result(self):
         super().get_result()
 
@@ -1850,9 +1924,7 @@ class FloodedRiceReport(LandModuleReport):
             self.soil_n2o = list(map(sum, zip_longest(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]), fillvalue=0)))
             self.fire_n2o = list(map(sum, zip_longest(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]), fillvalue=0)))
 
-            self.rice_cultivation_ch4 = list(
-                map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0))
-            )
+            self.rice_cultivation_ch4 = list(map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0)))
 
     def populate_metadata(self):
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -1875,9 +1947,7 @@ class FloodedRiceReport(LandModuleReport):
 
         if self.module.is_with():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.area)
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_w is None else self.module.cultivation_period_t2_w
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_w is None else self.module.cultivation_period_t2_w)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.water_management_type_before_cultivation_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.water_management_type_after_cultivation_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.organic_amendment_type_w.name)
@@ -1885,9 +1955,7 @@ class FloodedRiceReport(LandModuleReport):
 
         if self.module.is_without():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.area)
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_wo is None else self.module.cultivation_period_t2_wo
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_wo is None else self.module.cultivation_period_t2_wo)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.water_management_type_before_cultivation_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.water_management_type_after_cultivation_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
@@ -1938,9 +2006,7 @@ class FloodedRiceReport(LandModuleReport):
 
         self.add_submodules_results()
 
-        self.rice_cultivation_ch4 = list(
-            map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0))
-        )
+        self.rice_cultivation_ch4 = list(map(sum, zip_longest(self.rice_cultivation_ch4, self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]), fillvalue=0)))
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.rice_cultivation_ch4, fillvalue=0)))
 
         yearly_emissions = list(map(sum, zip_longest(self.rice_cultivation_ch4, fillvalue=0)))
@@ -2139,9 +2205,7 @@ class FisheryReport(BaseModuleReport):
         self.refrigeration_hfc = self.extract_emissions(self.emissions_set, self.refrigeration_hfc_source[0], self.refrigeration_hfc_source[1])
         self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
 
-        self.total_emissions = list(
-            map(sum, zip_longest(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_n2o, self.liquid_fuel_ch4, self.refrigeration_hfc, self.electricity_co2_eq, fillvalue=0))
-        )
+        self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_n2o, self.liquid_fuel_ch4, self.refrigeration_hfc, self.electricity_co2_eq, fillvalue=0)))
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from liquid fuels consumption")
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="N2O from liquid fuels consumption")
@@ -2388,23 +2452,13 @@ class LivestockReport(BaseModuleReport):
 
         self.enteric_fermentation_ch4 = self.extract_emissions(self.emissions_set, self.enteric_fermentation_ch4_source[0], self.enteric_fermentation_ch4_source[1])
         self.manure_management_other_than_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_ch4_source[0], self.manure_management_other_than_prp_ch4_source[1])
-        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1]
-        )
-        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1]
-        )
-        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1]
-        )
+        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1])
+        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1])
         self.manure_management_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_prp_ch4_source[0], self.manure_management_prp_ch4_source[1])
         self.manure_management_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_direct_n2o_source[0], self.manure_management_prp_direct_n2o_source[1])
-        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1]
-        )
-        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1]
-        )
+        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1])
 
         self.total_emissions = list(
             map(
@@ -2713,12 +2767,8 @@ class ForestManagementReport(LandModuleReport):
         self.degradation_deadwood_co2 = self.extract_emissions(self.emissions_set, self.degradation_deadwood_co2_source[0], self.degradation_deadwood_co2_source[1])
 
         self.hwp_co2 = list(map(sum, zip_longest(self.rotation_hwp_agb_co2, self.rotation_hwp_bgb_co2, self.logging_hwp_agb_co2, self.logging_hwp_bgb_co2, fillvalue=0)))
-        self.fire_n2o = list(
-            map(sum, zip_longest(self.rotation_agb_n2o, self.rotation_bgb_n2o, self.disturbance_agb_n2o, self.disturbance_bgb_n2o, self.logging_agb_n2o, self.logging_bgb_n2o, fillvalue=0))
-        )
-        self.fire_ch4 = list(
-            map(sum, zip_longest(self.rotation_agb_ch4, self.rotation_bgb_ch4, self.disturbance_agb_ch4, self.disturbance_bgb_ch4, self.logging_agb_ch4, self.logging_bgb_ch4, fillvalue=0))
-        )
+        self.fire_n2o = list(map(sum, zip_longest(self.rotation_agb_n2o, self.rotation_bgb_n2o, self.disturbance_agb_n2o, self.disturbance_bgb_n2o, self.logging_agb_n2o, self.logging_bgb_n2o, fillvalue=0)))
+        self.fire_ch4 = list(map(sum, zip_longest(self.rotation_agb_ch4, self.rotation_bgb_ch4, self.disturbance_agb_ch4, self.disturbance_bgb_ch4, self.logging_agb_ch4, self.logging_bgb_ch4, fillvalue=0)))
         self.biomass_loss_co2 = list(
             map(
                 sum,
@@ -2835,29 +2885,15 @@ class EnergyReport(BaseModuleReport):
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            self.electricity_co2_eq = list(
-                map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0))
-            )
+            self.electricity_co2_eq = list(map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0)))
 
-            self.solid_fuel_co2 = list(
-                map(sum, zip_longest(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]), fillvalue=0))
-            )
-            self.solid_fuel_ch4 = list(
-                map(sum, zip_longest(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]), fillvalue=0))
-            )
-            self.solid_fuel_n2o = list(
-                map(sum, zip_longest(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]), fillvalue=0))
-            )
+            self.solid_fuel_co2 = list(map(sum, zip_longest(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]), fillvalue=0)))
+            self.solid_fuel_ch4 = list(map(sum, zip_longest(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]), fillvalue=0)))
+            self.solid_fuel_n2o = list(map(sum, zip_longest(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]), fillvalue=0)))
 
-            self.liquid_fuel_co2 = list(
-                map(sum, zip_longest(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]), fillvalue=0))
-            )
-            self.liquid_fuel_ch4 = list(
-                map(sum, zip_longest(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]), fillvalue=0))
-            )
-            self.liquid_fuel_n2o = list(
-                map(sum, zip_longest(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]), fillvalue=0))
-            )
+            self.liquid_fuel_co2 = list(map(sum, zip_longest(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]), fillvalue=0)))
+            self.liquid_fuel_ch4 = list(map(sum, zip_longest(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]), fillvalue=0)))
+            self.liquid_fuel_n2o = list(map(sum, zip_longest(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]), fillvalue=0)))
 
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.electricity_co2_eq, fillvalue=0)))
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_ch4, self.liquid_fuel_n2o, fillvalue=0)))
@@ -3019,9 +3055,7 @@ class InputReport(BaseModuleReport):
             if "feed" in submodule.input_type.macro_input_type.name.casefold():
                 self.feed_co2_eq = list(map(sum, zip_longest(self.feed_co2_eq, self.extract_emissions(submodule_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]), fillvalue=0)))
             else:
-                self.inputs_co2_eq = list(
-                    map(sum, zip_longest(self.inputs_co2_eq, self.extract_emissions(submodule_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]), fillvalue=0))
-                )
+                self.inputs_co2_eq = list(map(sum, zip_longest(self.inputs_co2_eq, self.extract_emissions(submodule_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]), fillvalue=0)))
 
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.inputs_co2, self.inputs_n2o, fillvalue=0)))
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.feed_co2_eq, fillvalue=0)))
@@ -3185,9 +3219,7 @@ class IrrigationReport(BaseModuleReport):
         self.total_emissions = list(
             map(
                 sum,
-                zip_longest(
-                    self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o, fillvalue=0
-                ),
+                zip_longest(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o, fillvalue=0),
             )
         )
 
@@ -3328,13 +3360,9 @@ class SettlementReport(LandModuleReport):
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
             if isinstance(submodule, api_models.Road):
-                self.roads_co2_eq = list(
-                    map(sum, zip_longest(self.roads_co2_eq, self.extract_emissions(submodules_emission_set, self.roads_co2_eq_source[0], self.roads_co2_eq_source[1]), fillvalue=0))
-                )
+                self.roads_co2_eq = list(map(sum, zip_longest(self.roads_co2_eq, self.extract_emissions(submodules_emission_set, self.roads_co2_eq_source[0], self.roads_co2_eq_source[1]), fillvalue=0)))
             elif isinstance(submodule, api_models.Building):
-                self.buildings_co2_eq = list(
-                    map(sum, zip_longest(self.buildings_co2_eq, self.extract_emissions(submodules_emission_set, self.buildings_co2_eq_source[0], self.buildings_co2_eq_source[1]), fillvalue=0))
-                )
+                self.buildings_co2_eq = list(map(sum, zip_longest(self.buildings_co2_eq, self.extract_emissions(submodules_emission_set, self.buildings_co2_eq_source[0], self.buildings_co2_eq_source[1]), fillvalue=0)))
 
         self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.roads_co2_eq, self.buildings_co2_eq, fillvalue=0)))
 
@@ -3582,21 +3610,13 @@ class TransportReport(BaseModuleReport):
         for submodule in submodules:
             submodules_emission_set = submodule.cached_results_by_activity_by_gas["balance"] if submodule.cached_results_by_activity_by_gas is not None else None
             if submodules_emission_set is not None:
-                self.fuel_co2_eq = list(
-                    map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0))
-                )
-                self.fuel_ch4_eq = list(
-                    map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0))
-                )
-                self.fuel_n2o_eq = list(
-                    map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0))
-                )
+                self.fuel_co2_eq = list(map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0)))
+                self.fuel_ch4_eq = list(map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0)))
+                self.fuel_n2o_eq = list(map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0)))
                 self.electricity_co2_eq = list(
                     map(
                         sum,
-                        zip_longest(
-                            self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0
-                        ),
+                        zip_longest(self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0),
                     )
                 )
                 continue
@@ -3617,9 +3637,7 @@ class TransportReport(BaseModuleReport):
             self.fuel_co2_eq = list(map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0)))
             self.fuel_ch4_eq = list(map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0)))
             self.fuel_n2o_eq = list(map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0)))
-            self.electricity_co2_eq = list(
-                map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0))
-            )
+            self.electricity_co2_eq = list(map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0)))
 
             self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.fuel_co2_eq, self.fuel_ch4_eq, self.fuel_n2o_eq, self.electricity_co2_eq, fillvalue=0)))
 
@@ -3698,26 +3716,16 @@ class ProcessingReport(BaseModuleReport):
 
             if submodules_emission_set is not None:
                 print(f"Submodules emission set: {submodules_emission_set}")
-                self.fuel_co2_eq = list(
-                    map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0))
-                )
-                self.fuel_ch4_eq = list(
-                    map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0))
-                )
-                self.fuel_n2o_eq = list(
-                    map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0))
-                )
+                self.fuel_co2_eq = list(map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0)))
+                self.fuel_ch4_eq = list(map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0)))
+                self.fuel_n2o_eq = list(map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions_from_dict(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0)))
                 self.electricity_co2_eq = list(
                     map(
                         sum,
-                        zip_longest(
-                            self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0
-                        ),
+                        zip_longest(self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0),
                     )
                 )
-                self.water_use_eq = list(
-                    map(sum, zip_longest(self.water_use_eq, self.extract_emissions_from_dict(submodules_emission_set, self.water_use_source[0], self.water_use_source[1]), fillvalue=0))
-                )
+                self.water_use_eq = list(map(sum, zip_longest(self.water_use_eq, self.extract_emissions_from_dict(submodules_emission_set, self.water_use_source[0], self.water_use_source[1]), fillvalue=0)))
                 continue
 
             CalculatorClass = calculators.ProcessingEntryCalculator
@@ -3736,9 +3744,7 @@ class ProcessingReport(BaseModuleReport):
             self.fuel_co2_eq = list(map(sum, zip_longest(self.fuel_co2_eq, self.extract_emissions(submodules_emission_set, self.fuel_co2_eq_source[0], self.fuel_co2_eq_source[1]), fillvalue=0)))
             self.fuel_ch4_eq = list(map(sum, zip_longest(self.fuel_ch4_eq, self.extract_emissions(submodules_emission_set, self.fuel_ch4_eq_source[0], self.fuel_ch4_eq_source[1]), fillvalue=0)))
             self.fuel_n2o_eq = list(map(sum, zip_longest(self.fuel_n2o_eq, self.extract_emissions(submodules_emission_set, self.fuel_n2o_eq_source[0], self.fuel_n2o_eq_source[1]), fillvalue=0)))
-            self.electricity_co2_eq = list(
-                map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0))
-            )
+            self.electricity_co2_eq = list(map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0)))
             self.water_use_eq = list(map(sum, zip_longest(self.water_use_eq, self.extract_emissions(submodules_emission_set, self.water_use_source[0], self.water_use_source[1]), fillvalue=0)))
 
             self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.fuel_co2_eq, self.fuel_ch4_eq, self.fuel_n2o_eq, self.electricity_co2_eq, self.water_use_eq, fillvalue=0)))
@@ -3837,9 +3843,7 @@ class PackagingReport(BaseModuleReport):
                 self.electricity_co2_eq = list(
                     map(
                         sum,
-                        zip_longest(
-                            self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0
-                        ),
+                        zip_longest(self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0),
                     )
                 )
                 self.packaging_co2_eq = list(
@@ -3863,12 +3867,8 @@ class PackagingReport(BaseModuleReport):
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            self.electricity_co2_eq = list(
-                map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0))
-            )
-            self.packaging_co2_eq = list(
-                map(sum, zip_longest(self.packaging_co2_eq, self.extract_emissions(submodules_emission_set, self.packaging_co2_eq_source[0], self.packaging_co2_eq_source[1]), fillvalue=0))
-            )
+            self.electricity_co2_eq = list(map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0)))
+            self.packaging_co2_eq = list(map(sum, zip_longest(self.packaging_co2_eq, self.extract_emissions(submodules_emission_set, self.packaging_co2_eq_source[0], self.packaging_co2_eq_source[1]), fillvalue=0)))
 
             self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.electricity_co2_eq, self.packaging_co2_eq, fillvalue=0)))
 
@@ -3931,15 +3931,11 @@ class StorageReport(BaseModuleReport):
 
             if submodules_emission_set is not None:
                 print(f"Submodules emission set: {submodules_emission_set}")
-                self.storage_co2_eq = list(
-                    map(sum, zip_longest(self.storage_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]), fillvalue=0))
-                )
+                self.storage_co2_eq = list(map(sum, zip_longest(self.storage_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]), fillvalue=0)))
                 self.electricity_co2_eq = list(
                     map(
                         sum,
-                        zip_longest(
-                            self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0
-                        ),
+                        zip_longest(self.electricity_co2_eq, self.extract_emissions_from_dict(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0),
                     )
                 )
                 continue
@@ -3957,12 +3953,8 @@ class StorageReport(BaseModuleReport):
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            self.storage_co2_eq = list(
-                map(sum, zip_longest(self.storage_co2_eq, self.extract_emissions(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]), fillvalue=0))
-            )
-            self.electricity_co2_eq = list(
-                map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0))
-            )
+            self.storage_co2_eq = list(map(sum, zip_longest(self.storage_co2_eq, self.extract_emissions(submodules_emission_set, self.storage_co2_eq_source[0], self.storage_co2_eq_source[1]), fillvalue=0)))
+            self.electricity_co2_eq = list(map(sum, zip_longest(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]), fillvalue=0)))
 
             self.total_emissions = list(map(sum, zip_longest(self.total_emissions, self.electricity_co2_eq, self.storage_co2_eq, fillvalue=0)))
 

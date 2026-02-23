@@ -6,7 +6,6 @@ import json
 import base64
 
 import firebase_admin
-import pyrebase
 from dotenv import load_dotenv
 
 """
