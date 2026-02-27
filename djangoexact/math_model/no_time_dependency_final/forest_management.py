@@ -751,7 +751,7 @@ class ForestManagement(BaseModule):
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                inventory = InventoryPerGasPerActivity(GasTypes.N2O, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE)
+                inventory = InventoryPerGasPerActivity(GasTypes.N2O, self.soc_start * self.hectares_start * 44/12, ActivityTypes.SOIL_CO2_CHANGE)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
