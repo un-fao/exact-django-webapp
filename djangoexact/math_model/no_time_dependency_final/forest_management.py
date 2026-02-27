@@ -656,8 +656,8 @@ class ForestManagement(BaseModule):
                     )
                 )
 
-                agb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.agb_start * self.hectares_start, ActivityTypes.AGB_GROWTH)
-                bgb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.bgb_start * self.hectares_start, ActivityTypes.BGB_GROWTH)
+                agb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.agb_start * self.hectares_start * 44/12, ActivityTypes.AGB_GROWTH)
+                bgb_inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.bgb_start * self.hectares_start * 44/12, ActivityTypes.BGB_GROWTH)
                 self.inventory.emissions_by_sector_by_gas.append(agb_inventory)
                 self.inventory.emissions_by_sector_by_gas.append(bgb_inventory)
 
@@ -696,7 +696,7 @@ class ForestManagement(BaseModule):
                     YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in yearly_litter_emissions], activity=ActivityTypes.LITTER, delay=self.delay)
                 )
 
-                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=self.litter_start * self.hectares_start, activity=ActivityTypes.LITTER)
+                inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=self.litter_start * self.hectares_start * 44/12, activity=ActivityTypes.LITTER)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
 
             except Exception as e:
@@ -738,7 +738,7 @@ class ForestManagement(BaseModule):
                     )
                 )
 
-                inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.deadwood_start * self.hectares_start, ActivityTypes.DEADWOOD)
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.deadwood_start * self.hectares_start * 44/12, ActivityTypes.DEADWOOD)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
             except Exception as e:
                 traceback.print_exc()
