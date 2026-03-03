@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Scripts{% endblock %}</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <nav class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <a href="{% url 'admin_scripts:dashboard' %}" class="text-lg font-semibold text-gray-900">
+                Admin Scripts
+            </a>
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span>{{ request.user.email }}</span>
+                <a href="/admin/" class="text-blue-600 hover:text-blue-800">Django Admin</a>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
