@@ -370,6 +370,25 @@ class CompileScenariosViewTest(TestCase):
         response = self.client.get("/api/admin-scripts/compile-scenarios/export/")
         self.assertEqual(response.status_code, 405)
 
+    def test_parse_changes_with_scenario_prefix(self):
+        from admin_scripts.views import _parse_changes_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        post.setlist("scenario-0-change-0-filter-region", ["Central Asia"])
+
+        changes = _parse_changes_from_post(post, prefix="scenario-0-")
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["module_type"], "Grassland")
+        self.assertEqual(changes[0]["start"]["field"], "grassland_management_type")
+        self.assertEqual(changes[0]["start"]["value"], "Non-Degraded")
+        self.assertEqual(changes[0]["end"]["value"], "Improved Grassland")
+        self.assertEqual(changes[0]["filters"]["region"], ["Central Asia"])
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",

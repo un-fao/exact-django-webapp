@@ -64,31 +64,36 @@ def example_script(request):
 # Compile Scenarios
 # ---------------------------------------------------------------------------
 
-def _parse_changes_from_post(post_data):
-    """Parse indexed change fields from POST data into a list of change dicts."""
+def _parse_changes_from_post(post_data, prefix=""):
+    """Parse indexed change fields from POST data into a list of change dicts.
+
+    Args:
+        post_data: QueryDict from request.POST
+        prefix: Optional prefix before 'change-N-' keys (e.g. "scenario-0-")
+    """
     changes = []
     index = 0
     while True:
-        module_type = post_data.get(f"change-{index}-module_type")
+        module_type = post_data.get(f"{prefix}change-{index}-module_type")
         if module_type is None:
             break
         if module_type:
             change = {
                 "module_type": module_type,
                 "start": {
-                    "field": post_data.get(f"change-{index}-field", ""),
-                    "value": post_data.get(f"change-{index}-from_value", ""),
+                    "field": post_data.get(f"{prefix}change-{index}-field", ""),
+                    "value": post_data.get(f"{prefix}change-{index}-from_value", ""),
                 },
                 "end": {
-                    "field": post_data.get(f"change-{index}-field", ""),
-                    "value": post_data.get(f"change-{index}-to_value", ""),
+                    "field": post_data.get(f"{prefix}change-{index}-field", ""),
+                    "value": post_data.get(f"{prefix}change-{index}-to_value", ""),
                 },
                 "filters": {},
             }
-            region = post_data.getlist(f"change-{index}-filter-region")
+            region = post_data.getlist(f"{prefix}change-{index}-filter-region")
             if region:
                 change["filters"]["region"] = region
-            climate = post_data.getlist(f"change-{index}-filter-climate")
+            climate = post_data.getlist(f"{prefix}change-{index}-filter-climate")
             if climate:
                 change["filters"]["climate"] = climate
             changes.append(change)
@@ -108,30 +113,6 @@ def _parse_global_filters(post_data):
     return filters
 
 
-def _compute_distribution(statistics):
-    """Determine if distribution is symmetric or skewed and compute range."""
-    if (
-        statistics["count"] > 1
-        and statistics["std"]
-        and statistics["mean"] is not None
-        and statistics["median"] is not None
-    ):
-        mean_minus_median = abs(statistics["mean"] - statistics["median"])
-        if mean_minus_median < 0.25 * statistics["std"]:
-            return {
-                "distribution": "Symmetric",
-                "distribution_class": "bg-blue-50 text-blue-800",
-                "range_lower": statistics["mean"] - statistics["std"],
-                "range_upper": statistics["mean"] + statistics["std"],
-            }
-        else:
-            return {
-                "distribution": "Skewed",
-                "distribution_class": "bg-amber-50 text-amber-800",
-                "range_lower": statistics["q1"],
-                "range_upper": statistics["q3"],
-            }
-    return {}
 
 
 @login_required(login_url="/admin/login/")
@@ -155,7 +136,23 @@ def compile_scenarios(request):
             aggregates = ChangeRecord.objects.filter(q_objects)
             statistics = stats_for(aggregates)
             context["statistics"] = statistics
-            context.update(_compute_distribution(statistics))
+
+        # Enrich changes with available options so the form can re-render with selections
+        for change in changes:
+            mt = change["module_type"]
+            change["fields"] = list(
+                ChangeRecord.objects.filter(module_type=mt)
+                .values_list("field", flat=True).distinct().order_by("field")
+            )
+            fld = change["start"]["field"]
+            if fld:
+                qs = ChangeRecord.objects.filter(module_type=mt, field=fld)
+                change["from_values"] = list(
+                    qs.values_list("from_value", flat=True).distinct().order_by("from_value")
+                )
+                change["to_values"] = list(
+                    qs.values_list("to_value", flat=True).distinct().order_by("to_value")
+                )
 
         context["scenario_name"] = request.POST.get("scenario_name", "")
         context["category"] = request.POST.get("category", "")
@@ -334,8 +331,6 @@ def compile_scenarios_export(request):
     scenario_name = request.POST.get("scenario_name", "Custom Scenario")
     category = request.POST.get("category", "")
 
-    dist = _compute_distribution(statistics)
-
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         summary_data = [{
@@ -353,9 +348,6 @@ def compile_scenarios_export(request):
             "IQR": statistics.get("iqr"),
             "CI 95%": statistics.get("ci_95"),
             "CI 99%": statistics.get("ci_99"),
-            "Distribution": dist.get("distribution", ""),
-            "Range Lower": dist.get("range_lower"),
-            "Range Upper": dist.get("range_upper"),
         }]
         pd.DataFrame(summary_data).to_excel(writer, sheet_name="Summary", index=False)
 
