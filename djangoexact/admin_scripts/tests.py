@@ -1,3 +1,5 @@
+import io
+
 from django.test import TestCase, Client, override_settings
 from api.models import CustomUser
 from minitool.models import ChangeRecord
@@ -572,3 +574,32 @@ class HtmxScenarioPrefixTest(TestCase):
         self.assertContains(response, 'data-scenario-panel="1"')
         self.assertContains(response, 'name="scenario-1-scenario_name"')
         self.assertContains(response, 'name="scenario-1-change-0-module_type"')
+
+    def test_export_multi_scenario(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Scenario A",
+            "scenario-0-category": "Cat A",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-1-scenario_name": "Scenario B",
+            "scenario-1-category": "Cat B",
+            "scenario-1-change-0-module_type": "Grassland",
+            "scenario-1-change-0-field": "grassland_management_type",
+            "scenario-1-change-0-from_value": "Non-Degraded",
+            "scenario-1-change-0-to_value": "Improved Grassland",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        import openpyxl
+        buf = io.BytesIO(b"".join(response.streaming_content))
+        wb = openpyxl.load_workbook(buf)
+        self.assertIn("Scenario A", wb.sheetnames)
+        self.assertIn("Scenario A Changes", wb.sheetnames)
+        self.assertIn("Scenario B", wb.sheetnames)
+        self.assertIn("Scenario B Changes", wb.sheetnames)

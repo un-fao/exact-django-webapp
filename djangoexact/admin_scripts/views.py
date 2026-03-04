@@ -409,54 +409,63 @@ def compile_scenarios_export(request):
     if request.method != "POST":
         return HttpResponse("POST required", status=405)
 
-    changes = _parse_changes_from_post(request.POST)
+    scenarios = _parse_scenarios_from_post(request.POST)
     global_filters = _parse_global_filters(request.POST)
 
-    if not changes:
-        return HttpResponse("No changes provided", status=400)
-
-    q_objects = build_scenario_query(changes, global_filters)
-    aggregates = ChangeRecord.objects.filter(q_objects)
-    statistics = stats_for(aggregates)
-
-    scenario_name = request.POST.get("scenario_name", "Custom Scenario")
-    category = request.POST.get("category", "")
+    if not scenarios:
+        return HttpResponse("No scenarios provided", status=400)
 
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        summary_data = [{
-            "Category": category,
-            "Scenario Name": scenario_name,
-            "Count": statistics.get("count", 0),
-            "Sum Total": statistics.get("sum_total"),
-            "Mean": statistics.get("mean"),
-            "Median": statistics.get("median"),
-            "Min": statistics.get("min"),
-            "Max": statistics.get("max"),
-            "Std Dev": statistics.get("std"),
-            "Q1": statistics.get("q1"),
-            "Q3": statistics.get("q3"),
-            "IQR": statistics.get("iqr"),
-            "CI 95%": statistics.get("ci_95"),
-            "CI 99%": statistics.get("ci_99"),
-        }]
-        pd.DataFrame(summary_data).to_excel(writer, sheet_name="Summary", index=False)
+        for scenario in scenarios:
+            scenario_name = scenario["scenario_name"] or "Unnamed Scenario"
+            category = scenario["category"]
+            changes = scenario["changes"]
 
-        changes_data = []
-        for i, change in enumerate(changes, 1):
-            changes_data.append({
-                "Change #": i,
-                "Module Type": change.get("module_type", ""),
-                "Field": change["start"]["field"],
-                "From Value": change["start"]["value"],
-                "To Value": change["end"]["value"],
-            })
-        if changes_data:
-            pd.DataFrame(changes_data).to_excel(writer, sheet_name="Changes", index=False)
+            if not changes:
+                continue
+
+            q_objects = build_scenario_query(changes, global_filters)
+            aggregates = ChangeRecord.objects.filter(q_objects)
+            statistics = stats_for(aggregates)
+
+            # Summary sheet (truncate name to 31 chars for Excel limit)
+            summary_sheet = scenario_name[:31]
+            summary_data = [{
+                "Category": category,
+                "Scenario Name": scenario_name,
+                "Count": statistics.get("count", 0),
+                "Sum Total": statistics.get("sum_total"),
+                "Mean": statistics.get("mean"),
+                "Median": statistics.get("median"),
+                "Min": statistics.get("min"),
+                "Max": statistics.get("max"),
+                "Std Dev": statistics.get("std"),
+                "Q1": statistics.get("q1"),
+                "Q3": statistics.get("q3"),
+                "IQR": statistics.get("iqr"),
+                "CI 95%": statistics.get("ci_95"),
+                "CI 99%": statistics.get("ci_99"),
+            }]
+            pd.DataFrame(summary_data).to_excel(writer, sheet_name=summary_sheet, index=False)
+
+            # Changes sheet
+            changes_sheet = f"{scenario_name} Changes"[:31]
+            changes_data = []
+            for i, change in enumerate(changes, 1):
+                changes_data.append({
+                    "Change #": i,
+                    "Module Type": change.get("module_type", ""),
+                    "Field": change["start"]["field"],
+                    "From Value": change["start"]["value"],
+                    "To Value": change["end"]["value"],
+                })
+            if changes_data:
+                pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)
 
     buffer.seek(0)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"scenario_{timestamp}.xlsx"
+    filename = f"scenarios_{timestamp}.xlsx"
 
     return FileResponse(
         buffer,
