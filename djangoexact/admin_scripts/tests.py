@@ -425,3 +425,32 @@ class CompileScenariosViewTest(TestCase):
         self.client.login(email="regular@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 403)
+
+
+class ChangeKeyParsingTest(TestCase):
+    def test_extract_change_key_info_old_format(self):
+        from admin_scripts.views import _extract_change_key_info
+
+        result = _extract_change_key_info(
+            {"change-2-module_type": "Grassland"},
+            suffix="module_type"
+        )
+        self.assertEqual(result, ("Grassland", "2", "change-2-"))
+
+    def test_extract_change_key_info_scenario_format(self):
+        from admin_scripts.views import _extract_change_key_info
+
+        result = _extract_change_key_info(
+            {"scenario-1-change-3-module_type": "Grassland"},
+            suffix="module_type"
+        )
+        self.assertEqual(result, ("Grassland", "3", "scenario-1-change-3-"))
+
+    def test_extract_change_key_info_no_match(self):
+        from admin_scripts.views import _extract_change_key_info
+
+        result = _extract_change_key_info(
+            {"unrelated_key": "value"},
+            suffix="module_type"
+        )
+        self.assertIsNone(result)

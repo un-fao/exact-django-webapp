@@ -1,4 +1,5 @@
 import io
+import re
 from datetime import datetime
 from functools import wraps
 
@@ -136,6 +137,28 @@ def _parse_scenarios_from_post(post_data):
         })
         index += 1
     return scenarios
+
+
+def _extract_change_key_info(data, suffix):
+    """Extract value and index from change-prefixed keys in request data.
+
+    Handles both old format (change-N-suffix) and new format (scenario-S-change-N-suffix).
+
+    Args:
+        data: dict-like request.GET or request.POST
+        suffix: the field suffix to look for (e.g. "module_type", "field")
+
+    Returns:
+        Tuple of (value, change_index, full_prefix) or None if not found.
+        full_prefix includes everything up to and including the trailing dash,
+        e.g. "scenario-1-change-3-" or "change-2-".
+    """
+    pattern = re.compile(r"^((?:scenario-\d+-)?change-(\d+)-)" + re.escape(suffix) + r"$")
+    for key, value in data.items():
+        m = pattern.match(key)
+        if m and value:
+            return (value, m.group(2), m.group(1))
+    return None
 
 
 
