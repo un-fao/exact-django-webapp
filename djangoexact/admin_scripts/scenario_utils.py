@@ -20,7 +20,7 @@ def stats_for(qs):
         ss = sum(x * x for x in total_values)
 
         if n > 1:
-            var = (ss - (s * s) / n) / (n - 1)
+            var = max(0, (ss - (s * s) / n) / (n - 1))
             std = var**0.5
             se = std / (n**0.5)
             ci95 = 1.96 * se

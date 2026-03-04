@@ -328,6 +328,17 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Select module type and field first")
 
+    def test_htmx_filters(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/filters/",
+            {"module_type": "Grassland", "index": "0"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Central Asia")
+        self.assertContains(response, "Eastern Europe")
+        self.assertContains(response, "Cool Temperate")
+
     def test_htmx_add_change(self):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get(

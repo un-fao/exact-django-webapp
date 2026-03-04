@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.html import escape
 
 from admin_scripts.scenario_utils import build_scenario_query, stats_for
 from minitool.models import ChangeRecord
@@ -159,6 +160,7 @@ def compile_scenarios(request):
         context["scenario_name"] = request.POST.get("scenario_name", "")
         context["category"] = request.POST.get("category", "")
         context["changes"] = changes
+        context["global_filters"] = global_filters
 
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
@@ -177,7 +179,7 @@ def htmx_module_types(request):
     )
     options = ['<option value="">Select module type...</option>']
     for mt in module_types:
-        options.append(f'<option value="{mt}">{mt}</option>')
+        options.append(f'<option value="{escape(mt)}">{escape(mt)}</option>')
     return HttpResponse("\n".join(options))
 
 
@@ -218,7 +220,7 @@ def htmx_fields(request):
         f'<option value="">Select field...</option>'
     )
     for f in fields:
-        html += f'<option value="{f}">{f}</option>'
+        html += f'<option value="{escape(f)}">{escape(f)}</option>'
     html += "</select>"
     return HttpResponse(html)
 
@@ -267,8 +269,37 @@ def htmx_values(request):
 
 @login_required(login_url="/admin/login/")
 @staff_required
+def htmx_filters(request):
+    module_type = request.GET.get("module_type")
+    if not module_type:
+        for key, value in request.GET.items():
+            if key.startswith("change-") and key.endswith("-module_type") and value:
+                module_type = value
+                break
+
+    index = request.GET.get("index", "0")
+
+    if not module_type:
+        return HttpResponse("")
+
+    qs = ChangeRecord.objects.filter(module_type=module_type)
+    regions = list(qs.values_list("region", flat=True).distinct().order_by("region"))
+    climates = list(qs.values_list("climate", flat=True).distinct().order_by("climate"))
+
+    return render(request, "admin_scripts/partials/filter_options.html", {
+        "index": index,
+        "regions": regions,
+        "climates": climates,
+    })
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
 def htmx_add_change(request):
-    index = int(request.GET.get("index", 1))
+    try:
+        index = int(request.GET.get("index", 1))
+    except (ValueError, TypeError):
+        index = 1
     module_types = list(
         ChangeRecord.objects.values_list("module_type", flat=True)
         .distinct()

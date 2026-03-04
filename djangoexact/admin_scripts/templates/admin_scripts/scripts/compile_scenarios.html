@@ -109,6 +109,12 @@
         <input type="hidden" name="change-{{ forloop.counter0 }}-field" value="{{ change.start.field }}">
         <input type="hidden" name="change-{{ forloop.counter0 }}-from_value" value="{{ change.start.value }}">
         <input type="hidden" name="change-{{ forloop.counter0 }}-to_value" value="{{ change.end.value }}">
+        {% for region in change.filters.region %}
+        <input type="hidden" name="change-{{ forloop.parentloop.counter0 }}-filter-region" value="{{ region }}">
+        {% endfor %}
+        {% for climate in change.filters.climate %}
+        <input type="hidden" name="change-{{ forloop.parentloop.counter0 }}-filter-climate" value="{{ climate }}">
+        {% endfor %}
         {% endfor %}
         {% for key, values in global_filters.items %}
         {% for val in values %}
