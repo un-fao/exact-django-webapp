@@ -389,6 +389,34 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(changes[0]["end"]["value"], "Improved Grassland")
         self.assertEqual(changes[0]["filters"]["region"], ["Central Asia"])
 
+    def test_parse_scenarios_from_post(self):
+        from admin_scripts.views import _parse_scenarios_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-scenario_name"] = "Scenario A"
+        post["scenario-0-category"] = "Cat A"
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        post["scenario-1-scenario_name"] = "Scenario B"
+        post["scenario-1-category"] = "Cat B"
+        post["scenario-1-change-0-module_type"] = "Annual Cropland"
+        post["scenario-1-change-0-field"] = "organic_input_type"
+        post["scenario-1-change-0-from_value"] = "Low C input"
+        post["scenario-1-change-0-to_value"] = "High C input"
+
+        scenarios = _parse_scenarios_from_post(post)
+        self.assertEqual(len(scenarios), 2)
+        self.assertEqual(scenarios[0]["scenario_name"], "Scenario A")
+        self.assertEqual(scenarios[0]["category"], "Cat A")
+        self.assertEqual(len(scenarios[0]["changes"]), 1)
+        self.assertEqual(scenarios[0]["changes"][0]["module_type"], "Grassland")
+        self.assertEqual(scenarios[1]["scenario_name"], "Scenario B")
+        self.assertEqual(len(scenarios[1]["changes"]), 1)
+        self.assertEqual(scenarios[1]["changes"][0]["module_type"], "Annual Cropland")
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",

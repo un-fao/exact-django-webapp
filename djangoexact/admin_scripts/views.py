@@ -113,6 +113,30 @@ def _parse_global_filters(post_data):
     return filters
 
 
+def _parse_scenarios_from_post(post_data):
+    """Parse multiple scenarios from POST data.
+
+    Looks for scenario-N-scenario_name keys to detect scenario count,
+    then delegates to _parse_changes_from_post for each.
+
+    Returns:
+        List of dicts with keys: scenario_name, category, changes
+    """
+    scenarios = []
+    index = 0
+    while True:
+        name_key = f"scenario-{index}-scenario_name"
+        if name_key not in post_data:
+            break
+        prefix = f"scenario-{index}-"
+        scenarios.append({
+            "scenario_name": post_data.get(name_key, ""),
+            "category": post_data.get(f"scenario-{index}-category", ""),
+            "changes": _parse_changes_from_post(post_data, prefix=prefix),
+        })
+        index += 1
+    return scenarios
+
 
 
 @login_required(login_url="/admin/login/")
