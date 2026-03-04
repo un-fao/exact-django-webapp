@@ -1,74 +1,120 @@
-<div data-change-index="{{ index }}" class="bg-white border border-gray-200 rounded-lg p-5 mb-3 relative">
-    <div class="flex justify-between items-center mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">Change #{{ index|add:1 }}</h3>
+<div data-change-index="{{ index }}" class="bg-white border border-gray-200 rounded-lg mb-3 relative">
+    <div class="flex justify-between items-center px-5 py-3 cursor-pointer select-none"
+         onclick="let b=this.nextElementSibling; let a=this.querySelector('[data-chevron]'); b.classList.toggle('hidden'); a.classList.toggle('rotate-180')">
+        <div class="flex items-center gap-2">
+            <svg data-chevron class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+            <h3 class="text-sm font-semibold text-gray-700">Change #{{ index|add:1 }}</h3>
+            <span class="text-xs text-gray-400 change-summary">
+                {% if change.module_type %}— {{ change.module_type }}: {{ change.start.value }} &rarr; {{ change.end.value }}{% endif %}
+            </span>
+        </div>
         {% if index > 0 %}
-        <button type="button" onclick="this.closest('[data-change-index]').remove()"
+        <button type="button" onclick="event.stopPropagation(); this.closest('[data-change-index]').remove()"
                 class="text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
         {% endif %}
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Module Type</label>
-            <select name="change-{{ index }}-module_type" required
-                    hx-get="{% url 'admin_scripts:htmx-fields' %}"
-                    hx-target="#change-{{ index }}-field-container"
-                    hx-include="this"
-                    hx-trigger="change"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                <option value="">Select module type...</option>
-                {% for mt in module_types %}
-                <option value="{{ mt }}">{{ mt }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div id="change-{{ index }}-field-container">
-            <label class="block text-xs font-medium text-gray-500 mb-1">Field</label>
-            <select name="change-{{ index }}-field" required disabled
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
-                <option value="">Select module type first...</option>
-            </select>
-        </div>
-    </div>
-
-    <div id="change-{{ index }}-values-container" class="grid grid-cols-2 gap-4 mt-3">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">From Value</label>
-            <select name="change-{{ index }}-from_value" required disabled
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
-                <option value="">Select field first...</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">To Value</label>
-            <select name="change-{{ index }}-to_value" required disabled
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
-                <option value="">Select field first...</option>
-            </select>
-        </div>
-    </div>
-
-    <details class="mt-3">
-        <summary class="text-xs font-medium text-gray-500 cursor-pointer">Change-level Filters</summary>
-        <div id="change-{{ index }}-filters-container" class="mt-2 grid grid-cols-2 gap-3"
-             hx-get="{% url 'admin_scripts:htmx-filters' %}"
-             hx-include="[name='change-{{ index }}-module_type']"
-             hx-vals='{"index": "{{ index }}"}'
-             hx-trigger="load delay:100ms, change from:[name='change-{{ index }}-module_type']"
-             hx-swap="innerHTML">
+    <div class="px-5 pb-5">
+        <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Region</label>
-                <select name="change-{{ index }}-filter-region" multiple
-                        class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Module Type</label>
+                <select name="{{ prefix }}module_type" required
+                        hx-get="{% url 'admin_scripts:htmx-fields' %}"
+                        hx-target="#{{ id_prefix }}-field-container"
+                        hx-include="this"
+                        hx-trigger="change"
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <option value="">Select module type...</option>
+                    {% for mt in module_types %}
+                    <option value="{{ mt }}" {% if change.module_type == mt %}selected{% endif %}>{{ mt }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">Climate</label>
-                <select name="change-{{ index }}-filter-climate" multiple
-                        class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+
+            <div id="{{ id_prefix }}-field-container">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Field</label>
+                {% if change.fields %}
+                <select name="{{ prefix }}field" required
+                        hx-get="{% url 'admin_scripts:htmx-values' %}"
+                        hx-target="#{{ id_prefix }}-values-container"
+                        hx-include="[name='{{ prefix }}module_type']"
+                        hx-vals='{"index": "{{ index }}", "prefix": "{{ prefix }}"}'
+                        hx-trigger="change"
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <option value="">Select field...</option>
+                    {% for f in change.fields %}
+                    <option value="{{ f }}" {% if change.start.field == f %}selected{% endif %}>{{ f }}</option>
+                    {% endfor %}
                 </select>
+                {% else %}
+                <select name="{{ prefix }}field" required disabled
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+                    <option value="">Select module type first...</option>
+                </select>
+                {% endif %}
             </div>
         </div>
-    </details>
+
+        <div id="{{ id_prefix }}-values-container" class="grid grid-cols-2 gap-4 mt-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">From Value</label>
+                {% if change.from_values %}
+                <select name="{{ prefix }}from_value" required
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <option value="">Select from value...</option>
+                    {% for val in change.from_values %}
+                    <option value="{{ val }}" {% if change.start.value == val %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <select name="{{ prefix }}from_value" required disabled
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+                    <option value="">Select field first...</option>
+                </select>
+                {% endif %}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">To Value</label>
+                {% if change.to_values %}
+                <select name="{{ prefix }}to_value" required
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <option value="">Select to value...</option>
+                    {% for val in change.to_values %}
+                    <option value="{{ val }}" {% if change.end.value == val %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <select name="{{ prefix }}to_value" required disabled
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+                    <option value="">Select field first...</option>
+                </select>
+                {% endif %}
+            </div>
+        </div>
+
+        <details class="mt-3">
+            <summary class="text-xs font-medium text-gray-500 cursor-pointer">Change-level Filters</summary>
+            <div id="{{ id_prefix }}-filters-container" class="mt-2 grid grid-cols-2 gap-3"
+                 hx-get="{% url 'admin_scripts:htmx-filters' %}"
+                 hx-include="[name='{{ prefix }}module_type']"
+                 hx-vals='{"index": "{{ index }}", "prefix": "{{ prefix }}"}'
+                 hx-trigger="change from:[name='{{ prefix }}module_type']"
+                 hx-swap="innerHTML">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Region</label>
+                    <select name="{{ prefix }}filter-region" multiple
+                            class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Climate</label>
+                    <select name="{{ prefix }}filter-climate" multiple
+                            class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                    </select>
+                </div>
+            </div>
+        </details>
+    </div>
 </div>

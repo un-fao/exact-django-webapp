@@ -230,20 +230,16 @@ def htmx_module_types(request):
 @login_required(login_url="/admin/login/")
 @staff_required
 def htmx_fields(request):
-    module_type = None
-    index = "0"
-    for key, value in request.GET.items():
-        if key.startswith("change-") and key.endswith("-module_type") and value:
-            module_type = value
-            index = key.split("-")[1]
-            break
-
-    if not module_type:
+    result = _extract_change_key_info(request.GET, "module_type")
+    if not result:
         return HttpResponse(
             '<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
             '<select disabled class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">'
             '<option>Select module type first...</option></select>'
         )
+
+    module_type, index, prefix = result
+    id_prefix = prefix.rstrip("-")
 
     fields = list(
         ChangeRecord.objects.filter(module_type=module_type)
@@ -254,11 +250,11 @@ def htmx_fields(request):
     values_url = reverse("admin_scripts:htmx-values")
     html = (
         f'<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
-        f'<select name="change-{index}-field" required'
+        f'<select name="{prefix}field" required'
         f' hx-get="{values_url}"'
-        f' hx-target="#change-{index}-values-container"'
-        f""" hx-include="[name='change-{index}-module_type']" """
-        f""" hx-vals='{{"index": "{index}"}}' """
+        f' hx-target="#{id_prefix}-values-container"'
+        f""" hx-include="[name='{prefix}module_type']" """
+        f""" hx-vals='{{"index": "{index}", "prefix": "{prefix}"}}' """
         f' hx-trigger="change"'
         f' class="w-full border border-gray-300 rounded px-3 py-2 text-sm">'
         f'<option value="">Select field...</option>'
@@ -272,20 +268,13 @@ def htmx_fields(request):
 @login_required(login_url="/admin/login/")
 @staff_required
 def htmx_values(request):
-    module_type = request.GET.get("module_type")
-    if not module_type:
-        for key, value in request.GET.items():
-            if key.startswith("change-") and key.endswith("-module_type") and value:
-                module_type = value
-                break
+    result = _extract_change_key_info(request.GET, "module_type")
+    module_type = result[0] if result else None
 
-    field = request.GET.get("field")
-    if not field:
-        for key, value in request.GET.items():
-            if key.startswith("change-") and key.endswith("-field") and value:
-                field = value
-                break
+    field_result = _extract_change_key_info(request.GET, "field")
+    field = field_result[0] if field_result else None
 
+    prefix = request.GET.get("prefix", f"change-{request.GET.get('index', '0')}-")
     index = request.GET.get("index", "0")
 
     if not module_type or not field:
@@ -306,6 +295,7 @@ def htmx_values(request):
 
     return render(request, "admin_scripts/partials/value_options.html", {
         "index": index,
+        "prefix": prefix,
         "from_values": from_values,
         "to_values": to_values,
     })
@@ -314,13 +304,10 @@ def htmx_values(request):
 @login_required(login_url="/admin/login/")
 @staff_required
 def htmx_filters(request):
-    module_type = request.GET.get("module_type")
-    if not module_type:
-        for key, value in request.GET.items():
-            if key.startswith("change-") and key.endswith("-module_type") and value:
-                module_type = value
-                break
+    result = _extract_change_key_info(request.GET, "module_type")
+    module_type = result[0] if result else None
 
+    prefix = request.GET.get("prefix", f"change-{request.GET.get('index', '0')}-")
     index = request.GET.get("index", "0")
 
     if not module_type:
@@ -332,6 +319,7 @@ def htmx_filters(request):
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,
+        "prefix": prefix,
         "regions": regions,
         "climates": climates,
     })
@@ -344,6 +332,15 @@ def htmx_add_change(request):
         index = int(request.GET.get("index", 1))
     except (ValueError, TypeError):
         index = 1
+    scenario_index = request.GET.get("scenario_index", None)
+
+    if scenario_index is not None:
+        prefix = f"scenario-{scenario_index}-change-{index}-"
+        id_prefix = f"scenario-{scenario_index}-change-{index}"
+    else:
+        prefix = f"change-{index}-"
+        id_prefix = f"change-{index}"
+
     module_types = list(
         ChangeRecord.objects.values_list("module_type", flat=True)
         .distinct()
@@ -351,6 +348,9 @@ def htmx_add_change(request):
     )
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
+        "prefix": prefix,
+        "id_prefix": id_prefix,
+        "scenario_index": scenario_index,
         "module_types": module_types,
     })
 

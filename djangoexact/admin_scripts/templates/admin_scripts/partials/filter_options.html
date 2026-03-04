@@ -1,6 +1,6 @@
 <div>
     <label class="block text-xs text-gray-400 mb-1">Region</label>
-    <select name="change-{{ index }}-filter-region" multiple
+    <select name="{{ prefix }}filter-region" multiple
             class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="3">
         {% for r in regions %}
         <option value="{{ r }}">{{ r }}</option>
@@ -9,7 +9,7 @@
 </div>
 <div>
     <label class="block text-xs text-gray-400 mb-1">Climate</label>
-    <select name="change-{{ index }}-filter-climate" multiple
+    <select name="{{ prefix }}filter-climate" multiple
             class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="3">
         {% for c in climates %}
         <option value="{{ c }}">{{ c }}</option>

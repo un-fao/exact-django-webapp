@@ -454,3 +454,72 @@ class ChangeKeyParsingTest(TestCase):
             suffix="module_type"
         )
         self.assertIsNone(result)
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
+class HtmxScenarioPrefixTest(TestCase):
+    databases = {"default", "minitool"}
+
+    def setUp(self):
+        self.client = Client()
+        self.staff_user = CustomUser.objects.create_user(
+            email="staff@example.com",
+            password="testpass123",
+            is_staff=True,
+            firebase_uid="staff_uid",
+        )
+        ChangeRecord.objects.create(
+            module_type="Grassland", region="Central Asia", climate="Cool Temperate",
+            moisture="Moist", soil_type="High Activity Clay", total=-2.0,
+            field="grassland_management_type", from_value="Non-Degraded",
+            to_value="Improved Grassland",
+        )
+
+    def test_htmx_fields_with_scenario_prefix(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/fields/",
+            {"scenario-0-change-0-module_type": "Grassland"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "grassland_management_type")
+        self.assertContains(response, 'name="scenario-0-change-0-field"')
+
+    def test_htmx_values_with_scenario_prefix(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/values/",
+            {
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "index": "0",
+                "prefix": "scenario-0-change-0-",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Non-Degraded")
+        self.assertContains(response, 'name="scenario-0-change-0-from_value"')
+
+    def test_htmx_filters_with_scenario_prefix(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/filters/",
+            {
+                "scenario-0-change-0-module_type": "Grassland",
+                "index": "0",
+                "prefix": "scenario-0-change-0-",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Central Asia")
+        self.assertContains(response, 'name="scenario-0-change-0-filter-region"')
+
+    def test_htmx_add_change_with_scenario_index(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-change/",
+            {"index": "1", "scenario_index": "2"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Change #2")
+        self.assertContains(response, 'name="scenario-2-change-1-module_type"')

@@ -1,6 +1,6 @@
 <div>
     <label class="block text-xs font-medium text-gray-500 mb-1">From Value</label>
-    <select name="change-{{ index }}-from_value" required
+    <select name="{{ prefix }}from_value" required
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
         <option value="">Select from value...</option>
         {% for val in from_values %}
@@ -10,7 +10,7 @@
 </div>
 <div>
     <label class="block text-xs font-medium text-gray-500 mb-1">To Value</label>
-    <select name="change-{{ index }}-to_value" required
+    <select name="{{ prefix }}to_value" required
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
         <option value="">Select to value...</option>
         {% for val in to_values %}
