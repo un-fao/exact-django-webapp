@@ -14,4 +14,5 @@ urlpatterns = [
     path("compile-scenarios/htmx/values/", views.htmx_values, name="htmx-values"),
     path("compile-scenarios/htmx/filters/", views.htmx_filters, name="htmx-filters"),
     path("compile-scenarios/htmx/add-change/", views.htmx_add_change, name="htmx-add-change"),
+    path("compile-scenarios/htmx/run-scenario/", views.htmx_run_scenario, name="htmx-run-scenario"),
 ]

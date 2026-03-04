@@ -355,6 +355,29 @@ def htmx_add_change(request):
     })
 
 
+@login_required(login_url="/admin/login/")
+@staff_required
+def htmx_run_scenario(request):
+    if request.method != "POST":
+        return HttpResponse("POST required", status=405)
+
+    scenario_index = request.POST.get("scenario_index", "0")
+    prefix = f"scenario-{scenario_index}-"
+
+    changes = _parse_changes_from_post(request.POST, prefix=prefix)
+    global_filters = _parse_global_filters(request.POST)
+
+    context = {}
+    if not changes:
+        context["error"] = "Please add at least one change."
+    else:
+        q_objects = build_scenario_query(changes, global_filters)
+        aggregates = ChangeRecord.objects.filter(q_objects)
+        context["statistics"] = stats_for(aggregates)
+
+    return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
 # ---------------------------------------------------------------------------
 # Excel export
 # ---------------------------------------------------------------------------

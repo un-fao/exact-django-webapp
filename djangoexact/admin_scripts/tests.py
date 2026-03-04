@@ -523,3 +523,40 @@ class HtmxScenarioPrefixTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Change #2")
         self.assertContains(response, 'name="scenario-2-change-1-module_type"')
+
+    def test_htmx_run_scenario(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario-0-scenario_name": "Test Scenario",
+                "scenario-0-category": "Test",
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "scenario-0-change-0-from_value": "Non-Degraded",
+                "scenario-0-change-0-to_value": "Improved Grassland",
+                "global_filter_soil_type": ["High Activity Clay"],
+                "scenario_index": "0",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Results")
+        self.assertContains(response, "Count")
+
+    def test_htmx_run_scenario_no_changes(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario-0-scenario_name": "Empty",
+                "scenario-0-category": "Test",
+                "scenario_index": "0",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "at least one change")
+
+    def test_htmx_run_scenario_requires_post(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/htmx/run-scenario/")
+        self.assertEqual(response.status_code, 405)
