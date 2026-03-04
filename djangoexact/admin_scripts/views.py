@@ -357,6 +357,49 @@ def htmx_add_change(request):
 
 @login_required(login_url="/admin/login/")
 @staff_required
+def htmx_add_scenario(request):
+    try:
+        scenario_index = int(request.GET.get("index", 1))
+    except (ValueError, TypeError):
+        scenario_index = 1
+
+    module_types = list(
+        ChangeRecord.objects.values_list("module_type", flat=True)
+        .distinct()
+        .order_by("module_type")
+    )
+
+    default_prefix = f"scenario-{scenario_index}-change-0-"
+    default_id_prefix = f"scenario-{scenario_index}-change-0"
+
+    # Build tab button via OOB swap
+    tab_html = (
+        f'<button type="button" data-scenario-tab="{scenario_index}"'
+        f' onclick="switchScenarioTab({scenario_index})"'
+        f' class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600"'
+        f' hx-swap-oob="beforeend:#scenario-tabs">'
+        f'Scenario {scenario_index + 1}'
+        f'</button>'
+    )
+
+    from django.template.loader import render_to_string
+    panel_html = render_to_string(
+        "admin_scripts/partials/scenario_panel.html",
+        {
+            "scenario_index": scenario_index,
+            "module_types": module_types,
+            "default_prefix": default_prefix,
+            "default_id_prefix": default_id_prefix,
+            "active": True,
+        },
+        request=request,
+    )
+
+    return HttpResponse(panel_html + tab_html)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
 def htmx_run_scenario(request):
     if request.method != "POST":
         return HttpResponse("POST required", status=405)

@@ -560,3 +560,15 @@ class HtmxScenarioPrefixTest(TestCase):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/htmx/run-scenario/")
         self.assertEqual(response.status_code, 405)
+
+    def test_htmx_add_scenario(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-scenario/",
+            {"index": "1"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-scenario-tab="1"')
+        self.assertContains(response, 'data-scenario-panel="1"')
+        self.assertContains(response, 'name="scenario-1-scenario_name"')
+        self.assertContains(response, 'name="scenario-1-change-0-module_type"')
