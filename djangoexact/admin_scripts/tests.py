@@ -225,69 +225,64 @@ class CompileScenariosViewTest(TestCase):
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 302)
 
-    def test_compile_scenarios_post_returns_statistics(self):
+    def test_run_scenario_returns_statistics(self):
         self.client.login(email="staff@example.com", password="testpass123")
-        response = self.client.post("/api/admin-scripts/compile-scenarios/", {
-            "scenario_name": "Test Scenario",
-            "category": "Test Category",
-            "change-0-module_type": "Grassland",
-            "change-0-field": "grassland_management_type",
-            "change-0-from_value": "Non-Degraded",
-            "change-0-to_value": "Improved Grassland",
+        response = self.client.post("/api/admin-scripts/compile-scenarios/htmx/run-scenario/", {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Results")
         self.assertContains(response, "Count")
 
-    def test_compile_scenarios_post_no_matching_records(self):
+    def test_run_scenario_no_matching_records(self):
         self.client.login(email="staff@example.com", password="testpass123")
-        response = self.client.post("/api/admin-scripts/compile-scenarios/", {
-            "scenario_name": "Empty Scenario",
-            "category": "Test",
-            "change-0-module_type": "Nonexistent",
-            "change-0-field": "fake_field",
-            "change-0-from_value": "A",
-            "change-0-to_value": "B",
+        response = self.client.post("/api/admin-scripts/compile-scenarios/htmx/run-scenario/", {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Nonexistent",
+            "scenario-0-change-0-field": "fake_field",
+            "scenario-0-change-0-from_value": "A",
+            "scenario-0-change-0-to_value": "B",
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No matching records")
 
-    def test_compile_scenarios_post_with_global_filters(self):
+    def test_run_scenario_with_global_filters(self):
         self.client.login(email="staff@example.com", password="testpass123")
-        response = self.client.post("/api/admin-scripts/compile-scenarios/", {
-            "scenario_name": "Filtered Scenario",
-            "category": "Test",
-            "change-0-module_type": "Grassland",
-            "change-0-field": "grassland_management_type",
-            "change-0-from_value": "Non-Degraded",
-            "change-0-to_value": "Improved Grassland",
+        response = self.client.post("/api/admin-scripts/compile-scenarios/htmx/run-scenario/", {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
             "global_filter_soil_type": ["Sandy"],
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Results")
 
-    def test_compile_scenarios_post_multiple_changes(self):
+    def test_run_scenario_multiple_changes(self):
         self.client.login(email="staff@example.com", password="testpass123")
-        response = self.client.post("/api/admin-scripts/compile-scenarios/", {
-            "scenario_name": "Multi-Change",
-            "category": "Test",
-            "change-0-module_type": "Grassland",
-            "change-0-field": "grassland_management_type",
-            "change-0-from_value": "Non-Degraded",
-            "change-0-to_value": "Improved Grassland",
-            "change-1-module_type": "Annual Cropland",
-            "change-1-field": "organic_input_type",
-            "change-1-from_value": "Low C input",
-            "change-1-to_value": "High C input",
+        response = self.client.post("/api/admin-scripts/compile-scenarios/htmx/run-scenario/", {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-0-change-1-module_type": "Annual Cropland",
+            "scenario-0-change-1-field": "organic_input_type",
+            "scenario-0-change-1-from_value": "Low C input",
+            "scenario-0-change-1-to_value": "High C input",
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Results")
 
-    def test_compile_scenarios_post_missing_changes(self):
+    def test_run_scenario_missing_changes(self):
         self.client.login(email="staff@example.com", password="testpass123")
-        response = self.client.post("/api/admin-scripts/compile-scenarios/", {
-            "scenario_name": "Empty",
-            "category": "Test",
+        response = self.client.post("/api/admin-scripts/compile-scenarios/htmx/run-scenario/", {
+            "scenario_index": "0",
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "at least one change")
@@ -318,7 +313,12 @@ class CompileScenariosViewTest(TestCase):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get(
             "/api/admin-scripts/compile-scenarios/htmx/values/",
-            {"module_type": "Grassland", "field": "grassland_management_type", "index": "0"},
+            {
+                "change-0-module_type": "Grassland",
+                "change-0-field": "grassland_management_type",
+                "index": "0",
+                "prefix": "change-0-",
+            },
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Non-Degraded")
@@ -334,7 +334,11 @@ class CompileScenariosViewTest(TestCase):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get(
             "/api/admin-scripts/compile-scenarios/htmx/filters/",
-            {"module_type": "Grassland", "index": "0"},
+            {
+                "change-0-module_type": "Grassland",
+                "index": "0",
+                "prefix": "change-0-",
+            },
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Central Asia")
@@ -354,12 +358,12 @@ class CompileScenariosViewTest(TestCase):
     def test_export_to_excel(self):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
-            "scenario_name": "Test Export",
-            "category": "Test",
-            "change-0-module_type": "Grassland",
-            "change-0-field": "grassland_management_type",
-            "change-0-from_value": "Non-Degraded",
-            "change-0-to_value": "Improved Grassland",
+            "scenario-0-scenario_name": "Test Export",
+            "scenario-0-category": "Test",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
