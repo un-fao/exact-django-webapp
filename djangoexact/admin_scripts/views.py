@@ -170,42 +170,20 @@ def compile_scenarios(request):
         .distinct()
         .order_by("module_type")
     )
-    context = {"module_types": module_types}
 
-    if request.method == "POST":
-        changes = _parse_changes_from_post(request.POST)
-        global_filters = _parse_global_filters(request.POST)
+    # Render one empty scenario tab on GET
+    scenarios = [{
+        "scenario_name": "",
+        "category": "",
+        "changes": [],
+        "default_prefix": "scenario-0-change-0-",
+        "default_id_prefix": "scenario-0-change-0",
+    }]
 
-        if not changes:
-            context["error"] = "Please add at least one change."
-        else:
-            q_objects = build_scenario_query(changes, global_filters)
-            aggregates = ChangeRecord.objects.filter(q_objects)
-            statistics = stats_for(aggregates)
-            context["statistics"] = statistics
-
-        # Enrich changes with available options so the form can re-render with selections
-        for change in changes:
-            mt = change["module_type"]
-            change["fields"] = list(
-                ChangeRecord.objects.filter(module_type=mt)
-                .values_list("field", flat=True).distinct().order_by("field")
-            )
-            fld = change["start"]["field"]
-            if fld:
-                qs = ChangeRecord.objects.filter(module_type=mt, field=fld)
-                change["from_values"] = list(
-                    qs.values_list("from_value", flat=True).distinct().order_by("from_value")
-                )
-                change["to_values"] = list(
-                    qs.values_list("to_value", flat=True).distinct().order_by("to_value")
-                )
-
-        context["scenario_name"] = request.POST.get("scenario_name", "")
-        context["category"] = request.POST.get("category", "")
-        context["changes"] = changes
-        context["global_filters"] = global_filters
-
+    context = {
+        "module_types": module_types,
+        "scenarios": scenarios,
+    }
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
 
