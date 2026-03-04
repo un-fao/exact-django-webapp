@@ -574,7 +574,9 @@ class HtmxScenarioPrefixTest(TestCase):
             {"index": "1"},
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'hx-swap-oob="beforeend:#scenario-tabs"')
         self.assertContains(response, 'data-scenario-tab="1"')
+        self.assertContains(response, 'onclick="switchScenarioTab(1)"')
         self.assertContains(response, 'data-scenario-panel="1"')
         self.assertContains(response, 'name="scenario-1-scenario_name"')
         self.assertContains(response, 'name="scenario-1-change-0-module_type"')

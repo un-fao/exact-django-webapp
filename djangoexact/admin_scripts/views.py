@@ -350,14 +350,16 @@ def htmx_add_scenario(request):
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
 
-    # Build tab button via OOB swap
+    # Build tab button via OOB swap — the <div> is a carrier element:
+    # htmx beforeend appends the carrier's innerHTML (the <button>) to the target.
     tab_html = (
+        f'<div hx-swap-oob="beforeend:#scenario-tabs">'
         f'<button type="button" data-scenario-tab="{scenario_index}"'
         f' onclick="switchScenarioTab({scenario_index})"'
-        f' class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600"'
-        f' hx-swap-oob="beforeend:#scenario-tabs">'
+        f' class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">'
         f'Scenario {scenario_index + 1}'
         f'</button>'
+        f'</div>'
     )
 
     from django.template.loader import render_to_string
