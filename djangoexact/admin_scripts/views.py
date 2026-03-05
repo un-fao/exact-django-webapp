@@ -418,6 +418,7 @@ def compile_scenarios_export(request):
         return HttpResponse("No scenarios provided", status=400)
 
     buffer = io.BytesIO()
+    summary_rows = []
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         for scenario in scenarios:
             scenario_name = scenario["scenario_name"] or "Unnamed Scenario"
@@ -431,9 +432,7 @@ def compile_scenarios_export(request):
             aggregates = ChangeRecord.objects.filter(q_objects)
             statistics = stats_for(aggregates)
 
-            # Summary sheet (truncate name to 31 chars for Excel limit)
-            summary_sheet = scenario_name[:31]
-            summary_data = [{
+            summary_rows.append({
                 "Category": category,
                 "Scenario Name": scenario_name,
                 "Count": statistics.get("count", 0),
@@ -448,8 +447,7 @@ def compile_scenarios_export(request):
                 "IQR": statistics.get("iqr"),
                 "CI 95%": statistics.get("ci_95"),
                 "CI 99%": statistics.get("ci_99"),
-            }]
-            pd.DataFrame(summary_data).to_excel(writer, sheet_name=summary_sheet, index=False)
+            })
 
             # Changes sheet
             changes_sheet = f"{scenario_name} Changes"[:31]
@@ -464,6 +462,10 @@ def compile_scenarios_export(request):
                 })
             if changes_data:
                 pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)
+
+        if summary_rows:
+            pd.DataFrame(summary_rows).to_excel(writer, sheet_name="Summary", index=False)
+            writer.book.move_sheet("Summary", offset=-len(writer.book.sheetnames) + 1)
 
     buffer.seek(0)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

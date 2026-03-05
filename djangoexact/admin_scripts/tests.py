@@ -605,7 +605,8 @@ class HtmxScenarioPrefixTest(TestCase):
         import openpyxl
         buf = io.BytesIO(b"".join(response.streaming_content))
         wb = openpyxl.load_workbook(buf)
-        self.assertIn("Scenario A", wb.sheetnames)
+        self.assertIn("Summary", wb.sheetnames)
         self.assertIn("Scenario A Changes", wb.sheetnames)
-        self.assertIn("Scenario B", wb.sheetnames)
         self.assertIn("Scenario B Changes", wb.sheetnames)
+        self.assertNotIn("Scenario A", wb.sheetnames)
+        self.assertNotIn("Scenario B", wb.sheetnames)
