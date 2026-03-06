@@ -52,7 +52,6 @@ django-archive==0.2.0
 matplotlib==3.8.2
 Pyrebase4==4.8.0
 firebase-admin==6.5.0
-Pyrebase4==4.8.0
 requests==2.31.0
 django-unfold==0.34.0
 django-modeltranslation==0.19.9
@@ -65,5 +64,4 @@ python-slugify==8.0.4
 drf-nested-routers==0.94.1
 weasyprint==64.0
 google-cloud-storage==2.19.0
-PyYAML==6.0
-setuptools
+setuptools>=65.5.1
