@@ -811,11 +811,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 missing_fields.append("soil_type")
 
             if missing_fields:
-                raise serializers.ValidationError(
-                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
-                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
-                    f"on the activity or {', '.join(missing_fields)} on the project."
-                )
+                raise serializers.ValidationError(f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} on the activity or {', '.join(missing_fields)} on the project.")
 
         for module_type in module_types:
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
@@ -1246,11 +1242,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
                 missing_fields.append("soil_type")
 
             if missing_fields:
-                raise serializers.ValidationError(
-                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
-                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
-                    f"on the activity or {', '.join(missing_fields)} on the project."
-                )
+                raise serializers.ValidationError(f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} on the activity or {', '.join(missing_fields)} on the project.")
 
         if project.is_archived:
             log.error("Modules belonging to archived projects cannot be modified")
@@ -3383,10 +3375,16 @@ class NoteSerializer(serializers.ModelSerializer):
     module_id = serializers.SerializerMethodField(read_only=True)
 
     def get_module_type(self, obj):
+        # BUG: Some Notes have None content_object
+        if obj.content_object is None:
+            return None
         module_type = ModuleType.objects.get(class_name=obj.content_object.__class__.__name__)
         return get_model_serializer(ModuleType)(module_type, many=False).data
 
     def get_module_id(self, obj):
+        # BUG: Some Notes have None content_object
+        if obj.content_object is None:
+            return None
         return obj.content_object.id
 
     def validate(self, data):
