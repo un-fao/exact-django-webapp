@@ -3,7 +3,6 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from ipcc.models import GlobalWarmingPotential
 from rest_framework import permissions, routers
-from rest_framework.documentation import include_docs_urls
 from rest_framework_nested import routers as nested_routers
 from django.urls import include
 import api.models as models
@@ -185,7 +184,6 @@ router.register(r"data-sources", views.public_generic_viewset(models.DataSource)
 router.register(r"hih-assessments", views.HandInHandAssessmentViewSet, basename="handinhandassessment")
 
 urlpatterns = [
-    path("docs/", include_docs_urls(title="EX-ACT Docs")),
     path("health/", views.APIHealthView.as_view(), name="api-health"),
     path("minitool/process/", views.MinitoolProcessingView.as_view(), name="minitool-process"),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
