@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "minitool",
     "admin_scripts",
+    "bug_report",
 ]
 
 if DEBUG:
@@ -95,6 +96,7 @@ MIDDLEWARE = [
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "accounts.admin_auth_middleware.AdminAuthenticationMiddleware",  # Auto-authenticate as admin
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "bug_report.middleware.BugReportMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -262,6 +264,12 @@ EMAIL_PORT = os.getenv("EMAIL_PORT", "$EMAIL_PORT")
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 EMAIL_HOST_PASSWORD = os.getenv("SMTP_USER_PASSWORD", "$SMTP_USER_PASSWORD")
+
+# Bug report settings
+BUG_REPORT_ENDPOINT = os.getenv("BUG_REPORT_ENDPOINT", "")
+BUG_REPORT_THROTTLE_SECONDS = int(os.getenv("BUG_REPORT_THROTTLE_SECONDS", "300"))
+BUG_REPORT_MAX_REPORTS = int(os.getenv("BUG_REPORT_MAX_REPORTS", "50"))
+BUG_REPORT_BUFFER_SIZE = int(os.getenv("BUG_REPORT_BUFFER_SIZE", "20"))
 
 # # Firebase settings
 # try:
