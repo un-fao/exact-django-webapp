@@ -88,6 +88,7 @@ if DEBUG:
     INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
+    "bug_report.middleware.BugReportMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
