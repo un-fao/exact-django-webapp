@@ -540,7 +540,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage"]
+        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
         ref_name = "Activity"
 
 
