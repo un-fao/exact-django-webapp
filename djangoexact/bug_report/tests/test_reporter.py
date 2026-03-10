@@ -7,7 +7,6 @@ from django.test import SimpleTestCase, override_settings
     BUG_REPORT_ENDPOINT="https://example.com/api/bug-report",
     BUG_REPORT_THROTTLE_SECONDS=300,
     BUG_REPORT_MAX_REPORTS=50,
-    BUG_REPORT_BUFFER_SIZE=20,
 )
 class ErrorReporterTests(SimpleTestCase):
     def setUp(self):

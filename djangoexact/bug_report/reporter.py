@@ -27,26 +27,30 @@ class ErrorReporter:
         throttle_seconds = getattr(settings, "BUG_REPORT_THROTTLE_SECONDS", 300)
 
         with self._lock:
-            if self._report_count >= max_reports:
-                return False
-
             now = time.time()
-            last_sent = self._throttle_map.get(throttle_key)
-            if last_sent and (now - last_sent) < throttle_seconds:
-                return False
 
-            self._throttle_map[throttle_key] = now
-            self._report_count += 1
-
-            # Clean stale entries
+            # Clean stale entries unconditionally so _throttle_map doesn't
+            # grow unbounded when the session cap is already reached.
             stale_keys = [
                 k
                 for k, v in self._throttle_map.items()
                 if (now - v) > throttle_seconds
             ]
             for k in stale_keys:
-                if k != throttle_key:
-                    del self._throttle_map[k]
+                del self._throttle_map[k]
+
+            # _report_count is a hard session-lifetime cap: once the limit is
+            # reached, no further reports are sent for the entire process
+            # lifetime (it is intentionally not rolling).
+            if self._report_count >= max_reports:
+                return False
+
+            last_sent = self._throttle_map.get(throttle_key)
+            if last_sent and (now - last_sent) < throttle_seconds:
+                return False
+
+            self._throttle_map[throttle_key] = now
+            self._report_count += 1
 
             return True
 
