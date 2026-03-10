@@ -62,6 +62,14 @@ class ErrorReporterTests(SimpleTestCase):
         """Reporter is enabled when endpoint is set."""
         self.assertTrue(self.reporter.is_enabled())
 
+    def test_report_async_spawns_daemon_thread(self):
+        """report_async spawns a background daemon thread."""
+        with patch.object(self.reporter, "send_report") as mock_send:
+            payload = {"error": {"type": "ValueError"}}
+            self.reporter.report_async(payload)
+            import time; time.sleep(0.05)
+            mock_send.assert_called_once_with(payload)
+
     def test_send_report_silently_fails_on_error(self):
         """Network errors are swallowed, not raised."""
         payload = {"error": {"type": "ValueError", "message": "test"}}

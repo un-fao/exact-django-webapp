@@ -61,7 +61,7 @@ class ErrorReporter:
             request = Request(
                 endpoint,
                 data=data,
-                headers={"Content-type": "application/json"},
+                headers={"Content-Type": "application/json"},
                 method="POST",
             )
             urlopen(request, timeout=5)
