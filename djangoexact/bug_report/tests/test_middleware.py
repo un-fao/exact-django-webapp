@@ -90,6 +90,7 @@ class BugReportMiddlewareTests(SimpleTestCase):
         entry = self.middleware._request_buffer[0]
         self.assertNotIn("secret123", entry.get("body_snippet", ""))
         self.assertNotIn("abc", entry.get("body_snippet", ""))
+        self.assertIn("[REDACTED]", entry.get("body_snippet", ""))
 
     def test_process_exception_captures_traceback(self):
         """Unhandled exceptions are captured with traceback.
@@ -118,6 +119,7 @@ class BugReportMiddlewareTests(SimpleTestCase):
                 payload = mock_report.call_args[0][0]
                 self.assertEqual(payload["error"]["type"], "ValueError")
                 self.assertIn("test exception", payload["error"]["traceback"])
+                self.assertIn("Traceback", payload["error"]["traceback"])
 
     @override_settings(BUG_REPORT_ENDPOINT="")
     def test_middleware_inert_when_disabled(self):

@@ -36,7 +36,7 @@ class BugReportMiddleware:
         except Exception as exc:
             duration_ms = round((time.time() - start_time) * 1000)
             self._record_request(request, 500, duration_ms)
-            self.process_exception(request, exc)
+            self._capture_exception(request, exc)
 
             # Report the exception immediately since there is no response
             # object — Django's default handler would eventually return a 500,
@@ -55,8 +55,8 @@ class BugReportMiddleware:
 
         return response
 
-    def process_exception(self, request, exception):
-        """Capture exception details before Django's default handler."""
+    def _capture_exception(self, request, exception):
+        """Capture exception details on the request object."""
         request._bug_report_exception = {
             "type": type(exception).__name__,
             "message": str(exception),
