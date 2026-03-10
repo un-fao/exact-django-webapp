@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "minitool",
     "admin_scripts",
+    "bug_report",
 ]
 
 if DEBUG:
