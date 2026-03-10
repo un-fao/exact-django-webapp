@@ -1,9 +1,8 @@
 import json
 import time
-from collections import deque
 from unittest.mock import patch, MagicMock
 from django.test import SimpleTestCase, RequestFactory, override_settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
 
 @override_settings(
@@ -176,3 +175,13 @@ class BugReportMiddlewareTests(SimpleTestCase):
                 self.middleware(request)
                 payload = mock_report.call_args[0][0]
                 self.assertIsNone(payload["user"]["id"])
+
+    def test_nested_sensitive_fields_redacted(self):
+        """Sensitive fields in nested dicts are redacted."""
+        body = json.dumps({"credentials": {"password": "secret", "api_key": "key123"}, "name": "test"})
+        request = self.factory.post("/api/test/", data=body, content_type="application/json")
+        self.middleware(request)
+        entry = self.middleware._request_buffer[0]
+        self.assertNotIn("secret", entry.get("body_snippet", ""))
+        self.assertNotIn("key123", entry.get("body_snippet", ""))
+        self.assertIn("[REDACTED]", entry.get("body_snippet", ""))

@@ -96,6 +96,7 @@ class BugReportMiddleware:
         body_snippet = self._get_body_snippet(request)
         if body_snippet:
             entry["body_snippet"] = body_snippet
+        request._bug_report_body_snippet = body_snippet
 
         self._request_buffer.append(entry)
 
@@ -124,6 +125,11 @@ class BugReportMiddleware:
                 redacted[key] = "[REDACTED]"
             elif isinstance(value, dict):
                 redacted[key] = self._redact_sensitive(value)
+            elif isinstance(value, list):
+                redacted[key] = [
+                    self._redact_sensitive(item) if isinstance(item, dict) else item
+                    for item in value
+                ]
             else:
                 redacted[key] = value
         return redacted
@@ -156,7 +162,7 @@ class BugReportMiddleware:
         return {
             "method": request.method,
             "path": request.path,
-            "body_snippet": self._get_body_snippet(request),
+            "body_snippet": getattr(request, "_bug_report_body_snippet", self._get_body_snippet(request)),
             "query_params": dict(request.GET),
         }
 
