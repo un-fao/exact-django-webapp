@@ -2054,7 +2054,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
         is_summary = request.query_params.get("summary", False)
-        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
+        is_b_intact_param = request.query_params.get("is_b_intact", None)
         SerializerClass = ActivitySerializerWithModules
         if is_summary:
             SerializerClass = ActivitySummarySerializer
@@ -2068,7 +2068,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return activity_dict
 
         activities_list = Activity.objects.filter(project__id=project_id)
-        activities_list = activities_list.filter(is_b_intact=is_b_intact)
+        if is_b_intact_param is not None:
+            activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
 
         # Start measuring time
         start = time.time()

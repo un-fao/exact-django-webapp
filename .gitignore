@@ -143,7 +143,6 @@ djangoexact/scripts/forman_agb_revisedrevised.csv
 ADMIN_AUTH_SETUP.md
 env-win/*
 python-standalone/**/**
-
-# Worktrees
 .worktrees/
 docs/plans/
+.serena

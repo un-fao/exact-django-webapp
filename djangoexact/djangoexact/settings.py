@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "blog",
     "ckeditor",
     "minitool",
+    "admin_scripts",
 ]
 
 if DEBUG:
