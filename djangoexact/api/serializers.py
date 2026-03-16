@@ -543,6 +543,10 @@ class ModuleExportSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Export all model fields except relations that will be recreated."""
         data = {}
+        # Include original ID so the importer can remap cross-module
+        # OneToOneField references (e.g. Settlement.land_use_change →
+        # LandUseChange) whose PKs change in the target database.
+        data['_original_id'] = instance.id
         excluded_fields = (
             'id', 'activity', 'status', 'data_source', 'note',
             'history', 'last_modified'
@@ -550,9 +554,13 @@ class ModuleExportSerializer(serializers.Serializer):
         for field in instance._meta.get_fields():
             if field.name in excluded_fields:
                 continue
+            # Skip reverse relations (they have no DB column)
+            if not hasattr(field, 'column'):
+                continue
             if hasattr(field, 'get_internal_type'):
                 field_type = field.get_internal_type()
-                if field_type == 'ForeignKey':
+                if field_type in ('ForeignKey', 'OneToOneField'):
+                    # Store FK / OneToOne as ID
                     value = getattr(instance, f'{field.name}_id', None)
                 elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
                     continue
