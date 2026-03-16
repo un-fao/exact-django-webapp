@@ -147,3 +147,5 @@ python-standalone/**/**
 # Worktrees
 .worktrees/
 docs/plans/
+
+.serena

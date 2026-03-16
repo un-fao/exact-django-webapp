@@ -81,7 +81,7 @@ class AnnualCropland(LandModule):
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.soc_start * self.hectares_start * 44/12, ActivityTypes.SOIL_CO2_CHANGE))
 
             except Exception as e:
                 traceback.print_exc()
@@ -203,7 +203,7 @@ class AnnualCropland(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
                     # TODO Peter: Is this the half-year business
-                    inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS)
+                    inventory = InventoryPerGasPerActivity(GasTypes.CO2, self.biomass_start * self.hectares_start* 44/12, ActivityTypes.BIOMASS)
                     self.inventory.emissions_by_sector_by_gas.append(inventory)
 
                 else:
