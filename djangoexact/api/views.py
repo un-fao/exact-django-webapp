@@ -2078,6 +2078,8 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
 class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+    filterset_class = api_filters.NoteFilter
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     @transaction.atomic
     @swagger_auto_schema(responses={400: "Bad request", 201: NoteSerializer}, request_body=NewNoteSerializer)

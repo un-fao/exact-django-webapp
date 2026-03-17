@@ -1,7 +1,9 @@
 import django_filters as filters
-from .models import FuelType, SoilType
+from .models import FuelType, SoilType, Note, ModuleType
 from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey, ManyToManyField
 from rest_framework.filters import BaseFilterBackend
+from django.contrib.contenttypes.models import ContentType
+from . import utilities as utils
 
 
 def get_model_filter(model_arg):
@@ -40,6 +42,19 @@ class SoilTypeFilter(filters.FilterSet):
         model = SoilType
         fields = ["active", "is_coastal"]
 
+class NoteFilter(filters.FilterSet):
+    module_type = filters.NumberFilter(method="filter_module_type")
+    module_id = filters.NumberFilter(field_name="object_id")
+
+    def filter_module_type(self, queryset, name, value):
+        module_type = ModuleType.objects.get(id=value)
+        ModelClass = utils.get_model(module_type.class_name, suffix=None)
+        content_type = ContentType.objects.get_for_model(ModelClass)
+        return queryset.filter(content_type=content_type)
+
+    class Meta:
+        model = Note
+        fields = ["module_type", "module_id"]
 
 class DynamicSearchAndFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
