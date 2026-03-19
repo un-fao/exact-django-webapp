@@ -803,6 +803,83 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # Create new project
         project_data = validated_data['project'].copy()
 
+        def _create_comment(thread, comment_data, author_cache, parent=None):
+            """
+            Recursively create a comment and its replies.
+            Returns the created Comment instance.
+            """
+            from dateutil import parser as date_parser
+
+            author_email = comment_data.get('author_email')
+            author = None
+            if author_email:
+                if author_email in author_cache:
+                    author = author_cache[author_email]
+                else:
+                    author = CustomUser.objects.filter(email=author_email).first()
+                    author_cache[author_email] = author
+
+            # If author not found, use the importing user
+            if author is None:
+                author = request.user
+
+            # Parse date_created if provided
+            date_created = None
+            if comment_data.get('date_created'):
+                try:
+                    date_created = date_parser.parse(comment_data['date_created'])
+                except (ValueError, TypeError):
+                    pass
+
+            comment = Comment.objects.create(
+                thread=thread,
+                parent=parent,
+                author=author,
+                content=comment_data.get('content', ''),
+            )
+
+            # Update date_created if provided (auto_now_add prevents setting during create)
+            if date_created:
+                Comment.objects.filter(pk=comment.pk).update(date_created=date_created)
+
+            # Create replies recursively
+            for reply_data in comment_data.get('replies', []):
+                _create_comment(thread, reply_data, author_cache, parent=comment)
+
+            return comment
+
+        def _reconstruct_threads(instance, module_data, author_cache):
+            """
+            Reconstruct CommentThread objects for a module from exported thread data.
+            This handles thread fields that contain comment data from the export.
+            """
+            for field in instance._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if not field_name.endswith('_thread'):
+                    continue
+
+                thread_data = module_data.get(field_name)
+                if not thread_data or not isinstance(thread_data, dict):
+                    continue
+
+                comments_data = thread_data.get('comments', [])
+                if not comments_data:
+                    continue
+
+                # Get the thread that was created by the module's save() method
+                thread = getattr(instance, field_name, None)
+                if thread is None:
+                    # Create a new thread if one doesn't exist
+                    thread = CommentThread.objects.create()
+                    setattr(instance, field_name, thread)
+                    instance.save(update_fields=[field_name])
+
+                # Create comments within the thread
+                for comment_data in comments_data:
+                    _create_comment(thread, comment_data, author_cache)
+
         def prepare_model_data(model_class, data, module_id_map=None):
             """
             Filter data to valid model fields and convert FK fields to use _id suffix.
@@ -829,9 +906,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     continue
                 value = data[field_name]
 
-                # Skip _thread FK fields — the referenced CommentThreads
-                # don't exist in this database. Module.save() will create
-                # fresh threads via create_comment_threads().
+                # Skip _thread FK fields — these now contain thread/comment data
+                # that will be reconstructed after the module is created.
                 if isinstance(field, ForeignKey) and field_name.endswith('_thread'):
                     continue
 
@@ -929,6 +1005,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     # cross-module OneToOneField refs can be resolved.
                     module_id_map = {}
 
+                    # Cache for author lookups to avoid repeated DB queries
+                    author_cache = {}
+
                     # Create modules
                     for module_type, modules_list in modules_data.items():
                         model_class = self._get_module_class(module_type)
@@ -936,6 +1015,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             for module_data in modules_list:
                                 module_data = module_data.copy()
                                 original_id = module_data.pop('_original_id', None)
+                                submodules_data = module_data.pop('_submodules', [])
 
                                 filtered_module_data = prepare_model_data(
                                     model_class, module_data, module_id_map
@@ -947,6 +1027,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
                                 if original_id is not None:
                                     module_id_map[original_id] = new_instance
+
+                                # Reconstruct threads with comments for the module
+                                _reconstruct_threads(new_instance, module_data, author_cache)
+
+                                # Create submodules if present in the export
+                                if submodules_data:
+                                    self._create_submodules(
+                                        new_instance, submodules_data, prepare_model_data,
+                                        _reconstruct_threads, author_cache, module_id_map
+                                    )
 
                 return Response({
                     "exists": False,
@@ -965,6 +1055,74 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """Get module model class by name."""
         from . import models
         return getattr(models, class_name, None)
+
+    def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
+                           reconstruct_threads_fn, author_cache, module_id_map):
+        """
+        Create submodules for a parent module from exported submodule data.
+
+        Args:
+            parent_instance: The parent module instance
+            submodules_data: List of submodule data dictionaries from export
+            prepare_model_data: Function to filter model data
+            reconstruct_threads_fn: Function to reconstruct thread comments
+            author_cache: Cache for author lookups
+            module_id_map: Map of original IDs to new instances
+        """
+        for submodule_data in submodules_data:
+            submodule_data = submodule_data.copy()
+            original_id = submodule_data.pop('_original_id', None)
+            nested_submodules = submodule_data.pop('_submodules', [])
+            submodule_type = submodule_data.pop('_submodule_type', None)
+
+            # Get the submodule class
+            submodule_class = None
+
+            # First try to use the stored submodule type from the export
+            if submodule_type:
+                submodule_class = self._get_module_class(submodule_type)
+
+            # Fallback: try to determine from parent's related models
+            if submodule_class is None:
+                for field in parent_instance._meta.get_fields():
+                    if hasattr(field, 'related_model') and hasattr(field, 'related_query_name'):
+                        related_model = field.related_model
+                        # Check if this related model has a 'parent' field pointing to our parent class
+                        for related_field in related_model._meta.get_fields():
+                            if hasattr(related_field, 'column') and related_field.name == 'parent':
+                                if hasattr(related_field, 'related_model'):
+                                    if related_field.related_model == parent_instance.__class__:
+                                        submodule_class = related_model
+                                        break
+                    if submodule_class:
+                        break
+
+            if submodule_class is None:
+                logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
+                continue
+
+            filtered_submodule_data = prepare_model_data(
+                submodule_class, submodule_data, module_id_map
+            )
+
+            # Create the submodule with parent reference
+            new_submodule = submodule_class.objects.create(
+                parent=parent_instance,
+                **filtered_submodule_data
+            )
+
+            if original_id is not None:
+                module_id_map[original_id] = new_submodule
+
+            # Reconstruct threads for the submodule
+            reconstruct_threads_fn(new_submodule, submodule_data, author_cache)
+
+            # Recursively create nested submodules if present
+            if nested_submodules:
+                self._create_submodules(
+                    new_submodule, nested_submodules, prepare_model_data,
+                    reconstruct_threads_fn, author_cache, module_id_map
+                )
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
