@@ -537,6 +537,156 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
 
+class ModuleExportSerializer(serializers.Serializer):
+    """Generic serializer for exporting any module type."""
+
+    def _serialize_comment(self, comment):
+        """Serialize a single comment with its replies."""
+        comment_data = {
+            'content': comment.content,
+            'author_email': comment.author.email if comment.author else None,
+            'date_created': comment.date_created.isoformat() if comment.date_created else None,
+        }
+        # Include replies recursively
+        if comment.replies.exists():
+            comment_data['replies'] = [
+                self._serialize_comment(reply) for reply in comment.replies.all()
+            ]
+        return comment_data
+
+    def _serialize_thread(self, thread):
+        """Serialize a CommentThread with all its comments."""
+        if thread is None:
+            return None
+
+        # Get top-level comments only (those without a parent)
+        top_level_comments = thread.comments.filter(parent__isnull=True).order_by('date_created')
+
+        return {
+            'comments': [self._serialize_comment(comment) for comment in top_level_comments]
+        }
+
+    def to_representation(self, instance):
+        """Export all model fields except relations that will be recreated."""
+        data = {}
+        # Include original ID so the importer can remap cross-module
+        # OneToOneField references (e.g. Settlement.land_use_change →
+        # LandUseChange) whose PKs change in the target database.
+        data['_original_id'] = instance.id
+        excluded_fields = (
+            'id', 'activity', 'status', 'data_source', 'note',
+            'history', 'last_modified', 'parent'
+        )
+        for field in instance._meta.get_fields():
+            if field.name in excluded_fields:
+                continue
+            # Skip reverse relations (they have no DB column)
+            if not hasattr(field, 'column'):
+                continue
+            if hasattr(field, 'get_internal_type'):
+                field_type = field.get_internal_type()
+                if field_type in ('ForeignKey', 'OneToOneField'):
+                    # For thread fields, serialize the full thread data with comments
+                    if field.name.endswith('_thread'):
+                        thread_instance = getattr(instance, field.name, None)
+                        thread_data = self._serialize_thread(thread_instance)
+                        if thread_data and thread_data.get('comments'):
+                            data[field.name] = thread_data
+                    else:
+                        # Store FK / OneToOne as ID
+                        value = getattr(instance, f'{field.name}_id', None)
+                        if value is not None:
+                            data[field.name] = value
+                elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
+                    continue
+                else:
+                    value = getattr(instance, field.name, None)
+                    if value is not None:
+                        data[field.name] = value
+
+        # Export submodules if the module has them
+        if hasattr(instance, 'submodules'):
+            submodules = instance.submodules
+            if submodules:
+                submodules_list = []
+                for submodule in submodules:
+                    submodule_data = self.to_representation(submodule)
+                    # Include the submodule class name for proper reconstruction
+                    submodule_data['_submodule_type'] = submodule.__class__.__name__
+                    submodules_list.append(submodule_data)
+                data['_submodules'] = submodules_list
+
+        return data
+
+
+class ActivityExportSerializer(serializers.ModelSerializer):
+    """Serializer for exporting activities with their modules."""
+    modules = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        exclude = ['id', 'project', 'owner', 'created_at', 'updated_at']
+
+    def get_modules(self, obj):
+        """Group modules by their type."""
+        result = {}
+        module_serializer = ModuleExportSerializer()
+        for module in obj.modules:
+            module_type = module.__class__.__name__
+            if module_type not in result:
+                result[module_type] = []
+            result[module_type].append(module_serializer.to_representation(module))
+        return result
+
+
+class ProjectExportSerializer(serializers.ModelSerializer):
+    """Serializer for full project export."""
+    activities = ActivityExportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        for field in ['country', 'climate', 'moisture', 'soil_type', 'gw_potential', 'status']:
+            if field in data and data[field] is not None:
+                if isinstance(data[field], dict) and 'id' in data[field]:
+                    data[field] = data[field]['id']
+        return data
+
+
+class ProjectImportSerializer(serializers.Serializer):
+    """Serializer for validating and processing project imports."""
+    formatVersion = serializers.IntegerField()
+    appVersion = serializers.CharField()
+    compatibilityGroup = serializers.IntegerField()
+    exportedAt = serializers.DateTimeField()
+    exportId = serializers.UUIDField()
+    project = serializers.DictField()
+
+    def validate_compatibilityGroup(self, value):
+        """Ensure compatibility group matches current app."""
+        from .views import get_version_config
+        current_config = get_version_config()
+        current_group = current_config.get("compatibilityGroup", 1)
+        if value != current_group:
+            raise serializers.ValidationError(
+                f"This project was created with EX-ACT v{value} and cannot be "
+                f"imported into this version (v{current_group})."
+            )
+        return value
+
+    def validate_formatVersion(self, value):
+        """Ensure format version is supported."""
+        if value != 1:
+            raise serializers.ValidationError(
+                f"Unsupported file format version: {value}"
+            )
+        return value
+
+
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
