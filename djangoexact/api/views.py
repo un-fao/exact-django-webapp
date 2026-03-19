@@ -804,13 +804,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # Create new project
         project_data = validated_data['project'].copy()
 
-        def prepare_model_data(model_class, data):
+        def prepare_model_data(model_class, data, module_id_map=None):
             """
             Filter data to valid model fields and convert FK fields to use _id suffix.
             Django expects FK fields as either model instances or field_id=integer.
             Since exports contain integer IDs, we need to use the _id suffix.
+
+            For OneToOneField cross-references between modules in the same
+            activity (e.g. Settlement.land_use_change → LandUseChange),
+            ``module_id_map`` remaps old PKs to newly-created instances.
             """
+            import re
             from django.db.models import ForeignKey
+            from django.db.models.fields.related import OneToOneField
+
+            if module_id_map is None:
+                module_id_map = {}
 
             result = {}
             for field in model_class._meta.get_fields():
@@ -820,6 +829,36 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 if field_name not in data:
                     continue
                 value = data[field_name]
+
+                # Skip _thread FK fields — the referenced CommentThreads
+                # don't exist in this database. Module.save() will create
+                # fresh threads via create_comment_threads().
+                if isinstance(field, ForeignKey) and field_name.endswith('_thread'):
+                    continue
+
+                # OneToOneField cross-module references need ID remapping
+                # because the referenced module was re-created with a new PK.
+                if isinstance(field, OneToOneField):
+                    if isinstance(value, int) and value in module_id_map:
+                        # New export format: integer ID that maps to a
+                        # previously-created module in this activity.
+                        result[f"{field_name}_id"] = module_id_map[value].id
+                    elif isinstance(value, str):
+                        # Old export format: string like "(4) LandUseChange
+                        # in settlements". Parse the PK and remap.
+                        match = re.match(r'\((\d+)\)', value)
+                        if match:
+                            old_pk = int(match.group(1))
+                            if old_pk in module_id_map:
+                                result[f"{field_name}_id"] = module_id_map[old_pk].id
+                        # If not in the map the target module hasn't been
+                        # created yet or doesn't exist — skip gracefully
+                        # (the field is nullable).
+                    elif isinstance(value, int):
+                        # Reference-data FK (e.g. OrganicSoil pointing to
+                        # a shared record) — not in the map, use as-is.
+                        result[f"{field_name}_id"] = value
+                    continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
                 if isinstance(field, ForeignKey) and isinstance(value, int):
@@ -879,17 +918,37 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     if module_types_data:
                         activity.module_types.set(module_types_data)
 
+                    # Sort so modules referenced via OneToOneField are created
+                    # first: OrganicSoil → LandUseChange → everything else.
+                    def _module_sort_key(item):
+                        priority = {'OrganicSoil': 0, 'LandUseChange': 1}
+                        return priority.get(item[0], 2)
+
+                    modules_data = dict(sorted(modules_data.items(), key=_module_sort_key))
+
+                    # Maps old module PK → newly-created instance so that
+                    # cross-module OneToOneField refs can be resolved.
+                    module_id_map = {}
+
                     # Create modules
                     for module_type, modules_list in modules_data.items():
                         model_class = self._get_module_class(module_type)
                         if model_class:
                             for module_data in modules_list:
+                                module_data = module_data.copy()
+                                original_id = module_data.pop('_original_id', None)
+
                                 # Prepare module data with proper FK handling
-                                filtered_module_data = prepare_model_data(model_class, module_data)
-                                model_class.objects.create(
+                                filtered_module_data = prepare_model_data(
+                                    model_class, module_data, module_id_map
+                                )
+                                new_instance = model_class.objects.create(
                                     activity=activity,
                                     **filtered_module_data
                                 )
+
+                                if original_id is not None:
+                                    module_id_map[original_id] = new_instance
 
                 return Response({
                     "exists": False,

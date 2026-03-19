@@ -6948,6 +6948,8 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
         if not self.rshoot_before_20_yrs:
             raise ValueError(RSHOOT_UNDER_20_NOT_FOUND)
+        if self.rshoot_before_20_yrs.threshold is None:
+            self.rshoot_before_20_yrs.threshold = 0
 
         self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
         if not self.rshoot_after_20_yrs:
