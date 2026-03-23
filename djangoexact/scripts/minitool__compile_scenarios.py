@@ -421,6 +421,39 @@ def convert_scenario_from_minitool_format(scenario_dict, scenario_name, category
 
                         changes.append(change)
 
+        organic_soil_config = module_data.get("organic_soil")
+        if organic_soil_config:
+            csv_row_filters["organic_soil_total"] = NOT_NULL
+            os_fields = organic_soil_config.get("fields", {})
+            os_changes = {}
+            for field_key, field_value in os_fields.items():
+                values = field_value if isinstance(field_value, list) else [field_value]
+                if field_key.endswith("_start"):
+                    field_name = f"organic_soil_{field_key[:-6]}"
+                    if field_name not in os_changes:
+                        os_changes[field_name] = {"start": [], "end": []}
+                    os_changes[field_name]["start"] = [str(v) for v in values]
+                elif field_key.endswith("_w"):
+                    field_name = f"organic_soil_{field_key[:-2]}"
+                    if field_name not in os_changes:
+                        os_changes[field_name] = {"start": [], "end": []}
+                    os_changes[field_name]["end"] = [str(v) for v in values]
+
+            for field_name, field_data in os_changes.items():
+                start_values = field_data.get("start", [])
+                end_values = field_data.get("end", [])
+                if not start_values or not end_values:
+                    continue
+                for start_val in start_values:
+                    for end_val in end_values:
+                        if start_val == end_val:
+                            continue
+                        changes.append({
+                            "module_type": module_type_name,
+                            "start": {"field": field_name, "value": start_val},
+                            "end": {"field": field_name, "value": end_val},
+                        })
+
     if not changes:
         return None
 
@@ -497,6 +530,11 @@ AQUATIC_RESTORATION = [
     convert_scenario_from_minitool_format(scenarios.MANGROVE_REPLANTING_2, "Mangrove Replanting: and Natural Recruitment: assuming full restoration of hydrology and biomass", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.COASTAL_ZONE_STABILIZATION_1, "Coastal Zone Stabilization (e.g. through vegetation or permeable structures)", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.RIVERBANK_RESTORATION_1, "Riverbank or Riparian Restoration: Grassland to perennial", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1, "Wetland Hydrological Restoration: Annual Cropland (organic soil rewetting)", "Aquatic Restoration"),
+    convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2, "Wetland Hydrological Restoration: Grassland (organic soil rewetting)", "Aquatic Restoration"),
+]
+
+FOO = [
     convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_1, "Wetland Hydrological Restoration: Annual Cropland (organic soil rewetting)", "Aquatic Restoration"),
     convert_scenario_from_minitool_format(scenarios.WETLAND_HYDROLOGICAL_RESTORATION_2, "Wetland Hydrological Restoration: Grassland (organic soil rewetting)", "Aquatic Restoration"),
 ]
@@ -651,7 +689,7 @@ def run(clear: bool = False):
     if clear:
         models.EmissionScenario.objects.all().delete()
 
-    scenarios = [scenario for scenario in (SOIL_LAND_RESTORATION + AGROECOLOGICAL_PRODUCTIVE + AQUATIC_RESTORATION + FOREST_RESTORATION) if scenario is not None]
+    scenarios = [scenario for scenario in FOO if scenario is not None]
 
     for scenario in scenarios:
         category, created = models.EmissionScenarioCategory.objects.get_or_create(name=scenario["category"])
