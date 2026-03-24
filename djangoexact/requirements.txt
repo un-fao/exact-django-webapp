@@ -45,7 +45,7 @@ ruamel.yaml.clib==0.2.7
 simplejson==3.19.1
 six==1.16.0
 sqlparse==0.4.4
-setuptools>=69
+setuptools>=69,<78
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==1.26.19
