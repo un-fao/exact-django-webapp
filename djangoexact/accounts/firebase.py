@@ -6,7 +6,6 @@ from api.models import CustomUser as User
 from firebase_admin import auth as firebase_admin_auth
 from firebase_admin import credentials
 from rest_framework import authentication, exceptions
-
 from djangoexact.settings import FIREBASE_CONFIG
 
 
@@ -19,7 +18,8 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             return None
 
         # If request is for login or register, or admin, skip authentication
-        if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/api/accounts/token/refresh/", "/admin", "/api/swagger/", "/api/accounts/password-reset/"]:
+        # Admin scripts use Django session auth (not Firebase), so skip Firebase authentication
+        if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/api/accounts/token/refresh/", "/admin", "/api/swagger/", "/api/accounts/password-reset/"] or request.path.startswith("/api/admin-scripts/"):
             return None
 
         parts = token.split()

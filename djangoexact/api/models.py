@@ -634,6 +634,13 @@ class Project(Historical, DirtyFieldsMixin):
 
     map_data = models.JSONField(null=True, blank=True, verbose_name="map_data")
 
+    export_id = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True,
+        help_text="UUID for identifying this project across exports/imports"
+    )
+
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
@@ -983,6 +990,9 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     def area(self):
         return self.get_land_modules_area()
 
+    def heads(self):
+        return self.get_livestock_modules_heads()
+
     @property
     def start_year(self):
         return self.start_year_t2 if self.start_year_t2 is not None else self.project.start_year_of_activities
@@ -1038,6 +1048,14 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 area += module.area
                 break
         return area
+
+    def get_livestock_modules_heads(self) -> float:
+        heads = 0
+
+        for module in self.modules:
+            if isinstance(module, Livestock):
+                heads += module.heads_number_w
+        return heads
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"

@@ -144,7 +144,7 @@ class PerennialCropland(LandModule):
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_soil_emissions], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,self.soc_start * self.hectares_start*44/12, ActivityTypes.SOIL_CO2_CHANGE))
 
             except Exception as e:
                 traceback.print_exc()
@@ -200,11 +200,12 @@ class PerennialCropland(LandModule):
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
-                        inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS)
-                        self.inventory.emissions_by_sector_by_gas(inventory)
-                        
                 else:
                     pass
+
+                # TODO: Do wherever we have the same biomass emissions logic in other land modules
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start * self.hectares_start * 44/12, ActivityTypes.BIOMASS)
+                self.inventory.emissions_by_sector_by_gas(inventory)
 
             except Exception as e:
                 traceback.print_exc()

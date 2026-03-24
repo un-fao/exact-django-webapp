@@ -1,0 +1,97 @@
+{% extends "admin_scripts/base.html" %}
+
+{% block title %}Compile Scenarios — Admin Scripts{% endblock %}
+
+{% block content %}
+<a href="{% url 'admin_scripts:dashboard' %}" class="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to Dashboard</a>
+
+<h1 class="text-2xl font-bold text-gray-900 mb-2">Compile Scenarios</h1>
+<p class="text-sm text-gray-500 mb-6">Build custom emission scenarios and compute statistics from ChangeRecord data.</p>
+
+<form method="post" action="{% url 'admin_scripts:compile-scenarios-export' %}" id="scenario-form">
+    {% csrf_token %}
+
+    {# Tab bar #}
+    <div class="flex items-center gap-1 border-b border-gray-200 mb-4">
+        <div id="scenario-tabs" class="flex">
+            {% for scenario in scenarios %}
+            <button type="button" data-scenario-tab="{{ forloop.counter0 }}"
+                    onclick="switchScenarioTab({{ forloop.counter0 }})"
+                    class="px-4 py-2 text-sm font-medium border-b-2 {% if forloop.first %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700{% endif %}">
+                Scenario {{ forloop.counter }}
+            </button>
+            {% endfor %}
+        </div>
+        <button type="button"
+                hx-get="{% url 'admin_scripts:htmx-add-scenario' %}"
+                hx-target="#scenario-panels"
+                hx-swap="beforeend"
+                hx-vals='js:{"index": document.querySelectorAll("[data-scenario-panel]").length}'
+                hx-on::after-settle="switchScenarioTab(document.querySelectorAll('[data-scenario-panel]').length - 1)"
+                class="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
+            + Add Scenario
+        </button>
+    </div>
+
+    {# Scenario panels #}
+    <div id="scenario-panels">
+        {% for scenario in scenarios %}
+            {% include "admin_scripts/partials/scenario_panel.html" with scenario_index=forloop.counter0 scenario=scenario module_types=module_types default_prefix=scenario.default_prefix default_id_prefix=scenario.default_id_prefix active=forloop.first %}
+        {% endfor %}
+    </div>
+
+    {# Global filters (shared) #}
+    <details class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+        <summary class="text-sm font-medium text-gray-700 cursor-pointer">Global Filters (applied to all scenarios)</summary>
+        <div class="mt-3 grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Soil Type</label>
+                <select name="global_filter_soil_type" multiple
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" size="3">
+                    <option value="High Activity Clay" selected>High Activity Clay</option>
+                    <option value="Low Activity Clay" selected>Low Activity Clay</option>
+                    <option value="Sandy" selected>Sandy</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Region</label>
+                <select name="global_filter_region" multiple
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" size="3">
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Leave empty for all regions</p>
+            </div>
+        </div>
+    </details>
+
+    {# Export all #}
+    <button type="submit"
+            class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 text-sm font-medium">
+        Export All to Excel
+    </button>
+</form>
+
+{% if error %}
+<div class="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+    {{ error }}
+</div>
+{% endif %}
+
+<script>
+function switchScenarioTab(index) {
+    document.querySelectorAll('[data-scenario-panel]').forEach(function(p) {
+        p.classList.add('hidden');
+    });
+    document.querySelectorAll('[data-scenario-tab]').forEach(function(t) {
+        t.classList.remove('border-blue-500', 'text-blue-600');
+        t.classList.add('border-transparent', 'text-gray-500');
+    });
+    var panel = document.querySelector('[data-scenario-panel="' + index + '"]');
+    if (panel) panel.classList.remove('hidden');
+    var tab = document.querySelector('[data-scenario-tab="' + index + '"]');
+    if (tab) {
+        tab.classList.add('border-blue-500', 'text-blue-600');
+        tab.classList.remove('border-transparent', 'text-gray-500');
+    }
+}
+</script>
+{% endblock %}

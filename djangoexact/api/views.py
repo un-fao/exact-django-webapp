@@ -1,5 +1,8 @@
+import json
 import os
 import logging
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from django.urls import reverse
 from django.conf import settings
@@ -11,6 +14,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -83,6 +87,8 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
+    ProjectExportSerializer,
+    ProjectImportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -389,6 +395,20 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
+def get_version_config():
+    """Read version config from file or environment."""
+    config_paths = [
+        Path(__file__).parent.parent.parent / 'version.config.json',
+        Path(os.environ.get('EXACT_USER_DATA_DIR', '')) / 'version.config.json',
+    ]
+    for config_path in config_paths:
+        if config_path.exists():
+            with open(config_path) as f:
+                return json.load(f)
+    # Default for development
+    return {"appVersion": "1.0.0", "compatibilityGroup": 1}
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -690,6 +710,409 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Export project as .exactproject file",
+        responses={
+            200: "Project exported successfully",
+            403: "Permission denied",
+            404: "Project not found"
+        }
+    )
+    def export(self, request, pk=None):
+        """Export a project with all its activities and modules."""
+        project: Project = get_object_or_404(Project, pk=pk)
+
+        # Check permission
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        # Generate export_id if not exists
+        if not project.export_id:
+            project.export_id = uuid.uuid4()
+            project.save(update_fields=['export_id'])
+
+        # Get version config
+        version_config = get_version_config()
+
+        # Build export data
+        serializer = ProjectExportSerializer(project)
+        export_data = {
+            "formatVersion": 1,
+            "appVersion": version_config.get("appVersion", "1.0.0"),
+            "compatibilityGroup": version_config.get("compatibilityGroup", 1),
+            "exportedAt": timezone.now().isoformat(),
+            "exportId": str(project.export_id),
+            "project": serializer.data
+        }
+
+        # Return as JSON file
+        response = HttpResponse(
+            json.dumps(export_data, indent=2, default=str),
+            content_type="application/json"
+        )
+        safe_name = project.name.replace('"', '').replace('/', '-')[:50]
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        return response
+
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(
+        operation_description="Import a .exactproject file",
+        request_body=ProjectImportSerializer,
+        responses={
+            200: "Project already exists",
+            201: "Project imported successfully",
+            400: "Invalid file format or compatibility mismatch"
+        }
+    )
+    def import_project(self, request):
+        """Import a project from .exactproject file data."""
+        serializer = ProjectImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return utils.ErrorResponse(
+                serializer.errors,
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        validated_data = serializer.validated_data
+        export_id = validated_data['exportId']
+        force_copy = request.query_params.get('forceCopy', 'false').lower() == 'true'
+
+        # Check if project with this export_id already exists
+        if not force_copy:
+            existing = Project.objects.filter(export_id=export_id).first()
+            if existing:
+                return Response({
+                    "exists": True,
+                    "projectId": existing.id,
+                    "projectName": existing.name
+                }, status=http_status.HTTP_200_OK)
+
+        # Create new project
+        project_data = validated_data['project'].copy()
+
+        def _create_comment(thread, comment_data, author_cache, parent=None):
+            """
+            Recursively create a comment and its replies.
+            Returns the created Comment instance.
+            """
+            from dateutil import parser as date_parser
+
+            author_email = comment_data.get('author_email')
+            author = None
+            if author_email:
+                if author_email in author_cache:
+                    author = author_cache[author_email]
+                else:
+                    author = CustomUser.objects.filter(email=author_email).first()
+                    author_cache[author_email] = author
+
+            # If author not found, use the importing user
+            if author is None:
+                author = request.user
+
+            # Parse date_created if provided
+            date_created = None
+            if comment_data.get('date_created'):
+                try:
+                    date_created = date_parser.parse(comment_data['date_created'])
+                except (ValueError, TypeError):
+                    pass
+
+            comment = Comment.objects.create(
+                thread=thread,
+                parent=parent,
+                author=author,
+                content=comment_data.get('content', ''),
+            )
+
+            # Update date_created if provided (auto_now_add prevents setting during create)
+            if date_created:
+                Comment.objects.filter(pk=comment.pk).update(date_created=date_created)
+
+            # Create replies recursively
+            for reply_data in comment_data.get('replies', []):
+                _create_comment(thread, reply_data, author_cache, parent=comment)
+
+            return comment
+
+        def _reconstruct_threads(instance, module_data, author_cache):
+            """
+            Reconstruct CommentThread objects for a module from exported thread data.
+            This handles thread fields that contain comment data from the export.
+            """
+            for field in instance._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if not field_name.endswith('_thread'):
+                    continue
+
+                thread_data = module_data.get(field_name)
+                if not thread_data or not isinstance(thread_data, dict):
+                    continue
+
+                comments_data = thread_data.get('comments', [])
+                if not comments_data:
+                    continue
+
+                # Get the thread that was created by the module's save() method
+                thread = getattr(instance, field_name, None)
+                if thread is None:
+                    # Create a new thread if one doesn't exist
+                    thread = CommentThread.objects.create()
+                    setattr(instance, field_name, thread)
+                    instance.save(update_fields=[field_name])
+
+                # Create comments within the thread
+                for comment_data in comments_data:
+                    _create_comment(thread, comment_data, author_cache)
+
+        def prepare_model_data(model_class, data, module_id_map=None):
+            """
+            Filter data to valid model fields and convert FK fields to use _id suffix.
+            Django expects FK fields as either model instances or field_id=integer.
+            Since exports contain integer IDs, we need to use the _id suffix.
+
+            For OneToOneField cross-references between modules in the same
+            activity (e.g. Settlement.land_use_change → LandUseChange),
+            ``module_id_map`` remaps old PKs to newly-created instances.
+            """
+            import re
+            from django.db.models import ForeignKey
+            from django.db.models.fields.related import OneToOneField
+
+            if module_id_map is None:
+                module_id_map = {}
+
+            result = {}
+            for field in model_class._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if field_name not in data:
+                    continue
+                value = data[field_name]
+
+                # Skip _thread FK fields — these now contain thread/comment data
+                # that will be reconstructed after the module is created.
+                if isinstance(field, ForeignKey) and field_name.endswith('_thread'):
+                    continue
+
+                # OneToOneField cross-module references need ID remapping
+                # because the referenced module was re-created with a new PK.
+                if isinstance(field, OneToOneField):
+                    if isinstance(value, int) and value in module_id_map:
+                        # New export format: integer ID that maps to a
+                        # previously-created module in this activity.
+                        result[f"{field_name}_id"] = module_id_map[value].id
+                    elif isinstance(value, str):
+                        # Old export format: string like "(4) LandUseChange
+                        # in settlements". Parse the PK and remap.
+                        match = re.match(r'\((\d+)\)', value)
+                        if match:
+                            old_pk = int(match.group(1))
+                            if old_pk in module_id_map:
+                                result[f"{field_name}_id"] = module_id_map[old_pk].id
+                        # If not in the map the target module hasn't been
+                        # created yet or doesn't exist — skip gracefully
+                        # (the field is nullable).
+                    elif isinstance(value, int):
+                        # Reference-data FK (e.g. OrganicSoil pointing to
+                        # a shared record) — not in the map, use as-is.
+                        result[f"{field_name}_id"] = value
+                    continue
+
+                # For ForeignKey fields with integer values, use field_id suffix
+                if isinstance(field, ForeignKey) and isinstance(value, int):
+                    result[f"{field_name}_id"] = value
+                else:
+                    result[field_name] = value
+            return result
+
+        try:
+            with transaction.atomic():
+                # Extract activities before creating project
+                activities_data = project_data.pop('activities', [])
+
+                # Prepare project data with proper FK handling
+                filtered_project_data = prepare_model_data(Project, project_data)
+
+                # Generate unique name if needed (unique_together on name + owner)
+                base_name = filtered_project_data.get('name', 'Imported Project')
+                name = base_name
+                counter = 1
+                while Project.objects.filter(name=name, owner=request.user).exists():
+                    counter += 1
+                    name = f"{base_name} (Copy {counter})" if counter > 2 else f"{base_name} (Copy)"
+                filtered_project_data['name'] = name
+
+                # Create project
+                project = Project.objects.create(
+                    owner=request.user,
+                    export_id=export_id if not force_copy else uuid.uuid4(),
+                    **filtered_project_data
+                )
+
+                # Lock project and create membership (same as regular create)
+                project.lock(request.user)
+                ProjectMembership.objects.create(
+                    user=request.user,
+                    project=project,
+                    group=Group.objects.get_or_create(name="Admin")[0]
+                )
+
+                # Create activities and modules
+                for activity_data in activities_data:
+                    activity_data = activity_data.copy()
+                    modules_data = activity_data.pop('modules', {})
+                    module_types_data = activity_data.pop('module_types', [])
+
+                    # Prepare activity data with proper FK handling
+                    filtered_activity_data = prepare_model_data(Activity, activity_data)
+
+                    activity = Activity.objects.create(
+                        project=project,
+                        owner=request.user,
+                        **filtered_activity_data
+                    )
+
+                    # Set module types
+                    if module_types_data:
+                        activity.module_types.set(module_types_data)
+
+                    # Sort so modules referenced via OneToOneField are created
+                    # first: OrganicSoil → LandUseChange → everything else.
+                    def _module_sort_key(item):
+                        priority = {'OrganicSoil': 0, 'LandUseChange': 1}
+                        return priority.get(item[0], 2)
+
+                    modules_data = dict(sorted(modules_data.items(), key=_module_sort_key))
+
+                    # Maps old module PK → newly-created instance so that
+                    # cross-module OneToOneField refs can be resolved.
+                    module_id_map = {}
+
+                    # Cache for author lookups to avoid repeated DB queries
+                    author_cache = {}
+
+                    # Create modules
+                    for module_type, modules_list in modules_data.items():
+                        model_class = self._get_module_class(module_type)
+                        if model_class:
+                            for module_data in modules_list:
+                                module_data = module_data.copy()
+                                original_id = module_data.pop('_original_id', None)
+                                submodules_data = module_data.pop('_submodules', [])
+
+                                filtered_module_data = prepare_model_data(
+                                    model_class, module_data, module_id_map
+                                )
+                                new_instance = model_class.objects.create(
+                                    activity=activity,
+                                    **filtered_module_data
+                                )
+
+                                if original_id is not None:
+                                    module_id_map[original_id] = new_instance
+
+                                # Reconstruct threads with comments for the module
+                                _reconstruct_threads(new_instance, module_data, author_cache)
+
+                                # Create submodules if present in the export
+                                if submodules_data:
+                                    self._create_submodules(
+                                        new_instance, submodules_data, prepare_model_data,
+                                        _reconstruct_threads, author_cache, module_id_map
+                                    )
+
+                return Response({
+                    "exists": False,
+                    "projectId": project.id,
+                    "projectName": project.name
+                }, status=http_status.HTTP_201_CREATED)
+
+        except Exception as e:
+            logger.error(f"Failed to import project: {str(e)}")
+            return utils.ErrorResponse(
+                f"Failed to import project: {str(e)}",
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+    def _get_module_class(self, class_name):
+        """Get module model class by name."""
+        from . import models
+        return getattr(models, class_name, None)
+
+    def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
+                           reconstruct_threads_fn, author_cache, module_id_map):
+        """
+        Create submodules for a parent module from exported submodule data.
+
+        Args:
+            parent_instance: The parent module instance
+            submodules_data: List of submodule data dictionaries from export
+            prepare_model_data: Function to filter model data
+            reconstruct_threads_fn: Function to reconstruct thread comments
+            author_cache: Cache for author lookups
+            module_id_map: Map of original IDs to new instances
+        """
+        for submodule_data in submodules_data:
+            submodule_data = submodule_data.copy()
+            original_id = submodule_data.pop('_original_id', None)
+            nested_submodules = submodule_data.pop('_submodules', [])
+            submodule_type = submodule_data.pop('_submodule_type', None)
+
+            # Get the submodule class
+            submodule_class = None
+
+            # First try to use the stored submodule type from the export
+            if submodule_type:
+                submodule_class = self._get_module_class(submodule_type)
+
+            # Fallback: try to determine from parent's related models
+            if submodule_class is None:
+                for field in parent_instance._meta.get_fields():
+                    if hasattr(field, 'related_model') and hasattr(field, 'related_query_name'):
+                        related_model = field.related_model
+                        # Check if this related model has a 'parent' field pointing to our parent class
+                        for related_field in related_model._meta.get_fields():
+                            if hasattr(related_field, 'column') and related_field.name == 'parent':
+                                if hasattr(related_field, 'related_model'):
+                                    if related_field.related_model == parent_instance.__class__:
+                                        submodule_class = related_model
+                                        break
+                    if submodule_class:
+                        break
+
+            if submodule_class is None:
+                logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
+                continue
+
+            filtered_submodule_data = prepare_model_data(
+                submodule_class, submodule_data, module_id_map
+            )
+
+            # Create the submodule with parent reference
+            new_submodule = submodule_class.objects.create(
+                parent=parent_instance,
+                **filtered_submodule_data
+            )
+
+            if original_id is not None:
+                module_id_map[original_id] = new_submodule
+
+            # Reconstruct threads for the submodule
+            reconstruct_threads_fn(new_submodule, submodule_data, author_cache)
+
+            # Recursively create nested submodules if present
+            if nested_submodules:
+                self._create_submodules(
+                    new_submodule, nested_submodules, prepare_model_data,
+                    reconstruct_threads_fn, author_cache, module_id_map
+                )
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
@@ -1904,14 +2327,15 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
         modules = self.request.query_params.get("modules", False)
-        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
+        is_b_intact_param = request.query_params.get("is_b_intact", None)
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
             return error
 
         activities_list = Activity.objects.filter(project__id=project_id)
-        activities_list = activities_list.filter(is_b_intact=is_b_intact)
+        if is_b_intact_param is not None:
+            activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
 
         SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
 

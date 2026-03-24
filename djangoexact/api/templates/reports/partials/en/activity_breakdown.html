@@ -18,9 +18,13 @@
                     <div class="col-sm-12 text-start">
                         <p>The activity will be implemented starting from {{ activity.start_year }}, for {{ activity.implementation_years }} years, ending in {{ activity.last_year_of_accounting }}.</p>
                         <p>
-                            Impact: {{ activity.area }} {{ activity.main_impact }}
+                            {% if activity.is_livestock %}
+                                Impact: {{ activity.heads }} heads of livestock
+                            {% else %}
+                                Impact: {{ activity.area }} {{ activity.main_impact }}
+                                .
+                            {% endif %}
                             {% if activity.secondary_impacts %}, plus emissions from {{ activity.secondary_impacts }}{% endif %}
-                            .
                         </p>
                         <p>
                             Carbon balance: <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>.

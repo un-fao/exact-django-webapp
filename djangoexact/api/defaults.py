@@ -628,9 +628,9 @@ class LargeFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_w_default=self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_wo_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -693,9 +693,9 @@ class SmallFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_w_default=self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_wo_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -1409,7 +1409,7 @@ class ForestManagementDefaults(Defaults):
             agb_start = defaults.agb_start_w
         elif defaults.agb_start_wo is not None:
             agb_start = defaults.agb_start_wo
-
+        
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_start_w is not None:
             bgb_start = defaults.agb_start_w * defaults.rshoot_after_20_yrs.value
         elif defaults.rshoot_after_20_yrs is not None and defaults.agb_start_wo is not None:
@@ -1420,6 +1420,11 @@ class ForestManagementDefaults(Defaults):
 
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_wo is not None:
             bgb_wo = defaults.agb_max_wo * defaults.rshoot_after_20_yrs.value
+
+        if self.input.data_source is not None and self.input.data_source.short_name == "FRA":
+            bgb_start = defaults.bgb_start_start
+            bgb_w = defaults.bgb_start_w
+            bgb_wo = defaults.bgb_start_wo
 
         if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_w is not None:
             bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.rshoot_before_20_yrs.value

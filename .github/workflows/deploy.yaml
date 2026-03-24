@@ -81,7 +81,8 @@ jobs:
         cd djangoexact
         
         pip install --upgrade pip setuptools wheel
-        pip install -r requirements.txt
+        pip install -r requirements.txt --no-cache-dir
+        pip install --force-reinstall setuptools
         # - yes | python manage.py makemigrations --merge
         python manage.py migrate
         python manage.py collectstatic --noinput
