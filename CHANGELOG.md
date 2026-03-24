@@ -1,3 +1,9 @@
+## 1.19.2a2 (2026-03-24)
+
+### Fix
+
+- replace outdate pyrebase library with custom lightwaight firebase wrapper
+
 ## 1.19.2a1 (2026-03-24)
 
 ### Fix
