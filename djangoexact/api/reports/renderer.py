@@ -300,11 +300,9 @@ class ExcelRenderer:
             hv = chf[i] if i < len(chf) else 0
             ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=col, value=hv).fill = _BEIGE
             hh = hhf[i] if i < len(hhf) else 0
-            if hh:
-                ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=col, value=hh).fill = _BEIGE
+            ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=col, value=hh).fill = _BEIGE
             ct = ctf[i] if i < len(ctf) else 0
-            if ct:
-                ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=col, value=ct).fill = _BEIGE
+            ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=col, value=ct).fill = _BEIGE
 
     # -------------------------------------------------------------------------
     # Shadow Price of Carbon sheet

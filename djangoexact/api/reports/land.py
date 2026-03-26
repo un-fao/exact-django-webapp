@@ -766,7 +766,7 @@ class ForestManagementReport(LandModuleReport):
         biomass_gain_co2 = _add(_add(_add(growth_agb_co2, growth_bgb_co2), litter_co2), deadwood_co2)
 
         zeros = [0.0] * self._project_duration
-        total_emissions = _add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(
+        total_emissions = _add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(
             zeros,
             rotation_hwp_agb_co2), rotation_hwp_bgb_co2), rotation_agb_n2o), rotation_agb_ch4),
             rotation_bgb_n2o), rotation_bgb_ch4), rotation_agb_co2), rotation_bgb_co2),
