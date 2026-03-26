@@ -8,7 +8,7 @@ from ipcc.models import *
 from ..factories import *
 import api.tests.base_test_classes as t
 
-import api.reports as reports
+from api.reports import generate_excel_report
 
 
 class AnnualCroplandWithMinorSeasonTest(t.ModuleTest):
@@ -29,8 +29,7 @@ class AnnualCroplandWithMinorSeasonTest(t.ModuleTest):
     def test(self):
         self.calculate_results()
 
-        res = reports.BaseProjectReport(self.project)
-        res.build_report()
+        generate_excel_report(self.project)
 
 
 AnnualCroplandWithMinorSeasonTest().test()
