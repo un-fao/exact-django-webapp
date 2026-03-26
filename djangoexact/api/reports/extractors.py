@@ -8,6 +8,11 @@ from typing import Any
 import logging as log
 
 
+def _add(a: list[float], b: list[float]) -> list[float]:
+    """Element-wise addition of two float lists, zero-filling the shorter one."""
+    return list(map(sum, zip_longest(a, b, fillvalue=0)))
+
+
 def extract_emissions(
     source: list | dict,
     activity_type: Any = None,

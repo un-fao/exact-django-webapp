@@ -13,7 +13,6 @@ MetadataWrite offset convention:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from itertools import zip_longest
 from typing import Any
 
 import logging as log
@@ -25,11 +24,7 @@ import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
-from .extractors import extract_emissions
-
-
-def _add(a: list[float], b: list[float]) -> list[float]:
-    return list(map(sum, zip_longest(a, b, fillvalue=0)))
+from .extractors import _add, extract_emissions
 
 
 def _zeros(n: int) -> list[float]:
@@ -84,9 +79,6 @@ class WaterbodyReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -143,9 +135,6 @@ class AquacultureReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -196,9 +185,6 @@ class FisheryReport(BaseModuleReport):
             is_with=m.is_with(),
             is_without=m.is_without(),
             units_catch_w=units_catch_w,
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -331,7 +317,7 @@ class LargeFisheryReport(FisheryReport):
             MetadataWrite(4, 6, m.refrigerant_pc_thread.format_comments() if m.refrigerant_pc_thread else ""),
             MetadataWrite(5, 6, m.ice_preserved_catch_pc_thread.format_comments() if m.ice_preserved_catch_pc_thread else ""),
         ]
-        return self._compute_fishery("Small Fishery", mw)
+        return self._compute_fishery("Large Fishery", mw)
 
 
 # ---------------------------------------------------------------------------
@@ -434,9 +420,6 @@ class LivestockReport(BaseModuleReport):
             is_with=m.is_with(),
             is_without=m.is_without(),
             units_heads_w=units_heads_w,
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -477,12 +460,25 @@ class EnergyReport(BaseModuleReport):
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
 
             electricity_co2_eq = _add(electricity_co2_eq, extract_emissions(sub_es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-            liquid_fuel_co2 = _add(liquid_fuel_co2, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
-            liquid_fuel_ch4 = _add(liquid_fuel_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
-            liquid_fuel_n2o = _add(liquid_fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
-            solid_fuel_co2 = _add(solid_fuel_co2, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
-            solid_fuel_ch4 = _add(solid_fuel_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
-            solid_fuel_n2o = _add(solid_fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
+
+            # Determine whether this entry is a solid fuel or liquid/gaseous fuel.
+            # The macro_fuel_type name "Solid (tdm)" identifies solid fuels;
+            # "Liquid or gaseous (m3)" (or any non-solid) are liquid fuels.
+            # Electricity entries produce ELECTRICITY activity type (already handled above)
+            # and no FUEL activity type entries, so they are skipped here automatically.
+            fuel_type = getattr(submodule, "fuel_type_w", None) or getattr(submodule, "fuel_type_start", None)
+            macro_name = ""
+            if fuel_type and fuel_type.macro_fuel_type:
+                macro_name = fuel_type.macro_fuel_type.name.casefold()
+
+            if "solid" in macro_name:
+                solid_fuel_co2 = _add(solid_fuel_co2, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
+                solid_fuel_ch4 = _add(solid_fuel_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
+                solid_fuel_n2o = _add(solid_fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
+            else:
+                liquid_fuel_co2 = _add(liquid_fuel_co2, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
+                liquid_fuel_ch4 = _add(liquid_fuel_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
+                liquid_fuel_n2o = _add(liquid_fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
 
         total = _add(
             _add(_add(electricity_co2_eq, liquid_fuel_co2), _add(liquid_fuel_ch4, liquid_fuel_n2o)),
@@ -579,9 +575,6 @@ class EnergyReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -676,9 +669,6 @@ class InputReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -813,9 +803,6 @@ class IrrigationReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -932,9 +919,6 @@ class OrganicSoilReport(BaseModuleReport):
             total_emissions=_zeros(self._project_duration),
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -1000,9 +984,6 @@ class TransportReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -1075,9 +1056,6 @@ class ProcessingReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -1135,9 +1113,6 @@ class PackagingReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )
 
@@ -1195,8 +1170,5 @@ class StorageReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items_from_module(activity_title),
         )

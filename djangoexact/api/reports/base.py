@@ -27,7 +27,7 @@ from .data_types import (
     ShadowPriceRow,
     T2Override,
 )
-from .extractors import extract_emissions
+from .extractors import _add, extract_emissions
 
 
 class NotReadyError(Exception):
@@ -61,7 +61,7 @@ class BaseModuleReport:
             raise NotReadyError(
                 f"Cannot calculate report for module {self.module.module_type.name} "
                 f"in activity {self.module.activity.name}: {e}"
-            )
+            ) from e
 
         from api.calculators import Result
 
@@ -128,6 +128,7 @@ class BaseActivityReport:
         from .registry import get_report_class
 
         module_results: list[ModuleResult] = []
+        module_reports: list[BaseModuleReport] = []
         total_emissions = [0.0] * self.project_report.duration
         total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
@@ -142,6 +143,7 @@ class BaseActivityReport:
             report = report_cls(module, self)
             result = report.compute()
             module_results.append(result)
+            module_reports.append(report)
 
             total_emissions = list(map(sum, zip_longest(
                 total_emissions, result.total_emissions, fillvalue=0
@@ -190,6 +192,7 @@ class BaseActivityReport:
             total_heads_yearly=total_heads_yearly,
             total_catch_yearly=total_catch_yearly,
             t2_overrides=t2_overrides,
+            _module_reports=module_reports,
         )
 
 
@@ -260,20 +263,14 @@ class BaseProjectReport:
         agg = EmissionsAggregator(duration=self.duration)
         dur = self.duration
 
-        def _add(acc: list[float], vals: list[float]) -> list[float]:
-            return list(map(sum, zip_longest(acc, vals, fillvalue=0)))
-
-        # We need access to the module-level emissions_set / w / wo.
-        # These are stored on module report instances, not on ModuleResult.
-        # We pass them through by reconstructing from module_report instances.
-        # To avoid this problem entirely, we store them directly on ModuleResult
-        # via a _raw_emissions field.
-        # See _build_report_instances().
+        # Emissions sets are stored on BaseModuleReport instances, not on ModuleResult.
+        # ActivityResult._module_reports holds the report instances in the same order
+        # as module_results, populated by BaseActivityReport.compute().
         for activity_result in activity_results:
-            for module_result in activity_result.module_results:
-                es = module_result._emissions_set
-                es_w = module_result._emissions_set_w
-                es_wo = module_result._emissions_set_wo
+            for report in activity_result._module_reports:
+                es = report.emissions_set
+                es_w = report.emissions_set_w
+                es_wo = report.emissions_set_wo
 
                 def extr(source, activity_type=None, gas_type=None, excl_a=None, excl_g=None):
                     return extract_emissions(
@@ -361,8 +358,11 @@ class BaseProjectReport:
         yearly_balance_w = aggregated.yearly_balance_w
         yearly_balance_wo = aggregated.yearly_balance_wo
 
+        # Bulk-fetch all shadow prices once to avoid N+1 queries inside the loop
+        shadow_prices_by_year = {sp.year: sp for sp in shadow_prices_qs}
+
         for i, year in enumerate(range(self.start_year, self.last_year)):
-            sp = shadow_prices_qs.filter(year=year).first()
+            sp = shadow_prices_by_year.get(year)
             if sp is None and year > 2017:
                 sp = ipcc_models.ShadowPriceOfCarbon(
                     year=year,

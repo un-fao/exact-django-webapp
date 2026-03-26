@@ -73,12 +73,6 @@ class ModuleResult:
     is_with: bool = False
     is_without: bool = False
 
-    # Internal: raw emissions sets kept for project-level aggregation in
-    # BaseProjectReport._build_aggregated_from_module_emissions().
-    # Not used by renderers.
-    _emissions_set: list = field(default_factory=list, repr=False)
-    _emissions_set_w: list = field(default_factory=list, repr=False)
-    _emissions_set_wo: list = field(default_factory=list, repr=False)
     _inventory_items: list = field(default_factory=list, repr=False)  # list[InventoryItem]
 
 
@@ -101,6 +95,11 @@ class ActivityResult:
     total_heads_yearly: list[float] = field(default_factory=list)
     total_catch_yearly: list[float] = field(default_factory=list)
     t2_overrides: list[T2Override] = field(default_factory=list)
+
+    # Internal: module report instances carrying emissions_set / _w / _wo.
+    # Used by BaseProjectReport._build_aggregated_from_module_emissions()
+    # and html_context._gas_totals(). Not used by renderers.
+    _module_reports: list = field(default_factory=list, repr=False)
 
 
 @dataclass

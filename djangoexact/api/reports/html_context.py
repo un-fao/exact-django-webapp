@@ -37,8 +37,9 @@ from .extractors import extract_emissions
 def _gas_totals(result: ProjectResult, es_attr: str) -> dict[str, float]:
     """Sum total emissions per gas across all modules for one scenario.
 
-    ``es_attr`` is one of ``_emissions_set``, ``_emissions_set_w``,
-    ``_emissions_set_wo``.
+    ``es_attr`` is one of ``emissions_set``, ``emissions_set_w``,
+    ``emissions_set_wo`` – attributes on BaseModuleReport instances stored in
+    ActivityResult._module_reports.
     """
     dur = result.duration
     gas_map = {
@@ -51,8 +52,8 @@ def _gas_totals(result: ProjectResult, es_attr: str) -> dict[str, float]:
     }
     totals = {g: 0.0 for g in gas_map}
     for ar in result.activity_results:
-        for mr in ar.module_results:
-            es = getattr(mr, es_attr, [])
+        for report in ar._module_reports:
+            es = getattr(report, es_attr, [])
             for gas_name, gas_type in gas_map.items():
                 totals[gas_name] += sum(
                     extract_emissions(es, gas_type=gas_type, duration=dur)
@@ -138,9 +139,9 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     # ------------------------------------------------------------------
     # Gas-level totals (needed for charts and primary/secondary GHG)
     # ------------------------------------------------------------------
-    gas_totals_w = _gas_totals(result, "_emissions_set_w")
-    gas_totals_wo = _gas_totals(result, "_emissions_set_wo")
-    gas_totals_bal = _gas_totals(result, "_emissions_set")
+    gas_totals_w = _gas_totals(result, "emissions_set_w")
+    gas_totals_wo = _gas_totals(result, "emissions_set_wo")
+    gas_totals_bal = _gas_totals(result, "emissions_set")
 
     def _gas_dict(name: str, totals: dict) -> dict:
         return {"name": name, "value": totals[name]}

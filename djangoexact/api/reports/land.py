@@ -5,8 +5,8 @@ Each class implements compute() -> ModuleResult.
 
 from __future__ import annotations
 
+import functools
 from dataclasses import dataclass, field
-from itertools import zip_longest
 from typing import Any
 
 import logging as log
@@ -19,11 +19,7 @@ import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
-from .extractors import extract_emissions
-
-
-def _add(a: list[float], b: list[float]) -> list[float]:
-    return list(map(sum, zip_longest(a, b, fillvalue=0)))
+from .extractors import _add, extract_emissions
 
 
 @dataclass
@@ -140,9 +136,6 @@ class LandUseChangeReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -245,9 +238,6 @@ class PerennialCroplandReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -364,9 +354,6 @@ class AnnualCroplandReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -407,9 +394,6 @@ class SetAsideReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -481,9 +465,6 @@ class GrasslandReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -511,9 +492,6 @@ class OtherLandReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -599,9 +577,6 @@ class CoastalWetlandReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -699,9 +674,6 @@ class FloodedRiceReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -766,16 +738,24 @@ class ForestManagementReport(LandModuleReport):
         biomass_gain_co2 = _add(_add(_add(growth_agb_co2, growth_bgb_co2), litter_co2), deadwood_co2)
 
         zeros = [0.0] * self._project_duration
-        total_emissions = _add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(_add(
+        total_emissions = functools.reduce(_add, [
             zeros,
-            rotation_hwp_agb_co2), rotation_hwp_bgb_co2), rotation_agb_n2o), rotation_agb_ch4),
-            rotation_bgb_n2o), rotation_bgb_ch4), rotation_agb_co2), rotation_bgb_co2),
-            disturbance_agb_co2), disturbance_bgb_co2), disturbance_fire_agb_n2o),
-            disturbance_fire_agb_ch4), disturbance_fire_bgb_n2o), disturbance_fire_bgb_ch4),
-            logging_hwp_agb_co2), logging_hwp_bgb_co2), logging_agb_n2o), logging_agb_ch4),
-            logging_bgb_n2o), logging_bgb_ch4), logging_agb_co2), logging_bgb_co2),
-            degradation_agb_co2), degradation_bgb_co2), growth_agb_co2), growth_bgb_co2),
-            litter_co2), deadwood_co2), degradation_litter_co2), degradation_deadwood_co2)
+            rotation_hwp_agb_co2, rotation_hwp_bgb_co2,
+            rotation_agb_n2o, rotation_agb_ch4,
+            rotation_bgb_n2o, rotation_bgb_ch4,
+            rotation_agb_co2, rotation_bgb_co2,
+            disturbance_agb_co2, disturbance_bgb_co2,
+            disturbance_fire_agb_n2o, disturbance_fire_agb_ch4,
+            disturbance_fire_bgb_n2o, disturbance_fire_bgb_ch4,
+            logging_hwp_agb_co2, logging_hwp_bgb_co2,
+            logging_agb_n2o, logging_agb_ch4,
+            logging_bgb_n2o, logging_bgb_ch4,
+            logging_agb_co2, logging_bgb_co2,
+            degradation_agb_co2, degradation_bgb_co2,
+            growth_agb_co2, growth_bgb_co2,
+            litter_co2, deadwood_co2,
+            degradation_litter_co2, degradation_deadwood_co2,
+        ])
 
         # Metadata
         default = defaults.ForestManagementDefaults(input=m).get_defaults()
@@ -869,9 +849,6 @@ class ForestManagementReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )
 
@@ -997,8 +974,5 @@ class SettlementReport(LandModuleReport):
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
             is_without=m.is_without(),
-            _emissions_set=self.emissions_set,
-            _emissions_set_w=self.emissions_set_w,
-            _emissions_set_wo=self.emissions_set_wo,
             _inventory_items=self._inventory_items(activity_title),
         )

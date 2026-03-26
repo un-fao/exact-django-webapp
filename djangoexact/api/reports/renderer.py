@@ -77,22 +77,19 @@ class ExcelRenderer:
         self._manager = ExcelFileManager()
 
     def render(self) -> bytes:
+        # Open the workbook once, write everything, then serialize once at the end.
         wb = self._manager.get_workbook()
+
         self._write_skeleton(wb)
-        self._manager.save_workbook(wb)
 
         for activity_result in self.result.activity_results:
-            wb = self._manager.get_workbook()
             self._write_activity(wb, activity_result)
-            self._manager.save_workbook(wb)
 
-        wb = self._manager.get_workbook()
         self._write_results_summary(wb)
         self._write_shadow_price(wb)
         self._write_inventory(wb)
-        self._manager.save_workbook(wb)
 
-        return self._manager.get_excel_bytes()
+        return self._manager.finalize()
 
     # -------------------------------------------------------------------------
     # Skeleton – project-level headers
