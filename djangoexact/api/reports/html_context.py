@@ -120,60 +120,49 @@ def _chart_project_balance(total_w: float, total_wo: float, total_balance: float
     return chart_b64
 
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
+def _compute_gas_totals(result: ProjectResult, total_balance: float) -> dict:
+    """Compute per-gas totals for all three scenarios and derive GHG ranking.
 
-def build_template_context(result: ProjectResult, request, lang: str) -> dict:
-    """Return the full context dict for the PDF HTML template."""
-    activate(lang)
-    project = result.project
-
-    # ------------------------------------------------------------------
-    # Project-level totals (from aggregated yearly balances)
-    # ------------------------------------------------------------------
-    total_w = float(sum(result.aggregated.yearly_balance_w))
-    total_wo = float(sum(result.aggregated.yearly_balance_wo))
-    total_balance = total_w - total_wo
-
-    # ------------------------------------------------------------------
-    # Gas-level totals (needed for charts and primary/secondary GHG)
-    # ------------------------------------------------------------------
+    Returns a dict with keys:
+      gas_totals_w, gas_totals_wo,
+      primary/secondary/tertiary ghg name + emissions values.
+    """
     gas_totals_w = _gas_totals(result, "emissions_set_w")
     gas_totals_wo = _gas_totals(result, "emissions_set_wo")
     gas_totals_bal = _gas_totals(result, "emissions_set")
 
-    def _gas_dict(name: str, totals: dict) -> dict:
-        return {"name": name, "value": totals[name]}
-
     gas_names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
-    gases_w = [_gas_dict(g, gas_totals_w) for g in gas_names]
-    gases_wo = [_gas_dict(g, gas_totals_wo) for g in gas_names]
-    gases_bal = [_gas_dict(g, gas_totals_bal) for g in gas_names]
+    gases_bal = [{"name": g, "value": gas_totals_bal[g]} for g in gas_names]
 
-    # Primary / secondary / tertiary GHG by absolute balance value
     sorted_gases = sorted(
         gases_bal,
         key=lambda x: abs(x["value"]) if x["value"] != 0 else 0,
         reverse=True,
     )
-    INCREASES = _("increases")
-    DECREASES = _("decreases")
 
-    def _direction(v):
-        return INCREASES if v >= 0 else DECREASES
+    return {
+        "gas_totals_w": gas_totals_w,
+        "gas_totals_wo": gas_totals_wo,
+        "primary_ghg": sorted_gases[0]["name"],
+        "primary_ghg_emissions": sorted_gases[0]["value"],
+        "secondary_ghg": sorted_gases[1]["name"],
+        "secondary_ghg_emissions": sorted_gases[1]["value"],
+        "tertiary_ghg": sorted_gases[2]["name"],
+        "tertiary_ghg_emissions": sorted_gases[2]["value"],
+    }
 
-    project_primary_ghg = sorted_gases[0]["name"]
-    project_primary_ghg_emissions = sorted_gases[0]["value"]
-    project_secondary_ghg = sorted_gases[1]["name"]
-    project_secondary_ghg_emissions = sorted_gases[1]["value"]
-    project_tertiary_ghg = sorted_gases[2]["name"]
-    project_tertiary_ghg_emissions = sorted_gases[2]["value"]
 
-    # ------------------------------------------------------------------
-    # Per-activity processed data
-    # ------------------------------------------------------------------
-    activities_qs = {a.name: a for a in project.activities.all()}
+def _compute_activity_contexts(
+    result: ProjectResult,
+    activities_qs: dict,
+    total_balance: float,
+) -> list:
+    """Build the processed activity list used by the template.
+
+    Mutates each ``db_activity`` with ``.modules_emissions``, ``.results``,
+    ``.main_impact``, and ``.secondary_impacts`` dynamic attributes, then
+    returns the sorted list.
+    """
     processed_activities = []
 
     for ar in result.activity_results:
@@ -223,16 +212,22 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
         db_activity.secondary_impacts = ", ".join(secondary_impacts) if secondary_impacts else None
         processed_activities.append(db_activity)
 
-    processed_activities = sorted(
+    return sorted(
         processed_activities,
         key=lambda x: x.results["balance"],
         reverse=total_balance > 0,
     )
 
-    # ------------------------------------------------------------------
-    # Aggregate indicators: area, livestock heads, fishery, land types
-    # ------------------------------------------------------------------
-    total_area = sum(a.area for a in project.activities.all())
+
+def _compute_indicator_aggregates(activities_qs: dict, project) -> dict:
+    """Aggregate livestock, fishery, aquaculture, land-type and area indicators.
+
+    Returns a dict with keys:
+      total_area, total_heads, total_tonnes_of_catch,
+      livestock_heads, small_fishery_types, large_fishery_data,
+      aquaculture_data, land_types, soc.
+    """
+    total_area = sum(a.area for a in activities_qs.values())
 
     livestock_heads = [
         {"name": lct.name, "value_w": 0, "value_wo": 0}
@@ -296,32 +291,95 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
         + large_fishery_data.get("value_w", 0)
     )
 
-    # SOC value
     soc = ipcc_models.SoilOrganicCarbon.objects.get(
         climate=project.climate,
         moisture=project.moisture,
         soil_type=project.soil_type,
     )
 
-    # ------------------------------------------------------------------
-    # Charts
-    # ------------------------------------------------------------------
+    return {
+        "total_area": total_area,
+        "total_heads": total_heads,
+        "total_tonnes_of_catch": total_tonnes_of_catch,
+        "livestock_heads": livestock_heads,
+        "small_fishery_types": small_fishery_types,
+        "large_fishery_data": large_fishery_data,
+        "aquaculture_data": aquaculture_data,
+        "land_types": land_types,
+        "soc": soc,
+    }
+
+
+def _build_chart_data(
+    total_w: float,
+    total_wo: float,
+    total_balance: float,
+    gas_totals_w: dict,
+    gas_totals_wo: dict,
+) -> tuple[str, str]:
+    """Generate both charts and return (project_chart_base64, gases_chart_base64)."""
     project_chart_base64 = _chart_project_balance(total_w, total_wo, total_balance)
     project_gases_chart_base64 = _chart_gases_w_wo(gas_totals_w, gas_totals_wo)
+    return project_chart_base64, project_gases_chart_base64
 
-    # ------------------------------------------------------------------
-    # FAO logo
-    # ------------------------------------------------------------------
+
+def _load_fao_logo(lang: str) -> str:
+    """Load the FAO logo SVG for the given language and return it as base64."""
     try:
         faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
     except FileNotFoundError:
         faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
     faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
     faologo.close()
+    return faologo_base64
 
-    # ------------------------------------------------------------------
-    # Final context
-    # ------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def build_template_context(result: ProjectResult, request, lang: str) -> dict:
+    """Return the full context dict for the PDF HTML template."""
+    activate(lang)
+    project = result.project
+
+    # Project-level totals (from aggregated yearly balances)
+    total_w = float(sum(result.aggregated.yearly_balance_w))
+    total_wo = float(sum(result.aggregated.yearly_balance_wo))
+    total_balance = total_w - total_wo
+
+    # Gas-level totals and GHG ranking
+    gas_data = _compute_gas_totals(result, total_balance)
+
+    # Direction helper uses locale-aware strings (activated above)
+    INCREASES = _("increases")
+    DECREASES = _("decreases")
+
+    def _direction(v):
+        return INCREASES if v >= 0 else DECREASES
+
+    # Per-activity processed data (prefetched queryset reused below)
+    activities_qs = {
+        a.name: a
+        for a in project.activities.prefetch_related("modules").all()
+    }
+    processed_activities = _compute_activity_contexts(result, activities_qs, total_balance)
+
+    # Indicator aggregates (reuses prefetched activities_qs)
+    indicators = _compute_indicator_aggregates(activities_qs, project)
+
+    # Charts
+    project_chart_base64, project_gases_chart_base64 = _build_chart_data(
+        total_w,
+        total_wo,
+        total_balance,
+        gas_data["gas_totals_w"],
+        gas_data["gas_totals_wo"],
+    )
+
+    # FAO logo
+    faologo_base64 = _load_fao_logo(lang)
+
     return {
         "project": project,
         "start_year_of_activities": project.start_year_of_activities,
@@ -331,28 +389,27 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
         "total_carbon_balance": total_balance,
         "project_emissions_w": total_w,
         "project_emissions_wo": total_wo,
-        "project_emissions_balance": total_balance,
-        "total_area": total_area,
-        "total_heads": total_heads,
-        "total_tonnes_of_catch": total_tonnes_of_catch,
-        "soc": soc.value,
-        "project_primary_ghg": project_primary_ghg,
-        "project_primary_ghg_emissions": project_primary_ghg_emissions,
-        "project_primary_ghg_direction": _direction(project_primary_ghg_emissions),
-        "project_secondary_ghg": project_secondary_ghg,
-        "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
-        "project_secondary_ghg_direction": _direction(project_secondary_ghg_emissions),
-        "project_tertiary_ghg": project_tertiary_ghg,
-        "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
-        "project_tertiary_ghg_direction": _direction(project_tertiary_ghg_emissions),
+        "total_area": indicators["total_area"],
+        "total_heads": indicators["total_heads"],
+        "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
+        "soc": indicators["soc"].value,
+        "project_primary_ghg": gas_data["primary_ghg"],
+        "project_primary_ghg_emissions": gas_data["primary_ghg_emissions"],
+        "project_primary_ghg_direction": _direction(gas_data["primary_ghg_emissions"]),
+        "project_secondary_ghg": gas_data["secondary_ghg"],
+        "project_secondary_ghg_emissions": gas_data["secondary_ghg_emissions"],
+        "project_secondary_ghg_direction": _direction(gas_data["secondary_ghg_emissions"]),
+        "project_tertiary_ghg": gas_data["tertiary_ghg"],
+        "project_tertiary_ghg_emissions": gas_data["tertiary_ghg_emissions"],
+        "project_tertiary_ghg_direction": _direction(gas_data["tertiary_ghg_emissions"]),
         "activities_total": processed_activities,
         "project_chart_base64": project_chart_base64,
         "project_gases_chart_base64": project_gases_chart_base64,
         "faologo_base64": faologo_base64,
-        "livestock_heads": livestock_heads,
-        "small_fishery_types": small_fishery_types,
-        "large_fishery_data": large_fishery_data,
-        "aquaculture_data": aquaculture_data,
-        "land_types": land_types,
+        "livestock_heads": indicators["livestock_heads"],
+        "small_fishery_types": indicators["small_fishery_types"],
+        "large_fishery_data": indicators["large_fishery_data"],
+        "aquaculture_data": indicators["aquaculture_data"],
+        "land_types": indicators["land_types"],
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }

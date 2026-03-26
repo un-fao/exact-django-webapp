@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING
 
 import api.models as api_models
@@ -9,12 +10,15 @@ import api.models as api_models
 if TYPE_CHECKING:
     from .base import BaseModuleReport
 
-# Populated lazily to avoid circular imports; filled by _build_registry() below.
-_MODULE_REPORT_REGISTRY: dict[type, type] = {}
 
-
+@functools.lru_cache(maxsize=None)
 def _build_registry() -> dict[type, type]:
-    """Build the registry after all module classes are importable."""
+    """Build and cache the module-type → report-class registry.
+
+    Deferred import avoids circular imports at module load time. The result is
+    cached after the first call so the registry dict is constructed exactly once,
+    regardless of concurrency (CPython GIL guarantees lru_cache atomicity).
+    """
     from .land import (
         AnnualCroplandReport,
         CoastalWetlandReport,
@@ -72,10 +76,7 @@ def _build_registry() -> dict[type, type]:
 
 def get_report_class(module) -> type | None:
     """Return the report class for a module instance, or None if not registered."""
-    global _MODULE_REPORT_REGISTRY
-    if not _MODULE_REPORT_REGISTRY:
-        _MODULE_REPORT_REGISTRY = _build_registry()
-    cls = _MODULE_REPORT_REGISTRY.get(type(module))
+    cls = _build_registry().get(type(module))
     if cls is None:
         import logging
         logging.warning(f"No report class registered for {type(module).__name__}")
