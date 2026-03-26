@@ -30,6 +30,8 @@ from .constants import (
     ROW_CH4,
     ROW_CUMULATIVE_BALANCE,
     ROW_CUMULATIVE_HECTARES,
+    ROW_CUMULATIVE_HEADS,
+    ROW_CUMULATIVE_CATCH,
     ROW_N2O,
     ROW_OTHER_CO2,
     ROW_OTHER_GHGS,
@@ -117,8 +119,6 @@ class ExcelRenderer:
         ws_res.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
         ws_res.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
         ws_res.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
-        ws_res.cell(row=11, column=2, value="Coming soon").fill = _BEIGE
-        ws_res.cell(row=12, column=2, value="Coming soon").fill = _BEIGE
 
         for i, year in enumerate(range(r.start_year, r.last_year)):
             ws_res.cell(row=1, column=i + DATA_COL_START, value=year)
@@ -285,6 +285,8 @@ class ExcelRenderer:
         cumulative_balance = list(np.cumsum(yearly_balance))
 
         chf = self.result.cumulative_hectares_yearly
+        hhf = self.result.cumulative_heads_yearly
+        ctf = self.result.cumulative_catch_yearly
         for i, _year in enumerate(range(self.result.start_year, self.result.last_year)):
             col = i + DATA_COL_START
             ws_res.cell(row=ROW_CUMULATIVE_BALANCE, column=col, value=cumulative_balance[i])
@@ -297,6 +299,12 @@ class ExcelRenderer:
             ws_res.cell(row=ROW_OTHER_GHGS, column=col, value=agg.other_ghgs[i])
             hv = chf[i] if i < len(chf) else 0
             ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=col, value=hv).fill = _BEIGE
+            hh = hhf[i] if i < len(hhf) else 0
+            if hh:
+                ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=col, value=hh).fill = _BEIGE
+            ct = ctf[i] if i < len(ctf) else 0
+            if ct:
+                ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=col, value=ct).fill = _BEIGE
 
     # -------------------------------------------------------------------------
     # Shadow Price of Carbon sheet

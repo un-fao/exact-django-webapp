@@ -178,6 +178,9 @@ class FisheryReport(BaseModuleReport):
             electricity_co2_eq,
         )
 
+        dur = m.activity.implementation_years + m.activity.capitalization_years
+        units_catch_w = [float(m.total_catch_yr_w)] * dur if m.is_with() else []
+
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title=metadata_section_title,
@@ -192,6 +195,7 @@ class FisheryReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
+            units_catch_w=units_catch_w,
             _emissions_set=self.emissions_set,
             _emissions_set_w=self.emissions_set_w,
             _emissions_set_wo=self.emissions_set_wo,
@@ -408,6 +412,9 @@ class LivestockReport(BaseModuleReport):
             MetadataWrite(5, 6, m.complementary_manure_management_type_thread.format_comments()),
         ]
 
+        dur = m.activity.implementation_years + m.activity.capitalization_years
+        units_heads_w = [float(m.heads_number_w)] * dur if m.is_with() else []
+
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Livestock",
@@ -426,6 +433,7 @@ class LivestockReport(BaseModuleReport):
             total_emissions=total,
             is_with=m.is_with(),
             is_without=m.is_without(),
+            units_heads_w=units_heads_w,
             _emissions_set=self.emissions_set,
             _emissions_set_w=self.emissions_set_w,
             _emissions_set_wo=self.emissions_set_wo,

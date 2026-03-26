@@ -62,6 +62,10 @@ class ModuleResult:
     units_breakdown_w: list[float] = field(default_factory=list)
     units_breakdown_wo: list[float] = field(default_factory=list)
 
+    # Livestock heads and fishery catch – for cumulative heads/catch rows
+    units_heads_w: list[float] = field(default_factory=list)
+    units_catch_w: list[float] = field(default_factory=list)
+
     # Raw inventory object for the Inventory sheet (or None)
     inventory: Any = None
 
@@ -94,6 +98,8 @@ class ActivityResult:
     module_results: list[ModuleResult]
     total_emissions: list[float]
     total_hectares_yearly: list[float]
+    total_heads_yearly: list[float] = field(default_factory=list)
+    total_catch_yearly: list[float] = field(default_factory=list)
     t2_overrides: list[T2Override] = field(default_factory=list)
 
 
@@ -204,6 +210,8 @@ class ProjectResult:
     activity_results: list[ActivityResult]
     aggregated: EmissionsAggregator
     cumulative_hectares_yearly: list[float]
+    cumulative_heads_yearly: list[float]
+    cumulative_catch_yearly: list[float]
 
     shadow_price_rows: list[ShadowPriceRow]
     nominal_shadow_prices: list[Any]   # ipcc_models.ShadowPriceOfCarbon instances

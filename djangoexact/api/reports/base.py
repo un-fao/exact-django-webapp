@@ -130,6 +130,8 @@ class BaseActivityReport:
         module_results: list[ModuleResult] = []
         total_emissions = [0.0] * self.project_report.duration
         total_hectares_yearly = [0.0] * self.project_report.duration
+        total_heads_yearly = [0.0] * self.project_report.duration
+        total_catch_yearly = [0.0] * self.project_report.duration
 
         for module in self.activity.modules:
             report_cls = get_report_class(module)
@@ -154,6 +156,16 @@ class BaseActivityReport:
                     total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
                 )))
 
+            if result.units_heads_w:
+                total_heads_yearly = list(map(sum, zip_longest(
+                    total_heads_yearly, result.units_heads_w, fillvalue=0
+                )))
+
+            if result.units_catch_w:
+                total_catch_yearly = list(map(sum, zip_longest(
+                    total_catch_yearly, result.units_catch_w, fillvalue=0
+                )))
+
         t2_overrides = []
         if self.activity.climate_t2:
             t2_overrides.append(T2Override("Climate", self.activity.climate_t2.name))
@@ -175,6 +187,8 @@ class BaseActivityReport:
             module_results=module_results,
             total_emissions=total_emissions,
             total_hectares_yearly=total_hectares_yearly,
+            total_heads_yearly=total_heads_yearly,
+            total_catch_yearly=total_catch_yearly,
             t2_overrides=t2_overrides,
         )
 
@@ -209,6 +223,8 @@ class BaseProjectReport:
 
         aggregated = self._build_aggregated(activity_results)
         cumulative_hectares = self._build_cumulative_hectares(activity_results)
+        cumulative_heads = self._build_cumulative_heads(activity_results)
+        cumulative_catch = self._build_cumulative_catch(activity_results)
         shadow_rows, nominal_spcs, extra_spcs = self._build_shadow_price_data(aggregated)
         inventory_items = self._build_inventory_items(activity_results)
 
@@ -220,6 +236,8 @@ class BaseProjectReport:
             activity_results=activity_results,
             aggregated=aggregated,
             cumulative_hectares_yearly=cumulative_hectares,
+            cumulative_heads_yearly=cumulative_heads,
+            cumulative_catch_yearly=cumulative_catch,
             shadow_price_rows=shadow_rows,
             nominal_shadow_prices=nominal_spcs,
             extra_shadow_prices=extra_spcs,
@@ -314,6 +332,22 @@ class BaseProjectReport:
         for ar in activity_results:
             cumulative = list(map(sum, zip_longest(
                 cumulative, ar.total_hectares_yearly, fillvalue=0
+            )))
+        return cumulative
+
+    def _build_cumulative_heads(self, activity_results: list[ActivityResult]) -> list[float]:
+        cumulative = [0.0] * self.duration
+        for ar in activity_results:
+            cumulative = list(map(sum, zip_longest(
+                cumulative, ar.total_heads_yearly, fillvalue=0
+            )))
+        return cumulative
+
+    def _build_cumulative_catch(self, activity_results: list[ActivityResult]) -> list[float]:
+        cumulative = [0.0] * self.duration
+        for ar in activity_results:
+            cumulative = list(map(sum, zip_longest(
+                cumulative, ar.total_catch_yearly, fillvalue=0
             )))
         return cumulative
 
