@@ -48,8 +48,29 @@ class BaseModuleReport:
     emissions_set: list = field(default=None, repr=False)
     emissions_set_w: list = field(default=None, repr=False)
     emissions_set_wo: list = field(default=None, repr=False)
+    _from_cache: bool = field(default=False, repr=False)
+    _cached_inventory: list = field(default_factory=list, repr=False)
+    _cache_result: Any = field(default=None, repr=False)
 
     def __post_init__(self):
+        from .cache import load_emissions_from_cache
+        cache_result = load_emissions_from_cache(self.module)
+        if cache_result is not None:
+            self._init_from_cache(cache_result)
+        else:
+            self._init_from_calculator()
+
+    def _init_from_cache(self, cache_result: "CacheResult") -> None:
+        """Cached path: populate emissions_set* from module's cached results."""
+        self.emissions_set    = cache_result.balance
+        self.emissions_set_w  = cache_result.with_project
+        self.emissions_set_wo = cache_result.without_project
+        self._cached_inventory = cache_result.inventory
+        self._cache_result = cache_result
+        self._from_cache = True
+
+    def _init_from_calculator(self) -> None:
+        """Calculated path: run the calculator and extract emissions sets."""
         try:
             self.result = self.calculator.calculate()
             self.inventory = self.calculator.inventory
@@ -65,8 +86,8 @@ class BaseModuleReport:
 
         from api.calculators import Result
 
-        self.emissions_set = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
-        self.emissions_set_w = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
+        self.emissions_set    = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
+        self.emissions_set_w  = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
         self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
 
     @property
@@ -98,7 +119,10 @@ class BaseModuleReport:
         )
 
     def _inventory_items_from_module(self, activity_title: str) -> list[InventoryItem]:
-        """Build InventoryItem list from self.inventory if available."""
+        """Build InventoryItem list — from cache or from live inventory object."""
+        if self._from_cache:
+            from .cache import build_inventory_from_cache
+            return build_inventory_from_cache(self._cached_inventory, self.module, activity_title)
         if self.inventory is None:
             return []
         items = []

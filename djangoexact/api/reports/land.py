@@ -34,15 +34,60 @@ class LandModuleReport(BaseModuleReport):
     _units_breakdown_wo: list[float] = field(default_factory=list, repr=False)
 
     def __post_init__(self):
-        super().__post_init__()
         length = (
             self.module.activity.implementation_years
             + self.module.activity.capitalization_years
         )
-        break_w = getattr(self.calculator.math_w, "hectares_total", np.zeros(length))
-        break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(length))
-        self._units_breakdown_w = list(np.round(break_w, 2))
-        self._units_breakdown_wo = list(np.round(break_wo, 2))
+        # Snapshot whether cached units exist BEFORE base __post_init__ decides the path
+        _cached_units = (
+            self.module.cached_units_breakdown
+            if self.module.is_cached_results_valid()
+            else None
+        )
+
+        super().__post_init__()  # dispatches to _init_from_cache or _init_from_calculator
+
+        if self._from_cache and _cached_units is not None:
+            # ── Full cache hit ──────────────────────────────────────────────────
+            self._units_breakdown_w  = _cached_units["w"]
+            self._units_breakdown_wo = _cached_units["wo"]
+
+        elif self._from_cache and _cached_units is None:
+            # ── Partial cache hit: emissions cached, units not yet stored ───────
+            # Run the calculator solely to extract hectares, then persist.
+            try:
+                self.calculator.calculate()
+                break_w  = getattr(self.calculator.math_w,  "hectares_total", np.zeros(length))
+                break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(length))
+                self._units_breakdown_w  = list(np.round(break_w,  2))
+                self._units_breakdown_wo = list(np.round(break_wo, 2))
+                self.module.cache_units_breakdown(
+                    self._units_breakdown_w, self._units_breakdown_wo
+                )
+            except Exception as exc:
+                log.warning(
+                    f"Could not compute units_breakdown for cached module "
+                    f"{self.module.pk}: {exc}"
+                )
+                self._units_breakdown_w  = [0.0] * length
+                self._units_breakdown_wo = [0.0] * length
+
+        else:
+            # ── Calculator path (full, original logic) ──────────────────────────
+            break_w  = getattr(self.calculator.math_w,  "hectares_total", np.zeros(length))
+            break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(length))
+            self._units_breakdown_w  = list(np.round(break_w,  2))
+            self._units_breakdown_wo = list(np.round(break_wo, 2))
+            # Cache units alongside emissions for future report runs.
+            if self.module.is_cached_results_valid():
+                try:
+                    self.module.cache_units_breakdown(
+                        self._units_breakdown_w, self._units_breakdown_wo
+                    )
+                except Exception as exc:
+                    log.warning(
+                        f"Could not cache units_breakdown for module {self.module.pk}: {exc}"
+                    )
 
     def _extract_land_base(self):
         """Return (biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4) from balance emissions."""
