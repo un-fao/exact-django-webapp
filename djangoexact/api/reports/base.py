@@ -50,6 +50,7 @@ class BaseModuleReport:
     emissions_set_wo: list = field(default=None, repr=False)
     _from_cache: bool = field(default=False, repr=False)
     _cached_inventory: list = field(default_factory=list, repr=False)
+    _cache_result: Any = field(default=None, repr=False)
 
     def __post_init__(self):
         from .cache import load_emissions_from_cache
@@ -65,6 +66,7 @@ class BaseModuleReport:
         self.emissions_set_w  = cache_result.with_project
         self.emissions_set_wo = cache_result.without_project
         self._cached_inventory = cache_result.inventory
+        self._cache_result = cache_result
         self._from_cache = True
 
     def _init_from_calculator(self) -> None:

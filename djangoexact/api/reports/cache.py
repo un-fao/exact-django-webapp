@@ -23,6 +23,8 @@ class CacheResult:
     with_project: Any                   # cached["total_w"]   → emissions_set_w
     without_project: Any                # cached["total_wo"]  → emissions_set_wo
     inventory: list = field(default_factory=list)  # cached["inventory"]
+    units_breakdown_w: list | None = None
+    units_breakdown_wo: list | None = None
 
 
 def load_emissions_from_cache(module) -> CacheResult | None:
@@ -39,11 +41,14 @@ def load_emissions_from_cache(module) -> CacheResult | None:
     cached = module.cached_results_by_activity_by_gas
     if cached is None:
         return None
+    units = module.cached_units_breakdown or {}
     return CacheResult(
         balance=cached["balance"],
         with_project=cached["total_w"],
         without_project=cached["total_wo"],
         inventory=cached.get("inventory") or [],
+        units_breakdown_w=units.get("w"),
+        units_breakdown_wo=units.get("wo"),
     )
 
 
