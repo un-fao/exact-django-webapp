@@ -10,10 +10,16 @@ Run with:
 """
 from __future__ import annotations
 
+import logging
 import unittest
 from dataclasses import dataclass, field
 from typing import Any
 from unittest.mock import MagicMock, Mock, patch
+
+# land.py and extractors.py both use `import logging as log` (root logger).
+# Suppress DEBUG-level output (e.g. "Extracting all emissions") globally so
+# it doesn't pollute the test runner output.
+logging.disable(logging.DEBUG)
 
 
 # ===========================================================================
@@ -499,7 +505,12 @@ class TestLandModuleReportBranches(unittest.TestCase):
             def compute(self):
                 return None
 
-        report = FailingLandReport(module=module, activity_report=activity_report)
+        # Suppress the expected warning that logs to the root logger; also
+        # assert it was emitted so the fallback path remains under test.
+        with patch("logging.warning") as mock_warn:
+            report = FailingLandReport(module=module, activity_report=activity_report)
+        mock_warn.assert_called_once()
+        self.assertIn("Could not compute units_breakdown", mock_warn.call_args[0][0])
         self.assertTrue(report._from_cache)
         self.assertEqual(report._units_breakdown_w, [0.0] * duration)
         self.assertEqual(report._units_breakdown_wo, [0.0] * duration)
