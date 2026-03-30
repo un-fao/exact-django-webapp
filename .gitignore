@@ -147,3 +147,5 @@ docs/plans/
 
 .serena
 CLAUDE.md
+faostat_crops.csv
+yield_items.csv
