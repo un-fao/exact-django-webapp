@@ -4328,12 +4328,14 @@ class SettlementCalculator(LandModuleCalculator):
             self.fmg_wo = DefaultValue(self.ef_wo.fmg)
             self.biomass_ef_wo.value = self.ef_wo.biomass
 
-        # SOCinitial in case of non-paved settlement (start) to paved settlement (end)
-        if self.luc and self.module.is_start() and self.module.settlement_type_start.name.casefold() != "paved settlement":
+        # NOTE: SOCinitial in case of non-settlement (start) to paved settlement or infrastructure on existing land (end)
+        if self.luc and not self.module.is_start():
             is_paved_w = self.module.is_with() and self.module.settlement_type_w.name.casefold() == "paved settlement"
             is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name.casefold() == "paved settlement"
+            is_existing_infra_w = self.module.is_with() and self.module.existing_infrastructure_w.name.casefold() == "infrastructure on existing land (no paving)"
+            is_existing_infra_wo = self.module.is_without() and self.module.existing_infrastructure_wo.name.casefold() == "infrastructure on existing land (no paving)"
 
-            if is_paved_w or is_paved_wo:
+            if is_paved_w or is_paved_wo or is_existing_infra_w or is_existing_infra_wo:
                 self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
                 self.fi_start = get_fi_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
                 self.fmg_start = get_fmg_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
