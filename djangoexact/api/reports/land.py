@@ -39,10 +39,14 @@ class LandModuleReport(BaseModuleReport):
             self.module.activity.implementation_years
             + self.module.activity.capitalization_years
         )
-        break_w = getattr(self.calculator.math_w, "hectares_total", np.zeros(length))
-        break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(length))
-        self._units_breakdown_w = list(np.round(break_w, 2))
-        self._units_breakdown_wo = list(np.round(break_wo, 2))
+        if self._from_cache:
+            self._units_breakdown_w  = [0.0] * length
+            self._units_breakdown_wo = [0.0] * length
+        else:
+            break_w  = getattr(self.calculator.math_w,  "hectares_total", np.zeros(length))
+            break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(length))
+            self._units_breakdown_w  = list(np.round(break_w,  2))
+            self._units_breakdown_wo = list(np.round(break_wo, 2))
 
     def _extract_land_base(self):
         """Return (biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4) from balance emissions."""
