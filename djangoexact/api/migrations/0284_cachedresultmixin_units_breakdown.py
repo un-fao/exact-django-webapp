@@ -271,11 +271,6 @@ class Migration(migrations.Migration):
             field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
         ),
         migrations.AddField(
-            model_name='historicalvaluechain',
-            name='cached_units_breakdown',
-            field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
-        ),
-        migrations.AddField(
             model_name='historicalwaterbody',
             name='cached_units_breakdown',
             field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
@@ -366,11 +361,6 @@ class Migration(migrations.Migration):
             field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
         ),
         migrations.AddField(
-            model_name='packagingtype',
-            name='cached_units_breakdown',
-            field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
-        ),
-        migrations.AddField(
             model_name='perennialcropland',
             name='cached_units_breakdown',
             field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
@@ -422,11 +412,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='transportentry',
-            name='cached_units_breakdown',
-            field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
-        ),
-        migrations.AddField(
-            model_name='valuechain',
             name='cached_units_breakdown',
             field=models.JSONField(blank=True, null=True, verbose_name='cached_units_breakdown'),
         ),
