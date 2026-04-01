@@ -542,6 +542,15 @@ def get_forest_management_modules_in_plantation_projects():
 
     return forests
 
+def change_all_other_land_flu_data_to_1():
+    """
+    Change all OtherLandFLUData objects to have a value of 1.0 for all land use types.
+    """
+    from ipcc.models import FLUData
+    flu_datas = FLUData.objects.filter(land_use_type__name__iexact="Other Land").all()
+    for flu_data in flu_datas:
+        flu_data.value = 1.0
+        flu_data.save()
 
 def run():
     import os
@@ -554,23 +563,27 @@ def run():
         # cycle_all_modules_and_invalidate_cached_results()
         # import_input_types_units()
         # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
-        get_forest_management_modules_in_plantation_projects()
+        # get_forest_management_modules_in_plantation_projects()
+        change_all_other_land_flu_data_to_1()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        import_input_types_units()
+        # import_input_types_units()
+        # change_all_other_land_flu_data_to_1()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
         # sanitize_minitool_data()
+        change_all_other_land_flu_data_to_1()
         pass
 
     if app_mode == "test":
         # TODO: Run in test
         add_default_project_lock_expiration_time_minutes_application_parameter()
         import_hih_links()
+        change_all_other_land_flu_data_to_1()
         pass
 
     return True

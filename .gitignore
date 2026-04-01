@@ -1,3 +1,6 @@
+# Git worktrees
+.worktrees/
+
 # These are some examples of commonly ignored file patterns.
 # You should customize this list as applicable to your project.
 # Learn more about .gitignore:
@@ -143,3 +146,6 @@ djangoexact/scripts/forman_agb_revisedrevised.csv
 docs/plans/
 
 .serena
+CLAUDE.md
+faostat_crops.csv
+yield_items.csv

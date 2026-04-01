@@ -4328,12 +4328,14 @@ class SettlementCalculator(LandModuleCalculator):
             self.fmg_wo = DefaultValue(self.ef_wo.fmg)
             self.biomass_ef_wo.value = self.ef_wo.biomass
 
-        # SOCinitial in case of non-paved settlement (start) to paved settlement (end)
-        if self.luc and self.module.is_start() and self.module.settlement_type_start.name.casefold() != "paved settlement":
+        # NOTE: SOCinitial in case of non-settlement (start) to paved settlement or infrastructure on existing land (end)
+        if self.luc and not self.module.is_start():
             is_paved_w = self.module.is_with() and self.module.settlement_type_w.name.casefold() == "paved settlement"
             is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name.casefold() == "paved settlement"
+            is_existing_infra_w = self.module.is_with() and self.module.existing_infrastructure_w.name.casefold() == "infrastructure on existing land (no paving)"
+            is_existing_infra_wo = self.module.is_without() and self.module.existing_infrastructure_wo.name.casefold() == "infrastructure on existing land (no paving)"
 
-            if is_paved_w or is_paved_wo:
+            if is_paved_w or is_paved_wo or is_existing_infra_w or is_existing_infra_wo:
                 self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
                 self.fi_start = get_fi_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
                 self.fmg_start = get_fmg_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
@@ -6948,6 +6950,8 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
         if not self.rshoot_before_20_yrs:
             raise ValueError(RSHOOT_UNDER_20_NOT_FOUND)
+        if self.rshoot_before_20_yrs.threshold is None:
+            self.rshoot_before_20_yrs.threshold = 0
 
         self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
         if not self.rshoot_after_20_yrs:
@@ -7136,7 +7140,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)) if self.disturbances else None,
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)) if self.disturbances else None,
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)) if self.disturbances else None,
-                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())] if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0 else [],
+                "disturbance_percentage_fire": [1 if "fire" in d.disturbance_type.name.casefold() else 0 for d in self.disturbances] if self.disturbances.count() > 0 else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_start,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_start,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
@@ -7216,7 +7220,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_w", flat=True)) if self.disturbances else None,
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_w", flat=True)) if self.disturbances else None,
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_w", flat=True)) if self.disturbances else None,
-                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())] if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0 else [],
+                "disturbance_percentage_fire": [1 if "fire" in d.disturbance_type.name.casefold() else 0 for d in self.disturbances] if self.disturbances.count() > 0 else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_w,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_w,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_w,
@@ -7294,7 +7298,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_wo", flat=True)) if self.disturbances else None,
                 "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_wo", flat=True)) if self.disturbances else None,
                 "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_wo", flat=True)) if self.disturbances else None,
-                "disturbance_percentage_fire": [1 for i in range(self.disturbances.filter(disturbance_type__name__icontains="fire").count())] if self.disturbances.filter(disturbance_type__name__icontains="fire").count() > 0 else [],
+                "disturbance_percentage_fire": [1 if "fire" in d.disturbance_type.name.casefold() else 0 for d in self.disturbances] if self.disturbances.count() > 0 else [],
                 "logging_recurrence": self.forest.logging_recurrence_yrs_wo,
                 "logging_percentage": self.forest.logging_percentage_agb_logged_wo,
                 "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_wo,

@@ -4,7 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
-import api.reports as reports
+from api.reports import generate_excel_report
 
 from .factories import *
 import api.tests.base_test_classes as t
@@ -31,8 +31,7 @@ class AnnualToOtherLand(t.LandUseChangeTest):
     def test(self):
         self.calculate_results()
 
-        report = reports.BaseProjectReport(self.project)
-        report.build_report()
+        generate_excel_report(self.project)
 
 
 AnnualToOtherLand().test()

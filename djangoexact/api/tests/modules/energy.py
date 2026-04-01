@@ -4,7 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
-import api.reports as r
+from api.reports import generate_excel_report
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -25,8 +25,7 @@ class EnergyTest(t.ModuleWithSubmodulesTest):
         self.calculate_results()
         self.calculate_submodule_results()
 
-        report = r.BaseProjectReport(self.project)
-        report.build_report()
+        generate_excel_report(self.project)
 
 
 EnergyTest().test()

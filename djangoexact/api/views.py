@@ -1,5 +1,8 @@
+import json
 import os
 import logging
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from django.urls import reverse
 from django.conf import settings
@@ -11,6 +14,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -83,6 +87,8 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
+    ProjectExportSerializer,
+    ProjectImportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -129,7 +135,6 @@ from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-import api.reports as reports
 from django.http import HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
@@ -386,6 +391,20 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+
+def get_version_config():
+    """Read version config from file or environment."""
+    config_paths = [
+        Path(__file__).parent.parent.parent / 'version.config.json',
+        Path(os.environ.get('EXACT_USER_DATA_DIR', '')) / 'version.config.json',
+    ]
+    for config_path in config_paths:
+        if config_path.exists():
+            with open(config_path) as f:
+                return json.load(f)
+    # Default for development
+    return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -683,9 +702,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return response
 
         try:
-            report = reports.BaseProjectReport(project, activities=selected_activities)
-            _, file_bytes_buffer = report.build_report()
-            report.close_file()
+            from .reports import generate_excel_report
+            file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
         except Exception as e:
             traceback.print_exc()
             logger.error(f"Error generating report: {e}")
@@ -700,6 +718,409 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Export project as .exactproject file",
+        responses={
+            200: "Project exported successfully",
+            403: "Permission denied",
+            404: "Project not found"
+        }
+    )
+    def export(self, request, pk=None):
+        """Export a project with all its activities and modules."""
+        project: Project = get_object_or_404(Project, pk=pk)
+
+        # Check permission
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        # Generate export_id if not exists
+        if not project.export_id:
+            project.export_id = uuid.uuid4()
+            project.save(update_fields=['export_id'])
+
+        # Get version config
+        version_config = get_version_config()
+
+        # Build export data
+        serializer = ProjectExportSerializer(project)
+        export_data = {
+            "formatVersion": 1,
+            "appVersion": version_config.get("appVersion", "1.0.0"),
+            "compatibilityGroup": version_config.get("compatibilityGroup", 1),
+            "exportedAt": timezone.now().isoformat(),
+            "exportId": str(project.export_id),
+            "project": serializer.data
+        }
+
+        # Return as JSON file
+        response = HttpResponse(
+            json.dumps(export_data, indent=2, default=str),
+            content_type="application/json"
+        )
+        safe_name = project.name.replace('"', '').replace('/', '-')[:50]
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        return response
+
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(
+        operation_description="Import a .exactproject file",
+        request_body=ProjectImportSerializer,
+        responses={
+            200: "Project already exists",
+            201: "Project imported successfully",
+            400: "Invalid file format or compatibility mismatch"
+        }
+    )
+    def import_project(self, request):
+        """Import a project from .exactproject file data."""
+        serializer = ProjectImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return utils.ErrorResponse(
+                serializer.errors,
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        validated_data = serializer.validated_data
+        export_id = validated_data['exportId']
+        force_copy = request.query_params.get('forceCopy', 'false').lower() == 'true'
+
+        # Check if project with this export_id already exists
+        if not force_copy:
+            existing = Project.objects.filter(export_id=export_id).first()
+            if existing:
+                return Response({
+                    "exists": True,
+                    "projectId": existing.id,
+                    "projectName": existing.name
+                }, status=http_status.HTTP_200_OK)
+
+        # Create new project
+        project_data = validated_data['project'].copy()
+
+        def _create_comment(thread, comment_data, author_cache, parent=None):
+            """
+            Recursively create a comment and its replies.
+            Returns the created Comment instance.
+            """
+            from dateutil import parser as date_parser
+
+            author_email = comment_data.get('author_email')
+            author = None
+            if author_email:
+                if author_email in author_cache:
+                    author = author_cache[author_email]
+                else:
+                    author = CustomUser.objects.filter(email=author_email).first()
+                    author_cache[author_email] = author
+
+            # If author not found, use the importing user
+            if author is None:
+                author = request.user
+
+            # Parse date_created if provided
+            date_created = None
+            if comment_data.get('date_created'):
+                try:
+                    date_created = date_parser.parse(comment_data['date_created'])
+                except (ValueError, TypeError):
+                    pass
+
+            comment = Comment.objects.create(
+                thread=thread,
+                parent=parent,
+                author=author,
+                content=comment_data.get('content', ''),
+            )
+
+            # Update date_created if provided (auto_now_add prevents setting during create)
+            if date_created:
+                Comment.objects.filter(pk=comment.pk).update(date_created=date_created)
+
+            # Create replies recursively
+            for reply_data in comment_data.get('replies', []):
+                _create_comment(thread, reply_data, author_cache, parent=comment)
+
+            return comment
+
+        def _reconstruct_threads(instance, module_data, author_cache):
+            """
+            Reconstruct CommentThread objects for a module from exported thread data.
+            This handles thread fields that contain comment data from the export.
+            """
+            for field in instance._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if not field_name.endswith('_thread'):
+                    continue
+
+                thread_data = module_data.get(field_name)
+                if not thread_data or not isinstance(thread_data, dict):
+                    continue
+
+                comments_data = thread_data.get('comments', [])
+                if not comments_data:
+                    continue
+
+                # Get the thread that was created by the module's save() method
+                thread = getattr(instance, field_name, None)
+                if thread is None:
+                    # Create a new thread if one doesn't exist
+                    thread = CommentThread.objects.create()
+                    setattr(instance, field_name, thread)
+                    instance.save(update_fields=[field_name])
+
+                # Create comments within the thread
+                for comment_data in comments_data:
+                    _create_comment(thread, comment_data, author_cache)
+
+        def prepare_model_data(model_class, data, module_id_map=None):
+            """
+            Filter data to valid model fields and convert FK fields to use _id suffix.
+            Django expects FK fields as either model instances or field_id=integer.
+            Since exports contain integer IDs, we need to use the _id suffix.
+
+            For OneToOneField cross-references between modules in the same
+            activity (e.g. Settlement.land_use_change → LandUseChange),
+            ``module_id_map`` remaps old PKs to newly-created instances.
+            """
+            import re
+            from django.db.models import ForeignKey
+            from django.db.models.fields.related import OneToOneField
+
+            if module_id_map is None:
+                module_id_map = {}
+
+            result = {}
+            for field in model_class._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if field_name not in data:
+                    continue
+                value = data[field_name]
+
+                # Skip _thread FK fields — these now contain thread/comment data
+                # that will be reconstructed after the module is created.
+                if isinstance(field, ForeignKey) and field_name.endswith('_thread'):
+                    continue
+
+                # OneToOneField cross-module references need ID remapping
+                # because the referenced module was re-created with a new PK.
+                if isinstance(field, OneToOneField):
+                    if isinstance(value, int) and value in module_id_map:
+                        # New export format: integer ID that maps to a
+                        # previously-created module in this activity.
+                        result[f"{field_name}_id"] = module_id_map[value].id
+                    elif isinstance(value, str):
+                        # Old export format: string like "(4) LandUseChange
+                        # in settlements". Parse the PK and remap.
+                        match = re.match(r'\((\d+)\)', value)
+                        if match:
+                            old_pk = int(match.group(1))
+                            if old_pk in module_id_map:
+                                result[f"{field_name}_id"] = module_id_map[old_pk].id
+                        # If not in the map the target module hasn't been
+                        # created yet or doesn't exist — skip gracefully
+                        # (the field is nullable).
+                    elif isinstance(value, int):
+                        # Reference-data FK (e.g. OrganicSoil pointing to
+                        # a shared record) — not in the map, use as-is.
+                        result[f"{field_name}_id"] = value
+                    continue
+
+                # For ForeignKey fields with integer values, use field_id suffix
+                if isinstance(field, ForeignKey) and isinstance(value, int):
+                    result[f"{field_name}_id"] = value
+                else:
+                    result[field_name] = value
+            return result
+
+        try:
+            with transaction.atomic():
+                # Extract activities before creating project
+                activities_data = project_data.pop('activities', [])
+
+                # Prepare project data with proper FK handling
+                filtered_project_data = prepare_model_data(Project, project_data)
+
+                # Generate unique name if needed (unique_together on name + owner)
+                base_name = filtered_project_data.get('name', 'Imported Project')
+                name = base_name
+                counter = 1
+                while Project.objects.filter(name=name, owner=request.user).exists():
+                    counter += 1
+                    name = f"{base_name} (Copy {counter})" if counter > 2 else f"{base_name} (Copy)"
+                filtered_project_data['name'] = name
+
+                # Create project
+                project = Project.objects.create(
+                    owner=request.user,
+                    export_id=export_id if not force_copy else uuid.uuid4(),
+                    **filtered_project_data
+                )
+
+                # Lock project and create membership (same as regular create)
+                project.lock(request.user)
+                ProjectMembership.objects.create(
+                    user=request.user,
+                    project=project,
+                    group=Group.objects.get_or_create(name="Admin")[0]
+                )
+
+                # Create activities and modules
+                for activity_data in activities_data:
+                    activity_data = activity_data.copy()
+                    modules_data = activity_data.pop('modules', {})
+                    module_types_data = activity_data.pop('module_types', [])
+
+                    # Prepare activity data with proper FK handling
+                    filtered_activity_data = prepare_model_data(Activity, activity_data)
+
+                    activity = Activity.objects.create(
+                        project=project,
+                        owner=request.user,
+                        **filtered_activity_data
+                    )
+
+                    # Set module types
+                    if module_types_data:
+                        activity.module_types.set(module_types_data)
+
+                    # Sort so modules referenced via OneToOneField are created
+                    # first: OrganicSoil → LandUseChange → everything else.
+                    def _module_sort_key(item):
+                        priority = {'OrganicSoil': 0, 'LandUseChange': 1}
+                        return priority.get(item[0], 2)
+
+                    modules_data = dict(sorted(modules_data.items(), key=_module_sort_key))
+
+                    # Maps old module PK → newly-created instance so that
+                    # cross-module OneToOneField refs can be resolved.
+                    module_id_map = {}
+
+                    # Cache for author lookups to avoid repeated DB queries
+                    author_cache = {}
+
+                    # Create modules
+                    for module_type, modules_list in modules_data.items():
+                        model_class = self._get_module_class(module_type)
+                        if model_class:
+                            for module_data in modules_list:
+                                module_data = module_data.copy()
+                                original_id = module_data.pop('_original_id', None)
+                                submodules_data = module_data.pop('_submodules', [])
+
+                                filtered_module_data = prepare_model_data(
+                                    model_class, module_data, module_id_map
+                                )
+                                new_instance = model_class.objects.create(
+                                    activity=activity,
+                                    **filtered_module_data
+                                )
+
+                                if original_id is not None:
+                                    module_id_map[original_id] = new_instance
+
+                                # Reconstruct threads with comments for the module
+                                _reconstruct_threads(new_instance, module_data, author_cache)
+
+                                # Create submodules if present in the export
+                                if submodules_data:
+                                    self._create_submodules(
+                                        new_instance, submodules_data, prepare_model_data,
+                                        _reconstruct_threads, author_cache, module_id_map
+                                    )
+
+                return Response({
+                    "exists": False,
+                    "projectId": project.id,
+                    "projectName": project.name
+                }, status=http_status.HTTP_201_CREATED)
+
+        except Exception as e:
+            logger.error(f"Failed to import project: {str(e)}")
+            return utils.ErrorResponse(
+                f"Failed to import project: {str(e)}",
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+    def _get_module_class(self, class_name):
+        """Get module model class by name."""
+        from . import models
+        return getattr(models, class_name, None)
+
+    def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
+                           reconstruct_threads_fn, author_cache, module_id_map):
+        """
+        Create submodules for a parent module from exported submodule data.
+
+        Args:
+            parent_instance: The parent module instance
+            submodules_data: List of submodule data dictionaries from export
+            prepare_model_data: Function to filter model data
+            reconstruct_threads_fn: Function to reconstruct thread comments
+            author_cache: Cache for author lookups
+            module_id_map: Map of original IDs to new instances
+        """
+        for submodule_data in submodules_data:
+            submodule_data = submodule_data.copy()
+            original_id = submodule_data.pop('_original_id', None)
+            nested_submodules = submodule_data.pop('_submodules', [])
+            submodule_type = submodule_data.pop('_submodule_type', None)
+
+            # Get the submodule class
+            submodule_class = None
+
+            # First try to use the stored submodule type from the export
+            if submodule_type:
+                submodule_class = self._get_module_class(submodule_type)
+
+            # Fallback: try to determine from parent's related models
+            if submodule_class is None:
+                for field in parent_instance._meta.get_fields():
+                    if hasattr(field, 'related_model') and hasattr(field, 'related_query_name'):
+                        related_model = field.related_model
+                        # Check if this related model has a 'parent' field pointing to our parent class
+                        for related_field in related_model._meta.get_fields():
+                            if hasattr(related_field, 'column') and related_field.name == 'parent':
+                                if hasattr(related_field, 'related_model'):
+                                    if related_field.related_model == parent_instance.__class__:
+                                        submodule_class = related_model
+                                        break
+                    if submodule_class:
+                        break
+
+            if submodule_class is None:
+                logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
+                continue
+
+            filtered_submodule_data = prepare_model_data(
+                submodule_class, submodule_data, module_id_map
+            )
+
+            # Create the submodule with parent reference
+            new_submodule = submodule_class.objects.create(
+                parent=parent_instance,
+                **filtered_submodule_data
+            )
+
+            if original_id is not None:
+                module_id_map[original_id] = new_submodule
+
+            # Reconstruct threads for the submodule
+            reconstruct_threads_fn(new_submodule, submodule_data, author_cache)
+
+            # Recursively create nested submodules if present
+            if nested_submodules:
+                self._create_submodules(
+                    new_submodule, nested_submodules, prepare_model_data,
+                    reconstruct_threads_fn, author_cache, module_id_map
+                )
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
@@ -880,397 +1301,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
-            activate(lang)
+            from .reports import compute_project_result
+            from .reports.html_context import build_template_context
 
             project: Project = self.get_object()
-            soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
-            # Calculate total area of all activities
-            total_area = sum(activity.area for activity in project.activities.all())
-
-            # Call project results endpoint
-            total_results_response = self.results(request, pk=pk)
-
-            total_data = total_results_response.data
-            activities = total_data["activities"]
-            modules = [module for activity in activities for module in activity["modules"]]
-            results = [module["results"] for module in modules]
-            # TODO: Maybe instead of doing this show the module but with an error message
-            total_w = sum(result["total_w"] for result in results if result.get("total_w", None) is not None)
-            total_wo = sum(result["total_wo"] for result in results if result.get("total_wo", None) is not None)
-            total_balance = total_w - total_wo
-
-            project_emissions_w = total_w
-            project_emissions_wo = total_wo
-            project_emissions_balance = total_balance
-
-            new_request = request._request
-            new_request.query_params = request.query_params.copy()
-            new_request.query_params["aggregate"] = "gas"
-
-            gas_results_response = self.results(new_request, pk=pk)
-            gas_data = gas_results_response.data
-            activities = gas_data["activities"]
-            modules = [module for activity in activities for module in activity["modules"]]
-            results = [module["results"] for module in modules]
-
-            emissions_w = [result["total_w"] for result in results if result.get("total_w", None) is not None]
-            emissions_wo = [result["total_wo"] for result in results if result.get("total_wo", None) is not None]
-
-            co2_w = {"name": "CO2", "value": 0}
-            ch4_w = {"name": "CH4", "value": 0}
-            n2o_w = {"name": "N2O", "value": 0}
-            co_w = {"name": "CO", "value": 0}
-            doc_w = {"name": "DOC", "value": 0}
-            other_w = {"name": "OTHER", "value": 0}
-
-            gases_w = [co2_w, ch4_w, n2o_w, co_w, doc_w, other_w]
-
-            for w in emissions_w:
-                for g in w:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other_w["value"] += sum([e["value"] for e in g["emissions"]])
-
-            co2_wo = {"name": "CO2", "value": 0}
-            ch4_wo = {"name": "CH4", "value": 0}
-            n2o_wo = {"name": "N2O", "value": 0}
-            co_wo = {"name": "CO", "value": 0}
-            doc_wo = {"name": "DOC", "value": 0}
-            other_wo = {"name": "OTHER", "value": 0}
-
-            gases_wo = [co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo]
-
-            for wo in emissions_wo:
-                for g in wo:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other_wo["value"] += sum([e["value"] for e in g["emissions"]])
-
-            balances = [result["balance"] for result in results if result.get("balance", None) is not None]
-
-            co2 = {"name": "CO2", "value": 0}
-            ch4 = {"name": "CH4", "value": 0}
-            n2o = {"name": "N2O", "value": 0}
-            co = {"name": "CO", "value": 0}
-            doc = {"name": "DOC", "value": 0}
-            other = {"name": "OTHER", "value": 0}
-
-            for b in balances:
-                for g in b:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other["value"] += sum([e["value"] for e in g["emissions"]])
-
-            gases = [co2, ch4, n2o, co, doc, other]
-
-            INCREASES = _("increases")
-            DECREASES = _("decreases")
-
-            sorted_gases = sorted(gases, key=lambda x: (abs(x["value"]) and x["value"] != 0), reverse=True)
-            highest_gas = sorted_gases[0]
-            second_highest_gas = sorted_gases[1]
-            third_highest_gas = sorted_gases[2]
-
-            project_primary_ghg = highest_gas["name"]
-            project_primary_ghg_emissions = highest_gas["value"]
-            project_primary_ghg_direction = INCREASES if project_primary_ghg_emissions >= 0 else DECREASES
-
-            project_secondary_ghg = second_highest_gas["name"]
-            project_secondary_ghg_emissions = second_highest_gas["value"]
-            project_secondary_ghg_direction = INCREASES if project_secondary_ghg_emissions >= 0 else DECREASES
-
-            project_tertiary_ghg = third_highest_gas["name"]
-            project_tertiary_ghg_emissions = third_highest_gas["value"]
-            project_tertiary_ghg_direction = INCREASES if project_tertiary_ghg_emissions >= 0 else DECREASES
-
-            activities = project.activities.all()
-
-            processed_activities = []
-
-            # Hectares: if with to without, with is counted as 0 and without as area
-            livestock_heads = [{"name": lct.name, "value_w": 0, "value_wo": 0} for lct in LivestockCategoryType.objects.all()]
-
-            small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
-            large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
-            aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
-            land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
-
-            for a in total_data["activities"]:
-                db_activity: Activity = activities.get(name=a["name"])
-                mlist = list(filter(lambda x: x.get("results", None) is not None and x["results"].get("balance", None) is not None, a["modules"]))
-                modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
-
-                db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
-
-                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist if m["results"]["total_w"] is not None])
-                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist if m["results"]["total_wo"] is not None])
-                sum_all_balance = sum_all_total_w - sum_all_total_wo
-
-                db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
-
-                main_impact = None
-                secondary_impacts = []
-
-                if db_activity.is_luc:
-                    main_impact = _("hectares")
-                elif db_activity.is_fishery:
-                    main_impact = _("tonnes of catch")
-                elif db_activity.is_livestock:
-                    main_impact = _("livestock heads")
-
-                if any([db_activity.is_energy, db_activity.is_storage, db_activity.is_transport, db_activity.is_processing]):
-                    secondary_impacts.append(_("energy consumption"))
-                if db_activity.is_packaging:
-                    secondary_impacts.append(_("packaging material"))
-                if db_activity.is_input:
-                    secondary_impacts.append(_("agricultural inputs use"))
-
-                secondary_impacts = ", ".join(secondary_impacts)
-
-                db_activity.main_impact = main_impact
-                if secondary_impacts:
-                    db_activity.secondary_impacts = secondary_impacts
-
-                for m in db_activity.modules:
-                    if issubclass(m.__class__, Fishery):
-                        if isinstance(m, SmallFishery):
-                            m: SmallFishery
-                            for ft in small_fishery_types:
-                                if ft["name"] == m.fishery_type.name:
-                                    ft["value_w"] += m.total_catch_yr_w
-                                    ft["value_wo"] += m.total_catch_yr_wo
-                        elif isinstance(m, LargeFishery):
-                            m: LargeFishery
-                            large_fishery_data["value_wo"] += m.total_catch_yr_wo
-                            large_fishery_data["value_w"] += m.total_catch_yr_w
-
-                    elif isinstance(m, Livestock):
-                        m: Livestock
-                        for lh in livestock_heads:
-                            if lh["name"] == m.livestock_category_type.name:
-                                lh["value_w"] += m.heads_number_w
-                                lh["value_wo"] += m.heads_number_wo
-
-                    elif isinstance(m, Aquaculture):
-                        m: Aquaculture
-                        aquaculture_data["value_w"] += m.annual_production_w
-                        aquaculture_data["value_wo"] += m.annual_production_wo
-
-                    elif issubclass(m.__class__, LandModule):
-                        m: LandModule
-                        for lt in land_types:
-                            if lt["name"] == m.module_type.name:
-                                if m.is_with() and not m.is_without():
-                                    lt["value_w"] += m.area
-                                elif m.is_without() and not m.is_with():
-                                    lt["value_wo"] += m.area
-                                elif m.is_with() and m.is_without():
-                                    lt["value_w"] += m.area
-                                    lt["value_wo"] += m.area
-
-                processed_activities.append(db_activity)
-
-            processed_activities = sorted(processed_activities, key=lambda x: x.results["balance"], reverse=total_balance > 0)
-
-            livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
-            small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
-            large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
-            aquaculture_data = {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0 else aquaculture_data
-            land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
-            total_heads = sum([lh["value_w"] for lh in livestock_heads])
-            total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
-
-            activities_total = processed_activities
-
-            def plot_with_without_balance_bar_chart_stacked_by_gas(data_w: list, data_wo: list):
-                co2_w, ch4_w, n2o_w, co_w, doc_w, other_w = data_w
-                co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo = data_wo
-
-                # Prepare bar labels
-                labels = ["With", "Without", "Balance"]
-
-                # Build lists of values for each gas for "With", "Without", and the difference
-                co2_vals = [
-                    co2_w["value"],
-                    co2_wo["value"],
-                    co2_w["value"] - co2_wo["value"],
-                ]
-                ch4_vals = [
-                    ch4_w["value"],
-                    ch4_wo["value"],
-                    ch4_w["value"] - ch4_wo["value"],
-                ]
-                n2o_vals = [
-                    n2o_w["value"],
-                    n2o_wo["value"],
-                    n2o_w["value"] - n2o_wo["value"],
-                ]
-                co_vals = [
-                    co_w["value"],
-                    co_wo["value"],
-                    co_w["value"] - co_wo["value"],
-                ]
-                doc_vals = [
-                    doc_w["value"],
-                    doc_wo["value"],
-                    doc_w["value"] - doc_wo["value"],
-                ]
-                other_vals = [
-                    other_w["value"],
-                    other_wo["value"],
-                    other_w["value"] - other_wo["value"],
-                ]
-
-                # Stack them in an array for plotting
-                data_arrays = np.array([co2_vals, ch4_vals, n2o_vals, co_vals, doc_vals, other_vals])
-                # Each row is a gas, each column is a bar (With, Without, Balance)
-
-                x = np.arange(len(labels))
-                width = 0.6
-
-                fig, ax = plt.subplots(figsize=(6.5, 4))
-
-                # We'll accumulate the bottom of each stack as we go
-                bottom = np.zeros(len(labels))
-
-                colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
-                names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
-
-                for idx, row in enumerate(data_arrays):
-                    ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=names[idx])
-                    bottom += row
-
-                ax.set_xticks(x)
-                ax.set_xticklabels(labels)
-                ax.ticklabel_format(style="plain", axis="y", useOffset=False)
-                ax.set_ylabel("Emissions (tonnes)")
-                ax.set_title("")
-                ax.legend()
-
-                # Save to a BytesIO buffer
-                buf = io.BytesIO()
-                plt.savefig(buf, format="svg")
-                buf.seek(0)
-
-                # Encode as base64 for embedding in HTML
-                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-                plt.close(fig)
-                plt.clf()
-
-                buf.close()
-                return chart_base64
-
-            def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
-                # Create the figure and axis
-                fig, ax = plt.subplots(figsize=(6.5, 4))
-
-                # Data
-                labels = ["With", "Without", "Balance"]
-                emissions = [project_emissions_w, project_emissions_wo, project_emissions_balance]
-                # Create horizontal bar chart
-                ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
-
-                for i, v in enumerate(emissions):
-                    ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
-
-                # Add legend
-                ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
-
-                # Customize the chart
-                ax.ticklabel_format(style="plain", axis="x", useOffset=False)
-                ax.grid(True, axis="x", linestyle="--", alpha=0.7)
-
-                # Save to a BytesIO buffer
-                buf = io.BytesIO()
-                plt.savefig(buf, format="svg")
-                buf.seek(0)
-
-                # Encode as base64 for embedding in HTML
-                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-                plt.close(fig)
-                plt.clf()
-
-                buf.close()
-                return chart_base64
-
-            # Get faologo.eps from static files
-            try:
-                faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
-            except FileNotFoundError:
-                faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
-
-            # Add it as base64 to the context
-            faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
-
-            project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
-            project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
-
-            download_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            context = {
-                "project": project,
-                "start_year_of_activities": project.start_year_of_activities,
-                "implementation_years": project.implementation_years,
-                "last_year_of_accounting": project.last_year_of_accounting,
-                "total_project_years": (project.implementation_years + project.capitalization_years),
-                "total_carbon_balance": project_emissions_balance,
-                "project_emissions_w": project_emissions_w,
-                "project_emissions_wo": project_emissions_wo,
-                "project_emissions_balance": project_emissions_balance,
-                "total_area": total_area,
-                "total_heads": total_heads,
-                "total_tonnes_of_catch": total_tonnes_of_catch,
-                "soc": soc.value,
-                "project_primary_ghg": project_primary_ghg,
-                "project_primary_ghg_emissions": project_primary_ghg_emissions,
-                "project_primary_ghg_direction": project_primary_ghg_direction,
-                "project_secondary_ghg": project_secondary_ghg,
-                "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
-                "project_secondary_ghg_direction": project_secondary_ghg_direction,
-                "project_tertiary_ghg": project_tertiary_ghg,
-                "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
-                "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
-                "activities": activities,
-                "activities_total": activities_total,
-                "project_chart_base64": project_chart_base64,
-                "project_gases_chart_base64": project_gases_chart_base64,
-                "faologo_base64": faologo_base64,
-                "livestock_heads": livestock_heads,
-                "small_fishery_types": small_fishery_types,
-                "large_fishery_data": large_fishery_data,
-                "aquaculture_data": aquaculture_data,
-                "land_types": land_types,
-                "download_date_time": download_date_time,
-            }
-
+            result = compute_project_result(project)
+            context = build_template_context(result, request, lang)
             html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
@@ -1278,12 +1315,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             pdf = HTML(string=html).write_pdf()
 
-            # Create the HTTP response with PDF content
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
-
-            faologo.close()
-
             return response
 
         except Exception as e:
