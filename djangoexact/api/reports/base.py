@@ -90,6 +90,20 @@ class BaseModuleReport:
         self.emissions_set_w  = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
         self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
 
+        try:
+            from .cache import save_results_to_cache
+            save_results_to_cache(
+                self.module,
+                self.emissions_set,
+                self.emissions_set_w,
+                self.emissions_set_wo,
+                self.inventory,
+            )
+        except Exception as e:
+            log.warning(
+                f"Could not save results to cache for module {self.module.pk}: {e}"
+            )
+
     @property
     def _project_duration(self) -> int:
         return self.activity_report.project_report.duration
