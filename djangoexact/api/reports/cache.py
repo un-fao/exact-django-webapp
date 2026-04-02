@@ -78,3 +78,50 @@ def build_inventory_from_cache(
             value=value,
         ))
     return items
+
+
+def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_wo, inventory) -> None:
+    """Persist calculator output to the module's cache after a fresh calculation.
+
+    Only updates cached_results_by_activity_by_gas and last_cached_at so that
+    future report runs hit the cache.  The other breakdown fields
+    (cached_results_total, cached_results_by_activity, cached_results_by_gas)
+    are left untouched; views.py will populate them on the next API call.
+    """
+    from django.utils import timezone
+
+    if module.pk is None:
+        return
+
+    def _serialize(es):
+        rows = []
+        for e in es:
+            activity = e.activity
+            if hasattr(activity, "value"):
+                activity = activity.value
+            rows.append({
+                "activity": activity,
+                "gas_type": {"name": e.gas_type.name if e.gas_type else None},
+                "emissions": [{"value": v.value} for v in e.emissions],
+            })
+        return rows
+
+    data = {
+        "balance": _serialize(emissions_set),
+        "total_w": _serialize(emissions_set_w),
+        "total_wo": _serialize(emissions_set_wo),
+        "inventory": inventory.to_dict() if inventory is not None else [],
+    }
+
+    from datetime import timedelta
+
+    update_fields = ["last_cached_at", "cached_results_by_activity_by_gas"]
+    now = timezone.now()
+    module.last_cached_at = now
+    module.cached_results_by_activity_by_gas = data
+    if module.last_modified is None:
+        module.last_modified = now - timedelta(seconds=1)
+        update_fields.append("last_modified")
+    if hasattr(module, "skip_history_when_saving"):
+        module.skip_history_when_saving = True
+    module.save(update_fields=update_fields)
