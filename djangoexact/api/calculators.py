@@ -5222,49 +5222,49 @@ class LivestockCalculator(BaseCalculator):
                     self.ch4_ef_t2_w = self.ch4_ef_t2_w.value
 
                 # System for complementary manure management
-                self.ef_ch4_systems_wo = utils.get_or_raise(
+                self.ef_ch4_systems_w = utils.get_or_raise(
                     ipcc.LivestockManureEF,
                     manure_ef_flt | ch4 | complementary_mm,
-                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
                     method="get",
                 )
-                self.ef_ch4_system_values_wo = [self.ef_ch4_systems_wo.value if self.ef_ch4_systems_wo.value else 0]
+                self.ef_ch4_system_values_w = [self.ef_ch4_systems_w.value if self.ef_ch4_systems_w.value else 0]
 
                 # Percentage for complementary manure management
-                self.animal_waste_management_systems_wo = utils.get_or_raise(
+                self.animal_waste_management_systems_w = utils.get_or_raise(
                     ipcc.LivestockAWMS,
                     production_category_region_flt | complementary_mm,
-                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
+                    f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
                     method="get",
                 )
-                self.animal_waste_management_systems_values_wo = [self.animal_waste_management_systems_wo.value if self.animal_waste_management_systems_wo.value else 0]
+                self.animal_waste_management_systems_values_w = [self.animal_waste_management_systems_w.value if self.animal_waste_management_systems_w.value else 0]
 
                 # PRP N2O Direct EF of other systems
-                self.ef_n2o_direct_systems_wo = utils.get_or_raise(
+                self.ef_n2o_direct_systems_w = utils.get_or_raise(
                     ipcc.LivestockManureEF,
                     manure_ef_flt | n2o | complementary_mm,
-                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    f"Could not find N2O Direct EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
                     method="get",
                 )
-                self.ef_n2o_direct_systems_wo = [self.ef_n2o_direct_systems_wo.value if self.ef_n2o_direct_systems_wo.value else 0]
+                self.ef_n2o_direct_systems_w = [self.ef_n2o_direct_systems_w.value if self.ef_n2o_direct_systems_w.value else 0]
 
                 # PRP N2O Volatilization EF of other systems
-                self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(
+                self.ef_n2o_volatilization_systems_w = utils.get_or_raise(
                     ipcc.LivestockManureEF,
                     manure_ef_flt | volatilization | complementary_mm,
-                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
                     method="get",
                 )
-                self.ef_n2o_volatilization_systems_wo = [self.ef_n2o_volatilization_systems_wo.value if self.ef_n2o_volatilization_systems_wo.value else 0]
+                self.ef_n2o_volatilization_systems_w = [self.ef_n2o_volatilization_systems_w.value if self.ef_n2o_volatilization_systems_w.value else 0]
 
                 # PRP N2O Leaching EF of other systems
-                self.ef_n2o_leaching_systems_wo = utils.get_or_raise(
+                self.ef_n2o_leaching_systems_w = utils.get_or_raise(
                     ipcc.LivestockManureEF,
                     manure_ef_flt | leaching | complementary_mm,
-                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
+                    f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}",
                     method="get",
                 )
-                self.ef_n2o_leaching_systems_wo = [self.ef_n2o_leaching_systems_wo.value if self.ef_n2o_leaching_systems_wo.value else 0]
+                self.ef_n2o_leaching_systems_w = [self.ef_n2o_leaching_systems_w.value if self.ef_n2o_leaching_systems_w.value else 0]
 
         if module.is_without():
             production_category_region_flt = {
