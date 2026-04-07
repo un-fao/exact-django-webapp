@@ -1613,8 +1613,6 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
             for field, value in data.items():
                 setattr(self.instance, field, value)
 
-            self.save()
-
             # Validate the parent Land Use Change on related LandModule change
             parent_luc = getattr(self.instance, "land_use_change", None)
 
