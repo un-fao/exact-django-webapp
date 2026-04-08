@@ -50,8 +50,24 @@ def _make_row(*, area="Italy", item="Wheat", year=2022, value="3500.0", flag="A"
     }
 
 
+def _default_get_par(domain, par):
+    """Default side effect for faostat.get_par covering the standard test labels."""
+    if par == "area":
+        return {"Italy": "106", "Brazil": "21"}
+    if par == "item":
+        return {"Wheat": "15", "Root Crops": "125"}
+    if par == "element":
+        return {"Yield": "2413"}
+    return {}
+
+
 def _mock_faostat_returning(rows: list[dict]):
-    """Return a MagicMock for the ``faostat`` module that yields *rows* from get_data_df."""
+    """Return a MagicMock for the ``faostat`` module that yields *rows* from get_data_df.
+
+    Also wires the default get_par side effect so that label-to-code resolution
+    succeeds for the standard test inputs (area="Italy", item="Wheat",
+    element="Yield") without real network calls.
+    """
     import pandas as pd
 
     mock_faostat = MagicMock()
@@ -59,6 +75,7 @@ def _mock_faostat_returning(rows: list[dict]):
         mock_faostat.get_data_df.return_value = pd.DataFrame(rows)
     else:
         mock_faostat.get_data_df.return_value = pd.DataFrame()
+    mock_faostat.get_par.side_effect = _default_get_par
     return mock_faostat
 
 
@@ -208,23 +225,28 @@ class TestGetYieldExplicitYearNotFound:
 class TestGetYieldUnrecognisedInputs:
     """AC-4, AC-5, BR-7: area or item not recognised by FAOSTAT → FAOSTATInvalidInputError.
 
-    FAOSTAT signals an invalid area/item by returning an empty result set.
+    _resolve_code now raises early (before get_data_df) when the label is
+    absent from the get_par response dict.
     """
 
     def test_unrecognised_area_raises_invalid_input_error(self, monkeypatch):
-        """AC-4: area string not found in FAOSTAT → FAOSTATInvalidInputError."""
+        """AC-4: area string not found in get_par → FAOSTATInvalidInputError."""
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
-        with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
+        mock_faostat = _mock_faostat_returning([])
+        with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATInvalidInputError):
+                # "NotARealCountry" is absent from _default_get_par("area")
                 get_yield(area="NotARealCountry", item="Wheat")
 
     def test_unrecognised_item_raises_invalid_input_error(self, monkeypatch):
-        """AC-5: item string not found in FAOSTAT → FAOSTATInvalidInputError."""
+        """AC-5: item string not found in get_par → FAOSTATInvalidInputError."""
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
-        with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
+        mock_faostat = _mock_faostat_returning([])
+        with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATInvalidInputError):
+                # "NotARealCrop" is absent from _default_get_par("item")
                 get_yield(area="Italy", item="NotARealCrop")
 
 
@@ -240,6 +262,7 @@ class TestGetYieldNetworkError:
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
+        mock_faostat.get_par.side_effect = _default_get_par
         mock_faostat.get_data_df.side_effect = ConnectionError("timeout")
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError):
@@ -251,6 +274,7 @@ class TestGetYieldNetworkError:
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         original = ConnectionError("timeout")
         mock_faostat = MagicMock()
+        mock_faostat.get_par.side_effect = _default_get_par
         mock_faostat.get_data_df.side_effect = original
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError) as exc_info:
@@ -262,6 +286,7 @@ class TestGetYieldNetworkError:
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
+        mock_faostat.get_par.side_effect = _default_get_par
         mock_faostat.get_data_df.side_effect = PermissionError("401 Unauthorized")
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError):
@@ -360,10 +385,15 @@ class TestGetYieldFixedFaostatParams:
         mock_faostat = _mock_faostat_returning(rows)
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             get_yield(area="Italy", item="Wheat")
-        call_kwargs = mock_faostat.get_data_df.call_args
-        # Domain QCL must appear in the call (as a positional or keyword arg)
-        all_args = str(call_kwargs)
+        call_args = mock_faostat.get_data_df.call_args
+        all_args = str(call_args)
+        # Domain QCL must appear in the call.
         assert "QCL" in all_args
+        # Numeric codes (not label strings) must be passed in the pars dict.
+        pars = call_args.kwargs["pars"]
+        assert pars["area"] == "106"
+        assert pars["item"] == "15"
+        assert pars["element"] == "2413"
 
     def test_returned_record_element_is_always_yield(self, monkeypatch):
         """BR-1: element field in the returned record is always 'Yield'."""
@@ -570,6 +600,7 @@ class TestRowToRecordSchemaGuard:
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         row = {"Area": "Italy", "Item": "Wheat", "Year": 2022, "Flag": "A", "Element": "Yield", "Unit": "hg/ha"}
         mock_faostat = MagicMock()
+        mock_faostat.get_par.side_effect = _default_get_par
         mock_faostat.get_data_df.return_value = pd.DataFrame([row])
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError):

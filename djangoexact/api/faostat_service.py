@@ -48,6 +48,10 @@ _PASSWORD_ENV_VAR: Final[str] = "FAOSTAT_PASSWORD"
 # concurrent threads cannot interleave token writes and network calls.
 _faostat_lock: threading.Lock = threading.Lock()
 
+# Process-level cache for get_par results to avoid redundant network calls.
+# Key: (domain, par_name), value: {label: code} dict returned by get_par.
+_par_cache: dict[tuple[str, str], dict[str, str]] = {}
+
 
 class YieldRecord(NamedTuple):
     """Structured result returned by get_yield."""
@@ -72,6 +76,36 @@ def _get_credentials() -> tuple[str, str]:
             "The FAOSTAT token is retrieved programmatically using these credentials."
         )
     return username, password
+
+
+def _resolve_code(par_name: str, label: str) -> str:
+    """Return the FAOSTAT numeric code for a label in the QCL domain.
+
+    Uses _par_cache to avoid repeated get_par network calls.
+    Must be called inside _faostat_lock (after set_requests_args).
+
+    Raises
+    ------
+    FAOSTATInvalidInputError
+        If label not found and par_name is 'area' or 'item' (caller-supplied).
+    FAOSTATNetworkError
+        If label not found and par_name is 'element' (fixed internal constant),
+        which signals an unexpected API schema change.
+    """
+    cache_key = (_DOMAIN, par_name)
+    if cache_key not in _par_cache:
+        _par_cache[cache_key] = faostat.get_par(_DOMAIN, par_name)
+    code = _par_cache[cache_key].get(label)
+    if code is None:
+        if par_name == "element":
+            raise FAOSTATNetworkError(
+                f"Fixed FAOSTAT element '{label}' not found in domain {_DOMAIN!r}. "
+                "This indicates an unexpected API schema change."
+            )
+        raise FAOSTATInvalidInputError(
+            f"{par_name.capitalize()} '{label}' not found in FAOSTAT domain {_DOMAIN!r}."
+        )
+    return code
 
 
 def _row_to_record(row: dict) -> YieldRecord:
@@ -154,14 +188,22 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
     with _faostat_lock:
         faostat.set_requests_args(username=username, password=password)
 
+        # Resolve human-readable labels to FAOSTAT numeric codes.
+        # _resolve_code raises FAOSTATInvalidInputError for unknown area/item
+        # and FAOSTATNetworkError for an unexpected element schema change.
+        # Both propagate out of the with block before get_data_df is reached.
+        area_code = _resolve_code("area", area)
+        item_code = _resolve_code("item", item)
+        element_code = _resolve_code("element", _ELEMENT)
+
         # BR-1, BR-6: fetch from FAOSTAT (no caching).
         try:
             df = faostat.get_data_df(
                 _DOMAIN,
                 pars={
-                    "area": area,
-                    "item": item,
-                    "element": _ELEMENT,
+                    "area": area_code,
+                    "item": item_code,
+                    "element": element_code,
                 },
                 show_flags=True,
                 strval=True,
@@ -171,18 +213,18 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
                 f"FAOSTAT request failed: {exc}"
             ) from exc
 
-    # Empty DataFrame handling differs by whether a year was requested.
+    # Empty DataFrame safety net — labels were already validated by _resolve_code,
+    # so an empty result means there is genuinely no data available.
     if df is None or df.empty:
         if year is not None:
-            # A year was explicitly requested but no rows came back — the
-            # area/item might be valid but there is simply no data for that
-            # year (e.g. a future year).  Raise NoDataError (BR-3).
+            # A year was explicitly requested but no rows came back.
             raise FAOSTATNoDataError(
                 f"No FAOSTAT data found for area={area!r}, item={item!r}, "
                 f"year={year}."
             )
-        # No year requested and the response is empty → the area or item is
-        # not recognised by FAOSTAT (AC-4, AC-5).
+        # No year requested and the response is empty — labels are valid but
+        # the API returned no data (safety net; FAOSTATInvalidInputError kept
+        # for backwards compatibility with callers that handle AC-4/AC-5).
         raise FAOSTATInvalidInputError(
             f"No FAOSTAT data found for area={area!r}, item={item!r}. "
             "The area or item label may be unrecognised."
