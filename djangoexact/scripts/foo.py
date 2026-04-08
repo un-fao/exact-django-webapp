@@ -627,18 +627,24 @@ def run():
         # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
         # get_forest_management_modules_in_plantation_projects()
         change_all_other_land_flu_data_to_1()
+        import_crop_nitrous_estimation_default_factors()
+        import_fires_combustion_factors()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
         # import_input_types_units()
         # change_all_other_land_flu_data_to_1()
+        import_crop_nitrous_estimation_default_factors()
+        import_fires_combustion_factors()
         pass
 
-    if app_mode == "development":
+    if app_mode == "development" or app_mode == "local":
         # TODO: Run in development
         # sanitize_minitool_data()
-        change_all_other_land_flu_data_to_1()
+        # change_all_other_land_flu_data_to_1()
+        # import_crop_nitrous_estimation_default_factors()
+        # import_fires_combustion_factors()
         pass
 
     if app_mode == "test":
