@@ -1404,9 +1404,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.minor_biomass_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass()
         self.minor_biomass_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
         self.minor_biomass_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
-        self.minor_yield_default_start: SimpleNamespace = SimpleNamespace(average=0)
-        self.minor_yield_default_w: SimpleNamespace = SimpleNamespace(average=0)
-        self.minor_yield_default_wo: SimpleNamespace = SimpleNamespace(average=0)
+        self.minor_yield_default_start: SimpleNamespace = SimpleNamespace(average=None)
+        self.minor_yield_default_w: SimpleNamespace = SimpleNamespace(average=None)
+        self.minor_yield_default_wo: SimpleNamespace = SimpleNamespace(average=None)
 
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
         self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
