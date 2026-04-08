@@ -37,7 +37,7 @@ from api.faostat_service import get_yield  # noqa: E402
 _FAOSTAT_DATA_PATH = "api.faostat_service.faostat"
 
 
-def _make_row(*, area="Italy", item="Wheat", year=2022, value="3500.0", flag="A", element="Yield", unit="hg/ha"):
+def _make_row(*, area="Italy", item="Wheat", year=2022, value="3500.0", flag="A", element="Yield", unit="kg/ha"):
     """Return a dict that mirrors a single FAOSTAT API response row."""
     return {
         "Area": area,
@@ -504,11 +504,11 @@ class TestGetYieldReturnShape:
     def test_returned_record_has_unit_field_as_str(self, monkeypatch):
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
-        rows = [_make_row(unit="hg/ha")]
+        rows = [_make_row(unit="kg/ha")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert isinstance(result.unit, str)
-        assert result.unit == "hg/ha"
+        assert result.unit == "kg/ha"
 
     def test_returned_record_has_year_field_as_int(self, monkeypatch):
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
@@ -598,7 +598,7 @@ class TestRowToRecordSchemaGuard:
 
         monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
         monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
-        row = {"Area": "Italy", "Item": "Wheat", "Year": 2022, "Flag": "A", "Element": "Yield", "Unit": "hg/ha"}
+        row = {"Area": "Italy", "Item": "Wheat", "Year": 2022, "Flag": "A", "Element": "Yield", "Unit": "kg/ha"}
         mock_faostat = MagicMock()
         mock_faostat.get_par.side_effect = _default_get_par
         mock_faostat.get_data_df.return_value = pd.DataFrame([row])
