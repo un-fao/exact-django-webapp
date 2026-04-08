@@ -25,6 +25,8 @@ import threading
 from typing import Final, NamedTuple
 
 import faostat  # patched in tests via: patch("api.faostat_service.faostat", ...)
+import faostat.faostat as _faostat_internal  # needed for __BASE_URL__ reset workaround
+_FAOSTAT_BASE_URL: Final[str] = _faostat_internal.__BASE_URL__  # capture before set_requests_args corrupts it
 
 from api.faostat_exceptions import (
     FAOSTATInvalidInputError,
@@ -186,6 +188,9 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
     # by domain=QCL already restricts results to the Production group; no
     # separate group filter is needed or supported by the library.
     with _faostat_lock:
+        # Library bug: set_requests_args appends lang+'/' to __BASE_URL__ on every call
+        # instead of setting it. Reset to the original URL before each call.
+        _faostat_internal.__BASE_URL__ = _FAOSTAT_BASE_URL
         faostat.set_requests_args(username=username, password=password)
 
         # Resolve human-readable labels to FAOSTAT numeric codes.
