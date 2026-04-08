@@ -10,7 +10,7 @@ BR-1  Fixed params: domain=QCL, element=Yield.
 BR-2  No year supplied → record with highest year in response.
 BR-3  Year supplied → exact match or FAOSTATNoDataError.
 BR-4  Multiple rows same year → prefer Flag="A"; if none → FAOSTATNoDataError.
-BR-5  FAOSTAT_TOKEN absent/empty → FAOSTATNetworkError before any network call.
+BR-5  FAOSTAT_USERNAME or FAOSTAT_PASSWORD absent/empty → FAOSTATNetworkError before any network call.
 BR-6  No internal caching.
 BR-7  area/item are case-sensitive; no fuzzy matching.
 
@@ -38,7 +38,8 @@ _DOMAIN: Final[str] = "QCL"
 _ELEMENT: Final[str] = "Yield"
 _FLAG_OFFICIAL: Final[str] = "A"
 
-_TOKEN_ENV_VAR: Final[str] = "FAOSTAT_TOKEN"
+_USERNAME_ENV_VAR: Final[str] = "FAOSTAT_USERNAME"
+_PASSWORD_ENV_VAR: Final[str] = "FAOSTAT_PASSWORD"
 
 # HIGH-1: faostat.set_requests_args mutates global state on the faostat module.
 # The library does not support per-call token passing; every call to
@@ -59,20 +60,18 @@ class YieldRecord(NamedTuple):
     element: str
 
 
-def _get_token() -> str:
-    """Read FAOSTAT_TOKEN from the environment (BR-5).
-
-    Raises FAOSTATNetworkError if the token is absent or empty.
+def _get_credentials() -> tuple[str, str]:
+    """Read FAOSTAT_USERNAME and FAOSTAT_PASSWORD from the environment.
+    Raises FAOSTATNetworkError if either is absent or empty.
     """
-    token: str = os.environ.get(_TOKEN_ENV_VAR, "")
-
-    if not token:
+    username = os.environ.get(_USERNAME_ENV_VAR, "")
+    password = os.environ.get(_PASSWORD_ENV_VAR, "")
+    if not username or not password:
         raise FAOSTATNetworkError(
-            f"{_TOKEN_ENV_VAR} is not set or is empty. "
-            "Set the environment variable before calling get_yield()."
+            f"{_USERNAME_ENV_VAR} and {_PASSWORD_ENV_VAR} must both be set. "
+            "The FAOSTAT token is retrieved programmatically using these credentials."
         )
-
-    return token
+    return username, password
 
 
 def _row_to_record(row: dict) -> YieldRecord:
@@ -131,8 +130,8 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
         If a specific year is requested but no matching row is found (BR-3),
         or if the best year has multiple rows and none carries flag "A" (BR-4).
     FAOSTATNetworkError
-        If FAOSTAT_TOKEN is absent/empty (BR-5) or if the FAOSTAT endpoint
-        raises any network/auth exception (AC-6).
+        If FAOSTAT_USERNAME or FAOSTAT_PASSWORD is absent/empty (BR-5) or if
+        the FAOSTAT endpoint raises any network/auth exception (AC-6).
     """
     # AC-10: validate inputs before touching the network.
     if not area or not item:
@@ -140,10 +139,10 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
             "area and item must be non-empty strings."
         )
 
-    # BR-5: verify token before any network call.
-    token: str = _get_token()
+    # BR-5: verify credentials before any network call.
+    username, password = _get_credentials()
 
-    # HIGH-1: serialise token write + network call to avoid races between
+    # HIGH-1: serialise credentials write + network call to avoid races between
     # concurrent threads overwriting the shared faostat global auth header.
     #
     # HIGH-3: The spec mandates Group=Production, Domain=QCL, Element=Yield.
@@ -153,7 +152,7 @@ def get_yield(area: str, item: str, year: int | None = None) -> YieldRecord:
     # by domain=QCL already restricts results to the Production group; no
     # separate group filter is needed or supported by the library.
     with _faostat_lock:
-        faostat.set_requests_args(token=token)
+        faostat.set_requests_args(username=username, password=password)
 
         # BR-1, BR-6: fetch from FAOSTAT (no caching).
         try:

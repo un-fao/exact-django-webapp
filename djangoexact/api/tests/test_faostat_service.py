@@ -96,7 +96,8 @@ class TestGetYieldNoYearReturnsLatest:
 
     def test_no_year_returns_record_with_element_yield(self, monkeypatch):
         # HIGH-2: ensure token is present so tests exercise the intended logic.
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2021, value="3200.0"),
             _make_row(year=2022, value="3500.0"),
@@ -106,14 +107,16 @@ class TestGetYieldNoYearReturnsLatest:
         assert result.element == "Yield"
 
     def test_no_year_returns_record_with_correct_area(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2022, value="3500.0")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert result.area == "Italy"
 
     def test_no_year_returns_record_with_correct_item(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2022, value="3500.0")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -121,7 +124,8 @@ class TestGetYieldNoYearReturnsLatest:
 
     def test_no_year_returns_most_recent_year_from_multi_year_response(self, monkeypatch):
         """BR-2, Edge: Multi-year response → scan all rows, pick highest year."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2019, value="3100.0"),
             _make_row(year=2021, value="3200.0"),
@@ -133,7 +137,8 @@ class TestGetYieldNoYearReturnsLatest:
 
     def test_no_year_returns_float_value(self, monkeypatch):
         """AC-9: returned value field is Python float, not string."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2022, value="3500.0")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -149,7 +154,8 @@ class TestGetYieldExplicitYearFound:
     """AC-2, BR-3: year supplied → exact match returned."""
 
     def test_explicit_year_returns_matching_year(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2020, value="3100.0"),
             _make_row(year=2021, value="3300.0"),
@@ -160,7 +166,8 @@ class TestGetYieldExplicitYearFound:
 
     def test_explicit_year_returned_value_is_float(self, monkeypatch):
         """AC-9 also applies to the explicit-year path."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2021, value="3300.0")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat", year=2021)
@@ -177,7 +184,8 @@ class TestGetYieldExplicitYearNotFound:
     """AC-3, BR-3, Edge: future year → FAOSTAT returns no rows → FAOSTATNoDataError."""
 
     def test_explicit_year_not_in_response_raises_no_data_error(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2020, value="3100.0")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             with pytest.raises(FAOSTATNoDataError):
@@ -185,7 +193,8 @@ class TestGetYieldExplicitYearNotFound:
 
     def test_future_year_raises_no_data_error(self, monkeypatch):
         """Edge: future year → FAOSTAT returns empty → FAOSTATNoDataError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
             with pytest.raises(FAOSTATNoDataError):
                 get_yield(area="Italy", item="Wheat", year=2099)
@@ -204,14 +213,16 @@ class TestGetYieldUnrecognisedInputs:
 
     def test_unrecognised_area_raises_invalid_input_error(self, monkeypatch):
         """AC-4: area string not found in FAOSTAT → FAOSTATInvalidInputError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
             with pytest.raises(FAOSTATInvalidInputError):
                 get_yield(area="NotARealCountry", item="Wheat")
 
     def test_unrecognised_item_raises_invalid_input_error(self, monkeypatch):
         """AC-5: item string not found in FAOSTAT → FAOSTATInvalidInputError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
             with pytest.raises(FAOSTATInvalidInputError):
                 get_yield(area="Italy", item="NotARealCrop")
@@ -226,7 +237,8 @@ class TestGetYieldNetworkError:
     """AC-6: network/API unreachable → FAOSTATNetworkError; original error is __cause__."""
 
     def test_network_exception_raises_faostat_network_error(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
         mock_faostat.get_data_df.side_effect = ConnectionError("timeout")
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
@@ -235,7 +247,8 @@ class TestGetYieldNetworkError:
 
     def test_network_error_wraps_original_exception_as_cause(self, monkeypatch):
         """AC-6: original exception is chained via __cause__."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         original = ConnectionError("timeout")
         mock_faostat = MagicMock()
         mock_faostat.get_data_df.side_effect = original
@@ -246,7 +259,8 @@ class TestGetYieldNetworkError:
 
     def test_invalid_token_raises_faostat_network_error(self, monkeypatch):
         """Edge: token present but invalid/expired → FAOSTATNetworkError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
         mock_faostat.get_data_df.side_effect = PermissionError("401 Unauthorized")
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
@@ -255,16 +269,17 @@ class TestGetYieldNetworkError:
 
 
 # ---------------------------------------------------------------------------
-# AC-7  FAOSTAT_TOKEN missing/empty → FAOSTATNetworkError before any request
+# AC-7  FAOSTAT_USERNAME or FAOSTAT_PASSWORD missing/empty → FAOSTATNetworkError
 # ---------------------------------------------------------------------------
 
 
-class TestGetYieldMissingToken:
-    """AC-7, BR-5: FAOSTAT_TOKEN absent or empty → FAOSTATNetworkError, no network call."""
+class TestGetYieldMissingCredentials:
+    """AC-7, BR-5: FAOSTAT_USERNAME or FAOSTAT_PASSWORD absent or empty → FAOSTATNetworkError, no network call."""
 
     def test_missing_token_env_var_raises_network_error(self, monkeypatch):
-        """BR-5: absent token → FAOSTATNetworkError before any network call."""
-        monkeypatch.delenv("FAOSTAT_TOKEN", raising=False)
+        """BR-5: absent FAOSTAT_USERNAME → FAOSTATNetworkError before any network call."""
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
+        monkeypatch.delenv("FAOSTAT_USERNAME", raising=False)
         mock_faostat = MagicMock()
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError):
@@ -272,8 +287,19 @@ class TestGetYieldMissingToken:
         mock_faostat.get_data_df.assert_not_called()
 
     def test_empty_token_env_var_raises_network_error(self, monkeypatch):
-        """BR-5: empty string token treated same as absent token."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "")
+        """BR-5: absent FAOSTAT_PASSWORD → FAOSTATNetworkError before any network call."""
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.delenv("FAOSTAT_PASSWORD", raising=False)
+        mock_faostat = MagicMock()
+        with patch(_FAOSTAT_DATA_PATH, mock_faostat):
+            with pytest.raises(FAOSTATNetworkError):
+                get_yield(area="Italy", item="Wheat")
+        mock_faostat.get_data_df.assert_not_called()
+
+    def test_both_credentials_missing_raises_network_error(self, monkeypatch):
+        """BR-5: both FAOSTAT_USERNAME and FAOSTAT_PASSWORD absent → FAOSTATNetworkError."""
+        monkeypatch.delenv("FAOSTAT_USERNAME", raising=False)
+        monkeypatch.delenv("FAOSTAT_PASSWORD", raising=False)
         mock_faostat = MagicMock()
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATNetworkError):
@@ -290,7 +316,8 @@ class TestGetYieldEmptyStringInputs:
     """AC-10, Edge: area="" or item="" → FAOSTATInvalidInputError, no network request."""
 
     def test_empty_area_raises_invalid_input_error(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATInvalidInputError):
@@ -298,7 +325,8 @@ class TestGetYieldEmptyStringInputs:
         mock_faostat.get_data_df.assert_not_called()
 
     def test_empty_item_raises_invalid_input_error(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATInvalidInputError):
@@ -306,7 +334,8 @@ class TestGetYieldEmptyStringInputs:
         mock_faostat.get_data_df.assert_not_called()
 
     def test_both_empty_raises_invalid_input_error(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         mock_faostat = MagicMock()
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             with pytest.raises(FAOSTATInvalidInputError):
@@ -325,7 +354,8 @@ class TestGetYieldFixedFaostatParams:
     """BR-1: service must always call faostat with domain=QCL and element filter Yield."""
 
     def test_get_data_df_called_with_domain_qcl(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row()]
         mock_faostat = _mock_faostat_returning(rows)
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
@@ -337,7 +367,8 @@ class TestGetYieldFixedFaostatParams:
 
     def test_returned_record_element_is_always_yield(self, monkeypatch):
         """BR-1: element field in the returned record is always 'Yield'."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(element="Yield")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -354,7 +385,8 @@ class TestGetYieldTieBreaking:
 
     def test_multiple_rows_same_year_prefers_flag_a_row(self, monkeypatch):
         """BR-4: when two rows share the year, the one with Flag='A' is returned."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2022, value="3500.0", flag="A"),
             _make_row(year=2022, value="9999.0", flag="E"),
@@ -365,7 +397,8 @@ class TestGetYieldTieBreaking:
 
     def test_multiple_rows_same_year_no_flag_a_raises_no_data_error(self, monkeypatch):
         """BR-4: tie with no flag 'A' row → FAOSTATNoDataError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2022, value="3500.0", flag="E"),
             _make_row(year=2022, value="3400.0", flag="F"),
@@ -376,7 +409,8 @@ class TestGetYieldTieBreaking:
 
     def test_no_year_multiple_rows_highest_year_flag_a_selected(self, monkeypatch):
         """BR-2 + BR-4: no year → highest year chosen; if tie, flag A wins."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2022, value="3500.0", flag="A"),
             _make_row(year=2022, value="9999.0", flag="E"),
@@ -389,7 +423,8 @@ class TestGetYieldTieBreaking:
 
     def test_no_year_highest_year_multiple_rows_no_flag_a_raises_no_data_error(self, monkeypatch):
         """HIGH-4: no year, highest year has multiple rows, none with flag 'A' → FAOSTATNoDataError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [
             _make_row(year=2022, value="3500.0", flag="E"),
             _make_row(year=2022, value="3400.0", flag="F"),
@@ -409,7 +444,8 @@ class TestGetYieldNoCaching:
     """BR-6: no internal caching — repeated calls always hit faostat."""
 
     def test_two_identical_calls_issue_two_faostat_requests(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row()]
         mock_faostat = _mock_faostat_returning(rows)
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
@@ -428,14 +464,16 @@ class TestGetYieldReturnShape:
 
     def test_returned_record_has_value_field_as_float(self, monkeypatch):
         """AC-9."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(value="3500.5")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert isinstance(result.value, float)
 
     def test_returned_record_has_unit_field_as_str(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(unit="hg/ha")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -443,28 +481,32 @@ class TestGetYieldReturnShape:
         assert result.unit == "hg/ha"
 
     def test_returned_record_has_year_field_as_int(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(year=2022)]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert isinstance(result.year, int)
 
     def test_returned_record_has_item_field(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(item="Wheat")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert result.item == "Wheat"
 
     def test_returned_record_has_area_field(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(area="Italy")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
         assert result.area == "Italy"
 
     def test_returned_record_has_element_field_equal_to_yield(self, monkeypatch):
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(element="Yield")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -472,7 +514,8 @@ class TestGetYieldReturnShape:
 
     def test_string_value_from_faostat_is_cast_to_float(self, monkeypatch):
         """AC-9: FAOSTAT returns values as strings; service must coerce to float."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(value="1234.56")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             result = get_yield(area="Italy", item="Wheat")
@@ -495,7 +538,8 @@ class TestGetYieldEmptyResultSet:
         cannot distinguish between an unknown area/item and one with no data;
         the spec resolves this by raising FAOSTATInvalidInputError (AC-4/AC-5).
         """
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning([])):
             with pytest.raises(FAOSTATInvalidInputError):
                 get_yield(area="Italy", item="Wheat")
@@ -511,7 +555,8 @@ class TestRowToRecordSchemaGuard:
 
     def test_non_numeric_value_raises_network_error(self, monkeypatch):
         """MEDIUM-2: non-numeric Value field → FAOSTATNetworkError."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row(value="N/A")]
         with patch(_FAOSTAT_DATA_PATH, _mock_faostat_returning(rows)):
             with pytest.raises(FAOSTATNetworkError):
@@ -521,7 +566,8 @@ class TestRowToRecordSchemaGuard:
         """MEDIUM-2: missing Value column → FAOSTATNetworkError."""
         import pandas as pd
 
-        monkeypatch.setenv("FAOSTAT_TOKEN", "dummy-token")
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         row = {"Area": "Italy", "Item": "Wheat", "Year": 2022, "Flag": "A", "Element": "Yield", "Unit": "hg/ha"}
         mock_faostat = MagicMock()
         mock_faostat.get_data_df.return_value = pd.DataFrame([row])
@@ -531,18 +577,19 @@ class TestRowToRecordSchemaGuard:
 
 
 # ---------------------------------------------------------------------------
-# MEDIUM-3 — Token is passed to the faostat library
+# MEDIUM-3 — Credentials are passed to the faostat library
 # ---------------------------------------------------------------------------
 
 
-class TestTokenPassedToFaostatLibrary:
-    """MEDIUM-3: verify the token is forwarded to faostat.set_requests_args."""
+class TestCredentialsPassedToFaostatLibrary:
+    """MEDIUM-3: verify credentials are forwarded to faostat.set_requests_args."""
 
-    def test_set_requests_args_called_with_correct_token(self, monkeypatch):
-        """MEDIUM-3: get_yield must call faostat.set_requests_args(token=<value>)."""
-        monkeypatch.setenv("FAOSTAT_TOKEN", "my-secret-token")
+    def test_set_requests_args_called_with_correct_credentials(self, monkeypatch):
+        """MEDIUM-3: get_yield must call faostat.set_requests_args(username=..., password=...)."""
+        monkeypatch.setenv("FAOSTAT_USERNAME", "testuser")
+        monkeypatch.setenv("FAOSTAT_PASSWORD", "testpass")
         rows = [_make_row()]
         mock_faostat = _mock_faostat_returning(rows)
         with patch(_FAOSTAT_DATA_PATH, mock_faostat):
             get_yield(area="Italy", item="Wheat")
-        mock_faostat.set_requests_args.assert_called_once_with(token="my-secret-token")
+        mock_faostat.set_requests_args.assert_called_once_with(username="testuser", password="testpass")
