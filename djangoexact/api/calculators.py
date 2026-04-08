@@ -1438,6 +1438,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.minor_residue_availability_t2_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
             self.minor_residue_availability_t2_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
 
+        faostat_year = module.faostat_year_t2 if module.faostat_year_t2 is not None else self.project.start_year_of_activities
+
         climate = self.climate
         moisture = self.moisture
 
@@ -1465,7 +1467,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 self.crop_yield_start = _fetch_faostat_yield(
                     country_name=self.country.name,
                     item_name=lut_start.name,
-                    start_year=self.project.start_year_of_activities,
+                    start_year=faostat_year,
                     region=self.region,
                     land_use_type=lut_start,
                 )
@@ -1488,7 +1490,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_yield_default_start = _fetch_faostat_yield(
                         country_name=self.country.name,
                         item_name=minor_lut_start.name,
-                        start_year=self.project.start_year_of_activities,
+                        start_year=faostat_year,
                         region=self.region,
                         land_use_type=minor_lut_start,
                     )
@@ -1510,7 +1512,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 self.crop_yield_w = _fetch_faostat_yield(
                     country_name=self.country.name,
                     item_name=lut_w.name,
-                    start_year=self.project.start_year_of_activities,
+                    start_year=faostat_year,
                     region=self.region,
                     land_use_type=lut_w,
                 )
@@ -1533,7 +1535,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_yield_default_w = _fetch_faostat_yield(
                         country_name=self.country.name,
                         item_name=minor_lut_w.name,
-                        start_year=self.project.start_year_of_activities,
+                        start_year=faostat_year,
                         region=self.region,
                         land_use_type=minor_lut_w,
                     )
@@ -1555,7 +1557,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 self.crop_yield_wo = _fetch_faostat_yield(
                     country_name=self.country.name,
                     item_name=lut_wo.name,
-                    start_year=self.project.start_year_of_activities,
+                    start_year=faostat_year,
                     region=self.region,
                     land_use_type=lut_wo,
                 )
@@ -1578,7 +1580,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_yield_default_wo = _fetch_faostat_yield(
                         country_name=self.country.name,
                         item_name=minor_lut_wo.name,
-                        start_year=self.project.start_year_of_activities,
+                        start_year=faostat_year,
                         region=self.region,
                         land_use_type=minor_lut_wo,
                     )
