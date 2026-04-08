@@ -66,3 +66,4 @@ drf-nested-routers==0.94.1
 weasyprint==64.0
 google-cloud-storage==2.19.0
 PyYAML==6.0
+faostat==2.0.1
