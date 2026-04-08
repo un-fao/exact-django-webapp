@@ -1320,7 +1320,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return response
 
         except Exception as e:
-            return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception(e)
+            return utils.ErrorResponse("An unexpected error occurred while generating the PDF", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=["get"])
     @swagger_auto_schema(
