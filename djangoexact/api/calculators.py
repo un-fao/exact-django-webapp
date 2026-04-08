@@ -1326,27 +1326,51 @@ class OtherLandUseCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
 
-def _fetch_faostat_yield(country_name: str, item_name: str, start_year: int) -> SimpleNamespace:
+def _fetch_faostat_yield(
+    country_name: str,
+    item_name: str,
+    start_year: int,
+    region,
+    land_use_type,
+) -> SimpleNamespace:
     """
     Fetch yield from FAOSTAT for the given country/item, trying start_year first,
     then stepping back year by year until data is found or we exhaust 20 years.
+    Falls back to Django's CropYieldStat model on any FAOSTAT failure.
     Returns a SimpleNamespace with an `average` attribute (float) to stay compatible
     with downstream .average usage.
-    Raises FAOSTATNoDataError if no data found in any year.
+    Raises FAOSTATNoDataError if neither FAOSTAT nor the local DB has data.
     """
     from api.faostat_service import get_yield
-    from api.faostat_exceptions import FAOSTATNoDataError
+    from api.faostat_exceptions import FAOSTATError, FAOSTATNoDataError
 
-    for year in range(start_year, start_year - 20, -1):
+    try:
+        for year in range(start_year, start_year - 20, -1):
+            try:
+                record = get_yield(area=country_name, item=item_name, year=year)
+                return SimpleNamespace(average=record.value)
+            except FAOSTATNoDataError:
+                continue
+        raise FAOSTATNoDataError(
+            f"No FAOSTAT yield data found for '{item_name}' in '{country_name}' "
+            f"for year {start_year} or any of the preceding 19 years."
+        )
+    except FAOSTATError:
+        log.warning(
+            "FAOSTAT yield unavailable for '%s' in '%s'; falling back to CropYieldStat.",
+            item_name,
+            country_name,
+        )
         try:
-            record = get_yield(area=country_name, item=item_name, year=year)
-            return SimpleNamespace(value=record.value)
-        except FAOSTATNoDataError:
-            continue
-    raise FAOSTATNoDataError(
-        f"No FAOSTAT yield data found for '{item_name}' in '{country_name}' "
-        f"for year {start_year} or any of the preceding 19 years."
-    )
+            result = ipcc.CropYieldStat.objects.get_or_region_average(
+                continent=region, land_use_type=land_use_type
+            )
+            return SimpleNamespace(average=result.average)
+        except Exception:
+            raise FAOSTATNoDataError(
+                f"No yield data found for '{item_name}' in '{country_name}' "
+                "in either FAOSTAT or the local CropYieldStat database."
+            )
 
 
 class AnnualCropCalculator(LandModuleCalculator):
@@ -1441,6 +1465,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     country_name=self.country.name,
                     item_name=lut_start.name,
                     start_year=self.project.start_year_of_activities,
+                    region=self.region,
+                    land_use_type=lut_start,
                 )
             except FAOSTATNoDataError:
                 if module.crop_yield_t2_start is None:
@@ -1462,6 +1488,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                         country_name=self.country.name,
                         item_name=minor_lut_start.name,
                         start_year=self.project.start_year_of_activities,
+                        region=self.region,
+                        land_use_type=minor_lut_start,
                     )
                 except FAOSTATNoDataError:
                     if module.crop_yield_t2_start is None:
@@ -1482,6 +1510,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     country_name=self.country.name,
                     item_name=lut_w.name,
                     start_year=self.project.start_year_of_activities,
+                    region=self.region,
+                    land_use_type=lut_w,
                 )
             except FAOSTATNoDataError:
                 if module.crop_yield_t2_w is None:
@@ -1503,6 +1533,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                         country_name=self.country.name,
                         item_name=minor_lut_w.name,
                         start_year=self.project.start_year_of_activities,
+                        region=self.region,
+                        land_use_type=minor_lut_w,
                     )
                 except FAOSTATNoDataError:
                     if module.crop_yield_t2_w is None:
@@ -1523,6 +1555,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     country_name=self.country.name,
                     item_name=lut_wo.name,
                     start_year=self.project.start_year_of_activities,
+                    region=self.region,
+                    land_use_type=lut_wo,
                 )
             except FAOSTATNoDataError:
                 if module.crop_yield_t2_wo is None:
@@ -1544,6 +1578,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                         country_name=self.country.name,
                         item_name=minor_lut_wo.name,
                         start_year=self.project.start_year_of_activities,
+                        region=self.region,
+                        land_use_type=minor_lut_wo,
                     )
                 except FAOSTATNoDataError:
                     if module.crop_yield_t2_wo is None:
@@ -1599,14 +1635,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
-                "yield_value_main": self.crop_yield_start.value,
+                "yield_value_main": self.crop_yield_start.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_w,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_start.value,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1661,14 +1697,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
-                "yield_value_main": self.crop_yield_start.value,
+                "yield_value_main": self.crop_yield_start.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_wo,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.minor_yield_default_start.value,
+                "yield_value_minor": self.minor_yield_default_start.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1726,14 +1762,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_main_tier_2": self.module.residue_availability_t2_w,
                 "n_estimation_slope_main": self.n_estimation_factor_w.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_w.intercept,
-                "yield_value_main": self.crop_yield_w.value,
+                "yield_value_main": self.crop_yield_w.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_w,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_w.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_w.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
-                "yield_value_minor": self.minor_yield_default_w.value,
+                "yield_value_minor": self.minor_yield_default_w.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_w.name_en == "Retained",
@@ -1791,14 +1827,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_main_tier_2": self.module.residue_availability_t2_wo,
                 "n_estimation_slope_main": self.n_estimation_factor_wo.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_wo.intercept,
-                "yield_value_main": self.crop_yield_wo.value,
+                "yield_value_main": self.crop_yield_wo.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_wo,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_wo.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_wo.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
-                "yield_value_minor": self.minor_yield_default_wo.value,
+                "yield_value_minor": self.minor_yield_default_wo.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_wo.name_en == "Retained",
