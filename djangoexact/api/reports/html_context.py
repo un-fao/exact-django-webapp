@@ -361,7 +361,7 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     # Per-activity processed data (prefetched queryset reused below)
     activities_qs = {
         a.name: a
-        for a in project.activities.prefetch_related("modules").all()
+        for a in project.activities.all()
     }
     processed_activities = _compute_activity_contexts(result, activities_qs, total_balance)
 
