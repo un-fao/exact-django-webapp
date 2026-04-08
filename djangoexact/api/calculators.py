@@ -1348,7 +1348,8 @@ def _fetch_faostat_yield(
         for year in range(start_year, start_year - 20, -1):
             try:
                 record = get_yield(area=country_name, item=item_name, year=year)
-                return SimpleNamespace(average=record.value)
+                # FAOSTAT Yield is in hg/ha; the math model expects t/ha (multiplies by 1000 internally).
+                return SimpleNamespace(average=record.value / 10_000)
             except FAOSTATNoDataError:
                 continue
         raise FAOSTATNoDataError(
