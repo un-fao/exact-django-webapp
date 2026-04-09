@@ -1326,6 +1326,54 @@ class OtherLandUseCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
 
+def _fetch_faostat_yield(
+    country_name: str,
+    item_name: str,
+    start_year: int,
+    region,
+    land_use_type,
+) -> SimpleNamespace:
+    """
+    Fetch yield from FAOSTAT for the given country/item, trying start_year first,
+    then stepping back year by year until data is found or we exhaust 20 years.
+    Falls back to Django's CropYieldStat model on any FAOSTAT failure.
+    Returns a SimpleNamespace with an `average` attribute (float) to stay compatible
+    with downstream .average usage.
+    Raises FAOSTATNoDataError if neither FAOSTAT nor the local DB has data.
+    """
+    from api.faostat_service import get_yield
+    from api.faostat_exceptions import FAOSTATError, FAOSTATNoDataError
+
+    try:
+        for year in range(start_year, start_year - 20, -1):
+            try:
+                record = get_yield(area=country_name, item=item_name, year=year)
+                # FAOSTAT Yield is in kg/ha; the math model expects t/ha (multiplies by 1000 internally).
+                return SimpleNamespace(average=record.value / 1_000)
+            except FAOSTATNoDataError:
+                continue
+        raise FAOSTATNoDataError(
+            f"No FAOSTAT yield data found for '{item_name}' in '{country_name}' "
+            f"for year {start_year} or any of the preceding 19 years."
+        )
+    except FAOSTATError:
+        log.warning(
+            "FAOSTAT yield unavailable for '%s' in '%s'; falling back to CropYieldStat.",
+            item_name,
+            country_name,
+        )
+        try:
+            result = ipcc.CropYieldStat.objects.get_or_region_average(
+                continent=region, land_use_type=land_use_type
+            )
+            return SimpleNamespace(average=result.average)
+        except Exception:
+            raise FAOSTATNoDataError(
+                f"No yield data found for '{item_name}' in '{country_name}' "
+                "in either FAOSTAT or the local CropYieldStat database."
+            )
+
+
 class AnnualCropCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
@@ -1337,9 +1385,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.biomass_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass()
         self.biomass_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
         self.biomass_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
-        self.crop_yield_start: ipcc.CropYieldStat = ipcc.CropYieldStat()
-        self.crop_yield_w: ipcc.CropYieldStat = ipcc.CropYieldStat()
-        self.crop_yield_wo: ipcc.CropYieldStat = ipcc.CropYieldStat()
+        self.crop_yield_start: SimpleNamespace = SimpleNamespace(average=0)
+        self.crop_yield_w: SimpleNamespace = SimpleNamespace(average=0)
+        self.crop_yield_wo: SimpleNamespace = SimpleNamespace(average=0)
         self.burning_emission_factor: ipcc.BurningEmissionFactor = ipcc.BurningEmissionFactor()
         self.minor_burning_emission_factor: ipcc.BurningEmissionFactor = ipcc.BurningEmissionFactor()
         self.fires_start: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
@@ -1357,9 +1405,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.minor_biomass_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass()
         self.minor_biomass_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
         self.minor_biomass_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
-        self.minor_yield_default_start = ipcc.CropYieldStat()
-        self.minor_yield_default_w = ipcc.CropYieldStat()
-        self.minor_yield_default_wo = ipcc.CropYieldStat()
+        self.minor_yield_default_start: SimpleNamespace = SimpleNamespace(average=None)
+        self.minor_yield_default_w: SimpleNamespace = SimpleNamespace(average=None)
+        self.minor_yield_default_wo: SimpleNamespace = SimpleNamespace(average=None)
 
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
         self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
@@ -1370,6 +1418,8 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.minor_residue_availability_t2_wo: SimpleNamespace = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False) -> SimpleNamespace:
+        from api.faostat_exceptions import FAOSTATNoDataError
+
         super().get_defaults(calculate)
 
         module: AnnualCropland = self.data
@@ -1387,6 +1437,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.minor_residue_availability_t2_start = SimpleNamespace(value=getattr_or_default(self.math_start_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_minor_tier_2_default"))
             self.minor_residue_availability_t2_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
             self.minor_residue_availability_t2_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
+
+        faostat_year = module.faostat_year_t2 if module.faostat_year_t2 is not None else self.project.start_year_of_activities
 
         climate = self.climate
         moisture = self.moisture
@@ -1412,10 +1464,16 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_start = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_start)
-            except ipcc.CropYieldStat.DoesNotExist:
+                self.crop_yield_start = _fetch_faostat_yield(
+                    country_name=self.country.name,
+                    item_name=lut_start.name,
+                    start_year=faostat_year,
+                    region=self.region,
+                    land_use_type=lut_start,
+                )
+            except FAOSTATNoDataError:
                 if module.crop_yield_t2_start is None:
-                    raise Exception(f"CropYieldStats for {lut_start}, {climate} {moisture} in {self.region} does not exist for start scenario.")
+                    raise Exception(f"No FAOSTAT yield data found for {lut_start} in {self.country.name}. Provide a manual yield (T2) for the start scenario.")
 
             if minor_lut_start is not None:
                 try:
@@ -1429,9 +1487,16 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_start} does not exist")
 
                 try:
-                    self.minor_yield_default_start = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_start)
-                except ipcc.CropYieldStat.DoesNotExist:
-                    raise Exception(f"CropYieldStats for {minor_lut_start}, {climate} {moisture} in {self.region} does not exist for start scenario.")
+                    self.minor_yield_default_start = _fetch_faostat_yield(
+                        country_name=self.country.name,
+                        item_name=minor_lut_start.name,
+                        start_year=faostat_year,
+                        region=self.region,
+                        land_use_type=minor_lut_start,
+                    )
+                except FAOSTATNoDataError:
+                    if module.crop_yield_t2_start is None:
+                        raise Exception(f"No FAOSTAT yield data found for {minor_lut_start} in {self.country.name}. Provide a manual yield (T2) for the start scenario.")
 
             elif self.module.minor_yield_start is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type} is specified but the minor crop is missing for the start scenario")
@@ -1444,10 +1509,16 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_w = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_w)
-            except ipcc.CropYieldStat.DoesNotExist:
+                self.crop_yield_w = _fetch_faostat_yield(
+                    country_name=self.country.name,
+                    item_name=lut_w.name,
+                    start_year=faostat_year,
+                    region=self.region,
+                    land_use_type=lut_w,
+                )
+            except FAOSTATNoDataError:
                 if module.crop_yield_t2_w is None:
-                    raise Exception(f"CropYieldStats for {lut_w}, {climate} {moisture} in {self.region} does not exist for with scenario.")
+                    raise Exception(f"No FAOSTAT yield data found for {lut_w} in {self.country.name}. Provide a manual yield (T2) for the w scenario.")
 
             if minor_lut_w is not None:
                 try:
@@ -1461,9 +1532,16 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_w} does not exist")
 
                 try:
-                    self.minor_yield_default_w = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_w)
-                except ipcc.CropYieldStat.DoesNotExist:
-                    raise Exception(f"CropYieldStats for {minor_lut_w}, {climate} {moisture} in {self.region} does not exist for with scenario.")
+                    self.minor_yield_default_w = _fetch_faostat_yield(
+                        country_name=self.country.name,
+                        item_name=minor_lut_w.name,
+                        start_year=faostat_year,
+                        region=self.region,
+                        land_use_type=minor_lut_w,
+                    )
+                except FAOSTATNoDataError:
+                    if module.crop_yield_t2_w is None:
+                        raise Exception(f"No FAOSTAT yield data found for {minor_lut_w} in {self.country.name}. Provide a manual yield (T2) for the w scenario.")
 
             elif self.module.minor_yield_w is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the with scenario")
@@ -1476,10 +1554,16 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_wo = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=lut_wo)
-            except ipcc.CropYieldStat.DoesNotExist:
+                self.crop_yield_wo = _fetch_faostat_yield(
+                    country_name=self.country.name,
+                    item_name=lut_wo.name,
+                    start_year=faostat_year,
+                    region=self.region,
+                    land_use_type=lut_wo,
+                )
+            except FAOSTATNoDataError:
                 if module.crop_yield_t2_wo is None:
-                    raise Exception(f"CropYieldStats for {lut_wo}, {climate} {moisture} in {self.region} does not exist for without scenario.")
+                    raise Exception(f"No FAOSTAT yield data found for {lut_wo} in {self.country.name}. Provide a manual yield (T2) for the wo scenario.")
 
             if minor_lut_wo is not None:
                 try:
@@ -1493,9 +1577,16 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_wo} does not exist")
 
                 try:
-                    self.minor_yield_default_wo = ipcc.CropYieldStat.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_wo)
-                except ipcc.CropYieldStat.DoesNotExist:
-                    raise Exception(f"CropYieldStats for {minor_lut_wo}, {climate} {moisture} in {self.region} does not exist for without scenario.")
+                    self.minor_yield_default_wo = _fetch_faostat_yield(
+                        country_name=self.country.name,
+                        item_name=minor_lut_wo.name,
+                        start_year=faostat_year,
+                        region=self.region,
+                        land_use_type=minor_lut_wo,
+                    )
+                except FAOSTATNoDataError:
+                    if module.crop_yield_t2_wo is None:
+                        raise Exception(f"No FAOSTAT yield data found for {minor_lut_wo} in {self.country.name}. Provide a manual yield (T2) for the wo scenario.")
 
             elif self.module.minor_yield_wo is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type} is specified but the minor crop is missing for the without scenario")

@@ -154,7 +154,7 @@ def _compute_gas_totals(result: ProjectResult, total_balance: float) -> dict:
 
 def _compute_activity_contexts(
     result: ProjectResult,
-    activities_qs: dict,
+    activities_by_name: dict,
     total_balance: float,
 ) -> list:
     """Build the processed activity list used by the template.
@@ -166,7 +166,7 @@ def _compute_activity_contexts(
     processed_activities = []
 
     for ar in result.activity_results:
-        db_activity = activities_qs.get(ar.title)
+        db_activity = activities_by_name.get(ar.title)
         if db_activity is None:
             continue
 
@@ -219,7 +219,7 @@ def _compute_activity_contexts(
     )
 
 
-def _compute_indicator_aggregates(activities_qs: dict, project) -> dict:
+def _compute_indicator_aggregates(activities_by_name: dict, project) -> dict:
     """Aggregate livestock, fishery, aquaculture, land-type and area indicators.
 
     Returns a dict with keys:
@@ -227,7 +227,7 @@ def _compute_indicator_aggregates(activities_qs: dict, project) -> dict:
       livestock_heads, small_fishery_types, large_fishery_data,
       aquaculture_data, land_types, soc.
     """
-    total_area = sum(a.area for a in activities_qs.values())
+    total_area = sum(a.area for a in activities_by_name.values())
 
     livestock_heads = [
         {"name": lct.name, "value_w": 0, "value_wo": 0}
@@ -244,7 +244,7 @@ def _compute_indicator_aggregates(activities_qs: dict, project) -> dict:
         for lt in api_models.ModuleType.objects.filter(is_luc=True).all()
     ]
 
-    for db_activity in activities_qs.values():
+    for db_activity in activities_by_name.values():
         for m in db_activity.modules:
             if isinstance(m, api_models.SmallFishery):
                 for ft in small_fishery_types:
@@ -291,11 +291,20 @@ def _compute_indicator_aggregates(activities_qs: dict, project) -> dict:
         + large_fishery_data.get("value_w", 0)
     )
 
-    soc = ipcc_models.SoilOrganicCarbon.objects.get(
-        climate=project.climate,
-        moisture=project.moisture,
-        soil_type=project.soil_type,
-    )
+    if project.climate is None or project.moisture is None or project.soil_type is None:
+        soc = None
+    else:
+        try:
+            soc = ipcc_models.SoilOrganicCarbon.objects.get(
+                climate=project.climate,
+                moisture=project.moisture,
+                soil_type=project.soil_type,
+            )
+        except (
+            ipcc_models.SoilOrganicCarbon.DoesNotExist,
+            ipcc_models.SoilOrganicCarbon.MultipleObjectsReturned,
+        ):
+            soc = None
 
     return {
         "total_area": total_area,
@@ -325,12 +334,11 @@ def _build_chart_data(
 
 def _load_fao_logo(lang: str) -> str:
     """Load the FAO logo SVG for the given language and return it as base64."""
-    try:
-        faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
-    except FileNotFoundError:
-        faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
-    faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
-    faologo.close()
+    lang_path = os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg")
+    fallback_path = os.path.join(settings.BASE_DIR, "media", "faologo.svg")
+    logo_path = lang_path if os.path.exists(lang_path) else fallback_path
+    with open(logo_path, "rb") as faologo:
+        faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
     return faologo_base64
 
 
@@ -358,15 +366,15 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     def _direction(v):
         return INCREASES if v >= 0 else DECREASES
 
-    # Per-activity processed data (prefetched queryset reused below)
-    activities_qs = {
+    # Per-activity processed data (plain queryset, iterated once and stored as a dict)
+    activities_by_name = {
         a.name: a
-        for a in project.activities.prefetch_related("modules").all()
+        for a in project.activities.all()
     }
-    processed_activities = _compute_activity_contexts(result, activities_qs, total_balance)
+    processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
 
-    # Indicator aggregates (reuses prefetched activities_qs)
-    indicators = _compute_indicator_aggregates(activities_qs, project)
+    # Indicator aggregates
+    indicators = _compute_indicator_aggregates(activities_by_name, project)
 
     # Charts
     project_chart_base64, project_gases_chart_base64 = _build_chart_data(
@@ -392,7 +400,7 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
-        "soc": indicators["soc"].value,
+        "soc": indicators["soc"].value if indicators["soc"] is not None else None,
         "project_primary_ghg": gas_data["primary_ghg"],
         "project_primary_ghg_emissions": gas_data["primary_ghg_emissions"],
         "project_primary_ghg_direction": _direction(gas_data["primary_ghg_emissions"]),

@@ -1841,6 +1841,7 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     crop_yield_t2_w = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_w")
     crop_yield_t2_wo = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_wo")
     crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
+    faostat_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="faostat_year_t2")
 
     area = models.FloatField(null=True, blank=True, verbose_name="area")
 

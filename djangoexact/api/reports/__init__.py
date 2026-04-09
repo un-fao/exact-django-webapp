@@ -44,6 +44,10 @@ def generate_excel_report(project, activities=None) -> bytes:
     Raises:
         NotReadyError: If any module cannot be calculated.
     """
+    if activities is None:
+        activities = project.activities.filter(is_b_intact=False)
+    else:
+        activities = activities.filter(is_b_intact=False)
     result = compute_project_result(project, activities)
     return ExcelRenderer(result).render()
 

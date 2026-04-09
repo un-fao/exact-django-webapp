@@ -552,6 +552,68 @@ def change_all_other_land_flu_data_to_1():
         flu_data.value = 1.0
         flu_data.save()
 
+
+def import_fires_combustion_factors():
+    """
+    Import FiresCombustionFactors from CSV.
+    For each row, get the api.LandUseType by name (no creation), then update_or_create
+    the ipcc.FiresCombustionFactor with the given value.
+    """
+    from ipcc.models import FiresCombustionFactor
+
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/FiresCombustionFactors_20260408.csv"))
+    for _, row in df.iterrows():
+        try:
+            land_use_type = models.LandUseType.objects.get(name=row["land_use_type"])
+        except models.LandUseType.DoesNotExist:
+            print(f"LandUseType not found: {row['land_use_type']}, skipping")
+            continue
+
+        factor, created = FiresCombustionFactor.objects.update_or_create(
+            land_use_type=land_use_type,
+            defaults={"value": row["value"]},
+        )
+        if created:
+            print(f"Created FiresCombustionFactor for {land_use_type.name}")
+        else:
+            print(f"Updated FiresCombustionFactor for {land_use_type.name}")
+
+
+def import_crop_nitrous_estimation_default_factors():
+    """
+    Import CropNitrousEstimationDefaultFactors from CSV.
+    For each row, get_or_create the api.CropType by name, then get_or_create
+    the ipcc.CropNitrousEstimationDefaultFactor with the remaining fields.
+    """
+    from ipcc.models import CropNitrousEstimationDefaultFactor
+
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/CropNitrousEstimationDefaultFactors_20260804.csv"))
+    for _, row in df.iterrows():
+        land_use_type, created = models.LandUseType.objects.get_or_create(name=row["land_use_type"])
+        if created:
+            annual_cropland = models.ModuleType.objects.get(class_name="AnnualCropland")
+            land_use_type.module_types.set([annual_cropland])
+            print(f"Created LandUseType: {land_use_type.name}")
+
+        factor, created = CropNitrousEstimationDefaultFactor.objects.update_or_create(
+            land_use_type=land_use_type,
+            defaults={
+                "dry_matter": row["dry_matter"],
+                "slope": row["slope"],
+                "intercept": row["intercept"],
+                "n_ag_residues": row["n_ag_residues"],
+                "rag": row["rag"],
+                "rs_t": row["rs_t"],
+                "n_bg_t": row["n_bg_t"],
+                "comment": row["comment"],
+            },
+        )
+        if created:
+            print(f"Created CropNitrousEstimationDefaultFactor for {land_use_type.name}")
+        else:
+            print(f"Updated CropNitrousEstimationDefaultFactor for {land_use_type.name}")
+
+
 def run():
     import os
 
@@ -565,18 +627,24 @@ def run():
         # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
         # get_forest_management_modules_in_plantation_projects()
         change_all_other_land_flu_data_to_1()
+        import_crop_nitrous_estimation_default_factors()
+        import_fires_combustion_factors()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
         # import_input_types_units()
         # change_all_other_land_flu_data_to_1()
+        import_crop_nitrous_estimation_default_factors()
+        import_fires_combustion_factors()
         pass
 
-    if app_mode == "development":
+    if app_mode == "development" or app_mode == "local":
         # TODO: Run in development
         # sanitize_minitool_data()
-        change_all_other_land_flu_data_to_1()
+        # change_all_other_land_flu_data_to_1()
+        # import_crop_nitrous_estimation_default_factors()
+        # import_fires_combustion_factors()
         pass
 
     if app_mode == "test":
