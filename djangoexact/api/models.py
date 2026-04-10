@@ -990,6 +990,9 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     def area(self):
         return self.get_land_modules_area()
 
+    def heads(self):
+        return self.get_livestock_modules_heads()
+
     @property
     def start_year(self):
         return self.start_year_t2 if self.start_year_t2 is not None else self.project.start_year_of_activities
@@ -1045,6 +1048,14 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 area += module.area
                 break
         return area
+
+    def get_livestock_modules_heads(self) -> float:
+        heads = 0
+
+        for module in self.modules:
+            if isinstance(module, Livestock):
+                heads += module.heads_number_w
+        return heads
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
@@ -1152,6 +1163,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
     cached_results_by_activity = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
     cached_results_by_gas = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
     cached_results_by_activity_by_gas = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
+    cached_units_breakdown = models.JSONField(null=True, blank=True, verbose_name="cached_units_breakdown")
     last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name="last_modified")
 
     def save(self, *args, **kwargs):
@@ -1160,7 +1172,13 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
         if self.pk and self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
-            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
+            cache_fields = [
+                "last_cached_at",
+                "cached_results_total", "cached_results_by_activity",
+                "cached_results_by_gas", "cached_results_by_activity_by_gas",
+                "cached_units_breakdown",
+                "last_modified",
+            ]
 
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
@@ -1183,12 +1201,20 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
         self.save()
 
+    def cache_units_breakdown(self, units_breakdown_w: list, units_breakdown_wo: list) -> None:
+        """Store land-module units breakdown for use by the report pipeline."""
+        self.cached_units_breakdown = {"w": units_breakdown_w, "wo": units_breakdown_wo}
+        if hasattr(self, "skip_history_when_saving"):
+            self.skip_history_when_saving = True
+        self.save(update_fields=["cached_units_breakdown"])
+
     def invalidate_cached_results(self):
         self.last_cached_at = None
         self.cached_results_total = None
         self.cached_results_by_activity = None
         self.cached_results_by_gas = None
         self.cached_results_by_activity_by_gas = None
+        self.cached_units_breakdown = None
         if isinstance(self, Submodule):
             parent: Module = self.parent
             parent.invalidate_cached_results()
@@ -1815,6 +1841,7 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     crop_yield_t2_w = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_w")
     crop_yield_t2_wo = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_wo")
     crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
+    faostat_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="faostat_year_t2")
 
     area = models.FloatField(null=True, blank=True, verbose_name="area")
 

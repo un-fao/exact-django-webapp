@@ -394,6 +394,9 @@ class CropNitrousEstimationDefaultFactor(Model):
     n_ag_residues = FloatField()
     rs_t = FloatField()
     n_bg_t = FloatField()
+    dry_matter = FloatField(null=True, blank=True)
+    rag = FloatField(null=True, blank=True)
+    comment = CharField(max_length=250, null=True, blank=True)
 
     objects = CropNitrousEstimationDefaultFactorManager()
 

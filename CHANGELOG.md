@@ -1,3 +1,17 @@
+## 1.19.2a3 (2026-03-24)
+
+## 1.19.2a2 (2026-03-24)
+
+### Fix
+
+- replace outdate pyrebase library with custom lightwaight firebase wrapper
+
+## 1.19.2a1 (2026-03-24)
+
+### Fix
+
+- **reports**: missing heads of livestock in activity breakdown
+
 ## 1.19.2a0 (2026-01-22)
 
 ### Fix

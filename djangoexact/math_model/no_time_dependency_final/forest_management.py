@@ -776,7 +776,7 @@ class ForestManagement(BaseModule):
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
         # NOTE: This is done to fix a problem of communication between front-end and back-end. Absense of disturbance should not be seen as 0, but as None. This is a temporary fix, as we should not have this problem in the future.
-        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0):
+        elif (self.disturbance_recurrence is not None and any([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0):
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None
