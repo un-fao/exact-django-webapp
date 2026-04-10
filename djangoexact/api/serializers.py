@@ -604,17 +604,48 @@ class ModuleExportSerializer(serializers.Serializer):
                     if value is not None:
                         data[field.name] = value
 
-        # Export submodules if the module has them
-        if hasattr(instance, 'submodules'):
+        # Export submodules if the module has them.
+        #
+        # NOTE: Input, Energy and Irrigation define their `submodules`
+        # property *after* a bare `pass` statement, which places the
+        # property at module-level rather than inside the class body.
+        # hasattr() therefore returns False for those instances.  We work
+        # around the bug by consulting an explicit registry that maps each
+        # parent-module class to a callable that returns its submodule
+        # queryset.  This is intentionally defined in the serializer so
+        # that models.py need not be modified.
+        _SUBMODULE_FETCHERS = {
+            'Input': lambda obj: list(obj.input_entries.all()),
+            'Energy': lambda obj: list(obj.entries.all()),
+            'Irrigation': lambda obj: (
+                list(obj.irrigation_systems.all())
+                + list(obj.irrigation_phases.all())
+            ),
+            'Storage': lambda obj: list(obj.entries.all()),
+            'Processing': lambda obj: list(obj.entries.all()),
+            'Packaging': lambda obj: list(obj.entries.all()),
+            'Transport': lambda obj: list(obj.entries.all()),
+        }
+
+        class_name = instance.__class__.__name__
+        fetcher = _SUBMODULE_FETCHERS.get(class_name)
+        if fetcher is not None:
+            submodules = fetcher(instance)
+        elif hasattr(instance, 'submodules'):
+            # Fallback for any other module types that correctly expose the
+            # property inside their class body.
             submodules = instance.submodules
-            if submodules:
-                submodules_list = []
-                for submodule in submodules:
-                    submodule_data = self.to_representation(submodule)
-                    # Include the submodule class name for proper reconstruction
-                    submodule_data['_submodule_type'] = submodule.__class__.__name__
-                    submodules_list.append(submodule_data)
-                data['_submodules'] = submodules_list
+        else:
+            submodules = []
+
+        if submodules:
+            submodules_list = []
+            for submodule in submodules:
+                submodule_data = self.to_representation(submodule)
+                # Include the submodule class name for proper reconstruction.
+                submodule_data['_submodule_type'] = submodule.__class__.__name__
+                submodules_list.append(submodule_data)
+            data['_submodules'] = submodules_list
 
         return data
 

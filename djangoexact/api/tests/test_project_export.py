@@ -5,8 +5,30 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status as http_status
 
-from .factories import UserFactory, ProjectFactory
-from ..models import Project
+from .factories import (
+    UserFactory,
+    ProjectFactory,
+    InputFactory,
+    InputEntryFactory,
+    StorageFactory,
+    StorageEntryFactory,
+    IrrigationFactory,
+    IrrigationSystemFactory,
+    IrrigationPhaseFactory,
+)
+from ..models import (
+    Activity,
+    ModuleType,
+    Project,
+    Input,
+    InputEntry,
+    Storage,
+    StorageEntry,
+    Irrigation,
+    IrrigationSystem,
+    IrrigationPhase,
+    StatusType,
+)
 
 
 class ProjectExportIdFieldTests(TestCase):
@@ -301,3 +323,224 @@ class ThreadCommentExportImportTests(TestCase):
         # Verify project was created
         imported_project = Project.objects.get(id=response.data['projectId'])
         self.assertEqual(imported_project.name, "Project with Comments")
+
+
+# ---------------------------------------------------------------------------
+# Helpers shared by the roundtrip tests
+# ---------------------------------------------------------------------------
+
+def _make_activity(project, user, module_type_class_name):
+    """Create an Activity and register it with the given ModuleType class name."""
+    module_type, _ = ModuleType.objects.get_or_create(
+        class_name=module_type_class_name,
+        defaults={'name_en': module_type_class_name},
+    )
+    status, _ = StatusType.objects.get_or_create(name_en='EMPTY')
+    activity = Activity.objects.create(
+        project=project,
+        owner=user,
+        name=f'{module_type_class_name} activity',
+    )
+    activity.module_types.add(module_type)
+    return activity
+
+
+def _export_project(client, project_id):
+    """Export a project and return the parsed JSON payload."""
+    response = client.get(f'/api/projects/{project_id}/export/')
+    assert response.status_code == http_status.HTTP_200_OK, response.content
+    return json.loads(response.content)
+
+
+def _import_payload(client, export_data, force_copy=True):
+    """Re-import an export payload and return the parsed response."""
+    if force_copy:
+        url = '/api/projects/import_project/?forceCopy=true'
+    else:
+        url = '/api/projects/import_project/'
+    response = client.post(url, data=export_data, format='json')
+    return response
+
+
+# ---------------------------------------------------------------------------
+# Input + InputEntry roundtrip
+# ---------------------------------------------------------------------------
+
+class InputSubmoduleExportImportTests(TestCase):
+    """Export/import roundtrip for Input modules with InputEntry submodules."""
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.project = ProjectFactory(owner=self.user, name='Input Roundtrip Project')
+
+    def _create_input_with_entries(self, n_entries=2):
+        activity = _make_activity(self.project, self.user, 'Input')
+        parent = InputFactory(activity=activity)
+        entries = [InputEntryFactory(parent=parent) for _ in range(n_entries)]
+        return parent, entries
+
+    def test_export_includes_input_entries(self):
+        """Exporting an Input module must include its InputEntry submodules."""
+        parent, entries = self._create_input_with_entries(n_entries=2)
+
+        data = _export_project(self.client, self.project.id)
+
+        modules = data['project']['activities'][0]['modules']
+        self.assertIn('Input', modules, 'Input must be present in export')
+        input_data = modules['Input'][0]
+        self.assertIn('_submodules', input_data, 'Input export must include _submodules key')
+        self.assertEqual(len(input_data['_submodules']), 2)
+        for sub in input_data['_submodules']:
+            self.assertEqual(sub['_submodule_type'], 'InputEntry')
+
+    def test_import_recreates_input_entries(self):
+        """Importing a project with Input+InputEntry must recreate all entries."""
+        self._create_input_with_entries(n_entries=3)
+
+        export_data = _export_project(self.client, self.project.id)
+        response = _import_payload(self.client, export_data, force_copy=True)
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+        new_project = Project.objects.get(id=response.data['projectId'])
+
+        new_inputs = Input.objects.filter(activity__project=new_project)
+        self.assertEqual(new_inputs.count(), 1)
+        new_entries = InputEntry.objects.filter(parent__in=new_inputs)
+        self.assertEqual(new_entries.count(), 3)
+
+    def test_import_roundtrip_is_idempotent(self):
+        """Two successive imports of the same payload must both succeed."""
+        self._create_input_with_entries(n_entries=1)
+        export_data = _export_project(self.client, self.project.id)
+
+        r1 = _import_payload(self.client, export_data, force_copy=True)
+        self.assertEqual(r1.status_code, http_status.HTTP_201_CREATED)
+
+        r2 = _import_payload(self.client, export_data, force_copy=True)
+        self.assertEqual(r2.status_code, http_status.HTTP_201_CREATED)
+
+
+# ---------------------------------------------------------------------------
+# Storage + StorageEntry roundtrip  (tests the unique-name fix)
+# ---------------------------------------------------------------------------
+
+class StorageSubmoduleExportImportTests(TestCase):
+    """Export/import roundtrip for Storage modules with StorageEntry submodules.
+
+    StorageEntry inherits from ValueChainSubmodule which has a unique=True
+    `name` field.  Importing the same payload twice must not raise an
+    IntegrityError.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.project = ProjectFactory(owner=self.user, name='Storage Roundtrip Project')
+
+    def _create_storage_with_entries(self, n_entries=2):
+        activity = _make_activity(self.project, self.user, 'Storage')
+        parent = StorageFactory(activity=activity)
+        entries = [StorageEntryFactory(parent=parent) for _ in range(n_entries)]
+        return parent, entries
+
+    def test_export_includes_storage_entries(self):
+        """Exporting a Storage module must include its StorageEntry submodules."""
+        parent, entries = self._create_storage_with_entries(n_entries=2)
+
+        data = _export_project(self.client, self.project.id)
+
+        modules = data['project']['activities'][0]['modules']
+        self.assertIn('Storage', modules, 'Storage must be present in export')
+        storage_data = modules['Storage'][0]
+        self.assertIn('_submodules', storage_data, 'Storage export must include _submodules key')
+        self.assertEqual(len(storage_data['_submodules']), 2)
+        for sub in storage_data['_submodules']:
+            self.assertEqual(sub['_submodule_type'], 'StorageEntry')
+
+    def test_import_recreates_storage_entries(self):
+        """Importing a project with Storage+StorageEntry must recreate all entries."""
+        self._create_storage_with_entries(n_entries=2)
+
+        export_data = _export_project(self.client, self.project.id)
+        response = _import_payload(self.client, export_data, force_copy=True)
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+        new_project = Project.objects.get(id=response.data['projectId'])
+
+        new_storages = Storage.objects.filter(activity__project=new_project)
+        self.assertEqual(new_storages.count(), 1)
+        new_entries = StorageEntry.objects.filter(parent__in=new_storages)
+        self.assertEqual(new_entries.count(), 2)
+
+    def test_import_twice_does_not_raise_integrity_error(self):
+        """Importing the same Storage project twice must not fail on the unique `name` field."""
+        self._create_storage_with_entries(n_entries=1)
+        export_data = _export_project(self.client, self.project.id)
+
+        r1 = _import_payload(self.client, export_data, force_copy=True)
+        self.assertEqual(r1.status_code, http_status.HTTP_201_CREATED)
+
+        r2 = _import_payload(self.client, export_data, force_copy=True)
+        self.assertEqual(
+            r2.status_code, http_status.HTTP_201_CREATED,
+            'Second import failed — unique name constraint not handled: '
+            + r2.content.decode(),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Irrigation + IrrigationSystem + IrrigationPhase roundtrip
+# ---------------------------------------------------------------------------
+
+class IrrigationSubmoduleExportImportTests(TestCase):
+    """Export/import roundtrip for Irrigation modules with both submodule types."""
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.project = ProjectFactory(owner=self.user, name='Irrigation Roundtrip Project')
+
+    def _create_irrigation_with_submodules(self):
+        activity = _make_activity(self.project, self.user, 'Irrigation')
+        parent = IrrigationFactory(activity=activity)
+        system = IrrigationSystemFactory(parent=parent)
+        phase = IrrigationPhaseFactory(parent=parent)
+        return parent, system, phase
+
+    def test_export_includes_both_irrigation_submodule_types(self):
+        """Exporting an Irrigation module must include both IrrigationSystem and IrrigationPhase."""
+        parent, system, phase = self._create_irrigation_with_submodules()
+
+        data = _export_project(self.client, self.project.id)
+
+        modules = data['project']['activities'][0]['modules']
+        self.assertIn('Irrigation', modules, 'Irrigation must be present in export')
+        irrigation_data = modules['Irrigation'][0]
+        self.assertIn('_submodules', irrigation_data, 'Irrigation export must include _submodules key')
+
+        submodule_types = {s['_submodule_type'] for s in irrigation_data['_submodules']}
+        self.assertIn('IrrigationSystem', submodule_types)
+        self.assertIn('IrrigationPhase', submodule_types)
+
+    def test_import_recreates_irrigation_submodules(self):
+        """Importing a project with Irrigation submodules must recreate all of them."""
+        self._create_irrigation_with_submodules()
+
+        export_data = _export_project(self.client, self.project.id)
+        response = _import_payload(self.client, export_data, force_copy=True)
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+        new_project = Project.objects.get(id=response.data['projectId'])
+
+        new_irrigations = Irrigation.objects.filter(activity__project=new_project)
+        self.assertEqual(new_irrigations.count(), 1)
+        self.assertEqual(
+            IrrigationSystem.objects.filter(parent__in=new_irrigations).count(), 1
+        )
+        self.assertEqual(
+            IrrigationPhase.objects.filter(parent__in=new_irrigations).count(), 1
+        )

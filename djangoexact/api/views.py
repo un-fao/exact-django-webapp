@@ -1106,6 +1106,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 submodule_class, submodule_data, module_id_map
             )
 
+            # ValueChainSubmodule (StorageEntry, ProcessingEntry, PackagingEntry,
+            # TransportEntry) inherits a `name` field declared with unique=True.
+            # Passing the exported name verbatim would cause an IntegrityError
+            # whenever the same project is imported more than once (or when the
+            # name already exists in the database from any prior import).
+            # The name is display-only and has no semantic meaning for
+            # calculations, so we drop it during import and let the model
+            # keep it NULL (which the unique constraint allows for NULLs).
+            _VALUE_CHAIN_SUBMODULE_CLASSES = {
+                'StorageEntry', 'ProcessingEntry', 'PackagingEntry', 'TransportEntry',
+            }
+            if submodule_type in _VALUE_CHAIN_SUBMODULE_CLASSES:
+                filtered_submodule_data.pop('name', None)
+
             # Create the submodule with parent reference
             new_submodule = submodule_class.objects.create(
                 parent=parent_instance,
