@@ -1663,6 +1663,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1725,6 +1727,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_wo,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1790,6 +1794,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1855,6 +1861,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
