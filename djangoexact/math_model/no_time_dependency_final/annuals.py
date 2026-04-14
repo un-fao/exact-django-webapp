@@ -45,9 +45,11 @@ class AnnualCropland(LandModule):
     n_content_ag_main: float
     ratio_bg_ag_main: float
     n_content_bg_main: float
+    dm_content_main: float
     n_content_ag_minor: Optional[float] = None
     ratio_bg_ag_minor: Optional[float] = None
     n_content_bg_minor: Optional[float] = None
+    dm_content_minor: Optional[float] = None
     yield_main_tier_2: Optional[float] = None
     yield_minor_tier_2: Optional[float] = None
 
@@ -103,7 +105,7 @@ class AnnualCropland(LandModule):
             yield_value_main = self.yield_main * 1000
 
             # Calculate agricultural residue for main season
-            ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+            ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.dm_content_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
             ag_residue_tonnes_main = ag_residue_main / 1000
 
             # Calculate methane emissions for main season
@@ -133,7 +135,7 @@ class AnnualCropland(LandModule):
 
             # Calculate agricultural residue for minor season
             ag_residue_minor = (
-                self.residue_minor_tier_2 * 1000 if self.residue_minor_tier_2 else yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor if yield_value_minor else 0
+                self.residue_minor_tier_2 * 1000 if self.residue_minor_tier_2 else yield_value_minor * self.dm_content_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor if yield_value_minor else 0
             )
             ag_residue_tonnes_minor = ag_residue_minor / 1000
 
