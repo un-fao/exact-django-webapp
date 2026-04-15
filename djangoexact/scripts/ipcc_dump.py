@@ -5170,11 +5170,15 @@ def run():
         add_flu_data_for_all_grassland_management_types()
         add_fmg_data_for_all_grassland_management_types()
         update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
         update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "development":
@@ -5183,12 +5187,16 @@ def run():
         # delete_and_import_forest_management_agb()
         # delete_and_import_forest_total_biomass()
         # delete_and_import_forest_combustion_factor()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "local":
         # TODO: Run in local
         # update_forest_management_agb_and_rshoot_data()
         update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "test":

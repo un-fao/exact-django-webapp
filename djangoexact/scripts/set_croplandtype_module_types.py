@@ -3,7 +3,7 @@ Set LandUseType.module_types for annual/perennial cropland from IPCC CSV.
 
 Usage:
     python manage.py runscript set_croplandtype_module_types
-    python manage.py runscript set_croplandtype_module_types --script-args --apply
+    python manage.py runscript set_croplandtype_module_types --script-args=--apply
 """
 
 import csv

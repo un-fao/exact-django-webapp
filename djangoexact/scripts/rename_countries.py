@@ -3,8 +3,8 @@ Rename EX-ACT country names to FAO official names (Q1).
 
 Usage:
     python manage.py runscript rename_countries
-    python manage.py runscript rename_countries --script-args --apply
-    python manage.py runscript rename_countries --script-args --q3 --apply
+    python manage.py runscript rename_countries --script-args=--apply
+    python manage.py runscript rename_countries --script-args=--q3 --script-args=--apply
 """
 
 from django.db import transaction
