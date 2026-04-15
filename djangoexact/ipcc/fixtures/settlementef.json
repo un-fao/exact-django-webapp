@@ -1,0 +1,899 @@
+[
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1485,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 1,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1486,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 1,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1487,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 1,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1489,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 2,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1490,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 2,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1491,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 2,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1493,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1494,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1495,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1497,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1498,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1499,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1501,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 20,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1502,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 20,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1503,
+    "fields": {
+      "settlement_type": 21,
+      "climate": 20,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1505,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 1,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1506,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 1,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1507,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 1,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1509,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 2,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1510,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 2,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1511,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 2,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1513,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1514,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1515,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1517,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1518,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1519,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1521,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 20,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1522,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 20,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1523,
+    "fields": {
+      "settlement_type": 22,
+      "climate": 20,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1525,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1526,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1527,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1529,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 1,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1530,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 2,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1531,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 1,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1532,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 2,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1533,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 1,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1534,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 2,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.14,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1537,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.17,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1538,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.17,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1539,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.17,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1541,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 20,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.16,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1542,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 20,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.16,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1543,
+    "fields": {
+      "settlement_type": 23,
+      "climate": 20,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.16,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1545,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 1,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1546,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 1,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1547,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 1,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1549,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 2,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1550,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 2,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1551,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 2,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1553,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1554,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1555,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1557,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1558,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1559,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1561,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 20,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1562,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 20,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1563,
+    "fields": {
+      "settlement_type": 24,
+      "climate": 20,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1565,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 0.77,
+      "fmg": 1.03,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1566,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 0.7,
+      "fmg": 1.09,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1567,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 1,
+      "moisture": 1,
+      "flu": 0.77,
+      "fmg": 1.03,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1568,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 1,
+      "moisture": 2,
+      "flu": 0.7,
+      "fmg": 1.09,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1569,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 2,
+      "moisture": 1,
+      "flu": 0.76,
+      "fmg": 1.04,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1570,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 2,
+      "moisture": 2,
+      "flu": 0.69,
+      "fmg": 1.1,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1571,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 0.92,
+      "fmg": 1.04,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1572,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 0.83,
+      "fmg": 1.1,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 1573,
+    "fields": {
+      "settlement_type": 25,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 0.83,
+      "fmg": 1.1,
+      "fi": 1.0,
+      "biomass": 0.0
+    }
+  }
+]

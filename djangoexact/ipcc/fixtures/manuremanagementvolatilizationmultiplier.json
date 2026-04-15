@@ -1,0 +1,26 @@
+[
+  {
+    "model": "ipcc.manuremanagementvolatilizationmultiplier",
+    "pk": 1,
+    "fields": {
+      "moisture": 2,
+      "value": 0.01
+    }
+  },
+  {
+    "model": "ipcc.manuremanagementvolatilizationmultiplier",
+    "pk": 2,
+    "fields": {
+      "moisture": 1,
+      "value": 0.005
+    }
+  },
+  {
+    "model": "ipcc.manuremanagementvolatilizationmultiplier",
+    "pk": 3,
+    "fields": {
+      "moisture": 4,
+      "value": 0.014
+    }
+  }
+]

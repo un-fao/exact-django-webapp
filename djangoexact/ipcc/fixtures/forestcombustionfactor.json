@@ -1,0 +1,470 @@
+[
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 75,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 82,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 76,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 171,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 77,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 172,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 78,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 173,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 79,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 155,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 80,
+    "fields": {
+      "climate": 3,
+      "forest_type": 2,
+      "land_use_type": 82,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 81,
+    "fields": {
+      "climate": 3,
+      "forest_type": 2,
+      "land_use_type": 171,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 82,
+    "fields": {
+      "climate": 3,
+      "forest_type": 2,
+      "land_use_type": 172,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 83,
+    "fields": {
+      "climate": 3,
+      "forest_type": 2,
+      "land_use_type": 173,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 84,
+    "fields": {
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 174,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 85,
+    "fields": {
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 172,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 86,
+    "fields": {
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 167,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.74
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 87,
+    "fields": {
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 88,
+    "fields": {
+      "climate": 2,
+      "forest_type": 2,
+      "land_use_type": 174,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 89,
+    "fields": {
+      "climate": 2,
+      "forest_type": 2,
+      "land_use_type": 172,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 90,
+    "fields": {
+      "climate": 2,
+      "forest_type": 2,
+      "land_use_type": 167,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.74
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 91,
+    "fields": {
+      "climate": 2,
+      "forest_type": 2,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 92,
+    "fields": {
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 155,
+      "co2": null,
+      "ch4": 6.8,
+      "n2o": null,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 93,
+    "fields": {
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 165,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 94,
+    "fields": {
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 164,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 95,
+    "fields": {
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 96,
+    "fields": {
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 166,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 97,
+    "fields": {
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 167,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 98,
+    "fields": {
+      "climate": 1,
+      "forest_type": 2,
+      "land_use_type": 165,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 99,
+    "fields": {
+      "climate": 1,
+      "forest_type": 2,
+      "land_use_type": 164,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 100,
+    "fields": {
+      "climate": 1,
+      "forest_type": 2,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 101,
+    "fields": {
+      "climate": 1,
+      "forest_type": 2,
+      "land_use_type": 166,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 102,
+    "fields": {
+      "climate": 1,
+      "forest_type": 2,
+      "land_use_type": 167,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 103,
+    "fields": {
+      "climate": 4,
+      "forest_type": 1,
+      "land_use_type": 168,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 104,
+    "fields": {
+      "climate": 4,
+      "forest_type": 1,
+      "land_use_type": 169,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 105,
+    "fields": {
+      "climate": 4,
+      "forest_type": 1,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 106,
+    "fields": {
+      "climate": 4,
+      "forest_type": 2,
+      "land_use_type": 168,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 107,
+    "fields": {
+      "climate": 4,
+      "forest_type": 2,
+      "land_use_type": 169,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 108,
+    "fields": {
+      "climate": 4,
+      "forest_type": 2,
+      "land_use_type": 163,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 109,
+    "fields": {
+      "climate": 20,
+      "forest_type": 1,
+      "land_use_type": 163,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 110,
+    "fields": {
+      "climate": 20,
+      "forest_type": 2,
+      "land_use_type": 163,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36
+    }
+  }
+]

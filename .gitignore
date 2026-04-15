@@ -78,9 +78,12 @@ djangoexact/scripts/lsipt_participants.py
 
 
 **/fixtures/
+!djangoexact/api/fixtures/
+!djangoexact/api/fixtures/**
+!djangoexact/ipcc/fixtures/
+!djangoexact/ipcc/fixtures/**
 **/starting_fixtures/
 load_starting_fixtures.py
-djangoexact/api/fixtures/
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json

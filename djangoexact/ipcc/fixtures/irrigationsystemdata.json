@@ -1,0 +1,74 @@
+[
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 11,
+    "fields": {
+      "irrigation_system_type": 1,
+      "value": 34.46666667
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 12,
+    "fields": {
+      "irrigation_system_type": 2,
+      "value": 90.2
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 13,
+    "fields": {
+      "irrigation_system_type": 3,
+      "value": 444.7666667
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 14,
+    "fields": {
+      "irrigation_system_type": 4,
+      "value": 130.1666667
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 15,
+    "fields": {
+      "irrigation_system_type": 5,
+      "value": 59.76666667
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 16,
+    "fields": {
+      "irrigation_system_type": 6,
+      "value": 85.43333333
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 17,
+    "fields": {
+      "irrigation_system_type": 7,
+      "value": 79.2
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 18,
+    "fields": {
+      "irrigation_system_type": 8,
+      "value": 61.96666667
+    }
+  },
+  {
+    "model": "ipcc.irrigationsystemdata",
+    "pk": 19,
+    "fields": {
+      "irrigation_system_type": 9,
+      "value": 311.3
+    }
+  }
+]
