@@ -1,0 +1,18 @@
+# Cloud Build config for the computation job image.
+# Triggered manually or via CI when the compute pipeline changes.
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'deploy/Dockerfile.computation_job'
+      - '--build-arg'
+      - 'BASE_IMAGE=gcr.io/$PROJECT_ID/exact-webapp:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/exact-computation-job:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'
+      - '.'
+images:
+  - 'gcr.io/$PROJECT_ID/exact-computation-job:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'
