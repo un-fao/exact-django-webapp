@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.test import SimpleTestCase
 from io import StringIO
 from types import ModuleType
@@ -228,3 +230,15 @@ class ScaffoldCatalogCommandTest(SimpleTestCase):
         module_types = [m["module_type"] for m in data["modules"]]
         self.assertNotIn("CoastalWetland2", module_types)
         self.assertIn("CoastalWetland", module_types)
+
+
+class CatalogFileTest(SimpleTestCase):
+
+    def test_catalog_yaml_exists(self):
+        catalog_path = Path(__file__).resolve().parent.parent / "catalog" / "scenario_catalog.yaml"
+        self.assertTrue(catalog_path.exists(), f"Catalog file not found at {catalog_path}")
+
+    def test_catalog_yaml_loads_without_error(self):
+        catalog_path = Path(__file__).resolve().parent.parent / "catalog" / "scenario_catalog.yaml"
+        modules = load_catalog(str(catalog_path))
+        self.assertGreater(len(modules), 0)
