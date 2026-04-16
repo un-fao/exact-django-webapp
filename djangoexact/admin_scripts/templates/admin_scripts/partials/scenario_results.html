@@ -28,3 +28,10 @@
     {{ error }}
 </div>
 {% endif %}
+
+{% if not_computed %}
+<div class="mt-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg p-4 text-sm">
+    <p class="font-medium">Data not yet computed</p>
+    <p class="mt-1">No pre-computed results exist for this scenario combination. In a future update, you'll be able to trigger computation directly from here.</p>
+</div>
+{% endif %}

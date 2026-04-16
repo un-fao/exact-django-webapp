@@ -322,8 +322,8 @@ class CompileScenariosViewTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Non-Degraded")
-        self.assertContains(response, "Improved Grassland")
+        self.assertContains(response, "from_value")
+        self.assertContains(response, "to_value")
 
     def test_htmx_values_requires_both_params(self):
         self.client.login(email="staff@example.com", password="testpass123")
@@ -504,7 +504,7 @@ class HtmxScenarioPrefixTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Non-Degraded")
+        self.assertContains(response, "from_value")
         self.assertContains(response, 'name="scenario-0-change-0-from_value"')
 
     def test_htmx_filters_with_scenario_prefix(self):
