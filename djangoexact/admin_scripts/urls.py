@@ -6,6 +6,7 @@ app_name = "admin_scripts"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
+    path("jobs/", views.jobs_list, name="jobs-list"),
     path("example-script/", views.example_script, name="example-script"),
     path("compile-scenarios/", views.compile_scenarios, name="compile-scenarios"),
     path("compile-scenarios/export/", views.compile_scenarios_export, name="compile-scenarios-export"),

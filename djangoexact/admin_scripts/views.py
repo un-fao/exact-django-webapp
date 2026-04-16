@@ -59,7 +59,26 @@ SCRIPTS = [
         "url": "compile-scenarios",
         "description": "Build custom emission scenarios and compute statistics from ChangeRecord data.",
     },
+    {
+        "name": "Jobs",
+        "url": "jobs-list",
+        "description": "View computation job status and history.",
+    },
 ]
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def jobs_list(request):
+    """Persistent jobs panel showing all ComputationJobs for the current user."""
+    jobs = (
+        ComputationJob.objects
+        .filter(requested_by=request.user)
+        .order_by("-created_at")
+    )
+    return render(request, "admin_scripts/jobs_list.html", {
+        "jobs": jobs,
+    })
 
 
 @login_required(login_url="/admin/login/")
