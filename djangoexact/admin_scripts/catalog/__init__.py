@@ -163,3 +163,16 @@ def validate_catalog(modules: list[CatalogModule]) -> list[str]:
                 )
 
     return errors
+
+
+_catalog_cache = None
+
+
+def get_catalog():
+    global _catalog_cache
+    if _catalog_cache is not None:
+        return _catalog_cache
+    from pathlib import Path
+    catalog_path = Path(__file__).resolve().parent / "scenario_catalog.yaml"
+    _catalog_cache = load_catalog(str(catalog_path))
+    return _catalog_cache

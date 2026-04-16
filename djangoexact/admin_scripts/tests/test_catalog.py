@@ -17,6 +17,7 @@ from admin_scripts.catalog import (
     load_catalog,
     validate_catalog,
     ValidationError,
+    get_catalog,
 )
 
 
@@ -242,3 +243,21 @@ class CatalogFileTest(SimpleTestCase):
         catalog_path = Path(__file__).resolve().parent.parent / "catalog" / "scenario_catalog.yaml"
         modules = load_catalog(str(catalog_path))
         self.assertGreater(len(modules), 0)
+
+
+class GetCatalogTest(SimpleTestCase):
+
+    def test_get_catalog_returns_modules(self):
+        modules = get_catalog()
+        self.assertGreater(len(modules), 0)
+        self.assertIsInstance(modules[0], CatalogModule)
+
+    def test_get_catalog_is_cached(self):
+        modules1 = get_catalog()
+        modules2 = get_catalog()
+        self.assertIs(modules1, modules2)
+
+    def test_get_catalog_modules_have_fields(self):
+        modules = get_catalog()
+        for module in modules:
+            self.assertGreater(len(module.fields), 0, f"{module.module_type} has no fields")
