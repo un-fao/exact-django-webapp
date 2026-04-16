@@ -11,6 +11,9 @@ from django.urls import reverse
 from django.utils.html import escape
 
 from admin_scripts.catalog import get_catalog
+from admin_scripts.gap_detector import detect_gap
+from admin_scripts.job_dispatcher import enqueue_or_join
+from admin_scripts.models import ComputationJob
 from admin_scripts.scenario_utils import build_scenario_query, stats_for
 from django.apps import apps
 from minitool.models import ChangeRecord
@@ -406,9 +409,60 @@ def htmx_run_scenario(request):
     else:
         q_objects = build_scenario_query(changes, global_filters)
         aggregates = ChangeRecord.objects.filter(q_objects)
-        context["statistics"] = stats_for(aggregates)
+        stats = stats_for(aggregates)
+
+        if stats["count"] == 0:
+            # Check if any of the changes are gaps (no data computed yet)
+            gaps = []
+            for change in changes:
+                field = change["start"]["field"]
+                from_val = change["start"]["value"]
+                to_val = change["end"]["value"]
+                if detect_gap(change["module_type"], field, from_val, to_val):
+                    gaps.append({
+                        "module_type": change["module_type"],
+                        "field": field,
+                        "from_value": from_val,
+                        "to_value": to_val,
+                    })
+
+            if gaps:
+                context["gaps"] = gaps
+            else:
+                context["statistics"] = stats
+        else:
+            context["statistics"] = stats
 
     return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def htmx_enqueue_job(request):
+    if request.method != "POST":
+        return HttpResponse("POST required", status=405)
+
+    module_type = request.POST.get("module_type", "")
+    attribute = request.POST.get("attribute", "")
+    from_value = request.POST.get("from_value", "")
+    to_value = request.POST.get("to_value", "")
+
+    if not all([module_type, attribute, from_value, to_value]):
+        return HttpResponse(
+            '<div class="text-red-600 text-sm">Missing parameters.</div>'
+        )
+
+    job = enqueue_or_join(
+        user=request.user,
+        module_type=module_type,
+        attribute=attribute,
+        from_value=from_value,
+        to_value=to_value,
+    )
+
+    return render(request, "admin_scripts/partials/job_enqueued.html", {
+        "job": job,
+    })
 
 
 # ---------------------------------------------------------------------------
