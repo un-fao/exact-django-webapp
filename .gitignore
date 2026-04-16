@@ -154,3 +154,4 @@ CLAUDE.md
 faostat_crops.csv
 yield_items.csv
 .playwright-mcp
+djangoexact/test_minitool.db
