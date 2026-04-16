@@ -1,10 +1,13 @@
 from django.test import SimpleTestCase
+from io import StringIO
 from types import ModuleType
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import sys
 import yaml
 import tempfile
 import os
+
+from django.core.management import call_command
 
 from admin_scripts.catalog import (
     CatalogModule,
@@ -15,12 +18,53 @@ from admin_scripts.catalog import (
 )
 
 
+def _make_qs_mock(model_name: str) -> MagicMock:
+    """Create a MagicMock that behaves like a Django QuerySet."""
+    mock = MagicMock()
+    mock.model.__name__ = model_name
+    # Ensure isinstance(value, list) returns False
+    mock.__class__ = type("QuerySet", (), {})
+    return mock
+
+
 MOCK_MODULE_CONFIGS = {
     "Grassland": {
         "fields": {
-            "grassland_management_type_start": {},
-            "is_fire_used": {},
+            "grassland_management_type_start": _make_qs_mock(
+                "GrasslandManagementType"
+            ),
+            "grassland_management_type_w": _make_qs_mock(
+                "GrasslandManagementType"
+            ),
+            "is_fire_used_start": [True, False],
+            "is_fire_used_w": [True, False],
         },
+        "config_name": "grassland",
+    },
+    "ForestManagement": {
+        "fields": {
+            "forest_type": _make_qs_mock("ForestType"),
+            "forest_condition_type": _make_qs_mock("ForestConditionType"),
+            "average_yearly_degradation_percentage_start": [0],
+            "average_yearly_degradation_percentage_w": [0.01, 0.02],
+        },
+        "config_name": "forest_management",
+    },
+    "CoastalWetland": {
+        "fields": {
+            "land_use_type": _make_qs_mock("LandUseType"),
+            "area_under_drainage_start": [1, 0],
+            "area_under_drainage_w": [1, 0],
+        },
+        "config_name": "coastal_wetland",
+    },
+    "CoastalWetland2": {
+        "fields": {
+            "land_use_type": _make_qs_mock("LandUseType"),
+            "area_under_drainage_start": [0],
+            "area_under_drainage_w": [0],
+        },
+        "config_name": "coastal_wetland",
     },
 }
 
@@ -146,3 +190,41 @@ class ValidateCatalogTest(SimpleTestCase):
         modules = load_catalog_from_string(INVALID_FIELD_YAML)
         errors = validate_catalog(modules)
         self.assertTrue(any("totally_fake_field" in e for e in errors))
+
+
+@patch.dict(sys.modules, {"api.minitool": _fake_minitool})
+class ScaffoldCatalogCommandTest(SimpleTestCase):
+
+    def test_command_outputs_valid_yaml(self):
+        out = StringIO()
+        call_command("scaffold_scenario_catalog", stdout=out)
+        output = out.getvalue()
+        data = yaml.safe_load(output)
+        self.assertIn("modules", data)
+        self.assertGreater(len(data["modules"]), 0)
+
+    def test_command_output_passes_validation(self):
+        out = StringIO()
+        call_command("scaffold_scenario_catalog", stdout=out)
+        data = yaml.safe_load(out.getvalue())
+        modules = [CatalogModule.from_dict(m) for m in data["modules"]]
+        errors = validate_catalog(modules)
+        self.assertEqual(errors, [], f"Scaffold output has validation errors: {errors}")
+
+    def test_each_module_has_at_least_one_field(self):
+        out = StringIO()
+        call_command("scaffold_scenario_catalog", stdout=out)
+        data = yaml.safe_load(out.getvalue())
+        for mod in data["modules"]:
+            self.assertGreater(
+                len(mod.get("fields", [])), 0,
+                f"Module {mod['module_type']} has no fields",
+            )
+
+    def test_duplicate_config_name_skipped(self):
+        out = StringIO()
+        call_command("scaffold_scenario_catalog", stdout=out)
+        data = yaml.safe_load(out.getvalue())
+        module_types = [m["module_type"] for m in data["modules"]]
+        self.assertNotIn("CoastalWetland2", module_types)
+        self.assertIn("CoastalWetland", module_types)
