@@ -54,6 +54,9 @@ class Command(BaseCommand):
             job.completed_at = timezone.now()
             job.save(update_fields=["status", "completed_at", "updated_at"])
 
+            from admin_scripts.notifications import notify_job_completed
+            notify_job_completed(job)
+
             self.stdout.write(self.style.SUCCESS(f"Job {job_id} completed."))
 
         except Exception as exc:
@@ -64,6 +67,10 @@ class Command(BaseCommand):
             job.save(
                 update_fields=["status", "error_message", "completed_at", "updated_at"]
             )
+
+            from admin_scripts.notifications import notify_job_completed
+            notify_job_completed(job)
+
             raise CommandError(f"Job {job_id} failed: {exc}")
 
     def _run_computation(self, job):

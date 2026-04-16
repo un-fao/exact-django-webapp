@@ -1,0 +1,11 @@
+<span class="inline-flex items-center text-xs">
+    {% if job.status == "pending" %}
+    <span class="text-amber-600">⏳ Pending</span>
+    {% elif job.status == "running" %}
+    <span class="text-blue-600">🔄 Running...</span>
+    {% elif job.status == "completed" %}
+    <span class="text-green-600">✅ Completed</span>
+    {% elif job.status == "failed" %}
+    <span class="text-red-600">❌ Failed{% if job.error_message %}: {{ job.error_message|truncatewords:10 }}{% endif %}</span>
+    {% endif %}
+</span>

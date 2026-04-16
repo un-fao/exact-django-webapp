@@ -465,6 +465,22 @@ def htmx_enqueue_job(request):
     })
 
 
+@login_required(login_url="/admin/login/")
+@staff_required
+def htmx_job_status(request):
+    """Poll endpoint for job status updates."""
+    job_id = request.GET.get("job_id")
+    if not job_id:
+        return HttpResponse("")
+
+    try:
+        job = ComputationJob.objects.get(pk=job_id)
+    except ComputationJob.DoesNotExist:
+        return HttpResponse('<span class="text-red-500">Job not found</span>')
+
+    return render(request, "admin_scripts/partials/job_status.html", {"job": job})
+
+
 # ---------------------------------------------------------------------------
 # Excel export
 # ---------------------------------------------------------------------------
