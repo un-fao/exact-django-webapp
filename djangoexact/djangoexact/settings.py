@@ -315,3 +315,9 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
 DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
+
+# Computation Jobs — Cloud Run
+# Set to a Cloud Run Job resource name to enable GCP dispatch.
+# Empty string = subprocess fallback (local dev).
+CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
+CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")

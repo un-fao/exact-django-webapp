@@ -76,12 +76,19 @@ def enqueue_or_join(user, module_type, attribute, from_value, to_value, filters=
 
 
 def dispatch_job(job_pk):
-    """Dispatch a computation job via subprocess (local fallback).
+    """Dispatch a computation job.
 
-    In production, this will be replaced by Cloud Run Job dispatch (PR 6).
+    Uses Cloud Run Jobs if settings.CLOUD_RUN_COMPUTATION_JOB_NAME is set,
+    otherwise falls back to a local subprocess.
     """
-    subprocess.Popen(
-        [sys.executable, "manage.py", "run_computation_job", "--job-id", str(job_pk)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    from admin_scripts.cloud_run import CLOUD_RUN_JOB_NAME
+
+    if CLOUD_RUN_JOB_NAME:
+        from admin_scripts.cloud_run import dispatch_cloud_run_job
+        dispatch_cloud_run_job(job_pk)
+    else:
+        subprocess.Popen(
+            [sys.executable, "manage.py", "run_computation_job", "--job-id", str(job_pk)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
