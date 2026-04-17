@@ -321,3 +321,7 @@ DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 # Empty string = subprocess fallback (local dev).
 CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
 CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
+
+# Job Notifications
+# Set to True to enable email notifications for completed jobs.
+JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
