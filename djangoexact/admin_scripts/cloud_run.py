@@ -46,7 +46,34 @@ def dispatch_cloud_run_job(job_pk: int) -> str | None:
     try:
         operation = client.run_job(request=request)
         logger.info("Dispatched Cloud Run Job for job %d: %s", job_pk, operation.name)
+        from admin_scripts.models import ComputationJob
+        ComputationJob.objects.filter(pk=job_pk).update(
+            cloud_run_execution_name=operation.name,
+        )
         return operation.name
     except Exception:
         logger.exception("Failed to dispatch Cloud Run Job for job %d", job_pk)
         return None
+
+
+def cancel_cloud_run_job(execution_name: str) -> bool:
+    """Cancel a running Cloud Run Job execution.
+
+    Returns True on success, False on failure.
+    """
+    try:
+        from google.cloud import run_v2
+    except ImportError:
+        logger.error("google-cloud-run not installed; cannot cancel execution.")
+        return False
+
+    client = run_v2.ExecutionsClient()
+    request = run_v2.CancelExecutionRequest(name=execution_name)
+
+    try:
+        client.cancel_execution(request=request)
+        logger.info("Cancelled Cloud Run execution: %s", execution_name)
+        return True
+    except Exception:
+        logger.exception("Failed to cancel Cloud Run execution: %s", execution_name)
+        return False

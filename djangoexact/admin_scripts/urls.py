@@ -6,6 +6,8 @@ app_name = "admin_scripts"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
+    path("jobs/", views.jobs_list, name="jobs-list"),
+    path("jobs/partial/", views.jobs_list_partial, name="jobs-list-partial"),
     path("example-script/", views.example_script, name="example-script"),
     path("compile-scenarios/", views.compile_scenarios, name="compile-scenarios"),
     path("compile-scenarios/export/", views.compile_scenarios_export, name="compile-scenarios-export"),
@@ -18,4 +20,5 @@ urlpatterns = [
     path("compile-scenarios/htmx/enqueue-job/", views.htmx_enqueue_job, name="htmx-enqueue-job"),
     path("compile-scenarios/htmx/add-scenario/", views.htmx_add_scenario, name="htmx-add-scenario"),
     path("compile-scenarios/htmx/job-status/", views.htmx_job_status, name="htmx-job-status"),
+    path("compile-scenarios/htmx/cancel-job/", views.htmx_cancel_job, name="htmx-cancel-job"),
 ]

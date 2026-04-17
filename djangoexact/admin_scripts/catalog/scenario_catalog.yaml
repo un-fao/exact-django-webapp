@@ -52,11 +52,11 @@ modules:
   label: Annual Cropland
   config_name: annual_cropland
   fields:
-  - field_name: land_use_type
-    label: Land Use Type
-    value_source:
-      kind: queryset
-      model: LandUseType
+  # - field_name: land_use_type
+  #   label: Land Use Type
+  #   value_source:
+  #     kind: queryset
+  #     model: LandUseType
   - field_name: tillage_management_type
     label: Tillage Management Type
     value_source:

@@ -5,14 +5,16 @@ from functools import wraps
 
 import pandas as pd
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.utils.html import escape
 
 from admin_scripts.catalog import get_catalog
 from admin_scripts.gap_detector import detect_gap
-from admin_scripts.job_dispatcher import enqueue_or_join
+from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
 from admin_scripts.models import ComputationJob
 from admin_scripts.scenario_utils import build_scenario_query, stats_for
 from django.apps import apps
@@ -59,7 +61,77 @@ SCRIPTS = [
         "url": "compile-scenarios",
         "description": "Build custom emission scenarios and compute statistics from ChangeRecord data.",
     },
+    {
+        "name": "Jobs",
+        "url": "jobs-list",
+        "description": "View computation job status and history.",
+    },
 ]
+
+
+def _jobs_list_context(request):
+    """Build shared context for the jobs list (full page + HTMX partial)."""
+    valid_statuses = {s.value for s in ComputationJob.Status}
+    raw_status = request.GET.get("status", "") or ""
+    selected_status = raw_status if raw_status in valid_statuses else ""
+
+    base_qs = ComputationJob.objects.filter(requested_by=request.user)
+
+    status_counts = dict(
+        base_qs.values_list("status")
+        .annotate(c=Count("id"))
+        .values_list("status", "c")
+    )
+
+    if selected_status:
+        jobs = base_qs.filter(status=selected_status).order_by("-created_at")
+    else:
+        jobs = base_qs.order_by("-created_at")
+
+    active_count = status_counts.get("pending", 0) + status_counts.get("running", 0)
+    total_count = sum(status_counts.values())
+
+    tab_defs = [
+        ("all", "All", total_count),
+        ("pending", "Pending", status_counts.get("pending", 0)),
+        ("running", "Running", status_counts.get("running", 0)),
+        ("completed", "Completed", status_counts.get("completed", 0)),
+        ("failed", "Failed", status_counts.get("failed", 0)),
+        ("cancelled", "Cancelled", status_counts.get("cancelled", 0)),
+    ]
+    filter_tabs = []
+    for key, label, count in tab_defs:
+        # Always show "All"; always show the currently selected status tab;
+        # otherwise, only show tabs where count > 0.
+        if key == "all" or count > 0 or key == selected_status:
+            filter_tabs.append({"key": key, "label": label, "count": count})
+
+    return {
+        "jobs": jobs,
+        "status_counts": status_counts,
+        "active_count": active_count,
+        "selected_status": selected_status,
+        "filter_tabs": filter_tabs,
+        "total_count": total_count,
+    }
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def jobs_list(request):
+    """Persistent jobs panel showing all ComputationJobs for the current user."""
+    return render(request, "admin_scripts/jobs_list.html", _jobs_list_context(request))
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def jobs_list_partial(request):
+    """HTMX partial endpoint that renders only the jobs list body."""
+    return render(
+        request,
+        "admin_scripts/partials/jobs_table.html",
+        _jobs_list_context(request),
+    )
 
 
 @login_required(login_url="/admin/login/")
@@ -478,6 +550,18 @@ def htmx_job_status(request):
     except ComputationJob.DoesNotExist:
         return HttpResponse('<span class="text-red-500">Job not found</span>')
 
+    return render(request, "admin_scripts/partials/job_status.html", {"job": job})
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+@require_POST
+def htmx_cancel_job(request):
+    """Cancel a pending or running computation job via HTMX."""
+    job_id = request.POST.get("job_id")
+    job = get_object_or_404(ComputationJob, pk=job_id)
+    cancel_job(job.pk)
+    job.refresh_from_db()
     return render(request, "admin_scripts/partials/job_status.html", {"job": job})
 
 

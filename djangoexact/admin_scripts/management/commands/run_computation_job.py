@@ -31,6 +31,10 @@ class Command(BaseCommand):
         except ComputationJob.DoesNotExist:
             raise CommandError(f"ComputationJob {job_id} not found")
 
+        if job.status == ComputationJob.Status.CANCELLED:
+            self.stderr.write(f"Job {job_id} was cancelled. Skipping.")
+            return
+
         if job.status != ComputationJob.Status.PENDING:
             self.stderr.write(
                 f"Job {job_id} is '{job.status}', expected 'pending'. Skipping."
@@ -61,6 +65,10 @@ class Command(BaseCommand):
 
         except Exception as exc:
             logger.exception("Job %d failed", job_id)
+            # Ensure DB connection is fresh before saving failure status —
+            # the fork-based pool may have caused a stale connection.
+            from django.db import connection
+            connection.ensure_connection()
             job.status = ComputationJob.Status.FAILED
             job.error_message = str(exc)
             job.completed_at = timezone.now()
@@ -77,12 +85,23 @@ class Command(BaseCommand):
         """Run the actual computation for a job."""
         from api.services.minitool_compute import compute_module_slice
 
+        def _update_progress(pct):
+            from django.db import connection
+            if connection.connection and not connection.is_usable():
+                connection.close()
+            from admin_scripts.models import ComputationJob
+            ComputationJob.objects.filter(pk=job.pk).update(progress=pct)
+
         data, errors = compute_module_slice(
             module_type=job.module_type,
+            attribute=job.attribute,
+            from_value=job.from_value,
+            to_value=job.to_value,
             chunk_size=10000,
             max_rows=10000,
             max_workers=None,
             save_results=True,
+            progress_callback=_update_progress,
         )
 
         self.stdout.write(

@@ -10,6 +10,7 @@ class ComputationJob(models.Model):
         RUNNING = "running", "Running"
         COMPLETED = "completed", "Completed"
         FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
 
     # Coalescing key — SHA-256 of canonicalized parameters
     filters_hash = models.CharField(max_length=64, unique=True, db_index=True)
@@ -21,11 +22,16 @@ class ComputationJob(models.Model):
     to_value = models.CharField(max_length=255)
     filters = models.JSONField(default=dict, blank=True)
 
+    # Process tracking (for cancellation)
+    pid = models.IntegerField(null=True, blank=True)
+    cloud_run_execution_name = models.CharField(max_length=512, blank=True, default="")
+
     # State
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
     error_message = models.TextField(blank=True, default="")
+    progress = models.PositiveSmallIntegerField(default=0)
 
     # Tracking
     created_at = models.DateTimeField(auto_now_add=True)
