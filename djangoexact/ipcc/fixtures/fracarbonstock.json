@@ -1,0 +1,3306 @@
+[
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 425,
+    "fields": {
+      "country": 145,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 426,
+    "fields": {
+      "country": 208,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 427,
+    "fields": {
+      "country": 106,
+      "year": 2020,
+      "agb": 13.81,
+      "bgb": 5.03,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 36719.16,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 428,
+    "fields": {
+      "country": 1,
+      "year": 2020,
+      "agb": 70.87,
+      "bgb": 17.01,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1505.38,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 429,
+    "fields": {
+      "country": 209,
+      "year": 2020,
+      "agb": 72.38,
+      "bgb": 14.48,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1389.76,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 430,
+    "fields": {
+      "country": 156,
+      "year": 2020,
+      "agb": 14.4,
+      "bgb": 2.88,
+      "deadwood": 1.2,
+      "litter": null,
+      "carbon_stock_biomass_total": 1150975.53,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 431,
+    "fields": {
+      "country": 54,
+      "year": 2020,
+      "agb": 98.7,
+      "bgb": 27.73,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 695.37,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 432,
+    "fields": {
+      "country": 55,
+      "year": 2020,
+      "agb": 98.7,
+      "bgb": 27.73,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1026.61,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 433,
+    "fields": {
+      "country": 56,
+      "year": 2020,
+      "agb": 88.65,
+      "bgb": 22.61,
+      "deadwood": null,
+      "litter": 3.89,
+      "carbon_stock_biomass_total": 3179031.98,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 434,
+    "fields": {
+      "country": 107,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 435,
+    "fields": {
+      "country": 57,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 436,
+    "fields": {
+      "country": 142,
+      "year": 2020,
+      "agb": 41.99,
+      "bgb": 19.89,
+      "deadwood": 12.07,
+      "litter": 4.43,
+      "carbon_stock_biomass_total": 8292235.59,
+      "carbon_stock_total": 21948695.33
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 437,
+    "fields": {
+      "country": 210,
+      "year": 2020,
+      "agb": 83.84,
+      "bgb": 20.91,
+      "deadwood": 1.79,
+      "litter": null,
+      "carbon_stock_biomass_total": 408435.96,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 438,
+    "fields": {
+      "country": 108,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 439,
+    "fields": {
+      "country": 58,
+      "year": 2020,
+      "agb": 18.71,
+      "bgb": 7.48,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 13353.23,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 440,
+    "fields": {
+      "country": 109,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 441,
+    "fields": {
+      "country": 146,
+      "year": 2020,
+      "agb": 31.44,
+      "bgb": 12.09,
+      "deadwood": 1.7,
+      "litter": 0.27,
+      "carbon_stock_biomass_total": 81984.4,
+      "carbon_stock_total": 237120.06
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 442,
+    "fields": {
+      "country": 59,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 443,
+    "fields": {
+      "country": 45,
+      "year": 2020,
+      "agb": 77.1,
+      "bgb": 11.7,
+      "deadwood": 0.4,
+      "litter": 10.6,
+      "carbon_stock_biomass_total": 778562.88,
+      "carbon_stock_total": 1813139.68
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 444,
+    "fields": {
+      "country": 211,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 445,
+    "fields": {
+      "country": 60,
+      "year": 2020,
+      "agb": 99.2,
+      "bgb": 23.8,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 157077.15,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 446,
+    "fields": {
+      "country": 157,
+      "year": 2020,
+      "agb": 48.68,
+      "bgb": 9.74,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 183155.46,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 447,
+    "fields": {
+      "country": 137,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 448,
+    "fields": {
+      "country": 147,
+      "year": 2020,
+      "agb": 127.05,
+      "bgb": 54.52,
+      "deadwood": 3.03,
+      "litter": 6.23,
+      "carbon_stock_biomass_total": 494792.78,
+      "carbon_stock_total": 694568.39
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 449,
+    "fields": {
+      "country": 61,
+      "year": 2020,
+      "agb": 61.69,
+      "bgb": 15.3,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3913691.18,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 450,
+    "fields": {
+      "country": 62,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 451,
+    "fields": {
+      "country": 212,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 452,
+    "fields": {
+      "country": 158,
+      "year": 2020,
+      "agb": 72.97,
+      "bgb": 20.43,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1424788.98,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 453,
+    "fields": {
+      "country": 64,
+      "year": 2020,
+      "agb": 84.71,
+      "bgb": 19.96,
+      "deadwood": 5.09,
+      "litter": 2.44,
+      "carbon_stock_biomass_total": 51981173.53,
+      "carbon_stock_total": 76265871.97
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 454,
+    "fields": {
+      "country": 65,
+      "year": 2020,
+      "agb": 98.7,
+      "bgb": 27.73,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 457.68,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 455,
+    "fields": {
+      "country": 263,
+      "year": 2020,
+      "agb": 116.09,
+      "bgb": 27.86,
+      "deadwood": null,
+      "litter": 2.11,
+      "carbon_stock_biomass_total": 54701.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 456,
+    "fields": {
+      "country": 46,
+      "year": 2020,
+      "agb": 84.83,
+      "bgb": 20.2,
+      "deadwood": null,
+      "litter": 10.18,
+      "carbon_stock_biomass_total": 408881.79,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 457,
+    "fields": {
+      "country": 159,
+      "year": 2020,
+      "agb": 22.0,
+      "bgb": 6.0,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 174059.2,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 458,
+    "fields": {
+      "country": 160,
+      "year": 2020,
+      "agb": 56.11,
+      "bgb": 15.63,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 20061.37,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 459,
+    "fields": {
+      "country": 161,
+      "year": 2020,
+      "agb": 44.7,
+      "bgb": 12.5,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 2615.18,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 460,
+    "fields": {
+      "country": 264,
+      "year": 2020,
+      "agb": 32.57,
+      "bgb": 18.24,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 409953.88,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 461,
+    "fields": {
+      "country": 162,
+      "year": 2020,
+      "agb": 124.57,
+      "bgb": 29.9,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3141993.95,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 462,
+    "fields": {
+      "country": 138,
+      "year": 2020,
+      "agb": 45.22,
+      "bgb": 11.19,
+      "deadwood": 20.04,
+      "litter": 48.47,
+      "carbon_stock_biomass_total": 19570214.12,
+      "carbon_stock_total": 72119413.43
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 463,
+    "fields": {
+      "country": 66,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 464,
+    "fields": {
+      "country": 163,
+      "year": 2020,
+      "agb": 102.03,
+      "bgb": 24.49,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 2821775.56,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 465,
+    "fields": {
+      "country": 164,
+      "year": 2020,
+      "agb": 42.88,
+      "bgb": 12.01,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 236740.57,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 466,
+    "fields": {
+      "country": 67,
+      "year": 2020,
+      "agb": 109.64,
+      "bgb": 21.93,
+      "deadwood": 25.0,
+      "litter": 4.6,
+      "carbon_stock_biomass_total": 2395981.8,
+      "carbon_stock_total": 3845553.52
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 467,
+    "fields": {
+      "country": 4,
+      "year": 2020,
+      "agb": 31.72,
+      "bgb": 7.94,
+      "deadwood": 5.67,
+      "litter": null,
+      "carbon_stock_biomass_total": 8724334.62,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 468,
+    "fields": {
+      "country": 68,
+      "year": 2020,
+      "agb": 92.06,
+      "bgb": 20.81,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 6675347.38,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 469,
+    "fields": {
+      "country": 165,
+      "year": 2020,
+      "agb": 31.02,
+      "bgb": 6.25,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1226.93,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 470,
+    "fields": {
+      "country": 166,
+      "year": 2020,
+      "agb": 97.4,
+      "bgb": 36.0,
+      "deadwood": 0.35,
+      "litter": null,
+      "carbon_stock_biomass_total": 2927596.4,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 471,
+    "fields": {
+      "country": 9,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 472,
+    "fields": {
+      "country": 69,
+      "year": 2020,
+      "agb": 97.8,
+      "bgb": 26.2,
+      "deadwood": 5.9,
+      "litter": 1.5,
+      "carbon_stock_biomass_total": 376323.88,
+      "carbon_stock_total": 732617.62
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 473,
+    "fields": {
+      "country": 258,
+      "year": 2020,
+      "agb": 44.39,
+      "bgb": 12.76,
+      "deadwood": 12.93,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 162117.98,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 474,
+    "fields": {
+      "country": 213,
+      "year": 2020,
+      "agb": 81.79,
+      "bgb": 19.37,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 196160.37,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 475,
+    "fields": {
+      "country": 70,
+      "year": 2020,
+      "agb": 53.39,
+      "bgb": 12.81,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 214620.4,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 476,
+    "fields": {
+      "country": 256,
+      "year": 2020,
+      "agb": 35.6,
+      "bgb": 10.3,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3.21,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 477,
+    "fields": {
+      "country": 110,
+      "year": 2020,
+      "agb": 19.71,
+      "bgb": 5.52,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 4352.93,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 478,
+    "fields": {
+      "country": 282,
+      "year": 2020,
+      "agb": 76.72,
+      "bgb": 19.33,
+      "deadwood": 7.4,
+      "litter": 4.81,
+      "carbon_stock_biomass_total": 257134.49,
+      "carbon_stock_total": 461155.52
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 479,
+    "fields": {
+      "country": 275,
+      "year": 2020,
+      "agb": 29.28,
+      "bgb": 10.82,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 241806.61,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 480,
+    "fields": {
+      "country": 168,
+      "year": 2020,
+      "agb": 108.6,
+      "bgb": 40.17,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 18768115.05,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 481,
+    "fields": {
+      "country": 214,
+      "year": 2020,
+      "agb": 52.91,
+      "bgb": 11.67,
+      "deadwood": 0.8,
+      "litter": 11.0,
+      "carbon_stock_biomass_total": 40584.66,
+      "carbon_stock_total": 157882.98
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 482,
+    "fields": {
+      "country": 169,
+      "year": 2020,
+      "agb": 40.66,
+      "bgb": 11.38,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 301.83,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 483,
+    "fields": {
+      "country": 72,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 484,
+    "fields": {
+      "country": 73,
+      "year": 2020,
+      "agb": 41.3,
+      "bgb": 11.2,
+      "deadwood": 4.0,
+      "litter": 0.9,
+      "carbon_stock_biomass_total": 112565.25,
+      "carbon_stock_total": 549961.65
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 485,
+    "fields": {
+      "country": 74,
+      "year": 2020,
+      "agb": 88.51,
+      "bgb": 22.0,
+      "deadwood": 16.12,
+      "litter": 2.77,
+      "carbon_stock_biomass_total": 1381135.19,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 486,
+    "fields": {
+      "country": 111,
+      "year": 2020,
+      "agb": 56.4,
+      "bgb": 16.07,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3259.7,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 487,
+    "fields": {
+      "country": 75,
+      "year": 2020,
+      "agb": 53.64,
+      "bgb": 11.88,
+      "deadwood": 5.65,
+      "litter": 1.79,
+      "carbon_stock_biomass_total": 38255.82,
+      "carbon_stock_total": 152707.98
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 488,
+    "fields": {
+      "country": 170,
+      "year": 2020,
+      "agb": 100.82,
+      "bgb": 24.2,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 306101.47,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 489,
+    "fields": {
+      "country": 171,
+      "year": 2020,
+      "agb": 34.08,
+      "bgb": 9.45,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 45935.47,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 490,
+    "fields": {
+      "country": 215,
+      "year": 2020,
+      "agb": 54.46,
+      "bgb": 12.83,
+      "deadwood": 1.87,
+      "litter": null,
+      "carbon_stock_biomass_total": 164079.94,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 491,
+    "fields": {
+      "country": 172,
+      "year": 2020,
+      "agb": 35.74,
+      "bgb": 10.08,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 22798.2,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 492,
+    "fields": {
+      "country": 173,
+      "year": 2020,
+      "agb": 57.01,
+      "bgb": 13.87,
+      "deadwood": 14.72,
+      "litter": null,
+      "carbon_stock_biomass_total": 1209815.28,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 493,
+    "fields": {
+      "country": 276,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 494,
+    "fields": {
+      "country": 216,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 495,
+    "fields": {
+      "country": 11,
+      "year": 2020,
+      "agb": 95.31,
+      "bgb": 22.48,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 134282.96,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 496,
+    "fields": {
+      "country": 217,
+      "year": 2020,
+      "agb": 29.88,
+      "bgb": 8.65,
+      "deadwood": 0.74,
+      "litter": 11.26,
+      "carbon_stock_biomass_total": 863418.77,
+      "carbon_stock_total": 4867010.71
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 497,
+    "fields": {
+      "country": 218,
+      "year": 2020,
+      "agb": 64.3,
+      "bgb": 18.3,
+      "deadwood": 8.03,
+      "litter": null,
+      "carbon_stock_biomass_total": 1425097.8,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 498,
+    "fields": {
+      "country": 77,
+      "year": 2020,
+      "agb": 171.57,
+      "bgb": 41.18,
+      "deadwood": 12.25,
+      "litter": 3.0,
+      "carbon_stock_biomass_total": 1702606.34,
+      "carbon_stock_total": 2626535.37
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 499,
+    "fields": {
+      "country": 12,
+      "year": 2020,
+      "agb": 69.99,
+      "bgb": 17.09,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 13014.98,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 500,
+    "fields": {
+      "country": 175,
+      "year": 2020,
+      "agb": 104.93,
+      "bgb": 25.18,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 3061566.37,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 501,
+    "fields": {
+      "country": 176,
+      "year": 2020,
+      "agb": 20.9,
+      "bgb": 4.2,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 6091.02,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 502,
+    "fields": {
+      "country": 112,
+      "year": 2020,
+      "agb": 59.67,
+      "bgb": 15.55,
+      "deadwood": null,
+      "litter": 18.99,
+      "carbon_stock_biomass_total": 212300.93,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 503,
+    "fields": {
+      "country": 219,
+      "year": 2020,
+      "agb": 92.57,
+      "bgb": 14.44,
+      "deadwood": 2.31,
+      "litter": 18.63,
+      "carbon_stock_biomass_total": 1221947.19,
+      "carbon_stock_total": 2232300.31
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 504,
+    "fields": {
+      "country": 177,
+      "year": 2020,
+      "agb": 45.42,
+      "bgb": 9.23,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 436419.05,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 505,
+    "fields": {
+      "country": 220,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 506,
+    "fields": {
+      "country": 221,
+      "year": 2020,
+      "agb": 16.09,
+      "bgb": 5.5,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 84239.86,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 507,
+    "fields": {
+      "country": 139,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 508,
+    "fields": {
+      "country": 78,
+      "year": 2020,
+      "agb": 51.42,
+      "bgb": 13.78,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1154.04,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 509,
+    "fields": {
+      "country": 79,
+      "year": 2020,
+      "agb": 165.0,
+      "bgb": 37.0,
+      "deadwood": 9.0,
+      "litter": 1.5,
+      "carbon_stock_biomass_total": 14527.84,
+      "carbon_stock_total": 22475.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 510,
+    "fields": {
+      "country": 13,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 511,
+    "fields": {
+      "country": 80,
+      "year": 2020,
+      "agb": 62.0,
+      "bgb": 14.88,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 271217.26,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 512,
+    "fields": {
+      "country": 222,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 513,
+    "fields": {
+      "country": 178,
+      "year": 2020,
+      "agb": 61.66,
+      "bgb": 14.8,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 473210.94,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 514,
+    "fields": {
+      "country": 179,
+      "year": 2020,
+      "agb": 40.0,
+      "bgb": 8.0,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 95040.48,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 515,
+    "fields": {
+      "country": 81,
+      "year": 2020,
+      "agb": 234.51,
+      "bgb": 54.23,
+      "deadwood": 9.34,
+      "litter": 3.64,
+      "carbon_stock_biomass_total": 5317245.27,
+      "carbon_stock_total": 7290264.8
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 516,
+    "fields": {
+      "country": 82,
+      "year": 2020,
+      "agb": 44.43,
+      "bgb": 10.29,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 19004.26,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 517,
+    "fields": {
+      "country": 223,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 518,
+    "fields": {
+      "country": 83,
+      "year": 2020,
+      "agb": 52.86,
+      "bgb": 19.18,
+      "deadwood": 5.79,
+      "litter": 1.69,
+      "carbon_stock_biomass_total": 458121.09,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 519,
+    "fields": {
+      "country": 48,
+      "year": 2020,
+      "agb": 52.91,
+      "bgb": 13.23,
+      "deadwood": 3.39,
+      "litter": null,
+      "carbon_stock_biomass_total": 135786.08,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 520,
+    "fields": {
+      "country": 224,
+      "year": 2020,
+      "agb": 11.83,
+      "bgb": 2.96,
+      "deadwood": null,
+      "litter": 6.0,
+      "carbon_stock_biomass_total": 759.47,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 521,
+    "fields": {
+      "country": 149,
+      "year": 2020,
+      "agb": 31.6,
+      "bgb": 9.9,
+      "deadwood": 0.4,
+      "litter": 1.9,
+      "carbon_stock_biomass_total": 2994640.0,
+      "carbon_stock_total": 7216000.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 522,
+    "fields": {
+      "country": 266,
+      "year": 2020,
+      "agb": 84.11,
+      "bgb": 20.19,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 9609492.76,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 523,
+    "fields": {
+      "country": 150,
+      "year": 2020,
+      "agb": 64.7,
+      "bgb": 17.94,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 888534.54,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 524,
+    "fields": {
+      "country": 113,
+      "year": 2020,
+      "agb": 24.02,
+      "bgb": 6.85,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 25467.75,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 525,
+    "fields": {
+      "country": 225,
+      "year": 2020,
+      "agb": 55.82,
+      "bgb": 11.99,
+      "deadwood": 19.61,
+      "litter": 12.92,
+      "carbon_stock_biomass_total": 53028.78,
+      "carbon_stock_total": 332757.33
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 526,
+    "fields": {
+      "country": 226,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 527,
+    "fields": {
+      "country": 114,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 528,
+    "fields": {
+      "country": 227,
+      "year": 2020,
+      "agb": 55.3,
+      "bgb": 13.7,
+      "deadwood": 3.1,
+      "litter": 3.2,
+      "carbon_stock_biomass_total": 660062.97,
+      "carbon_stock_total": 1501882.41
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 529,
+    "fields": {
+      "country": 84,
+      "year": 2020,
+      "agb": 74.5,
+      "bgb": 18.62,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 55582.4,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 530,
+    "fields": {
+      "country": 16,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 531,
+    "fields": {
+      "country": 228,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 532,
+    "fields": {
+      "country": 115,
+      "year": 2020,
+      "agb": 26.74,
+      "bgb": 7.49,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3337.43,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 533,
+    "fields": {
+      "country": 116,
+      "year": 2020,
+      "agb": 38.76,
+      "bgb": 11.24,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 172734.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 534,
+    "fields": {
+      "country": 180,
+      "year": 2020,
+      "agb": 94.18,
+      "bgb": 24.25,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 427661.39,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 535,
+    "fields": {
+      "country": 17,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 536,
+    "fields": {
+      "country": 117,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 537,
+    "fields": {
+      "country": 118,
+      "year": 2020,
+      "agb": 23.34,
+      "bgb": 7.55,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 40632.09,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 538,
+    "fields": {
+      "country": 277,
+      "year": 2020,
+      "agb": 57.11,
+      "bgb": 11.42,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1137289.62,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 539,
+    "fields": {
+      "country": 229,
+      "year": 2020,
+      "agb": 64.06,
+      "bgb": 20.5,
+      "deadwood": 5.1,
+      "litter": 12.14,
+      "carbon_stock_biomass_total": 288416.4,
+      "carbon_stock_total": 921936.54
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 540,
+    "fields": {
+      "country": 119,
+      "year": 2020,
+      "agb": 28.8,
+      "bgb": 6.42,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 5048.08,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 541,
+    "fields": {
+      "country": 181,
+      "year": 2020,
+      "agb": 34.65,
+      "bgb": 12.84,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1639.35,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 542,
+    "fields": {
+      "country": 182,
+      "year": 2020,
+      "agb": 96.54,
+      "bgb": 23.17,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 911883.74,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 543,
+    "fields": {
+      "country": 120,
+      "year": 2020,
+      "agb": 23.18,
+      "bgb": 4.7,
+      "deadwood": 3.96,
+      "litter": 2.12,
+      "carbon_stock_biomass_total": 6049.96,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 544,
+    "fields": {
+      "country": 230,
+      "year": 2020,
+      "agb": 113.94,
+      "bgb": 21.47,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 907.25,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 545,
+    "fields": {
+      "country": 231,
+      "year": 2020,
+      "agb": 66.6,
+      "bgb": 15.5,
+      "deadwood": 5.0,
+      "litter": 23.2,
+      "carbon_stock_biomass_total": 180702.1,
+      "carbon_stock_total": 401242.3
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 546,
+    "fields": {
+      "country": 232,
+      "year": 2020,
+      "agb": 84.93,
+      "bgb": 16.99,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 9040.3,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 547,
+    "fields": {
+      "country": 183,
+      "year": 2020,
+      "agb": 76.71,
+      "bgb": 20.26,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 1205318.68,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 548,
+    "fields": {
+      "country": 184,
+      "year": 2020,
+      "agb": 37.0,
+      "bgb": 8.9,
+      "deadwood": 2.8,
+      "litter": 0.5,
+      "carbon_stock_biomass_total": 102894.03,
+      "carbon_stock_total": 236051.01
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 549,
+    "fields": {
+      "country": 267,
+      "year": 2020,
+      "agb": 98.64,
+      "bgb": 23.67,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 2337838.23,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 550,
+    "fields": {
+      "country": 151,
+      "year": 2020,
+      "agb": 63.45,
+      "bgb": 15.23,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 64.52,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 551,
+    "fields": {
+      "country": 185,
+      "year": 2020,
+      "agb": 21.79,
+      "bgb": 5.46,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 362316.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 552,
+    "fields": {
+      "country": 233,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 553,
+    "fields": {
+      "country": 20,
+      "year": 2020,
+      "agb": 62.1,
+      "bgb": 14.9,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 723.8,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 554,
+    "fields": {
+      "country": 85,
+      "year": 2020,
+      "agb": 145.0,
+      "bgb": 35.0,
+      "deadwood": 9.5,
+      "litter": 1.5,
+      "carbon_stock_biomass_total": 9412.2,
+      "carbon_stock_total": 13595.4
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 555,
+    "fields": {
+      "country": 186,
+      "year": 2020,
+      "agb": 24.96,
+      "bgb": 9.98,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 10929.23,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 556,
+    "fields": {
+      "country": 187,
+      "year": 2020,
+      "agb": 58.37,
+      "bgb": 15.05,
+      "deadwood": null,
+      "litter": 2.83,
+      "carbon_stock_biomass_total": 2846.49,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 557,
+    "fields": {
+      "country": 188,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 558,
+    "fields": {
+      "country": 86,
+      "year": 2020,
+      "agb": 24.72,
+      "bgb": 6.12,
+      "deadwood": 2.69,
+      "litter": 1.33,
+      "carbon_stock_biomass_total": 2025943.75,
+      "carbon_stock_total": 5190988.16
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 559,
+    "fields": {
+      "country": 268,
+      "year": 2020,
+      "agb": 62.1,
+      "bgb": 14.9,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 723.8,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 560,
+    "fields": {
+      "country": 234,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 561,
+    "fields": {
+      "country": 22,
+      "year": 2020,
+      "agb": 29.1,
+      "bgb": 8.6,
+      "deadwood": 7.7,
+      "litter": 15.9,
+      "carbon_stock_biomass_total": 534313.81,
+      "carbon_stock_total": 2057887.66
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 562,
+    "fields": {
+      "country": 235,
+      "year": 2020,
+      "agb": 48.43,
+      "bgb": 8.0,
+      "deadwood": 4.15,
+      "litter": null,
+      "carbon_stock_biomass_total": 46667.61,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 563,
+    "fields": {
+      "country": 87,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 564,
+    "fields": {
+      "country": 121,
+      "year": 2020,
+      "agb": 19.95,
+      "bgb": 6.13,
+      "deadwood": 0.1,
+      "litter": 2.72,
+      "carbon_stock_biomass_total": 149764.14,
+      "carbon_stock_total": 290684.84
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 565,
+    "fields": {
+      "country": 189,
+      "year": 2020,
+      "agb": 47.64,
+      "bgb": 12.58,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 2212709.23,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 566,
+    "fields": {
+      "country": 269,
+      "year": 2020,
+      "agb": 59.01,
+      "bgb": 16.52,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 2155920.01,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 567,
+    "fields": {
+      "country": 190,
+      "year": 2020,
+      "agb": 31.68,
+      "bgb": 8.87,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 269207.4,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 568,
+    "fields": {
+      "country": 24,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 569,
+    "fields": {
+      "country": 152,
+      "year": 2020,
+      "agb": 80.95,
+      "bgb": 26.98,
+      "deadwood": null,
+      "litter": 11.86,
+      "carbon_stock_biomass_total": 643481.9,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 570,
+    "fields": {
+      "country": 236,
+      "year": 2020,
+      "agb": 27.56,
+      "bgb": 5.54,
+      "deadwood": 2.2,
+      "litter": 12.29,
+      "carbon_stock_biomass_total": 12230.45,
+      "carbon_stock_total": 30690.67
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 571,
+    "fields": {
+      "country": 25,
+      "year": 2020,
+      "agb": 68.7,
+      "bgb": 15.67,
+      "deadwood": 7.77,
+      "litter": 1.56,
+      "carbon_stock_biomass_total": 70703.75,
+      "carbon_stock_total": 143888.03
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 572,
+    "fields": {
+      "country": 143,
+      "year": 2020,
+      "agb": 147.33,
+      "bgb": 36.13,
+      "deadwood": 21.41,
+      "litter": 10.86,
+      "carbon_stock_biomass_total": 1814894.56,
+      "carbon_stock_total": 3073726.64
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 573,
+    "fields": {
+      "country": 88,
+      "year": 2020,
+      "agb": 42.78,
+      "bgb": 10.27,
+      "deadwood": 4.42,
+      "litter": null,
+      "carbon_stock_biomass_total": 180769.47,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 574,
+    "fields": {
+      "country": 191,
+      "year": 2020,
+      "agb": 17.95,
+      "bgb": 5.14,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 24930.27,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 575,
+    "fields": {
+      "country": 192,
+      "year": 2020,
+      "agb": 63.34,
+      "bgb": 13.47,
+      "deadwood": 5.11,
+      "litter": null,
+      "carbon_stock_biomass_total": 1661166.03,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 576,
+    "fields": {
+      "country": 26,
+      "year": 2020,
+      "agb": 52.67,
+      "bgb": 10.53,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1192.58,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 577,
+    "fields": {
+      "country": 27,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 578,
+    "fields": {
+      "country": 237,
+      "year": 2020,
+      "agb": 33.67,
+      "bgb": 9.08,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 42813.7,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 579,
+    "fields": {
+      "country": 28,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 580,
+    "fields": {
+      "country": 238,
+      "year": 2020,
+      "agb": 32.08,
+      "bgb": 8.54,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 494751.6,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 581,
+    "fields": {
+      "country": 122,
+      "year": 2020,
+      "agb": 50.6,
+      "bgb": 14.17,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 161.93,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 582,
+    "fields": {
+      "country": 153,
+      "year": 2020,
+      "agb": 35.39,
+      "bgb": 10.76,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 171950.29,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 583,
+    "fields": {
+      "country": 29,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 584,
+    "fields": {
+      "country": 126,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 585,
+    "fields": {
+      "country": 89,
+      "year": 2020,
+      "agb": 70.1,
+      "bgb": 14.8,
+      "deadwood": 7.6,
+      "litter": 1.0,
+      "carbon_stock_biomass_total": 357755.02,
+      "carbon_stock_total": 671264.71
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 586,
+    "fields": {
+      "country": 30,
+      "year": 2020,
+      "agb": 82.6,
+      "bgb": 10.1,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3323828.95,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 587,
+    "fields": {
+      "country": 90,
+      "year": 2020,
+      "agb": 32.84,
+      "bgb": 12.04,
+      "deadwood": 3.83,
+      "litter": 2.09,
+      "carbon_stock_biomass_total": 722669.43,
+      "carbon_stock_total": 1707644.67
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 588,
+    "fields": {
+      "country": 91,
+      "year": 2020,
+      "agb": 111.76,
+      "bgb": 29.7,
+      "deadwood": 1.75,
+      "litter": null,
+      "carbon_stock_biomass_total": 10231854.14,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 589,
+    "fields": {
+      "country": 270,
+      "year": 2020,
+      "agb": 103.29,
+      "bgb": 24.63,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 919564.43,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 590,
+    "fields": {
+      "country": 154,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 591,
+    "fields": {
+      "country": 49,
+      "year": 2020,
+      "agb": 78.0,
+      "bgb": 16.0,
+      "deadwood": 4.0,
+      "litter": null,
+      "carbon_stock_biomass_total": 891402.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 592,
+    "fields": {
+      "country": 239,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 593,
+    "fields": {
+      "country": 92,
+      "year": 2020,
+      "agb": 37.59,
+      "bgb": 10.91,
+      "deadwood": 8.19,
+      "litter": 25.23,
+      "carbon_stock_biomass_total": 24072.01,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 594,
+    "fields": {
+      "country": 123,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 595,
+    "fields": {
+      "country": 32,
+      "year": 2020,
+      "agb": 65.84,
+      "bgb": 20.94,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 545585.86,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 596,
+    "fields": {
+      "country": 50,
+      "year": 2020,
+      "agb": 46.68,
+      "bgb": 17.33,
+      "deadwood": 1.76,
+      "litter": 2.33,
+      "carbon_stock_biomass_total": 24739.87,
+      "carbon_stock_total": 50217.95
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 597,
+    "fields": {
+      "country": 259,
+      "year": 2020,
+      "agb": 60.0,
+      "bgb": 12.0,
+      "deadwood": 1.0,
+      "litter": null,
+      "carbon_stock_biomass_total": 7087.68,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 598,
+    "fields": {
+      "country": 51,
+      "year": 2020,
+      "agb": 97.52,
+      "bgb": 19.74,
+      "deadwood": 9.23,
+      "litter": 22.51,
+      "carbon_stock_biomass_total": 812500.4,
+      "carbon_stock_total": 1661655.48
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 599,
+    "fields": {
+      "country": 144,
+      "year": 2020,
+      "agb": 38.67,
+      "bgb": 11.3,
+      "deadwood": 8.84,
+      "litter": 7.92,
+      "carbon_stock_biomass_total": 40741120.65,
+      "carbon_stock_total": 133898624.07
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 600,
+    "fields": {
+      "country": 194,
+      "year": 2020,
+      "agb": 68.65,
+      "bgb": 17.57,
+      "deadwood": null,
+      "litter": 2.1,
+      "carbon_stock_biomass_total": 23796.72,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 601,
+    "fields": {
+      "country": 257,
+      "year": 2020,
+      "agb": 58.52,
+      "bgb": 16.38,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 12.73,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 602,
+    "fields": {
+      "country": 195,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 603,
+    "fields": {
+      "country": 94,
+      "year": 2020,
+      "agb": 98.7,
+      "bgb": 27.73,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1390.73,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 604,
+    "fields": {
+      "country": 95,
+      "year": 2020,
+      "agb": 138.19,
+      "bgb": 32.23,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3539.62,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 605,
+    "fields": {
+      "country": 283,
+      "year": 2020,
+      "agb": 58.52,
+      "bgb": 16.38,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 92.88,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 606,
+    "fields": {
+      "country": 140,
+      "year": 2020,
+      "agb": 12.17,
+      "bgb": 4.8,
+      "deadwood": 1.66,
+      "litter": null,
+      "carbon_stock_biomass_total": 20.7,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 607,
+    "fields": {
+      "country": 97,
+      "year": 2020,
+      "agb": 102.99,
+      "bgb": 24.72,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3644.84,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 608,
+    "fields": {
+      "country": 33,
+      "year": 2020,
+      "agb": 49.35,
+      "bgb": 9.87,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 9574.1,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 609,
+    "fields": {
+      "country": 240,
+      "year": 2020,
+      "agb": 42.77,
+      "bgb": 12.19,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 54.96,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 610,
+    "fields": {
+      "country": 196,
+      "year": 2020,
+      "agb": 76.38,
+      "bgb": 18.33,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 4915.45,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 611,
+    "fields": {
+      "country": 124,
+      "year": 2020,
+      "agb": 12.51,
+      "bgb": 4.06,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 16188.89,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 612,
+    "fields": {
+      "country": 197,
+      "year": 2020,
+      "agb": 20.8,
+      "bgb": 6.24,
+      "deadwood": 0.91,
+      "litter": null,
+      "carbon_stock_biomass_total": 218163.05,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 613,
+    "fields": {
+      "country": 242,
+      "year": 2020,
+      "agb": 73.79,
+      "bgb": 17.4,
+      "deadwood": 34.39,
+      "litter": 51.64,
+      "carbon_stock_biomass_total": 248278.45,
+      "carbon_stock_total": 1317326.98
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 614,
+    "fields": {
+      "country": 198,
+      "year": 2020,
+      "agb": 81.22,
+      "bgb": 19.49,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 3393.93,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 615,
+    "fields": {
+      "country": 199,
+      "year": 2020,
+      "agb": 38.54,
+      "bgb": 7.71,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 117238.2,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 616,
+    "fields": {
+      "country": 271,
+      "year": 2020,
+      "agb": 63.78,
+      "bgb": 12.82,
+      "deadwood": 3.77,
+      "litter": 5.94,
+      "carbon_stock_biomass_total": 1192.66,
+      "carbon_stock_total": 2666.52
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 617,
+    "fields": {
+      "country": 279,
+      "year": 2020,
+      "agb": 58.52,
+      "bgb": 16.38,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 92.88,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 618,
+    "fields": {
+      "country": 52,
+      "year": 2020,
+      "agb": 84.37,
+      "bgb": 16.87,
+      "deadwood": 8.72,
+      "litter": 11.73,
+      "carbon_stock_biomass_total": 194978.12,
+      "carbon_stock_total": 504855.43
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 619,
+    "fields": {
+      "country": 243,
+      "year": 2020,
+      "agb": 118.96,
+      "bgb": 26.48,
+      "deadwood": 6.22,
+      "litter": 10.4,
+      "carbon_stock_biomass_total": 180030.0,
+      "carbon_stock_total": 328470.57
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 620,
+    "fields": {
+      "country": 35,
+      "year": 2020,
+      "agb": 45.02,
+      "bgb": 9.04,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 136391.76,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 621,
+    "fields": {
+      "country": 200,
+      "year": 2020,
+      "agb": 48.17,
+      "bgb": 13.49,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 368726.8,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 622,
+    "fields": {
+      "country": 201,
+      "year": 2020,
+      "agb": 40.26,
+      "bgb": 9.69,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 851652.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 623,
+    "fields": {
+      "country": 125,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 624,
+    "fields": {
+      "country": 244,
+      "year": 2020,
+      "agb": 27.32,
+      "bgb": 11.12,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 713914.21,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 625,
+    "fields": {
+      "country": 155,
+      "year": 2020,
+      "agb": 37.2,
+      "bgb": 9.99,
+      "deadwood": null,
+      "litter": 13.76,
+      "carbon_stock_biomass_total": 99713.41,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 626,
+    "fields": {
+      "country": 127,
+      "year": 2020,
+      "agb": 26.31,
+      "bgb": 7.37,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 618349.64,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 627,
+    "fields": {
+      "country": 100,
+      "year": 2020,
+      "agb": 170.55,
+      "bgb": 40.54,
+      "deadwood": 8.7,
+      "litter": null,
+      "carbon_stock_biomass_total": 3207784.86,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 628,
+    "fields": {
+      "country": 245,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 629,
+    "fields": {
+      "country": 246,
+      "year": 2020,
+      "agb": 36.24,
+      "bgb": 12.19,
+      "deadwood": 2.59,
+      "litter": 25.96,
+      "carbon_stock_biomass_total": 1355071.4,
+      "carbon_stock_total": 3720220.8
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 630,
+    "fields": {
+      "country": 247,
+      "year": 2020,
+      "agb": 96.53,
+      "bgb": 25.54,
+      "deadwood": 8.85,
+      "litter": 16.73,
+      "carbon_stock_biomass_total": 154920.26,
+      "carbon_stock_total": 347038.13
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 631,
+    "fields": {
+      "country": 128,
+      "year": 2020,
+      "agb": 23.49,
+      "bgb": 7.06,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 15949.54,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 632,
+    "fields": {
+      "country": 129,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 633,
+    "fields": {
+      "country": 273,
+      "year": 2020,
+      "agb": 66.98,
+      "bgb": 16.09,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1650850.11,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 634,
+    "fields": {
+      "country": 280,
+      "year": 2020,
+      "agb": 70.5,
+      "bgb": 19.74,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 83120.06,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 635,
+    "fields": {
+      "country": 202,
+      "year": 2020,
+      "agb": 56.85,
+      "bgb": 15.48,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 87466.5,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 636,
+    "fields": {
+      "country": 38,
+      "year": 2020,
+      "agb": 0.0,
+      "bgb": 0.0,
+      "deadwood": 0.0,
+      "litter": 0.0,
+      "carbon_stock_biomass_total": 0.0,
+      "carbon_stock_total": 0.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 637,
+    "fields": {
+      "country": 39,
+      "year": 2020,
+      "agb": 91.39,
+      "bgb": 21.93,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 1014.21,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 638,
+    "fields": {
+      "country": 101,
+      "year": 2020,
+      "agb": 42.38,
+      "bgb": 10.85,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 12146.55,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 639,
+    "fields": {
+      "country": 130,
+      "year": 2020,
+      "agb": 27.61,
+      "bgb": 9.29,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 25930.74,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 640,
+    "fields": {
+      "country": 131,
+      "year": 2020,
+      "agb": 25.65,
+      "bgb": 6.47,
+      "deadwood": 0.23,
+      "litter": 5.25,
+      "carbon_stock_biomass_total": 713717.96,
+      "carbon_stock_total": 1954947.27
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 641,
+    "fields": {
+      "country": 132,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 642,
+    "fields": {
+      "country": 102,
+      "year": 2020,
+      "agb": 62.16,
+      "bgb": 17.41,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 837.08,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 643,
+    "fields": {
+      "country": 40,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 644,
+    "fields": {
+      "country": 203,
+      "year": 2020,
+      "agb": 45.1,
+      "bgb": 10.8,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 130688.61,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 645,
+    "fields": {
+      "country": 53,
+      "year": 2020,
+      "agb": 69.45,
+      "bgb": 15.48,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 822971.7,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 646,
+    "fields": {
+      "country": 133,
+      "year": 2020,
+      "agb": 34.97,
+      "bgb": 15.07,
+      "deadwood": 7.01,
+      "litter": 2.11,
+      "carbon_stock_biomass_total": 15877.69,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 647,
+    "fields": {
+      "country": 248,
+      "year": 2020,
+      "agb": 58.0,
+      "bgb": 21.0,
+      "deadwood": 13.0,
+      "litter": 16.0,
+      "carbon_stock_biomass_total": 252010.0,
+      "carbon_stock_total": 1097360.0
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 648,
+    "fields": {
+      "country": 204,
+      "year": 2020,
+      "agb": 24.29,
+      "bgb": 10.11,
+      "deadwood": 1.47,
+      "litter": null,
+      "carbon_stock_biomass_total": 1573628.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 649,
+    "fields": {
+      "country": 141,
+      "year": 2020,
+      "agb": 47.33,
+      "bgb": 9.82,
+      "deadwood": 8.86,
+      "litter": 13.5,
+      "carbon_stock_biomass_total": 17704784.25,
+      "carbon_stock_total": 62643646.95
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 650,
+    "fields": {
+      "country": 103,
+      "year": 2020,
+      "agb": 26.25,
+      "bgb": 11.2,
+      "deadwood": 7.46,
+      "litter": 17.0,
+      "carbon_stock_biomass_total": 745.63,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 651,
+    "fields": {
+      "country": 104,
+      "year": 2020,
+      "agb": 46.0,
+      "bgb": 12.0,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 117798.0,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 652,
+    "fields": {
+      "country": 134,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 653,
+    "fields": {
+      "country": 42,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 654,
+    "fields": {
+      "country": 105,
+      "year": 2020,
+      "agb": 96.22,
+      "bgb": 22.86,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 5505175.57,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 655,
+    "fields": {
+      "country": 281,
+      "year": 2020,
+      "agb": 29.47,
+      "bgb": 7.83,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 546187.26,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 656,
+    "fields": {
+      "country": 44,
+      "year": 2020,
+      "agb": 80.9,
+      "bgb": 15.65,
+      "deadwood": 7.12,
+      "litter": 1.89,
+      "carbon_stock_biomass_total": 562.89,
+      "carbon_stock_total": 914.79
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 657,
+    "fields": {
+      "country": 135,
+      "year": 2020,
+      "agb": 19.95,
+      "bgb": 6.13,
+      "deadwood": 0.1,
+      "litter": 2.72,
+      "carbon_stock_biomass_total": 17345.03,
+      "carbon_stock_total": 33665.84
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 658,
+    "fields": {
+      "country": 136,
+      "year": 2020,
+      "agb": null,
+      "bgb": null,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": null,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 659,
+    "fields": {
+      "country": 205,
+      "year": 2020,
+      "agb": 21.5,
+      "bgb": 6.1,
+      "deadwood": 0.99,
+      "litter": null,
+      "carbon_stock_biomass_total": 1236867.23,
+      "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.fracarbonstock",
+    "pk": 660,
+    "fields": {
+      "country": 206,
+      "year": 2020,
+      "agb": 44.64,
+      "bgb": 12.5,
+      "deadwood": null,
+      "litter": null,
+      "carbon_stock_biomass_total": 996783.3,
+      "carbon_stock_total": null
+    }
+  }
+]

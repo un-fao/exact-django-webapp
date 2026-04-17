@@ -30,7 +30,7 @@ def import_changes_into_entries():
         entries.append(entry)
 
     # Save the entries to the database
-    Entry.objects.db_manager("minitool").bulk_create(entries)
+    Entry.objects.bulk_create(entries)
     print(f"Imported {len(entries)} entries into the database.")
 
 
@@ -89,7 +89,7 @@ def import_aggregated_practices_csv():
 
                 # Process batch when it reaches the limit
                 if len(entries) >= BATCH_SIZE:
-                    StatisticsModuleTotal.objects.db_manager("minitool").bulk_create(entries, ignore_conflicts=True)
+                    StatisticsModuleTotal.objects.bulk_create(entries, ignore_conflicts=True)
                     batch_count += 1
                     print(f"Processed batch {batch_count} with {len(entries)} entries...")
                     entries.clear()
@@ -100,7 +100,7 @@ def import_aggregated_practices_csv():
 
     # Save remaining entries to the database
     if entries:
-        StatisticsModuleTotal.objects.db_manager("minitool").bulk_create(entries, ignore_conflicts=True)
+        StatisticsModuleTotal.objects.bulk_create(entries, ignore_conflicts=True)
         batch_count += 1
         print(f"Processed final batch {batch_count} with {len(entries)} entries...")
     

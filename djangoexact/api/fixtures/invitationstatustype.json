@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.invitationstatustype",
+    "pk": 2,
+    "fields": {
+      "name": "accepted",
+      "name_en": "accepted",
+      "name_fr": "accepté",
+      "name_es": "aceptada",
+      "name_ru": "одобренный\n"
+    }
+  },
+  {
+    "model": "api.invitationstatustype",
+    "pk": 1,
+    "fields": {
+      "name": "pending",
+      "name_en": "pending",
+      "name_fr": "En cours",
+      "name_es": "pendiente",
+      "name_ru": "В ожидании"
+    }
+  },
+  {
+    "model": "api.invitationstatustype",
+    "pk": 3,
+    "fields": {
+      "name": "rejected",
+      "name_en": "rejected",
+      "name_fr": "rejeté",
+      "name_es": "rechazada",
+      "name_ru": "Отклонено"
+    }
+  }
+]

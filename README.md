@@ -72,15 +72,15 @@ EX-ACT (Ex-Ante Carbon Balance Tool) is a Django REST Framework-based API that p
 
    The API will be available at `http://localhost:8000/api/`
 
-## 📊 IPCC Data Integration
+## 📊 Reference Data & Fixtures
 
-To populate your database with IPCC data:
+To bootstrap a fresh database with all reference data (IPCC tables, Types, Countries, Regions, etc.):
 
-1. Ensure `django_extensions` is installed (included in requirements.txt)
-2. Run the data import script:
-   ```bash
-   python manage.py runscript ipcc_dump
-   ```
+```bash
+python manage.py load_reference_data --app=all
+```
+
+See [djangoexact/docs/guides/fixtures-guide.md](djangoexact/docs/guides/fixtures-guide.md) for the full dump/load workflow, PK stability guardrails, determinism guarantees, and how to add a new reference model.
 
 ## 🔍 API Testing
 

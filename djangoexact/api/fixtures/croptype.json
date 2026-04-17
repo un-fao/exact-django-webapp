@@ -1,0 +1,800 @@
+[
+  {
+    "model": "api.croptype",
+    "pk": 43,
+    "fields": {
+      "name": "Agroforestry - default",
+      "name_en": "Agroforestry - default",
+      "name_fr": "Agroforesterie - défaut\n",
+      "name_es": "Agroforestería - Por Defecto",
+      "name_ru": "Агролесомелиорация - по умолчанию",
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": true
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 61,
+    "fields": {
+      "name": "Agroforestry - Default",
+      "name_en": "Agroforestry - Default",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 24,
+    "fields": {
+      "name": "Alfalfa",
+      "name_en": "Alfalfa",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 44,
+    "fields": {
+      "name": "Alley cropping",
+      "name_en": "Alley cropping",
+      "name_fr": "Cultures en allées\n",
+      "name_es": "Cultivos en fajas",
+      "name_ru": "Междурядные культуры",
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": true
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 62,
+    "fields": {
+      "name": "Alley Cropping",
+      "name_en": "Alley Cropping",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 15,
+    "fields": {
+      "name": "Barley",
+      "name_en": "Barley",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 41,
+    "fields": {
+      "name": "Beans",
+      "name_en": "Beans",
+      "name_fr": "Haricots",
+      "name_es": "Frijoles",
+      "name_ru": "Бобы",
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 34,
+    "fields": {
+      "name": "Cereals",
+      "name_en": "Cereals",
+      "name_fr": "Céréales",
+      "name_es": "Cereales",
+      "name_ru": "Злаки",
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 42,
+    "fields": {
+      "name": "Default",
+      "name_en": "Default",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 21,
+    "fields": {
+      "name": "Dry Bean",
+      "name_en": "Dry Bean",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 29,
+    "fields": {
+      "name": "Flooded Rice",
+      "name_en": "Flooded Rice",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 5,
+    "fields": {
+      "name": "Generic Value",
+      "name_en": "Generic Value",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 6,
+    "fields": {
+      "name": "Grains",
+      "name_en": "Grains",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 27,
+    "fields": {
+      "name": "Grass-Clover Mixtures",
+      "name_en": "Grass-Clover Mixtures",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 40,
+    "fields": {
+      "name": "Groundnuts",
+      "name_en": "Groundnuts",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 45,
+    "fields": {
+      "name": "Hedgerow",
+      "name_en": "Hedgerow",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": true
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 28,
+    "fields": {
+      "name": "Long-Term Cultivated",
+      "name_en": "Long-Term Cultivated",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 2,
+    "fields": {
+      "name": "Maize",
+      "name_en": "Maize",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 17,
+    "fields": {
+      "name": "Millet",
+      "name_en": "Millet",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 46,
+    "fields": {
+      "name": "Multistrata",
+      "name_en": "Multistrata",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 10,
+    "fields": {
+      "name": "N-Fixing Forages",
+      "name_en": "N-Fixing Forages",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 25,
+    "fields": {
+      "name": "Non-Legume Hay",
+      "name_en": "Non-Legume Hay",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 11,
+    "fields": {
+      "name": "Non-N-Fixing Forages",
+      "name_en": "Non-N-Fixing Forages",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 16,
+    "fields": {
+      "name": "Oats",
+      "name_en": "Oats",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 47,
+    "fields": {
+      "name": "Oil palm",
+      "name_en": "Oil palm",
+      "name_fr": "Palmier à huile\n",
+      "name_es": "Palma Aceitera",
+      "name_ru": "Масличная пальма",
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 32,
+    "fields": {
+      "name": "Oilseeds",
+      "name_en": "Oilseeds",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 65,
+    "fields": {
+      "name": "Olive",
+      "name_en": "Olive",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 66,
+    "fields": {
+      "name": "Orchard",
+      "name_en": "Orchard",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 48,
+    "fields": {
+      "name": "Parkland",
+      "name_en": "Parkland",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 23,
+    "fields": {
+      "name": "Peanuts",
+      "name_en": "Peanuts",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 49,
+    "fields": {
+      "name": "Perennial fallow",
+      "name_en": "Perennial fallow",
+      "name_fr": "Jachère pérenne\n",
+      "name_es": "Barbecho mejorado",
+      "name_ru": "Многолетний пар",
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 63,
+    "fields": {
+      "name": "Perennial Fallow",
+      "name_en": "Perennial Fallow",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 26,
+    "fields": {
+      "name": "Perennial Grasses",
+      "name_en": "Perennial Grasses",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 30,
+    "fields": {
+      "name": "Perennial/Tree Crop",
+      "name_en": "Perennial/Tree Crop",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 22,
+    "fields": {
+      "name": "Potatoes",
+      "name_en": "Potatoes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 35,
+    "fields": {
+      "name": "Pulses",
+      "name_en": "Pulses",
+      "name_fr": "Légumineuses",
+      "name_es": "Legumbres",
+      "name_ru": "Бобовые культуры",
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 3,
+    "fields": {
+      "name": "Rice",
+      "name_en": "Rice",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 9,
+    "fields": {
+      "name": "Root Crops",
+      "name_en": "Root Crops",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 36,
+    "fields": {
+      "name": "Roots And Tubers",
+      "name_en": "Roots And Tubers",
+      "name_fr": "Racines et tubercules\n",
+      "name_es": "Raizes y Tubérculos",
+      "name_ru": "Корни и клубни",
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 50,
+    "fields": {
+      "name": "Rubber",
+      "name_en": "Rubber",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 19,
+    "fields": {
+      "name": "Rye",
+      "name_en": "Rye",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 31,
+    "fields": {
+      "name": "Set Aside (< 20 Yrs)",
+      "name_en": "Set Aside (< 20 Yrs)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 51,
+    "fields": {
+      "name": "Shaded perennial",
+      "name_en": "Shaded perennial",
+      "name_fr": "Pérenne ombragé\n",
+      "name_es": "Cultivos perennes bajo sombra",
+      "name_ru": "Тенистое многолетнее растение",
+      "description": "",
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 64,
+    "fields": {
+      "name": "Shaded Perennial",
+      "name_en": "Shaded Perennial",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 68,
+    "fields": {
+      "name": "Short Rotation Coppice",
+      "name_en": "Short Rotation Coppice",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 52,
+    "fields": {
+      "name": "Silvoarable",
+      "name_en": "Silvoarable",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 53,
+    "fields": {
+      "name": "Silvopasture",
+      "name_en": "Silvopasture",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 18,
+    "fields": {
+      "name": "Sorghum",
+      "name_en": "Sorghum",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 20,
+    "fields": {
+      "name": "Soybeans",
+      "name_en": "Soybeans",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 14,
+    "fields": {
+      "name": "Spring Wheat",
+      "name_en": "Spring Wheat",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 4,
+    "fields": {
+      "name": "Sugarcane",
+      "name_en": "Sugarcane",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 54,
+    "fields": {
+      "name": "Tea",
+      "name_en": "Tea",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 8,
+    "fields": {
+      "name": "Tubers",
+      "name_en": "Tubers",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": "",
+      "is_main_crop": true,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 33,
+    "fields": {
+      "name": "Vegetables",
+      "name_en": "Vegetables",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 67,
+    "fields": {
+      "name": "Vine",
+      "name_en": "Vine",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 12,
+    "fields": {
+      "name": "Wheat",
+      "name_en": "Wheat",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  },
+  {
+    "model": "api.croptype",
+    "pk": 13,
+    "fields": {
+      "name": "Winter Wheat",
+      "name_en": "Winter Wheat",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "description": null,
+      "is_main_crop": false,
+      "is_agrofoforestry": false
+    }
+  }
+]

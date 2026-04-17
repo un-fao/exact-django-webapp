@@ -1,0 +1,72 @@
+[
+  {
+    "model": "api.gleamregion",
+    "pk": 11,
+    "fields": {
+      "name": "East Asia And South-East Asia"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 2,
+    "fields": {
+      "name": "Eastern Europe"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 12,
+    "fields": {
+      "name": "Latin America And The Caribbean"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 13,
+    "fields": {
+      "name": "Nena"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 5,
+    "fields": {
+      "name": "North America"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 6,
+    "fields": {
+      "name": "Oceania"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 7,
+    "fields": {
+      "name": "Russian Federation"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 8,
+    "fields": {
+      "name": "South Asia"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 9,
+    "fields": {
+      "name": "Sub-Saharan Africa"
+    }
+  },
+  {
+    "model": "api.gleamregion",
+    "pk": 10,
+    "fields": {
+      "name": "Western Europe"
+    }
+  }
+]

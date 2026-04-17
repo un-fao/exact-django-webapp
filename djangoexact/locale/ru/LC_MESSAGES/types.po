@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
@@ -7,13 +8,13 @@ msgstr ""
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English\n"
 "Language: en\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Loco-Source-Locale: it_IT\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Parser: loco_parse_po\n"
-"X-Generator: Loco https://localise.biz/"
+"X-Loco-Source-Locale: it_IT\n"
 
 #. InvitationStatusType
 msgid "pending"
@@ -21,7 +22,7 @@ msgstr "В ожидании"
 
 #. InvitationStatusType
 msgid "accepted"
-msgstr "одобренный\n"
+msgstr "одобренный"
 
 #. InvitationStatusType
 msgid "rejected"
@@ -938,7 +939,7 @@ msgstr "Разнообразные морские ракообразные"
 
 #. FishType
 msgid "Miscellaneous Marine Fishes"
-msgstr "Разнообразные морские рыбы\n"
+msgstr "Разнообразные морские рыбы"
 
 #. FishType
 msgid "Miscellaneous Marine Molluscs"
@@ -1422,11 +1423,13 @@ msgstr "Восточная Европа"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
-msgstr "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
+msgstr ""
+"Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
-msgstr "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
+msgstr ""
+"Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
 
 #. GlobalWarmingPotential
 msgid "IPCC Sixth Assessment Report (AR6)"

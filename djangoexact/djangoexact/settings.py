@@ -146,14 +146,6 @@ if os.getenv("GAE_APPLICATION", None):
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-            "OPTIONS": {
-                "timeout": 20,
-                "check_same_thread": False,
-            },
-        },
     }
 else:
     DATABASES = {
@@ -171,13 +163,9 @@ else:
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-        },
     }
 
-DATABASE_ROUTERS = ["minitool.db_router.AppSpecificDatabaseRouter", "ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
+DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
 # Database connection management
 DATABASE_CONNECTION_POOLING = True

@@ -81,7 +81,7 @@ class AdminScriptsAccessTest(TestCase):
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class ScenarioUtilsTest(TestCase):
-    databases = {"default", "minitool"}
+    databases = {"default"}
 
     def setUp(self):
         for i, total in enumerate([-3.0, -2.5, -2.0, -1.5, -1.0]):
@@ -95,6 +95,7 @@ class ScenarioUtilsTest(TestCase):
                 field="grassland_management_type",
                 from_value="Non-Degraded",
                 to_value="Improved Grassland",
+                csv_row_data={"row": i},
             )
 
     def test_stats_for_returns_all_keys(self):
@@ -184,7 +185,7 @@ class ScenarioUtilsTest(TestCase):
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
-    databases = {"default", "minitool"}
+    databases = {"default"}
 
     def setUp(self):
         self.client = Client()
@@ -464,7 +465,7 @@ class ChangeKeyParsingTest(TestCase):
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class HtmxScenarioPrefixTest(TestCase):
-    databases = {"default", "minitool"}
+    databases = {"default"}
 
     def setUp(self):
         self.client = Client()

@@ -1,0 +1,992 @@
+[
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 121,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 122,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 123,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 124,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 125,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 126,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 127,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 128,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 129,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 130,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 131,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 132,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 133,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 134,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 135,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 136,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 137,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 138,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 139,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 140,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 141,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 142,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 143,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 144,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 145,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 146,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 147,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 148,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 226.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 149,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 108.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 150,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 8,
+      "value": 286.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 151,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 152,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 153,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 154,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 155,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 156,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 157,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 158,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 159,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 160,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 161,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 162,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 163,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 164,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 165,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 166,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 167,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 168,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 169,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 170,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 171,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 172,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 173,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 174,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 175,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 176,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 177,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 178,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 340.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 179,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 180,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 7,
+      "value": 471.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 181,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 182,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 183,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 184,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 185,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 186,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 187,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 188,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 189,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 190,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 191,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 192,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 193,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 194,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 195,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 196,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 197,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 198,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 199,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 200,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 201,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 202,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 203,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 204,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 205,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 206,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 207,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 208,
+    "fields": {
+      "land_use_type": 156,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 255.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 209,
+    "fields": {
+      "land_use_type": 157,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.defaultsoilcarbonstock",
+    "pk": 210,
+    "fields": {
+      "land_use_type": 155,
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 9,
+      "value": 386.0
+    }
+  }
+]

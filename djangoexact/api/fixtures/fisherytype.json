@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.fisherytype",
+    "pk": 2,
+    "fields": {
+      "name": "Inland",
+      "name_en": "Inland",
+      "name_fr": "Interne",
+      "name_es": "Continental",
+      "name_ru": "Внутренний"
+    }
+  },
+  {
+    "model": "api.fisherytype",
+    "pk": 1,
+    "fields": {
+      "name": "Marine",
+      "name_en": "Marine",
+      "name_fr": "Marin",
+      "name_es": "Marina",
+      "name_ru": "Морской"
+    }
+  },
+  {
+    "model": "api.fisherytype",
+    "pk": 3,
+    "fields": {
+      "name": "Unmotorized Fishing",
+      "name_en": "Unmotorized Fishing",
+      "name_fr": "Pêche non motorisée\n",
+      "name_es": "Pesca sin motor",
+      "name_ru": "Ручное рыболовство"
+    }
+  }
+]

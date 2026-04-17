@@ -74,8 +74,8 @@ class Command(BaseCommand):
         change_record_table = ChangeRecord._meta.db_table
         change_aggregate_table = ChangeAggregate._meta.db_table
 
-        # Use the minitool database connection
-        minitool_connection = connections["minitool"]
+        # Use the default database connection
+        minitool_connection = connections["default"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting records to delete...")
@@ -119,8 +119,8 @@ class Command(BaseCommand):
         change_record_table = ChangeRecord._meta.db_table
         change_aggregate_table = ChangeAggregate._meta.db_table
 
-        # Use the minitool database connection
-        minitool_connection = connections["minitool"]
+        # Use the default database connection
+        minitool_connection = connections["default"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting all records...")

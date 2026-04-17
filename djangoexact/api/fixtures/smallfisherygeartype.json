@@ -1,0 +1,125 @@
+[
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 7,
+    "fields": {
+      "name": "Dredges",
+      "name_en": "Dredges",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "fishery_types": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 2,
+    "fields": {
+      "name": "Gillnets And Entangling Nets",
+      "name_en": "Gillnets And Entangling Nets",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "fishery_types": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 3,
+    "fields": {
+      "name": "Hooks And Lines",
+      "name_en": "Hooks And Lines",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "fishery_types": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 4,
+    "fields": {
+      "name": "Multiple",
+      "name_en": "Multiple",
+      "name_fr": "Multiple",
+      "name_es": "Múltiple",
+      "name_ru": "Множество ",
+      "fishery_types": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 8,
+    "fields": {
+      "name": "Not Specified",
+      "name_en": "Not Specified",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "fishery_types": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 5,
+    "fields": {
+      "name": "Pots And Traps",
+      "name_en": "Pots And Traps",
+      "name_fr": "Casiers et nasses",
+      "name_es": "Nasas y Trampas",
+      "name_ru": "Ловушки и кошели",
+      "fishery_types": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 6,
+    "fields": {
+      "name": "Surrounding Nets",
+      "name_en": "Surrounding Nets",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "fishery_types": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "api.smallfisherygeartype",
+    "pk": 1,
+    "fields": {
+      "name": "Trawls",
+      "name_en": "Trawls",
+      "name_fr": "Chaluts",
+      "name_es": "Redes de Arrastre",
+      "name_ru": "Травли",
+      "fishery_types": [
+        1,
+        3
+      ]
+    }
+  }
+]
