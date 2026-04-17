@@ -67,34 +67,23 @@ class Command(BaseCommand):
             raise CommandError(f"Job {job_id} failed: {exc}")
 
     def _run_computation(self, job):
-        """Run the actual computation for a job.
+        """Run the actual computation for a job."""
+        from api.services.minitool_compute import compute_module_slice
 
-        PR 5 will replace this with compute_module_slice() extracted
-        from compute_minitool. For now, this is a placeholder that
-        validates the job parameters against MODULE_CONFIGS.
-        """
-        from api.minitool import MODULE_CONFIGS
-
-        if job.module_type not in MODULE_CONFIGS:
-            raise ValueError(
-                f"Unknown module_type '{job.module_type}'. "
-                f"Valid: {sorted(MODULE_CONFIGS.keys())}"
-            )
-
-        config = MODULE_CONFIGS[job.module_type]
-        config_fields = config.get("fields", {})
-
-        # Validate the attribute exists
-        attr_start = f"{job.attribute}_start"
-        if attr_start not in config_fields and job.attribute not in config_fields:
-            raise ValueError(
-                f"Unknown attribute '{job.attribute}' for module '{job.module_type}'"
-            )
+        data, errors = compute_module_slice(
+            module_type=job.module_type,
+            chunk_size=10000,
+            max_rows=10000,
+            max_workers=None,
+            save_results=True,
+        )
 
         self.stdout.write(
-            f"  Module: {job.module_type} (config_name: {config.get('config_name')})"
+            f"  Results: {len(data)} successful, {len(errors)} errors"
         )
-        self.stdout.write(f"  Attribute: {job.attribute}")
-        self.stdout.write(
-            "  Computation placeholder — PR 5 adds compute_module_slice"
-        )
+
+        if errors and not data:
+            raise RuntimeError(
+                f"All {len(errors)} permutations failed. "
+                f"First error: {errors[0]}"
+            )
