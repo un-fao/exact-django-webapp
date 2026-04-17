@@ -2,56 +2,85 @@
 {% block title %}Computation Jobs{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
-    <a href="{% url 'admin_scripts:dashboard' %}" class="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to Dashboard</a>
+<div class="space-y-6">
 
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Computation Jobs</h1>
-
-    {% if jobs %}
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Module</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">From &rarr; To</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for job in jobs %}
-                <tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">#{{ job.pk }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ job.module_type }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ job.attribute }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ job.from_value }} &rarr; {{ job.to_value }}</td>
-                    <td class="px-4 py-3 text-sm">
-                        {% if job.status == "pending" %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Pending</span>
-                        {% elif job.status == "running" %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Running</span>
-                        {% elif job.status == "completed" %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
-                        {% elif job.status == "failed" %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>
-                        {% endif %}
-                        {% if job.error_message %}
-                        <p class="text-xs text-red-500 mt-1">{{ job.error_message|truncatewords:15 }}</p>
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-500">{{ job.created_at|date:"M d, Y H:i" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {# Header #}
+    <div class="flex items-center justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Computation Jobs</h1>
+        <a href="{% url 'admin_scripts:dashboard' %}"
+           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"></path>
+                <path d="M12 19l-7-7 7-7"></path>
+            </svg>
+            Back to Dashboard
+        </a>
     </div>
-    {% else %}
-    <div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <p class="text-gray-500">No computation jobs yet.</p>
-        <p class="text-sm text-gray-400 mt-1">Jobs will appear here when you request computations from the scenario builder.</p>
+
+    {# Summary strip #}
+    <div class="flex flex-wrap gap-3">
+        <div class="bg-white border border-gray-200 rounded-lg p-4 flex-1 min-w-[120px]">
+            <div class="text-2xl font-semibold text-amber-600">{{ status_counts.pending|default:0 }}</div>
+            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">Pending</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-4 flex-1 min-w-[120px]">
+            <div class="text-2xl font-semibold text-blue-600">{{ status_counts.running|default:0 }}</div>
+            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">Running</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-4 flex-1 min-w-[120px]">
+            <div class="text-2xl font-semibold text-green-600">{{ status_counts.completed|default:0 }}</div>
+            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">Completed</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-4 flex-1 min-w-[120px]">
+            <div class="text-2xl font-semibold text-red-600">{{ status_counts.failed|default:0 }}</div>
+            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">Failed</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-4 flex-1 min-w-[120px]">
+            <div class="text-2xl font-semibold text-gray-500">{{ status_counts.cancelled|default:0 }}</div>
+            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">Cancelled</div>
+        </div>
+    </div>
+
+    {# Filter tabs #}
+    {% if filter_tabs %}
+    <div class="flex flex-wrap gap-2">
+        {% for tab in filter_tabs %}
+            {% if tab.key == "all" %}
+                {% with is_active=selected_status|length|add:0 %}
+                <a href="{% url 'admin_scripts:jobs-list' %}"
+                   class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border rounded-full transition
+                          {% if not selected_status %}bg-blue-50 text-blue-700 border-blue-200{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
+                    {{ tab.label }}
+                    <span class="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 text-xs rounded-full
+                                 {% if not selected_status %}bg-blue-100 text-blue-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {{ tab.count }}
+                    </span>
+                </a>
+                {% endwith %}
+            {% else %}
+                <a href="{% url 'admin_scripts:jobs-list' %}?status={{ tab.key }}"
+                   class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border rounded-full transition
+                          {% if selected_status == tab.key %}bg-blue-50 text-blue-700 border-blue-200{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
+                    {{ tab.label }}
+                    <span class="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 text-xs rounded-full
+                                 {% if selected_status == tab.key %}bg-blue-100 text-blue-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {{ tab.count }}
+                    </span>
+                </a>
+            {% endif %}
+        {% endfor %}
     </div>
     {% endif %}
+
+    {# List body — HTMX polls while there are active jobs #}
+    <div id="jobs-list-body"
+         hx-get="{% url 'admin_scripts:jobs-list-partial' %}?status={{ selected_status|default:'' }}"
+         hx-trigger="every 5s[document.querySelector('[data-active-jobs]')?.dataset.activeJobs === 'true']"
+         hx-swap="innerHTML">
+        {% include "admin_scripts/partials/jobs_table.html" %}
+    </div>
+
 </div>
 {% endblock %}

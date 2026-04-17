@@ -4,12 +4,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import os
+import signal
 import subprocess
 import sys
 
+from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from admin_scripts.models import ComputationJob
+
+logger = logging.getLogger(__name__)
 
 
 def compute_filters_hash(params: dict) -> str:
@@ -87,8 +94,45 @@ def dispatch_job(job_pk):
         from admin_scripts.cloud_run import dispatch_cloud_run_job
         dispatch_cloud_run_job(job_pk)
     else:
-        subprocess.Popen(
+        log_dir = getattr(settings, "BASE_DIR", ".") / "logs"
+        log_dir.mkdir(exist_ok=True)
+        log_file = log_dir / f"job_{job_pk}.log"
+        logger.info("Dispatching local job %d, logging to %s", job_pk, log_file)
+        fh = open(log_file, "w")  # noqa: SIM115 — intentionally kept open for subprocess lifetime
+        proc = subprocess.Popen(
             [sys.executable, "manage.py", "run_computation_job", "--job-id", str(job_pk)],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=fh,
+            stderr=fh,
+            start_new_session=True,
         )
+        ComputationJob.objects.filter(pk=job_pk).update(pid=proc.pid)
+
+
+def cancel_job(job_pk):
+    """Cancel a pending or running computation job.
+
+    Terminates the local process group (if any) and cancels the Cloud Run
+    execution (if any), then marks the job as cancelled.
+
+    Returns True if the job was cancelled, False if it was not cancellable.
+    """
+    job = ComputationJob.objects.get(pk=job_pk)
+    if job.status not in (ComputationJob.Status.PENDING, ComputationJob.Status.RUNNING):
+        return False
+
+    # Kill local process group
+    if job.pid:
+        try:
+            os.killpg(os.getpgid(job.pid), signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass  # process already exited
+
+    # Cancel Cloud Run execution
+    if job.cloud_run_execution_name:
+        from admin_scripts.cloud_run import cancel_cloud_run_job
+        cancel_cloud_run_job(job.cloud_run_execution_name)
+
+    job.status = ComputationJob.Status.CANCELLED
+    job.completed_at = timezone.now()
+    job.save(update_fields=["status", "completed_at", "updated_at"])
+    return True
