@@ -10,7 +10,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import escape
 
+from admin_scripts.catalog import get_catalog
 from admin_scripts.scenario_utils import build_scenario_query, stats_for
+from django.apps import apps
 from minitool.models import ChangeRecord
 
 
@@ -22,6 +24,25 @@ def staff_required(view_func):
             return HttpResponseForbidden("You do not have permission to access this page.")
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def _resolve_value_source(value_source):
+    """Resolve a catalog value_source dict to a list of string values.
+
+    For queryset sources, queries the model and returns str() of each instance.
+    For static sources, returns the values list as strings.
+    """
+    kind = value_source.get("kind", "")
+    if kind == "queryset":
+        model_name = value_source.get("model", "")
+        try:
+            model = apps.get_model("api", model_name)
+            return [str(obj) for obj in model.objects.all().order_by("pk")]
+        except LookupError:
+            return []
+    elif kind == "static":
+        return [str(v) for v in value_source.get("values", [])]
+    return []
 
 
 SCRIPTS = [
@@ -165,11 +186,8 @@ def _extract_change_key_info(data, suffix):
 @login_required(login_url="/admin/login/")
 @staff_required
 def compile_scenarios(request):
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
 
     # Render one empty scenario tab on GET
     scenarios = [{
@@ -194,14 +212,10 @@ def compile_scenarios(request):
 @login_required(login_url="/admin/login/")
 @staff_required
 def htmx_module_types(request):
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
     options = ['<option value="">Select module type...</option>']
-    for mt in module_types:
-        options.append(f'<option value="{escape(mt)}">{escape(mt)}</option>')
+    for m in catalog:
+        options.append(f'<option value="{escape(m.module_type)}">{escape(m.label)}</option>')
     return HttpResponse("\n".join(options))
 
 
@@ -219,12 +233,12 @@ def htmx_fields(request):
     module_type, index, prefix = result
     id_prefix = prefix.rstrip("-")
 
-    fields = list(
-        ChangeRecord.objects.filter(module_type=module_type)
-        .values_list("field", flat=True)
-        .distinct()
-        .order_by("field")
-    )
+    catalog = get_catalog()
+    catalog_module = next((m for m in catalog if m.module_type == module_type), None)
+    if catalog_module is None:
+        fields = []
+    else:
+        fields = [f.field_name for f in catalog_module.fields]
     values_url = reverse("admin_scripts:htmx-values")
     html = (
         f'<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
@@ -258,18 +272,20 @@ def htmx_values(request):
     if not module_type or not field:
         return HttpResponse("<p class='text-xs text-gray-400'>Select module type and field first</p>")
 
-    from_values = list(
-        ChangeRecord.objects.filter(module_type=module_type, field=field)
-        .values_list("from_value", flat=True)
-        .distinct()
-        .order_by("from_value")
-    )
-    to_values = list(
-        ChangeRecord.objects.filter(module_type=module_type, field=field)
-        .values_list("to_value", flat=True)
-        .distinct()
-        .order_by("to_value")
-    )
+    catalog = get_catalog()
+    catalog_module = next((m for m in catalog if m.module_type == module_type), None)
+    catalog_field = None
+    if catalog_module:
+        catalog_field = next((f for f in catalog_module.fields if f.field_name == field), None)
+
+    if catalog_field:
+        values = _resolve_value_source(catalog_field.value_source)
+    else:
+        values = []
+
+    # Both from and to share the same value pool
+    from_values = values
+    to_values = values
 
     return render(request, "admin_scripts/partials/value_options.html", {
         "index": index,
@@ -319,11 +335,8 @@ def htmx_add_change(request):
         prefix = f"change-{index}-"
         id_prefix = f"change-{index}"
 
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
         "prefix": prefix,
@@ -341,11 +354,8 @@ def htmx_add_scenario(request):
     except (ValueError, TypeError):
         scenario_index = 1
 
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
 
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
