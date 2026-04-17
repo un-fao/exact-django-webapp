@@ -249,7 +249,7 @@ class CompileScenariosViewTest(TestCase):
             "scenario-0-change-0-to_value": "B",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No matching records")
+        self.assertContains(response, "not yet computed")
 
     def test_run_scenario_with_global_filters(self):
         self.client.login(email="staff@example.com", password="testpass123")

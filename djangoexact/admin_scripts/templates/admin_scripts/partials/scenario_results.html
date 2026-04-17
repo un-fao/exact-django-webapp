@@ -23,6 +23,28 @@
 </div>
 {% endif %}
 
+{% if gaps %}
+<div class="mt-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg p-4 text-sm">
+    <p class="font-medium">Data not yet computed</p>
+    <p class="mt-1">The following combinations have no pre-computed results:</p>
+    <ul class="mt-2 list-disc list-inside">
+        {% for gap in gaps %}
+        <li>
+            {{ gap.module_type }} / {{ gap.field }}: {{ gap.from_value }} → {{ gap.to_value }}
+            <button type="button"
+                    hx-post="{% url 'admin_scripts:htmx-enqueue-job' %}"
+                    hx-vals='{"module_type": "{{ gap.module_type }}", "attribute": "{{ gap.field }}", "from_value": "{{ gap.from_value }}", "to_value": "{{ gap.to_value }}"}'
+                    hx-target="closest li"
+                    hx-swap="outerHTML"
+                    class="ml-2 text-xs text-blue-600 hover:text-blue-800 underline">
+                Compute
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 {% if error %}
 <div class="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
     {{ error }}
