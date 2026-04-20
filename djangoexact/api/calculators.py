@@ -1341,37 +1341,18 @@ def _fetch_faostat_yield(
     with downstream .average usage.
     Raises FAOSTATNoDataError if neither FAOSTAT nor the local DB has data.
     """
-    from api.faostat_service import get_yield
-    from api.faostat_exceptions import FAOSTATError, FAOSTATNoDataError
+    from api.faostat_exceptions import FAOSTATNoDataError
 
     try:
-        for year in range(start_year, start_year - 20, -1):
-            try:
-                record = get_yield(area=country_name, item=item_name, year=year)
-                # FAOSTAT Yield is in kg/ha; the math model expects t/ha (multiplies by 1000 internally).
-                return SimpleNamespace(average=record.value / 1_000)
-            except FAOSTATNoDataError:
-                continue
+        result = ipcc.CropYieldStat.objects.get_or_region_average(
+            continent=region, land_use_type=land_use_type
+        )
+        return SimpleNamespace(average=result.average)
+    except Exception:
         raise FAOSTATNoDataError(
-            f"No FAOSTAT yield data found for '{item_name}' in '{country_name}' "
-            f"for year {start_year} or any of the preceding 19 years."
+            f"No yield data found for '{item_name}' in '{country_name}' "
+            "in either FAOSTAT or the local CropYieldStat database."
         )
-    except FAOSTATError:
-        log.warning(
-            "FAOSTAT yield unavailable for '%s' in '%s'; falling back to CropYieldStat.",
-            item_name,
-            country_name,
-        )
-        try:
-            result = ipcc.CropYieldStat.objects.get_or_region_average(
-                continent=region, land_use_type=land_use_type
-            )
-            return SimpleNamespace(average=result.average)
-        except Exception:
-            raise FAOSTATNoDataError(
-                f"No yield data found for '{item_name}' in '{country_name}' "
-                "in either FAOSTAT or the local CropYieldStat database."
-            )
 
 
 class AnnualCropCalculator(LandModuleCalculator):
