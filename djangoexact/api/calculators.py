@@ -96,7 +96,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
 
-from api.utilities import getattr_or_default
+from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
 
 from . import utilities as utils
 from .models import (
@@ -324,9 +324,9 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     try:
         return ipcc.FLUData.objects.get(**filters)
     except ipcc.FLUData.DoesNotExist:
-        class_lut = LandUseType.objects.filter(name=module.module_type.name).first()
+        class_lut = LandUseType.objects.filter(name_en=module.module_type.name_en).first()
         if not class_lut:
-            log.debug(f"LandUseType for {module.module_type.name} does not exist")
+            log.debug(f"LandUseType for {module.module_type.name_en} does not exist")
             return SimpleNamespace(value=1)
         filters["land_use_type"] = class_lut
         try:
@@ -1192,17 +1192,17 @@ class OtherLandUseCalculator(BaseCalculator):
             )
 
         try:
-            luc_start = module_start.land_use_type_start if module_start.land_use_type_start else LandUseType.objects.get(name=luc.module_type_start.name)
+            luc_start = module_start.land_use_type_start if module_start.land_use_type_start else LandUseType.objects.get(name_en=luc.module_type_start.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_start.name} does not exist")
 
         try:
-            luc_w = module_w.land_use_type_w if module_w.land_use_type_w else LandUseType.objects.get(name=luc.module_type_w.name)
+            luc_w = module_w.land_use_type_w if module_w.land_use_type_w else LandUseType.objects.get(name_en=luc.module_type_w.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_w.name} does not exist")
 
         try:
-            luc_wo = module_wo.land_use_type_wo if module_wo.land_use_type_wo else LandUseType.objects.get(name=luc.module_type_wo.name)
+            luc_wo = module_wo.land_use_type_wo if module_wo.land_use_type_wo else LandUseType.objects.get(name_en=luc.module_type_wo.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_wo.name} does not exist")
 
@@ -3913,7 +3913,7 @@ class EnergyEntryCalculator(BaseCalculator):
 
         for scenario in utils.ScenarioTypes:
             fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name.casefold() in utils.FOSSIL_METHANE_FUELS:
+            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
@@ -4248,14 +4248,14 @@ class FuelCalculator(BaseCalculator):
 
         for scenario in utils.ScenarioTypes:
             fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name.casefold() in utils.FOSSIL_METHANE_FUELS:
+            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
 
-        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
 
     def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
         try:
@@ -4424,9 +4424,9 @@ class SettlementCalculator(LandModuleCalculator):
             self.biomass_ef_wo.value = self.ef_wo.biomass
 
         # SOCinitial in case of non-paved settlement (start) to paved settlement (end)
-        if self.luc and self.module.is_start() and self.module.settlement_type_start.name.casefold() != "paved settlement":
-            is_paved_w = self.module.is_with() and self.module.settlement_type_w.name.casefold() == "paved settlement"
-            is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name.casefold() == "paved settlement"
+        if self.luc and self.module.is_start() and self.module.settlement_type_start.name_en.casefold() != "paved settlement":
+            is_paved_w = self.module.is_with() and self.module.settlement_type_w.name_en.casefold() == "paved settlement"
+            is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name_en.casefold() == "paved settlement"
 
             if is_paved_w or is_paved_wo:
                 self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
@@ -8111,13 +8111,13 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         self.methane_constant_w = self.project.gwp.ch4
         self.methane_constant_wo = self.project.gwp.ch4
 
-        if self.module.fuel_type_start.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_start.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_start = self.project.gwp.ch4_fossil
 
-        if self.module.fuel_type_w.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_w.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_w = self.project.gwp.ch4_fossil
 
-        if self.module.fuel_type_wo.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:

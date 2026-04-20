@@ -3004,7 +3004,7 @@ class InputReport(BaseModuleReport):
             self.inputs_co2 = list(map(sum, zip_longest(self.inputs_co2, self.extract_emissions(submodule_emission_set, self.inputs_co2_source[0], self.inputs_co2_source[1]), fillvalue=0)))
             self.inputs_n2o = list(map(sum, zip_longest(self.inputs_n2o, self.extract_emissions(submodule_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]), fillvalue=0)))
 
-            if "feed" in submodule.input_type.macro_input_type.name.casefold():
+            if "feed" in submodule.input_type.macro_input_type.name_en.casefold():
                 self.feed_co2_eq = list(map(sum, zip_longest(self.feed_co2_eq, self.extract_emissions(submodule_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]), fillvalue=0)))
             else:
                 self.inputs_co2_eq = list(
