@@ -13,7 +13,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": false,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -30,7 +30,7 @@
       "has_co2_emissions": true,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonne per year"
+      "unit": "t/yr"
     }
   },
   {
@@ -47,7 +47,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of active ingredient"
+      "unit": "t active ingredient/yr"
     }
   },
   {
@@ -64,7 +64,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of active ingredient"
+      "unit": "t active ingredient/yr"
     }
   },
   {
@@ -81,7 +81,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of active ingredient"
+      "unit": "t active ingredient/yr"
     }
   },
   {
@@ -98,7 +98,7 @@
       "has_co2_emissions": true,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes per year"
+      "unit": "t/yr"
     }
   },
   {
@@ -115,7 +115,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -132,7 +132,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -149,7 +149,7 @@
       "has_co2_emissions": true,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes per year"
+      "unit": "t/yr"
     }
   },
   {
@@ -166,7 +166,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of P205 per year"
+      "unit": "t P₂O₅/yr"
     }
   },
   {
@@ -183,7 +183,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": false,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of K20 per year"
+      "unit": "t K₂O/yr"
     }
   },
   {
@@ -200,7 +200,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": false,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -217,7 +217,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": false,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -234,7 +234,7 @@
       "has_co2_emissions": false,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of N per year"
+      "unit": "t N/yr"
     }
   },
   {
@@ -251,7 +251,7 @@
       "has_co2_emissions": true,
       "has_n2o_emissions": true,
       "has_co2_e_emissions": true,
-      "unit": "tonnes of Urea per year"
+      "unit": "t urea/yr"
     }
   },
   {

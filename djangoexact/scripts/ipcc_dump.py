@@ -5194,9 +5194,9 @@ def run():
     if app_mode == "local":
         # TODO: Run in local
         # update_forest_management_agb_and_rshoot_data()
-        update_value_chain_refrigerant_emission_factors()
-        delete_and_import_total_biomass_after_defo()
-        delete_and_import_forest_total_biomass()
+        # update_value_chain_refrigerant_emission_factors()
+        # delete_and_import_total_biomass_after_defo()
+        # delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "test":
