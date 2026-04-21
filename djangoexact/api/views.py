@@ -1654,7 +1654,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             invitation.sender = self.request.user
             invitation.save()
 
-        if not invitation.status.name == utils.InvitationStatus.PENDING.value:
+        if not invitation.status.name_en == utils.InvitationStatus.PENDING.value:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.pk}")
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
 
@@ -1713,7 +1713,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
         does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
-        if new_status.name == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
+        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
             ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
