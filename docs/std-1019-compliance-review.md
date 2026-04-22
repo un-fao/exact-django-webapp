@@ -118,8 +118,13 @@ git push --force-with-lease origin --tags
 ```
 All collaborators must re-clone.
 
-### 5.3 ⚠️ Migrate local `.env*` off developer workstations
-Local `djangoexact/.env.production`, `.env.local`, `.env.review`, and `gcp-deployment/.env.cloud` are correctly excluded from git but contain real DB passwords, Firebase private keys, and the SMTP password for `exact-notifications@fao.org`. Anyone with workstation access can read them. Migrate to GCP Secret Manager and delete the local copies.
+### 5.3 ℹ️ Production secret management — already handled via GitHub
+Production and review secrets are managed through **GitHub Actions Secrets and Variables** and injected at deploy time by `.github/workflows/deploy.yaml` (see the `${{ secrets.* }}` and `${{ vars.* }}` references for `DB_PASSWORD`, `SECRET_KEY`, `SMTP_USER_PASSWORD`, `FIREBASE_SERVICE_ACCOUNT`, etc.). No additional migration to a separate secret store is required for compliance.
+
+Recommended hygiene on top of the existing setup:
+- **Delete stale local copies.** Any `.env.production` / `.env.review` file left on a developer workstation is a frozen snapshot of prod credentials at the moment it was created. Because GitHub is now authoritative, those local files serve no functional purpose and should be removed.
+- **Local `.env`/`.env.local` for dev-only credentials is fine** — those should contain non-production values (local Postgres, dev Firebase project, etc.) and are already correctly excluded by `.gitignore`.
+- **Rotate on leave.** When a contributor leaves the project, rotate any GitHub Secret they had access to, same as today for any privileged credential.
 
 ### 5.4 ⚠️ Obtain written ESA maintenance commitment
 Form Section 5 requires confirmation of a 12-month funding line and named technical resource. The repo cannot demonstrate this on its own — a written attestation from ESA is needed.
