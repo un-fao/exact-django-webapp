@@ -8034,7 +8034,7 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         if self.module.fuel_type_w and self.module.fuel_type_w.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_w = self.project.gwp.ch4_fossil
 
-        if self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
+        if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:
