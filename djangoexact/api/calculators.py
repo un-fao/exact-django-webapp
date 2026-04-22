@@ -3415,7 +3415,6 @@ class LargeFisheryCalculator(BaseCalculator):
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
-        self.electricity_country: Country = None
         self.electricity_emission: ipcc.ElectricityEmission = None
         self.electricity_emission_ef: float = 0
 
