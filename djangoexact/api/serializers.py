@@ -281,7 +281,7 @@ class UserReadSerializer(serializers.ModelSerializer):
 class UserWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "email", "first_name", "last_name", "country", "organization", "is_opted_out_of_emails"]
+        fields = ["id", "email", "first_name", "last_name", "country", "organization", "is_opted_out_of_emails"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
