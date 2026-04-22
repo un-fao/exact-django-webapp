@@ -2521,7 +2521,7 @@ class Fishery(Module):
 
     def save(self, *args, **kwargs):
         if self.pk is None and not self.ef_source_t2:
-            self.ef_source_t2 = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+            self.ef_source_t2 = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
 
         return super().save(*args, **kwargs)
 
@@ -2611,6 +2611,9 @@ class InputEntry(Submodule):
 
 
 class EmissionFactorSource(models.Model):
+    OPERATING_MARGIN = "Operating Margin"
+    COMBINED_MARGIN = "Combined Margin"
+
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -2640,7 +2643,7 @@ class ElectricityTier2Mixin(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None and not self.ef_source:
-            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
 
         return super().save(*args, **kwargs)
 

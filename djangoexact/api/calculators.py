@@ -3186,7 +3186,7 @@ class GrasslandCalculator(LandModuleCalculator):
 
 
 def _resolve_electricity_emission_ef(electricity_emission: "ipcc.ElectricityEmission", ef_source) -> float:
-    if ef_source is None or ef_source.name == "Operating Margin":
+    if ef_source is None or ef_source.name == ef_source.__class__.OPERATING_MARGIN:
         return electricity_emission.operating_margin
     return electricity_emission.combined_margin
 
@@ -3989,7 +3989,7 @@ class EnergyEntryCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected_start.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.operating_margin
@@ -4178,7 +4178,7 @@ class ElectricityCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
             else:
                 self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
