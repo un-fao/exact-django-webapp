@@ -51,7 +51,7 @@ if not SECRET_KEY:
 
         raise ImproperlyConfigured("SECRET_KEY environment variable is required when DEBUG is False.")
 
-_default_hosts = "localhost,127.0.0.1,0.0.0.0,localhost:3000,.minitool-741920004150.europe-west1.run.app"
+_default_hosts = "localhost,127.0.0.1,0.0.0.0"
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).split(",") if h.strip()]
 
 # CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
