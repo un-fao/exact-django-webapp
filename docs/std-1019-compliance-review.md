@@ -17,16 +17,21 @@ After the changes on this branch, **all eight attestation points can be ticked**
 
 ## 2. Attestation Status
 
+Production secrets are managed in **GitHub Actions Secrets & Variables** (injected at deploy time by `.github/workflows/deploy.yaml`). That context shifts how a few items are read — noted below.
+
 | # | Form attestation | Baseline | After this branch |
 |---|---|---|---|
 | 2.1 | Third-party dependencies reviewed for AGPL-3 compatibility | ✅ Yes (already) | ✅ Yes |
 | 2.2 | No proprietary code requiring FAO legal distribution rights | ✅ Yes (already) | ✅ Yes |
-| 3.1 | Secrets verification — no hardcoded passwords, keys, IPs, tokens | ❌ No | ⚠️ **Yes, pending history purge & GCP key rotation (§5)** |
-| 3.2 | Vulnerability scan within last 6 months | ❌ No | ✅ Yes (automated scans on push/PR + weekly cron) |
+| 3.1 | Secrets verification — no hardcoded passwords, keys, IPs, tokens in **repo** | ❌ No | ✅ Yes |
+| 3.1-hist | …and no secrets in **commit history** | ❌ No | ⚠️ **Pending** — one committed Firebase service-account key remains reachable in history; must be rotated (if live) and purged with `git filter-repo` (§5.1 + §5.2). Only remaining technical blocker. |
+| 3.2 | Vulnerability scan within last 6 months | ❌ No | ✅ Yes — continuous: `pip-audit` + `bandit` + `npm audit` + gitleaks on every push/PR, plus weekly Monday 07:00 UTC cron |
 | 3.3 | SDLC docs present (README, deployment, contributing) | ⚠️ Partial | ✅ Yes |
 | 4.1 | No PII / confidential member-state data / unanonymized datasets | ❌ No | ✅ Yes |
 | 4.2 | Test data is 100 % synthetic | ❌ No | ✅ Yes |
-| 5.1 | 12-month maintenance commitment from a funded resource | ✅ Yes (policy sign-off required) | ✅ Yes |
+| 5.1 | 12-month maintenance commitment from a funded resource | ✅ Yes (written ESA attestation to accompany the form) | ✅ Yes |
+
+**Net result:** 7 of 8 attestations are green on this branch. The last one (3.1 — commit history) becomes green as soon as §5.1 (rotate or confirm-dead) and §5.2 (`git filter-repo`) are completed. Secret management itself is already production-grade via GitHub Secrets; no additional secret-store migration is required.
 
 ---
 
