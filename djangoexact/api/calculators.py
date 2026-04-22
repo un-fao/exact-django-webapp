@@ -3205,7 +3205,6 @@ class SmallFisheryCalculator(BaseCalculator):
         self.energy_ef_default_co2: float = 0
         self.energy_ef_default_ch4: float = 0
         self.energy_ef_default_n2o: float = 0
-        self.electricity_country: Country = None
         self.electricity_emission: ipcc.ElectricityEmission = None
         self.electricity_emission_ef: float = 0
         self.lost_refrigerant_default: float = 0
