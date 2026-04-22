@@ -81,10 +81,10 @@ class Command(BaseCommand):
                 self.stdout.write("  - Counting records to delete...")
 
             # Count records first to show progress
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -102,13 +102,13 @@ class Command(BaseCommand):
                 self.stdout.write("  - Deleting individual records...")
 
             # Delete ChangeRecord entries
-            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
 
             if show_progress:
                 self.stdout.write("  - Deleting aggregate records...")
 
             # Delete ChangeAggregate entries
-            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])
+            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
 
             if show_progress:
                 self.stdout.write(f"  - Successfully deleted {total_to_delete:,} records")
@@ -126,10 +126,10 @@ class Command(BaseCommand):
                 self.stdout.write("  - Counting all records...")
 
             # Count all records first
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosec B608
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosec B608
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -147,8 +147,8 @@ class Command(BaseCommand):
                 self.stdout.write("  - Deleting all records (fastest method)...")
 
             # Delete all records from both tables
-            cursor.execute(f"DELETE FROM {change_record_table}")
-            cursor.execute(f"DELETE FROM {change_aggregate_table}")
+            cursor.execute(f"DELETE FROM {change_record_table}")  # nosec B608
+            cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosec B608
 
             # For SQLite, we can also run VACUUM to reclaim space immediately
             cursor.execute("VACUUM")

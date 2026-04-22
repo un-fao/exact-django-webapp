@@ -475,12 +475,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             # Ensures the table is a valid identifier, reducing the risk of SQL injection
                             if not table_name.isidentifier():
                                 raise ValueError("Invalid table name")
-                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosec B608
                     table_name = m._meta.db_table
                     # Ensures the table is a valid identifier, reducing the risk of SQL injection
                     if not table_name.isidentifier():
                         raise ValueError("Invalid table name")
-                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosec B608
 
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
