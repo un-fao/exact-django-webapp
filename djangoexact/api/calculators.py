@@ -3275,11 +3275,10 @@ class SmallFisheryCalculator(BaseCalculator):
                 raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
 
         try:
-            self.electricity_country = self.module.country_t2 if self.module.country_t2 else self.country
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
             self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
+            raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
         try:
             self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
@@ -3417,7 +3416,6 @@ class LargeFisheryCalculator(BaseCalculator):
         self.kw_tonnes: float = 0
         self.electricity_emission: ipcc.ElectricityEmission = None
         self.electricity_emission_ef: float = 0
-
         self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
         self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
 
@@ -3487,11 +3485,10 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.electricity_country = self.module.country_t2 if self.module.country_t2 else self.country
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
             self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
+            raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
         try:
             self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
