@@ -25,7 +25,7 @@ Production secrets are managed in **GitHub Actions Secrets & Variables** (inject
 | 2.2 | No proprietary code requiring FAO legal distribution rights | ✅ Yes (already) | ✅ Yes |
 | 3.1 | Secrets verification — no hardcoded passwords, keys, IPs, tokens in **repo** | ❌ No | ✅ Yes |
 | 3.1-hist | …and no secrets in **commit history** | ❌ No | ⚠️ **Pending** — one committed Firebase service-account key remains reachable in history; must be rotated (if live) and purged with `git filter-repo` (§5.1 + §5.2). Only remaining technical blocker. |
-| 3.2 | Vulnerability scan within last 6 months | ❌ No | ✅ Yes — continuous: `pip-audit` + `bandit` + `npm audit` + gitleaks on every push/PR, plus weekly Monday 07:00 UTC cron |
+| 3.2 | Vulnerability scan within last 6 months | ❌ No | ⚠️ Yes (process) — continuous `pip-audit` + `bandit` + `npm audit` + gitleaks on every push/PR + weekly cron. 75/84 `pip-audit` findings fixed on this branch (Django 4.2.1 → 4.2.30 LTS + 14 other packages). **Residual:** 9 CVEs in Django 4.2 only — fixes require a Django 5.2 LTS migration tracked as its own epic (§5.5). |
 | 3.3 | SDLC docs present (README, deployment, contributing) | ⚠️ Partial | ✅ Yes |
 | 4.1 | No PII / confidential member-state data / unanonymized datasets | ❌ No | ✅ Yes |
 | 4.2 | Test data is 100 % synthetic | ❌ No | ✅ Yes |
@@ -92,6 +92,8 @@ Production secrets are managed in **GitHub Actions Secrets & Variables** (inject
 | `djangoexact/scripts/foo.py` | Replaced `mariagiulia.crespi@fao.org` → `owner@example.com` and real project name reference with placeholder |
 | `djangoexact/locale/fr/LC_MESSAGES/django.po` | `Last-Translator` line now attributes `EX-ACT team <exact@fao.org>` (a published public address) |
 | `djangoexact/math_model/no_time_dependency_final/forest_management.py:159` | Informal TODO referencing a colleague rewritten as `# TODO: Re-implement as Tier 2.` |
+| `djangoexact/requirements.txt` | Bumped 15 packages flagged by `pip-audit` (Django 4.2.1 → 4.2.30 LTS, DRF 3.14 → 3.15.2, gunicorn 20 → 22, urllib3 1.26 → 2.6.3, requests 2.31 → 2.33, weasyprint 64 → 68, pytest 7 → 9, PyJWT 2.7 → 2.12.1, Jinja2 3.1.2 → 3.1.6, sqlparse 0.4.4 → 0.5.4, idna 3.4 → 3.10, certifi 2023.5 → 2024.12, python-dotenv 1.0 → 1.2.2, setuptools → ≥78.1.1, pluggy 1.0 → 1.5). Result: 84 → 9 known CVEs (remaining 9 are all Django 4.2-LTS-EOL — see §5.5). Deduplicated two stray `setuptools` / `PyYAML` entries. |
+| `.github/workflows/deploy.yaml` | Bootstrap `pip install` now pins `setuptools>=78.1.1` (was `<78`, which carried CVE-2025-47273) |
 
 ### 4.3 Deletion
 | File | Change |
@@ -133,6 +135,16 @@ Recommended hygiene on top of the existing setup:
 
 ### 5.4 ⚠️ Obtain written ESA maintenance commitment
 Form Section 5 requires confirmation of a 12-month funding line and named technical resource. The repo cannot demonstrate this on its own — a written attestation from ESA is needed.
+
+### 5.5 ⚠️ Django 4.2 LTS reached EOL (April 2026) — plan migration to Django 5.2 LTS
+After the dependency bump in §4.2, `pip-audit -r djangoexact/requirements.txt --strict` reports 9 residual CVEs, **all in Django 4.2.30** (the latest 4.2.x patch release). Fixes for these CVEs are only available on the Django 5.2 LTS line, which this repo cannot adopt in the same PR because the jump requires coordinated bumps of ~8 Django-pluggable packages (`djangorestframework` 3.15 → 3.16, `django-cors-headers` 4.0 → 4.4, `django-auditlog` 2.2 → 3.0, `django-simple-history` 3.4 → 3.8, `django-filter`, `django-extensions`, `asgiref`, `django-environ`) plus application-code changes for removed-in-5.x deprecations and a full test-suite run.
+
+| CVE | Severity (upstream) | Fixed in |
+|---|---|---|
+| CVE-2026-1287, CVE-2026-1207, CVE-2026-25673, CVE-2026-3902, CVE-2026-33034 | 2026 series | Django 5.2.1 |
+| CVE-2025-64458, CVE-2025-64459, CVE-2025-57833, CVE-2025-59681 | 2025 series | Django 5.2.1 |
+
+**Action:** open a dedicated epic for the Django 5.2 migration; target completion **before** the public AGPL-3 release so the STD 1019 attestation on §3.2 (“vulnerability scan clean within last 6 months”) remains defensible to an external reader. Until then, 3.2 is ticked on process grounds (`pip-audit` runs continuously and these 9 findings are knowingly tracked), not on zero-findings grounds.
 
 ---
 
