@@ -155,3 +155,7 @@ faostat_crops.csv
 yield_items.csv
 .playwright-mcp
 djangoexact/test_minitool.db
+docs/superpowers/specs/
+.sisyphus
+pc.json
+vs2.0.txt
