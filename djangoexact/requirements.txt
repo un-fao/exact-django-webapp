@@ -1,4 +1,4 @@
-asgiref==3.6.0
+asgiref==3.8.1
 attrs==23.1.0
 certifi==2024.12.14
 charset-normalizer==3.1.0
@@ -6,13 +6,13 @@ colorama==0.4.6
 coreapi==2.3.3
 coreschema==0.0.4
 httplib2==0.22.0
-Django==4.2.30
-django-filter==23.5
-django-auditlog==2.2.2
-django-cors-headers==4.0.0
-django-environ==0.10.0
-django-extensions==3.2.1
-djangorestframework==3.15.2
+Django==5.2.13
+django-filter==24.3
+django-auditlog==3.0.0
+django-cors-headers==4.4.0
+django-environ==0.11.2
+django-extensions==3.2.3
+djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
 drf-spectacular==0.26.2
 drf-yasg==1.21.14
@@ -49,7 +49,7 @@ setuptools>=78.1.1
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==2.6.3
-django-simple-history==3.4.0
+django-simple-history==3.8.0
 django-archive==0.2.0
 matplotlib==3.8.2
 firebase-admin==6.5.0
