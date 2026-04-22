@@ -17,7 +17,7 @@ from django.contrib.auth.models import Group
 class ProjectTest:
     def __init__(self):
         log.basicConfig(level=log.INFO)
-        self.user = User.objects.get(email="claudio.lavacca@fao.org")
+        self.user = User.objects.get(email="testuser@example.com")
         self.climates = Climate.objects.all()
         self.countries = Country.objects.all()
         self.soil_types = SoilType.objects.all().exclude(active=False).exclude(name="Mineral").exclude(name="Organic")
