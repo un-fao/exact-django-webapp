@@ -3185,6 +3185,12 @@ class GrasslandCalculator(LandModuleCalculator):
         return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
 
+def _resolve_electricity_emission_ef(electricity_emission: "ipcc.ElectricityEmission", ef_source) -> float:
+    if ef_source is None or ef_source.name == ef_source.__class__.OPERATING_MARGIN:
+        return electricity_emission.operating_margin
+    return electricity_emission.combined_margin
+
+
 class SmallFisheryCalculator(BaseCalculator):
     """
     Calculator for small fishery.
@@ -3200,6 +3206,7 @@ class SmallFisheryCalculator(BaseCalculator):
         self.energy_ef_default_ch4: float = 0
         self.energy_ef_default_n2o: float = 0
         self.electricity_emission: ipcc.ElectricityEmission = None
+        self.electricity_emission_ef: float = 0
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
@@ -3269,6 +3276,7 @@ class SmallFisheryCalculator(BaseCalculator):
 
         try:
             self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
@@ -3320,7 +3328,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_emission_ef,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3365,7 +3373,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_emission_ef,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
@@ -3406,9 +3414,8 @@ class LargeFisheryCalculator(BaseCalculator):
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
-        self.electricity_country: Country = None
         self.electricity_emission: ipcc.ElectricityEmission = None
-
+        self.electricity_emission_ef: float = 0
         self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
         self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
 
@@ -3478,10 +3485,10 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.country
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
+            raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
         try:
             self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
@@ -3531,7 +3538,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_emission_ef,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3576,7 +3583,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_emission_ef,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
@@ -3982,7 +3989,7 @@ class EnergyEntryCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected_start.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.operating_margin
@@ -4171,7 +4178,7 @@ class ElectricityCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
             else:
                 self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
