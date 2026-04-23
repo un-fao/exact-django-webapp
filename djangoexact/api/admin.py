@@ -21,7 +21,7 @@ excluded_models = {"FieldDefinition", "APIHealth", "CustomUser", "HandInHandAsse
 
 for model in (model for model in dir() if not model.startswith("_") and model not in excluded_models):
     try:
-        admin.site.register(eval(model), ModelAdmin)
+        admin.site.register(globals()[model], ModelAdmin)
     except Exception:
         pass
 

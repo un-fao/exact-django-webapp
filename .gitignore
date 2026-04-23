@@ -15,6 +15,19 @@ venv/
 *.env
 .vscode
 
+# Service account keys, private keys, and other credentials — never commit
+*service-account*.json
+*service_account*.json
+*-credentials.json
+*.pem
+*.key
+!package.json
+!package-lock.json
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
 # Node artifact files
 node_modules/
 dist/
@@ -159,3 +172,4 @@ docs/superpowers/specs/
 .sisyphus
 pc.json
 vs2.0.txt
+STD 1019 open-source agreement_EX-ACT.docx

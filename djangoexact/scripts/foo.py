@@ -194,7 +194,7 @@ def search_historical_projects_for_project_name():
     """
     Search historical projects for project name
     """
-    projects = models.Project.history.filter(name__icontains="improving livelihoods in rural Kenya", owner__email="mariagiulia.crespi@fao.org", history_change_reason="delete")
+    projects = models.Project.history.filter(name__icontains="example project name", owner__email="owner@example.com", history_change_reason="delete")
     print(f"Found {projects.count()} projects")
     for project in projects:
         print(f"Project: {project.name}")

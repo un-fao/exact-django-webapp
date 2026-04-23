@@ -37,15 +37,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", ".minitool-741920004150.europe-west1.run.app"]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Fail fast in non-DEBUG environments when SECRET_KEY is not provided.
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only-do-not-use-in-production"
+    else:
+        from django.core.exceptions import ImproperlyConfigured
 
-CORS_ORIGIN_ALLOW_ALL = True
+        raise ImproperlyConfigured("SECRET_KEY environment variable is required when DEBUG is False.")
+
+_default_hosts = "localhost,127.0.0.1,0.0.0.0"
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).split(",") if h.strip()]
+
+# CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
 
 # Application definition
@@ -81,10 +92,8 @@ INSTALLED_APPS = [
     "ckeditor",
     "minitool",
     "admin_scripts",
+    "corsheaders",
 ]
-
-if DEBUG:
-    INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

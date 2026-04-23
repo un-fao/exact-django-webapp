@@ -14,7 +14,7 @@ class FirebaseAuth:
         url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"email": email, "password": password, "returnSecureToken": True})
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, data=data, timeout=10)
         self._raise_detailed_error(response)
         return response.json()
 
@@ -22,7 +22,7 @@ class FirebaseAuth:
         url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"idToken": id_token})
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, data=data, timeout=10)
         self._raise_detailed_error(response)
         return response.json()
 
@@ -30,7 +30,7 @@ class FirebaseAuth:
         url = "https://securetoken.googleapis.com/v1/token?key={0}".format(self.api_key)
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"grantType": "refresh_token", "refreshToken": refresh_token})
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, data=data, timeout=10)
         self._raise_detailed_error(response)
         result = response.json()
         return {

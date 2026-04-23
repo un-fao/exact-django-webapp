@@ -58,7 +58,7 @@ for model in [
     and not model.startswith("ForestTotalBiomass")
 ]:
     try:
-        admin.site.register(eval(model), GenericExportModelAdmin)
+        admin.site.register(globals()[model], GenericExportModelAdmin)
     except:
         pass
 
