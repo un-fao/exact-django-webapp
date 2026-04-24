@@ -1,0 +1,662 @@
+[
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 232,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 233,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 234,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 235,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 236,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 237,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 238,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 239,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 240,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 241,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 242,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 243,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 244,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 245,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 246,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 247,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 248,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 249,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 250,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 251,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 252,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 253,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 254,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 255,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 256,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 257,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 258,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 259,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 260,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 261,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 193.7,
+      "salinity": 1
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 262,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 263,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 264,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 265,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 266,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 267,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 268,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 269,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 270,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 271,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 272,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 273,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 274,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 275,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 276,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 277,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 278,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 279,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 280,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 281,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 282,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 283,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 284,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 285,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 286,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 287,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 288,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 289,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 290,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "salinity": 2
+    }
+  },
+  {
+    "model": "ipcc.rewettingmethanefactor",
+    "pk": 291,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "salinity": 2
+    }
+  }
+]

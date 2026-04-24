@@ -1,3 +1,5 @@
+import sys
+
 from rest_framework import serializers
 import api.models as api_models
 import ipcc.models as ipcc_models
@@ -108,7 +110,8 @@ def get_public_module_serializer(model_arg: models.Model) -> serializers.ModelSe
             except api_models.ModuleType.DoesNotExist:
                 return None
 
-    try:
-        return globals()["Public" + model_arg.__name__ + "Serializer"]
-    except KeyError:
-        return GenericPublicModuleSerializer
+    serializer_name = "Public" + model_arg.__name__ + "Serializer"
+    candidate = getattr(sys.modules[__name__], serializer_name, None)
+    if isinstance(candidate, type) and issubclass(candidate, serializers.Serializer):
+        return candidate
+    return GenericPublicModuleSerializer

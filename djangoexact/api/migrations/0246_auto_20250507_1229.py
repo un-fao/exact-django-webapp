@@ -2,7 +2,6 @@
 
 from django.db import migrations
 import django.core.validators
-import django.db.models.deletion
 from django.db import models
 
 
@@ -96,11 +95,6 @@ class Migration(migrations.Migration):
             model_name="grasslandmanagementtype",
             name="name_ru",
             field=models.CharField(max_length=100, null=True),
-        ),
-        migrations.AddField(
-            model_name="historicalprocessingentry",
-            name="fuel_type_thread",
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to="api.commentthread"),
         ),
         migrations.AddField(
             model_name="inputtype",

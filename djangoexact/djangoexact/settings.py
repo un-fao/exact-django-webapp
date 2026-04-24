@@ -37,15 +37,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", ".minitool-741920004150.europe-west1.run.app"]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Fail fast in non-DEBUG environments when SECRET_KEY is not provided.
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only-do-not-use-in-production"
+    else:
+        from django.core.exceptions import ImproperlyConfigured
 
-CORS_ORIGIN_ALLOW_ALL = True
+        raise ImproperlyConfigured("SECRET_KEY environment variable is required when DEBUG is False.")
+
+_default_hosts = "localhost,127.0.0.1,0.0.0.0"
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).split(",") if h.strip()]
+
+# CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
 
 # Application definition
@@ -81,10 +92,8 @@ INSTALLED_APPS = [
     "ckeditor",
     "minitool",
     "admin_scripts",
+    "corsheaders",
 ]
-
-if DEBUG:
-    INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -146,14 +155,6 @@ if os.getenv("GAE_APPLICATION", None):
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-            "OPTIONS": {
-                "timeout": 20,
-                "check_same_thread": False,
-            },
-        },
     }
 else:
     DATABASES = {
@@ -171,13 +172,9 @@ else:
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
-        "minitool": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "minitool.db"),
-        },
     }
 
-DATABASE_ROUTERS = ["minitool.db_router.AppSpecificDatabaseRouter", "ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
+DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
 # Database connection management
 DATABASE_CONNECTION_POOLING = True
@@ -243,6 +240,14 @@ REST_FRAMEWORK = {
         "accounts.firebase.FirebaseAuthentication",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "1000/min",
+    },
 }
 
 # Auditlog Settings
@@ -327,3 +332,13 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
 DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
+
+# Computation Jobs — Cloud Run
+# Set to a Cloud Run Job resource name to enable GCP dispatch.
+# Empty string = subprocess fallback (local dev).
+CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
+CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
+
+# Job Notifications
+# Set to True to enable email notifications for completed jobs.
+JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")

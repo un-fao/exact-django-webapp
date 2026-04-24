@@ -156,7 +156,7 @@ class ForestManagement(BaseModule):
         self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         self.max_agb_value = self.max_agb_value_default if self.max_agb_value_tier_2 is None else self.max_agb_value_tier_2
-        if self.max_bgb_value_default is None and self.max_bgb_value_tier_2 is None:  # TODO: Re-implement it as tier2 (yes, I'm looking at you, Bart. hi :] )
+        if self.max_bgb_value_default is None and self.max_bgb_value_tier_2 is None:  # TODO: Re-implement as Tier 2.
             self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
         else:
             self.max_bgb_value = self.max_bgb_value_default if self.max_bgb_value_tier_2 is None else self.max_bgb_value_tier_2

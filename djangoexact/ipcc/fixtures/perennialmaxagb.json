@@ -1,0 +1,722 @@
+[
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 621,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 71,
+      "value": 41.7625
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 622,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 7,
+      "value": 47.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 623,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 8,
+      "value": 22.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 624,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 9,
+      "value": 9.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 625,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 10,
+      "value": 65.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 626,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 11,
+      "value": 11.8
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 627,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 12,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 628,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 13,
+      "value": 72.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 629,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 14,
+      "value": 58.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 630,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 16,
+      "value": 9.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 631,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 17,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 632,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 20,
+      "value": 5.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 633,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 18,
+      "value": 12.69
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 634,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 21,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 635,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 22,
+      "value": 80.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 636,
+    "fields": {
+      "climate": 3,
+      "land_use_type": 19,
+      "value": 20.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 637,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 71,
+      "value": 39.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 638,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 7,
+      "value": 47.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 639,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 8,
+      "value": 22.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 640,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 9,
+      "value": 26.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 641,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 10,
+      "value": 65.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 642,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 11,
+      "value": 11.8
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 643,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 12,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 644,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 13,
+      "value": 27.3
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 645,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 14,
+      "value": 69.9
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 646,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 16,
+      "value": 9.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 647,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 17,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 648,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 20,
+      "value": 5.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 649,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 18,
+      "value": 12.69
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 650,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 21,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 651,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 22,
+      "value": 80.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 652,
+    "fields": {
+      "climate": 1,
+      "land_use_type": 19,
+      "value": 20.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 653,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 71,
+      "value": 39.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 654,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 7,
+      "value": 47.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 655,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 8,
+      "value": 22.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 656,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 9,
+      "value": 26.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 657,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 10,
+      "value": 65.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 658,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 11,
+      "value": 11.8
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 659,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 12,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 660,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 13,
+      "value": 27.3
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 661,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 14,
+      "value": 69.9
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 662,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 16,
+      "value": 9.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 663,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 17,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 664,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 20,
+      "value": 5.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 665,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 18,
+      "value": 12.69
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 666,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 21,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 667,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 22,
+      "value": 80.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 668,
+    "fields": {
+      "climate": 2,
+      "land_use_type": 19,
+      "value": 20.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 669,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 71,
+      "value": 36.2875
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 670,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 7,
+      "value": 47.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 671,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 8,
+      "value": 22.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 672,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 9,
+      "value": 26.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 673,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 10,
+      "value": 65.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 674,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 11,
+      "value": 11.8
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 675,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 12,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 676,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 13,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 677,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 14,
+      "value": 69.9
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 678,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 16,
+      "value": 9.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 679,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 17,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 680,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 20,
+      "value": 5.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 681,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 18,
+      "value": 12.69
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 682,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 21,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 683,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 22,
+      "value": 80.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 684,
+    "fields": {
+      "climate": 4,
+      "land_use_type": 19,
+      "value": 20.7
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 685,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 71,
+      "value": 40.73125
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 686,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 7,
+      "value": 47.4
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 687,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 8,
+      "value": 22.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 688,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 9,
+      "value": 17.75
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 689,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 10,
+      "value": 65.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 690,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 11,
+      "value": 11.8
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 691,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 12,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 692,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 13,
+      "value": 49.75
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 693,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 14,
+      "value": 64.05
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 694,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 16,
+      "value": 9.1
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 695,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 17,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 696,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 20,
+      "value": 5.5
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 697,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 18,
+      "value": 12.69
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 698,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 21,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 699,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 22,
+      "value": 80.2
+    }
+  },
+  {
+    "model": "ipcc.perennialmaxagb",
+    "pk": 700,
+    "fields": {
+      "climate": 20,
+      "land_use_type": 19,
+      "value": 20.7
+    }
+  }
+]

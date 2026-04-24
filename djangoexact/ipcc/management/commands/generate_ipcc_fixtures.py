@@ -16,11 +16,24 @@ Usage:
 
 import os
 import json
+import sys
 from django.core.management.base import BaseCommand
 from django.core import serializers
 from django.db.models import Model
 
 from ipcc.models import *
+
+
+def _resolve_model_class(model_name: str):
+    """Resolve a model name to its class within this module's namespace.
+
+    Returns the class when it is a concrete Django Model subclass, otherwise None.
+    Confining the lookup to this module prevents arbitrary name resolution.
+    """
+    candidate = getattr(sys.modules[__name__], model_name, None)
+    if isinstance(candidate, type) and issubclass(candidate, Model):
+        return candidate
+    return None
 
 
 class Command(BaseCommand):
@@ -183,12 +196,9 @@ class Command(BaseCommand):
         # Get model classes in the specified order
         models = []
         for model_name in model_order:
-            try:
-                model_class = globals().get(model_name)
-                if model_class and issubclass(model_class, Model):
-                    models.append(model_class)
-            except (NameError, TypeError):
-                continue
+            model_class = _resolve_model_class(model_name)
+            if model_class is not None:
+                models.append(model_class)
 
         return models
 
@@ -386,14 +396,11 @@ class Command(BaseCommand):
         """Get specific models by name."""
         models = []
         for model_name in model_names:
-            try:
-                model_class = globals().get(model_name)
-                if model_class and issubclass(model_class, Model):
-                    models.append(model_class)
-                else:
-                    self.stdout.write(self.style.WARNING(f"Model {model_name} not found in IPCC app"))
-            except (NameError, TypeError):
-                self.stdout.write(self.style.WARNING(f"Invalid model name: {model_name}"))
+            model_class = _resolve_model_class(model_name)
+            if model_class is not None:
+                models.append(model_class)
+            else:
+                self.stdout.write(self.style.WARNING(f"Model {model_name} not found in IPCC app"))
         return models
 
     def _generate_fixture_for_model(self, model_class):

@@ -1,0 +1,156 @@
+[
+  {
+    "model": "api.buildingtype",
+    "pk": 2,
+    "fields": {
+      "name": "Agricultural Buildings (Concrete)",
+      "name_en": "Agricultural Buildings (Concrete)",
+      "name_fr": "Bâtiments agricoles (béton)\n",
+      "name_es": "Construcciones Agrícolas (Cemento)",
+      "name_ru": "Сельскохозяйственные постройки (бетон)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 3,
+    "fields": {
+      "name": "Agricultural Buildings (Metal)",
+      "name_en": "Agricultural Buildings (Metal)",
+      "name_fr": "Bâtiments agricoles (métal)\n",
+      "name_es": "Construcciones Agrícolas (Metal)",
+      "name_ru": "Сельскохозяйственные постройки (металл)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 17,
+    "fields": {
+      "name": "Education",
+      "name_en": "Education",
+      "name_fr": "Éducation",
+      "name_es": "Educación",
+      "name_ru": "Образование"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 14,
+    "fields": {
+      "name": "Food Sales (Retail Or Wholesale)",
+      "name_en": "Food Sales (Retail Or Wholesale)",
+      "name_fr": "Vente alimentaire (détail ou gros)\n",
+      "name_es": "Venta de alimentos (al por menor o al por mayor)",
+      "name_ru": "Продажа продуктов питания (розничная или оптовая)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 15,
+    "fields": {
+      "name": "Food Service (Restaurants)",
+      "name_en": "Food Service (Restaurants)",
+      "name_fr": "Service alimentaire (restaurants)\n",
+      "name_es": "Servicio de Comida (Restaurantes)",
+      "name_ru": "Общественное питание (рестораны)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 6,
+    "fields": {
+      "name": "Garage (Concrete)",
+      "name_en": "Garage (Concrete)",
+      "name_fr": "Garage (béton)\n",
+      "name_es": "Garaje (Cemento)",
+      "name_ru": "Гараж (Бетон)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 7,
+    "fields": {
+      "name": "Garage (Metal)",
+      "name_en": "Garage (Metal)",
+      "name_fr": "Garage (métal)\n",
+      "name_es": "Garaje (Metal)",
+      "name_ru": "Гараж (Металлический)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 18,
+    "fields": {
+      "name": "Health Care (Metal)",
+      "name_en": "Health Care (Metal)",
+      "name_fr": "Soins de santé (métal)\n",
+      "name_es": "Atención Sanitaria (Metal)",
+      "name_ru": "Здравоохранение (Металл)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 1,
+    "fields": {
+      "name": "Housing (Concrete)",
+      "name_en": "Housing (Concrete)",
+      "name_fr": "Logement (béton)\n",
+      "name_es": "Viviendas (Cemento)",
+      "name_ru": "Жилье (Бетон)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 4,
+    "fields": {
+      "name": "Industrial Buildings (Concrete)",
+      "name_en": "Industrial Buildings (Concrete)",
+      "name_fr": "Bâtiments industriels (béton)\n",
+      "name_es": "Construcciones Industriales (Cemento)",
+      "name_ru": "Промышленные здания (бетон)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 5,
+    "fields": {
+      "name": "Industrial Buildings (Metal)",
+      "name_en": "Industrial Buildings (Metal)",
+      "name_fr": "Bâtiments industriels (métal)\n",
+      "name_es": "Construcciones Industriales (Metal)",
+      "name_ru": "Промышленные здания (металл)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 8,
+    "fields": {
+      "name": "Offices (Concrete)",
+      "name_en": "Offices (Concrete)",
+      "name_fr": "Bureaux (béton)\n",
+      "name_es": "Oficinas (Cemento)",
+      "name_ru": "Офисы (бетонные)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 9,
+    "fields": {
+      "name": "Offices (Metal)",
+      "name_en": "Offices (Metal)",
+      "name_fr": "Bureaux (métal)\n",
+      "name_es": "Oficinas (Metal)",
+      "name_ru": "Офисы (металлические)"
+    }
+  },
+  {
+    "model": "api.buildingtype",
+    "pk": 16,
+    "fields": {
+      "name": "Warehouse And Storage",
+      "name_en": "Warehouse And Storage",
+      "name_fr": "Entrepôt et stockage\n",
+      "name_es": "Almacén y Almacenamiento",
+      "name_ru": "Склад и хранение"
+    }
+  }
+]

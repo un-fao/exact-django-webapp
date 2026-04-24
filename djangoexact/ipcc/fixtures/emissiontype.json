@@ -1,0 +1,30 @@
+[
+  {
+    "model": "ipcc.emissiontype",
+    "pk": 1,
+    "fields": {
+      "name": "CH4"
+    }
+  },
+  {
+    "model": "ipcc.emissiontype",
+    "pk": 2,
+    "fields": {
+      "name": "N2O"
+    }
+  },
+  {
+    "model": "ipcc.emissiontype",
+    "pk": 3,
+    "fields": {
+      "name": "N2O Volatilization"
+    }
+  },
+  {
+    "model": "ipcc.emissiontype",
+    "pk": 4,
+    "fields": {
+      "name": "N2O Leaching"
+    }
+  }
+]

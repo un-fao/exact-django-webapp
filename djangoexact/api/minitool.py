@@ -28,6 +28,25 @@ except Exception as e:
     pass
 
 
+class _PairedValues:
+    """Marker wrapper for paired _start/_w values in constrained permutations.
+
+    When the permutation engine encounters a ``_PairedValues`` instance in a
+    combination tuple it knows to unpack ``.start`` and ``.w`` into two
+    consecutive positions (matching the original ``_start`` / ``_w`` field
+    order).  This avoids collisions with regular 2-tuples such as
+    ``(climate, moisture)``.
+    """
+    __slots__ = ("start", "w")
+
+    def __init__(self, start: Any, w: Any) -> None:
+        self.start = start
+        self.w = w
+
+    def __repr__(self) -> str:  # pragma: no cover – debugging aid
+        return f"_PairedValues({self.start!r}, {self.w!r})"
+
+
 def extract_relevant_traceback(traceback_str: str, max_lines: int = 10) -> str:
     """
     Extract only the most relevant lines from a stack trace to avoid huge CSV files.
@@ -615,8 +634,6 @@ class GrasslandProcessor(ModuleProcessor):
             fire_periodicity_w,
             fire_impact_start,
             fire_impact_w,
-            yield_start,
-            yield_w,
             climate_moisture,
             soil_type,
             region,
@@ -645,9 +662,6 @@ class GrasslandProcessor(ModuleProcessor):
             fire_impact_start=fire_impact_start,
             fire_impact_w=fire_impact_w,
             fire_impact_wo=fire_impact_start,
-            yield_start=yield_start,
-            yield_w=yield_w,
-            yield_wo=yield_start,
             land_use_type_start=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_w=models.LandUseType.objects.get(name="Grassland"),
             land_use_type_wo=models.LandUseType.objects.get(name="Grassland"),
@@ -1196,10 +1210,12 @@ class PermutationComputer:
         """Initialize Django in child processes"""
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoexact.settings")
         logging.getLogger().setLevel(logging.CRITICAL)
-        django.setup()
+
+        from django.apps import apps
+        if not apps.ready:
+            django.setup()
 
         from django.db import connections
-
         connections.close_all()
 
     def chunked_product(self, *iterables, chunk_size: int = 1000):
@@ -1211,8 +1227,38 @@ class PermutationComputer:
                 break
             yield chunk
 
+    @staticmethod
+    def _flatten_combo(combo: tuple) -> tuple:
+        """Flatten a combination tuple, unpacking ``_PairedValues`` markers.
+
+        Regular elements are kept as-is (including ``(climate, moisture)``
+        2-tuples), while ``_PairedValues`` instances are expanded to their
+        ``.start`` and ``.w`` components so the resulting flat tuple matches
+        the positional order that each module processor expects.
+        """
+        flat: list = []
+        for item in combo:
+            if isinstance(item, _PairedValues):
+                flat.append(item.start)
+                flat.append(item.w)
+            else:
+                flat.append(item)
+        return tuple(flat)
+
+    def _chunked_constrained_product(self, *iterables, chunk_size: int = 1000):
+        """Yield chunks of Cartesian product with ``_PairedValues`` flattening."""
+        it = itertools.product(*iterables)
+        while True:
+            raw_chunk = list(itertools.islice(it, chunk_size))
+            if not raw_chunk:
+                break
+            yield [self._flatten_combo(combo) for combo in raw_chunk]
+
     def compute_permutations(
-        self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000, stop_at: Optional[int] = None, is_coastal: bool = False, max_workers: Optional[int] = None
+        self, fields: Dict[str, Any], model: Any, chunk_size: int = 10000,
+        stop_at: Optional[int] = None, is_coastal: bool = False,
+        max_workers: Optional[int] = None, progress_callback=None,
+        paired_keys: Optional[List[Tuple[str, str]]] = None,
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Compute permutations for a model"""
         import api.models as models
@@ -1270,12 +1316,45 @@ class PermutationComputer:
         # Get processor
         processor = self.processor_registry.get_processor(model.__name__)
 
-        # Prepare iterables
-        iterables = [list(val) if not isinstance(val, int) else range(val) for val in fields.values()]
+        # Prepare iterables, respecting paired fields that must vary together
+        use_constrained = bool(paired_keys)
 
-        # Compute total permutations
-        total = math.prod(len(x) for x in iterables)
-        logger.info(f"Total permutations (theoretical): {total:,}")
+        if use_constrained:
+            paired_start_keys = {s for s, _ in paired_keys}
+            paired_w_keys = {w for _, w in paired_keys}
+            paired_map = {s: w for s, w in paired_keys}
+
+            iterables = []
+            field_keys = list(fields.keys())
+            skip_keys: set = set()
+
+            for key in field_keys:
+                if key in skip_keys:
+                    continue
+
+                val = fields[key]
+                items = list(val) if not isinstance(val, int) else list(range(val))
+
+                if key in paired_start_keys:
+                    # Paired _start key: merge with its _w counterpart into
+                    # a single axis using _PairedValues so the product yields
+                    # one element that will be unpacked into two positions.
+                    w_key = paired_map[key]
+                    skip_keys.add(w_key)
+                    iterables.append([_PairedValues(v, v) for v in items])
+                elif key in paired_w_keys:
+                    # Already consumed by the start key above
+                    continue
+                else:
+                    iterables.append(items)
+
+            total = math.prod(len(x) for x in iterables)
+            logger.info(f"Total permutations (constrained): {total:,}")
+        else:
+            # Original behaviour: full cartesian product
+            iterables = [list(val) if not isinstance(val, int) else list(range(val)) for val in fields.values()]
+            total = math.prod(len(x) for x in iterables)
+            logger.info(f"Total permutations (theoretical): {total:,}")
 
         data = []
         errors_data = []
@@ -1292,14 +1371,30 @@ class PermutationComputer:
             start_time = time.time()
             processed_count = 0
 
-            with ProcessPoolExecutor(max_workers=max_workers, initializer=self.django_initializer) as executor:
+            # Use 'fork' context explicitly: the management command is single-threaded so
+            # fork is safe, and it avoids the spawn chicken-and-egg where unpickling the
+            # initializer imports api.minitool (which runs module-level ORM queries)
+            # before Django is set up — causing "populate() isn't reentrant" on macOS.
+            import multiprocessing
+            mp_context = multiprocessing.get_context("fork")
+            # Close parent's DB connections before forking so children don't inherit
+            # the open socket. With fork, psycopg2's close() in child sends a
+            # protocol-level termination over the shared FD, killing the parent's connection.
+            from django.db import connections
+            connections.close_all()
+            with ProcessPoolExecutor(max_workers=max_workers, initializer=self.django_initializer, mp_context=mp_context) as executor:
                 pbar = tqdm(total=total, desc=f"Building {model.__name__} permutations", unit=" permutations", postfix={"success": 0, "errors": 0})
 
                 # Optimize chunk size based on number of workers
                 optimal_chunk_size = max(chunk_size, chunk_size // max_workers * max_workers)
                 logger.info(f"Using chunk size: {optimal_chunk_size}")
 
-                for chunk in self.chunked_product(*iterables, chunk_size=optimal_chunk_size):
+                if use_constrained:
+                    chunk_iter = self._chunked_constrained_product(*iterables, chunk_size=optimal_chunk_size)
+                else:
+                    chunk_iter = self.chunked_product(*iterables, chunk_size=optimal_chunk_size)
+
+                for chunk in chunk_iter:
                     # Use submit instead of map for better load balancing
                     futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
 
@@ -1324,6 +1419,10 @@ class PermutationComputer:
                         pbar.update(1)
                         processed_count += 1
 
+                        if progress_callback and processed_count % 500 == 0:
+                            pct = min(int(processed_count * 100 / total), 99)
+                            progress_callback(pct)
+
                         # Log performance every 1000 processed items
                         if processed_count % 1000 == 0:
                             elapsed_time = time.time() - start_time
@@ -1345,7 +1444,7 @@ class PermutationComputer:
 
         if not data:
             logger.warning(f"No data for {model.__name__}!")
-            return [], []
+            return [], errors_data
 
         # Log summary of results
         total_processed = len(data) + len(errors_data)

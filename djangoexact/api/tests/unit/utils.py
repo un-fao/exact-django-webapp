@@ -21,7 +21,7 @@ class APITestCaseMixin(APITestCase):
         Set up the test environment for the project lock tests.
 
         This method initializes the following attributes:
-        - self.user: A CustomUser instance with the email "claudio.lavacca@fao.org".
+        - self.user: A CustomUser instance with the email "testuser@example.com".
         - self.user2: A CustomUser instance with the email "test@user.org".
         - self.group: A Group instance with the name "Second Reviewer".
         - self.country: A randomly selected Country instance.
@@ -42,7 +42,7 @@ class APITestCaseMixin(APITestCase):
         log.getLogger().setLevel(log.INFO)
         log.debug("Setting up ProjectLockTestCase")
         self.request_factory = APIRequestFactory(enforce_csrf_checks=False)
-        self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
+        self.user = models.CustomUser.objects.get(email="testuser@example.com")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
         self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()

@@ -1,0 +1,18 @@
+[
+  {
+    "model": "api.projectstatus",
+    "pk": 2,
+    "fields": {
+      "name": "Design",
+      "value": 0
+    }
+  },
+  {
+    "model": "api.projectstatus",
+    "pk": 1,
+    "fields": {
+      "name": "Implementation",
+      "value": 1
+    }
+  }
+]

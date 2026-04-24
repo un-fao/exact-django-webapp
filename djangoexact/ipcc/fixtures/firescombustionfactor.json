@@ -1,0 +1,1330 @@
+[
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 138,
+    "fields": {
+      "land_use_type": 28,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 139,
+    "fields": {
+      "land_use_type": 25,
+      "value": 0.8
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 140,
+    "fields": {
+      "land_use_type": 26,
+      "value": 0.8
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 141,
+    "fields": {
+      "land_use_type": 27,
+      "value": 0.8
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 142,
+    "fields": {
+      "land_use_type": 24,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 143,
+    "fields": {
+      "land_use_type": 30,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 145,
+    "fields": {
+      "land_use_type": 31,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 146,
+    "fields": {
+      "land_use_type": 37,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 147,
+    "fields": {
+      "land_use_type": 38,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 148,
+    "fields": {
+      "land_use_type": 44,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 149,
+    "fields": {
+      "land_use_type": 42,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 150,
+    "fields": {
+      "land_use_type": 39,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 151,
+    "fields": {
+      "land_use_type": 40,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 152,
+    "fields": {
+      "land_use_type": 41,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 153,
+    "fields": {
+      "land_use_type": 45,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 154,
+    "fields": {
+      "land_use_type": 43,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 155,
+    "fields": {
+      "land_use_type": 32,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 156,
+    "fields": {
+      "land_use_type": 65,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 157,
+    "fields": {
+      "land_use_type": 64,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 158,
+    "fields": {
+      "land_use_type": 71,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 159,
+    "fields": {
+      "land_use_type": 7,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 160,
+    "fields": {
+      "land_use_type": 9,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 161,
+    "fields": {
+      "land_use_type": 10,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 162,
+    "fields": {
+      "land_use_type": 21,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 163,
+    "fields": {
+      "land_use_type": 11,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 164,
+    "fields": {
+      "land_use_type": 8,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 165,
+    "fields": {
+      "land_use_type": 22,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 166,
+    "fields": {
+      "land_use_type": 12,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 167,
+    "fields": {
+      "land_use_type": 13,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 168,
+    "fields": {
+      "land_use_type": 14,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 169,
+    "fields": {
+      "land_use_type": 19,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 170,
+    "fields": {
+      "land_use_type": 17,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 171,
+    "fields": {
+      "land_use_type": 46,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 172,
+    "fields": {
+      "land_use_type": 16,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 173,
+    "fields": {
+      "land_use_type": 18,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 174,
+    "fields": {
+      "land_use_type": 20,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 175,
+    "fields": {
+      "land_use_type": 66,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 176,
+    "fields": {
+      "land_use_type": 177,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 177,
+    "fields": {
+      "land_use_type": 178,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 178,
+    "fields": {
+      "land_use_type": 179,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 179,
+    "fields": {
+      "land_use_type": 180,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 180,
+    "fields": {
+      "land_use_type": 181,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 181,
+    "fields": {
+      "land_use_type": 182,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 182,
+    "fields": {
+      "land_use_type": 183,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 183,
+    "fields": {
+      "land_use_type": 184,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 184,
+    "fields": {
+      "land_use_type": 185,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 185,
+    "fields": {
+      "land_use_type": 186,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 186,
+    "fields": {
+      "land_use_type": 187,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 187,
+    "fields": {
+      "land_use_type": 189,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 188,
+    "fields": {
+      "land_use_type": 190,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 189,
+    "fields": {
+      "land_use_type": 191,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 190,
+    "fields": {
+      "land_use_type": 192,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 191,
+    "fields": {
+      "land_use_type": 193,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 192,
+    "fields": {
+      "land_use_type": 194,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 193,
+    "fields": {
+      "land_use_type": 195,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 194,
+    "fields": {
+      "land_use_type": 196,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 195,
+    "fields": {
+      "land_use_type": 197,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 196,
+    "fields": {
+      "land_use_type": 198,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 197,
+    "fields": {
+      "land_use_type": 199,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 198,
+    "fields": {
+      "land_use_type": 200,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 199,
+    "fields": {
+      "land_use_type": 201,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 200,
+    "fields": {
+      "land_use_type": 202,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 201,
+    "fields": {
+      "land_use_type": 203,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 202,
+    "fields": {
+      "land_use_type": 204,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 203,
+    "fields": {
+      "land_use_type": 205,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 204,
+    "fields": {
+      "land_use_type": 206,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 205,
+    "fields": {
+      "land_use_type": 207,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 206,
+    "fields": {
+      "land_use_type": 208,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 207,
+    "fields": {
+      "land_use_type": 209,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 208,
+    "fields": {
+      "land_use_type": 210,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 209,
+    "fields": {
+      "land_use_type": 211,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 210,
+    "fields": {
+      "land_use_type": 212,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 211,
+    "fields": {
+      "land_use_type": 213,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 212,
+    "fields": {
+      "land_use_type": 214,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 213,
+    "fields": {
+      "land_use_type": 215,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 214,
+    "fields": {
+      "land_use_type": 216,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 215,
+    "fields": {
+      "land_use_type": 217,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 216,
+    "fields": {
+      "land_use_type": 218,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 217,
+    "fields": {
+      "land_use_type": 219,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 218,
+    "fields": {
+      "land_use_type": 220,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 219,
+    "fields": {
+      "land_use_type": 221,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 220,
+    "fields": {
+      "land_use_type": 222,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 221,
+    "fields": {
+      "land_use_type": 223,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 222,
+    "fields": {
+      "land_use_type": 224,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 223,
+    "fields": {
+      "land_use_type": 225,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 224,
+    "fields": {
+      "land_use_type": 226,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 225,
+    "fields": {
+      "land_use_type": 227,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 226,
+    "fields": {
+      "land_use_type": 228,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 227,
+    "fields": {
+      "land_use_type": 229,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 228,
+    "fields": {
+      "land_use_type": 230,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 229,
+    "fields": {
+      "land_use_type": 231,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 230,
+    "fields": {
+      "land_use_type": 232,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 231,
+    "fields": {
+      "land_use_type": 233,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 232,
+    "fields": {
+      "land_use_type": 234,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 233,
+    "fields": {
+      "land_use_type": 235,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 234,
+    "fields": {
+      "land_use_type": 236,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 235,
+    "fields": {
+      "land_use_type": 237,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 236,
+    "fields": {
+      "land_use_type": 238,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 237,
+    "fields": {
+      "land_use_type": 239,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 238,
+    "fields": {
+      "land_use_type": 240,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 239,
+    "fields": {
+      "land_use_type": 242,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 240,
+    "fields": {
+      "land_use_type": 243,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 241,
+    "fields": {
+      "land_use_type": 244,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 242,
+    "fields": {
+      "land_use_type": 245,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 243,
+    "fields": {
+      "land_use_type": 246,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 244,
+    "fields": {
+      "land_use_type": 247,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 245,
+    "fields": {
+      "land_use_type": 248,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 246,
+    "fields": {
+      "land_use_type": 249,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 247,
+    "fields": {
+      "land_use_type": 250,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 248,
+    "fields": {
+      "land_use_type": 251,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 249,
+    "fields": {
+      "land_use_type": 252,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 250,
+    "fields": {
+      "land_use_type": 253,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 251,
+    "fields": {
+      "land_use_type": 254,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 252,
+    "fields": {
+      "land_use_type": 255,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 253,
+    "fields": {
+      "land_use_type": 256,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 254,
+    "fields": {
+      "land_use_type": 257,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 255,
+    "fields": {
+      "land_use_type": 258,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 256,
+    "fields": {
+      "land_use_type": 259,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 257,
+    "fields": {
+      "land_use_type": 260,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 258,
+    "fields": {
+      "land_use_type": 261,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 259,
+    "fields": {
+      "land_use_type": 262,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 260,
+    "fields": {
+      "land_use_type": 263,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 261,
+    "fields": {
+      "land_use_type": 264,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 262,
+    "fields": {
+      "land_use_type": 265,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 263,
+    "fields": {
+      "land_use_type": 266,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 264,
+    "fields": {
+      "land_use_type": 267,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 265,
+    "fields": {
+      "land_use_type": 268,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 266,
+    "fields": {
+      "land_use_type": 269,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 267,
+    "fields": {
+      "land_use_type": 270,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 268,
+    "fields": {
+      "land_use_type": 271,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 269,
+    "fields": {
+      "land_use_type": 272,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 270,
+    "fields": {
+      "land_use_type": 273,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 271,
+    "fields": {
+      "land_use_type": 274,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 272,
+    "fields": {
+      "land_use_type": 275,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 273,
+    "fields": {
+      "land_use_type": 276,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 274,
+    "fields": {
+      "land_use_type": 277,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 275,
+    "fields": {
+      "land_use_type": 278,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 276,
+    "fields": {
+      "land_use_type": 279,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 277,
+    "fields": {
+      "land_use_type": 281,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 278,
+    "fields": {
+      "land_use_type": 282,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 279,
+    "fields": {
+      "land_use_type": 283,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 280,
+    "fields": {
+      "land_use_type": 284,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 281,
+    "fields": {
+      "land_use_type": 285,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 282,
+    "fields": {
+      "land_use_type": 286,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 283,
+    "fields": {
+      "land_use_type": 287,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 284,
+    "fields": {
+      "land_use_type": 288,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 285,
+    "fields": {
+      "land_use_type": 289,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 286,
+    "fields": {
+      "land_use_type": 290,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 287,
+    "fields": {
+      "land_use_type": 291,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 288,
+    "fields": {
+      "land_use_type": 292,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 289,
+    "fields": {
+      "land_use_type": 293,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 290,
+    "fields": {
+      "land_use_type": 294,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 291,
+    "fields": {
+      "land_use_type": 295,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 292,
+    "fields": {
+      "land_use_type": 296,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 293,
+    "fields": {
+      "land_use_type": 297,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 294,
+    "fields": {
+      "land_use_type": 298,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 295,
+    "fields": {
+      "land_use_type": 299,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 296,
+    "fields": {
+      "land_use_type": 300,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 297,
+    "fields": {
+      "land_use_type": 301,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 298,
+    "fields": {
+      "land_use_type": 302,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 299,
+    "fields": {
+      "land_use_type": 303,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 300,
+    "fields": {
+      "land_use_type": 304,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 301,
+    "fields": {
+      "land_use_type": 305,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 302,
+    "fields": {
+      "land_use_type": 306,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 303,
+    "fields": {
+      "land_use_type": 307,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.firescombustionfactor",
+    "pk": 304,
+    "fields": {
+      "land_use_type": 310,
+      "value": 0.85
+    }
+  }
+]

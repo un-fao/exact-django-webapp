@@ -1,0 +1,57 @@
+[
+  {
+    "model": "api.trophictype",
+    "pk": 1,
+    "fields": {
+      "name": "Default",
+      "name_en": "Default",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.trophictype",
+    "pk": 3,
+    "fields": {
+      "name": "Eutrophic",
+      "name_en": "Eutrophic",
+      "name_fr": "Eutrophe",
+      "name_es": "Eutrófico",
+      "name_ru": "Эвтрофный"
+    }
+  },
+  {
+    "model": "api.trophictype",
+    "pk": 5,
+    "fields": {
+      "name": "Hypereutrophic",
+      "name_en": "Hypereutrophic",
+      "name_fr": "Hypereutrophe",
+      "name_es": "Hipereutrófico",
+      "name_ru": "Гиперэвтрофный"
+    }
+  },
+  {
+    "model": "api.trophictype",
+    "pk": 4,
+    "fields": {
+      "name": "Mesotrophic",
+      "name_en": "Mesotrophic",
+      "name_fr": "Mésotrophe",
+      "name_es": "Mesotrófico",
+      "name_ru": "Мезоэутрофный"
+    }
+  },
+  {
+    "model": "api.trophictype",
+    "pk": 2,
+    "fields": {
+      "name": "Oligotrophic",
+      "name_en": "Oligotrophic",
+      "name_fr": "Oligotrophe",
+      "name_es": "Oligotrófico",
+      "name_ru": "Олиготрофный"
+    }
+  }
+]

@@ -1,0 +1,130 @@
+[
+  {
+    "model": "ipcc.riceyield",
+    "pk": 1,
+    "fields": {
+      "continent": 16,
+      "value": 4.2997
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 2,
+    "fields": {
+      "continent": 15,
+      "value": 4.9066
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 3,
+    "fields": {
+      "continent": 6,
+      "value": 3.6902
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 4,
+    "fields": {
+      "continent": 1,
+      "value": 2.5449
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 5,
+    "fields": {
+      "continent": 7,
+      "value": 6.9739
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 6,
+    "fields": {
+      "continent": 11,
+      "value": 6.3766
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 7,
+    "fields": {
+      "continent": 2,
+      "value": 1.1161
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 8,
+    "fields": {
+      "continent": 3,
+      "value": 8.6981
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 9,
+    "fields": {
+      "continent": 12,
+      "value": 6.6937
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 10,
+    "fields": {
+      "continent": 14,
+      "value": 6.1154
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 11,
+    "fields": {
+      "continent": 8,
+      "value": 4.2911
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 12,
+    "fields": {
+      "continent": 4,
+      "value": 2.9177
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 13,
+    "fields": {
+      "continent": 9,
+      "value": 4.0533
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 14,
+    "fields": {
+      "continent": 5,
+      "value": 1.9235
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 15,
+    "fields": {
+      "continent": 10,
+      "value": 6.3167
+    }
+  },
+  {
+    "model": "ipcc.riceyield",
+    "pk": 16,
+    "fields": {
+      "continent": 13,
+      "value": 8.5398
+    }
+  }
+]

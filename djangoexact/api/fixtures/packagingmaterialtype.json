@@ -1,0 +1,57 @@
+[
+  {
+    "model": "api.packagingmaterialtype",
+    "pk": 3,
+    "fields": {
+      "name": "Aluminium",
+      "name_en": "Aluminium",
+      "name_fr": "Aluminium",
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.packagingmaterialtype",
+    "pk": 2,
+    "fields": {
+      "name": "Paper",
+      "name_en": "Paper",
+      "name_fr": "Papier",
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.packagingmaterialtype",
+    "pk": 5,
+    "fields": {
+      "name": "Plastic (LDPE)",
+      "name_en": "Plastic (LDPE)",
+      "name_fr": "Plastique (LDPE)\n",
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.packagingmaterialtype",
+    "pk": 4,
+    "fields": {
+      "name": "Plastic (mixed)",
+      "name_en": "Plastic (mixed)",
+      "name_fr": "Plastique (mixte)\n",
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.packagingmaterialtype",
+    "pk": 1,
+    "fields": {
+      "name": "Wood",
+      "name_en": "Wood",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  }
+]

@@ -1,0 +1,3698 @@
+[
+  {
+    "model": "ipcc.fludata",
+    "pk": 12810,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12811,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12812,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12813,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12814,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12815,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12816,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12817,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12818,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12819,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12820,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12821,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 1,
+      "grassland_management_type": null,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12822,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12823,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12824,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12825,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12826,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12827,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12828,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12829,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12830,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12831,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.88
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12832,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.88
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12833,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 161,
+      "grassland_management_type": null,
+      "value": 0.88
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12834,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12835,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12836,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12837,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12838,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12839,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12840,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12841,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12842,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12843,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12844,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12845,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 3,
+      "grassland_management_type": null,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12846,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12847,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12848,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12849,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12850,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12851,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12852,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12853,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12854,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12855,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12856,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12857,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 4,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12858,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12859,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12860,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12861,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12862,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12863,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12864,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12865,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12866,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12867,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12868,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12869,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 162,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12870,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12871,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12872,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12873,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12874,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12875,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12876,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12877,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12878,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12879,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12880,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12881,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 71,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12882,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12883,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12884,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12885,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12886,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12887,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12888,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12889,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12890,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12891,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12892,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12893,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 7,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12894,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12895,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12896,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12897,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12898,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12899,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12900,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12901,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12902,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12903,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12904,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12905,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 8,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12906,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12907,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12908,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12909,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12910,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12911,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12912,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12913,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12914,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12915,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12916,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12917,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12918,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12919,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12920,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12921,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12922,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12923,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12924,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12925,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12926,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12927,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12928,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12929,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 10,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12930,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12931,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12932,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12933,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12934,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12935,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12936,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12937,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12938,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12939,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12940,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12941,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 11,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12942,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12943,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12944,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12945,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12946,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12947,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12948,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12949,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12950,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12951,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12952,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12953,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 12,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12954,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12955,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12956,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12957,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12958,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12959,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12960,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12961,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12962,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12963,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12964,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12965,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 13,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12966,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12967,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12968,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12969,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12970,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12971,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12972,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12973,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12974,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12975,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12976,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12977,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 14,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12978,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12979,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12980,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12981,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12982,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12983,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12984,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12985,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12986,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12987,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12988,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12989,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 21,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12990,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12991,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12992,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12993,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12994,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12995,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12996,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12997,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12998,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 12999,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13000,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13001,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 22,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13002,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13003,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13004,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13005,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13006,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13007,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13008,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13009,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13010,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13011,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13012,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13013,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 19,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13014,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13015,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13016,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13017,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13018,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13019,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13020,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13021,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13022,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13023,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13024,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13025,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 16,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13026,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13027,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13028,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13029,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13030,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13031,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13032,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13033,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13034,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13035,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13036,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13037,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 17,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13038,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13039,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13040,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13041,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13042,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13043,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13044,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13045,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13046,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13047,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13048,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13049,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 18,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13050,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13051,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13052,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13053,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13054,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13055,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13056,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13057,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13058,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13059,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13060,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13061,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 20,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13062,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13063,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13064,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13065,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13066,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13067,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13068,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13069,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13070,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13071,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13072,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13073,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 15,
+      "grassland_management_type": null,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13074,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13075,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13076,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13077,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13078,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13079,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13080,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13081,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13082,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13083,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13084,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13085,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 6,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13086,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13087,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13088,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13089,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13090,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13091,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13092,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13093,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13094,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13095,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13096,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13097,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13098,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13099,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13100,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13101,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13102,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13103,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13104,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13105,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13106,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13107,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13108,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13109,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13110,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13111,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13112,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13113,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13114,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13115,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13116,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13117,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13118,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13119,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13120,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13121,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13122,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13123,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13124,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13125,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13126,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13127,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13128,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13129,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13130,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13131,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13132,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13133,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13134,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13135,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13136,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13137,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13138,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13139,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13140,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13141,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13142,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13143,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13144,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fludata",
+    "pk": 13145,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  }
+]

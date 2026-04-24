@@ -1,0 +1,182 @@
+[
+  {
+    "model": "api.applicationparameter",
+    "pk": 62,
+    "fields": {
+      "name": "c_fraction_ref",
+      "value": 1.0,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 47,
+    "fields": {
+      "name": "conversion_bar_meter_head",
+      "value": 10.19,
+      "unit": "bar/meter"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 59,
+    "fields": {
+      "name": "default_combustion_factor",
+      "value": 0.77,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 60,
+    "fields": {
+      "name": "default_fire_periodicity",
+      "value": 1.0,
+      "unit": "years"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 48,
+    "fields": {
+      "name": "erh_electricity",
+      "value": 2.725e-06,
+      "unit": "MWh"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 58,
+    "fields": {
+      "name": "feed_ef_default",
+      "value": 0.0,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 55,
+    "fields": {
+      "name": "large_fishery_kw_tonnes",
+      "value": 60.0,
+      "unit": "kW/tonnes"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 54,
+    "fields": {
+      "name": "large_fishery_lost_refrigerant_default",
+      "value": 0.48734,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 56,
+    "fields": {
+      "name": "large_fishery_tonnes_ice_default",
+      "value": 2.8,
+      "unit": "tonnes"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 46,
+    "fields": {
+      "name": "leaching_multiplier",
+      "value": 0.011,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 57,
+    "fields": {
+      "name": "nitrous_ef_default",
+      "value": 0.00169,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 61,
+    "fields": {
+      "name": "percentage_c_lost_excavation",
+      "value": 0.96,
+      "unit": "%"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 65,
+    "fields": {
+      "name": "project_lock_expiration_time_minutes",
+      "value": 30.0,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 63,
+    "fields": {
+      "name": "project_uploads_max_file_size_mb",
+      "value": 50.0,
+      "unit": "MB"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 50,
+    "fields": {
+      "name": "pumping_efficiency",
+      "value": 0.45,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 52,
+    "fields": {
+      "name": "small_fishery_kw_tonnes",
+      "value": 60.0,
+      "unit": "kW/tonnes"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 51,
+    "fields": {
+      "name": "small_fishery_lost_refrigerant_default",
+      "value": 0.083,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 53,
+    "fields": {
+      "name": "small_fishery_tonnes_ice_default",
+      "value": 2.8,
+      "unit": "tonnes"
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 64,
+    "fields": {
+      "name": "transmission_loss",
+      "value": 0.1,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.applicationparameter",
+    "pk": 49,
+    "fields": {
+      "name": "transportation_loss",
+      "value": 0.1,
+      "unit": null
+    }
+  }
+]

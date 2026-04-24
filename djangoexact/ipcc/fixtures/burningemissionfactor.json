@@ -1,0 +1,62 @@
+[
+  {
+    "model": "ipcc.burningemissionfactor",
+    "pk": 6,
+    "fields": {
+      "category": 2,
+      "co2": 1613.0,
+      "co": 65.0,
+      "ch4": 2.3,
+      "n2o": 0.21,
+      "nox": 3.9
+    }
+  },
+  {
+    "model": "ipcc.burningemissionfactor",
+    "pk": 7,
+    "fields": {
+      "category": 3,
+      "co2": 1515.0,
+      "co": 92.0,
+      "ch4": 2.7,
+      "n2o": 0.07,
+      "nox": 2.5
+    }
+  },
+  {
+    "model": "ipcc.burningemissionfactor",
+    "pk": 8,
+    "fields": {
+      "category": 4,
+      "co2": 1580.0,
+      "co": 104.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "nox": 1.6
+    }
+  },
+  {
+    "model": "ipcc.burningemissionfactor",
+    "pk": 9,
+    "fields": {
+      "category": 5,
+      "co2": 1569.0,
+      "co": 107.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "nox": 3.0
+    }
+  },
+  {
+    "model": "ipcc.burningemissionfactor",
+    "pk": 10,
+    "fields": {
+      "category": 6,
+      "co2": 1550.0,
+      "co": 78.0,
+      "ch4": 6.1,
+      "n2o": 0.06,
+      "nox": 1.1
+    }
+  }
+]

@@ -1,0 +1,332 @@
+[
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 162,
+    "fields": {
+      "grassland_management_type": 6,
+      "climate": 4,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.11
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 163,
+    "fields": {
+      "grassland_management_type": 6,
+      "climate": 1,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.11
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 164,
+    "fields": {
+      "grassland_management_type": 6,
+      "climate": 3,
+      "fmg": 1.17,
+      "flu": 1.0,
+      "fi": 1.11
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 165,
+    "fields": {
+      "grassland_management_type": 6,
+      "climate": 20,
+      "fmg": 1.16,
+      "flu": 1.0,
+      "fi": 1.11
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 166,
+    "fields": {
+      "grassland_management_type": 6,
+      "climate": 2,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.11
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 167,
+    "fields": {
+      "grassland_management_type": 5,
+      "climate": 4,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 168,
+    "fields": {
+      "grassland_management_type": 5,
+      "climate": 1,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 169,
+    "fields": {
+      "grassland_management_type": 5,
+      "climate": 3,
+      "fmg": 1.17,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 170,
+    "fields": {
+      "grassland_management_type": 5,
+      "climate": 20,
+      "fmg": 1.16,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 171,
+    "fields": {
+      "grassland_management_type": 5,
+      "climate": 2,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 172,
+    "fields": {
+      "grassland_management_type": 4,
+      "climate": 4,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 173,
+    "fields": {
+      "grassland_management_type": 4,
+      "climate": 1,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 174,
+    "fields": {
+      "grassland_management_type": 4,
+      "climate": 3,
+      "fmg": 1.17,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 175,
+    "fields": {
+      "grassland_management_type": 4,
+      "climate": 20,
+      "fmg": 1.16,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 176,
+    "fields": {
+      "grassland_management_type": 4,
+      "climate": 2,
+      "fmg": 1.14,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 177,
+    "fields": {
+      "grassland_management_type": 3,
+      "climate": 4,
+      "fmg": 0.7,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 178,
+    "fields": {
+      "grassland_management_type": 3,
+      "climate": 3,
+      "fmg": 0.7,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 179,
+    "fields": {
+      "grassland_management_type": 3,
+      "climate": 1,
+      "fmg": 0.7,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 180,
+    "fields": {
+      "grassland_management_type": 3,
+      "climate": 2,
+      "fmg": 0.7,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 181,
+    "fields": {
+      "grassland_management_type": 3,
+      "climate": 20,
+      "fmg": 0.7,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 182,
+    "fields": {
+      "grassland_management_type": 2,
+      "climate": 4,
+      "fmg": 0.9,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 183,
+    "fields": {
+      "grassland_management_type": 2,
+      "climate": 3,
+      "fmg": 0.9,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 184,
+    "fields": {
+      "grassland_management_type": 2,
+      "climate": 1,
+      "fmg": 0.9,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 185,
+    "fields": {
+      "grassland_management_type": 2,
+      "climate": 2,
+      "fmg": 0.9,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 186,
+    "fields": {
+      "grassland_management_type": 2,
+      "climate": 20,
+      "fmg": 0.9,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 187,
+    "fields": {
+      "grassland_management_type": 1,
+      "climate": 4,
+      "fmg": 1.0,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 188,
+    "fields": {
+      "grassland_management_type": 1,
+      "climate": 3,
+      "fmg": 1.0,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 189,
+    "fields": {
+      "grassland_management_type": 1,
+      "climate": 1,
+      "fmg": 1.0,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 190,
+    "fields": {
+      "grassland_management_type": 1,
+      "climate": 2,
+      "fmg": 1.0,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  },
+  {
+    "model": "ipcc.grasslandstockexchangefactor",
+    "pk": 191,
+    "fields": {
+      "grassland_management_type": 1,
+      "climate": 20,
+      "fmg": 1.0,
+      "flu": 1.0,
+      "fi": 1.0
+    }
+  }
+]

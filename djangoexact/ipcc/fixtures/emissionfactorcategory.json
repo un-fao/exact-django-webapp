@@ -1,0 +1,37 @@
+[
+  {
+    "model": "ipcc.emissionfactorcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Savanna and grassland"
+    }
+  },
+  {
+    "model": "ipcc.emissionfactorcategory",
+    "pk": 3,
+    "fields": {
+      "name": "Agricultural residues"
+    }
+  },
+  {
+    "model": "ipcc.emissionfactorcategory",
+    "pk": 4,
+    "fields": {
+      "name": "Tropical forest"
+    }
+  },
+  {
+    "model": "ipcc.emissionfactorcategory",
+    "pk": 5,
+    "fields": {
+      "name": "Extra tropical forest"
+    }
+  },
+  {
+    "model": "ipcc.emissionfactorcategory",
+    "pk": 6,
+    "fields": {
+      "name": "Biofuel burning"
+    }
+  }
+]
