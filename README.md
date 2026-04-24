@@ -2,6 +2,9 @@
 
 EX-ACT (Ex-Ante Carbon Balance Tool) is a Django REST Framework-based API that provides a comprehensive system for carbon balance analysis and greenhouse gas emissions calculations. This tool is designed to help estimate the impact of agriculture, forestry, and other land use projects on carbon balance and greenhouse gas emissions. It is built for direct use of the [EX-ACT Web Tool](https://exact.apps.fao.org/), but its IPCC dataset is freely accessible upon request and grant of the proper permissions to the CSI team.
 
+Copyright (C) 2023–2026 Food and Agriculture Organization of the United Nations (FAO).
+Licensed under the [GNU Affero General Public License v3.0 or later](./LICENSE). See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines, [SECURITY.md](./SECURITY.md) for vulnerability reporting, and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) for community standards.
+
 ## 🌟 Features
 
 - **Comprehensive API Documentation**: Available in multiple formats
@@ -72,15 +75,15 @@ EX-ACT (Ex-Ante Carbon Balance Tool) is a Django REST Framework-based API that p
 
    The API will be available at `http://localhost:8000/api/`
 
-## 📊 IPCC Data Integration
+## 📊 Reference Data & Fixtures
 
-To populate your database with IPCC data:
+To bootstrap a fresh database with all reference data (IPCC tables, Types, Countries, Regions, etc.):
 
-1. Ensure `django_extensions` is installed (included in requirements.txt)
-2. Run the data import script:
-   ```bash
-   python manage.py runscript ipcc_dump
-   ```
+```bash
+python manage.py load_reference_data --app=all
+```
+
+See [djangoexact/docs/guides/fixtures-guide.md](djangoexact/docs/guides/fixtures-guide.md) for the full dump/load workflow, PK stability guardrails, determinism guarantees, and how to add a new reference model.
 
 ## 🔍 API Testing
 
@@ -99,3 +102,16 @@ When the server is running, access the API documentation at:
 - ReDoc: http://localhost:8000/api/redoc/
 
 ## 🛠 Project Structure
+
+## 📄 License
+
+EX-ACT is released under the [GNU Affero General Public License v3.0 or later](./LICENSE) (`AGPL-3.0-or-later`).
+
+Copyright (C) 2023–2026 Food and Agriculture Organization of the United Nations (FAO).
+
+## 🤝 Community
+
+- **Contributing**: see [CONTRIBUTING.md](./CONTRIBUTING.md)
+- **Code of Conduct**: see [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- **Security**: report vulnerabilities privately per [SECURITY.md](./SECURITY.md) — do **not** open public issues for security concerns.
+- **Contact**: exact@fao.org

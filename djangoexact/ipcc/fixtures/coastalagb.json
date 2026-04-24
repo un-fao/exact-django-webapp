@@ -1,0 +1,332 @@
+[
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 91,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 92,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 93,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 94,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 95,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 75.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 96,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 75.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 97,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 92.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 98,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 192.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 99,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 155,
+      "value": 192.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 100,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 101,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 102,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 103,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 104,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 105,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 106,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 107,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 108,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 109,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 110,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 111,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 112,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 113,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 114,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 115,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 116,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 117,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 118,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 119,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  },
+  {
+    "model": "ipcc.coastalagb",
+    "pk": 120,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t dry matter/ha"
+    }
+  }
+]

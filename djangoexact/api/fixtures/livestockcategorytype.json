@@ -1,0 +1,206 @@
+[
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 54,
+    "fields": {
+      "name": "Breeding Swine",
+      "name_en": "Breeding Swine",
+      "name_fr": "Suidés de reproduction",
+      "name_es": "Porcino reproductivo",
+      "name_ru": "Разведение свиней",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 46,
+    "fields": {
+      "name": "Camels",
+      "name_en": "Camels",
+      "name_fr": "Chameaux",
+      "name_es": "Camellos",
+      "name_ru": "Верблюды",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 59,
+    "fields": {
+      "name": "Chicken Broiler",
+      "name_en": "Chicken Broiler",
+      "name_fr": "Poulets\n",
+      "name_es": "Pollos parrilleros",
+      "name_ru": "Цыпленок-бройлер",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 58,
+    "fields": {
+      "name": "Chicken Layer",
+      "name_en": "Chicken Layer",
+      "name_fr": "Poules pondeuses\n",
+      "name_es": "Gallinas ponedoras",
+      "name_ru": "Курица несушка",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 50,
+    "fields": {
+      "name": "Dairy Buffalo",
+      "name_en": "Dairy Buffalo",
+      "name_fr": "Buffles laitiers\n",
+      "name_es": "Búfala lechera",
+      "name_ru": "дойная буйвола",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 40,
+    "fields": {
+      "name": "Dairy Cattle",
+      "name_en": "Dairy Cattle",
+      "name_fr": "Vaches laitières\n",
+      "name_es": "Vacas lecheras",
+      "name_ru": "дойная корова",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 51,
+    "fields": {
+      "name": "Dairy Sheep",
+      "name_en": "Dairy Sheep",
+      "name_fr": "Brebis laitières\n",
+      "name_es": "Oveja lechera",
+      "name_ru": "дойная овца",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 56,
+    "fields": {
+      "name": "Deer",
+      "name_en": "Deer",
+      "name_fr": "Cervidés",
+      "name_es": "Ciervo",
+      "name_ru": "Олень",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 55,
+    "fields": {
+      "name": "Goats",
+      "name_en": "Goats",
+      "name_fr": "Chèvres",
+      "name_es": "Cabras",
+      "name_ru": "Козы",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 53,
+    "fields": {
+      "name": "Growing Swine",
+      "name_en": "Growing Swine",
+      "name_fr": "Suidés en croissance",
+      "name_es": "Porcino en crecimiento",
+      "name_ru": "Разведение свиней",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 47,
+    "fields": {
+      "name": "Horses",
+      "name_en": "Horses",
+      "name_fr": "Chevaux",
+      "name_es": "Caballos",
+      "name_ru": "Лошади",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 60,
+    "fields": {
+      "name": "Llamas And Alpacas",
+      "name_en": "Llamas And Alpacas",
+      "name_fr": "Lamas et alpacas\n",
+      "name_es": "Llamas y Alpacas",
+      "name_ru": "Ламы и альпаки",
+      "is_active": false
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 48,
+    "fields": {
+      "name": "Mules And Asses",
+      "name_en": "Mules And Asses",
+      "name_fr": "Mules et ânes\n",
+      "name_es": "Mulas y asnos",
+      "name_ru": "Мулы и ослы",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 57,
+    "fields": {
+      "name": "Ostrich",
+      "name_en": "Ostrich",
+      "name_fr": "Autruche",
+      "name_es": "Avestruz",
+      "name_ru": "Страус",
+      "is_active": false
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 49,
+    "fields": {
+      "name": "Other Buffalo",
+      "name_en": "Other Buffalo",
+      "name_fr": "Autres buffles\n",
+      "name_es": "Búfalo otro",
+      "name_ru": "Прочий буйвол",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 41,
+    "fields": {
+      "name": "Other Cattle",
+      "name_en": "Other Cattle",
+      "name_fr": "Autres bovins\n",
+      "name_es": "Vacuno otro",
+      "name_ru": "Прочий крупный рогатый скот",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.livestockcategorytype",
+    "pk": 52,
+    "fields": {
+      "name": "Other Sheep",
+      "name_en": "Other Sheep",
+      "name_fr": "Autres moutons\n",
+      "name_es": "Ovino otro",
+      "name_ru": "Прочий вид овец",
+      "is_active": true
+    }
+  }
+]

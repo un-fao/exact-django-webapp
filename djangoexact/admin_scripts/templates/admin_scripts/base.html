@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin Scripts{% endblock %}</title>
+    {# Tailwind Play CDN is dynamically generated per-request, so SRI is not applicable. #}
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"
+            integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+            crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen">
     <nav class="bg-white border-b border-gray-200 px-6 py-4">

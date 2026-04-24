@@ -37,6 +37,8 @@ from .constants import (
     ROW_OTHER_GHGS,
     ROW_SOIL_CO2,
     ROW_YEARLY_BALANCE,
+    ROW_YEARLY_FLUX_W,
+    ROW_YEARLY_FLUX_WO,
     SPC_NOMINAL_ROW,
     SPC_NPV_START_ROW,
     SPC_ROW_HEADER,
@@ -116,6 +118,8 @@ class ExcelRenderer:
         ws_res.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
         ws_res.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
         ws_res.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_YEARLY_FLUX_WO, column=1, value="Yearly flux - without (tCO2-eq)")
+        ws_res.cell(row=ROW_YEARLY_FLUX_W, column=1, value="Yearly flux - with (tCO2-eq)")
 
         for i, year in enumerate(range(r.start_year, r.last_year)):
             ws_res.cell(row=1, column=i + DATA_COL_START, value=year)
@@ -300,6 +304,10 @@ class ExcelRenderer:
             ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=col, value=hh).fill = _BEIGE
             ct = ctf[i] if i < len(ctf) else 0
             ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=col, value=ct).fill = _BEIGE
+            ybw_wo = agg.yearly_balance_wo[i] if i < len(agg.yearly_balance_wo) else 0
+            ws_res.cell(row=ROW_YEARLY_FLUX_WO, column=col, value=ybw_wo)
+            ybw_w = agg.yearly_balance_w[i] if i < len(agg.yearly_balance_w) else 0
+            ws_res.cell(row=ROW_YEARLY_FLUX_W, column=col, value=ybw_w)
 
     # -------------------------------------------------------------------------
     # Shadow Price of Carbon sheet
@@ -340,7 +348,10 @@ class ExcelRenderer:
         for col in range(1, 5):
             ws.cell(
                 row=npv_start, column=col,
-                value="SPC with Net Present Value discounting" if col == 1 else "",
+                value=(
+                    "Present value of monetized absolute GHG emissions with SPC"
+                    if col == 1 else ""
+                ),
             ).fill = _ORANGE
 
         ws.cell(row=npv_start + 1, column=1, value="Insert rate of discounting")
@@ -348,22 +359,41 @@ class ExcelRenderer:
         rate_cell.number_format = "0%"
         rate_ref = f"$C${npv_start + 1}"
 
-        npv_year_row = npv_start + 3
-        ws.cell(row=npv_year_row, column=1, value="Year")
-        ws.cell(row=npv_year_row + 1, column=1, value="Without (tCO2-eq)")
-        ws.cell(row=npv_year_row + 2, column=1, value="Low Boundary $")
-        ws.cell(row=npv_year_row + 3, column=1, value="High Boundary $")
-        ws.cell(row=npv_year_row + 5, column=1, value="With (tCO2-eq)")
-        ws.cell(row=npv_year_row + 6, column=1, value="Low Boundary $")
-        ws.cell(row=npv_year_row + 7, column=1, value="High Boundary $")
+        npv_year_row = npv_start + 3  # 15
+        wo_tco2_row = npv_year_row + 1  # 16
+        wo_low_row = npv_year_row + 2   # 17
+        wo_high_row = npv_year_row + 3  # 18
+        wo_sum_low_row = npv_year_row + 4   # 19
+        wo_sum_high_row = npv_year_row + 5  # 20
+        with_tco2_row = npv_year_row + 7   # 22
+        with_low_row = npv_year_row + 8    # 23
+        with_high_row = npv_year_row + 9   # 24
+        with_sum_low_row = npv_year_row + 10   # 25
+        with_sum_high_row = npv_year_row + 11  # 26
 
-        spc_to_npv = {
-            SPC_ROW_WO: npv_year_row + 1,
-            SPC_ROW_WO_LOW: npv_year_row + 2,
-            SPC_ROW_WO_HIGH: npv_year_row + 3,
-            SPC_ROW_WITH: npv_year_row + 5,
-            SPC_ROW_WITH_LOW: npv_year_row + 6,
-            SPC_ROW_WITH_HIGH: npv_year_row + 7,
+        ws.cell(row=npv_year_row, column=1, value="Year")
+        ws.cell(row=wo_tco2_row, column=1, value="Without (tCO2-eq)")
+        ws.cell(row=wo_low_row, column=1, value="Low Boundary $")
+        ws.cell(row=wo_high_row, column=1, value="High Boundary $")
+        ws.cell(row=wo_sum_low_row, column=1, value="Summed present value - low boundary ($)")
+        ws.cell(row=wo_sum_high_row, column=1, value="Summed present value - high boundary ($)")
+        ws.cell(row=with_tco2_row, column=1, value="With (tCO2-eq)")
+        ws.cell(row=with_low_row, column=1, value="Low Boundary $")
+        ws.cell(row=with_high_row, column=1, value="High Boundary $")
+        ws.cell(row=with_sum_low_row, column=1, value="Summed present value - low boundary ($)")
+        ws.cell(row=with_sum_high_row, column=1, value="Summed present value - high boundary ($)")
+
+        # Undiscounted tCO2-eq rows: straight references to top section
+        undiscounted_map = {
+            SPC_ROW_WO: wo_tco2_row,
+            SPC_ROW_WITH: with_tco2_row,
+        }
+        # Discounted monetized $ rows: negative discounted formula
+        discounted_map = {
+            SPC_ROW_WO_LOW: wo_low_row,
+            SPC_ROW_WO_HIGH: wo_high_row,
+            SPC_ROW_WITH_LOW: with_low_row,
+            SPC_ROW_WITH_HIGH: with_high_row,
         }
 
         num_years = self.result.last_year - self.result.start_year
@@ -371,11 +401,36 @@ class ExcelRenderer:
             col = i + DATA_COL_START
             col_letter = get_column_letter(col)
             ws.cell(row=npv_year_row, column=col, value=f"={col_letter}2")
-            for spc_row, npv_row in spc_to_npv.items():
+            for spc_row, npv_row in undiscounted_map.items():
                 ws.cell(
                     row=npv_row, column=col,
-                    value=f"={col_letter}{spc_row}/(1+{rate_ref})^({col_letter}$2-$B$2)",
+                    value=f"={col_letter}{spc_row}",
                 )
+            for spc_row, npv_row in discounted_map.items():
+                ws.cell(
+                    row=npv_row, column=col,
+                    value=f"=-{col_letter}{spc_row}/(1+{rate_ref})^({col_letter}$2-$B$2)",
+                )
+
+        # Summed present value rows (column B only)
+        if num_years > 0:
+            last_col_letter = get_column_letter(DATA_COL_START + num_years - 1)
+            ws.cell(
+                row=wo_sum_low_row, column=DATA_COL_START,
+                value=f"=SUM(B{wo_low_row}:{last_col_letter}{wo_low_row})",
+            )
+            ws.cell(
+                row=wo_sum_high_row, column=DATA_COL_START,
+                value=f"=SUM(B{wo_high_row}:{last_col_letter}{wo_high_row})",
+            )
+            ws.cell(
+                row=with_sum_low_row, column=DATA_COL_START,
+                value=f"=SUM(B{with_low_row}:{last_col_letter}{with_low_row})",
+            )
+            ws.cell(
+                row=with_sum_high_row, column=DATA_COL_START,
+                value=f"=SUM(B{with_high_row}:{last_col_letter}{with_high_row})",
+            )
 
         # Nominal SPC table
         ws.cell(
@@ -404,8 +459,9 @@ class ExcelRenderer:
             row=SPC_NOMINAL_ROW + 5, column=1,
             value=(
                 "* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% "
-                "annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on "
-                "Shadow Price of Carbon in Economic Analysis"
+                "annual increase in the SPC values starting from 2050, as per World Bank (2024), "
+                "2024 Guidance Note on Shadow Price of Carbon in Economic Analysis, "
+                "Washington, D.C.: World Bank Group."
             ),
         )
 

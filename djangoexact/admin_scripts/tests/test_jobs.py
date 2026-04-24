@@ -1,0 +1,177 @@
+"""Tests for ComputationJob model, gap detector, and job dispatcher."""
+
+from django.test import TestCase, TransactionTestCase
+from django.utils import timezone
+from unittest.mock import patch
+
+from admin_scripts.gap_detector import detect_gap
+from admin_scripts.job_dispatcher import compute_filters_hash, enqueue_or_join
+from admin_scripts.models import ComputationJob
+from minitool.models import ChangeRecord
+
+
+class ComputationJobModelTest(TestCase):
+    databases = {"default"}
+
+    def test_create_job(self):
+        job = ComputationJob.objects.create(
+            filters_hash="abc123",
+            module_type="Grassland",
+            attribute="grassland_management_type",
+            from_value="Non-Degraded",
+            to_value="Improved Grassland",
+        )
+        self.assertEqual(job.status, ComputationJob.Status.PENDING)
+        self.assertEqual(str(job), "Grassland/grassland_management_type [pending]")
+
+    def test_status_transitions(self):
+        job = ComputationJob.objects.create(
+            filters_hash="def456",
+            module_type="Grassland",
+            attribute="grassland_management_type",
+            from_value="A",
+            to_value="B",
+        )
+        job.status = ComputationJob.Status.RUNNING
+        job.started_at = timezone.now()
+        job.save()
+        job.refresh_from_db()
+        self.assertEqual(job.status, "running")
+
+    def test_filters_hash_unique(self):
+        ComputationJob.objects.create(
+            filters_hash="unique_hash",
+            module_type="Grassland",
+            attribute="test",
+            from_value="A",
+            to_value="B",
+        )
+        with self.assertRaises(Exception):
+            ComputationJob.objects.create(
+                filters_hash="unique_hash",
+                module_type="Livestock",
+                attribute="test",
+                from_value="C",
+                to_value="D",
+            )
+
+
+class GapDetectorTest(TestCase):
+    databases = {"default"}
+
+    def test_detect_gap_when_no_data(self):
+        result = detect_gap("Grassland", "grassland_management_type", "A", "B")
+        self.assertTrue(result)
+
+    def test_detect_gap_when_data_exists(self):
+        ChangeRecord.objects.create(
+            module_type="Grassland",
+            field="grassland_management_type",
+            from_value="Non-Degraded",
+            to_value="Improved Grassland",
+            region="Africa",
+            climate="Tropical",
+            moisture="Moist",
+            soil_type="Clay",
+            total=-1.0,
+        )
+        result = detect_gap(
+            "Grassland", "grassland_management_type",
+            "Non-Degraded", "Improved Grassland",
+        )
+        self.assertFalse(result)
+
+
+class FiltersHashTest(TestCase):
+
+    def test_hash_deterministic(self):
+        params = {
+            "module_type": "Grassland",
+            "attribute": "grassland_management_type",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        h1 = compute_filters_hash(params)
+        h2 = compute_filters_hash(params)
+        self.assertEqual(h1, h2)
+        self.assertEqual(len(h1), 64)  # SHA-256 hex
+
+    def test_hash_differs_for_different_params(self):
+        h1 = compute_filters_hash({
+            "module_type": "Grassland",
+            "attribute": "grassland_management_type",
+            "from_value": "A",
+            "to_value": "B",
+        })
+        h2 = compute_filters_hash({
+            "module_type": "Grassland",
+            "attribute": "grassland_management_type",
+            "from_value": "A",
+            "to_value": "C",
+        })
+        self.assertNotEqual(h1, h2)
+
+    def test_hash_key_order_irrelevant(self):
+        h1 = compute_filters_hash({
+            "module_type": "Grassland",
+            "attribute": "test",
+            "from_value": "A",
+            "to_value": "B",
+            "filters": {"region": "Africa", "climate": "Tropical"},
+        })
+        h2 = compute_filters_hash({
+            "to_value": "B",
+            "from_value": "A",
+            "module_type": "Grassland",
+            "attribute": "test",
+            "filters": {"climate": "Tropical", "region": "Africa"},
+        })
+        self.assertEqual(h1, h2)
+
+
+class EnqueueOrJoinTest(TransactionTestCase):
+    databases = {"default"}
+
+    def setUp(self):
+        from api.models import CustomUser
+        self.user1 = CustomUser.objects.create_user(
+            email="user1@example.com",
+            password="test123",
+            firebase_uid="uid1",
+        )
+        self.user2 = CustomUser.objects.create_user(
+            email="user2@example.com",
+            password="test123",
+            firebase_uid="uid2",
+        )
+
+    @patch("admin_scripts.job_dispatcher.dispatch_job")
+    def test_enqueue_creates_job(self, mock_dispatch):
+        job = enqueue_or_join(
+            self.user1, "Grassland", "grassland_management_type", "A", "B",
+        )
+        self.assertEqual(job.status, ComputationJob.Status.PENDING)
+        self.assertEqual(job.module_type, "Grassland")
+        self.assertIn(self.user1, job.requested_by.all())
+
+    @patch("admin_scripts.job_dispatcher.dispatch_job")
+    def test_join_existing_job(self, mock_dispatch):
+        job1 = enqueue_or_join(
+            self.user1, "Grassland", "grassland_management_type", "A", "B",
+        )
+        job2 = enqueue_or_join(
+            self.user2, "Grassland", "grassland_management_type", "A", "B",
+        )
+        self.assertEqual(job1.pk, job2.pk)
+        self.assertEqual(job1.requested_by.count(), 2)
+
+    @patch("admin_scripts.job_dispatcher.dispatch_job")
+    def test_dispatch_called_once_for_coalesced_jobs(self, mock_dispatch):
+        enqueue_or_join(
+            self.user1, "Grassland", "grassland_management_type", "A", "B",
+        )
+        enqueue_or_join(
+            self.user2, "Grassland", "grassland_management_type", "A", "B",
+        )
+        # dispatch_job called via on_commit — only the first enqueue triggers it
+        mock_dispatch.assert_called_once()

@@ -11,6 +11,7 @@ import numpy as np
 import traceback
 
 from django.contrib.auth.models import Group
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
@@ -339,6 +340,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         new_password = serializer.validated_data["password_new"]
 
+        validate_password(new_password, user=user)
         user.set_password(new_password)
         user.save()
 
@@ -475,12 +477,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             # Ensures the table is a valid identifier, reducing the risk of SQL injection
                             if not table_name.isidentifier():
                                 raise ValueError("Invalid table name")
-                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])
+                            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosec B608
                     table_name = m._meta.db_table
                     # Ensures the table is a valid identifier, reducing the risk of SQL injection
                     if not table_name.isidentifier():
                         raise ValueError("Invalid table name")
-                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])
+                    # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosec B608
 
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])

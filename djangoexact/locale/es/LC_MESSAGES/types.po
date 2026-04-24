@@ -1190,7 +1190,7 @@ msgstr "Pienso Definido por el usuario (tier 2)"
 
 #. InputType
 msgid "User Defined Input (tier 2)"
-msgstr ""
+msgstr "Entrada definida por el usuario (nivel 2)"
 
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
@@ -1464,39 +1464,39 @@ msgstr "Alimentadas a lluvia, Aguas profundas "
 
 #. ModuleType
 msgid "Processing"
-msgstr ""
+msgstr "Procesamiento"
 
 #. ModuleType
 msgid "Packaging"
-msgstr ""
+msgstr "Embalaje"
 
 #. ModuleType
 msgid "Processing Entry"
-msgstr ""
+msgstr "Entrada de procesamiento"
 
 #. ModuleType
 msgid "Packaging Entry"
-msgstr ""
+msgstr "Entrada de embalaje"
 
 #. ModuleType
 msgid "Transport"
-msgstr ""
+msgstr "Transporte"
 
 #. ModuleType
 msgid "Storage"
-msgstr ""
+msgstr "Almacenamiento"
 
 #. ModuleType
 msgid "Transport Entry"
-msgstr ""
+msgstr "Entrada de transporte"
 
 #. ModuleType
 msgid "Storage Entry"
-msgstr ""
+msgstr "Entrada de almacenamiento"
 
 #. ModuleType
 msgid "Energy Entry"
-msgstr ""
+msgstr "Entrada de energía"
 
 #. FuelType
 msgid "LPG"
@@ -1524,20 +1524,20 @@ msgstr "Gasolina (2-tiempos)"
 
 #. IrrigationSystemType
 msgid "Other (set up Tier 2)"
-msgstr ""
+msgstr "Otro (configurar nivel 2)"
 
 #. PackagingMaterialType
 msgid "Paper"
-msgstr ""
+msgstr "Papel"
 
 #. PackagingMaterialType
 msgid "Aluminium"
-msgstr ""
+msgstr "Aluminio"
 
 #. PackagingMaterialType
 msgid "Plastic (mixed)"
-msgstr ""
+msgstr "Plástico (mezclado)"
 
 #. PackagingMaterialType
 msgid "Plastic (LDPE)"
-msgstr ""
+msgstr "Plástico (LDPE)"

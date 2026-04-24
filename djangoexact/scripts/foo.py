@@ -194,7 +194,7 @@ def search_historical_projects_for_project_name():
     """
     Search historical projects for project name
     """
-    projects = models.Project.history.filter(name__icontains="improving livelihoods in rural Kenya", owner__email="mariagiulia.crespi@fao.org", history_change_reason="delete")
+    projects = models.Project.history.filter(name__icontains="example project name", owner__email="owner@example.com", history_change_reason="delete")
     print(f"Found {projects.count()} projects")
     for project in projects:
         print(f"Project: {project.name}")
@@ -614,6 +614,27 @@ def import_crop_nitrous_estimation_default_factors():
             print(f"Updated CropNitrousEstimationDefaultFactor for {land_use_type.name}")
 
 
+def set_all_climates_and_moistures_for_crop_nitrous_land_use_types():
+    """
+    For every land_use_type in CropNitrousEstimationDefaultFactors_20260804.csv,
+    set .climates to all available api.Climate and .moistures to all available api.Moisture.
+    """
+    all_climates = list(models.Climate.objects.all())
+    all_moistures = list(models.Moisture.objects.all())
+
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/CropNitrousEstimationDefaultFactors_20260804.csv"))
+    for _, row in df.iterrows():
+        try:
+            land_use_type = models.LandUseType.objects.get(name=row["land_use_type"])
+        except models.LandUseType.DoesNotExist:
+            print(f"LandUseType not found: {row['land_use_type']}, skipping")
+            continue
+
+        land_use_type.climates.set(all_climates)
+        land_use_type.moistures.set(all_moistures)
+        print(f"Updated {land_use_type.name}: {len(all_climates)} climates, {len(all_moistures)} moistures")
+
+
 def run():
     import os
 
@@ -629,14 +650,18 @@ def run():
         change_all_other_land_flu_data_to_1()
         import_crop_nitrous_estimation_default_factors()
         import_fires_combustion_factors()
+        import_crop_nitrous_estimation_default_factors()
+        import_fires_combustion_factors()
+        set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
         # import_input_types_units()
         # change_all_other_land_flu_data_to_1()
-        import_crop_nitrous_estimation_default_factors()
-        import_fires_combustion_factors()
+        # import_crop_nitrous_estimation_default_factors()
+        # import_fires_combustion_factors()
+        # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
     if app_mode == "development" or app_mode == "local":
@@ -645,6 +670,8 @@ def run():
         # change_all_other_land_flu_data_to_1()
         # import_crop_nitrous_estimation_default_factors()
         # import_fires_combustion_factors()
+        # import_input_types_units()
+        # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
     if app_mode == "test":

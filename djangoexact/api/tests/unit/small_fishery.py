@@ -86,3 +86,17 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         self.assertIn("fui_t2_start_default", response.data)
         self.assertIn("fui_t2_w_default", response.data)
         self.assertIn("fui_t2_wo_default", response.data)
+
+    def test_presence_of_electricity_emission_default_in_defaults(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("electricity_emission_default", response.data)
+
+    def test_patch_country_t2_and_ef_source_t2(self):
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["country_t2"] = self.project.country.id
+        validated_data["ef_source_t2"] = models.EmissionFactorSource.objects.get_or_create(name="Combined Margin")[0].id
+        response = self.edit_module(self.module, self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "READY")

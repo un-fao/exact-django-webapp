@@ -5,12 +5,18 @@ from functools import wraps
 
 import pandas as pd
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.utils.html import escape
 
+from admin_scripts.catalog import get_catalog
+from admin_scripts.gap_detector import detect_gap
+from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
+from admin_scripts.models import ComputationJob
 from admin_scripts.scenario_utils import build_scenario_query, stats_for
+from django.apps import apps
 from minitool.models import ChangeRecord
 
 
@@ -24,6 +30,25 @@ def staff_required(view_func):
     return wrapper
 
 
+def _resolve_value_source(value_source):
+    """Resolve a catalog value_source dict to a list of string values.
+
+    For queryset sources, queries the model and returns str() of each instance.
+    For static sources, returns the values list as strings.
+    """
+    kind = value_source.get("kind", "")
+    if kind == "queryset":
+        model_name = value_source.get("model", "")
+        try:
+            model = apps.get_model("api", model_name)
+            return [str(obj) for obj in model.objects.all().order_by("pk")]
+        except LookupError:
+            return []
+    elif kind == "static":
+        return [str(v) for v in value_source.get("values", [])]
+    return []
+
+
 SCRIPTS = [
     {
         "name": "Example Script",
@@ -35,7 +60,77 @@ SCRIPTS = [
         "url": "compile-scenarios",
         "description": "Build custom emission scenarios and compute statistics from ChangeRecord data.",
     },
+    {
+        "name": "Jobs",
+        "url": "jobs-list",
+        "description": "View computation job status and history.",
+    },
 ]
+
+
+def _jobs_list_context(request):
+    """Build shared context for the jobs list (full page + HTMX partial)."""
+    valid_statuses = {s.value for s in ComputationJob.Status}
+    raw_status = request.GET.get("status", "") or ""
+    selected_status = raw_status if raw_status in valid_statuses else ""
+
+    base_qs = ComputationJob.objects.filter(requested_by=request.user)
+
+    status_counts = dict(
+        base_qs.values_list("status")
+        .annotate(c=Count("id"))
+        .values_list("status", "c")
+    )
+
+    if selected_status:
+        jobs = base_qs.filter(status=selected_status).order_by("-created_at")
+    else:
+        jobs = base_qs.order_by("-created_at")
+
+    active_count = status_counts.get("pending", 0) + status_counts.get("running", 0)
+    total_count = sum(status_counts.values())
+
+    tab_defs = [
+        ("all", "All", total_count),
+        ("pending", "Pending", status_counts.get("pending", 0)),
+        ("running", "Running", status_counts.get("running", 0)),
+        ("completed", "Completed", status_counts.get("completed", 0)),
+        ("failed", "Failed", status_counts.get("failed", 0)),
+        ("cancelled", "Cancelled", status_counts.get("cancelled", 0)),
+    ]
+    filter_tabs = []
+    for key, label, count in tab_defs:
+        # Always show "All"; always show the currently selected status tab;
+        # otherwise, only show tabs where count > 0.
+        if key == "all" or count > 0 or key == selected_status:
+            filter_tabs.append({"key": key, "label": label, "count": count})
+
+    return {
+        "jobs": jobs,
+        "status_counts": status_counts,
+        "active_count": active_count,
+        "selected_status": selected_status,
+        "filter_tabs": filter_tabs,
+        "total_count": total_count,
+    }
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def jobs_list(request):
+    """Persistent jobs panel showing all ComputationJobs for the current user."""
+    return render(request, "admin_scripts/jobs_list.html", _jobs_list_context(request))
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def jobs_list_partial(request):
+    """HTMX partial endpoint that renders only the jobs list body."""
+    return render(
+        request,
+        "admin_scripts/partials/jobs_table.html",
+        _jobs_list_context(request),
+    )
 
 
 @login_required(login_url="/admin/login/")
@@ -165,11 +260,8 @@ def _extract_change_key_info(data, suffix):
 @login_required(login_url="/admin/login/")
 @staff_required
 def compile_scenarios(request):
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
 
     # Render one empty scenario tab on GET
     scenarios = [{
@@ -194,15 +286,12 @@ def compile_scenarios(request):
 @login_required(login_url="/admin/login/")
 @staff_required
 def htmx_module_types(request):
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
+    catalog = get_catalog()
+    return render(
+        request,
+        "admin_scripts/partials/module_type_options.html",
+        {"modules": catalog},
     )
-    options = ['<option value="">Select module type...</option>']
-    for mt in module_types:
-        options.append(f'<option value="{escape(mt)}">{escape(mt)}</option>')
-    return HttpResponse("\n".join(options))
 
 
 @login_required(login_url="/admin/login/")
@@ -210,37 +299,34 @@ def htmx_module_types(request):
 def htmx_fields(request):
     result = _extract_change_key_info(request.GET, "module_type")
     if not result:
-        return HttpResponse(
-            '<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
-            '<select disabled class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">'
-            '<option>Select module type first...</option></select>'
+        return render(
+            request,
+            "admin_scripts/partials/field_select.html",
+            {"has_module_type": False},
         )
 
     module_type, index, prefix = result
     id_prefix = prefix.rstrip("-")
 
-    fields = list(
-        ChangeRecord.objects.filter(module_type=module_type)
-        .values_list("field", flat=True)
-        .distinct()
-        .order_by("field")
-    )
+    catalog = get_catalog()
+    catalog_module = next((m for m in catalog if m.module_type == module_type), None)
+    if catalog_module is None:
+        fields = []
+    else:
+        fields = [f.field_name for f in catalog_module.fields]
     values_url = reverse("admin_scripts:htmx-values")
-    html = (
-        f'<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
-        f'<select name="{prefix}field" required'
-        f' hx-get="{values_url}"'
-        f' hx-target="#{id_prefix}-values-container"'
-        f""" hx-include="[name='{prefix}module_type']" """
-        f""" hx-vals='{{"index": "{index}", "prefix": "{prefix}"}}' """
-        f' hx-trigger="change"'
-        f' class="w-full border border-gray-300 rounded px-3 py-2 text-sm">'
-        f'<option value="">Select field...</option>'
+    return render(
+        request,
+        "admin_scripts/partials/field_select.html",
+        {
+            "has_module_type": True,
+            "prefix": prefix,
+            "id_prefix": id_prefix,
+            "index": index,
+            "values_url": values_url,
+            "fields": fields,
+        },
     )
-    for f in fields:
-        html += f'<option value="{escape(f)}">{escape(f)}</option>'
-    html += "</select>"
-    return HttpResponse(html)
 
 
 @login_required(login_url="/admin/login/")
@@ -258,18 +344,20 @@ def htmx_values(request):
     if not module_type or not field:
         return HttpResponse("<p class='text-xs text-gray-400'>Select module type and field first</p>")
 
-    from_values = list(
-        ChangeRecord.objects.filter(module_type=module_type, field=field)
-        .values_list("from_value", flat=True)
-        .distinct()
-        .order_by("from_value")
-    )
-    to_values = list(
-        ChangeRecord.objects.filter(module_type=module_type, field=field)
-        .values_list("to_value", flat=True)
-        .distinct()
-        .order_by("to_value")
-    )
+    catalog = get_catalog()
+    catalog_module = next((m for m in catalog if m.module_type == module_type), None)
+    catalog_field = None
+    if catalog_module:
+        catalog_field = next((f for f in catalog_module.fields if f.field_name == field), None)
+
+    if catalog_field:
+        values = _resolve_value_source(catalog_field.value_source)
+    else:
+        values = []
+
+    # Both from and to share the same value pool
+    from_values = values
+    to_values = values
 
     return render(request, "admin_scripts/partials/value_options.html", {
         "index": index,
@@ -319,11 +407,8 @@ def htmx_add_change(request):
         prefix = f"change-{index}-"
         id_prefix = f"change-{index}"
 
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
         "prefix": prefix,
@@ -341,41 +426,26 @@ def htmx_add_scenario(request):
     except (ValueError, TypeError):
         scenario_index = 1
 
-    module_types = list(
-        ChangeRecord.objects.values_list("module_type", flat=True)
-        .distinct()
-        .order_by("module_type")
-    )
+    catalog = get_catalog()
+    module_types = [m.module_type for m in catalog]
 
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
 
-    # Build tab button via OOB swap — the <div> is a carrier element:
-    # htmx beforeend appends the carrier's innerHTML (the <button>) to the target.
-    tab_html = (
-        f'<div hx-swap-oob="beforeend:#scenario-tabs">'
-        f'<button type="button" data-scenario-tab="{scenario_index}"'
-        f' onclick="switchScenarioTab({scenario_index})"'
-        f' class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">'
-        f'Scenario {scenario_index + 1}'
-        f'</button>'
-        f'</div>'
-    )
-
-    from django.template.loader import render_to_string
-    panel_html = render_to_string(
-        "admin_scripts/partials/scenario_panel.html",
+    # The scenario_tab partial is an OOB swap carrier — htmx unwraps the inner
+    # <button> into #scenario-tabs via beforeend.
+    return render(
+        request,
+        "admin_scripts/partials/scenario_add.html",
         {
             "scenario_index": scenario_index,
+            "scenario_number": scenario_index + 1,
             "module_types": module_types,
             "default_prefix": default_prefix,
             "default_id_prefix": default_id_prefix,
             "active": True,
         },
-        request=request,
     )
-
-    return HttpResponse(panel_html + tab_html)
 
 
 @login_required(login_url="/admin/login/")
@@ -396,9 +466,88 @@ def htmx_run_scenario(request):
     else:
         q_objects = build_scenario_query(changes, global_filters)
         aggregates = ChangeRecord.objects.filter(q_objects)
-        context["statistics"] = stats_for(aggregates)
+        stats = stats_for(aggregates)
+
+        if stats["count"] == 0:
+            # Check if any of the changes are gaps (no data computed yet)
+            gaps = []
+            for change in changes:
+                field = change["start"]["field"]
+                from_val = change["start"]["value"]
+                to_val = change["end"]["value"]
+                if detect_gap(change["module_type"], field, from_val, to_val):
+                    gaps.append({
+                        "module_type": change["module_type"],
+                        "field": field,
+                        "from_value": from_val,
+                        "to_value": to_val,
+                    })
+
+            if gaps:
+                context["gaps"] = gaps
+            else:
+                context["statistics"] = stats
+        else:
+            context["statistics"] = stats
 
     return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def htmx_enqueue_job(request):
+    if request.method != "POST":
+        return HttpResponse("POST required", status=405)
+
+    module_type = request.POST.get("module_type", "")
+    attribute = request.POST.get("attribute", "")
+    from_value = request.POST.get("from_value", "")
+    to_value = request.POST.get("to_value", "")
+
+    if not all([module_type, attribute, from_value, to_value]):
+        return HttpResponse(
+            '<div class="text-red-600 text-sm">Missing parameters.</div>'
+        )
+
+    job = enqueue_or_join(
+        user=request.user,
+        module_type=module_type,
+        attribute=attribute,
+        from_value=from_value,
+        to_value=to_value,
+    )
+
+    return render(request, "admin_scripts/partials/job_enqueued.html", {
+        "job": job,
+    })
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def htmx_job_status(request):
+    """Poll endpoint for job status updates."""
+    job_id = request.GET.get("job_id")
+    if not job_id:
+        return HttpResponse("")
+
+    try:
+        job = ComputationJob.objects.get(pk=job_id)
+    except ComputationJob.DoesNotExist:
+        return HttpResponse('<span class="text-red-500">Job not found</span>')
+
+    return render(request, "admin_scripts/partials/job_status.html", {"job": job})
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+@require_POST
+def htmx_cancel_job(request):
+    """Cancel a pending or running computation job via HTMX."""
+    job_id = request.POST.get("job_id")
+    job = get_object_or_404(ComputationJob, pk=job_id)
+    cancel_job(job.pk)
+    job.refresh_from_db()
+    return render(request, "admin_scripts/partials/job_status.html", {"job": job})
 
 
 # ---------------------------------------------------------------------------

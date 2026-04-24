@@ -20,11 +20,11 @@ msgstr ""
 
 #: api/models.py:2981
 msgid "Field Definition"
-msgstr ""
+msgstr "Definición de campo"
 
 #: api/models.py:2982
 msgid "Field Definitions"
-msgstr ""
+msgstr "Definiciones de campo"
 
 #: api/views.py:944
 msgid "increases"
@@ -36,24 +36,24 @@ msgstr "disminuye"
 
 #: api/views.py:993
 msgid "hectares"
-msgstr ""
+msgstr "hectáreas"
 
 #: api/views.py:995
 msgid "tonnes of catch"
-msgstr ""
+msgstr "toneladas de captura"
 
 #: api/views.py:997
 msgid "livestock heads"
-msgstr ""
+msgstr "cabezas de ganado"
 
 #: api/views.py:1000
 msgid "energy consumption"
-msgstr ""
+msgstr "consumo de energía"
 
 #: api/views.py:1002
 msgid "packaging material"
-msgstr ""
+msgstr "material de embalaje"
 
 #: api/views.py:1004
 msgid "agricultural inputs use"
-msgstr ""
+msgstr "uso de insumos agrícolas"

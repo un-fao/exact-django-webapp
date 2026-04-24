@@ -1,0 +1,146 @@
+[
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 1,
+    "fields": {
+      "continent": 1,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 2,
+    "fields": {
+      "continent": 2,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 3,
+    "fields": {
+      "continent": 3,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 4,
+    "fields": {
+      "continent": 4,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 5,
+    "fields": {
+      "continent": 5,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 6,
+    "fields": {
+      "continent": 6,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 7,
+    "fields": {
+      "continent": 7,
+      "cultivation_period": 112,
+      "value": 1.32
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 8,
+    "fields": {
+      "continent": 8,
+      "cultivation_period": 102,
+      "value": 1.22
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 9,
+    "fields": {
+      "continent": 9,
+      "cultivation_period": 112,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 10,
+    "fields": {
+      "continent": 10,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 11,
+    "fields": {
+      "continent": 11,
+      "cultivation_period": 123,
+      "value": 1.56
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 12,
+    "fields": {
+      "continent": 12,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 13,
+    "fields": {
+      "continent": 13,
+      "cultivation_period": 139,
+      "value": 0.65
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 14,
+    "fields": {
+      "continent": 14,
+      "cultivation_period": 124,
+      "value": 1.27
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 15,
+    "fields": {
+      "continent": 15,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  },
+  {
+    "model": "ipcc.ricedefaultemissionfactor",
+    "pk": 16,
+    "fields": {
+      "continent": 16,
+      "cultivation_period": 113,
+      "value": 1.19
+    }
+  }
+]
