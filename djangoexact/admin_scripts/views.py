@@ -10,7 +10,6 @@ from django.http import FileResponse, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from django.utils.html import escape
 
 from admin_scripts.catalog import get_catalog
 from admin_scripts.gap_detector import detect_gap
@@ -288,10 +287,11 @@ def compile_scenarios(request):
 @staff_required
 def htmx_module_types(request):
     catalog = get_catalog()
-    options = ['<option value="">Select module type...</option>']
-    for m in catalog:
-        options.append(f'<option value="{escape(m.module_type)}">{escape(m.label)}</option>')
-    return HttpResponse("\n".join(options))
+    return render(
+        request,
+        "admin_scripts/partials/module_type_options.html",
+        {"modules": catalog},
+    )
 
 
 @login_required(login_url="/admin/login/")
@@ -299,10 +299,10 @@ def htmx_module_types(request):
 def htmx_fields(request):
     result = _extract_change_key_info(request.GET, "module_type")
     if not result:
-        return HttpResponse(
-            '<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
-            '<select disabled class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">'
-            '<option>Select module type first...</option></select>'
+        return render(
+            request,
+            "admin_scripts/partials/field_select.html",
+            {"has_module_type": False},
         )
 
     module_type, index, prefix = result
@@ -315,21 +315,18 @@ def htmx_fields(request):
     else:
         fields = [f.field_name for f in catalog_module.fields]
     values_url = reverse("admin_scripts:htmx-values")
-    html = (
-        f'<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>'
-        f'<select name="{prefix}field" required'
-        f' hx-get="{values_url}"'
-        f' hx-target="#{id_prefix}-values-container"'
-        f""" hx-include="[name='{prefix}module_type']" """
-        f""" hx-vals='{{"index": "{index}", "prefix": "{prefix}"}}' """
-        f' hx-trigger="change"'
-        f' class="w-full border border-gray-300 rounded px-3 py-2 text-sm">'
-        f'<option value="">Select field...</option>'
+    return render(
+        request,
+        "admin_scripts/partials/field_select.html",
+        {
+            "has_module_type": True,
+            "prefix": prefix,
+            "id_prefix": id_prefix,
+            "index": index,
+            "values_url": values_url,
+            "fields": fields,
+        },
     )
-    for f in fields:
-        html += f'<option value="{escape(f)}">{escape(f)}</option>'
-    html += "</select>"
-    return HttpResponse(html)
 
 
 @login_required(login_url="/admin/login/")
@@ -435,32 +432,20 @@ def htmx_add_scenario(request):
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
 
-    # Build tab button via OOB swap — the <div> is a carrier element:
-    # htmx beforeend appends the carrier's innerHTML (the <button>) to the target.
-    tab_html = (
-        f'<div hx-swap-oob="beforeend:#scenario-tabs">'
-        f'<button type="button" data-scenario-tab="{scenario_index}"'
-        f' onclick="switchScenarioTab({scenario_index})"'
-        f' class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">'
-        f'Scenario {scenario_index + 1}'
-        f'</button>'
-        f'</div>'
-    )
-
-    from django.template.loader import render_to_string
-    panel_html = render_to_string(
-        "admin_scripts/partials/scenario_panel.html",
+    # The scenario_tab partial is an OOB swap carrier — htmx unwraps the inner
+    # <button> into #scenario-tabs via beforeend.
+    return render(
+        request,
+        "admin_scripts/partials/scenario_add.html",
         {
             "scenario_index": scenario_index,
+            "scenario_number": scenario_index + 1,
             "module_types": module_types,
             "default_prefix": default_prefix,
             "default_id_prefix": default_id_prefix,
             "active": True,
         },
-        request=request,
     )
-
-    return HttpResponse(panel_html + tab_html)
 
 
 @login_required(login_url="/admin/login/")

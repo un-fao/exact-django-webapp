@@ -6,6 +6,7 @@ import csv
 from .models import *
 
 from django.db.models import ForeignKey, OneToOneField, ManyToManyField
+from django.db.models import Model as DjangoModel
 
 
 class GenericExportModelAdmin(ModelAdmin):
@@ -41,25 +42,31 @@ class GenericExportModelAdmin(ModelAdmin):
     export_as_csv.short_description = "Export Selected as CSV"
 
 
-for model in [
-    model
-    for model in dir()
-    if not model.startswith("_")
-    and not model.startswith("ForestManagementAGB")
-    and not model.startswith("PerennialAGB")
-    and not model.startswith("PerennialBGB")
-    and not model.startswith("AfforestationFLU")
-    and not model.startswith("LivestockTAM")
-    and not model.startswith("LivestockVSER")
-    and not model.startswith("LivestockManureEF")
-    and not model.startswith("FLUData")
-    and not model.startswith("LivestockAWMS")
-    and not model.startswith("ForestManagementRootToShoot")
-    and not model.startswith("ForestTotalBiomass")
+_ipcc_module_ns = dict(globals())
+_excluded_prefixes = (
+    "ForestManagementAGB",
+    "PerennialAGB",
+    "PerennialBGB",
+    "AfforestationFLU",
+    "LivestockTAM",
+    "LivestockVSER",
+    "LivestockManureEF",
+    "FLUData",
+    "LivestockAWMS",
+    "ForestManagementRootToShoot",
+    "ForestTotalBiomass",
+)
+for model_name in [
+    name
+    for name in _ipcc_module_ns
+    if not name.startswith("_") and not name.startswith(_excluded_prefixes)
 ]:
+    candidate = _ipcc_module_ns.get(model_name)
+    if not isinstance(candidate, type) or not issubclass(candidate, DjangoModel):
+        continue
     try:
-        admin.site.register(globals()[model], GenericExportModelAdmin)
-    except:
+        admin.site.register(candidate, GenericExportModelAdmin)
+    except Exception:
         pass
 
 

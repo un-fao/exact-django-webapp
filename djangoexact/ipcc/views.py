@@ -1,3 +1,5 @@
+import sys
+
 import django_filters
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Model
@@ -42,9 +44,11 @@ def generic_viewset(_model: Model):
 
             return super().get_queryset()
 
-    concrete_viewset = globals().get(f"{_model.__name__}ViewSet", GenericViewSet)
-
-    return concrete_viewset or GenericViewSet
+    viewset_name = f"{_model.__name__}ViewSet"
+    candidate = getattr(sys.modules[__name__], viewset_name, None)
+    if isinstance(candidate, type) and issubclass(candidate, viewsets.GenericViewSet):
+        return candidate
+    return GenericViewSet
 
 
 class CropYieldStatViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
