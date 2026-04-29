@@ -1,3 +1,9 @@
+## 1.19.2a5 (2026-04-29)
+
+### Fix
+
+- **coastal_wetlands**: invert calculation logic of drainage stock biomass
+
 ## 1.19.2a4 (2026-04-20)
 
 ### Fix
