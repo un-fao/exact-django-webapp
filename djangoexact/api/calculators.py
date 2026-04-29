@@ -4438,8 +4438,8 @@ class SettlementCalculator(LandModuleCalculator):
         if self.luc and not self.module.is_start():
             is_paved_w = self.module.is_with() and self.module.settlement_type_w.name_en.casefold() == "paved settlement"
             is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name_en.casefold() == "paved settlement"
-            is_existing_infra_w = self.module.is_with() and self.module.existing_infrastructure_w.name_en.casefold() == "infrastructure on existing land (no paving)"
-            is_existing_infra_wo = self.module.is_without() and self.module.existing_infrastructure_wo.name_en.casefold() == "infrastructure on existing land (no paving)"
+            is_existing_infra_w = self.module.is_with() and self.module.settlement_type_w.name_en.casefold() == "infrastructure on existing land (no paving)"
+            is_existing_infra_wo = self.module.is_without() and self.module.settlement_type_wo.name_en.casefold() == "infrastructure on existing land (no paving)"
 
             if is_paved_w or is_paved_wo or is_existing_infra_w or is_existing_infra_wo:
                 self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)

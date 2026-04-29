@@ -86,12 +86,12 @@ class CoastalWetland(BaseModule):
                     deadwood = self.deadwood_default if self.deadwood_tier_2 is None else self.deadwood_tier_2
 
                     # TODO: ask Lorenzo about this variable, should it be 0? Should it be calculated?
-                    stock_c_biomass_start = 0
+                    stock_c_biomass_end = 0
                     area_drained_end = self.area_drained_end
                     # NOT USED IN THE EXCEL, TODO: ask Lorenzo
                     area_drained_start = self.area_drained_start
 
-                    stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
+                    stock_c_biomass_start = (agb + bgb + litter + deadwood) * area_drained_end
 
                     emissions_biomass_total_drainage = (stock_c_biomass_start - stock_c_biomass_end) * (44 / 12)
 
