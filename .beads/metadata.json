@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "exact_django_webapp",
+  "project_id": "62297651-7a5f-4eca-8428-20ccc085b8a0"
+}
