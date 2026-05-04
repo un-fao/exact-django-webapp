@@ -3205,8 +3205,8 @@ class SmallFisheryCalculator(BaseCalculator):
         self.energy_ef_default_co2: float = 0
         self.energy_ef_default_ch4: float = 0
         self.energy_ef_default_n2o: float = 0
-        self.electricity_emission: ipcc.ElectricityEmission = None
-        self.electricity_emission_ef: float = 0
+        self.electricity_ef: ipcc.ElectricityEmission = None
+        self.electricity_ef_value: float = 0
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
@@ -3275,8 +3275,8 @@ class SmallFisheryCalculator(BaseCalculator):
                 raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
 
         try:
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
-            self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
+            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef_value = _resolve_electricity_emission_ef(self.electricity_ef, self.module.ef_source)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
@@ -3328,7 +3328,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission_ef,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3373,7 +3373,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission_ef,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
@@ -3414,8 +3414,8 @@ class LargeFisheryCalculator(BaseCalculator):
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
-        self.electricity_emission: ipcc.ElectricityEmission = None
-        self.electricity_emission_ef: float = 0
+        self.electricity_ef: ipcc.ElectricityEmission = None
+        self.electricity_ef_value: float = 0
         self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
         self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
 
@@ -3485,8 +3485,8 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
-            self.electricity_emission_ef = _resolve_electricity_emission_ef(self.electricity_emission, self.module.ef_source_t2)
+            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef_value = _resolve_electricity_emission_ef(self.electricity_ef, self.module.ef_source)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
@@ -3538,7 +3538,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission_ef,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3583,7 +3583,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission_ef,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
