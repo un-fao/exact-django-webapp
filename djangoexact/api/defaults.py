@@ -620,7 +620,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
-            electricity_emission_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -654,7 +655,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_default_start,
             fui_t2_w_default=defaults.fui_default_w,
             fui_t2_wo_default=defaults.fui_default_wo,
-            electricity_emission_default=defaults.electricity_emission_ef,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 
@@ -687,7 +689,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
-            electricity_emission_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -721,7 +724,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_start,
             fui_t2_w_default=defaults.fui_w,
             fui_t2_wo_default=defaults.fui_wo,
-            electricity_emission_default=defaults.electricity_emission_ef,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 
