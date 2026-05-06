@@ -1,0 +1,302 @@
+[
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 157,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 158,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 159,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 160,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 161,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 162,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 163,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 164,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 165,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 166,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 167,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 168,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 169,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 170,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 171,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 172,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 173,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 174,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 175,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 176,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 177,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 178,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 179,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 180,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 181,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 182,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 183,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 184,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 10.7
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 185,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.coastaldeadwood",
+    "pk": 186,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0
+    }
+  }
+]

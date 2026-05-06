@@ -272,8 +272,7 @@ def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float,
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled
         if gas_system_tier_2 is None:
-            ef_system = ef_system_default if ef_single_system is None else [ef_single_system]
-
+            ef_system = ef_system_default if ef_single_system is None else [ef_single_system] * len(percentage_system_default)
             if percentage_prp_tier_2 is None:
                 gas_system = [i * (tam / 1000) * (vser_or_ner) / gas_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
             else:

@@ -156,7 +156,7 @@ class ForestManagement(BaseModule):
         self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         self.max_agb_value = self.max_agb_value_default if self.max_agb_value_tier_2 is None else self.max_agb_value_tier_2
-        if self.max_bgb_value_default is None and self.max_bgb_value_tier_2 is None:  # TODO: Re-implement it as tier2 (yes, I'm looking at you, Bart. hi :] )
+        if self.max_bgb_value_default is None and self.max_bgb_value_tier_2 is None:  # TODO: Re-implement as Tier 2.
             self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
         else:
             self.max_bgb_value = self.max_bgb_value_default if self.max_bgb_value_tier_2 is None else self.max_bgb_value_tier_2
@@ -776,7 +776,7 @@ class ForestManagement(BaseModule):
             # This means we have rotation, if not rotation_recurrence is None
             calculate_rotation()
         # NOTE: This is done to fix a problem of communication between front-end and back-end. Absense of disturbance should not be seen as 0, but as None. This is a temporary fix, as we should not have this problem in the future.
-        elif (self.disturbance_recurrence is not None and all([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0):
+        elif (self.disturbance_recurrence is not None and any([x != 0 for x in self.disturbance_recurrence])) or (self.logging_recurrence is not None and self.logging_recurrence != 0):
             calculate_disturbance_or_logging()
         elif self.degradation_percentage:
             # This means we have degradation, if not degradation_percentage is None

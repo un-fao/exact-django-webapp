@@ -1,0 +1,7 @@
+# Thin wrapper over the main Django image for Cloud Run Job execution.
+# Builds from the same base image as the webapp; only the entrypoint differs.
+ARG BASE_IMAGE=gcr.io/PROJECT_ID/exact-webapp:latest
+FROM ${BASE_IMAGE}
+
+# Cloud Run Jobs execute the container command once and exit.
+ENTRYPOINT ["python", "manage.py", "run_computation_job"]

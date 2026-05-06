@@ -1,0 +1,332 @@
+[
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 91,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 92,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 93,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 94,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 95,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 96,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 97,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 98,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 99,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 100,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 101,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 102,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 103,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 104,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 105,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 106,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "fire_type": 1,
+      "value": 66.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 107,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "fire_type": 2,
+      "value": 336.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 108,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "fire_type": 3,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 109,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "fire_type": 1,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 110,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "fire_type": 2,
+      "value": 353.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 111,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "fire_type": 3,
+      "value": 155.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 112,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "fire_type": 1,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 113,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "fire_type": 2,
+      "value": 353.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 114,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "fire_type": 3,
+      "value": 155.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 115,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "fire_type": 1,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 116,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "fire_type": 2,
+      "value": 353.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 117,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "fire_type": 3,
+      "value": 155.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 118,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "fire_type": 1,
+      "value": 0.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 119,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "fire_type": 2,
+      "value": 353.0,
+      "unit": "t dm/ha"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilfuelconsumption",
+    "pk": 120,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "fire_type": 3,
+      "value": 155.0,
+      "unit": "t dm/ha"
+    }
+  }
+]

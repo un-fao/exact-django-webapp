@@ -1,0 +1,200 @@
+[
+  {
+    "model": "api.region",
+    "pk": 16,
+    "fields": {
+      "name": "Caribbean",
+      "name_en": "Caribbean",
+      "name_fr": "Caraïbes",
+      "name_es": "Caribe",
+      "name_ru": "Карибский"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 2,
+    "fields": {
+      "name": "Central Africa",
+      "name_en": "Central Africa",
+      "name_fr": "Afrique centrale\n",
+      "name_es": "África Central",
+      "name_ru": "Центральная Африка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 15,
+    "fields": {
+      "name": "Central America",
+      "name_en": "Central America",
+      "name_fr": "Amérique centrale\n",
+      "name_es": "América Central",
+      "name_ru": "Центральная Америка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 6,
+    "fields": {
+      "name": "Central Asia",
+      "name_en": "Central Asia",
+      "name_fr": "Asie centrale\n",
+      "name_es": "Asia Central",
+      "name_ru": "Центральная Азия"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 1,
+    "fields": {
+      "name": "Eastern Africa",
+      "name_en": "Eastern Africa",
+      "name_fr": "Afrique de l'Est\n",
+      "name_es": "África Oriental",
+      "name_ru": "Восточная Африка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 7,
+    "fields": {
+      "name": "Eastern Asia",
+      "name_en": "Eastern Asia",
+      "name_fr": "Asie de l'Est\n",
+      "name_es": "Asia Oriental",
+      "name_ru": "Восточная Азия"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 23,
+    "fields": {
+      "name": "Eastern Europe",
+      "name_en": "Eastern Europe",
+      "name_fr": "Europe de l'Est\n",
+      "name_es": "Europa Oriental",
+      "name_ru": "Восточная Европа"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 11,
+    "fields": {
+      "name": "Europe",
+      "name_en": "Europe",
+      "name_fr": "Europe",
+      "name_es": "Europa",
+      "name_ru": "Европа"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 13,
+    "fields": {
+      "name": "North America",
+      "name_en": "North America",
+      "name_fr": "Amérique du Nord\n",
+      "name_es": "América Septentrional",
+      "name_ru": "Северная Америка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 3,
+    "fields": {
+      "name": "Northern Africa",
+      "name_en": "Northern Africa",
+      "name_fr": "Afrique du Nord\n",
+      "name_es": "África Septentrional",
+      "name_ru": "Северная Африка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 12,
+    "fields": {
+      "name": "Oceania",
+      "name_en": "Oceania",
+      "name_fr": "Océanie",
+      "name_es": "Oceanía",
+      "name_ru": "Океания"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 14,
+    "fields": {
+      "name": "South America",
+      "name_en": "South America",
+      "name_fr": "Amérique du Sud\n",
+      "name_es": "América del Sur",
+      "name_ru": "Южная Америка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 8,
+    "fields": {
+      "name": "South-Eastern Asia",
+      "name_en": "South-Eastern Asia",
+      "name_fr": "Asie du Sud-Est\n",
+      "name_es": "Asia Sudoriental",
+      "name_ru": "Юго-восточная Азия"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 4,
+    "fields": {
+      "name": "Southern Africa",
+      "name_en": "Southern Africa",
+      "name_fr": "Afrique méridionale\n\n",
+      "name_es": "África Meridional",
+      "name_ru": "Южная Африка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 9,
+    "fields": {
+      "name": "Southern Asia",
+      "name_en": "Southern Asia",
+      "name_fr": "Asie méridionale\n",
+      "name_es": "Asia Meridional",
+      "name_ru": "Южная Азия"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 5,
+    "fields": {
+      "name": "Western Africa",
+      "name_en": "Western Africa",
+      "name_fr": "Afrique de l'Ouest\n",
+      "name_es": "África Occidental",
+      "name_ru": "Западная Африка"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 10,
+    "fields": {
+      "name": "Western Asia",
+      "name_en": "Western Asia",
+      "name_fr": "Asie de l'Ouest\n",
+      "name_es": "Asia Occidental",
+      "name_ru": "Западная Азия"
+    }
+  },
+  {
+    "model": "api.region",
+    "pk": 22,
+    "fields": {
+      "name": "Western Europe",
+      "name_en": "Western Europe",
+      "name_fr": "Europe de l'Ouest\n",
+      "name_es": "Europa Occidenta",
+      "name_ru": "Западная Европа"
+    }
+  }
+]

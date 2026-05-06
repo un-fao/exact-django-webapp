@@ -228,7 +228,8 @@ def copy_project(project, owner):
         project_copy.name = get_unique_name(project_copy, project_copy.name)
         project_copy._state.adding = True
         project_copy.is_finalized = False
-        project.owner = owner
+        project_copy.is_public = False
+        project_copy.owner = owner
         project_copy.save()
 
         # Add Membership to the new project

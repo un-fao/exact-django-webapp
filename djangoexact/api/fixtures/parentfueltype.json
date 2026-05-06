@@ -1,0 +1,16 @@
+[
+  {
+    "model": "api.parentfueltype",
+    "pk": 2,
+    "fields": {
+      "name": "Electricity"
+    }
+  },
+  {
+    "model": "api.parentfueltype",
+    "pk": 1,
+    "fields": {
+      "name": "Fuel"
+    }
+  }
+]

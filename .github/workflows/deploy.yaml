@@ -39,6 +39,9 @@ jobs:
         ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
 
     - name: Deploy
+      env:
+        DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: |
         set -x
 
@@ -51,8 +54,12 @@ jobs:
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
         sed -i 's|\$STORAGE_BUCKET|${{ vars.STORAGE_BUCKET }}|g' djangoexact/app.yaml
+        sed -i 's|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g' djangoexact/app.yaml
+        sed -i 's|\$DJANGO_DEBUG|${{ vars.DJANGO_DEBUG }}|g' djangoexact/app.yaml
+        sed -i 's|\$ALLOWED_HOSTS|${{ vars.ALLOWED_HOSTS }}|g' djangoexact/app.yaml
+        sed -i 's|\$CORS_ALLOWED_ORIGINS|${{ vars.CORS_ALLOWED_ORIGINS }}|g' djangoexact/app.yaml
 
-        echo "$(cat djangoexact/app.yaml)"
+        # NOTE: do NOT echo app.yaml — it contains injected DB_PASSWORD and SECRET_KEY after substitution.
 
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
@@ -76,13 +83,14 @@ jobs:
         sed -i 's|\$FIREBASE_MEASUREMENT_ID|${{ vars.FIREBASE_MEASUREMENT_ID }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$FIREBASE_SERVICE_ACCOUNT|${{ secrets.FIREBASE_SERVICE_ACCOUNT }}|g' djangoexact/djangoexact/settings.py
 
-        echo "$(cat djangoexact/djangoexact/settings.py)"
-        
+        # NOTE: do NOT echo settings.py — it contains injected DB_PASSWORD, SECRET_KEY,
+        # SMTP_USER_PASSWORD and FIREBASE_SERVICE_ACCOUNT after substitution.
+
         cd djangoexact
         
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip 'setuptools>=78.1.1' wheel
         pip install -r requirements.txt --no-cache-dir
-        pip install --force-reinstall setuptools
+        pip install --force-reinstall 'setuptools>=78.1.1'
         # - yes | python manage.py makemigrations --merge
         python manage.py migrate
         python manage.py collectstatic --noinput

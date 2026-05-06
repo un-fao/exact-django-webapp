@@ -1,3 +1,5 @@
+import sys
+
 import django_filters as filters
 from .models import FuelType, SoilType, Note, ModuleType
 from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey, ManyToManyField
@@ -12,10 +14,11 @@ def get_model_filter(model_arg):
             model = model_arg
             fields = "__all__"
 
-    try:
-        return globals()[f"{model_arg.__name__}Filter"]
-    except KeyError:
-        return GenericModelFilter
+    filter_name = f"{model_arg.__name__}Filter"
+    candidate = getattr(sys.modules[__name__], filter_name, None)
+    if isinstance(candidate, type) and issubclass(candidate, filters.FilterSet):
+        return candidate
+    return GenericModelFilter
 
 
 class FuelTypeFilter(filters.FilterSet):

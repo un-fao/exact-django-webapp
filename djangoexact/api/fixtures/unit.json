@@ -1,0 +1,23 @@
+[
+  {
+    "model": "api.unit",
+    "pk": 3,
+    "fields": {
+      "name": "m3/yr"
+    }
+  },
+  {
+    "model": "api.unit",
+    "pk": 1,
+    "fields": {
+      "name": "MWh/yr"
+    }
+  },
+  {
+    "model": "api.unit",
+    "pk": 2,
+    "fields": {
+      "name": "tdm/yr"
+    }
+  }
+]

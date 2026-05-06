@@ -1,0 +1,90 @@
+[
+  {
+    "model": "api.macroinputtype",
+    "pk": 6,
+    "fields": {
+      "name": "Animal Feed",
+      "name_en": "Animal Feed",
+      "name_fr": "Aliments du betáil",
+      "name_es": "Pienso",
+      "name_ru": "Корм для животных"
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 10,
+    "fields": {
+      "name": "Electricity",
+      "name_en": "Electricity",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 1,
+    "fields": {
+      "name": "Lime Application",
+      "name_en": "Lime Application",
+      "name_fr": "Application de chaux\n",
+      "name_es": "Aplicación de cal",
+      "name_ru": "Применение извести"
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 3,
+    "fields": {
+      "name": "N-Fertilizers On Irrigated Rice",
+      "name_en": "N-Fertilizers On Irrigated Rice",
+      "name_fr": "Engrais azotés sur le riz irrigué\n",
+      "name_es": "Fertilizantes de N en Arroz de Regadío",
+      "name_ru": "N-удобрения на орошаемом рисе"
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 4,
+    "fields": {
+      "name": "Organic N-Fertilizers",
+      "name_en": "Organic N-Fertilizers",
+      "name_fr": "Engrais azotés organiques\n",
+      "name_es": "Fertilizantes de N orgánicos",
+      "name_ru": "Органические N-удобрения"
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 11,
+    "fields": {
+      "name": "Other",
+      "name_en": "Other",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 5,
+    "fields": {
+      "name": "Pesticides",
+      "name_en": "Pesticides",
+      "name_fr": "Pesticides",
+      "name_es": "Pesticidas",
+      "name_ru": "Пестициды"
+    }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 2,
+    "fields": {
+      "name": "Synthetic Fertilizers",
+      "name_en": "Synthetic Fertilizers",
+      "name_fr": "Engrais synthétiques\n",
+      "name_es": "Fertilizantes sintéticos",
+      "name_ru": "Синтетические удобрения"
+    }
+  }
+]

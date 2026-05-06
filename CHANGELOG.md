@@ -1,3 +1,25 @@
+## 1.19.2a5 (2026-04-29)
+
+### Fix
+
+- **coastal_wetlands**: invert calculation logic of drainage stock biomass
+
+## 1.19.2a4 (2026-04-20)
+
+### Fix
+
+- **i18n**: use .name_en for control-flow on translated models
+- **deploy**: bump packaging to >=24.0 for GAE Cloud Build compatibility
+- **deploy**: restrict setuptools version in deploy workflow and requirements.txt
+
+## 1.19.2a3 (2026-03-24)
+
+## 1.19.2a2 (2026-03-24)
+
+### Fix
+
+- replace outdate pyrebase library with custom lightwaight firebase wrapper
+
 ## 1.19.2a1 (2026-03-24)
 
 ### Fix

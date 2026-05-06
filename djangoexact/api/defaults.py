@@ -25,11 +25,24 @@ Usage:
 
 from dataclasses import dataclass
 from types import SimpleNamespace
+import sys
 import api.calculators as calcs
 import api.models as api
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
+
+
+def _get_defaults_class(class_name: str):
+    """Look up a Defaults subclass by name within this module, returning None if not found.
+
+    Keeps lookup restricted to classes defined in this module so callers cannot
+    resolve arbitrary identifiers (e.g. builtins) through the factory.
+    """
+    candidate = getattr(sys.modules[__name__], class_name, None)
+    if isinstance(candidate, type) and candidate is not Defaults and issubclass(candidate, Defaults):
+        return candidate
+    return None
 
 
 class Defaults:
@@ -65,7 +78,7 @@ class DefaultsFactory:
         """
 
         module_type = type(input).__name__
-        DefaultClass: Defaults = globals().get(f"{module_type}Defaults", None)
+        DefaultClass: Defaults = _get_defaults_class(f"{module_type}Defaults")
 
         if DefaultClass is not None:
             if not input.is_ready():
@@ -607,6 +620,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -640,6 +655,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_default_start,
             fui_t2_w_default=defaults.fui_default_w,
             fui_t2_wo_default=defaults.fui_default_wo,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 
@@ -672,6 +689,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -705,6 +724,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_start,
             fui_t2_w_default=defaults.fui_w,
             fui_t2_wo_default=defaults.fui_wo,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 

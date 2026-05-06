@@ -1,0 +1,308 @@
+[
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 1,
+    "fields": {
+      "year": 2017,
+      "min_value": 37.0,
+      "max_value": 75.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 2,
+    "fields": {
+      "year": 2018,
+      "min_value": 38.0,
+      "max_value": 77.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 3,
+    "fields": {
+      "year": 2019,
+      "min_value": 39.0,
+      "max_value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 4,
+    "fields": {
+      "year": 2020,
+      "min_value": 40.0,
+      "max_value": 80.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 5,
+    "fields": {
+      "year": 2021,
+      "min_value": 41.0,
+      "max_value": 82.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 6,
+    "fields": {
+      "year": 2022,
+      "min_value": 42.0,
+      "max_value": 84.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 7,
+    "fields": {
+      "year": 2023,
+      "min_value": 43.0,
+      "max_value": 86.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 8,
+    "fields": {
+      "year": 2024,
+      "min_value": 44.0,
+      "max_value": 87.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 9,
+    "fields": {
+      "year": 2025,
+      "min_value": 45.0,
+      "max_value": 89.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 10,
+    "fields": {
+      "year": 2026,
+      "min_value": 46.0,
+      "max_value": 91.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 11,
+    "fields": {
+      "year": 2027,
+      "min_value": 47.0,
+      "max_value": 94.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 12,
+    "fields": {
+      "year": 2028,
+      "min_value": 48.0,
+      "max_value": 96.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 13,
+    "fields": {
+      "year": 2029,
+      "min_value": 49.0,
+      "max_value": 98.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 14,
+    "fields": {
+      "year": 2030,
+      "min_value": 50.0,
+      "max_value": 100.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 15,
+    "fields": {
+      "year": 2031,
+      "min_value": 51.0,
+      "max_value": 102.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 16,
+    "fields": {
+      "year": 2032,
+      "min_value": 52.0,
+      "max_value": 105.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 17,
+    "fields": {
+      "year": 2033,
+      "min_value": 53.0,
+      "max_value": 107.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 18,
+    "fields": {
+      "year": 2034,
+      "min_value": 55.0,
+      "max_value": 109.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 19,
+    "fields": {
+      "year": 2035,
+      "min_value": 56.0,
+      "max_value": 112.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 20,
+    "fields": {
+      "year": 2036,
+      "min_value": 57.0,
+      "max_value": 114.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 21,
+    "fields": {
+      "year": 2037,
+      "min_value": 58.0,
+      "max_value": 117.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 22,
+    "fields": {
+      "year": 2038,
+      "min_value": 60.0,
+      "max_value": 120.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 23,
+    "fields": {
+      "year": 2039,
+      "min_value": 61.0,
+      "max_value": 122.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 24,
+    "fields": {
+      "year": 2040,
+      "min_value": 63.0,
+      "max_value": 125.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 25,
+    "fields": {
+      "year": 2041,
+      "min_value": 64.0,
+      "max_value": 128.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 26,
+    "fields": {
+      "year": 2042,
+      "min_value": 65.0,
+      "max_value": 131.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 27,
+    "fields": {
+      "year": 2043,
+      "min_value": 67.0,
+      "max_value": 134.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 28,
+    "fields": {
+      "year": 2044,
+      "min_value": 68.0,
+      "max_value": 137.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 29,
+    "fields": {
+      "year": 2045,
+      "min_value": 70.0,
+      "max_value": 140.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 30,
+    "fields": {
+      "year": 2046,
+      "min_value": 71.0,
+      "max_value": 143.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 31,
+    "fields": {
+      "year": 2047,
+      "min_value": 73.0,
+      "max_value": 146.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 32,
+    "fields": {
+      "year": 2048,
+      "min_value": 75.0,
+      "max_value": 149.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 33,
+    "fields": {
+      "year": 2049,
+      "min_value": 76.0,
+      "max_value": 153.0
+    }
+  },
+  {
+    "model": "ipcc.shadowpriceofcarbon",
+    "pk": 34,
+    "fields": {
+      "year": 2050,
+      "min_value": 78.0,
+      "max_value": 156.0
+    }
+  }
+]
