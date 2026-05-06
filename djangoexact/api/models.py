@@ -2514,14 +2514,13 @@ class Fishery(Module):
     fui_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fui_t2_wo")
 
     country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="country_t2")
-
-    ef_source_t2 = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True, verbose_name="ef_source_t2")
+    ef_source = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True, verbose_name="ef_source_t2")
 
     implementation_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="implementation_year_t2")
 
     def save(self, *args, **kwargs):
-        if self.pk is None and not self.ef_source_t2:
-            self.ef_source_t2 = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
+        if self.pk is None and not self.ef_source:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
 
         return super().save(*args, **kwargs)
 
