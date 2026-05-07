@@ -2514,7 +2514,7 @@ class Fishery(Module):
     fui_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fui_t2_wo")
 
     country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="country_t2")
-    ef_source = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True, verbose_name="ef_source_t2")
+    ef_source = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="implementation_year_t2")
 
