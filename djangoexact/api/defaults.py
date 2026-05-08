@@ -137,9 +137,9 @@ class GrasslandDefaults(Defaults):
             biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=defaults.soc_t2_start if defaults.soc_t2_start is not None else defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_t2_w if defaults.soc_t2_w is not None else defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_t2_wo if defaults.soc_t2_wo is not None else defaults.soc_wo.value,
             biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
