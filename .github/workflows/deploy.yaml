@@ -104,6 +104,35 @@ jobs:
         gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
+    - name: Build computation-job image
+      if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
+      env:
+        SHA: ${{ github.sha }}
+      run: |
+        gcloud builds submit \
+          --config=deploy/cloudbuild-computation-job.yaml \
+          --substitutions=COMMIT_SHA="$SHA" \
+          --project=${{ vars.PROJECT_ID }} \
+          .
+
+    - name: Deploy/update Cloud Run Job
+      if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
+      env:
+        SHA: ${{ github.sha }}
+        REF_NAME: ${{ github.ref_name }}
+      run: |
+        gcloud run jobs deploy exact-computation-job \
+          --image="gcr.io/${{ vars.PROJECT_ID }}/exact-computation-job:$SHA" \
+          --region=${{ vars.CLOUD_RUN_REGION }} \
+          --project=${{ vars.PROJECT_ID }} \
+          --service-account=${{ vars.PROJECT_ID }}@appspot.gserviceaccount.com \
+          --set-cloudsql-instances=${{ vars.DB_INSTANCE_CONNECTION }} \
+          --memory=4Gi \
+          --cpu=2 \
+          --task-timeout=3600 \
+          --max-retries=0 \
+          --set-env-vars="^|^DB_ENGINE=${{ vars.DB_ENGINE }}|DB_HOST=/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}|DB_USER=${{ vars.DB_USERNAME }}|DB_PASSWORD=${{ secrets.DB_PASSWORD }}|DB_NAME=${{ vars.DB_NAME }}|DB_PORT=${{ vars.DB_PORT }}|SECRET_KEY=${{ secrets.SECRET_KEY }}|ALLOWED_HOSTS=${{ vars.ALLOWED_HOSTS }}|STORAGE_BUCKET=${{ vars.STORAGE_BUCKET }}|PROJECT_ID=${{ vars.PROJECT_ID }}|DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}|BRANCH_NAME=$REF_NAME|EMAIL_HOST=${{ vars.EMAIL_HOST }}|EMAIL_PORT=${{ vars.EMAIL_PORT }}|SMTP_USER_EMAIL=${{ vars.SMTP_USER_EMAIL }}|SMTP_USER_PASSWORD=${{ secrets.SMTP_USER_PASSWORD }}|FIREBASE_API_KEY=${{ vars.FIREBASE_API_KEY }}|FIREBASE_AUTH_DOMAIN=${{ vars.FIREBASE_AUTH_DOMAIN }}|FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}|FIREBASE_STORAGE_BUCKET=${{ vars.FIREBASE_STORAGE_BUCKET }}|FIREBASE_MESSAGING_SENDER_ID=${{ vars.FIREBASE_MESSAGING_SENDER_ID }}|FIREBASE_APP_ID=${{ vars.FIREBASE_APP_ID }}|FIREBASE_MEASUREMENT_ID=${{ vars.FIREBASE_MEASUREMENT_ID }}|FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}|JOB_NOTIFICATIONS_ENABLED=True"
+
     - name: Create Issue
       if: failure()
       uses: un-fao/fao-ga-create-issue@v2
