@@ -108,12 +108,21 @@ jobs:
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
       env:
         SHA: ${{ github.sha }}
+        PROJECT_ID: ${{ vars.PROJECT_ID }}
+      # Build with docker on the runner and push directly to gcr.io. We previously
+      # used `gcloud builds submit` but the deploy SA is blocked by an org policy
+      # from accessing the Cloud Build staging bucket; bypassing the Cloud Build
+      # API entirely sidesteps that. deploy/cloudbuild-computation-job.yaml is
+      # kept for ad-hoc manual builds via `gcloud builds submit`.
       run: |
-        gcloud builds submit \
-          --config=deploy/cloudbuild-computation-job.yaml \
-          --substitutions=COMMIT_SHA="$SHA" \
-          --project=${{ vars.PROJECT_ID }} \
+        gcloud auth configure-docker gcr.io --quiet
+        docker build \
+          -f deploy/Dockerfile.computation_job \
+          -t "gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
+          -t "gcr.io/$PROJECT_ID/exact-computation-job:latest" \
           .
+        docker push "gcr.io/$PROJECT_ID/exact-computation-job:$SHA"
+        docker push "gcr.io/$PROJECT_ID/exact-computation-job:latest"
 
     - name: Deploy/update Cloud Run Job
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
