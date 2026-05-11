@@ -128,12 +128,15 @@ jobs:
 
     - name: Deploy/update Cloud Run Job
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
-      # Hoist secrets into step env vars so bash sees them as already-set
-      # shell variables (single-level expansion) instead of pasting the raw
-      # secret into the gcloud invocation. Otherwise a secret value
-      # containing $X is re-interpreted by bash as a variable reference
-      # and silently corrupts the value — that broke DB connectivity until
-      # we tracked it down via psycopg2's "password authentication failed".
+      # We avoid passing secret values through `gcloud --set-env-vars` because
+      # GitHub Actions' interpolation of secrets containing $ into the YAML
+      # env: block (or bash double-quoting them on the CLI) silently mangles
+      # them — observed: DB_PASSWORD and SECRET_KEY each gained 2 extra chars
+      # on Cloud Run vs the working App Engine values, breaking psycopg2 auth.
+      #
+      # Instead we hand the values to Python via step env vars and let Python
+      # write a YAML file consumed by `gcloud run jobs deploy --env-vars-file`.
+      # Python's os.environ + yaml.safe_dump preserves the values verbatim.
       env:
         SHA: ${{ github.sha }}
         REF_NAME: ${{ github.ref_name }}
@@ -141,18 +144,66 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         SMTP_USER_PASSWORD: ${{ secrets.SMTP_USER_PASSWORD }}
         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        DB_ENGINE: ${{ vars.DB_ENGINE }}
+        DB_INSTANCE_CONNECTION: ${{ vars.DB_INSTANCE_CONNECTION }}
+        DB_USERNAME: ${{ vars.DB_USERNAME }}
+        DB_NAME: ${{ vars.DB_NAME }}
+        DB_PORT: ${{ vars.DB_PORT }}
+        ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+        STORAGE_BUCKET: ${{ vars.STORAGE_BUCKET }}
+        PROJECT_ID: ${{ vars.PROJECT_ID }}
+        DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
+        EMAIL_HOST: ${{ vars.EMAIL_HOST }}
+        EMAIL_PORT: ${{ vars.EMAIL_PORT }}
+        SMTP_USER_EMAIL: ${{ vars.SMTP_USER_EMAIL }}
+        FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+        FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+        FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+        FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+        FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+        FIREBASE_MEASUREMENT_ID: ${{ vars.FIREBASE_MEASUREMENT_ID }}
       run: |
+        python3 - <<'PYEOF' > /tmp/job-env.yaml
+        import os, sys, yaml
+        keys = [
+            "DB_ENGINE", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT",
+            "DB_HOST",
+            "SECRET_KEY", "ALLOWED_HOSTS", "STORAGE_BUCKET", "PROJECT_ID",
+            "DJANGO_DEBUG", "BRANCH_NAME",
+            "EMAIL_HOST", "EMAIL_PORT", "SMTP_USER_EMAIL", "SMTP_USER_PASSWORD",
+            "FIREBASE_API_KEY", "FIREBASE_AUTH_DOMAIN", "FIREBASE_PROJECT_ID",
+            "FIREBASE_STORAGE_BUCKET", "FIREBASE_MESSAGING_SENDER_ID",
+            "FIREBASE_APP_ID", "FIREBASE_MEASUREMENT_ID",
+            "FIREBASE_SERVICE_ACCOUNT", "JOB_NOTIFICATIONS_ENABLED",
+        ]
+        # Derive a couple of values, then pull everything else verbatim from
+        # the process env. Two renames: DB_USER comes from DB_USERNAME, and
+        # BRANCH_NAME from REF_NAME (settings.py reads DB_USER; the original
+        # github.ref_name flows through REF_NAME).
+        env = {
+            "DB_USER": os.environ["DB_USERNAME"],
+            "BRANCH_NAME": os.environ["REF_NAME"],
+            "DB_HOST": f"/cloudsql/{os.environ['DB_INSTANCE_CONNECTION']}",
+            "JOB_NOTIFICATIONS_ENABLED": "True",
+        }
+        for k in keys:
+            if k in env:
+                continue
+            env[k] = os.environ[k]
+        yaml.safe_dump(env, sys.stdout, default_flow_style=False, allow_unicode=True)
+        PYEOF
         gcloud run jobs deploy exact-computation-job \
-          --image="gcr.io/${{ vars.PROJECT_ID }}/exact-computation-job:$SHA" \
+          --image="gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
           --region=${{ vars.CLOUD_RUN_REGION }} \
-          --project=${{ vars.PROJECT_ID }} \
-          --service-account=${{ vars.PROJECT_ID }}@appspot.gserviceaccount.com \
-          --set-cloudsql-instances=${{ vars.DB_INSTANCE_CONNECTION }} \
+          --project="$PROJECT_ID" \
+          --service-account="$PROJECT_ID@appspot.gserviceaccount.com" \
+          --set-cloudsql-instances="$DB_INSTANCE_CONNECTION" \
           --memory=4Gi \
           --cpu=2 \
           --task-timeout=3600 \
           --max-retries=0 \
-          --set-env-vars="^|^DB_ENGINE=${{ vars.DB_ENGINE }}|DB_HOST=/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}|DB_USER=${{ vars.DB_USERNAME }}|DB_PASSWORD=$DB_PASSWORD|DB_NAME=${{ vars.DB_NAME }}|DB_PORT=${{ vars.DB_PORT }}|SECRET_KEY=$SECRET_KEY|ALLOWED_HOSTS=${{ vars.ALLOWED_HOSTS }}|STORAGE_BUCKET=${{ vars.STORAGE_BUCKET }}|PROJECT_ID=${{ vars.PROJECT_ID }}|DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}|BRANCH_NAME=$REF_NAME|EMAIL_HOST=${{ vars.EMAIL_HOST }}|EMAIL_PORT=${{ vars.EMAIL_PORT }}|SMTP_USER_EMAIL=${{ vars.SMTP_USER_EMAIL }}|SMTP_USER_PASSWORD=$SMTP_USER_PASSWORD|FIREBASE_API_KEY=${{ vars.FIREBASE_API_KEY }}|FIREBASE_AUTH_DOMAIN=${{ vars.FIREBASE_AUTH_DOMAIN }}|FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}|FIREBASE_STORAGE_BUCKET=${{ vars.FIREBASE_STORAGE_BUCKET }}|FIREBASE_MESSAGING_SENDER_ID=${{ vars.FIREBASE_MESSAGING_SENDER_ID }}|FIREBASE_APP_ID=${{ vars.FIREBASE_APP_ID }}|FIREBASE_MEASUREMENT_ID=${{ vars.FIREBASE_MEASUREMENT_ID }}|FIREBASE_SERVICE_ACCOUNT=$FIREBASE_SERVICE_ACCOUNT|JOB_NOTIFICATIONS_ENABLED=True"
+          --env-vars-file=/tmp/job-env.yaml
 
     - name: Create Issue
       if: failure()
