@@ -45,12 +45,22 @@ def dispatch_cloud_run_job(job_pk: int) -> str | None:
 
     try:
         operation = client.run_job(request=request)
-        logger.info("Dispatched Cloud Run Job for job %d: %s", job_pk, operation.name)
+        # google-cloud-run >=0.11 returns google.api_core.operation.Operation,
+        # which does not expose `.name` directly. The Execution being built is
+        # available as operation.metadata; its .name is the execution resource
+        # path that we need for cancellation. Older versions used to expose
+        # .name on the operation itself — assuming that here crashed dispatch
+        # with AttributeError despite the underlying execution starting fine,
+        # making jobs appear stuck at "pending".
+        execution_name = getattr(getattr(operation, "metadata", None), "name", "") or ""
+        logger.info(
+            "Dispatched Cloud Run Job for job %d: %s", job_pk, execution_name,
+        )
         from admin_scripts.models import ComputationJob
         ComputationJob.objects.filter(pk=job_pk).update(
-            cloud_run_execution_name=operation.name,
+            cloud_run_execution_name=execution_name,
         )
-        return operation.name
+        return execution_name or None
     except Exception:
         logger.exception("Failed to dispatch Cloud Run Job for job %d", job_pk)
         return None
