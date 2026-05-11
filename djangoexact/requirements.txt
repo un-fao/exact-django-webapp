@@ -65,5 +65,6 @@ python-slugify==8.0.4
 drf-nested-routers==0.94.1
 weasyprint==68.0
 google-cloud-storage==2.19.0
+google-cloud-run==0.16.0
 faostat==2.0.1
 tqdm==4.67.1
