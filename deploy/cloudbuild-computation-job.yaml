@@ -14,6 +14,7 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'
       - '.'
+timeout: '1200s'
 images:
   - 'gcr.io/$PROJECT_ID/exact-computation-job:$COMMIT_SHA'
   - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'

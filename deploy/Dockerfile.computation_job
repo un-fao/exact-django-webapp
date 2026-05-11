@@ -44,4 +44,4 @@ COPY djangoexact/ /app/
 # Cloud Run Jobs execute the container command once and exit.
 # `run_computation_job` is the management command at
 # admin_scripts/management/commands/run_computation_job.py.
-ENTRYPOINT ["python", "manage.py", "run_computation_job"]
+CMD ["python", "manage.py", "run_computation_job"]
