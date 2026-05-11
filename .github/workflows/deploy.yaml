@@ -160,11 +160,12 @@ jobs:
         FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
         FIREBASE_MEASUREMENT_ID: ${{ vars.FIREBASE_MEASUREMENT_ID }}
       run: |
-        LATEST=$(gcloud app versions list --service="$SERVICE_NAME" --project="$PROJECT_ID" --format="value(id)" --sort-by="~createTime" --limit=1)
+        LATEST=$(gcloud app versions list --service="$SERVICE_NAME" --project="$PROJECT_ID" --format="value(version.id)" --sort-by="~version.createTime" --limit=1)
         if [ -z "$LATEST" ]; then
           echo "No App Engine version found for service=$SERVICE_NAME — cannot source secrets." >&2
           exit 1
         fi
+        echo "Sourcing env from App Engine version: $LATEST"
         gcloud app versions describe "$LATEST" --service="$SERVICE_NAME" --project="$PROJECT_ID" --format=json > /tmp/aev.json
 
         python3 - <<'PYEOF' > /tmp/job-env.yaml
