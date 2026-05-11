@@ -58,6 +58,8 @@ jobs:
         sed -i 's|\$DJANGO_DEBUG|${{ vars.DJANGO_DEBUG }}|g' djangoexact/app.yaml
         sed -i 's|\$ALLOWED_HOSTS|${{ vars.ALLOWED_HOSTS }}|g' djangoexact/app.yaml
         sed -i 's|\$CORS_ALLOWED_ORIGINS|${{ vars.CORS_ALLOWED_ORIGINS }}|g' djangoexact/app.yaml
+        sed -i 's|\$CLOUD_RUN_COMPUTATION_JOB_NAME|${{ vars.CLOUD_RUN_COMPUTATION_JOB_NAME }}|g' djangoexact/app.yaml
+        sed -i 's|\$CLOUD_RUN_REGION|${{ vars.CLOUD_RUN_REGION }}|g' djangoexact/app.yaml
 
         # NOTE: do NOT echo app.yaml — it contains injected DB_PASSWORD and SECRET_KEY after substitution.
 
