@@ -128,31 +128,27 @@ jobs:
 
     - name: Deploy/update Cloud Run Job
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
-      # We avoid passing secret values through `gcloud --set-env-vars` because
-      # GitHub Actions' interpolation of secrets containing $ into the YAML
-      # env: block (or bash double-quoting them on the CLI) silently mangles
-      # them — observed: DB_PASSWORD and SECRET_KEY each gained 2 extra chars
-      # on Cloud Run vs the working App Engine values, breaking psycopg2 auth.
+      # GitHub Actions' interpolation of secrets into a YAML env: block adds
+      # escaping that diverges from App Engine's sed-substitution path. The
+      # observed effect is +2 chars on DB_PASSWORD and SECRET_KEY for any
+      # secret containing $ or \, which breaks psycopg2 auth against a
+      # Postgres user whose password was set via the App Engine path.
       #
-      # Instead we hand the values to Python via step env vars and let Python
-      # write a YAML file consumed by `gcloud run jobs deploy --env-vars-file`.
-      # Python's os.environ + yaml.safe_dump preserves the values verbatim.
+      # Workaround: source DB credentials and SECRET_KEY from the *already
+      # deployed* App Engine version's env (where they are sed-substituted
+      # and known to match the Postgres user). Everything else continues to
+      # come from GitHub vars/secrets (those values either have no $/\ or are
+      # not auth-sensitive so a length-skew there is harmless until we can
+      # switch to Secret Manager).
       env:
         SHA: ${{ github.sha }}
         REF_NAME: ${{ github.ref_name }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        PROJECT_ID: ${{ vars.PROJECT_ID }}
+        SERVICE_NAME: ${{ vars.SERVICE_NAME }}
+        CLOUD_RUN_REGION: ${{ vars.CLOUD_RUN_REGION }}
+        DB_INSTANCE_CONNECTION: ${{ vars.DB_INSTANCE_CONNECTION }}
         SMTP_USER_PASSWORD: ${{ secrets.SMTP_USER_PASSWORD }}
         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        DB_ENGINE: ${{ vars.DB_ENGINE }}
-        DB_INSTANCE_CONNECTION: ${{ vars.DB_INSTANCE_CONNECTION }}
-        DB_USERNAME: ${{ vars.DB_USERNAME }}
-        DB_NAME: ${{ vars.DB_NAME }}
-        DB_PORT: ${{ vars.DB_PORT }}
-        ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
-        STORAGE_BUCKET: ${{ vars.STORAGE_BUCKET }}
-        PROJECT_ID: ${{ vars.PROJECT_ID }}
-        DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
         EMAIL_HOST: ${{ vars.EMAIL_HOST }}
         EMAIL_PORT: ${{ vars.EMAIL_PORT }}
         SMTP_USER_EMAIL: ${{ vars.SMTP_USER_EMAIL }}
@@ -164,38 +160,53 @@ jobs:
         FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
         FIREBASE_MEASUREMENT_ID: ${{ vars.FIREBASE_MEASUREMENT_ID }}
       run: |
+        LATEST=$(gcloud app versions list --service="$SERVICE_NAME" --project="$PROJECT_ID" --format="value(id)" --sort-by="~createTime" --limit=1)
+        if [ -z "$LATEST" ]; then
+          echo "No App Engine version found for service=$SERVICE_NAME — cannot source secrets." >&2
+          exit 1
+        fi
+        gcloud app versions describe "$LATEST" --service="$SERVICE_NAME" --project="$PROJECT_ID" --format=json > /tmp/aev.json
+
         python3 - <<'PYEOF' > /tmp/job-env.yaml
-        import os, sys, yaml
-        keys = [
-            "DB_ENGINE", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT",
-            "DB_HOST",
-            "SECRET_KEY", "ALLOWED_HOSTS", "STORAGE_BUCKET", "PROJECT_ID",
-            "DJANGO_DEBUG", "BRANCH_NAME",
-            "EMAIL_HOST", "EMAIL_PORT", "SMTP_USER_EMAIL", "SMTP_USER_PASSWORD",
-            "FIREBASE_API_KEY", "FIREBASE_AUTH_DOMAIN", "FIREBASE_PROJECT_ID",
-            "FIREBASE_STORAGE_BUCKET", "FIREBASE_MESSAGING_SENDER_ID",
-            "FIREBASE_APP_ID", "FIREBASE_MEASUREMENT_ID",
-            "FIREBASE_SERVICE_ACCOUNT", "JOB_NOTIFICATIONS_ENABLED",
-        ]
-        # Derive a couple of values, then pull everything else verbatim from
-        # the process env. Two renames: DB_USER comes from DB_USERNAME, and
-        # BRANCH_NAME from REF_NAME (settings.py reads DB_USER; the original
-        # github.ref_name flows through REF_NAME).
-        env = {
-            "DB_USER": os.environ["DB_USERNAME"],
-            "BRANCH_NAME": os.environ["REF_NAME"],
-            "DB_HOST": f"/cloudsql/{os.environ['DB_INSTANCE_CONNECTION']}",
-            "JOB_NOTIFICATIONS_ENABLED": "True",
+        import json, os, sys, yaml
+        with open('/tmp/aev.json') as f:
+            aev = json.load(f).get('envVariables', {})
+        out = {
+            # From App Engine (sed-substituted): byte-for-byte parity required.
+            'DB_ENGINE': aev['DB_ENGINE'],
+            'DB_HOST': f"/cloudsql/{os.environ['DB_INSTANCE_CONNECTION']}",
+            'DB_USER': aev['DB_USERNAME'],
+            'DB_PASSWORD': aev['DB_PASSWORD'],
+            'DB_NAME': aev['DB_NAME'],
+            'DB_PORT': aev['DB_PORT'],
+            'SECRET_KEY': aev['SECRET_KEY'],
+            'ALLOWED_HOSTS': aev['ALLOWED_HOSTS'],
+            'STORAGE_BUCKET': aev['STORAGE_BUCKET'],
+            'PROJECT_ID': aev['PROJECT_ID'],
+            'DJANGO_DEBUG': aev['DJANGO_DEBUG'],
+            # Not in App Engine env_variables (sed-substituted into settings.py):
+            # pull from step env vars (GitHub vars/secrets).
+            'BRANCH_NAME': os.environ['REF_NAME'],
+            'EMAIL_HOST': os.environ['EMAIL_HOST'],
+            'EMAIL_PORT': os.environ['EMAIL_PORT'],
+            'SMTP_USER_EMAIL': os.environ['SMTP_USER_EMAIL'],
+            'SMTP_USER_PASSWORD': os.environ['SMTP_USER_PASSWORD'],
+            'FIREBASE_API_KEY': os.environ['FIREBASE_API_KEY'],
+            'FIREBASE_AUTH_DOMAIN': os.environ['FIREBASE_AUTH_DOMAIN'],
+            'FIREBASE_PROJECT_ID': os.environ['FIREBASE_PROJECT_ID'],
+            'FIREBASE_STORAGE_BUCKET': os.environ['FIREBASE_STORAGE_BUCKET'],
+            'FIREBASE_MESSAGING_SENDER_ID': os.environ['FIREBASE_MESSAGING_SENDER_ID'],
+            'FIREBASE_APP_ID': os.environ['FIREBASE_APP_ID'],
+            'FIREBASE_MEASUREMENT_ID': os.environ['FIREBASE_MEASUREMENT_ID'],
+            'FIREBASE_SERVICE_ACCOUNT': os.environ['FIREBASE_SERVICE_ACCOUNT'],
+            'JOB_NOTIFICATIONS_ENABLED': 'True',
         }
-        for k in keys:
-            if k in env:
-                continue
-            env[k] = os.environ[k]
-        yaml.safe_dump(env, sys.stdout, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(out, sys.stdout, default_flow_style=False, allow_unicode=True)
         PYEOF
+
         gcloud run jobs deploy exact-computation-job \
           --image="gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
-          --region=${{ vars.CLOUD_RUN_REGION }} \
+          --region="$CLOUD_RUN_REGION" \
           --project="$PROJECT_ID" \
           --service-account="$PROJECT_ID@appspot.gserviceaccount.com" \
           --set-cloudsql-instances="$DB_INSTANCE_CONNECTION" \
