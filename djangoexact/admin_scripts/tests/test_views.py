@@ -691,8 +691,8 @@ class CompileScenariosViewTest(TestCase):
         headers = [cell.value for cell in ws[1]]
         self.assertIn("Units", headers)
         units_col = headers.index("Units")
-        # First data row should have the unit value we posted (stored as string in our dict)
-        self.assertEqual(str(ws[2][units_col].value), "2.5")
+        # Parser stores the raw POSTed string; xlsx cell preserves that string.
+        self.assertEqual(ws[2][units_col].value, "2.5")
 
     def test_export_summary_reflects_unit_scaling(self):
         self.client.login(email="staff@example.com", password="testpass123")
