@@ -182,6 +182,25 @@ class ScenarioUtilsTest(TestCase):
         results = ChangeRecord.objects.filter(q)
         self.assertEqual(results.count(), 6)
 
+    def test_coerce_unit_returns_float_for_numeric_string(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit("2.5"), 2.5)
+        self.assertEqual(_coerce_unit("3"), 3.0)
+        self.assertEqual(_coerce_unit(2.0), 2.0)
+        self.assertEqual(_coerce_unit(0), 0.0)
+
+    def test_coerce_unit_defaults_to_one_on_invalid_input(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit(None), 1.0)
+        self.assertEqual(_coerce_unit(""), 1.0)
+        self.assertEqual(_coerce_unit("   "), 1.0)
+        self.assertEqual(_coerce_unit("abc"), 1.0)
+
+    def test_coerce_unit_clamps_negative_to_one(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit("-2"), 1.0)
+        self.assertEqual(_coerce_unit(-0.5), 1.0)
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):

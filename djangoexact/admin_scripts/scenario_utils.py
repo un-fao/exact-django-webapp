@@ -3,6 +3,22 @@ import statistics as stats_module
 from django.db.models import Avg, Count, Max, Min, Q, Sum
 
 
+def _coerce_unit(value):
+    """Convert a POSTed unit value to a safe float multiplier.
+
+    Returns 1.0 for None, blank strings, non-numeric strings, and negative numbers.
+    """
+    if value is None:
+        return 1.0
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return 1.0
+    if f < 0:
+        return 1.0
+    return f
+
+
 def stats_for(qs):
     """Compute descriptive statistics for a ChangeRecord queryset's 'total' field."""
     agg = qs.aggregate(
