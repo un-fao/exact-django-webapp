@@ -116,8 +116,10 @@ def _create_flexible_value_query(field_name, value):
 def _build_single_change_q(change, global_filters):
     """Build a Q object matching ChangeRecords for one change in a scenario.
 
-    Returns Q() (matches nothing) if the change has no module_type — callers
-    should skip such changes rather than OR an empty Q into a wider query.
+    Returns ``Q(pk__in=[])`` (a sentinel that matches nothing — a bare
+    ``Q()`` would match *everything*) when the change has no module_type,
+    so the helper is safe to call standalone. Callers that OR results
+    together should still skip such changes to avoid noise.
     """
     module_type = change.get("module_type")
     if not module_type:
