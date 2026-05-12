@@ -597,6 +597,35 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(len(scenarios[1]["changes"]), 1)
         self.assertEqual(scenarios[1]["changes"][0]["module_type"], "Annual Cropland")
 
+    def test_parse_changes_extracts_unit_field(self):
+        from admin_scripts.views import _parse_changes_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        post["scenario-0-change-0-unit"] = "2.5"
+
+        changes = _parse_changes_from_post(post, prefix="scenario-0-")
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["unit"], "2.5")
+
+    def test_parse_changes_unit_defaults_to_empty_string_when_missing(self):
+        from admin_scripts.views import _parse_changes_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        # no unit key
+
+        changes = _parse_changes_from_post(post, prefix="scenario-0-")
+        self.assertEqual(changes[0]["unit"], "")
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",

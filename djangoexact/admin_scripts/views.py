@@ -185,6 +185,7 @@ def _parse_changes_from_post(post_data, prefix=""):
                     "value": post_data.get(f"{prefix}change-{index}-to_value", ""),
                 },
                 "filters": {},
+                "unit": post_data.get(f"{prefix}change-{index}-unit", ""),
             }
             region = post_data.getlist(f"{prefix}change-{index}-filter-region")
             if region:
