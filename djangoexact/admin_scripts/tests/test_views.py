@@ -626,6 +626,34 @@ class CompileScenariosViewTest(TestCase):
         changes = _parse_changes_from_post(post, prefix="scenario-0-")
         self.assertEqual(changes[0]["unit"], "")
 
+    def test_run_scenario_applies_unit_multiplier(self):
+        """Posting unit=2 doubles the sum/mean compared to unit=1."""
+        self.client.login(email="staff@example.com", password="testpass123")
+
+        base_post = {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+        }
+
+        # Baseline: unit=1 (one matching Grassland record with total=-2.0 in fixtures)
+        response_one = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {**base_post, "scenario-0-change-0-unit": "1"},
+        )
+        self.assertEqual(response_one.status_code, 200)
+        self.assertContains(response_one, "-2.0")
+
+        # unit=2 should scale to -4.0
+        response_two = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {**base_post, "scenario-0-change-0-unit": "2"},
+        )
+        self.assertEqual(response_two.status_code, 200)
+        self.assertContains(response_two, "-4.0")
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",
