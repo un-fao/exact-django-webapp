@@ -201,6 +201,16 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(_coerce_unit("-2"), 1.0)
         self.assertEqual(_coerce_unit(-0.5), 1.0)
 
+    def test_coerce_unit_rejects_non_finite_values(self):
+        import math
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit(float("nan")), 1.0)
+        self.assertEqual(_coerce_unit(float("inf")), 1.0)
+        self.assertEqual(_coerce_unit(float("-inf")), 1.0)
+        self.assertEqual(_coerce_unit("nan"), 1.0)
+        self.assertEqual(_coerce_unit("inf"), 1.0)
+        self.assertEqual(_coerce_unit(math.nan), 1.0)
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
