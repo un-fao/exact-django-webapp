@@ -654,6 +654,22 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(response_two.status_code, 200)
         self.assertContains(response_two, "-4.0")
 
+    def test_compile_scenarios_form_renders_unit_input(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-0-unit"')
+        self.assertContains(response, 'Units')
+
+    def test_htmx_add_change_includes_unit_input(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-change/",
+            {"index": "1", "scenario_index": "0"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-1-unit"')
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",
