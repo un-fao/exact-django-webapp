@@ -185,3 +185,114 @@ def build_scenario_query(changes, global_filters):
             continue
         q_objects |= _build_single_change_q(change, global_filters)
     return q_objects
+
+
+def _descriptive_stats_from_values(values):
+    """Compute the same descriptive-statistics dict shape as ``stats_for(qs)``,
+    but from an already-materialized list of floats.
+    """
+    n = len(values)
+    if n == 0:
+        return {
+            "count": 0,
+            "sum_total": 0.0,
+            "mean": None,
+            "median": None,
+            "min": None,
+            "max": None,
+            "std": None,
+            "q1": None,
+            "q3": None,
+            "iqr": None,
+            "ci_95": None,
+            "ci_99": None,
+        }
+
+    s = sum(values)
+    mean = s / n
+    minv = min(values)
+    maxv = max(values)
+    ss = sum(x * x for x in values)
+
+    if n > 1:
+        var = max(0, (ss - (s * s) / n) / (n - 1))
+        std = var**0.5
+        se = std / (n**0.5)
+        ci95 = 1.96 * se
+        ci99 = 2.58 * se
+    else:
+        std = se = ci95 = ci99 = None
+
+    sorted_values = sorted(values)
+
+    if len(sorted_values) >= 4:
+        q1 = stats_module.quantiles(sorted_values, n=4)[0]
+        median = stats_module.median(sorted_values)
+        q3 = stats_module.quantiles(sorted_values, n=4)[2]
+    else:
+        n_values = len(sorted_values)
+        if n_values % 2 == 0:
+            median = (sorted_values[n_values // 2 - 1] + sorted_values[n_values // 2]) / 2
+        else:
+            median = sorted_values[n_values // 2]
+
+        q1_idx = (n_values - 1) * 0.25
+        q3_idx = (n_values - 1) * 0.75
+
+        if q1_idx.is_integer():
+            q1 = sorted_values[int(q1_idx)]
+        else:
+            lower_idx = int(q1_idx)
+            upper_idx = min(lower_idx + 1, n_values - 1)
+            weight = q1_idx - lower_idx
+            q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+
+        if q3_idx.is_integer():
+            q3 = sorted_values[int(q3_idx)]
+        else:
+            lower_idx = int(q3_idx)
+            upper_idx = min(lower_idx + 1, n_values - 1)
+            weight = q3_idx - lower_idx
+            q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
+
+    iqr = q3 - q1
+
+    return {
+        "count": n,
+        "sum_total": s,
+        "mean": mean,
+        "median": median,
+        "min": minv,
+        "max": maxv,
+        "std": std,
+        "q1": q1,
+        "q3": q3,
+        "iqr": iqr,
+        "ci_95": ci95,
+        "ci_99": ci99,
+    }
+
+
+def stats_for_scenario(changes, global_filters):
+    """Compute descriptive statistics over ``record.total × change.unit`` for
+    every ChangeRecord matched by each change in *changes*.
+
+    A record matching multiple changes is counted once *per matching change*
+    (so its scaled value appears once for each change's unit). The unit
+    defaults to 1.0 for missing / blank / non-numeric / negative inputs,
+    which makes a scenario with no explicit units behave equivalently to the
+    legacy ``stats_for(build_scenario_query(...))`` pipeline.
+    """
+    # Lazy import to keep this module import-cycle-safe.
+    from minitool.models import ChangeRecord
+
+    scaled_values = []
+    for change in changes:
+        if not change.get("module_type"):
+            continue
+        unit = _coerce_unit(change.get("unit"))
+        q = _build_single_change_q(change, global_filters)
+        totals = ChangeRecord.objects.filter(q).values_list("total", flat=True)
+        scaled_values.extend(v * unit for v in totals)
+
+    return _descriptive_stats_from_values(scaled_values)

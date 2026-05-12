@@ -211,6 +211,150 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(_coerce_unit("inf"), 1.0)
         self.assertEqual(_coerce_unit(math.nan), 1.0)
 
+    def test_stats_for_scenario_unit_one_matches_legacy_baseline(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "1",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+        self.assertAlmostEqual(stats["median"], -2.0, places=5)
+        self.assertAlmostEqual(stats["min"], -3.0, places=5)
+        self.assertAlmostEqual(stats["max"], -1.0, places=5)
+
+    def test_stats_for_scenario_missing_unit_defaults_to_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            # no "unit" key at all
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+
+    def test_stats_for_scenario_blank_unit_defaults_to_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+
+    def test_stats_for_scenario_unit_scales_distribution(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -20.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -4.0, places=5)
+        self.assertAlmostEqual(stats["median"], -4.0, places=5)
+        self.assertAlmostEqual(stats["min"], -6.0, places=5)
+        self.assertAlmostEqual(stats["max"], -2.0, places=5)
+        # std and CI scale linearly with the multiplier
+        unit_one_changes = [dict(changes[0], unit="1")]
+        baseline = stats_for_scenario(unit_one_changes, {})
+        self.assertAlmostEqual(stats["std"], baseline["std"] * 2, places=5)
+        self.assertAlmostEqual(stats["ci_95"], baseline["ci_95"] * 2, places=5)
+        self.assertAlmostEqual(stats["ci_99"], baseline["ci_99"] * 2, places=5)
+
+    def test_stats_for_scenario_unit_zero_zeros_out_distribution(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "0",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertEqual(stats["sum_total"], 0.0)
+        self.assertEqual(stats["mean"], 0.0)
+        self.assertEqual(stats["min"], 0.0)
+        self.assertEqual(stats["max"], 0.0)
+        self.assertEqual(stats["std"], 0.0)
+
+    def test_stats_for_scenario_negative_unit_treated_as_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "-2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        # negative unit clamps to 1.0 — sum stays negative, not positive
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+
+    def test_stats_for_scenario_overlapping_changes_count_once_per_change(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # Both changes match the same 5 Grassland records (same module_type/field/values).
+        # With units 1 and 3, the distribution gets 5 + 5 = 10 scaled values:
+        # 5 of [-3, -2.5, -2, -1.5, -1] and 5 of [-9, -7.5, -6, -4.5, -3].
+        changes = [
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "3",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 10)
+        # sum = -10 * 1 + -10 * 3 = -40
+        self.assertAlmostEqual(stats["sum_total"], -40.0, places=5)
+
+    def test_stats_for_scenario_no_changes_returns_empty_stats(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        stats = stats_for_scenario([], {})
+        self.assertEqual(stats["count"], 0)
+        self.assertEqual(stats["sum_total"], 0.0)
+        self.assertIsNone(stats["mean"])
+        self.assertIsNone(stats["std"])
+
+    def test_stats_for_scenario_skips_changes_without_module_type(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [
+            {
+                "module_type": "",
+                "start": {"field": "x", "value": "a"},
+                "end": {"field": "x", "value": "b"},
+                "unit": "2",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        # Only the second change contributes; first is skipped.
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
