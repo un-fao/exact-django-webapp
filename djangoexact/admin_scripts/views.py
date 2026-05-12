@@ -15,7 +15,7 @@ from admin_scripts.catalog import get_catalog
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
 from admin_scripts.models import ComputationJob
-from admin_scripts.scenario_utils import build_scenario_query, stats_for, stats_for_scenario
+from admin_scripts.scenario_utils import stats_for_scenario
 from django.apps import apps
 from minitool.models import ChangeRecord
 
@@ -576,9 +576,7 @@ def compile_scenarios_export(request):
             if not changes:
                 continue
 
-            q_objects = build_scenario_query(changes, global_filters)
-            aggregates = ChangeRecord.objects.filter(q_objects)
-            statistics = stats_for(aggregates)
+            statistics = stats_for_scenario(changes, global_filters)
 
             summary_rows.append({
                 "Category": category,
@@ -607,6 +605,7 @@ def compile_scenarios_export(request):
                     "Field": change["start"]["field"],
                     "From Value": change["start"]["value"],
                     "To Value": change["end"]["value"],
+                    "Units": change.get("unit", ""),
                 })
             if changes_data:
                 pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)

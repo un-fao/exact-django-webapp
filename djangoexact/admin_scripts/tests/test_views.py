@@ -670,6 +670,52 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="scenario-0-change-1-unit"')
 
+    def test_export_includes_units_column_in_changes_sheet(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Test Export",
+            "scenario-0-category": "Test",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-0-change-0-unit": "2.5",
+        })
+        self.assertEqual(response.status_code, 200)
+
+        import openpyxl
+        buf = io.BytesIO(b"".join(response.streaming_content))
+        wb = openpyxl.load_workbook(buf)
+        ws = wb["Test Export Changes"]
+        # Header row
+        headers = [cell.value for cell in ws[1]]
+        self.assertIn("Units", headers)
+        units_col = headers.index("Units")
+        # First data row should have the unit value we posted (stored as string in our dict)
+        self.assertEqual(str(ws[2][units_col].value), "2.5")
+
+    def test_export_summary_reflects_unit_scaling(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Scaled",
+            "scenario-0-category": "Test",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-0-change-0-unit": "2",
+        })
+        self.assertEqual(response.status_code, 200)
+
+        import openpyxl
+        buf = io.BytesIO(b"".join(response.streaming_content))
+        wb = openpyxl.load_workbook(buf)
+        ws = wb["Summary"]
+        headers = [cell.value for cell in ws[1]]
+        sum_col = headers.index("Sum Total")
+        # Fixture has one matching Grassland row with total=-2.0; unit=2 -> sum=-4.0
+        self.assertAlmostEqual(ws[2][sum_col].value, -4.0, places=5)
+
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
             email="regular@example.com", password="testpass123",
