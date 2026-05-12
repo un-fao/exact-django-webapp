@@ -113,6 +113,54 @@ def _create_flexible_value_query(field_name, value):
         return Q(**{field_name: str(value)})
 
 
+def _build_single_change_q(change, global_filters):
+    """Build a Q object matching ChangeRecords for one change in a scenario.
+
+    Returns Q() (matches nothing) if the change has no module_type — callers
+    should skip such changes rather than OR an empty Q into a wider query.
+    """
+    module_type = change.get("module_type")
+    if not module_type:
+        return Q(pk__in=[])
+
+    change_filters = {**global_filters, **change.get("filters", {})}
+    csv_row_filters = change.get("csv_row_filters", {})
+
+    change_q = (
+        Q(module_type=module_type, field=change["start"]["field"])
+        & _create_flexible_value_query("from_value", change["start"]["value"])
+        & _create_flexible_value_query("to_value", change["end"]["value"])
+    )
+
+    for col in ("region", "climate", "moisture", "soil_type"):
+        if change_filters.get(col):
+            values = change_filters[col] if isinstance(change_filters[col], list) else [change_filters[col]]
+            col_q = Q()
+            for val in values:
+                col_q |= Q(**{col: val})
+            change_q &= col_q
+
+    for filter_key, filter_value in change_filters.items():
+        if filter_key in ("region", "climate", "moisture", "soil_type"):
+            continue
+        filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+        filter_q = Q()
+        for val in filter_values:
+            filter_q |= Q(**{f"csv_row_data__{filter_key}": val}) | Q(**{f"custom_filters__{filter_key}": val})
+        change_q &= filter_q
+
+    for filter_key, filter_value in csv_row_filters.items():
+        if filter_key in ("module_start_type", "module_w_type"):
+            continue
+        filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
+        csv_filter_q = Q()
+        for val in filter_values:
+            csv_filter_q |= Q(**{f"csv_row_data__{filter_key}": val})
+        change_q &= csv_filter_q
+
+    return change_q
+
+
 def build_scenario_query(changes, global_filters):
     """
     Build a combined Q object for filtering ChangeRecords based on scenario changes.
@@ -130,47 +178,8 @@ def build_scenario_query(changes, global_filters):
         Q object suitable for ChangeRecord.objects.filter()
     """
     q_objects = Q()
-
     for change in changes:
-        module_type = change.get("module_type")
-        if not module_type:
+        if not change.get("module_type"):
             continue
-
-        change_filters = {**global_filters, **change.get("filters", {})}
-        csv_row_filters = change.get("csv_row_filters", {})
-
-        change_q = (
-            Q(module_type=module_type, field=change["start"]["field"])
-            & _create_flexible_value_query("from_value", change["start"]["value"])
-            & _create_flexible_value_query("to_value", change["end"]["value"])
-        )
-
-        for col in ("region", "climate", "moisture", "soil_type"):
-            if change_filters.get(col):
-                values = change_filters[col] if isinstance(change_filters[col], list) else [change_filters[col]]
-                col_q = Q()
-                for val in values:
-                    col_q |= Q(**{col: val})
-                change_q &= col_q
-
-        for filter_key, filter_value in change_filters.items():
-            if filter_key in ("region", "climate", "moisture", "soil_type"):
-                continue
-            filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
-            filter_q = Q()
-            for val in filter_values:
-                filter_q |= Q(**{f"csv_row_data__{filter_key}": val}) | Q(**{f"custom_filters__{filter_key}": val})
-            change_q &= filter_q
-
-        for filter_key, filter_value in csv_row_filters.items():
-            if filter_key in ("module_start_type", "module_w_type"):
-                continue
-            filter_values = filter_value if isinstance(filter_value, list) else [filter_value]
-            csv_filter_q = Q()
-            for val in filter_values:
-                csv_filter_q |= Q(**{f"csv_row_data__{filter_key}": val})
-            change_q &= csv_filter_q
-
-        q_objects |= change_q
-
+        q_objects |= _build_single_change_q(change, global_filters)
     return q_objects
