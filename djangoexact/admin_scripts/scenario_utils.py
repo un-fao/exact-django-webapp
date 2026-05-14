@@ -293,6 +293,9 @@ def stats_for_scenario(changes, global_filters):
         unit = _coerce_unit(change.get("unit"))
         q = _build_single_change_q(change, global_filters)
         totals = ChangeRecord.objects.filter(q).values_list("total", flat=True)
-        scaled_values.extend(v * unit for v in totals)
+        if unit == 1.0:
+            scaled_values.extend(totals)
+        else:
+            scaled_values.extend(v * unit for v in totals)
 
     return _descriptive_stats_from_values(scaled_values)
