@@ -41,7 +41,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Driven by the DJANGO_DEBUG env var (set in app.yaml / deploy config).
+# Defaults to False so a missing/misspelled env var fails safe.
+DEBUG = os.getenv("DJANGO_DEBUG", "False").strip().lower() in ("true", "1", "yes", "on")
 
 ALLOWED_HOSTS = [".$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", ".minitool-741920004150.europe-west1.run.app"]
 
@@ -80,10 +82,10 @@ INSTALLED_APPS = [
     "blog",
     "ckeditor",
     "minitool",
+    # corsheaders is always required because its middleware is always loaded
+    # below; gating it on DEBUG broke CORS in production once DEBUG flipped off.
+    "corsheaders",
 ]
-
-if DEBUG:
-    INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

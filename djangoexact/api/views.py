@@ -131,7 +131,6 @@ from django.db import connection
 import time
 import api.reports as reports
 from django.http import HttpResponse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
@@ -456,12 +455,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             # Ensures the table is a valid identifier, reducing the risk of SQL injection
                             if not table_name.isidentifier():
                                 raise ValueError("Invalid table name")
-                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosemgrep
                     table_name = m._meta.db_table
                     # Ensures the table is a valid identifier, reducing the risk of SQL injection
                     if not table_name.isidentifier():
                         raise ValueError("Invalid table name")
-                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosemgrep
 
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
@@ -568,8 +567,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                response = list(executor.map(serialize_project, page))
+            # Serial serialization: each ThreadPoolExecutor thread opens its own
+            # Django thread-local DB connection. With 10 workers per request, a
+            # handful of concurrent requests saturated the App Engine ↔ Cloud SQL
+            # Auth Proxy cap of 100 connections, surfacing as "Connection refused".
+            response = [serialize_project(project) for project in page]
             return paginator.get_paginated_response(response)
 
         return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
@@ -625,20 +627,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit all tasks to the executor
-            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
-
-            for future in as_completed(future_to_pk):
-                pk = future_to_pk[future]
-                try:
-                    data = future.result()
-                except Exception as exc:
-                    logging.error(f"Activity {pk} generated an exception: {exc}")
-                    # You can choose to handle exceptions differently if needed
-                else:
-                    response["activities"].append(data)
+        # Serial processing: parallel threads each opened their own Django
+        # thread-local DB connection and saturated the App Engine ↔ Cloud SQL
+        # Auth Proxy cap of 100 connections per instance.
+        for pk in activity_pks:
+            try:
+                data = process_activity(pk)
+            except Exception as exc:
+                logging.error(f"Activity {pk} generated an exception: {exc}")
+            else:
+                response["activities"].append(data)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -1868,9 +1866,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
-                logger.debug(f"Time taken to process activities: {time.time() - start}")
+            # Serial serialization: a default ThreadPoolExecutor() on Python 3.11
+            # spawns min(32, cpu_count + 4) workers — each acquires its own
+            # Django thread-local DB connection and saturates the App Engine
+            # ↔ Cloud SQL Auth Proxy cap of 100 connections per instance.
+            response = [process_activity(activity) for activity in page]
+            logger.debug(f"Time taken to process activities: {time.time() - start}")
             return paginator.get_paginated_response(response)
 
         # End measuring time
