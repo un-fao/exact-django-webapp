@@ -140,3 +140,12 @@ djangoexact/scripts/forest_t2.csv
 TODOS.md
 djangoexact/scripts/forest_t2 copy.csv
 djangoexact/scripts/forman_agb_revisedrevised.csv
+.beads
+.claude/settings.json
+.venv
+.env.*
+docs
+CLAUDE.md
+CUserssirvosterzoAppDataLocalTempsql_describe.txt
+EXACT_guide.pdf
+README.pdf
