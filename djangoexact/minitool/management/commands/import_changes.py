@@ -80,11 +80,12 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Counting records to delete...")
 
-            # Count records first to show progress
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep: table name from Django _meta.db_table (trusted); module_type is parameterized
+            # Count records first to show progress.
+            # Table names come from Django Model._meta.db_table (trusted); module_type is parameterized.
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep: table name from Django _meta.db_table (trusted); module_type is parameterized
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -101,14 +102,14 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Deleting individual records...")
 
-            # Delete ChangeRecord entries
-            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep: table name from Django _meta.db_table (trusted); module_type is parameterized
+            # Delete ChangeRecord entries (table name from Django _meta.db_table, module_type parameterized).
+            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
 
             if show_progress:
                 self.stdout.write("  - Deleting aggregate records...")
 
-            # Delete ChangeAggregate entries
-            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep: table name from Django _meta.db_table (trusted); module_type is parameterized
+            # Delete ChangeAggregate entries (table name from Django _meta.db_table, module_type parameterized).
+            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
 
             if show_progress:
                 self.stdout.write(f"  - Successfully deleted {total_to_delete:,} records")
@@ -125,11 +126,11 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Counting all records...")
 
-            # Count all records first
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosemgrep: table name from Django _meta.db_table (trusted), no user input in query
+            # Count all records first. Table names come from Django _meta.db_table; no user input in query.
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosemgrep
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosemgrep: table name from Django _meta.db_table (trusted), no user input in query
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosemgrep
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -146,9 +147,9 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Deleting all records (fastest method)...")
 
-            # Delete all records from both tables
-            cursor.execute(f"DELETE FROM {change_record_table}")  # nosemgrep: table name from Django _meta.db_table (trusted), no user input in query
-            cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosemgrep: table name from Django _meta.db_table (trusted), no user input in query
+            # Delete all records from both tables. Table names come from Django _meta.db_table; no user input in query.
+            cursor.execute(f"DELETE FROM {change_record_table}")  # nosemgrep
+            cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosemgrep
 
             # For SQLite, we can also run VACUUM to reclaim space immediately
             cursor.execute("VACUUM")
