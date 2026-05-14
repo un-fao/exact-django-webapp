@@ -26,7 +26,7 @@ def run_command(cmd, description, check=True):
     print("=" * 60)
 
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)  # nosemgrep: local fixture workflow script; cmd is built from in-script literals, not user input
         print("STDOUT:")
         print(result.stdout)
         if result.stderr:

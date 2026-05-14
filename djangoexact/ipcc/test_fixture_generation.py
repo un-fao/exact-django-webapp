@@ -18,7 +18,7 @@ def run_command(cmd, description):
     print("=" * 60)
 
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)  # nosemgrep: local fixture-generation test script; cmd is built from in-script literals, not user input
         print("STDOUT:")
         print(result.stdout)
         if result.stderr:
