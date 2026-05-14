@@ -81,6 +81,10 @@ djangoexact/api/fixtures/
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json
+djangoexact/djangoexact/fao-exact-dev-service-account-key.json
+# Generic guard for any future GCP/Firebase service-account or private-key JSON
+**/*-service-account-key*.json
+**/*-private-key*.json
 
 csv
 djangoexact/ipcc_dump_csv.zip
