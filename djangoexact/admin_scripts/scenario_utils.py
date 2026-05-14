@@ -35,53 +35,20 @@ def stats_for(qs):
     n, s = agg["n"] or 0, agg["s"] or 0.0
     mean = agg["mean"] if n else None
 
+    std = se = ci95 = ci99 = None
+    q1 = median = q3 = None
+
     if n > 0:
         total_values = list(qs.values_list("total", flat=True))
-        ss = sum(x * x for x in total_values)
 
         if n > 1:
-            var = max(0, (ss - (s * s) / n) / (n - 1))
-            std = var**0.5
+            std = stats_module.stdev(total_values)
             se = std / (n**0.5)
             ci95 = 1.96 * se
             ci99 = 2.58 * se
+            q1, median, q3 = stats_module.quantiles(total_values, n=4, method="inclusive")
         else:
-            std = se = ci95 = ci99 = None
-
-        sorted_values = sorted(total_values)
-
-        if len(sorted_values) >= 4:
-            q1 = stats_module.quantiles(sorted_values, n=4)[0]
-            median = stats_module.median(sorted_values)
-            q3 = stats_module.quantiles(sorted_values, n=4)[2]
-        else:
-            n_values = len(sorted_values)
-            if n_values % 2 == 0:
-                median = (sorted_values[n_values // 2 - 1] + sorted_values[n_values // 2]) / 2
-            else:
-                median = sorted_values[n_values // 2]
-
-            q1_idx = (n_values - 1) * 0.25
-            q3_idx = (n_values - 1) * 0.75
-
-            if q1_idx.is_integer():
-                q1 = sorted_values[int(q1_idx)]
-            else:
-                lower_idx = int(q1_idx)
-                upper_idx = min(lower_idx + 1, n_values - 1)
-                weight = q1_idx - lower_idx
-                q1 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
-
-            if q3_idx.is_integer():
-                q3 = sorted_values[int(q3_idx)]
-            else:
-                lower_idx = int(q3_idx)
-                upper_idx = min(lower_idx + 1, n_values - 1)
-                weight = q3_idx - lower_idx
-                q3 = sorted_values[lower_idx] * (1 - weight) + sorted_values[upper_idx] * weight
-    else:
-        std = se = ci95 = ci99 = None
-        q1 = median = q3 = None
+            median = q1 = q3 = total_values[0]
 
     iqr = (q3 - q1) if (q1 is not None and q3 is not None) else None
 
