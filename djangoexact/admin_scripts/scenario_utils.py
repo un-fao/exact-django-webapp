@@ -14,7 +14,7 @@ def _coerce_unit(value):
         return 1.0
     try:
         f = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return 1.0
     if not math.isfinite(f):
         return 1.0
