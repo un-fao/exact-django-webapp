@@ -182,6 +182,179 @@ class ScenarioUtilsTest(TestCase):
         results = ChangeRecord.objects.filter(q)
         self.assertEqual(results.count(), 6)
 
+    def test_coerce_unit_returns_float_for_numeric_string(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit("2.5"), 2.5)
+        self.assertEqual(_coerce_unit("3"), 3.0)
+        self.assertEqual(_coerce_unit(2.0), 2.0)
+        self.assertEqual(_coerce_unit(0), 0.0)
+
+    def test_coerce_unit_defaults_to_one_on_invalid_input(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit(None), 1.0)
+        self.assertEqual(_coerce_unit(""), 1.0)
+        self.assertEqual(_coerce_unit("   "), 1.0)
+        self.assertEqual(_coerce_unit("abc"), 1.0)
+
+    def test_coerce_unit_clamps_negative_to_one(self):
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit("-2"), 1.0)
+        self.assertEqual(_coerce_unit(-0.5), 1.0)
+
+    def test_coerce_unit_rejects_non_finite_values(self):
+        import math
+        from admin_scripts.scenario_utils import _coerce_unit
+        self.assertEqual(_coerce_unit(float("nan")), 1.0)
+        self.assertEqual(_coerce_unit(float("inf")), 1.0)
+        self.assertEqual(_coerce_unit(float("-inf")), 1.0)
+        self.assertEqual(_coerce_unit("nan"), 1.0)
+        self.assertEqual(_coerce_unit("inf"), 1.0)
+        self.assertEqual(_coerce_unit(math.nan), 1.0)
+
+    def test_stats_for_scenario_unit_one_matches_legacy_baseline(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "1",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+        self.assertAlmostEqual(stats["median"], -2.0, places=5)
+        self.assertAlmostEqual(stats["min"], -3.0, places=5)
+        self.assertAlmostEqual(stats["max"], -1.0, places=5)
+
+    def test_stats_for_scenario_missing_unit_defaults_to_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            # no "unit" key at all
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+
+    def test_stats_for_scenario_blank_unit_defaults_to_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -2.0, places=5)
+
+    def test_stats_for_scenario_unit_scales_distribution(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -20.0, places=5)
+        self.assertAlmostEqual(stats["mean"], -4.0, places=5)
+        self.assertAlmostEqual(stats["median"], -4.0, places=5)
+        self.assertAlmostEqual(stats["min"], -6.0, places=5)
+        self.assertAlmostEqual(stats["max"], -2.0, places=5)
+        # std and CI scale linearly with the multiplier
+        unit_one_changes = [dict(changes[0], unit="1")]
+        baseline = stats_for_scenario(unit_one_changes, {})
+        self.assertAlmostEqual(stats["std"], baseline["std"] * 2, places=5)
+        self.assertAlmostEqual(stats["ci_95"], baseline["ci_95"] * 2, places=5)
+        self.assertAlmostEqual(stats["ci_99"], baseline["ci_99"] * 2, places=5)
+
+    def test_stats_for_scenario_unit_zero_zeros_out_distribution(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "0",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 5)
+        self.assertEqual(stats["sum_total"], 0.0)
+        self.assertEqual(stats["mean"], 0.0)
+        self.assertEqual(stats["min"], 0.0)
+        self.assertEqual(stats["max"], 0.0)
+        self.assertEqual(stats["std"], 0.0)
+
+    def test_stats_for_scenario_negative_unit_treated_as_one(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "-2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        # negative unit clamps to 1.0 — sum stays negative, not positive
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+
+    def test_stats_for_scenario_overlapping_changes_count_once_per_change(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # Both changes match the same 5 Grassland records (same module_type/field/values).
+        # With units 1 and 3, the distribution gets 5 + 5 = 10 scaled values:
+        # 5 of [-3, -2.5, -2, -1.5, -1] and 5 of [-9, -7.5, -6, -4.5, -3].
+        changes = [
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "3",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 10)
+        # sum = -10 * 1 + -10 * 3 = -40
+        self.assertAlmostEqual(stats["sum_total"], -40.0, places=5)
+
+    def test_stats_for_scenario_no_changes_returns_empty_stats(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        stats = stats_for_scenario([], {})
+        self.assertEqual(stats["count"], 0)
+        self.assertEqual(stats["sum_total"], 0.0)
+        self.assertIsNone(stats["mean"])
+        self.assertIsNone(stats["std"])
+
+    def test_stats_for_scenario_skips_changes_without_module_type(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [
+            {
+                "module_type": "",
+                "start": {"field": "x", "value": "a"},
+                "end": {"field": "x", "value": "b"},
+                "unit": "2",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        # Only the second change contributes; first is skipped.
+        self.assertEqual(stats["count"], 5)
+        self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
@@ -423,6 +596,125 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(scenarios[1]["scenario_name"], "Scenario B")
         self.assertEqual(len(scenarios[1]["changes"]), 1)
         self.assertEqual(scenarios[1]["changes"][0]["module_type"], "Annual Cropland")
+
+    def test_parse_changes_extracts_unit_field(self):
+        from admin_scripts.views import _parse_changes_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        post["scenario-0-change-0-unit"] = "2.5"
+
+        changes = _parse_changes_from_post(post, prefix="scenario-0-")
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["unit"], "2.5")
+
+    def test_parse_changes_unit_defaults_to_empty_string_when_missing(self):
+        from admin_scripts.views import _parse_changes_from_post
+        from django.http import QueryDict
+
+        post = QueryDict(mutable=True)
+        post["scenario-0-change-0-module_type"] = "Grassland"
+        post["scenario-0-change-0-field"] = "grassland_management_type"
+        post["scenario-0-change-0-from_value"] = "Non-Degraded"
+        post["scenario-0-change-0-to_value"] = "Improved Grassland"
+        # no unit key
+
+        changes = _parse_changes_from_post(post, prefix="scenario-0-")
+        self.assertEqual(changes[0]["unit"], "")
+
+    def test_run_scenario_applies_unit_multiplier(self):
+        """Posting unit=2 doubles the sum/mean compared to unit=1."""
+        self.client.login(email="staff@example.com", password="testpass123")
+
+        base_post = {
+            "scenario_index": "0",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+        }
+
+        # Baseline: unit=1 (one matching Grassland record with total=-2.0 in fixtures)
+        response_one = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {**base_post, "scenario-0-change-0-unit": "1"},
+        )
+        self.assertEqual(response_one.status_code, 200)
+        self.assertContains(response_one, "-2.0")
+
+        # unit=2 should scale to -4.0
+        response_two = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {**base_post, "scenario-0-change-0-unit": "2"},
+        )
+        self.assertEqual(response_two.status_code, 200)
+        self.assertContains(response_two, "-4.0")
+
+    def test_compile_scenarios_form_renders_unit_input(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-0-unit"')
+        self.assertContains(response, 'Units')
+
+    def test_htmx_add_change_includes_unit_input(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-change/",
+            {"index": "1", "scenario_index": "0"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-1-unit"')
+
+    def test_export_includes_units_column_in_changes_sheet(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Test Export",
+            "scenario-0-category": "Test",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-0-change-0-unit": "2.5",
+        })
+        self.assertEqual(response.status_code, 200)
+
+        import openpyxl
+        buf = io.BytesIO(b"".join(response.streaming_content))
+        wb = openpyxl.load_workbook(buf)
+        ws = wb["Test Export Changes"]
+        # Header row
+        headers = [cell.value for cell in ws[1]]
+        self.assertIn("Units", headers)
+        units_col = headers.index("Units")
+        # Parser stores the raw POSTed string; xlsx cell preserves that string.
+        self.assertEqual(ws[2][units_col].value, "2.5")
+
+    def test_export_summary_reflects_unit_scaling(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Scaled",
+            "scenario-0-category": "Test",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-0-change-0-unit": "2",
+        })
+        self.assertEqual(response.status_code, 200)
+
+        import openpyxl
+        buf = io.BytesIO(b"".join(response.streaming_content))
+        wb = openpyxl.load_workbook(buf)
+        ws = wb["Summary"]
+        headers = [cell.value for cell in ws[1]]
+        sum_col = headers.index("Sum Total")
+        # Fixture has one matching Grassland row with total=-2.0; unit=2 -> sum=-4.0
+        self.assertAlmostEqual(ws[2][sum_col].value, -4.0, places=5)
 
     def test_compile_scenarios_access_forbidden_non_staff(self):
         regular_user = CustomUser.objects.create_user(
