@@ -61,7 +61,7 @@
       "name_es": "Alfalfa",
       "name_ru": "Люцерна",
       "forest_type": null,
-      "is_active": true,
+      "is_active": false,
       "module_types": [
         5
       ],
