@@ -76,7 +76,7 @@ class WaterbodyReport(BaseModuleReport):
             metadata_section_title="Waterbody",
             result_rows=[ResultRow("CH4 from waterbody management", ch4)],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -132,7 +132,7 @@ class AquacultureReport(BaseModuleReport):
                 ResultRow("CO2-eq from electricity", electricity_co2_eq),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -181,7 +181,7 @@ class FisheryReport(BaseModuleReport):
                 ResultRow("CO2-eq from electricity", electricity_co2_eq),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             units_catch_w=units_catch_w,
@@ -416,7 +416,7 @@ class LivestockReport(BaseModuleReport):
                 ResultRow("Indirect N2O from manure management PRP (volatilization)", mm_prp_vol_n2o),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             units_heads_w=units_heads_w,
@@ -572,7 +572,7 @@ class EnergyReport(BaseModuleReport):
                 ResultRow("N2O from solid fuels", solid_fuel_n2o),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -666,7 +666,7 @@ class InputReport(BaseModuleReport):
                 ResultRow("CO2-eq from feed", feed_co2_eq),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -800,7 +800,7 @@ class IrrigationReport(BaseModuleReport):
                 ResultRow("N2O from liquid fuel or electricity", lf_elec_n2o),
             ],
             metadata_writes=mw,
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -981,7 +981,7 @@ class TransportReport(BaseModuleReport):
                 ResultRow("CO2 from electricity", electricity_co2),
             ],
             metadata_writes=[],
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -1053,7 +1053,7 @@ class ProcessingReport(BaseModuleReport):
                 ResultRow("Yearly water use in liters", water_use),
             ],
             metadata_writes=[],
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -1075,32 +1075,17 @@ class PackagingReport(BaseModuleReport):
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         m = self.module
-        dur = self._project_duration
+        es = self.emissions_set
+        AT, GT = math_utils.ActivityTypes, math_utils.GasTypes
 
-        from api.calculators import Result
-
-        electricity_co2 = _zeros(dur)
-        packaging_co2 = _zeros(dur)
-
-        for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas["balance"]
-                      if submodule.cached_results_by_activity_by_gas is not None else None)
-            if cached is not None:
-                electricity_co2 = _add(electricity_co2, extract_emissions(cached, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-                packaging_co2 = _add(packaging_co2, extract_emissions(cached, math_utils.ActivityTypes.PACKAGING, math_utils.GasTypes.CO2, duration=dur))
-                continue
-
-            calculator = calculators.PackagingEntryCalculator(submodule)
-            try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
-            except Exception as e:
-                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
-                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
-
-            electricity_co2 = _add(electricity_co2, extract_emissions(sub_es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-            packaging_co2 = _add(packaging_co2, extract_emissions(sub_es, math_utils.ActivityTypes.PACKAGING, math_utils.GasTypes.CO2, duration=dur))
-
-        total = _add(electricity_co2, packaging_co2)
+        # Derive every row from the module balance (which the module-level
+        # PackagingCalculator already aggregates across all submodule entries).
+        # The Fuel rows were silently dropped before: see exact-django-webapp-jcb.
+        electricity_co2 = self._extract(es, AT.ELECTRICITY, GT.CO2)
+        packaging_co2 = self._extract(es, AT.PACKAGING, GT.CO2)
+        fuel_n2o = self._extract(es, AT.FUEL, GT.N2O)
+        fuel_ch4 = self._extract(es, AT.FUEL, GT.CH4)
+        fuel_co2 = self._extract(es, AT.FUEL, GT.CO2)
 
         return ModuleResult(
             title=m.module_type.name,
@@ -1108,9 +1093,12 @@ class PackagingReport(BaseModuleReport):
             result_rows=[
                 ResultRow("CO2 from electricity", electricity_co2),
                 ResultRow("CO2 from packaging", packaging_co2),
+                ResultRow("N2O from fuel combustion", fuel_n2o),
+                ResultRow("CH4 from fuel combustion", fuel_ch4),
+                ResultRow("CO2 from fuel combustion", fuel_co2),
             ],
             metadata_writes=[],
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
@@ -1132,32 +1120,17 @@ class StorageReport(BaseModuleReport):
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         m = self.module
-        dur = self._project_duration
+        es = self.emissions_set
+        AT, GT = math_utils.ActivityTypes, math_utils.GasTypes
 
-        from api.calculators import Result
-
-        electricity_co2 = _zeros(dur)
-        storage_co2 = _zeros(dur)
-
-        for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas["balance"]
-                      if submodule.cached_results_by_activity_by_gas is not None else None)
-            if cached is not None:
-                storage_co2 = _add(storage_co2, extract_emissions(cached, math_utils.ActivityTypes.STORAGE, math_utils.GasTypes.CO2, duration=dur))
-                electricity_co2 = _add(electricity_co2, extract_emissions(cached, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-                continue
-
-            calculator = calculators.StorageEntryCalculator(submodule)
-            try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
-            except Exception as e:
-                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
-                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
-
-            storage_co2 = _add(storage_co2, extract_emissions(sub_es, math_utils.ActivityTypes.STORAGE, math_utils.GasTypes.CO2, duration=dur))
-            electricity_co2 = _add(electricity_co2, extract_emissions(sub_es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-
-        total = _add(electricity_co2, storage_co2)
+        # Derive every row from the module balance (which the module-level
+        # StorageCalculator already aggregates across all submodule entries).
+        # The Fuel rows were silently dropped before: see exact-django-webapp-jcb.
+        electricity_co2 = self._extract(es, AT.ELECTRICITY, GT.CO2)
+        storage_co2 = self._extract(es, AT.STORAGE, GT.CO2)
+        fuel_n2o = self._extract(es, AT.FUEL, GT.N2O)
+        fuel_ch4 = self._extract(es, AT.FUEL, GT.CH4)
+        fuel_co2 = self._extract(es, AT.FUEL, GT.CO2)
 
         return ModuleResult(
             title=m.module_type.name,
@@ -1165,9 +1138,12 @@ class StorageReport(BaseModuleReport):
             result_rows=[
                 ResultRow("CO2 from electricity", electricity_co2),
                 ResultRow("CO2 from storage", storage_co2),
+                ResultRow("N2O from fuel combustion", fuel_n2o),
+                ResultRow("CH4 from fuel combustion", fuel_ch4),
+                ResultRow("CO2 from fuel combustion", fuel_co2),
             ],
             metadata_writes=[],
-            total_emissions=total,
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),

@@ -176,7 +176,7 @@ class LandUseChangeReport(LandModuleReport):
             metadata_section_title="Land Use Change",
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -278,7 +278,7 @@ class PerennialCroplandReport(LandModuleReport):
             metadata_writes=mw,
             additional_indicator_rows_w=ai_w,
             additional_indicator_rows_wo=ai_wo,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -394,7 +394,7 @@ class AnnualCroplandReport(LandModuleReport):
             metadata_writes=mw,
             additional_indicator_rows_w=ai_w,
             additional_indicator_rows_wo=ai_wo,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -434,7 +434,7 @@ class SetAsideReport(LandModuleReport):
             metadata_section_title="Set Aside",
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -505,7 +505,7 @@ class GrasslandReport(LandModuleReport):
             metadata_section_title="Grassland",
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -532,7 +532,7 @@ class OtherLandReport(LandModuleReport):
             metadata_section_title=m.module_type.name,
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=[],
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -617,7 +617,7 @@ class CoastalWetlandReport(LandModuleReport):
             metadata_section_title="Coastal Wetland",
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -714,7 +714,7 @@ class FloodedRiceReport(LandModuleReport):
             metadata_section_title=m.module_type.name,
             result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4, extra_rows),
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -889,7 +889,7 @@ class ForestManagementReport(LandModuleReport):
             metadata_section_title="Forest Management",
             result_rows=result_rows,
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),
@@ -939,10 +939,13 @@ class SettlementReport(LandModuleReport):
         activity_title = self.module.activity.name
         m = self.module
         dur = self._project_duration
-        zeros = [0.0] * dur
 
+        # Settlement is a land module: its balance carries land-use-change
+        # emissions (biomass / SOC / SOM-N2O / fire) in addition to the
+        # roads/buildings submodules. These 5 rows were hardcoded to zeros
+        # and excluded from the total: see exact-django-webapp-jcb.
+        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
         buildings_co2, roads_co2, infra_co2 = self._compute_submodule_emissions(dur)
-        total_emissions = _add(_add(buildings_co2, roads_co2), infra_co2)
 
         # Metadata: buildings, roads, other_infrastructures sub-loops
         mw = []
@@ -999,11 +1002,11 @@ class SettlementReport(LandModuleReport):
             mw.append(MetadataWrite(2 + row + i, 6, infra.area_m2_thread.format_comments()))
 
         result_rows = [
-            ResultRow("CO2 in biomass", zeros),
-            ResultRow("CO2 in soils", zeros),
-            ResultRow("N2O in soils", zeros),
-            ResultRow("N2O from fires", zeros),
-            ResultRow("CH4 from fires", zeros),
+            ResultRow("CO2 in biomass", biomass_co2),
+            ResultRow("CO2 in soils", soil_co2),
+            ResultRow("N2O in soils", soil_n2o),
+            ResultRow("N2O from fires", fire_n2o),
+            ResultRow("CH4 from fires", fire_ch4),
             ResultRow("CO2-eq from buildings", buildings_co2),
             ResultRow("CO2-eq from roads", roads_co2),
             ResultRow("CO2-eq from other infrastructure", infra_co2),
@@ -1014,7 +1017,7 @@ class SettlementReport(LandModuleReport):
             metadata_section_title=m.module_type.name,
             result_rows=result_rows,
             metadata_writes=mw,
-            total_emissions=total_emissions,
+            total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
             units_breakdown_wo=self._units_breakdown_wo,
             is_with=m.is_with(),

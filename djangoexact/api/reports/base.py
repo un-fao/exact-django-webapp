@@ -126,6 +126,21 @@ class BaseModuleReport:
             duration=self._project_duration,
         )
 
+    def _balance_total(self) -> list[float]:
+        """Full GHG balance of this module: the sum of *every* entry in
+        ``emissions_set`` (all activities, all gases).
+
+        A module's total emissions MUST equal the complete sum of its balance.
+        Building the total from a hand-picked whitelist of (activity, gas)
+        pairs silently drops any category the calculator emits but the report
+        forgot to extract — e.g. the ``Fuel`` activity that the per-change-units
+        feature split out of Storage/Packaging, or Settlement land emissions.
+        See issue exact-django-webapp-jcb.
+        """
+        return extract_emissions(
+            self.emissions_set, duration=self._project_duration
+        )
+
     def compute(self) -> ModuleResult:
         """Return a ModuleResult with all computed data. Must be overridden."""
         raise NotImplementedError(
