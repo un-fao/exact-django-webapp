@@ -4618,9 +4618,6 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
 
-        self.results_w += self.results_w
-        self.results_wo += self.results_wo
-
         for building in self.module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
 
