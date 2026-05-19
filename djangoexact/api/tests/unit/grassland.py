@@ -128,3 +128,20 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
+
+    def test_conditional_field_required_when_trigger_set(self):
+        # er8 conditional-fields path: with the trigger
+        # (grassland_management_type_start) set, its dependent
+        # fire_periodicity_start is mandatory. Nulling it -> EMPTY; restoring
+        # it -> READY. Exercises the conditional branch of the unified engine
+        # (and the `is None` operator canonicalization).
+        data = copy.deepcopy(self.validated_data)
+        data["fire_periodicity_start"] = None
+        response = self.edit_module(self.module, self.user, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "EMPTY")
+
+        data["fire_periodicity_start"] = self.validated_data["fire_periodicity_start"]
+        response = self.edit_module(self.module, self.user, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "READY")

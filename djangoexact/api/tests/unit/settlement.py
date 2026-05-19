@@ -169,3 +169,23 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")
 
         log.info("END - Testing parent not ready if submodule not ready after modification that makes the parent ready")
+
+    def test_submodules_empty_takes_precedence_over_empty(self):
+        # er8 rule: when the parent's OWN mandatory fields are missing AND a
+        # submodule is not ready, the parent status must be SUBMODULES_EMPTY
+        # (submodule-unready outranks own-EMPTY) — not EMPTY. This precedence
+        # was deliberately introduced by the refactor and was previously
+        # unasserted.
+        parent_data = copy.deepcopy(self.validated_data)
+        parent_data["settlement_type_start"] = None
+        response = self.edit_module(self.module, self.user, parent_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        sub_data = copy.deepcopy(self.validated_data)
+        sub_data["building_type"] = None
+        response = self.edit_module(self.submodules[0], self.user, sub_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "EMPTY")
+
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")

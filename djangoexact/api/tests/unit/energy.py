@@ -141,3 +141,23 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")
 
         log.info("END - Testing parent not ready if submodule not ready")
+
+    def test_create_submodule_fully_populated_is_ready(self):
+        # er8 create path: when ALL mandatory fields are in the create payload
+        # the submodule must come back READY. validate() computes the status
+        # into data["status"] (from the POST body, since there's no instance
+        # to merge model defaults from on create) and super().save() persists
+        # it; the cascade then runs with recompute_self=False, so this asserts
+        # the create-time status is correct without the redundant post-save
+        # self-recompute. transmission_loss_t2_* is a mandatory EnergyEntry
+        # field that defaults on a persisted instance but must be supplied
+        # explicitly on create to be READY (same pre-er8 behaviour).
+        data = copy.deepcopy(self.validated_data)
+        data["parent"] = self.module.pk
+        data["transmission_loss_t2_start"] = 0.1
+        data["transmission_loss_t2_w"] = 0.1
+        data["transmission_loss_t2_wo"] = 0.1
+        response = self.create_submodule(models.EnergyEntry, self.user, data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["status"]["name"], "READY")
