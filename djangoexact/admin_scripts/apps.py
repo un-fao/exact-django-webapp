@@ -10,6 +10,15 @@ class AdminScriptsConfig(AppConfig):
     name = "admin_scripts"
 
     def ready(self):
+        import os
+
+        # validate_catalog imports api.minitool, which runs DB queries at
+        # module import. That fails during django.setup() before the test DB
+        # exists. This startup catalog check is a dev/admin safety net, so it
+        # is skipped under the SQLite test settings (unset elsewhere).
+        if os.getenv("SKIP_STARTUP_CATALOG_VALIDATION", "").lower() in ("1", "true", "yes"):
+            return
+
         from pathlib import Path
         from admin_scripts.catalog import load_catalog, validate_catalog, ValidationError
 

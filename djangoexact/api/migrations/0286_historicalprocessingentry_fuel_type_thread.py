@@ -13,6 +13,70 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
+_TABLE = "api_historicalprocessingentry"
+_COLUMN = "fuel_type_thread_id"
+_INDEX = "api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"
+
+# Original Postgres path — unchanged. Existing Postgres databases already
+# applied 0286 so this never re-runs there; kept verbatim for any fresh
+# Postgres build.
+_PG_FORWARD = """
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = 'api_historicalprocessingentry'
+          AND column_name = 'fuel_type_thread_id'
+    ) THEN
+        ALTER TABLE api_historicalprocessingentry
+            ADD COLUMN fuel_type_thread_id bigint NULL;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_indexes
+        WHERE schemaname = current_schema()
+          AND tablename = 'api_historicalprocessingentry'
+          AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
+    ) THEN
+        CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
+            ON api_historicalprocessingentry (fuel_type_thread_id);
+    END IF;
+END
+$$;
+"""
+
+_PG_REVERSE = """
+DROP INDEX IF EXISTS api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a;
+ALTER TABLE api_historicalprocessingentry DROP COLUMN IF EXISTS fuel_type_thread_id;
+"""
+
+
+def _forward(apps, schema_editor):
+    conn = schema_editor.connection
+    if conn.vendor == "postgresql":
+        schema_editor.execute(_PG_FORWARD)
+        return
+    # SQLite / other: emulate the idempotent column + index creation.
+    with conn.cursor() as cursor:
+        existing = {c.name for c in conn.introspection.get_table_description(cursor, _TABLE)}
+    if _COLUMN not in existing:
+        schema_editor.execute(f"ALTER TABLE {_TABLE} ADD COLUMN {_COLUMN} bigint NULL")
+    schema_editor.execute(f"CREATE INDEX IF NOT EXISTS {_INDEX} ON {_TABLE} ({_COLUMN})")
+
+
+def _reverse(apps, schema_editor):
+    conn = schema_editor.connection
+    if conn.vendor == "postgresql":
+        schema_editor.execute(_PG_REVERSE)
+        return
+    schema_editor.execute(f"DROP INDEX IF EXISTS {_INDEX}")
+    try:
+        schema_editor.execute(f"ALTER TABLE {_TABLE} DROP COLUMN {_COLUMN}")
+    except Exception:
+        pass
+
 
 class Migration(migrations.Migration):
 
@@ -37,38 +101,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             database_operations=[
-                migrations.RunSQL(
-                    sql="""
-                    DO $$
-                    BEGIN
-                        IF NOT EXISTS (
-                            SELECT 1
-                            FROM information_schema.columns
-                            WHERE table_name = 'api_historicalprocessingentry'
-                              AND column_name = 'fuel_type_thread_id'
-                        ) THEN
-                            ALTER TABLE api_historicalprocessingentry
-                                ADD COLUMN fuel_type_thread_id bigint NULL;
-                        END IF;
-
-                        IF NOT EXISTS (
-                            SELECT 1
-                            FROM pg_indexes
-                            WHERE schemaname = current_schema()
-                              AND tablename = 'api_historicalprocessingentry'
-                              AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
-                        ) THEN
-                            CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
-                                ON api_historicalprocessingentry (fuel_type_thread_id);
-                        END IF;
-                    END
-                    $$;
-                    """,
-                    reverse_sql="""
-                    DROP INDEX IF EXISTS api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a;
-                    ALTER TABLE api_historicalprocessingentry DROP COLUMN IF EXISTS fuel_type_thread_id;
-                    """,
-                ),
+                migrations.RunPython(_forward, _reverse),
             ],
         ),
     ]

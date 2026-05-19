@@ -302,24 +302,32 @@ EMAIL_HOST_USER = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 EMAIL_HOST_PASSWORD = os.getenv("SMTP_USER_PASSWORD", "$SMTP_USER_PASSWORD")
 
 # Firebase settings
-try:
-    FIREBASE_CONFIG = {
-        "apiKey": os.getenv("FIREBASE_API_KEY", "$FIREBASE_API_KEY"),
-        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", "$FIREBASE_AUTH_DOMAIN"),
-        "projectId": os.getenv("FIREBASE_PROJECT_ID", "$FIREBASE_PROJECT_ID"),
-        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", "$FIREBASE_STORAGE_BUCKET"),
-        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", "$FIREBASE_MESSAGING_SENDER_ID"),
-        "appId": os.getenv("FIREBASE_APP_ID", "$FIREBASE_APP_ID"),
-        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID", "$FIREBASE_MEASUREMENT_ID"),
-        "databaseURL": "",
-        "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
-    }
+# SKIP_FIREBASE_INIT bypasses Firebase bootstrap for environments without
+# cloud credentials (e.g. the SQLite test settings). Tests authenticate via
+# DRF force_authenticate and never exercise Firebase, so this is inert there
+# and unset (therefore unchanged) for development/review/production.
+if os.getenv("SKIP_FIREBASE_INIT", "").lower() in ("1", "true", "yes"):
+    FIREBASE_CONFIG = {}
+    auth = None
+else:
+    try:
+        FIREBASE_CONFIG = {
+            "apiKey": os.getenv("FIREBASE_API_KEY", "$FIREBASE_API_KEY"),
+            "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", "$FIREBASE_AUTH_DOMAIN"),
+            "projectId": os.getenv("FIREBASE_PROJECT_ID", "$FIREBASE_PROJECT_ID"),
+            "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", "$FIREBASE_STORAGE_BUCKET"),
+            "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", "$FIREBASE_MESSAGING_SENDER_ID"),
+            "appId": os.getenv("FIREBASE_APP_ID", "$FIREBASE_APP_ID"),
+            "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID", "$FIREBASE_MEASUREMENT_ID"),
+            "databaseURL": "",
+            "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
+        }
 
-    from accounts.firebase_auth import FirebaseAuth
-    auth = FirebaseAuth(FIREBASE_CONFIG["apiKey"])
-    firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
-except Exception as e:
-    raise Exception(f"Firebase config not found: {e}") from e
+        from accounts.firebase_auth import FirebaseAuth
+        auth = FirebaseAuth(FIREBASE_CONFIG["apiKey"])
+        firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
+    except Exception as e:
+        raise Exception(f"Firebase config not found: {e}") from e
 
 UNFOLD = {
     "SIDEBAR": {
