@@ -21,6 +21,22 @@ import api.models as models
 import ipcc.models as ipcc_models
 
 
+def _resolve_land_use_type(resolver, class_name):
+    """Climate/moisture-aware LandUseType for `class_name`.
+
+    Module-level (not a factory method): inside `@factory.lazy_attribute`,
+    `self` is factory_boy's Resolver, which exposes declared attributes
+    (e.g. `activity`) but cannot dispatch to factory instance methods — so
+    `self._get_land_use_type()` raised AttributeError. Mirrors the working
+    UnitTestAnnualCroplandFactory logic.
+    """
+    qs = models.LandUseType.objects.filter(module_types__class_name=class_name, is_active=True)
+    if hasattr(resolver, "activity") and resolver.activity and resolver.activity.project:
+        project = resolver.activity.project
+        qs = qs.filter(climates=project.climate, moistures=project.moisture)
+    return qs.first()
+
+
 class UnitTestProjectFactory(DjangoModelFactory):
     """
     Project factory specifically for unit testing with reliable defaults.
@@ -167,7 +183,7 @@ class UnitTestForestManagementFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def land_use_type_start(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "ForestManagement")
 
     forest_type = factory.LazyAttribute(lambda obj: models.ForestType.objects.get(name_en="Natural"))
     forest_condition_type = factory.LazyAttribute(lambda obj: models.ForestConditionType.objects.get(name_en="Primary"))
@@ -179,13 +195,7 @@ class UnitTestForestManagementFactory(DjangoModelFactory):
     rotation_length_yrs_w = 2
     rotation_length_yrs_wo = 2
 
-    def _get_land_use_type(self):
-        """Get appropriate land use type for ForestManagement based on project climate."""
-        if hasattr(self, "activity") and self.activity and self.activity.project:
-            climate = self.activity.project.climate
-            moisture = self.activity.project.moisture
-            return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", climates=climate, moistures=moisture, is_active=True).first()
-        return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", is_active=True).first()
+    # land_use_type resolved via module-level _resolve_land_use_type()
 
 
 class UnitTestGrasslandFactory(DjangoModelFactory):
@@ -201,15 +211,15 @@ class UnitTestGrasslandFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def land_use_type_start(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "Grassland")
 
     @factory.lazy_attribute
     def land_use_type_w(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "Grassland")
 
     @factory.lazy_attribute
     def land_use_type_wo(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "Grassland")
 
     grassland_management_type_start = factory.LazyAttribute(lambda obj: models.GrasslandManagementType.objects.first())
     grassland_management_type_w = factory.LazyAttribute(lambda obj: models.GrasslandManagementType.objects.first())
@@ -231,13 +241,7 @@ class UnitTestGrasslandFactory(DjangoModelFactory):
     yield_w = 60.0
     yield_wo = 50.0
 
-    def _get_land_use_type(self):
-        """Get appropriate land use type for Grassland based on project climate."""
-        if hasattr(self, "activity") and self.activity and self.activity.project:
-            climate = self.activity.project.climate
-            moisture = self.activity.project.moisture
-            return models.LandUseType.objects.filter(module_types__class_name="Grassland", climates=climate, moistures=moisture, is_active=True).first()
-        return models.LandUseType.objects.filter(module_types__class_name="Grassland", is_active=True).first()
+    # land_use_type resolved via module-level _resolve_land_use_type()
 
 
 class UnitTestAquacultureFactory(DjangoModelFactory):
@@ -649,27 +653,21 @@ class UnitTestOtherLandFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def land_use_type_start(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "OtherLand")
 
     @factory.lazy_attribute
     def land_use_type_w(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "OtherLand")
 
     @factory.lazy_attribute
     def land_use_type_wo(self):
-        return self._get_land_use_type()
+        return _resolve_land_use_type(self, "OtherLand")
 
     is_degraded_land_start = False
     is_degraded_land_w = False
     is_degraded_land_wo = False
 
-    def _get_land_use_type(self):
-        """Get appropriate land use type for OtherLand based on project climate."""
-        if hasattr(self, "activity") and self.activity and self.activity.project:
-            climate = self.activity.project.climate
-            moisture = self.activity.project.moisture
-            return models.LandUseType.objects.filter(module_types__class_name="OtherLand", climates=climate, moistures=moisture, is_active=True).first()
-        return models.LandUseType.objects.filter(module_types__class_name="OtherLand", is_active=True).first()
+    # land_use_type resolved via module-level _resolve_land_use_type()
 
 
 class UnitTestOrganicSoilFactory(DjangoModelFactory):

@@ -40,3 +40,14 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 CLOUD_RUN_COMPUTATION_JOB_NAME = ""
 DEBUG = False
+
+# Disable django-auditlog under tests. With AUDITLOG_INCLUDE_ALL_MODELS the
+# post_save receiver writes a LogEntry that deepcopies every changed field —
+# including the multi-MB cached_results_* JSON the calculation tests populate
+# — which thrashes/hangs (effectively forever, ~0 CPU). Auditing is orthogonal
+# to the status refactor; read at AuditlogConfig.ready() so no models register.
+# EXCLUDE_TRACKING_FIELDS/MODELS must be cleared too: auditlog's
+# register_from_settings() raises if they are set while INCLUDE_ALL is False.
+AUDITLOG_INCLUDE_ALL_MODELS = False
+AUDITLOG_EXCLUDE_TRACKING_FIELDS = ()
+AUDITLOG_EXCLUDE_TRACKING_MODELS = ()
