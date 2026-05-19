@@ -16,10 +16,15 @@ from django.apps import apps
 
 
 class BaseModuleTestCase(APITestCaseMixin):
-    def setUp(self):
-        super().setUp()
+    # Concrete subclasses set ModuleClass. The bare abstract base is skipped
+    # so the test loader can collect this module without running it.
+    ModuleClass = None
 
-        self.ModuleClass: models.Module
+    def setUp(self):
+        if getattr(self, "ModuleClass", None) is None:
+            self.skipTest("abstract base test case (ModuleClass not configured)")
+
+        super().setUp()
 
         project_response = self.create_project()
         log.info(project_response.data) if project_response.status_code != status.HTTP_201_CREATED else None
@@ -324,6 +329,9 @@ class BaseLandUseChangeTestCase(APITestCaseMixin):
         - A land use change object
         - The three required modules (start, with, without)
         """
+        if type(self) in (BaseLandUseChangeTestCase, AnyToAnyLandUseChangeTestCase):
+            self.skipTest("abstract land use change base test case")
+
         super().setUp()
 
         # Module types for the land use change scenario
