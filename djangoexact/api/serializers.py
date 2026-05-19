@@ -1439,9 +1439,11 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
             self.validated_data["activity"].project.lock_updated_at = timezone.now()
             self.validated_data["activity"].project.save()
         instance = super().save(**kwargs)
-        # Single declarative cascade entrypoint: recompute this module and any
-        # related modules (e.g. LandModule -> its LandUseChange).
-        recompute_with_dependents(instance)
+        # Declarative cascade for related modules (e.g. LandModule -> its
+        # LandUseChange). The instance's own status was already computed in
+        # validate() and persisted by super().save(), so don't recompute it
+        # again here (recompute_self=False) — that just repeats work.
+        recompute_with_dependents(instance, recompute_self=False)
         return instance
 
     def _module_requires_climate_moisture_soil_type(self, module):
@@ -1490,9 +1492,11 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
             log.error(f"Parent attribute is not defined for {self.instance}")
             raise ValueError("Parent attribute is not defined")
 
-        # Declarative cascade: recompute this submodule and its parent
-        # (replaces the former parent_validation serializer re-instantiation).
-        recompute_with_dependents(self.instance)
+        # Declarative cascade: recompute this submodule's parent (replaces the
+        # former parent_validation serializer re-instantiation). The submodule's
+        # own status was computed in validate() and persisted by super().save(),
+        # so recompute_self=False avoids repeating that work.
+        recompute_with_dependents(self.instance, recompute_self=False)
 
         return self.instance
 

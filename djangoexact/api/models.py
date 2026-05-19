@@ -1387,11 +1387,19 @@ class ReadinessMixin:
         return self.status
 
 
-def recompute_with_dependents(instance, override_data: dict | None = None) -> None:
-    """Single cascade entrypoint: recompute `instance`, then every related
-    object declared in DEPENDENCY_MAP (breadth-first, terminating, idempotent).
+def recompute_with_dependents(instance, override_data: dict | None = None, recompute_self: bool = True) -> None:
+    """Single cascade entrypoint: recompute `instance` (unless its status was
+    already computed and persisted by the caller), then every related object
+    declared in DEPENDENCY_MAP (breadth-first, terminating, idempotent).
+
+    The serializer write path passes ``recompute_self=False``: ``validate()``
+    already computed the status into ``data["status"]`` and DRF's ``save()``
+    persisted it, so re-deriving it here is redundant work (and double-logs
+    the scenario predicates). The cascade still recomputes the dependents.
+    External callers keep the default to recompute the instance too.
     """
-    instance.recompute_status(override_data=override_data, persist=True)
+    if recompute_self:
+        instance.recompute_status(override_data=override_data, persist=True)
 
     seen = {(type(instance).__name__, instance.pk)}
     queue: list = []
