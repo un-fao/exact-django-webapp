@@ -1,3 +1,4 @@
+import functools
 import uuid
 from abc import abstractmethod
 
@@ -244,6 +245,35 @@ class StatusType(models.Model):
 
     def __str__(self):
         return f"({self.id}) {self.name}"
+
+
+class StatusNames:
+    """Canonical status `name_en` values. Exact strings the API/tests depend on."""
+
+    EMPTY = "EMPTY"
+    READY = "READY"
+    SUBMODULES_EMPTY = "SUBMODULES_EMPTY"
+    IN_PROGRESS = "IN PROGRESS"
+
+
+@functools.lru_cache(maxsize=None)
+def status_type_id(name_en: str) -> int:
+    """Cached StatusType pk lookup by `name_en`.
+
+    StatusType rows are migration-seeded with stable pks and are never
+    created/deleted by tests, so caching the pk is safe across the process.
+    """
+    return StatusType.objects.get(name_en=name_en).pk
+
+
+def status_type(name_en: str) -> "StatusType":
+    """Return the StatusType for `name_en` via the cached pk (one indexed get)."""
+    return StatusType.objects.get(pk=status_type_id(name_en))
+
+
+def clear_status_type_cache() -> None:
+    """Test hook: drop the cached pks if StatusType rows are ever recreated."""
+    status_type_id.cache_clear()
 
 
 class LandUseType(models.Model):
@@ -1251,7 +1281,166 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         super().delete(*args, **kwargs)
 
 
-class Submodule(Historical, CachedResultMixin):
+# ---------------------------------------------------------------------------
+# Module readiness / status: declarative config + one model-layer engine
+# ---------------------------------------------------------------------------
+
+# Per-module-class readiness config (the `mandatory_fields` dict shape kept from
+# the serializer Meta). Populated at import time by serializers.py.
+READINESS_CONFIG: dict[str, dict] = {}
+
+# Per-module-class: whether scenario gating (is_start/is_with/is_without)
+# applies. Only OrganicSoil opts out (its fields apply unconditionally).
+READINESS_SCENARIO_GATED: dict[str, bool] = {}
+
+# Declarative cascade: "when an instance of <class name> is saved, also
+# recompute these related objects". Each resolver maps instance -> iterable.
+DEPENDENCY_MAP: dict[str, list] = {}
+
+
+def register_readiness(cls_name: str, config: dict, scenario_gated: bool = True) -> None:
+    READINESS_CONFIG[cls_name] = config or {}
+    READINESS_SCENARIO_GATED[cls_name] = scenario_gated
+
+
+def register_dependents(cls_name: str, *resolvers) -> None:
+    DEPENDENCY_MAP.setdefault(cls_name, []).extend(resolvers)
+
+
+class ReadinessMixin:
+    """Model-layer readiness engine shared by Module and Submodule.
+
+    Replaces the three duplicate serializer `is_ready` engines. `compute_readiness`
+    is pure; `recompute_status` assigns the correct StatusType and optionally
+    persists only the status column.
+    """
+
+    def compute_readiness(self, override_data: dict | None = None) -> tuple[bool, dict]:
+        """Return (is_ready, errors). Pure: no DB writes, no status assignment.
+
+        `override_data` is the already-merged value dict the serializer builds
+        via `merge_instance_data` (instance fields overlaid with incoming data).
+        When None (cascade / external recompute on a persisted instance) the
+        instance's own field values are used.
+        """
+        config = READINESS_CONFIG.get(type(self).__name__, {})
+        if not config:
+            return True, {}
+
+        if override_data is not None:
+            combined = override_data
+        elif self.pk:
+            combined = {f.name: getattr(self, f.name) for f in self._meta.fields}
+        else:
+            combined = {}
+
+        scenario_gated = READINESS_SCENARIO_GATED.get(type(self).__name__, True)
+        errors: dict = {}
+
+        for scenario, cfg in config.items():
+            if scenario_gated:
+                check = getattr(self, f"is_{scenario}", None)
+                if check is None or not check():
+                    continue
+
+            missing = [f for f in cfg.get("mandatory", []) if combined.get(f) is None]
+            if missing:
+                errors.setdefault(scenario, []).append(f"Missing mandatory fields: {', '.join(missing)}")
+
+            for field, dependents in cfg.get("conditional", {}).items():
+                if combined.get(field):
+                    missing_dep = [d for d in dependents if combined.get(d) is None]
+                    if missing_dep:
+                        errors.setdefault(scenario, []).append(
+                            f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dep)}"
+                        )
+
+        return not errors, errors
+
+    def _extra_submodules_for_status(self) -> list:
+        """Submodule-like relations that gate SUBMODULES_EMPTY but are not in
+        the `submodules` property. Overridden by Energy (electricities/fuels)."""
+        return []
+
+    def _has_unready_submodules(self) -> bool:
+        if not self.pk:
+            return False
+        subs = getattr(self, "submodules", None)
+        items = list(subs) if subs is not None else []
+        items += self._extra_submodules_for_status()
+        return any(not s.is_ready() for s in items)
+
+    def recompute_status(self, override_data: dict | None = None, persist: bool = False) -> "StatusType":
+        is_ready, _ = self.compute_readiness(override_data)
+        # SUBMODULES_EMPTY takes precedence over EMPTY/READY: the old per-module
+        # validate overrides either early-returned or overrode after super(),
+        # so an unready submodule always wins regardless of own-field readiness.
+        if self._has_unready_submodules():
+            name = StatusNames.SUBMODULES_EMPTY
+        elif not is_ready:
+            name = StatusNames.EMPTY
+        else:
+            name = StatusNames.READY
+        self.status = status_type(name)
+        if persist and self.pk:
+            type(self).objects.filter(pk=self.pk).update(status=self.status)
+        return self.status
+
+
+def recompute_with_dependents(instance, override_data: dict | None = None) -> None:
+    """Single cascade entrypoint: recompute `instance`, then every related
+    object declared in DEPENDENCY_MAP (breadth-first, terminating, idempotent).
+    """
+    instance.recompute_status(override_data=override_data, persist=True)
+
+    seen = {(type(instance).__name__, instance.pk)}
+    queue: list = []
+    for resolver in DEPENDENCY_MAP.get(type(instance).__name__, []):
+        queue.extend(d for d in resolver(instance) if d is not None)
+
+    while queue:
+        # FIFO: process the module's own cached relation (e.g. its
+        # land_use_change) before any equivalent re-queried duplicate, so the
+        # in-memory object reused in the API response carries the fresh status.
+        dep = queue.pop(0)
+        key = (type(dep).__name__, dep.pk)
+        if key in seen:
+            continue
+        seen.add(key)
+        dep.recompute_status(persist=True)
+        for resolver in DEPENDENCY_MAP.get(type(dep).__name__, []):
+            queue.extend(d for d in resolver(dep) if d is not None)
+
+
+def _all_concrete_subclasses(cls):
+    for sub in cls.__subclasses__():
+        yield from _all_concrete_subclasses(sub)
+        if not getattr(sub._meta, "abstract", False):
+            yield sub
+
+
+def _register_default_dependents() -> None:
+    """Submodule -> parent; LandModule -> its LandUseChange. Called at end of
+    this module once all concrete model classes exist."""
+    for sub in _all_concrete_subclasses(Submodule):
+        register_dependents(sub.__name__, lambda s: [getattr(s, "parent", None)])
+
+    def _luc_dependents(m):
+        # The module's own OneToOne LUC plus the activity-level LandUseChange
+        # (the one LandUseChange.get_modules() resolves readiness from).
+        deps = [getattr(m, "land_use_change", None)]
+        if getattr(m, "activity_id", None):
+            deps.append(m.activity.landusechange.first())
+        return deps
+
+    for mod in _all_concrete_subclasses(Module):
+        if mod is LandUseChange:
+            continue
+        if any(f.name == "land_use_change" for f in mod._meta.fields):
+            register_dependents(mod.__name__, _luc_dependents)
+
+
+class Submodule(ReadinessMixin, Historical, CachedResultMixin):
     soc_t2_start = models.FloatField(null=True, blank=True, verbose_name="soc_t2_start")
     soc_t2_w = models.FloatField(null=True, blank=True, verbose_name="soc_t2_w")
     soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name="soc_t2_wo")
@@ -1337,7 +1526,7 @@ class Submodule(Historical, CachedResultMixin):
         return None
 
 
-class Module(Historical, CachedResultMixin):
+class Module(ReadinessMixin, Historical, CachedResultMixin):
     class Meta:
         abstract = True
 
@@ -2626,6 +2815,11 @@ class Energy(Module):
     def submodules(self) -> list["Submodule"]:
         return list(self.entries.all())
 
+    def _extra_submodules_for_status(self) -> list:
+        # Energy.submodules is only `entries`; electricities/fuels also gate
+        # SUBMODULES_EMPTY (preserves the old EnergySerializer.validate rule).
+        return list(self.electricities.all()) + list(self.fuels.all())
+
 
 class ElectricityTier2Mixin(models.Model):
     country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="country_t2")
@@ -3131,6 +3325,19 @@ class LandUseChange(Module):
 
         return module_types
 
+    def recompute_status(self, override_data: dict | None = None, persist: bool = False) -> "StatusType":
+        # LandUseChange readiness is derived from its scenario modules, never
+        # from its own fields, and never SUBMODULES_EMPTY (reproduces the old
+        # LandUseChangeWriteSerializer.validate rule).
+        try:
+            ready = all(m.is_ready() for m in self.get_modules())
+        except Exception:
+            ready = False
+        self.status = status_type(StatusNames.READY if ready else StatusNames.EMPTY)
+        if persist and self.pk:
+            type(self).objects.filter(pk=self.pk).update(status=self.status)
+        return self.status
+
 
 ### MODEL PARAMETERS TABLES ###
 
@@ -3383,3 +3590,7 @@ class HandInHandAssessment(models.Model):
 
     def __str__(self):
         return f"{self.country.name} - {self.name} ({self.year})"
+
+
+# Declarative cascade registration — runs once all concrete models exist.
+_register_default_dependents()

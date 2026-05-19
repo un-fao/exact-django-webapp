@@ -23,6 +23,7 @@ from django.utils.text import slugify
 
 from . import labels
 from .models import (
+    recompute_with_dependents,
     Module,
     Submodule,
     Activity,
@@ -1349,9 +1350,15 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
             return utils.ScenarioTypes.WITHOUT.value
         return None
 
-    @abstractmethod
-    def is_ready(self, data, mandatory_fields, instance=None):
-        raise NotImplementedError("is_ready method must be implemented")
+    def is_ready(self, data, mandatory_fields=None, instance=None):
+        """Unified readiness engine. Delegates to the model-layer
+        `compute_readiness` (replaces the former NoScenario/Scenario/OrganicSoil
+        duplicate engines). `mandatory_fields` is accepted for call-site
+        compatibility but ignored — the model reads READINESS_CONFIG.
+        """
+        combined = self.merge_instance_data(data, instance=instance)
+        obj = instance if instance is not None else self.Meta.model(**combined)
+        return obj.compute_readiness(override_data=combined)
 
 
 class BaseModuleSerializer(BaseGenericModuleSerializer):
@@ -1413,14 +1420,13 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
             log.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
-        is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
-
-        if not is_ready:
-            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-            data["status"] = StatusType.objects.get(name_en="EMPTY")
-            return super().validate(data)
-
-        data["status"] = StatusType.objects.get(name_en="READY")
+        # Status (EMPTY / READY / SUBMODULES_EMPTY) is computed by the
+        # model-layer engine. `module_instance` already has `activity` wired
+        # above; merged data reflects partial-update semantics.
+        data["status"] = module_instance.recompute_status(
+            override_data=self.merge_instance_data(data, instance=self.instance),
+            persist=False,
+        )
 
         log.debug(f"END BaseModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -1432,7 +1438,11 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         else:
             self.validated_data["activity"].project.lock_updated_at = timezone.now()
             self.validated_data["activity"].project.save()
-        return super().save(**kwargs)
+        instance = super().save(**kwargs)
+        # Single declarative cascade entrypoint: recompute this module and any
+        # related modules (e.g. LandModule -> its LandUseChange).
+        recompute_with_dependents(instance)
+        return instance
 
     def _module_requires_climate_moisture_soil_type(self, module):
         """Check if module type requires climate/moisture/soil_type."""
@@ -1460,26 +1470,18 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         else:
             project.lock(self.context["request"].user)
 
-        is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
-
-        if not is_ready:
-            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-            data["status"] = StatusType.objects.get(name_en="EMPTY")
-            return super().validate(data)
-
-        data["status"] = StatusType.objects.get(name_en="READY")
+        # Build a transient instance carrying `parent` so scenario predicates
+        # (is_start/is_with/is_without) resolve on create as well as update.
+        sub_obj = self.instance if self.instance is not None else self.Meta.model(
+            **self.merge_instance_data(data, instance=None)
+        )
+        data["status"] = sub_obj.recompute_status(
+            override_data=self.merge_instance_data(data, instance=self.instance),
+            persist=False,
+        )
 
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
-
-    def parent_validation(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
-        if ParentWriteSerializer is None:
-            raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
-
-        parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
 
     def save(self, **kwargs):
         super().save(**kwargs)
@@ -1488,81 +1490,23 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
             log.error(f"Parent attribute is not defined for {self.instance}")
             raise ValueError("Parent attribute is not defined")
 
-        parent = utils.getany([self.instance, dict(kwargs)], "parent")
-        log.info(f"Parent in serializer: {parent}")
-        self.parent_validation(parent)
+        # Declarative cascade: recompute this submodule and its parent
+        # (replaces the former parent_validation serializer re-instantiation).
+        recompute_with_dependents(self.instance)
 
         return self.instance
 
 
 class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
-    def is_ready(self, data, mandatory_fields, instance=None):
-        combined_data = self.merge_instance_data(data, instance=instance)
-
-        model_instance = self.Meta.model(**combined_data)
-        errors = {}
-
-        # If the module is a submodule, the parent module must be retrieved for the scenario checks
-        module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
-
-        if module_type.is_submodule:
-            model_instance = model_instance.parent
-
-        for scenario, config in mandatory_fields.items():
-            scenario_check_method = f"is_{scenario}"
-            if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
-                # Validate mandatory fields
-                mandatory_fields = config.get("mandatory", [])
-                missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
-                if missing_mandatory_fields:
-                    errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
-
-                # Validate conditional fields
-                conditional_fields = config.get("conditional", {})
-                for field, dependent_fields in conditional_fields.items():
-                    if combined_data.get(field):
-                        missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
-                        if missing_dependent_fields:
-                            if scenario not in errors:
-                                errors[scenario] = []
-                            errors[scenario].append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
-
-        return not errors, errors
+    # Engine collapsed into BaseGenericModuleSerializer.is_ready ->
+    # model.compute_readiness. Kept as a name for MRO compatibility.
+    pass
 
 
 class ScenarioBaseSerializer(BaseGenericModuleSerializer):
-    def is_ready(self, data, mandatory_fields, instance=None):
-        combined_data = self.merge_instance_data(data, instance=instance)
-
-        model_instance = self.Meta.model(**combined_data)
-        errors = {}
-
-        # If the module is a submodule, the parent module must be retrieved for the scenario checks
-        module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
-
-        if module_type.is_submodule:
-            model_instance = model_instance.parent
-
-        for scenario, config in mandatory_fields.items():
-            scenario_check_method = f"is_{scenario}"
-            if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
-                # Validate mandatory fields
-                mandatory_fields = config.get("mandatory", [])
-                missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
-                if missing_mandatory_fields:
-                    errors[scenario] = [f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"]
-
-                # Validate conditional fields
-                conditional_fields = config.get("conditional", {})
-                for field, dependent_fields in conditional_fields.items():
-                    if combined_data.get(field):
-                        missing_dependent_fields = [dep_field for dep_field in dependent_fields if combined_data.get(dep_field) is None]
-                        if missing_dependent_fields:
-                            if scenario not in errors:
-                                errors[scenario] = []
-                            errors[scenario].append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
-
-        return not errors, errors
+    # Engine collapsed into BaseGenericModuleSerializer.is_ready ->
+    # model.compute_readiness. Kept as a name for MRO compatibility.
+    pass
 
 
 class NoScenarioModuleSerializer(BaseModuleSerializer, NoScenarioBaseSerializer):
@@ -1594,40 +1538,16 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
     def validate(self, data):
         log.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
-        log.debug(f"Data: {data}")
 
-        activity = data["activity"] if "activity" in data else self.instance.activity
-        luc: LandUseChange = activity.landusechange.first()
-
+        # Update path: run the standard module guards + model-layer status
+        # computation (BaseModuleSerializer.validate). The related
+        # LandUseChange is recomputed by the declarative cascade in
+        # BaseModuleSerializer.save (LandModule -> its LandUseChange), so the
+        # former in-validate setattr/save and serializer re-instantiation are
+        # no longer needed. Create path keeps the prior behavior of deferring
+        # status to the post-save cascade.
         if self.instance and not isinstance(self.instance, LandUseChange):
-            is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
-
-            if not is_ready:
-                log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-                data["status"] = StatusType.objects.get(name_en="EMPTY")
-            else:
-                data["status"] = StatusType.objects.get(name_en="READY")
-
-            super().validate(data)
-
-            for field, value in data.items():
-                setattr(self.instance, field, value)
-
-            self.instance.save()
-
-            # Validate the parent Land Use Change on related LandModule change
-            parent_luc = getattr(self.instance, "land_use_change", None)
-
-            if parent_luc:
-                luc_serializer = get_module_serializer(LandUseChange)(data={}, instance=parent_luc, many=False, partial=True, context=self.context)
-                luc_serializer.is_valid()
-                luc_serializer.save()
-
-        if luc:
-            # If the module is associated with a Land Use Change, update the status of the Land Use Change
-            luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True, context=self.context)
-            luc_serializer.is_valid(raise_exception=True)
-            luc_serializer.save()
+            return super().validate(data)
 
         log.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return data
@@ -1772,14 +1692,8 @@ class AnnualCroplandSerializer(LandModuleSeralizer):
             },
         }
 
-    def validate(self, data):
-        for minor_season in self.instance.minor_seasons.all():
-            minor_season: MinorSeasonAnnualCropland
-            if not minor_season.is_ready():
-                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-                return data
-
-        return super().validate(data)
+    # SUBMODULES_EMPTY (unready minor_seasons) is now applied generically by
+    # the model engine (AnnualCropland.submodules -> minor_seasons).
 
 
 class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
@@ -1886,11 +1800,9 @@ class LandUseChangeWriteSerializer(LandModuleSeralizer):
     def validate(self, data):
         if self.instance:
             self.instance: LandUseChange
-            if all([m.is_ready() for m in self.instance.get_modules()]):
-                data["status"] = StatusType.objects.get(name_en="READY")
-            else:
-                data["status"] = StatusType.objects.get(name_en="EMPTY")
-            self.instance.save()
+            # LandUseChange.recompute_status: READY iff all scenario modules
+            # are ready, else EMPTY (never SUBMODULES_EMPTY).
+            data["status"] = self.instance.recompute_status(persist=True)
 
         return data
 
@@ -1947,29 +1859,9 @@ class OrganicSoilWriteSerializer(LandModuleSeralizer):
             },
         }
 
-    def is_ready(self, data, mandatory_fields, instance=None):
-        combined_data = self.merge_instance_data(data, instance=instance)
-
-        errors = {}
-
-        for scenario, config in mandatory_fields.items():
-            # Validate mandatory fields
-            mandatory_fields = config.get("mandatory", [])
-            missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
-            if missing_mandatory_fields:
-                errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
-
-            # Validate conditional fields
-            conditional_fields = config.get("conditional", {})
-            for field, dependent_fields in conditional_fields.items():
-                if combined_data.get(field):
-                    missing_dependent_fields = [dep_field for dep_field in dependent_fields if combined_data.get(dep_field) is None]
-                    if missing_dependent_fields:
-                        if scenario not in errors:
-                            errors[scenario] = []
-                        errors[scenario].append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
-
-        return not errors, errors
+    # is_ready engine removed: OrganicSoil is registered with
+    # scenario_gated=False so the unified model engine applies its
+    # mandatory/conditional fields unconditionally (no is_<scenario>() gate).
 
 
 class OrganicSoilReadSerializer(LandModuleSeralizer):
@@ -2229,23 +2121,8 @@ class IrrigationWriteSerializer(ScenarioModuleSerializer):
         ref_name = "Irrigation"
         mandatory_fields = {}
 
-    def validate(self, data):
-        super().validate(data)
-
-        irrigation_systems: list[IrrigationSystem] = self.instance.irrigation_systems.all()
-        irrigation_phases: list[IrrigationPhase] = self.instance.irrigation_phases.all()
-
-        for irrigation_system in irrigation_systems:
-            if not irrigation_system.is_ready():
-                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-                break
-
-        for irrigation_phase in irrigation_phases:
-            if not irrigation_phase.is_ready():
-                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-                break
-
-        return data
+    # SUBMODULES_EMPTY (unready irrigation_systems / irrigation_phases) is now
+    # applied generically by the model engine (Irrigation.submodules).
 
 
 class IrrigationReadSerializer(BaseGenericModuleSerializer):
@@ -2377,22 +2254,9 @@ class EnergySerializer(ScenarioModuleSerializer):
         ref_name = "Energy"
         mandatory_fields = {}
 
-    def validate(self, data):
-        super().validate(data)
-
-        electricities: QuerySet[Electricity] = self.instance.electricities.all()
-        fuels: QuerySet[Fuel] = self.instance.fuels.all()
-
-        if any([not entry.is_ready() for entry in self.instance.entries.all()]):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        if any([not electricity.is_ready() for electricity in electricities]):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        if any([not fuel.is_ready() for fuel in fuels]):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        return data
+    # SUBMODULES_EMPTY (unready entries/electricities/fuels) is now applied
+    # generically by the model engine: Energy.submodules (entries) +
+    # Energy._extra_submodules_for_status (electricities + fuels).
 
 
 class EnergyWriteSerializer(EnergySerializer):
@@ -2922,9 +2786,8 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         if errors:
             raise serializers.ValidationError(errors)
 
-        if any([not d.is_ready() for d in instance.disturbances.all()]):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
+        # SUBMODULES_EMPTY (unready disturbances) is applied generically by the
+        # model engine (ForestManagement.submodules -> disturbances).
         return data
 
 
@@ -2943,15 +2806,8 @@ class InputSerializer(ScenarioModuleSerializer):
         ref_name = "Input"
         mandatory_fields = {}
 
-    def validate(self, data):
-        entries = InputEntry.objects.filter(parent=self.instance).all()
-        for entry in entries:
-            entry: InputEntry
-            if not entry.is_ready():
-                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-                return data
-
-        return super().validate(data)
+    # SUBMODULES_EMPTY (unready input entries) is now applied generically by
+    # the model engine (Input.submodules -> input_entries).
 
 
 class InputWriteSerializer(InputSerializer):
@@ -3236,25 +3092,8 @@ class SettlementSerializer(LandModuleSeralizer):
             },
         }
 
-    def validate(self, data):
-        super().validate(data)
-
-        buildings = Building.objects.filter(parent=self.instance).all()
-
-        if any(not building.is_ready() for building in buildings):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        roads = Road.objects.filter(parent=self.instance).all()
-
-        if any(not road.is_ready() for road in roads):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
-
-        if any(not other_infrastructure.is_ready() for other_infrastructure in other_infrastructures):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        return data
+    # SUBMODULES_EMPTY (unready buildings / roads / other_infrastructures) is
+    # now applied generically by the model engine (Settlement.submodules).
 
 
 class SettlementWriteSerializer(SettlementSerializer):
@@ -3393,10 +3232,9 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
         if parent.disturbances.count() + 1 > 3:
             raise serializers.ValidationError("Only 3 disturbances are allowed")
 
-        if not self.instance or not self.instance.is_ready():
-            parent.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-            parent.save()
-
+        # Parent ForestManagement status (SUBMODULES_EMPTY when a disturbance
+        # is not ready) is recomputed by the declarative cascade in
+        # BaseSubmoduleSerializer.save (ForestDisturbance -> parent).
         return data
 
 
@@ -3604,18 +3442,9 @@ class FieldDefinitionResponseSerializer(serializers.Serializer):
 
 
 class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
-    def validate(self, data):
-        super().validate(data)
-
-        if not self.instance:
-            return data
-
-        entries = self.instance.entries.all()
-
-        if any([not submodule.is_ready() for submodule in entries]):
-            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-
-        return data
+    # SUBMODULES_EMPTY (unready entries) is now applied generically by the
+    # model engine (ValueChainParentModule.submodules -> entries).
+    pass
 
 
 class ValueChainSubmoduleWriteSerializer(ScenarioSubmoduleSerializer):
@@ -4089,3 +3918,24 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         result.sort(key=lambda x: x["name"])
 
         return result
+
+
+# ---------------------------------------------------------------------------
+# Expose each module's `mandatory_fields` config to the model-layer readiness
+# engine. Keeps the per-module configs physically on the *WriteSerializer.Meta
+# while making them readable from models.py via READINESS_CONFIG.
+# ---------------------------------------------------------------------------
+from .models import register_readiness as _register_readiness  # noqa: E402
+
+for _ser_name, _ser_obj in list(globals().items()):
+    if not _ser_name.endswith("WriteSerializer"):
+        continue
+    _meta = getattr(_ser_obj, "Meta", None)
+    _model = getattr(_meta, "model", None)
+    if _model is None:
+        continue
+    _register_readiness(
+        _model.__name__,
+        getattr(_meta, "mandatory_fields", {}),
+        scenario_gated=(_model.__name__ != "OrganicSoil"),
+    )
