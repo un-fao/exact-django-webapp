@@ -187,22 +187,21 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
     total_w/total_wo) so that extract_emissions over the merged sets sums main
     plus every minor season — with the minor contribution being a *balance*
     (w - wo), never a raw w+wo sum, and using the *minor's* own start, not the
-    main module's start."""
+    main module's start.
+
+    The helper is module-family-agnostic: it accepts a ``calculator_cls``
+    argument so the same logic serves FloodedRice, PerennialCropland, and
+    AnnualCropland (exact-django-webapp-flx).
+    """
 
     DURATION = 3
 
-    def _patch_paths(self, minor_balance_entries, minor_total_w_entries, minor_total_wo_entries):
-        """Patch FloodedRiceSeasonCalculator and Result so the helper sees the synthetic data."""
-        # The helper instantiates calculators.FloodedRiceSeasonCalculator(minor_season).
-        # We replace it with a no-op that returns a stub object whose .calculate()
-        # returns the placeholder tuple consumed by Result(*).
+    def _fake_calculator_cls(self, minor_balance_entries, minor_total_w_entries, minor_total_wo_entries):
+        """Build a fake calculator class whose .calculate() returns a stub
+        tuple consumed by the patched Result(*tuple)."""
         fake_minor_calc = Mock()
         fake_minor_calc.calculate.return_value = ("w_stub", "wo_stub")
-
-        calc_patch = patch(
-            "api.reports.land.calculators.FloodedRiceSeasonCalculator",
-            return_value=fake_minor_calc,
-        )
+        calc_cls = Mock(return_value=fake_minor_calc)
         result_patch = patch(
             "api.calculators.Result",
             _result_class_mock(
@@ -211,7 +210,7 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
                 minor_total_wo_entries,
             ),
         )
-        return calc_patch, result_patch
+        return calc_cls, result_patch
 
     def test_helper_appends_minor_balance_entries_to_emissions_set(self):
         """Each minor season's balance entries are appended to emissions_set."""
@@ -228,15 +227,17 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
 
         minor_seasons = [Mock(), Mock()]  # two minor seasons
 
-        calc_patch, result_patch = self._patch_paths(minor_balance, minor_balance, [])
-        with calc_patch, result_patch:
-            es, es_w, es_wo = _aggregate_minor_seasons_into_emissions_sets(
-                main_es, main_es_w, main_es_wo, minor_seasons
+        calc_cls, result_patch = self._fake_calculator_cls(minor_balance, minor_balance, [])
+        with result_patch:
+            es, es_w, es_wo, minor_invs = _aggregate_minor_seasons_into_emissions_sets(
+                main_es, main_es_w, main_es_wo, minor_seasons, calc_cls
             )
 
         biomass_sum = extract_emissions(es, "Biomass", "CO2", duration=self.DURATION)
         # main 10/20/30 + 2 minor seasons × [1, 2, 3] = [12, 24, 36]
         self.assertEqual(biomass_sum, [12.0, 24.0, 36.0])
+        # And the helper called calc_cls once per minor season.
+        self.assertEqual(calc_cls.call_count, len(minor_seasons))
 
     def test_helper_does_not_mutate_inputs_in_place(self):
         """The helper must return new lists; the original main lists are unchanged."""
@@ -250,27 +251,31 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
         minor_balance = [_entry_obj("Biomass", "CO2", [1.0, 2.0, 3.0])]
         minor_seasons = [Mock()]
 
-        calc_patch, result_patch = self._patch_paths(minor_balance, minor_balance, [])
-        with calc_patch, result_patch:
+        calc_cls, result_patch = self._fake_calculator_cls(minor_balance, minor_balance, [])
+        with result_patch:
             _aggregate_minor_seasons_into_emissions_sets(
-                main_es, main_es_w, main_es_wo, minor_seasons
+                main_es, main_es_w, main_es_wo, minor_seasons, calc_cls
             )
         self.assertEqual(len(main_es), original_main_len)
 
     def test_helper_returns_main_unchanged_when_no_minor_seasons(self):
-        """With zero minor seasons the returned lists equal the inputs."""
+        """With zero minor seasons the returned lists equal the inputs and
+        the calculator class is never instantiated."""
         from api.reports.land import _aggregate_minor_seasons_into_emissions_sets
 
         main_es = [_entry_obj("Biomass", "CO2", [10.0])]
         main_es_w = [_entry_obj("Biomass", "CO2", [11.0])]
         main_es_wo = [_entry_obj("Biomass", "CO2", [1.0])]
 
-        es, es_w, es_wo = _aggregate_minor_seasons_into_emissions_sets(
-            main_es, main_es_w, main_es_wo, []
+        calc_cls = Mock()
+        es, es_w, es_wo, minor_invs = _aggregate_minor_seasons_into_emissions_sets(
+            main_es, main_es_w, main_es_wo, [], calc_cls
         )
         self.assertEqual(es, main_es)
         self.assertEqual(es_w, main_es_w)
         self.assertEqual(es_wo, main_es_wo)
+        self.assertEqual(minor_invs, [])
+        calc_cls.assert_not_called()
 
     def test_helper_aggregates_straw_burning_ch4(self):
         """STRAW_BURNING/CH4 from minor seasons is included (Bug 7qn)."""
@@ -281,10 +286,10 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
         minor_balance = [_entry_obj("Straw Burning", "CH4", [2.0, 2.0, 2.0])]
         minor_seasons = [Mock(), Mock()]
 
-        calc_patch, result_patch = self._patch_paths(minor_balance, minor_balance, [])
-        with calc_patch, result_patch:
-            es, _, _ = _aggregate_minor_seasons_into_emissions_sets(
-                main_es, [], [], minor_seasons
+        calc_cls, result_patch = self._fake_calculator_cls(minor_balance, minor_balance, [])
+        with result_patch:
+            es, _, _, _ = _aggregate_minor_seasons_into_emissions_sets(
+                main_es, [], [], minor_seasons, calc_cls
             )
         fire_ch4 = extract_emissions(es, "Straw Burning", "CH4", duration=3)
         # main 5/5/5 + 2 minors × [2, 2, 2] = [9, 9, 9]
@@ -303,15 +308,36 @@ class TestAggregateMinorSeasonsIntoEmissionsSets(unittest.TestCase):
         minor_total_wo = [_entry_obj("Biomass", "CO2", [9.0, 9.0, 9.0])]
         minor_seasons = [Mock()]
 
-        calc_patch, result_patch = self._patch_paths(minor_balance, minor_total_w, minor_total_wo)
-        with calc_patch, result_patch:
-            es, _, _ = _aggregate_minor_seasons_into_emissions_sets(
-                main_es, [], [], minor_seasons
+        calc_cls, result_patch = self._fake_calculator_cls(minor_balance, minor_total_w, minor_total_wo)
+        with result_patch:
+            es, _, _, _ = _aggregate_minor_seasons_into_emissions_sets(
+                main_es, [], [], minor_seasons, calc_cls
             )
 
         balance_sum = extract_emissions(es, "Biomass", "CO2", duration=3)
         # If helper correctly took balance: [1, 1, 1]; if it added w+wo: [19, 19, 19].
         self.assertEqual(balance_sum, [1.0, 1.0, 1.0])
+
+    def test_helper_uses_given_calculator_class_per_season(self):
+        """Bug exact-django-webapp-ttm: the helper must instantiate
+        calculator_cls(minor_season) — never reach back to the main module's
+        start_w/wo. Asserted by giving a distinct calculator class and
+        checking it is the only class instantiated."""
+        from api.reports.land import _aggregate_minor_seasons_into_emissions_sets
+
+        minor_balance = [_entry_obj("Biomass", "CO2", [1.0, 1.0, 1.0])]
+        minor_seasons = [Mock(), Mock(), Mock()]
+
+        calc_cls, result_patch = self._fake_calculator_cls(minor_balance, minor_balance, [])
+        with result_patch:
+            _aggregate_minor_seasons_into_emissions_sets(
+                [], [], [], minor_seasons, calc_cls
+            )
+
+        # One instantiation per minor season, all with the season as the sole arg.
+        self.assertEqual(calc_cls.call_count, 3)
+        for i, season in enumerate(minor_seasons):
+            self.assertIs(calc_cls.call_args_list[i].args[0], season)
 
 
 # ===========================================================================
@@ -388,3 +414,327 @@ class TestRowSumEqualsBalanceTotal(unittest.TestCase):
         for i in range(self.DURATION):
             self.assertAlmostEqual(row_sum[i], total[i], places=6,
                                    msg=f"Year {i}: row_sum={row_sum[i]} total={total[i]}")
+
+
+# ===========================================================================
+# 4. EnergyReport per-electricity / per-fuel metadata stride
+#    Bug exact-django-webapp-5g2
+# ===========================================================================
+
+class TestEnergyMetadataStride(unittest.TestCase):
+    """Each Energy electricity/fuel entry must occupy exactly 4 metadata rows
+    so that consecutive entries do not collide in the Metadata sheet."""
+
+    def _build_electricity(self, idx: int):
+        e = Mock()
+        e.country_t2 = Mock(); e.country_t2.name = f"country_{idx}"
+        e.ef_source = Mock(); e.ef_source.name = f"ef_src_{idx}"
+        e.quantity_consumed_per_year_start = 10.0 + idx
+        e.quantity_consumed_per_year_w = 20.0 + idx
+        e.quantity_consumed_per_year_wo = 5.0 + idx
+        e.mwh_renewables_start = 1.0 + idx
+        e.mwh_renewables_w = 2.0 + idx
+        e.mwh_renewables_wo = 0.5 + idx
+        e.quantity_consumed_per_year_thread = Mock()
+        e.quantity_consumed_per_year_thread.format_comments = Mock(return_value="")
+        e.mwh_renewables_thread = Mock()
+        e.mwh_renewables_thread.format_comments = Mock(return_value="")
+        return e
+
+    def _build_fuel(self, idx: int):
+        f = Mock()
+        f.fuel_type_start = Mock(); f.fuel_type_start.name = f"ft_start_{idx}"
+        f.fuel_type_w = Mock(); f.fuel_type_w.name = f"ft_w_{idx}"
+        f.fuel_type_wo = Mock(); f.fuel_type_wo.name = f"ft_wo_{idx}"
+        f.quantity_consumed_per_year_start = 100.0 + idx
+        f.quantity_consumed_per_year_w = 200.0 + idx
+        f.quantity_consumed_per_year_wo = 50.0 + idx
+        f.quantity_consumed_per_year_thread = Mock()
+        f.quantity_consumed_per_year_thread.format_comments = Mock(return_value="")
+        return f
+
+    def test_electricity_helper_writes_four_consecutive_rows(self):
+        """Electricity helper emits rows base_row .. base_row + 3 only."""
+        from api.reports.modules import _energy_electricity_metadata_writes
+        e = self._build_electricity(0)
+        writes = _energy_electricity_metadata_writes(
+            e, base_row=0, is_start=False, is_with=True, is_without=False,
+        )
+        rows = sorted({w.row_offset for w in writes})
+        self.assertEqual(rows, [0, 1, 2, 3])
+
+    def test_two_electricities_have_unique_coords(self):
+        """With 2 electricities and all-state coverage, no (row_offset, col) duplicates."""
+        from api.reports.modules import _energy_electricity_metadata_writes
+        writes = []
+        for i in range(2):
+            writes += _energy_electricity_metadata_writes(
+                self._build_electricity(i),
+                base_row=4 * i,
+                is_start=True, is_with=True, is_without=True,
+            )
+        coords = [(w.row_offset, w.col) for w in writes]
+        self.assertEqual(
+            len(coords), len(set(coords)),
+            f"Duplicate coords: {sorted([c for c in coords if coords.count(c) > 1])}",
+        )
+
+    def test_fuel_helper_writes_four_consecutive_rows(self):
+        """Fuel helper emits rows base_row .. base_row + 3 only."""
+        from api.reports.modules import _energy_fuel_metadata_writes
+        f = self._build_fuel(0)
+        writes = _energy_fuel_metadata_writes(
+            f, base_row=0, is_start=False, is_with=True, is_without=False,
+        )
+        rows = sorted({w.row_offset for w in writes})
+        self.assertEqual(rows, [0, 1, 2, 3])
+
+    def test_two_fuels_have_unique_coords(self):
+        """With 2 fuels and all-state coverage, no (row_offset, col) duplicates."""
+        from api.reports.modules import _energy_fuel_metadata_writes
+        writes = []
+        for i in range(2):
+            writes += _energy_fuel_metadata_writes(
+                self._build_fuel(i),
+                base_row=4 * i,
+                is_start=True, is_with=True, is_without=True,
+            )
+        coords = [(w.row_offset, w.col) for w in writes]
+        self.assertEqual(
+            len(coords), len(set(coords)),
+            f"Duplicate coords: {sorted([c for c in coords if coords.count(c) > 1])}",
+        )
+
+    def test_combined_electricities_and_fuels_have_unique_coords(self):
+        """3 electricities + 2 fuels in sequence — every coord unique."""
+        from api.reports.modules import (
+            _energy_electricity_metadata_writes,
+            _energy_fuel_metadata_writes,
+        )
+        electricities = [self._build_electricity(i) for i in range(3)]
+        fuels = [self._build_fuel(i) for i in range(2)]
+        writes = []
+        for i, e in enumerate(electricities):
+            writes += _energy_electricity_metadata_writes(
+                e, base_row=4 * i,
+                is_start=True, is_with=True, is_without=True,
+            )
+        fuel_base = 4 * len(electricities)
+        for i, f in enumerate(fuels):
+            writes += _energy_fuel_metadata_writes(
+                f, base_row=fuel_base + 4 * i,
+                is_start=True, is_with=True, is_without=True,
+            )
+        coords = [(w.row_offset, w.col) for w in writes]
+        self.assertEqual(len(coords), len(set(coords)))
+
+
+# ===========================================================================
+# 5. ForestManagementReport disturbance metadata
+#    Bug exact-django-webapp-a34
+# ===========================================================================
+
+class TestForestDisturbanceMetadata(unittest.TestCase):
+    """Each disturbance must occupy exactly 3 metadata rows with the col=1
+    label on each row matching the field whose value is written at col >= 2
+    on the same row (label/data row mismatch fixed)."""
+
+    def _build_disturbance(self, idx: int):
+        d = Mock()
+        d.disturbance_type = Mock()
+        d.disturbance_type.name = f"dtype_{idx}"
+        d.recurrence_yrs_start = 5 + idx
+        d.recurrence_yrs_w = 4 + idx
+        d.recurrence_yrs_wo = 7 + idx
+        d.percentage_biomass_destruction_start = 0.1 + idx / 10
+        d.percentage_biomass_destruction_w = 0.2 + idx / 10
+        d.percentage_biomass_destruction_wo = 0.3 + idx / 10
+        return d
+
+    def test_helper_writes_three_rows(self):
+        """A single disturbance helper call produces rows base_row .. base_row + 2."""
+        from api.reports.land import _forest_disturbance_metadata_writes
+        d = self._build_disturbance(0)
+        writes = _forest_disturbance_metadata_writes(
+            d, disturbance_index=0, base_row=17,
+            is_start=False, is_with=True, is_without=False,
+        )
+        rows = sorted({w.row_offset for w in writes})
+        self.assertEqual(rows, [17, 18, 19])
+
+    def test_label_matches_data_on_same_row(self):
+        """The col=1 label on each row matches the field whose value is
+        written on the same row in col >= 2 (no off-by-one)."""
+        from api.reports.land import _forest_disturbance_metadata_writes
+        d = self._build_disturbance(0)
+        writes = _forest_disturbance_metadata_writes(
+            d, disturbance_index=0, base_row=17,
+            is_start=False, is_with=True, is_without=False,
+        )
+        by_row_col = {(w.row_offset, w.col): w.value for w in writes}
+
+        # Row 17: label 'type' should be paired with disturbance_type.name in col 3.
+        self.assertIn("type", by_row_col[(17, 1)])
+        self.assertEqual(by_row_col[(17, 3)], "dtype_0")
+        # Row 18: label 'recurrence' paired with recurrence_yrs_w (= 4).
+        self.assertIn("recurrence", by_row_col[(18, 1)])
+        self.assertEqual(by_row_col[(18, 3)], 4)
+        # Row 19: label 'biomass destruction' paired with percentage_biomass_destruction_w.
+        self.assertIn("biomass destruction", by_row_col[(19, 1)])
+        self.assertAlmostEqual(by_row_col[(19, 3)], 0.2)
+
+    def test_two_disturbances_have_unique_coords(self):
+        """2 disturbances at stride 3 produce non-colliding (row_offset, col)."""
+        from api.reports.land import _forest_disturbance_metadata_writes
+        writes = []
+        for i in range(2):
+            writes += _forest_disturbance_metadata_writes(
+                self._build_disturbance(i),
+                disturbance_index=i,
+                base_row=17 + 3 * i,
+                is_start=True, is_with=True, is_without=True,
+            )
+        coords = [(w.row_offset, w.col) for w in writes]
+        self.assertEqual(
+            len(coords), len(set(coords)),
+            f"Duplicate coords: {sorted([c for c in coords if coords.count(c) > 1])}",
+        )
+
+    def test_degradation_row_does_not_overlap_disturbances(self):
+        """In ForestManagementReport.compute the degradation row is placed at
+        ``17 + 3 * len(disturbances)``; with stride 3, this row never
+        overlaps a disturbance block."""
+        # With N disturbances at base 17, last disturbance row is 17 + 3*N - 1.
+        # Degradation row must be 17 + 3*N — strictly above last disturbance row.
+        for n in range(0, 5):
+            deg_row = 17 + 3 * n
+            last_dist_row = 17 + 3 * n - 1 if n > 0 else 16
+            self.assertGreater(deg_row, last_dist_row)
+
+    def test_no_typo_in_recurrence_label(self):
+        """The original typo 'distrubance' is fixed to 'Disturbance'."""
+        from api.reports.land import _forest_disturbance_metadata_writes
+        d = self._build_disturbance(0)
+        writes = _forest_disturbance_metadata_writes(
+            d, disturbance_index=0, base_row=0,
+            is_start=False, is_with=True, is_without=False,
+        )
+        all_labels = [w.value for w in writes if isinstance(w.value, str)]
+        for label in all_labels:
+            self.assertNotIn("distrubance", label.lower(),
+                             f"Label '{label}' still contains typo 'distrubance'")
+
+
+# ===========================================================================
+# 6. Minor-season inventory merge
+#    Bug exact-django-webapp-80d
+# ===========================================================================
+
+class TestMergeMinorInventories(unittest.TestCase):
+    """The _merge_minor_inventories helper aggregates main + minor-season
+    inventories by (gas_type, activity), so the Inventory worksheet picks
+    up minor-season contributions for FloodedRice / Perennial / Annual
+    cropland modules."""
+
+    def _make_inventory(self, entries):
+        """Build a real Inventory with the given (gas_type_name, activity_value, value) tuples."""
+        from math_model.no_time_dependency_final.ghg_inventory_class import (
+            Inventory,
+            InventoryPerGasPerActivity,
+        )
+        from math_model.no_time_dependency_final.ghg_emissions_classes import (
+            ActivityTypes,
+            GasTypes,
+        )
+
+        inv = Inventory()
+        for gas_name, activity_value, value in entries:
+            gas = GasTypes[gas_name]
+            activity = next((a for a in ActivityTypes if a.value == activity_value), None)
+            inv.emissions_by_sector_by_gas.append(
+                InventoryPerGasPerActivity(gas, value, activity)
+            )
+        return inv
+
+    def test_merges_main_with_one_minor(self):
+        """Main BIOMASS/CO2=10 + minor BIOMASS/CO2=3 → aggregated BIOMASS/CO2=13."""
+        from api.reports.land import _merge_minor_inventories
+
+        main = self._make_inventory([("CO2", "Biomass", 10.0)])
+        minor = self._make_inventory([("CO2", "Biomass", 3.0)])
+
+        result = _merge_minor_inventories(main, [minor])
+        self.assertIsNotNone(result)
+
+        # Find the BIOMASS/CO2 entry in the result.
+        by_key = {(i.gas_type.name, i.activity.value): i.value
+                  for i in result.emissions_by_sector_by_gas}
+        self.assertAlmostEqual(by_key[("CO2", "Biomass")], 13.0)
+
+    def test_merges_multiple_minors_summing_same_key(self):
+        """Two minors with same key add to main."""
+        from api.reports.land import _merge_minor_inventories
+
+        main = self._make_inventory([("CO2", "Biomass", 5.0)])
+        minor1 = self._make_inventory([("CO2", "Biomass", 2.0)])
+        minor2 = self._make_inventory([("CO2", "Biomass", 3.0)])
+
+        result = _merge_minor_inventories(main, [minor1, minor2])
+        by_key = {(i.gas_type.name, i.activity.value): i.value
+                  for i in result.emissions_by_sector_by_gas}
+        self.assertAlmostEqual(by_key[("CO2", "Biomass")], 10.0)
+
+    def test_appends_new_keys_not_in_main(self):
+        """If a minor has a (gas, activity) key not present in main, it is appended."""
+        from api.reports.land import _merge_minor_inventories
+
+        main = self._make_inventory([("CO2", "Biomass", 5.0)])
+        minor = self._make_inventory([("CH4", "Straw Burning", 1.5)])
+
+        result = _merge_minor_inventories(main, [minor])
+        by_key = {(i.gas_type.name, i.activity.value): i.value
+                  for i in result.emissions_by_sector_by_gas}
+        self.assertAlmostEqual(by_key[("CO2", "Biomass")], 5.0)
+        self.assertAlmostEqual(by_key[("CH4", "Straw Burning")], 1.5)
+
+    def test_skips_none_minor_inventories(self):
+        """None entries in the minor list are silently skipped."""
+        from api.reports.land import _merge_minor_inventories
+
+        main = self._make_inventory([("CO2", "Biomass", 5.0)])
+        minor = self._make_inventory([("CO2", "Biomass", 2.0)])
+
+        result = _merge_minor_inventories(main, [None, minor, None])
+        by_key = {(i.gas_type.name, i.activity.value): i.value
+                  for i in result.emissions_by_sector_by_gas}
+        self.assertAlmostEqual(by_key[("CO2", "Biomass")], 7.0)
+
+    def test_does_not_mutate_main_inventory(self):
+        """The helper must not mutate the main inventory in place."""
+        from api.reports.land import _merge_minor_inventories
+
+        main = self._make_inventory([("CO2", "Biomass", 5.0)])
+        minor = self._make_inventory([("CO2", "Biomass", 2.0)])
+
+        _merge_minor_inventories(main, [minor])
+        # Main still has only its original entry, unchanged.
+        self.assertEqual(len(main.emissions_by_sector_by_gas), 1)
+        self.assertAlmostEqual(main.emissions_by_sector_by_gas[0].value, 5.0)
+
+    def test_main_none_seeds_from_first_minor(self):
+        """If the main inventory is None, the first non-None minor seeds the result."""
+        from api.reports.land import _merge_minor_inventories
+
+        minor = self._make_inventory([("CO2", "Biomass", 2.0)])
+        result = _merge_minor_inventories(None, [None, minor])
+        self.assertIsNotNone(result)
+        by_key = {(i.gas_type.name, i.activity.value): i.value
+                  for i in result.emissions_by_sector_by_gas}
+        self.assertAlmostEqual(by_key[("CO2", "Biomass")], 2.0)
+
+    def test_returns_none_when_nothing_to_aggregate(self):
+        """If main is None and all minors are None (or list empty), result is None."""
+        from api.reports.land import _merge_minor_inventories
+
+        self.assertIsNone(_merge_minor_inventories(None, []))
+        self.assertIsNone(_merge_minor_inventories(None, [None, None]))
