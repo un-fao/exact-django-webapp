@@ -5,7 +5,6 @@ Each class implements compute() -> ModuleResult.
 
 from __future__ import annotations
 
-import functools
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -136,10 +135,6 @@ class LandUseChangeReport(LandModuleReport):
             self.emissions_set, math_utils.ActivityTypes.DOM, math_utils.GasTypes.CO2
         )
         soil_co2 = _add(soil_co2, dom_co2)
-        total_emissions = _add(
-            _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4),
-            dom_co2,
-        )
 
         m = self.module
         mw = [
@@ -193,39 +188,46 @@ class PerennialCroplandReport(LandModuleReport):
         self.calculator = calculators.PerennialCroplandCalculator(self.module)
         super().__post_init__()
 
-    def _add_minor_seasons(self, biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4):
-        minor_seasons = getattr(self.module, "minor_seasons", None)
-        if not minor_seasons:
-            return biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
-
-        for minor_season in minor_seasons.all():
-            minor_calc = calculators.PerennialCropCalculator(minor_season)
-            minor_es = []
-            if self.module.is_with():
-                minor_es += minor_calc.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
-                    minor_es += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
-            if self.module.is_without():
-                minor_es += minor_calc.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_wo is not None:
-                    minor_es += minor_calc.results_start_wo.yearly_emissions_by_sector_by_gas
-
-            dur = self._project_duration
-            biomass_co2 = _add(biomass_co2, extract_emissions(minor_es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2, duration=dur))
-            soil_co2 = _add(soil_co2, extract_emissions(minor_es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2, duration=dur))
-            soil_n2o = _add(soil_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O, duration=dur))
-            fire_n2o = _add(fire_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.N2O, duration=dur))
-            fire_ch4 = _add(fire_ch4, extract_emissions(minor_es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.CH4, duration=dur))
-
-        return biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
+        # In the calculator path, the main calculator only computes the main
+        # module — minor seasons must be merged in so emissions_set contains
+        # the full PerennialCropland picture (main + every minor season). The
+        # previous in-compute() _add_minor_seasons loop never called
+        # minor_calc.calculate(), used the MAIN module's start_w/wo, and
+        # appended raw w + wo into a balance — see exact-django-webapp-flx
+        # (covers exact-django-webapp-ttm / -fqg for PerennialCropland).
+        if not self._from_cache:
+            minor_seasons = getattr(self.module, "submodules", []) or []
+            if minor_seasons:
+                (
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_inventories,
+                ) = _aggregate_minor_seasons_into_emissions_sets(
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_seasons,
+                    calculators.PerennialCropCalculator,
+                )
+                self.inventory = _merge_minor_inventories(self.inventory, minor_inventories)
+                try:
+                    from .cache import save_results_to_cache
+                    save_results_to_cache(
+                        self.module,
+                        self.emissions_set,
+                        self.emissions_set_w,
+                        self.emissions_set_wo,
+                        self.inventory,
+                    )
+                except Exception as e:
+                    log.warning(
+                        f"Could not re-save merged PerennialCropland cache for module {self.module.pk}: {e}"
+                    )
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._add_minor_seasons(
-            biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
-        )
-        total_emissions = _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4)
 
         m = self.module
         units = m.area
@@ -295,36 +297,48 @@ class AnnualCroplandReport(LandModuleReport):
         self.calculator = calculators.AnnualCroplandCalculator(self.module)
         super().__post_init__()
 
-    def _add_minor_seasons(self, biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4):
-        minor_seasons = getattr(self.module, "submodules", [])
-        dur = self._project_duration
-        for minor_season in minor_seasons:
-            minor_calc = calculators.AnnualCropCalculator(minor_season)
-            minor_es = []
-            if self.module.is_with():
-                minor_es += minor_calc.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
-                    minor_es += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
-            if self.module.is_without():
-                minor_es += minor_calc.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_wo is not None:
-                    minor_es += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
-
-            biomass_co2 = _add(biomass_co2, extract_emissions(minor_es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2, duration=dur))
-            soil_co2 = _add(soil_co2, extract_emissions(minor_es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2, duration=dur))
-            soil_n2o = _add(soil_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O, duration=dur))
-            fire_n2o = _add(fire_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.N2O, duration=dur))
-            fire_ch4 = _add(fire_ch4, extract_emissions(minor_es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.CH4, duration=dur))
-
-        return biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
+        # In the calculator path, the main calculator only computes the main
+        # module — minor seasons must be merged in so emissions_set contains
+        # the full AnnualCropland picture (main + every minor season). The
+        # previous in-compute() _add_minor_seasons loop never called
+        # minor_calc.calculate(), used the MAIN module's start_w/wo (BOTH
+        # branches, not just is_with — fully broken vs PerennialCropland's
+        # half-fix), and appended raw w + wo into a balance — see
+        # exact-django-webapp-flx (covers exact-django-webapp-ttm / -fqg for
+        # AnnualCropland).
+        if not self._from_cache:
+            minor_seasons = getattr(self.module, "submodules", []) or []
+            if minor_seasons:
+                (
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_inventories,
+                ) = _aggregate_minor_seasons_into_emissions_sets(
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_seasons,
+                    calculators.AnnualCropCalculator,
+                )
+                self.inventory = _merge_minor_inventories(self.inventory, minor_inventories)
+                try:
+                    from .cache import save_results_to_cache
+                    save_results_to_cache(
+                        self.module,
+                        self.emissions_set,
+                        self.emissions_set_w,
+                        self.emissions_set_wo,
+                        self.inventory,
+                    )
+                except Exception as e:
+                    log.warning(
+                        f"Could not re-save merged AnnualCropland cache for module {self.module.pk}: {e}"
+                    )
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._add_minor_seasons(
-            biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
-        )
-        total_emissions = _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4)
 
         m = self.module
         units = m.area
@@ -414,7 +428,6 @@ class SetAsideReport(LandModuleReport):
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-        total_emissions = _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4)
 
         m = self.module
         units = m.area
@@ -454,7 +467,6 @@ class GrasslandReport(LandModuleReport):
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-        total_emissions = _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4)
 
         m = self.module
         units = m.area
@@ -525,7 +537,6 @@ class OtherLandReport(LandModuleReport):
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-        total_emissions = _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4)
         m = self.module
         return ModuleResult(
             title=m.module_type.name,
@@ -558,10 +569,6 @@ class CoastalWetlandReport(LandModuleReport):
             self.emissions_set, math_utils.ActivityTypes.DRAINAGE, math_utils.GasTypes.CO2
         )
         soil_co2 = _add(soil_co2, drainage_co2)
-        total_emissions = _add(
-            _add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4),
-            drainage_co2,
-        )
 
         m = self.module
         c = self.calculator
@@ -631,35 +638,117 @@ def _aggregate_minor_seasons_into_emissions_sets(
     emissions_set_w: list,
     emissions_set_wo: list,
     minor_seasons: list,
-) -> tuple[list, list, list]:
+    calculator_cls,
+) -> tuple[list, list, list, list]:
     """Append each minor season's balance / total_w / total_wo entries to the
-    main module's emission lists, so that downstream extract_emissions() sees
-    a fully aggregated FloodedRice picture (main season + every minor season).
+    main module's emission lists, and collect their inventories, so that
+    downstream extract_emissions() sees a fully aggregated picture (main
+    module + every minor season) and the report's inventory items include
+    minor-season contributions.
 
-    The values added per minor season come from
-    ``Result(*FloodedRiceSeasonCalculator(season).calculate()).balance`` (and
-    ``.total_w`` / ``.total_wo``) — i.e. the minor's own balance, not a raw
-    with+without sum, and using the minor's own start contribution rather
-    than the main module's. Mirrors what FloodedRiceCalculator does in the
-    production calculator path so cached and calculator paths converge.
+    The emission values added per minor season come from
+    ``Result(*calculator_cls(season).calculate()).balance`` (and
+    ``.total_w`` / ``.total_wo``) — i.e. the minor's own balance (w − wo),
+    not a raw with+without sum, and using the minor's own start contribution
+    rather than the main module's.
 
-    See exact-django-webapp-h8z / -ttm / -fqg / -7qn.
+    ``calculator_cls`` is the season-level calculator for the module family —
+    ``FloodedRiceSeasonCalculator`` for FloodedRice, ``PerennialCropCalculator``
+    for PerennialCropland, ``AnnualCropCalculator`` for AnnualCropland. It MUST
+    accept a single minor-season module on instantiation and return a
+    ``(results_w, results_wo)`` tuple from ``.calculate()`` consumable by
+    ``Result(*…)`` and expose an ``.inventory`` attribute (typically an
+    ``Inventory`` instance, possibly ``None``).
+
+    Returns ``(emissions_set, emissions_set_w, emissions_set_wo, minor_inventories)``
+    where ``minor_inventories`` is the list of ``minor_calc.inventory`` values
+    (in season order, with ``None`` entries preserved).
+
+    See exact-django-webapp-h8z / -ttm / -fqg / -7qn / -flx / -80d.
     """
     from api.calculators import Result
 
     es = list(emissions_set)
     es_w = list(emissions_set_w)
     es_wo = list(emissions_set_wo)
+    minor_inventories: list = []
 
     for minor_season in minor_seasons:
-        minor_calc = calculators.FloodedRiceSeasonCalculator(minor_season)
+        minor_calc = calculator_cls(minor_season)
         minor_results = minor_calc.calculate()
         r = Result(*minor_results)
         es.extend(list(r.balance.yearly_emissions_by_sector_by_gas))
         es_w.extend(list(r.total_w.yearly_emissions_by_sector_by_gas))
         es_wo.extend(list(r.total_wo.yearly_emissions_by_sector_by_gas))
+        minor_inventories.append(getattr(minor_calc, "inventory", None))
 
-    return es, es_w, es_wo
+    return es, es_w, es_wo, minor_inventories
+
+
+def _merge_minor_inventories(main_inventory, minor_inventories: list):
+    """Return ``main_inventory + Σ minor_inventories`` aggregated by
+    (gas_type, activity).
+
+    Uses ``Inventory.__add__`` which sums entries with matching keys and
+    appends new entries otherwise. ``None`` entries in ``minor_inventories``
+    are skipped. If ``main_inventory`` is ``None`` the first non-None minor
+    is used as the seed. Returns ``None`` if nothing aggregates.
+
+    See exact-django-webapp-80d.
+    """
+    from math_model.no_time_dependency_final.ghg_inventory_class import Inventory
+
+    result = main_inventory
+    for minor_inv in minor_inventories:
+        if minor_inv is None:
+            continue
+        if result is None:
+            # Deep-copy via __add__ on an empty inventory keeps the
+            # semantics (Inventory.__add__ deep-copies self).
+            result = Inventory() + minor_inv
+        else:
+            result = result + minor_inv
+    return result
+
+
+def _forest_disturbance_metadata_writes(
+    disturbance,
+    disturbance_index: int,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """Return the 3-row metadata block for one ForestManagement.Disturbance entry.
+
+    Each disturbance occupies exactly 3 metadata rows (type, recurrence,
+    biomass destruction), so the caller must pass
+    ``base_row = first_disturbance_row + 3 * disturbance_index`` to avoid
+    overlap between disturbances (and to leave a contiguous block before any
+    following degradation row). The col=1 label on each row matches the
+    field whose value is written at col >= 2 on the same row — fixing the
+    label/data row mismatch that the original stride-1 layout had.
+    See exact-django-webapp-a34.
+    """
+    writes: list[MetadataWrite] = [
+        MetadataWrite(base_row + 0, 1, f"Disturbance {disturbance_index + 1}: type"),
+        MetadataWrite(base_row + 1, 1, f"Disturbance {disturbance_index + 1}: recurrence (years)"),
+        MetadataWrite(base_row + 2, 1, f"Disturbance {disturbance_index + 1}: biomass destruction (%)"),
+    ]
+    for col, is_state, sfx in [
+        (2, is_start, "start"),
+        (3, is_with, "w"),
+        (4, is_without, "wo"),
+    ]:
+        if not is_state:
+            continue
+        writes += [
+            MetadataWrite(base_row + 0, col, disturbance.disturbance_type.name),
+            MetadataWrite(base_row + 1, col, getattr(disturbance, f"recurrence_yrs_{sfx}")),
+            MetadataWrite(base_row + 2, col, getattr(disturbance, f"percentage_biomass_destruction_{sfx}")),
+        ]
+    return writes
 
 
 def _flooded_rice_minor_season_metadata_writes(
@@ -714,14 +803,23 @@ class FloodedRiceReport(LandModuleReport):
         if not self._from_cache:
             minor_seasons = getattr(self.module, "submodules", []) or []
             if minor_seasons:
-                self.emissions_set, self.emissions_set_w, self.emissions_set_wo = (
-                    _aggregate_minor_seasons_into_emissions_sets(
-                        self.emissions_set,
-                        self.emissions_set_w,
-                        self.emissions_set_wo,
-                        minor_seasons,
-                    )
+                (
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_inventories,
+                ) = _aggregate_minor_seasons_into_emissions_sets(
+                    self.emissions_set,
+                    self.emissions_set_w,
+                    self.emissions_set_wo,
+                    minor_seasons,
+                    calculators.FloodedRiceSeasonCalculator,
                 )
+                # Also fold minor-season inventories into the report's
+                # inventory so the Inventory worksheet includes their
+                # contributions, not just the main season. See
+                # exact-django-webapp-80d.
+                self.inventory = _merge_minor_inventories(self.inventory, minor_inventories)
                 # Re-save the cache with the merged FloodedRice picture so the
                 # next report run reads the same numbers that this run is
                 # about to display. Without this, BaseModuleReport.
@@ -875,24 +973,6 @@ class ForestManagementReport(LandModuleReport):
         biomass_gain_co2 = _add(_add(_add(growth_agb_co2, growth_bgb_co2), litter_co2), deadwood_co2)
 
         zeros = [0.0] * self._project_duration
-        total_emissions = functools.reduce(_add, [
-            zeros,
-            rotation_hwp_agb_co2, rotation_hwp_bgb_co2,
-            rotation_agb_n2o, rotation_agb_ch4,
-            rotation_bgb_n2o, rotation_bgb_ch4,
-            rotation_agb_co2, rotation_bgb_co2,
-            disturbance_agb_co2, disturbance_bgb_co2,
-            disturbance_fire_agb_n2o, disturbance_fire_agb_ch4,
-            disturbance_fire_bgb_n2o, disturbance_fire_bgb_ch4,
-            logging_hwp_agb_co2, logging_hwp_bgb_co2,
-            logging_agb_n2o, logging_agb_ch4,
-            logging_bgb_n2o, logging_bgb_ch4,
-            logging_agb_co2, logging_bgb_co2,
-            degradation_agb_co2, degradation_bgb_co2,
-            growth_agb_co2, growth_bgb_co2,
-            litter_co2, deadwood_co2,
-            degradation_litter_co2, degradation_deadwood_co2,
-        ])
 
         # Metadata
         default = defaults.ForestManagementDefaults(input=m).get_defaults()
@@ -936,21 +1016,21 @@ class ForestManagementReport(LandModuleReport):
                 MetadataWrite(15, col, getattr(default, f"litter_t2_{sfx}_default"), fill="LIGHT_RED"),
                 MetadataWrite(16, col, getattr(default, f"deadwood_t2_{sfx}_default"), fill="LIGHT_RED"),
             ]
+        # Disturbance metadata blocks. Stride is 3 (one row per field) —
+        # earlier code used stride 1 which silently overwrote consecutive
+        # disturbances, AND placed the col=1 labels one row above their
+        # col >= 2 data, AND used the typo "distrubance". See
+        # exact-django-webapp-a34.
         for i, dist in enumerate(disturbances):
-            mw += [
-                MetadataWrite(17 + i, 1, f"Disturbance {i + 1}: type"),
-                MetadataWrite(18 + i, 1, "distrubance recurrence (years)"),
-                MetadataWrite(19 + i, 1, "biomass destruction (%)"),
-            ]
-            for col, is_state, sfx in [(2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")]:
-                if not is_state:
-                    continue
-                mw += [
-                    MetadataWrite(18 + i, col, dist.disturbance_type.name),
-                    MetadataWrite(19 + i, col, getattr(dist, f"recurrence_yrs_{sfx}")),
-                    MetadataWrite(20 + i, col, getattr(dist, f"percentage_biomass_destruction_{sfx}")),
-                ]
-        deg_row = 17 + len(disturbances)
+            mw += _forest_disturbance_metadata_writes(
+                dist,
+                disturbance_index=i,
+                base_row=17 + 3 * i,
+                is_start=m.is_start(),
+                is_with=m.is_with(),
+                is_without=m.is_without(),
+            )
+        deg_row = 17 + 3 * len(disturbances)
         mw.append(MetadataWrite(deg_row, 1, "average yearly degradation (%)"))
         for col, is_state, sfx in [(2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")]:
             if not is_state:

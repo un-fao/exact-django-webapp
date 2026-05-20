@@ -31,6 +31,86 @@ def _zeros(n: int) -> list[float]:
     return [0.0] * n
 
 
+def _energy_electricity_metadata_writes(
+    electricity,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """Return the 4-row metadata block for one Energy.Electricity entry.
+
+    Each electricity occupies exactly 4 metadata rows (country, grid MWh,
+    renewable MWh, EF scope), so the caller must pass
+    ``base_row = 4 * electricity_index`` to avoid overlap between entries.
+    See exact-django-webapp-5g2.
+    """
+    writes: list[MetadataWrite] = [
+        MetadataWrite(base_row + 0, 1, "Electricity - power country of origin"),
+        MetadataWrite(base_row + 1, 1, "Electricity grid (MWh/year)"),
+        MetadataWrite(base_row + 2, 1, "Electricity renewable (MWh/year)"),
+        MetadataWrite(base_row + 3, 1, "Scope of emission factor"),
+    ]
+    for col, is_state, sfx in [
+        (2, is_start, "start"),
+        (3, is_with, "w"),
+        (4, is_without, "wo"),
+    ]:
+        if not is_state:
+            continue
+        writes += [
+            MetadataWrite(base_row + 0, col, electricity.country_t2.name),
+            MetadataWrite(base_row + 1, col, getattr(electricity, f"quantity_consumed_per_year_{sfx}")),
+            MetadataWrite(base_row + 2, col, getattr(electricity, f"mwh_renewables_{sfx}")),
+            MetadataWrite(base_row + 3, col, electricity.ef_source.name),
+        ]
+    writes += [
+        MetadataWrite(base_row + 1, 6, electricity.quantity_consumed_per_year_thread.format_comments()),
+        MetadataWrite(base_row + 2, 6, electricity.mwh_renewables_thread.format_comments()),
+    ]
+    return writes
+
+
+def _energy_fuel_metadata_writes(
+    fuel,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """Return the 4-row metadata block for one Energy.Fuel entry.
+
+    Each fuel occupies exactly 4 metadata rows (estate, type, consumption,
+    accounting), so the caller must pass ``base_row = 4 * fuel_index`` (plus
+    any electricity offset) to avoid overlap. See exact-django-webapp-5g2.
+    """
+    writes: list[MetadataWrite] = [
+        MetadataWrite(base_row + 0, 1, "Fuel - estate"),
+        MetadataWrite(base_row + 1, 1, "Fuel - type"),
+        MetadataWrite(base_row + 2, 1, "Fuel consumption (m3 or tdm)"),
+        MetadataWrite(base_row + 3, 1, "Accounting for CO2 emissions (yes/no)"),
+    ]
+    for col, is_state, sfx in [
+        (2, is_start, "start"),
+        (3, is_with, "w"),
+        (4, is_without, "wo"),
+    ]:
+        if not is_state:
+            continue
+        writes += [
+            MetadataWrite(base_row + 0, col, "WIP"),
+            MetadataWrite(base_row + 1, col, getattr(fuel, f"fuel_type_{sfx}").name),
+            MetadataWrite(base_row + 2, col, getattr(fuel, f"quantity_consumed_per_year_{sfx}")),
+            MetadataWrite(base_row + 3, col, "WIP"),
+        ]
+    writes += [
+        MetadataWrite(base_row + 2, 6, fuel.quantity_consumed_per_year_thread.format_comments()),
+    ]
+    return writes
+
+
 # ---------------------------------------------------------------------------
 # Waterbody
 # ---------------------------------------------------------------------------
@@ -102,7 +182,6 @@ class AquacultureReport(BaseModuleReport):
 
         fish_n2o = self._extract(es, math_utils.ActivityTypes.N20_FIELD, math_utils.GasTypes.N2O)
         electricity_co2_eq = self._extract(es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2)
-        total = _add(fish_n2o, electricity_co2_eq)
 
         mw = [
             MetadataWrite(1, 1, "Production (tons fish/year)"),
@@ -160,12 +239,6 @@ class FisheryReport(BaseModuleReport):
         liquid_fuel_ch4 = self._extract(es, math_utils.ActivityTypes.CATCH, math_utils.GasTypes.CH4)
         refrigeration_hfc = self._extract(es, math_utils.ActivityTypes.REFRIGERANT, math_utils.GasTypes.OTHER)
         electricity_co2_eq = self._extract(es, math_utils.ActivityTypes.ICE, math_utils.GasTypes.OTHER)
-
-        total = _add(
-            _add(_add(_add(liquid_fuel_co2, liquid_fuel_n2o), liquid_fuel_ch4),
-                 refrigeration_hfc),
-            electricity_co2_eq,
-        )
 
         dur = m.activity.implementation_years + m.activity.capitalization_years
         units_catch_w = [float(m.total_catch_yr_w)] * dur if m.is_with() else []
@@ -347,14 +420,6 @@ class LivestockReport(BaseModuleReport):
         mm_prp_leach_n2o = self._extract(es, math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP, math_utils.GasTypes.N2O)
         mm_prp_vol_n2o = self._extract(es, math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP, math_utils.GasTypes.N2O)
 
-        total = _add(
-            _add(_add(_add(_add(_add(_add(_add(
-                enteric_ch4,
-                mm_other_ch4), mm_other_direct_n2o), mm_other_leach_n2o), mm_other_vol_n2o),
-                mm_prp_ch4), mm_prp_direct_n2o), mm_prp_leach_n2o),
-            mm_prp_vol_n2o,
-        )
-
         mw = [
             MetadataWrite(1, 1, "Livestock category"),
             MetadataWrite(2, 1, "Number of heads"),
@@ -480,84 +545,33 @@ class EnergyReport(BaseModuleReport):
                 liquid_fuel_ch4 = _add(liquid_fuel_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
                 liquid_fuel_n2o = _add(liquid_fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
 
-        total = _add(
-            _add(_add(electricity_co2_eq, liquid_fuel_co2), _add(liquid_fuel_ch4, liquid_fuel_n2o)),
-            _add(_add(solid_fuel_co2, solid_fuel_ch4), solid_fuel_n2o),
-        )
-
         # Build metadata writes (no title for Energy – metadata_section_title="")
-        # Offsets are 0-based: offset 0 = first row directly after previous section.
+        # Stride is 4 per entry (4 fields per electricity/fuel block). Earlier
+        # code used stride 1 with offsets (i, 1+i, 2+i, 3+i) which silently
+        # overwrote consecutive electricity/fuel entries; see
+        # exact-django-webapp-5g2.
         electricities = list(api_models.Electricity.objects.filter(parent=m).all())
         fuels = list(api_models.Fuel.objects.filter(parent=m).all())
-        n_elec = len(electricities)
 
-        mw = []
+        mw: list[MetadataWrite] = []
         for i, electricity in enumerate(electricities):
-            mw += [
-                MetadataWrite(i, 1, "Electricity - power country of origin"),
-                MetadataWrite(1 + i, 1, "Electricity grid (MWh/year)"),
-                MetadataWrite(2 + i, 1, "Electricity renewable (MWh/year)"),
-                MetadataWrite(3 + i, 1, "Scope of emission factor"),
-            ]
-            if m.is_start():
-                mw += [
-                    MetadataWrite(i, 2, electricity.country_t2.name),
-                    MetadataWrite(1 + i, 2, electricity.quantity_consumed_per_year_start),
-                    MetadataWrite(2 + i, 2, electricity.mwh_renewables_start),
-                    MetadataWrite(3 + i, 2, electricity.ef_source.name),
-                ]
-            if m.is_with():
-                mw += [
-                    MetadataWrite(i, 3, electricity.country_t2.name),
-                    MetadataWrite(1 + i, 3, electricity.quantity_consumed_per_year_w),
-                    MetadataWrite(2 + i, 3, electricity.mwh_renewables_w),
-                    MetadataWrite(3 + i, 3, electricity.ef_source.name),
-                ]
-            if m.is_without():
-                mw += [
-                    MetadataWrite(i, 4, electricity.country_t2.name),
-                    MetadataWrite(1 + i, 4, electricity.quantity_consumed_per_year_wo),
-                    MetadataWrite(2 + i, 4, electricity.mwh_renewables_wo),
-                    MetadataWrite(3 + i, 4, electricity.ef_source.name),
-                ]
-            mw += [
-                MetadataWrite(1 + i, 6, electricity.quantity_consumed_per_year_thread.format_comments()),
-                MetadataWrite(2 + i, 6, electricity.mwh_renewables_thread.format_comments()),
-            ]
+            mw += _energy_electricity_metadata_writes(
+                electricity,
+                base_row=4 * i,
+                is_start=m.is_start(),
+                is_with=m.is_with(),
+                is_without=m.is_without(),
+            )
 
-        # Fuel rows: offset base = n_elec + 3 (replicates last_metadata_row += n_elec + 3)
-        fuel_base = n_elec + 3
+        fuel_base = 4 * len(electricities)
         for i, fuel in enumerate(fuels):
-            mw += [
-                MetadataWrite(fuel_base + i, 1, "Fuel - estate"),
-                MetadataWrite(fuel_base + 1 + i, 1, "Fuel - type"),
-                MetadataWrite(fuel_base + 2 + i, 1, "Fuel consumption (m3 or tdm)"),
-                MetadataWrite(fuel_base + 3 + i, 1, "Accounting for CO2 emissions (yes/no)"),
-            ]
-            if m.is_start():
-                mw += [
-                    MetadataWrite(fuel_base + i, 2, "WIP"),
-                    MetadataWrite(fuel_base + 1 + i, 2, fuel.fuel_type_start.name),
-                    MetadataWrite(fuel_base + 2 + i, 2, fuel.quantity_consumed_per_year_start),
-                    MetadataWrite(fuel_base + 3 + i, 2, "WIP"),
-                ]
-            if m.is_with():
-                mw += [
-                    MetadataWrite(fuel_base + i, 3, "WIP"),
-                    MetadataWrite(fuel_base + 1 + i, 3, fuel.fuel_type_w.name),
-                    MetadataWrite(fuel_base + 2 + i, 3, fuel.quantity_consumed_per_year_w),
-                    MetadataWrite(fuel_base + 3 + i, 3, "WIP"),
-                ]
-            if m.is_without():
-                mw += [
-                    MetadataWrite(fuel_base + i, 4, "WIP"),
-                    MetadataWrite(fuel_base + 1 + i, 4, fuel.fuel_type_wo.name),
-                    MetadataWrite(fuel_base + 2 + i, 4, fuel.quantity_consumed_per_year_wo),
-                    MetadataWrite(fuel_base + 3 + i, 4, "WIP"),
-                ]
-            mw += [
-                MetadataWrite(fuel_base + 2 + i, 6, fuel.quantity_consumed_per_year_thread.format_comments()),
-            ]
+            mw += _energy_fuel_metadata_writes(
+                fuel,
+                base_row=fuel_base + 4 * i,
+                is_start=m.is_start(),
+                is_with=m.is_with(),
+                is_without=m.is_without(),
+            )
 
         return ModuleResult(
             title=m.module_type.name,
@@ -618,8 +632,6 @@ class InputReport(BaseModuleReport):
                 feed_co2_eq = _add(feed_co2_eq, extract_emissions(sub_es, math_utils.ActivityTypes.CO2_EQUIVALENT_VC, math_utils.GasTypes.CO2, duration=dur))
             else:
                 inputs_co2_eq = _add(inputs_co2_eq, extract_emissions(sub_es, math_utils.ActivityTypes.CO2_EQUIVALENT_VC, math_utils.GasTypes.CO2, duration=dur))
-
-        total = _add(_add(_add(inputs_co2, inputs_n2o), feed_co2_eq), inputs_co2_eq)
 
         # Metadata writes (no title, 0-based offsets)
         # Pattern: 3 rows per submodule entry, with +2 spacing between entries
@@ -712,8 +724,6 @@ class IrrigationReport(BaseModuleReport):
             lf_elec_co2 = _add(lf_elec_co2, extract_emissions(sub_es, math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.CO2, duration=dur))
             lf_elec_ch4 = _add(lf_elec_ch4, extract_emissions(sub_es, math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.CH4, duration=dur))
             lf_elec_n2o = _add(lf_elec_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.N2O, duration=dur))
-
-        total = _add(_add(_add(other_infra_co2_eq, lf_elec_co2), lf_elec_ch4), lf_elec_n2o)
 
         # Metadata writes (no title, 0-based offsets)
         systems = list(m.irrigation_systems.all())
@@ -969,8 +979,6 @@ class TransportReport(BaseModuleReport):
             fuel_n2o = _add(fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
             electricity_co2 = _add(electricity_co2, extract_emissions(sub_es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
 
-        total = _add(_add(_add(fuel_n2o, fuel_ch4), fuel_co2), electricity_co2)
-
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="",
@@ -1036,8 +1044,6 @@ class ProcessingReport(BaseModuleReport):
             fuel_n2o = _add(fuel_n2o, extract_emissions(sub_es, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
             electricity_co2 = _add(electricity_co2, extract_emissions(sub_es, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
             water_use = _add(water_use, extract_emissions(sub_es, math_utils.ActivityTypes.PROCESSING, math_utils.GasTypes.CO2, duration=dur))
-
-        total = _add(_add(_add(_add(fuel_co2, fuel_ch4), fuel_n2o), electricity_co2), water_use)
 
         cumulative_water = list(np.cumsum(water_use))
 
