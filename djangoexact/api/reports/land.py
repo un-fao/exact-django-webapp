@@ -626,6 +626,78 @@ class CoastalWetlandReport(LandModuleReport):
         )
 
 
+def _aggregate_minor_seasons_into_emissions_sets(
+    emissions_set: list,
+    emissions_set_w: list,
+    emissions_set_wo: list,
+    minor_seasons: list,
+) -> tuple[list, list, list]:
+    """Append each minor season's balance / total_w / total_wo entries to the
+    main module's emission lists, so that downstream extract_emissions() sees
+    a fully aggregated FloodedRice picture (main season + every minor season).
+
+    The values added per minor season come from
+    ``Result(*FloodedRiceSeasonCalculator(season).calculate()).balance`` (and
+    ``.total_w`` / ``.total_wo``) — i.e. the minor's own balance, not a raw
+    with+without sum, and using the minor's own start contribution rather
+    than the main module's. Mirrors what FloodedRiceCalculator does in the
+    production calculator path so cached and calculator paths converge.
+
+    See exact-django-webapp-h8z / -ttm / -fqg / -7qn.
+    """
+    from api.calculators import Result
+
+    es = list(emissions_set)
+    es_w = list(emissions_set_w)
+    es_wo = list(emissions_set_wo)
+
+    for minor_season in minor_seasons:
+        minor_calc = calculators.FloodedRiceSeasonCalculator(minor_season)
+        minor_results = minor_calc.calculate()
+        r = Result(*minor_results)
+        es.extend(list(r.balance.yearly_emissions_by_sector_by_gas))
+        es_w.extend(list(r.total_w.yearly_emissions_by_sector_by_gas))
+        es_wo.extend(list(r.total_wo.yearly_emissions_by_sector_by_gas))
+
+    return es, es_w, es_wo
+
+
+def _flooded_rice_minor_season_metadata_writes(
+    season,
+    season_calc,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """Return the metadata writes for a single FloodedRice minor season.
+
+    Each season occupies exactly 6 metadata rows (area, cultivation_period,
+    water_before, water_after, organic_amendment, yield), so the caller must
+    pass ``base_row = 8 + 6 * season_index`` to avoid overlap between seasons.
+
+    See exact-django-webapp-65h.
+    """
+    writes: list[MetadataWrite] = []
+    for col, is_state, sfx in [
+        (2, is_start, "start"),
+        (3, is_with, "w"),
+        (4, is_without, "wo"),
+    ]:
+        if not is_state:
+            continue
+        writes += [
+            MetadataWrite(base_row + 0, col, season.area),
+            MetadataWrite(base_row + 1, col, season_calc.efc_default.cultivation_period),
+            MetadataWrite(base_row + 2, col, getattr(season, f"water_management_type_before_cultivation_{sfx}").name),
+            MetadataWrite(base_row + 3, col, getattr(season, f"water_management_type_after_cultivation_{sfx}").name),
+            MetadataWrite(base_row + 4, col, getattr(season, f"organic_amendment_type_{sfx}").name),
+            MetadataWrite(base_row + 5, col, season_calc.yield_default.value),
+        ]
+    return writes
+
+
 @dataclass
 class FloodedRiceReport(LandModuleReport):
     module: api_models.FloodedRice
@@ -634,13 +706,51 @@ class FloodedRiceReport(LandModuleReport):
         self.calculator: calculators.FloodedRiceSeasonCalculator = calculators.FloodedRiceSeasonCalculator(self.module)
         super().__post_init__()
 
+        # In the calculator path, the main calculator only computes the main
+        # season — minor seasons must be merged in to match what the
+        # production-path FloodedRiceCalculator does (and what the cache,
+        # populated via the API view, already contains).
+        # See exact-django-webapp-h8z.
+        if not self._from_cache:
+            minor_seasons = getattr(self.module, "submodules", []) or []
+            if minor_seasons:
+                self.emissions_set, self.emissions_set_w, self.emissions_set_wo = (
+                    _aggregate_minor_seasons_into_emissions_sets(
+                        self.emissions_set,
+                        self.emissions_set_w,
+                        self.emissions_set_wo,
+                        minor_seasons,
+                    )
+                )
+                # Re-save the cache with the merged FloodedRice picture so the
+                # next report run reads the same numbers that this run is
+                # about to display. Without this, BaseModuleReport.
+                # _init_from_calculator() has already cached the (smaller)
+                # main-season-only balance, and subsequent report renders
+                # would silently downgrade to main-only until the API
+                # /results endpoint runs the full FloodedRiceCalculator.
+                try:
+                    from .cache import save_results_to_cache
+                    save_results_to_cache(
+                        self.module,
+                        self.emissions_set,
+                        self.emissions_set_w,
+                        self.emissions_set_wo,
+                        self.inventory,
+                    )
+                except Exception as e:
+                    log.warning(
+                        f"Could not re-save merged FloodedRice cache for module {self.module.pk}: {e}"
+                    )
+
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
         m = self.module
-        dur = self._project_duration
         es = self.emissions_set
 
-        # FloodedRice uses STRAW_BURNING instead of RESIDUE_BURNING for fire sources
+        # FloodedRice uses STRAW_BURNING instead of RESIDUE_BURNING for fire
+        # sources, so _extract_land_base() (which assumes RESIDUE_BURNING) is
+        # not applicable here.
         biomass_co2 = self._extract(es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2)
         soil_co2 = self._extract(es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2)
         soil_n2o = self._extract(es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O)
@@ -648,28 +758,11 @@ class FloodedRiceReport(LandModuleReport):
         fire_ch4 = self._extract(es, math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.CH4)
         rice_ch4 = self._extract(es, math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4)
 
-        # Add submodule seasons
-        minor_seasons = getattr(m, "submodules", [])
-        for minor_season in minor_seasons:
-            minor_calc = calculators.FloodedRiceSeasonCalculator(minor_season)
-            minor_calc.calculate()
-            minor_es = []
-            if m.is_with():
-                minor_es += minor_calc.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
-                    minor_es += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
-            if m.is_without():
-                minor_es += minor_calc.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_wo is not None:
-                    minor_es += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
+        # All minor-season contributions are already merged into
+        # self.emissions_set by __post_init__ (calculator path) or by the cache
+        # writer in the view (cached path). No further per-row summing needed.
 
-            biomass_co2 = _add(biomass_co2, extract_emissions(minor_es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2, duration=dur))
-            soil_co2 = _add(soil_co2, extract_emissions(minor_es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2, duration=dur))
-            soil_n2o = _add(soil_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O, duration=dur))
-            fire_n2o = _add(fire_n2o, extract_emissions(minor_es, math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.N2O, duration=dur))
-            rice_ch4 = _add(rice_ch4, extract_emissions(minor_es, math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4, duration=dur))
-
-        total_emissions = _add(_add(_add(_add(_add(biomass_co2, soil_co2), soil_n2o), fire_n2o), fire_ch4), rice_ch4)
+        minor_seasons = getattr(m, "submodules", []) or []
 
         # Metadata: row 1 = number of seasons (col 2), rows 2-7 = main season data
         n_seasons = len(minor_seasons) + 1
@@ -690,21 +783,20 @@ class FloodedRiceReport(LandModuleReport):
                 MetadataWrite(7, col, yield_val),
             ]
 
-        # Sub-season rows start at offset 8 (+i for each season)
+        # Minor-season metadata blocks. Stride is 6 (one per field) — earlier
+        # code used stride 1 which silently overwrote consecutive seasons.
+        # See exact-django-webapp-65h.
         for i, season in enumerate(minor_seasons):
             season_calc = calculators.FloodedRiceSeasonCalculator(season)
             season_calc.calculate()
-            for col, is_state, sfx in [(2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")]:
-                if not is_state:
-                    continue
-                mw += [
-                    MetadataWrite(8 + i, col, season.area),
-                    MetadataWrite(9 + i, col, season_calc.efc_default.cultivation_period),
-                    MetadataWrite(10 + i, col, getattr(season, f"water_management_type_before_cultivation_{sfx}").name),
-                    MetadataWrite(11 + i, col, getattr(season, f"water_management_type_after_cultivation_{sfx}").name),
-                    MetadataWrite(12 + i, col, getattr(season, f"organic_amendment_type_{sfx}").name),
-                    MetadataWrite(13 + i, col, season_calc.yield_default.value),
-                ]
+            mw += _flooded_rice_minor_season_metadata_writes(
+                season,
+                season_calc,
+                base_row=8 + 6 * i,
+                is_start=m.is_start(),
+                is_with=m.is_with(),
+                is_without=m.is_without(),
+            )
         mw.append(MetadataWrite(7, 6, m.crop_yield_t2_thread.format_comments()))
 
         extra_rows = [ResultRow("CH4 from rice cultivation", rice_ch4)]
