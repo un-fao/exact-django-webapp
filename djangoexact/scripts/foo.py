@@ -561,7 +561,7 @@ def import_fires_combustion_factors():
     """
     from ipcc.models import FiresCombustionFactor
 
-    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/FiresCombustionFactors_20260408.csv"))
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/FiresCombustionFactors_20260518.csv"))
     for _, row in df.iterrows():
         try:
             land_use_type = models.LandUseType.objects.get(name=row["land_use_type"])
@@ -764,8 +764,6 @@ def run():
         change_all_other_land_flu_data_to_1()
         import_crop_nitrous_estimation_default_factors()
         import_fires_combustion_factors()
-        import_crop_nitrous_estimation_default_factors()
-        import_fires_combustion_factors()
         set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
@@ -774,9 +772,9 @@ def run():
         # import_input_types_units()
         # change_all_other_land_flu_data_to_1()
         # import_crop_nitrous_estimation_default_factors()
-        # import_fires_combustion_factors()
         # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
-        remove_perennial_cropland_module_from_perennial_land_use_types()
+        # import_fires_combustion_factors()
+        # remove_perennial_cropland_module_from_perennial_land_use_types()
         pass
 
     if app_mode == "development" or app_mode == "local":
