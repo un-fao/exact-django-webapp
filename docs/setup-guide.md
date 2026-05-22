@@ -10,25 +10,27 @@ By the end of this guide you will have:
 
 1. The Django dev server running at `http://localhost:8000/`.
 2. A working login at `http://localhost:8000/admin/` with a superuser you created.
-3. A VS Code debugger that pauses on a breakpoint inside `djangoexact/math_model/no_time_dependency_final/annuals.py` when you make an annual-cropland API request.
+3. A VS Code debugger that pauses on a breakpoint inside a math-model file (e.g. `djangoexact/math_model/no_time_dependency_final/annuals.py`) when you make the matching API request. Annual cropland is the running example used throughout this guide, but the same flow applies to every module type - deforestation, flooded rice, livestock, and the rest.
 
 If any of these three is missing, you are not done - jump to [Troubleshooting](#7-troubleshooting).
 
 ### Repository layout (memorise this)
 
 ```
-exact-django-webapp/             ← repo root. venv lives here. .vscode/launch.json lives here.
-├── djangoexact/                 ← Django root. manage.py + requirements.txt live here.
-│   ├── djangoexact/             ← Django settings package. .env files live here.
+exact-django-webapp/             ← repo root; venv + .vscode/launch.json
+├── djangoexact/                 ← Django root; manage.py + requirements.txt
+│   ├── djangoexact/             ← settings package; .env files live here
 │   │   ├── settings.py
 │   │   └── .env / .env.development / .env.review / .env.production
-│   ├── api/calculators.py       ← Calculator layer (one class per Django model)
-│   ├── math_model/no_time_dependency_final/   ← Pure math, the actual emission logic
-│   ├── package.json             ← Frontend assets (Webpack + Tailwind + React)
+│   ├── api/calculators.py       ← calculator layer (one class per model)
+│   ├── math_model/no_time_dependency_final/   ← emission logic
+│   ├── package.json             ← frontend assets (Webpack/Tailwind/React)
 │   └── manage.py
-├── docs/                        ← This guide lives here.
-└── .vscode/launch.json          ← Debugger config (you will create this)
+├── docs/                        ← this guide
+└── .vscode/launch.json          ← debugger config (you create this)
 ```
+
+Two terms recur throughout this guide: **repo root** = `exact-django-webapp/` (the folder you open in VS Code) and **Django root** = `djangoexact/` (where `manage.py` lives). They are different folders, one level apart - don't confuse them.
 
 You will be `cd`-ing between these two levels a lot. **Every code block in this guide is annotated with the directory it must be run from** - read those comments.
 
@@ -41,6 +43,8 @@ Commands are written in three flavours depending on your OS:
 - **Windows (cmd.exe)** - only shown when PowerShell syntax differs.
 
 Pick one shell and stick with it for the whole session. Mixing them is the #1 cause of mysterious `APP_MODE` failures.
+
+> The verification commands throughout Section 1 (the `… --version` checks) are identical on every OS and shell - only the **installation** and **PATH-setting** steps differ between platforms.
 
 ### Who to ask for what
 
@@ -122,10 +126,17 @@ You should see `Python 3.11.x`.
 
 1. Download the Python 3.11.x installer from [python.org](https://www.python.org/downloads/)
 2. Run the installer - **check "Add python.exe to PATH"** before clicking Install
-3. Open a new terminal and verify:
+3. On the **last screen of the installer, click "Disable path length limit"** if the button appears. Several dependencies (and the deep `__pycache__` / `node_modules` trees this project creates) generate paths longer than Windows' legacy 260-character limit, which otherwise surfaces as confusing `pip` / `npm` failures. If your laptop belongs to FAO, you might need the permission of an IT admin to perform this step.
+4. Open a new terminal and verify:
 
 ```bash
 python --version
+```
+
+**Windows only:** If you missed the long-path button, enable it later from an **Administrator** PowerShell, then reboot:
+
+```powershell
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -Value 1
 ```
 
 > <!-- IMAGE: Screenshot of the Python installer with "Add to PATH" checkbox highlighted -->
@@ -263,11 +274,21 @@ gcloud --version
 
 The project ships a small frontend bundle (Webpack + Tailwind + a few React components). You won't write much JS in day-to-day work, but you need to **build the assets at least once** or the admin and a few pages will render unstyled.
 
-- **macOS:** `brew install node@20`
-- **Windows:** [nodejs.org](https://nodejs.org/) installer (LTS).
-- **Linux:** use [nvm](https://github.com/nvm-sh/nvm) and install Node 20 LTS.
+**macOS:**
 
-Verify:
+```bash
+brew install node@20
+```
+
+**Windows:** download and run the LTS installer from [nodejs.org](https://nodejs.org/).
+
+**Linux:** install [nvm](https://github.com/nvm-sh/nvm), then:
+
+```bash
+nvm install --lts
+```
+
+Verify (any OS):
 
 ```bash
 node --version    # v20.x or newer
@@ -276,11 +297,22 @@ npm --version
 
 ### 1.6 Install Git
 
-- **macOS:** comes with Xcode Command Line Tools - `xcode-select --install`.
-- **Windows:** [Git for Windows](https://git-scm.com/download/win). During install, accept the default "Git Bash" - useful as a fallback shell.
-- **Linux:** `sudo apt install git` / `sudo dnf install git`.
+**macOS:** comes with the Xcode Command Line Tools:
 
-Verify:
+```bash
+xcode-select --install
+```
+
+**Windows:** download and run [Git for Windows](https://git-scm.com/download/win). During install, accept the default "Git Bash" - useful as a fallback shell.
+
+**Linux:**
+
+```bash
+sudo apt install git    # Debian/Ubuntu
+sudo dnf install git    # Fedora/RHEL
+```
+
+Verify (any OS):
 
 ```bash
 git --version
@@ -288,7 +320,7 @@ git --version
 
 ### 1.7 WeasyPrint system libraries
 
-WeasyPrint is used to render PDF emission reports. Its Python wheel needs system libraries that pip cannot install:
+WeasyPrint is used to render PDF emission reports. **There is no separate `pip install weasyprint` step here** - the WeasyPrint Python package itself is pulled in by `requirements.txt` in [§2.3](#23-install-python-dependencies). This section only installs the **system libraries** (Pango, GDK-PixBuf, libffi - bundled together as the GTK runtime on Windows) that the wheel links against at runtime and that pip cannot install for you:
 
 **macOS:**
 
@@ -302,7 +334,7 @@ brew install pango gdk-pixbuf libffi
 sudo apt install -y libpango-1.0-0 libpangoft2-1.0-0 libffi-dev
 ```
 
-**Windows:** install the [GTK 3 runtime](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases) before running `pip install`. If that fails, the path of least resistance is to develop inside [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) - the Linux instructions then apply.
+**Windows:** install the [GTK 3 runtime](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases) before you run `pip install -r requirements.txt` in [§2.3](#23-install-python-dependencies). If that fails, the path of least resistance is to develop inside [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) - the Linux instructions then apply.
 
 You won't hit WeasyPrint errors until you exercise the report endpoints, but installing the libraries now avoids a painful detour later.
 
@@ -408,7 +440,7 @@ npm install
 npm run build
 ```
 
-`npm run build` produces a development bundle. The only npm script defined today is `build` (see `djangoexact/package.json`); re-run it whenever you touch frontend code, or wrap it in a watcher of your choice.
+`npm run build` produces a development bundle. The only npm script defined today is `build` (see `djangoexact/package.json`); re-run it whenever you touch frontend code. There is no watch/auto-rebuild script - if you do a lot of frontend work you can re-run `build` automatically on every file change with a tool like [`nodemon`](https://www.npmjs.com/package/nodemon) or [`watchexec`](https://github.com/watchexec/watchexec), but backend-focused work rarely needs this.
 
 ### 2.6 Initialise the Database
 
@@ -427,6 +459,8 @@ APP_MODE=development python manage.py createsuperuser
 ```bash
 APP_MODE=development python manage.py load_reference_data --app=all
 ```
+
+> **Why `APP_MODE=development` here?** The prefix decides which database the command writes to. For local work that is the **dev** database, reached through the Cloud SQL Proxy - so these are still operations against a remote database, not a separate local SQLite file. If you share the dev database with the rest of the team, the reference data may already be present; check with a teammate before assuming it's missing.
 
 See [`djangoexact/docs/guides/fixtures-guide.md`](../djangoexact/docs/guides/fixtures-guide.md) for the full dump/load workflow.
 
@@ -536,6 +570,8 @@ gcloud auth application-default login      # writes credentials the proxy will r
 
 This opens a browser window for authentication. Make sure you log in with your FAO Google account that has access to the GCP projects.
 
+> **Don't have access yet?** Request it from your project lead or the FAO CSI Information Office (see [Who to ask for what](#who-to-ask-for-what)). You need at least the **Cloud SQL Client** role on each project you intend to reach (`fao-exact-dev`, `fao-exact-review`, and - only if you genuinely need it - `fao-exact`) before the proxy will connect.
+
 The second command writes an **Application Default Credentials** file at:
 
 - macOS / Linux: `~/.config/gcloud/application_default_credentials.json`
@@ -590,9 +626,13 @@ To verify the connection works:
 APP_MODE=development python manage.py dbshell
 ```
 
-This should drop you into a PostgreSQL shell connected to the remote database. Type `\q` to exit.
+This should drop you into a PostgreSQL shell connected to the remote database.
+
+> **Exit cleanly with `\q`** (a backslash, then `q`, then Enter) - don't just close the terminal window. If output ever fills the screen and pauses at a `:` prompt (that's the pager), press `q` first to return to the shell, then `\q` to leave.
 
 ### 4.4 Making Production Actually Read-Only
+
+> ⚠️ **ATTENTION - read this before you ever start the server with `APP_MODE=production`.**
 
 The "Production (READ-ONLY)" label in `launch.json` is a convention, not an enforcement. To make it physically impossible to write to production while connected through your local machine, do one of:
 
@@ -648,7 +688,9 @@ If any of these fails, jump to [Troubleshooting](#7-troubleshooting) before cont
 
 ### 5.3 Authenticated API Requests
 
-Most API endpoints require token authentication. To grab a token for your superuser:
+Most API endpoints (anything under `/api/` that isn't public documentation) reject unauthenticated calls with `401 Unauthorized`. **You need a token whenever you hit those endpoints** - whether from Thunder Client, Postman, `curl`, or while triggering the debugger walkthrough in [§6.5](#65-practical-debugging-walkthrough).
+
+**1. Get a token for your superuser.** This is a plain HTTP call, so it can be run from any directory (no `cd` needed) as long as the server is running:
 
 ```bash
 curl -X POST http://localhost:8000/api/auth/token/ \
@@ -656,7 +698,21 @@ curl -X POST http://localhost:8000/api/auth/token/ \
   -d '{"username": "<your-superuser>", "password": "<your-password>"}'
 ```
 
-Use the returned token as `Authorization: Token <token>` in Thunder Client / Postman / `curl`. Save the token in a Thunder Client environment variable so you don't have to paste it for every request.
+The response body contains your token.
+
+**2. Send it on every authenticated request** as an HTTP header:
+
+```
+Authorization: Token <token>
+```
+
+**3. Store it once in Thunder Client** so you don't paste it every time. Thunder Client is the REST-client extension you installed in [§1.3](#13-install-vs-code-extensions):
+
+- Open Thunder Client from the VS Code activity bar → **Env** tab → **New Environment** (call it e.g. `local`).
+- Add a variable named `authToken` and paste your token as its value.
+- Reference it in any request header as `Authorization: Token {{authToken}}`.
+
+DRF tokens don't expire on their own; if a token ever stops working (for example, it was rotated), re-run step 1 to mint a fresh one.
 
 ---
 
@@ -664,7 +720,7 @@ Use the returned token as `Authorization: Token <token>` in Thunder Client / Pos
 
 ### 6.1 Setting Up the Debugger
 
-Create the file `.vscode/launch.json` in the **project root** with this configuration:
+Create the file `.vscode/launch.json` in the **repo root** (`exact-django-webapp/` - the same folder you opened in VS Code in [§2.4](#24-point-vs-code-at-the-venv)) with this configuration:
 
 ```json
 {
@@ -1050,7 +1106,25 @@ In VS Code, the **Testing** sidebar discovers `pytest` tests automatically once 
 - The default branch is `develop`. `main` is protected.
 - Branch naming: `feature/<short-name>`, `fix/<short-name>`, `chore/<short-name>`.
 - Pull requests target `develop`. The PR description should call out scope, test coverage, and migration notes.
-- Commit messages follow Conventional Commits (`fix:`, `feat:`, `chore:`, `docs:`).
+- Commit messages follow Conventional Commits (`fix:`, `feat:`, `chore:`, `docs:`). See more at: [Conventionalcommits](https://www.conventionalcommits.org/en/v1.0.0/)
+
+A typical change, end to end:
+
+```bash
+# from: exact-django-webapp/ (anywhere in the repo is fine)
+git checkout develop
+git pull --rebase
+git checkout -b fix/<short-name>
+
+# ...edit code, then stage and commit...
+git add -p
+git commit -m "fix: short description of what changed"
+git push -u origin fix/<short-name>
+```
+
+Then open a pull request against `develop` from the GitHub UI or with `gh pr create`. If your change touches the database, run `makemigrations`, commit the generated migration file alongside your code, and mention it in the PR description.
+
+> This section is intentionally brief for now. A fuller contribution guide - review expectations, CI checks, and the release flow - will follow. Until then, if any step here blocks you, ask the project lead.
 
 ### 8.3 Fixtures & Reference Data
 
