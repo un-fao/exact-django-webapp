@@ -69,9 +69,9 @@ class CustomUserAdmin(ModelAdmin):
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = "attachment; filename=customusers.csv"
         writer = csv.writer(response)
-        writer.writerow(["first_name", "last_name", "email"])
+        writer.writerow(["first_name", "last_name", "email", "is_opted_out_of_emails"])
         for user in queryset:
-            writer.writerow([user.first_name, user.last_name, user.email])
+            writer.writerow([user.first_name, user.last_name, user.email, user.is_opted_out_of_emails])
         return response
 
     export_as_csv.short_description = "Export selected users as CSV"

@@ -9,6 +9,8 @@ import os
 import signal
 import subprocess
 import sys
+import tempfile
+from pathlib import Path
 
 from django.conf import settings
 from django.db import transaction
@@ -94,8 +96,15 @@ def dispatch_job(job_pk):
         from admin_scripts.cloud_run import dispatch_cloud_run_job
         dispatch_cloud_run_job(job_pk)
     else:
-        log_dir = getattr(settings, "BASE_DIR", ".") / "logs"
-        log_dir.mkdir(exist_ok=True)
+        # EXACT_JOB_LOG_DIR overrides; otherwise BASE_DIR/logs (writable on local
+        # dev). On read-only deploys (e.g. App Engine Standard) BASE_DIR lives
+        # under /workspace, so fall back to a temp dir to keep dispatch working.
+        log_dir = Path(os.environ.get("EXACT_JOB_LOG_DIR") or settings.BASE_DIR / "logs")
+        try:
+            log_dir.mkdir(exist_ok=True, parents=True)
+        except OSError:
+            log_dir = Path(tempfile.gettempdir()) / "exact_job_logs"
+            log_dir.mkdir(exist_ok=True, parents=True)
         log_file = log_dir / f"job_{job_pk}.log"
         logger.info("Dispatching local job %d, logging to %s", job_pk, log_file)
         fh = open(log_file, "w")  # noqa: SIM115 — intentionally kept open for subprocess lifetime

@@ -1,7 +1,47 @@
-# Thin wrapper over the main Django image for Cloud Run Job execution.
-# Builds from the same base image as the webapp; only the entrypoint differs.
-ARG BASE_IMAGE=gcr.io/PROJECT_ID/exact-webapp:latest
-FROM ${BASE_IMAGE}
+# syntax=docker/dockerfile:1.6
+
+# Self-contained image for the Cloud Run Job that executes
+# `python manage.py run_computation_job`. This image is *not* derived from
+# the App Engine deployment — App Engine Standard does not produce a
+# container, so the Cloud Run Job builds its own.
+#
+# Build context: repo root. Invoked from CI via:
+#   gcloud builds submit --config=deploy/cloudbuild-computation-job.yaml .
+
+FROM python:3.11-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# psycopg2 needs libpq + a build toolchain. We keep the toolchain in a
+# separate stage so the runtime image stays slim.
+FROM base AS builder
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        gcc \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY djangoexact/requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip 'setuptools>=78.1.1' wheel \
+ && pip install --prefix=/install -r /app/requirements.txt \
+ && pip install --prefix=/install --force-reinstall 'setuptools>=78.1.1'
+
+FROM base AS runtime
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        libpq5 \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /install /usr/local
+WORKDIR /app
+COPY djangoexact/ /app/
 
 # Cloud Run Jobs execute the container command once and exit.
-ENTRYPOINT ["python", "manage.py", "run_computation_job"]
+# `run_computation_job` is the management command at
+# admin_scripts/management/commands/run_computation_job.py.
+CMD ["python", "manage.py", "run_computation_job"]

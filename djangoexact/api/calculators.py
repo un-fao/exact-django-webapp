@@ -4618,9 +4618,6 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
 
-        self.results_w += self.results_w
-        self.results_wo += self.results_wo
-
         for building in self.module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
 
@@ -6098,6 +6095,14 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
+        self.salinity_type = SalinityType.objects.get(value="<18")
+        if self.module.avg_salinity_t2:
+            self.salinity_type = self.module.avg_salinity_t2
+
+        self.soil_type_name = "Mineral"
+        if self.module.soil_type_t2:
+            self.soil_type_name = self.module.soil_type_t2.name
+
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
 
@@ -6115,9 +6120,6 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.calculate()
             self.agb_default.value = getattr_or_default(self.math_w, "agb_tier_2_default") or getattr_or_default(self.math_wo, "agb_tier_2_default")
             self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
-
-        self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
-        self.salinity_type: SalinityType = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value="<18")
 
         try:
             self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=self.module.land_use_type)

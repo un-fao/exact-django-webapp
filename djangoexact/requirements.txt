@@ -6,7 +6,7 @@ colorama==0.4.6
 coreapi==2.3.3
 coreschema==0.0.4
 httplib2==0.22.0
-Django==5.2.13
+Django==5.2.14
 django-filter==24.3
 django-auditlog==3.0.0
 django-cors-headers==4.4.0
@@ -48,7 +48,7 @@ sqlparse==0.5.4
 setuptools>=78.1.1
 tzdata==2023.3
 uritemplate==4.1.1
-urllib3==2.6.3
+urllib3==2.7.0
 django-simple-history==3.8.0
 django-archive==0.2.0
 matplotlib==3.8.2
@@ -65,5 +65,7 @@ python-slugify==8.0.4
 drf-nested-routers==0.94.1
 weasyprint==68.0
 google-cloud-storage==2.19.0
+google-cloud-run==0.16.0
+factory-boy==3.3.3
 faostat==2.0.1
 tqdm==4.67.1

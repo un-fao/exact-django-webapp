@@ -1,6 +1,6 @@
 # Contributing to EX-ACT
 
-Thank you for your interest in contributing to EX-ACT (Ex-Ante Carbon Balance Tool). This project is maintained by the ESA — Agrifood Economics and Policy Division of the Food and Agriculture Organization of the United Nations (FAO), in collaboration with the CSI Information Office.
+Thank you for your interest in contributing to EX-ACT (Environmental eXternalities ACcounting Tool). This project is maintained by the Agrifood Economics and Policy Division (ESA) of the Food and Agriculture Organization of the United Nations (FAO), in collaboration with the CSI Information Office.
 
 ## Code of Conduct
 
