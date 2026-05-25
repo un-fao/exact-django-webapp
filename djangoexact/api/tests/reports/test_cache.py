@@ -860,3 +860,88 @@ class TestInventoryParity(unittest.TestCase):
             self.assertEqual(ci.ipcc_category, li.ipcc_category)
             self.assertEqual(ci.gas_type, li.gas_type)
             self.assertAlmostEqual(ci.value, li.value)
+
+
+# ===========================================================================
+# 16  Regression: module total must be the FULL balance (no dropped activities)
+#     Guards exact-django-webapp-jcb — the per-module report whitelists used to
+#     silently drop the "Fuel" activity (Storage/Packaging) and Settlement land
+#     emissions, under-counting "Downstream" and "New facilities".
+# ===========================================================================
+
+class TestBalanceTotalIncludesAllActivities(unittest.TestCase):
+    """BaseModuleReport._balance_total() must sum EVERY entry in the balance,
+    including activity types no extraction whitelist mentions (e.g. Fuel)."""
+
+    DURATION = 3
+
+    @staticmethod
+    def _entry(activity, gas, values):
+        # Serialized list-of-dicts format, exactly as save_results_to_cache
+        # writes it and as the .exactp export embeds it.
+        return {
+            "activity": activity,
+            "gas_type": {"name": gas},
+            "emissions": [{"value": v} for v in values],
+        }
+
+    def _report_with_balance(self, balance):
+        module = _make_module_mock(
+            cache_valid=True,
+            cached_results={
+                "balance": balance,
+                "total_w": balance,
+                "total_wo": balance,
+                "inventory": [],
+            },
+            cached_units=None,
+        )
+        activity_report = Mock()
+        activity_report.project_report.duration = self.DURATION
+
+        from api.reports.base import BaseModuleReport
+
+        @dataclass
+        class ConcreteReport(BaseModuleReport):
+            def compute(self):
+                return None
+
+        return ConcreteReport(module=module, activity_report=activity_report)
+
+    def test_fuel_activity_is_not_dropped_from_total(self):
+        """A Storage-shaped balance: Electricity+Storage+Fuel. The Fuel
+        component (which the old StorageReport whitelist ignored) must be
+        included in _balance_total()."""
+        balance = [
+            self._entry("Electricity", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Storage", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Fuel", "CO2", [-100.0, -200.0, -300.0]),
+            self._entry("Fuel", "CH4", [-1.0, -2.0, -3.0]),
+            self._entry("Fuel", "N2O", [-0.5, -0.5, -0.5]),
+        ]
+        report = self._report_with_balance(balance)
+
+        total = report._balance_total()
+
+        # Full balance sum = every entry, every year.
+        self.assertEqual(len(total), self.DURATION)
+        self.assertAlmostEqual(sum(total), -607.5)  # -600 fuel CO2, -6 CH4, -1.5 N2O
+        # Old whitelist (Electricity+Storage only) would have been 0.0 — guard it.
+        self.assertNotAlmostEqual(sum(total), 0.0)
+
+    def test_settlement_land_plus_infrastructure_all_counted(self):
+        """A Settlement-shaped balance: land (Soil CO2 / SOM N2O / Biomass)
+        plus Roads. Every component must be in the total."""
+        balance = [
+            self._entry("Soil CO2 Change", "CO2", [100.0, 100.0, 100.0]),
+            self._entry("Soil Organic Matter", "N2O", [5.0, 5.0, 5.0]),
+            self._entry("Biomass", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Roads", "CO2", [1000.0, 1000.0, 1000.0]),
+        ]
+        report = self._report_with_balance(balance)
+
+        total = report._balance_total()
+
+        self.assertAlmostEqual(sum(total), 3315.0)  # 300 + 15 + 0 + 3000
+        # Old SettlementReport whitelist = Roads only (3000), land dropped.
+        self.assertNotAlmostEqual(sum(total), 3000.0)

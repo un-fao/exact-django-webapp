@@ -777,6 +777,9 @@ class IrrigationPhaseDefaults(Defaults):
     defaults: calcs.IrrigationPhaseCalculator = None
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.IrrigationPhaseCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1605,6 +1608,9 @@ class ValueChainEntryEnergyDefaultsMixin(Defaults):
     defaults: calcs.BaseValueChainCalculator = None
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.BaseValueChainCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1729,6 +1735,9 @@ class EnergyEntryDefaults(Defaults):
         ]
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.EnergyEntryCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:

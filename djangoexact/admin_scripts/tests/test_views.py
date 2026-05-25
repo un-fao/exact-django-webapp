@@ -395,6 +395,20 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "Add Another Change")
         self.assertContains(response, "Run Scenario")
 
+    def test_compile_scenarios_global_region_filter_populated(self):
+        """The scenario-level (global) region filter must list the distinct
+        regions present in ChangeRecord. Regression: the dropdown used to
+        render with no <option> elements because the view never passed
+        ``regions`` and the template had no loop."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="global_filter_region"')
+        # On a fresh GET the only place regions render is the global filter
+        # (change-level filters stay empty until a module type is chosen).
+        self.assertContains(response, '<option value="Central Asia">Central Asia</option>')
+        self.assertContains(response, '<option value="Eastern Europe">Eastern Europe</option>')
+
     def test_compile_scenarios_requires_staff(self):
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 302)
