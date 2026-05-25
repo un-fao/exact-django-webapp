@@ -273,9 +273,20 @@ def compile_scenarios(request):
         "default_id_prefix": "scenario-0-change-0",
     }]
 
+    # Populate the global (scenario-level) region filter from the distinct
+    # regions present in ChangeRecord. Without this the dropdown stays empty
+    # because the template has nothing to iterate over.
+    regions = list(
+        ChangeRecord.objects.exclude(region="")
+        .values_list("region", flat=True)
+        .distinct()
+        .order_by("region")
+    )
+
     context = {
         "module_types": module_types,
         "scenarios": scenarios,
+        "regions": regions,
     }
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
@@ -381,8 +392,12 @@ def htmx_filters(request):
         return HttpResponse("")
 
     qs = ChangeRecord.objects.filter(module_type=module_type)
-    regions = list(qs.values_list("region", flat=True).distinct().order_by("region"))
-    climates = list(qs.values_list("climate", flat=True).distinct().order_by("climate"))
+    regions = list(
+        qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
+    )
+    climates = list(
+        qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
+    )
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,
