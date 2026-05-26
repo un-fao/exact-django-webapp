@@ -338,6 +338,81 @@
         });
     }
 
+    function colorForLabel(label) {
+        // FNV-like 32-bit hash, mapped into the PALETTE.
+        var h = 2166136261;
+        for (var i = 0; i < label.length; i++) {
+            h ^= label.charCodeAt(i);
+            h = (h * 16777619) >>> 0;
+        }
+        return PALETTE[h % PALETTE.length];
+    }
+
+    function renderComposition(indices) {
+        var mount = document.getElementById("cmp-composition");
+        if (!mount) return;
+        destroyChart("composition");
+        var renderable = indices.filter(function (idx) {
+            var s = window.scenarioResults[idx];
+            var pc = s && s.result && s.result.statistics && s.result.statistics.per_change;
+            return pc && pc.length > 0;
+        });
+        if (renderable.length === 0) {
+            mount.classList.add("hidden");
+            return;
+        }
+        mount.classList.remove("hidden");
+        var canvas = mount.querySelector("canvas");
+
+        // Collect the union of change labels across all scenarios.
+        var labelSet = {};
+        renderable.forEach(function (idx) {
+            window.scenarioResults[idx].result.statistics.per_change.forEach(function (pc) {
+                labelSet[pc.label] = true;
+            });
+        });
+        var allLabels = Object.keys(labelSet);
+
+        var datasets = allLabels.map(function (label) {
+            return {
+                label: label,
+                backgroundColor: colorForLabel(label),
+                data: renderable.map(function (idx) {
+                    var pc = window.scenarioResults[idx].result.statistics.per_change;
+                    var match = pc.find(function (e) { return e.label === label; });
+                    return match ? match.sum : 0;
+                }),
+            };
+        });
+
+        var scenarioLabels = renderable.map(function (idx) {
+            return scenarioLabel(idx, window.scenarioResults[idx]);
+        });
+
+        charts.composition = new Chart(canvas, {
+            type: "bar",
+            data: { labels: scenarioLabels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                return ctx.dataset.label + ": " + Number(ctx.parsed.y).toFixed(4);
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true },
+                },
+            },
+        });
+    }
+
     function renderCompare() {
         var indices = Object.keys(window.scenarioResults).sort(function (a, b) {
             return Number(a) - Number(b);
@@ -349,7 +424,8 @@
         renderChips(indices);
         renderBarChart(indices);
         renderBoxPlot(indices);
-        // Composition stack and table will be added in later tasks.
+        renderComposition(indices);
+        // Comparison table will be added in next task.
     }
 
     window.renderCompare = renderCompare;
