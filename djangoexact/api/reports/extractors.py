@@ -17,10 +17,18 @@ def _eq(val: Any, target: Any) -> bool:
     """Return True if val equals target, handling enum vs. string comparisons.
 
     When source data comes from the serialized cache, ``val`` may be a plain
-    string (e.g. ``"Biomass"`` or ``"CO2"``) while ``target`` is an enum
-    instance (e.g. ``ActivityTypes.BIOMASS``).  This helper accepts both cases.
+    string while ``target`` is an enum instance. Cache serialization is
+    asymmetric: activity is stored as ``e.activity.value`` but gas_type is
+    stored as ``e.gas_type.name`` (see ``save_results_to_cache``), so this
+    helper must accept both forms — otherwise any enum whose ``.name``
+    differs from its ``.value`` (notably ``GasTypes.OTHER``: name "OTHER",
+    value "Other") silently fails to match every cached entry.
     """
-    return val == target or (hasattr(target, "value") and val == target.value)
+    return (
+        val == target
+        or (hasattr(target, "value") and val == target.value)
+        or (hasattr(target, "name") and val == target.name)
+    )
 
 
 def extract_emissions(
