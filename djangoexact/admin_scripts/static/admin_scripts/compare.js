@@ -108,6 +108,32 @@
     document.body.addEventListener("input", handleFormMutation, true);
     document.body.addEventListener("change", handleFormMutation, true);
 
+    function observeScenarioRemoval() {
+        var container = document.getElementById("scenario-panels");
+        if (!container) return;
+        var obs = new MutationObserver(function (mutations) {
+            var anyRemoved = false;
+            mutations.forEach(function (m) {
+                m.removedNodes.forEach(function (node) {
+                    if (node.nodeType !== 1) return;
+                    var idx = node.getAttribute && node.getAttribute("data-scenario-panel");
+                    if (idx !== null && idx !== undefined && idx in window.scenarioResults) {
+                        delete window.scenarioResults[idx];
+                        anyRemoved = true;
+                    }
+                });
+            });
+            if (anyRemoved) renderCompare();
+        });
+        obs.observe(container, { childList: true });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", observeScenarioRemoval);
+    } else {
+        observeScenarioRemoval();
+    }
+
     function classifyChip(slot) {
         // Worst rule wins. Returns { level: 'red'|'amber'|'green', label, detail }.
         var r = slot && slot.result;
