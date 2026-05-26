@@ -151,6 +151,15 @@
         return pieces.join(", ");
     }
 
+    var charts = {};  // key: mount id, value: Chart instance (destroyed before each re-render)
+
+    function destroyChart(key) {
+        if (charts[key]) {
+            charts[key].destroy();
+            delete charts[key];
+        }
+    }
+
     function renderChips(indices) {
         var container = document.getElementById("cmp-chips");
         if (!container) return;
@@ -193,6 +202,71 @@
         });
     }
 
+    function renderBarChart(indices) {
+        var mount = document.getElementById("cmp-bar");
+        if (!mount) return;
+        destroyChart("bar");
+        var renderable = indices.filter(function (idx) {
+            var s = window.scenarioResults[idx];
+            return s && s.result && s.result.statistics && s.result.statistics.count > 0
+                   && s.result.statistics.mean !== null;
+        });
+        if (renderable.length === 0) {
+            mount.classList.add("hidden");
+            return;
+        }
+        mount.classList.remove("hidden");
+        var canvas = mount.querySelector("canvas");
+        var labels = renderable.map(function (idx) {
+            return scenarioLabel(idx, window.scenarioResults[idx]);
+        });
+        var data = renderable.map(function (idx) {
+            var s = window.scenarioResults[idx].result.statistics;
+            var ci = s.ci_95 || 0;
+            return { y: s.mean, yMin: s.mean - ci, yMax: s.mean + ci };
+        });
+        var colors = renderable.map(function (idx) { return colorForScenario(idx); });
+
+        charts.bar = new Chart(canvas, {
+            type: "barWithErrorBars",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Mean",
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: colors,
+                    errorBarColor: "#374151",
+                    errorBarWhiskerColor: "#374151",
+                }],
+            },
+            options: {
+                indexAxis: "x",
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                var d = ctx.raw || {};
+                                var s = window.scenarioResults[renderable[ctx.dataIndex]].result.statistics;
+                                return [
+                                    "mean: " + Number(d.y).toFixed(4),
+                                    "CI 95%: ±" + Number(s.ci_95 || 0).toFixed(4),
+                                    "n: " + s.count,
+                                ];
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    y: { beginAtZero: false },
+                },
+            },
+        });
+    }
+
     function renderCompare() {
         var indices = Object.keys(window.scenarioResults).sort(function (a, b) {
             return Number(a) - Number(b);
@@ -202,7 +276,8 @@
         if (empty) empty.classList.toggle("hidden", hasAny);
 
         renderChips(indices);
-        // Charts and table will be added in later tasks.
+        renderBarChart(indices);
+        // Box plot, composition, table will be added in later tasks.
     }
 
     window.renderCompare = renderCompare;
