@@ -371,8 +371,9 @@ class ScenarioUtilsTest(TestCase):
     def test_stats_for_scenario_counts_outliers_outside_iqr_fences(self):
         from admin_scripts.scenario_utils import stats_for_scenario
         # Add two extreme records - one well below Q1 - 1.5*IQR, one above.
-        # Baseline Q1=-2.75, Q3=-1.25, IQR=1.5, so fences are -5.0 / 1.0.
-        # -100 is a low outlier; 50 is a high outlier.
+        # Baseline fixture has fences ~(-5.0, 1.0); -100 sits far below the
+        # low fence and 50 sits far above the high fence regardless of how
+        # the extreme records shift Q1/Q3.
         for extreme in (-100.0, 50.0):
             ChangeRecord.objects.create(
                 module_type="Grassland",
