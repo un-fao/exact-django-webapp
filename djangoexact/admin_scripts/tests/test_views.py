@@ -1208,3 +1208,97 @@ class HtmxScenarioPrefixTest(TestCase):
         self.assertIn("Scenario B Changes", wb.sheetnames)
         self.assertNotIn("Scenario A", wb.sheetnames)
         self.assertNotIn("Scenario B", wb.sheetnames)
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
+class HtmxRunScenarioContextTest(TestCase):
+    databases = {"default"}
+
+    def setUp(self):
+        self.client = Client()
+        self.staff_user = CustomUser.objects.create_user(
+            email="staff@example.com",
+            password="testpass123",
+            is_staff=True,
+            firebase_uid="staff_uid",
+        )
+        self.client.login(email="staff@example.com", password="testpass123")
+        for i, total in enumerate([-3.0, -2.5, -2.0, -1.5, -1.0]):
+            ChangeRecord.objects.create(
+                module_type="Grassland",
+                region="Central Asia",
+                climate="Cool Temperate",
+                moisture="Moist",
+                soil_type="High Activity Clay",
+                total=total,
+                field="grassland_management_type",
+                from_value="Non-Degraded",
+                to_value="Improved Grassland",
+                csv_row_data={"row": i},
+            )
+
+    def _post_run_scenario(self, scenario_index="0", scenario_name="My Scenario"):
+        return self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": scenario_index,
+                f"scenario-{scenario_index}-scenario_name": scenario_name,
+                f"scenario-{scenario_index}-category": "",
+                f"scenario-{scenario_index}-change-0-module_type": "Grassland",
+                f"scenario-{scenario_index}-change-0-field": "grassland_management_type",
+                f"scenario-{scenario_index}-change-0-from_value": "Non-Degraded",
+                f"scenario-{scenario_index}-change-0-to_value": "Improved Grassland",
+                f"scenario-{scenario_index}-change-0-unit": "1",
+            },
+        )
+
+    def test_response_contains_data_scenario_result_attribute(self):
+        response = self._post_run_scenario(scenario_index="2", scenario_name="Foo")
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode("utf-8")
+        self.assertIn('data-scenario-result=', body)
+        self.assertIn("data-scenario-index='2'", body)
+
+    def test_data_scenario_result_payload_parses_and_has_expected_keys(self):
+        import json, html
+        response = self._post_run_scenario(scenario_index="0", scenario_name="Foo")
+        body = response.content.decode("utf-8")
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertEqual(payload["scenario_index"], "0")
+        self.assertEqual(payload["scenario_name"], "Foo")
+        self.assertIn("statistics", payload)
+        self.assertEqual(payload["statistics"]["count"], 5)
+        self.assertIn("outliers_low", payload["statistics"])
+        self.assertIn("per_change", payload["statistics"])
+        self.assertEqual(payload["gaps"], [])
+        self.assertIsNone(payload["error"])
+        self.assertFalse(payload["not_computed"])
+
+    def test_data_scenario_result_present_when_no_matching_records(self):
+        import json, html
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": "0",
+                "scenario-0-scenario_name": "Empty",
+                "scenario-0-category": "",
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "scenario-0-change-0-from_value": "DoesNotExist",
+                "scenario-0-change-0-to_value": "AlsoMissing",
+                "scenario-0-change-0-unit": "1",
+            },
+        )
+        body = response.content.decode("utf-8")
+        self.assertIn("data-scenario-result=", body)
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertIn("statistics", payload)
+        self.assertEqual(payload["statistics"]["count"], 0)
