@@ -520,6 +520,136 @@ class LargeFisheryDataBuilder(ModuleDataBuilder):
 #         data["management_category_wo"] = start_category
 
 
+class EnergyDataBuilder(ModuleDataBuilder):
+    """Data builder for Energy modules (extracted from the single EnergyEntry)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("fuel_type"),
+            FieldMappingBuilder.numeric("quantity_consumed_per_year"),
+            FieldMappingBuilder.boolean("account_for_co2", is_single_field=True),
+        ]
+
+
+class StorageDataBuilder(ModuleDataBuilder):
+    """Data builder for Storage modules (extracted from StorageEntry)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("fuel_type"),
+            FieldMappingBuilder.numeric("quantity_consumed_per_year"),
+            FieldMappingBuilder.boolean("is_refrigerant_used", is_single_field=True),
+            FieldMappingBuilder.foreign_key("refrigerant_type"),
+        ]
+
+
+class ProcessingDataBuilder(ModuleDataBuilder):
+    """Data builder for Processing modules (extracted from ProcessingEntry)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("fuel_type"),
+            FieldMappingBuilder.numeric("quantity_consumed_per_year"),
+            FieldMappingBuilder.boolean("is_water_used", is_single_field=True),
+        ]
+
+
+class PackagingDataBuilder(ModuleDataBuilder):
+    """Data builder for Packaging modules (extracted from PackagingEntry)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("packaging_material_type"),
+            FieldMappingBuilder.numeric("kg_of_packaging_material"),
+            FieldMappingBuilder.boolean("is_electric", is_single_field=True),
+        ]
+
+
+class TransportDataBuilder(ModuleDataBuilder):
+    """Data builder for Transport modules (extracted from TransportEntry)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("fuel_type"),
+            FieldMappingBuilder.numeric("quantity_consumed_per_year"),
+        ]
+
+
+class IrrigationSystemDataBuilder(ModuleDataBuilder):
+    """Data builder for IrrigationSystem submodules (under Irrigation parent)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("irrigation_system_type", is_single_field=True),
+            FieldMappingBuilder.numeric("ha"),
+            FieldMappingBuilder.numeric("ef_t2"),
+        ]
+
+
+class IrrigationPhaseDataBuilder(ModuleDataBuilder):
+    """Data builder for IrrigationPhase submodules (under Irrigation parent)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("irrigation_system_type", is_single_field=True),
+            FieldMappingBuilder.foreign_key("fuel_type"),
+            FieldMappingBuilder.numeric("ha"),
+            FieldMappingBuilder.numeric("gross_irrigation_water"),
+        ]
+
+
+class SettlementDataBuilder(ModuleDataBuilder):
+    """Data builder for Settlement land modules."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("settlement_type"),
+            FieldMappingBuilder.numeric("biomass_t2"),
+        ]
+
+
+class BuildingDataBuilder(ModuleDataBuilder):
+    """Data builder for Building submodules (under Settlement parent)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("building_type"),
+            FieldMappingBuilder.numeric("area_m2"),
+            FieldMappingBuilder.numeric("ef_t2"),
+        ]
+
+
+class RoadDataBuilder(ModuleDataBuilder):
+    """Data builder for Road submodules (under Settlement parent)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("road_type"),
+            FieldMappingBuilder.numeric("length_km"),
+            FieldMappingBuilder.numeric("width_m"),
+        ]
+
+
+class OtherInfrastructureDataBuilder(ModuleDataBuilder):
+    """Data builder for OtherInfrastructure submodules (under Settlement parent)."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.numeric("area_m2"),
+            FieldMappingBuilder.numeric("ef_t2"),
+        ]
+
+
+class LandUseChangeDataBuilder(ModuleDataBuilder):
+    """Data builder for LandUseChange modules."""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.foreign_key("module_type"),
+            FieldMappingBuilder.boolean("is_fire_used"),
+        ]
+
+
 class ModuleDataBuilderRegistry:
     """Registry for module data builders"""
 
@@ -537,6 +667,18 @@ class ModuleDataBuilderRegistry:
         self.register("ForestManagement", ForestManagementDataBuilder())
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
+        self.register("Energy", EnergyDataBuilder())
+        self.register("Storage", StorageDataBuilder())
+        self.register("Processing", ProcessingDataBuilder())
+        self.register("Packaging", PackagingDataBuilder())
+        self.register("Transport", TransportDataBuilder())
+        self.register("IrrigationSystem", IrrigationSystemDataBuilder())
+        self.register("IrrigationPhase", IrrigationPhaseDataBuilder())
+        self.register("Settlement", SettlementDataBuilder())
+        self.register("Building", BuildingDataBuilder())
+        self.register("Road", RoadDataBuilder())
+        self.register("OtherInfrastructure", OtherInfrastructureDataBuilder())
+        self.register("LandUseChange", LandUseChangeDataBuilder())
 
     def register(self, module_name: str, builder: ModuleDataBuilder):
         """Register a new builder"""
@@ -557,6 +699,13 @@ class ModuleDataBuilderRegistry:
 
 class ModuleProcessor(ABC):
     """Abstract base class for module processors"""
+
+    # Optional override: when the catalog/MODULE_CONFIGS key differs from
+    # the Django class of the module returned by `create_module` (e.g.
+    # `EnergyProcessor` returns an EnergyEntry submodule but data must be
+    # written under the "Energy" key), set this to the catalog key. The
+    # default of None falls back to `module.__class__.__name__`.
+    data_builder_key: Optional[str] = None
 
     def __init__(self, data_builder_registry: ModuleDataBuilderRegistry):
         self.data_builder_registry = data_builder_registry
@@ -598,8 +747,15 @@ class ModuleProcessor(ABC):
             # Calculate result
             balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
 
-            # Build data
-            data = self.data_builder_registry.build_data(module)
+            # Build data — when ``data_builder_key`` is set, use it
+            # instead of the module's class name so parent-with-submodule
+            # processors can return the submodule (for calculator dispatch)
+            # but still emit ChangeRecord rows under the parent's key.
+            if self.data_builder_key is not None:
+                builder = self.data_builder_registry.get_builder(self.data_builder_key)
+                data = builder.build_data(module)
+            else:
+                data = self.data_builder_registry.build_data(module)
             data["total"] = balance
 
             return ProcessingResult.success_result(data)
@@ -952,6 +1108,392 @@ class LargeFisheryProcessor(ModuleProcessor):
         return module
 
 
+# ---------------------------------------------------------------------------
+# Processors for modules with a parent + submodule shape
+#
+# The existing land/livestock processors use ``factories.X.build()`` and rely
+# on the calculator operating on a single self-contained module. Energy /
+# Irrigation / Storage / Processing / Packaging / Transport / Settlement
+# all rely on submodules attached to a parent via a reverse-FK relation —
+# parent calculators that iterate ``parent.entries.all()`` only work when
+# the parent is persisted. To avoid DB writes during permutation, we
+# **build the parent unsaved**, build one submodule pointing at it, and
+# pass the *submodule* to ``CalculatorFactory`` so the submodule-level
+# calculator runs directly. ``data_builder_key`` then routes data emission
+# back to the catalog name (e.g. "Energy") so ChangeRecord rows align with
+# the UI selector.
+# ---------------------------------------------------------------------------
+
+
+def _build_project_activity(combination, factories):
+    """Pull climate/moisture/soil_type/region off the tail of a combination
+    and build an unsaved Project + Activity pair shared by every new
+    processor below. The tail order matches what compute_permutations
+    appends in ``fields.update({"climate_moistures": ..., "soil_types": ...,
+    "region": ...})``.
+    """
+    climate_moisture, soil_type, region = combination[-3:]
+    climate, moisture = climate_moisture
+    project = factories.ProjectFactory.build(
+        climate=climate,
+        moisture=moisture,
+        soil_type=soil_type,
+        country=region.countries.order_by("?").first(),
+    )
+    activity = factories.ActivityFactory.build(project=project)
+    return project, activity
+
+
+class EnergyProcessor(ModuleProcessor):
+    """Build Energy parent + a single EnergyEntry submodule.
+
+    The catalog/MODULE_CONFIGS key is ``"Energy"`` so ChangeRecord rows
+    land under that module_type, but the submodule's own calculator is
+    what actually runs (avoids the parent-bound ``entries.all()`` query).
+    """
+
+    data_builder_key = "Energy"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            fuel_type_start, fuel_type_w,
+            account_for_co2_start, account_for_co2_w,
+            quantity_consumed_per_year_start, quantity_consumed_per_year_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.EnergyFactory.build(activity=activity)
+        entry = models.EnergyEntry(
+            parent=parent,
+            fuel_type_start=fuel_type_start,
+            fuel_type_w=fuel_type_w,
+            fuel_type_wo=fuel_type_start,
+            quantity_consumed_per_year_start=quantity_consumed_per_year_start,
+            quantity_consumed_per_year_w=quantity_consumed_per_year_w,
+            quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
+            account_for_co2=account_for_co2_start,
+        )
+        return entry
+
+
+class StorageProcessor(ModuleProcessor):
+    """Build Storage parent + a single StorageEntry submodule."""
+
+    data_builder_key = "Storage"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            fuel_type_start, fuel_type_w,
+            quantity_consumed_per_year_start, quantity_consumed_per_year_w,
+            is_refrigerant_used_start, is_refrigerant_used_w,
+            refrigerant_type_start, refrigerant_type_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.StorageFactory.build(activity=activity)
+        entry = models.StorageEntry(
+            parent=parent,
+            fuel_type_start=fuel_type_start,
+            fuel_type_w=fuel_type_w,
+            fuel_type_wo=fuel_type_start,
+            quantity_consumed_per_year_start=quantity_consumed_per_year_start,
+            quantity_consumed_per_year_w=quantity_consumed_per_year_w,
+            quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
+            is_refrigerant_used=is_refrigerant_used_start,
+            refrigerant_type_start=refrigerant_type_start,
+            refrigerant_type_w=refrigerant_type_w,
+            refrigerant_type_wo=refrigerant_type_start,
+        )
+        return entry
+
+
+class ProcessingProcessor(ModuleProcessor):
+    """Build Processing parent + a single ProcessingEntry submodule."""
+
+    data_builder_key = "Processing"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            fuel_type_start, fuel_type_w,
+            quantity_consumed_per_year_start, quantity_consumed_per_year_w,
+            is_water_used_start, is_water_used_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.ProcessingFactory.build(activity=activity)
+        entry = models.ProcessingEntry(
+            parent=parent,
+            fuel_type_start=fuel_type_start,
+            fuel_type_w=fuel_type_w,
+            fuel_type_wo=fuel_type_start,
+            quantity_consumed_per_year_start=quantity_consumed_per_year_start,
+            quantity_consumed_per_year_w=quantity_consumed_per_year_w,
+            quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
+            is_water_used=is_water_used_start,
+        )
+        return entry
+
+
+class PackagingProcessor(ModuleProcessor):
+    """Build Packaging parent + a single PackagingEntry submodule."""
+
+    data_builder_key = "Packaging"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            packaging_material_type_start, packaging_material_type_w,
+            kg_of_packaging_material_start, kg_of_packaging_material_w,
+            is_electric_start, is_electric_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.PackagingFactory.build(activity=activity)
+        entry = models.PackagingEntry(
+            parent=parent,
+            packaging_material_type_start=packaging_material_type_start,
+            packaging_material_type_w=packaging_material_type_w,
+            packaging_material_type_wo=packaging_material_type_start,
+            kg_of_packaging_material_start=kg_of_packaging_material_start,
+            kg_of_packaging_material_w=kg_of_packaging_material_w,
+            kg_of_packaging_material_wo=kg_of_packaging_material_start,
+            is_electric=is_electric_start,
+        )
+        return entry
+
+
+class TransportProcessor(ModuleProcessor):
+    """Build Transport parent + a single TransportEntry submodule."""
+
+    data_builder_key = "Transport"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            fuel_type_start, fuel_type_w,
+            quantity_consumed_per_year_start, quantity_consumed_per_year_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.TransportFactory.build(activity=activity)
+        entry = models.TransportEntry(
+            parent=parent,
+            fuel_type_start=fuel_type_start,
+            fuel_type_w=fuel_type_w,
+            fuel_type_wo=fuel_type_start,
+            quantity_consumed_per_year_start=quantity_consumed_per_year_start,
+            quantity_consumed_per_year_w=quantity_consumed_per_year_w,
+            quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
+        )
+        return entry
+
+
+class IrrigationSystemProcessor(ModuleProcessor):
+    """Build Irrigation parent + a single IrrigationSystem submodule.
+
+    Catalog key matches the submodule class name, so
+    ``CalculatorFactory`` dispatches to ``IrrigationSystemCalculator`` and
+    the default data builder lookup ("IrrigationSystem") works without
+    needing ``data_builder_key``.
+    """
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            irrigation_system_type_start, irrigation_system_type_w,
+            ha_start, ha_w,
+            ef_t2_start, ef_t2_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.IrrigationFactory.build(activity=activity)
+        system = models.IrrigationSystem(
+            parent=parent,
+            irrigation_system_type=irrigation_system_type_start,
+            ha_start=ha_start,
+            ha_w=ha_w,
+            ha_wo=ha_start,
+            ef_t2_start=ef_t2_start,
+            ef_t2_w=ef_t2_w,
+            ef_t2_wo=ef_t2_start,
+        )
+        return system
+
+
+class IrrigationPhaseProcessor(ModuleProcessor):
+    """Build Irrigation parent + a single IrrigationPhase submodule."""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            irrigation_system_type_start, irrigation_system_type_w,
+            fuel_type_start, fuel_type_w,
+            ha_start, ha_w,
+            gross_irrigation_water_start, gross_irrigation_water_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.IrrigationFactory.build(activity=activity)
+        phase = models.IrrigationPhase(
+            parent=parent,
+            irrigation_system_type=irrigation_system_type_start,
+            fuel_type_start=fuel_type_start,
+            fuel_type_w=fuel_type_w,
+            fuel_type_wo=fuel_type_start,
+            ha_start=ha_start,
+            ha_w=ha_w,
+            ha_wo=ha_start,
+            gross_irrigation_water_start=gross_irrigation_water_start,
+            gross_irrigation_water_w=gross_irrigation_water_w,
+            gross_irrigation_water_wo=gross_irrigation_water_start,
+        )
+        return phase
+
+
+class SettlementProcessor(ModuleProcessor):
+    """Build a Settlement land module (no submodules attached).
+
+    Settlement is a LandModule whose calculator only loops over
+    ``buildings``/``roads`` when those submodules exist — leaving the
+    relation empty lets the parent's own carbon-stock math run unchanged.
+    """
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            land_use_type_start,
+            settlement_type_start, settlement_type_w,
+            biomass_t2_start, biomass_t2_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        settlement = factories.SettlementFactory.build(
+            activity=activity,
+            land_use_type_start=land_use_type_start,
+            land_use_type_w=land_use_type_start,
+            land_use_type_wo=land_use_type_start,
+            settlement_type_start=settlement_type_start,
+            settlement_type_w=settlement_type_w,
+            settlement_type_wo=settlement_type_start,
+            biomass_t2_start=biomass_t2_start,
+            biomass_t2_w=biomass_t2_w,
+            biomass_t2_wo=biomass_t2_start,
+        )
+        return settlement
+
+
+class BuildingProcessor(ModuleProcessor):
+    """Build Settlement parent + a single Building submodule."""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            building_type_start, building_type_w,
+            area_m2_start, area_m2_w,
+            ef_t2_start, ef_t2_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.SettlementFactory.build(activity=activity)
+        building = models.Building(
+            parent=parent,
+            building_type=building_type_start,
+            area_m2_start=area_m2_start,
+            area_m2_w=area_m2_w,
+            area_m2_wo=area_m2_start,
+            ef_t2_start=ef_t2_start,
+            ef_t2_w=ef_t2_w,
+            ef_t2_wo=ef_t2_start,
+        )
+        return building
+
+
+class RoadProcessor(ModuleProcessor):
+    """Build Settlement parent + a single Road submodule."""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            road_type_start, road_type_w,
+            length_km_start, length_km_w,
+            width_m_start, width_m_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.SettlementFactory.build(activity=activity)
+        road = models.Road(
+            parent=parent,
+            road_type=road_type_start,
+            length_km_start=length_km_start,
+            length_km_w=length_km_w,
+            length_km_wo=length_km_start,
+            width_m_start=width_m_start,
+            width_m_w=width_m_w,
+            width_m_wo=width_m_start,
+        )
+        return road
+
+
+class OtherInfrastructureProcessor(ModuleProcessor):
+    """Build Settlement parent + a single OtherInfrastructure submodule."""
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            area_m2_start, area_m2_w,
+            ef_t2_start, ef_t2_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        parent = factories.SettlementFactory.build(activity=activity)
+        other = models.OtherInfrastructure(
+            parent=parent,
+            area_m2_start=area_m2_start,
+            area_m2_w=area_m2_w,
+            area_m2_wo=area_m2_start,
+            ef_t2_start=ef_t2_start,
+            ef_t2_w=ef_t2_w,
+            ef_t2_wo=ef_t2_start,
+        )
+        return other
+
+
+class LandUseChangeProcessor(ModuleProcessor):
+    """Build a minimal LandUseChange.
+
+    LUC depends on three sibling land modules (start / with / without)
+    keyed off Activity. A full LUC permutation pipeline would require
+    auto-generating those siblings plus their own attributes — out of
+    scope here. The processor builds just the LUC instance itself; the
+    `LandUseChangeCalculator` will raise without the siblings, so this
+    processor is intentionally only useful once paired with the same
+    Activity-built sibling fixtures (tracked as a follow-up).
+    """
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            module_type_start, module_type_w,
+            is_fire_used_start, is_fire_used_w,
+            climate_moisture, soil_type, region,
+        ) = combination
+
+        project, activity = _build_project_activity(combination, factories)
+        luc = factories.LandUseChangeFactory.build(
+            activity=activity,
+            module_type_start=module_type_start,
+            module_type_w=module_type_w,
+            module_type_wo=module_type_start,
+            is_fire_used_start=is_fire_used_start,
+            is_fire_used_w=is_fire_used_w,
+            is_fire_used_wo=is_fire_used_start,
+            area=1,
+        )
+        return luc
+
+
 class ProcessorRegistry:
     """Registry for module processors"""
 
@@ -970,6 +1512,18 @@ class ProcessorRegistry:
         self.register("ForestManagement", ForestManagementProcessor(self._data_builder_registry))
         self.register("SmallFishery", SmallFisheryProcessor(self._data_builder_registry))
         self.register("LargeFishery", LargeFisheryProcessor(self._data_builder_registry))
+        self.register("Energy", EnergyProcessor(self._data_builder_registry))
+        self.register("Storage", StorageProcessor(self._data_builder_registry))
+        self.register("Processing", ProcessingProcessor(self._data_builder_registry))
+        self.register("Packaging", PackagingProcessor(self._data_builder_registry))
+        self.register("Transport", TransportProcessor(self._data_builder_registry))
+        self.register("IrrigationSystem", IrrigationSystemProcessor(self._data_builder_registry))
+        self.register("IrrigationPhase", IrrigationPhaseProcessor(self._data_builder_registry))
+        self.register("Settlement", SettlementProcessor(self._data_builder_registry))
+        self.register("Building", BuildingProcessor(self._data_builder_registry))
+        self.register("Road", RoadProcessor(self._data_builder_registry))
+        self.register("OtherInfrastructure", OtherInfrastructureProcessor(self._data_builder_registry))
+        self.register("LandUseChange", LandUseChangeProcessor(self._data_builder_registry))
 
     def register(self, module_name: str, processor: ModuleProcessor):
         """Register a new processor"""
@@ -1120,6 +1674,18 @@ class ConfigurationLoader:
                 "waterbody": False,
                 "other_land": False,
                 "set_aside": False,
+                "energy": False,
+                "storage": False,
+                "processing": False,
+                "packaging": False,
+                "transport": False,
+                "irrigation_system": False,
+                "irrigation_phase": False,
+                "settlement": False,
+                "building": False,
+                "road": False,
+                "other_infrastructure": False,
+                "land_use_change": False,
             },
             "performance": {
                 "max_rows": 10000,
@@ -1594,6 +2160,148 @@ MODULE_CONFIGS = {
         },
         "config_name": "waterbody",
     },
+    # Parent modules with a single submodule type. Field lists mirror the
+    # *Entry submodule's columns — the processor below builds the parent
+    # plus one submodule and runs the submodule's calculator directly so we
+    # don't have to persist the parent's `.entries.all()` relation.
+    "Energy": {
+        "fields": {
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "account_for_co2_start": [True, False],
+            "account_for_co2_w": [True, False],
+            "quantity_consumed_per_year_start": [1],
+            "quantity_consumed_per_year_w": [1],
+        },
+        "config_name": "energy",
+    },
+    "Storage": {
+        "fields": {
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "quantity_consumed_per_year_start": [1],
+            "quantity_consumed_per_year_w": [1],
+            "is_refrigerant_used_start": [True, False],
+            "is_refrigerant_used_w": [True, False],
+            "refrigerant_type_start": models.RefrigerantType.objects.all(),
+            "refrigerant_type_w": models.RefrigerantType.objects.all(),
+        },
+        "config_name": "storage",
+    },
+    "Processing": {
+        "fields": {
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "quantity_consumed_per_year_start": [1],
+            "quantity_consumed_per_year_w": [1],
+            "is_water_used_start": [True, False],
+            "is_water_used_w": [True, False],
+        },
+        "config_name": "processing",
+    },
+    "Packaging": {
+        "fields": {
+            "packaging_material_type_start": models.PackagingMaterialType.objects.all(),
+            "packaging_material_type_w": models.PackagingMaterialType.objects.all(),
+            "kg_of_packaging_material_start": [1],
+            "kg_of_packaging_material_w": [1],
+            "is_electric_start": [True, False],
+            "is_electric_w": [True, False],
+        },
+        "config_name": "packaging",
+    },
+    "Transport": {
+        "fields": {
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "quantity_consumed_per_year_start": [1],
+            "quantity_consumed_per_year_w": [1],
+        },
+        "config_name": "transport",
+    },
+    # Parent modules with multiple submodule types — one MODULE_CONFIGS entry
+    # per submodule class. ChangeRecord.module_type stores the submodule
+    # class name (e.g. "IrrigationSystem"), and the corresponding processor
+    # wires up the parent (Irrigation/Settlement) at build-time so the
+    # submodule's calculator can resolve `self.module.parent.activity`.
+    "IrrigationSystem": {
+        "fields": {
+            "irrigation_system_type_start": models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationSystem").all(),
+            "irrigation_system_type_w": models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationSystem").all(),
+            "ha_start": [1],
+            "ha_w": [1],
+            "ef_t2_start": [0],
+            "ef_t2_w": [0],
+        },
+        "config_name": "irrigation_system",
+    },
+    "IrrigationPhase": {
+        "fields": {
+            "irrigation_system_type_start": models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all(),
+            "irrigation_system_type_w": models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all(),
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "ha_start": [1],
+            "ha_w": [1],
+            "gross_irrigation_water_start": [1],
+            "gross_irrigation_water_w": [1],
+        },
+        "config_name": "irrigation_phase",
+    },
+    "Settlement": {
+        "fields": {
+            "land_use_type_start": models.LandUseType.objects.filter(name_en="Settlement").all(),
+            "settlement_type_start": models.SettlementType.objects.all(),
+            "settlement_type_w": models.SettlementType.objects.all(),
+            "biomass_t2_start": [0],
+            "biomass_t2_w": [0],
+        },
+        "config_name": "settlement",
+    },
+    "Building": {
+        "fields": {
+            "building_type_start": models.BuildingType.objects.all(),
+            "building_type_w": models.BuildingType.objects.all(),
+            "area_m2_start": [1],
+            "area_m2_w": [1],
+            "ef_t2_start": [0],
+            "ef_t2_w": [0],
+        },
+        "config_name": "building",
+    },
+    "Road": {
+        "fields": {
+            "road_type_start": models.RoadType.objects.all(),
+            "road_type_w": models.RoadType.objects.all(),
+            "length_km_start": [1],
+            "length_km_w": [1],
+            "width_m_start": [1],
+            "width_m_w": [1],
+        },
+        "config_name": "road",
+    },
+    "OtherInfrastructure": {
+        "fields": {
+            "area_m2_start": [1],
+            "area_m2_w": [1],
+            "ef_t2_start": [0],
+            "ef_t2_w": [0],
+        },
+        "config_name": "other_infrastructure",
+    },
+    "LandUseChange": {
+        # LandUseChange wires three land-modules together (start / with /
+        # without). The permutation engine here only varies the module_type
+        # FK pair; per-side land-module attributes are picked by the
+        # processor to keep the search space tractable.
+        "fields": {
+            "module_type_start": models.ModuleType.objects.filter(is_luc=True).all(),
+            "module_type_w": models.ModuleType.objects.filter(is_luc=True).all(),
+            "is_fire_used_start": [True, False],
+            "is_fire_used_w": [True, False],
+        },
+        "config_name": "land_use_change",
+    },
     # "OtherLand": {
     #     # TODO: I don't think this makes much sense.
     #     "fields": {
@@ -1608,7 +2316,6 @@ MODULE_CONFIGS = {
     #         "is_set_aside_w": [True, False],
     #     },
     # },
-    # TODO: Missing all Value Chain modules.
 }
 
 
