@@ -399,15 +399,88 @@ class CompileScenariosViewTest(TestCase):
         """The scenario-level (global) region filter must list the distinct
         regions present in ChangeRecord. Regression: the dropdown used to
         render with no <option> elements because the view never passed
-        ``regions`` and the template had no loop."""
+        ``regions`` and the template had no loop. Region is the only global
+        filter, so each option appears exactly once."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="global_filter_region"')
-        # On a fresh GET the only place regions render is the global filter
-        # (change-level filters stay empty until a module type is chosen).
-        self.assertContains(response, '<option value="Central Asia">Central Asia</option>')
-        self.assertContains(response, '<option value="Eastern Europe">Eastern Europe</option>')
+        self.assertContains(response, '<option value="Central Asia">Central Asia</option>', count=1)
+        self.assertContains(response, '<option value="Eastern Europe">Eastern Europe</option>', count=1)
+
+    def test_compile_scenarios_global_filter_excludes_soil_type(self):
+        """soil_type used to be a global filter (with hardcoded selected
+        options); it now lives at the per-change level only."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'name="global_filter_soil_type"')
+
+    def test_compile_scenarios_per_change_climate_filter_populated(self):
+        """The per-change Climate dropdown must list distinct ChangeRecord
+        climates at initial render."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-0-filter-climate"')
+        self.assertContains(response, '<option value="Cool Temperate">Cool Temperate</option>', count=1)
+        self.assertContains(response, '<option value="Warm Temperate">Warm Temperate</option>', count=1)
+
+    def test_compile_scenarios_per_change_moisture_filter_populated(self):
+        """The per-change Moisture dropdown must list distinct ChangeRecord
+        moisture values at initial render."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-0-filter-moisture"')
+        self.assertContains(response, '<option value="Moist">Moist</option>', count=1)
+        self.assertContains(response, '<option value="Dry">Dry</option>', count=1)
+
+    def test_compile_scenarios_per_change_soil_type_filter_populated(self):
+        """The per-change Soil Type dropdown must list distinct ChangeRecord
+        soil_type values at initial render."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get("/api/admin-scripts/compile-scenarios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-0-filter-soil_type"')
+        self.assertContains(response, '<option value="High Activity Clay">High Activity Clay</option>', count=1)
+        self.assertContains(response, '<option value="Sandy">Sandy</option>', count=1)
+
+    def test_htmx_add_change_populates_filter_dropdowns(self):
+        """htmx_add_change must pass climate/moisture/soil_type choices so the
+        new change panel's filter dropdowns aren't blank when the user clicks
+        + Add Another Change. Region is global only and not in the panel."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-change/",
+            {"index": "1", "scenario_index": "0"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-0-change-1-filter-climate"')
+        self.assertContains(response, 'name="scenario-0-change-1-filter-moisture"')
+        self.assertContains(response, 'name="scenario-0-change-1-filter-soil_type"')
+        self.assertNotContains(response, 'name="scenario-0-change-1-filter-region"')
+        self.assertContains(response, '<option value="Cool Temperate">Cool Temperate</option>')
+        self.assertContains(response, '<option value="Moist">Moist</option>')
+        self.assertContains(response, '<option value="High Activity Clay">High Activity Clay</option>')
+
+    def test_htmx_add_scenario_populates_filter_dropdowns(self):
+        """htmx_add_scenario must pass climate/moisture/soil_type choices so
+        the new scenario's change panel filter dropdowns aren't blank when the
+        user clicks + Add Scenario."""
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/add-scenario/",
+            {"index": "1"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="scenario-1-change-0-filter-climate"')
+        self.assertContains(response, 'name="scenario-1-change-0-filter-moisture"')
+        self.assertContains(response, 'name="scenario-1-change-0-filter-soil_type"')
+        self.assertNotContains(response, 'name="scenario-1-change-0-filter-region"')
+        self.assertContains(response, '<option value="Cool Temperate">Cool Temperate</option>')
+        self.assertContains(response, '<option value="Moist">Moist</option>')
+        self.assertContains(response, '<option value="High Activity Clay">High Activity Clay</option>')
 
     def test_compile_scenarios_requires_staff(self):
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
@@ -446,7 +519,7 @@ class CompileScenariosViewTest(TestCase):
             "scenario-0-change-0-field": "grassland_management_type",
             "scenario-0-change-0-from_value": "Non-Degraded",
             "scenario-0-change-0-to_value": "Improved Grassland",
-            "global_filter_soil_type": ["Sandy"],
+            "global_filter_region": ["Central Asia"],
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Results")
@@ -519,6 +592,9 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "Select module type and field first")
 
     def test_htmx_filters(self):
+        """htmx_filters narrows the per-change filter dropdowns to the chosen
+        module_type. Returns climate/moisture/soil_type options scoped to the
+        module — region is global, not per-change, and must not appear."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get(
             "/api/admin-scripts/compile-scenarios/htmx/filters/",
@@ -529,9 +605,16 @@ class CompileScenariosViewTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Central Asia")
-        self.assertContains(response, "Eastern Europe")
+        self.assertContains(response, 'name="change-0-filter-climate"')
+        self.assertContains(response, 'name="change-0-filter-moisture"')
+        self.assertContains(response, 'name="change-0-filter-soil_type"')
         self.assertContains(response, "Cool Temperate")
+        self.assertContains(response, "Warm Temperate")
+        self.assertContains(response, "Moist")
+        self.assertContains(response, "Dry")
+        self.assertContains(response, "High Activity Clay")
+        self.assertContains(response, "Sandy")
+        self.assertNotContains(response, 'name="change-0-filter-region"')
 
     def test_htmx_add_change(self):
         self.client.login(email="staff@example.com", password="testpass123")
@@ -573,7 +656,9 @@ class CompileScenariosViewTest(TestCase):
         post["scenario-0-change-0-field"] = "grassland_management_type"
         post["scenario-0-change-0-from_value"] = "Non-Degraded"
         post["scenario-0-change-0-to_value"] = "Improved Grassland"
-        post.setlist("scenario-0-change-0-filter-region", ["Central Asia"])
+        post.setlist("scenario-0-change-0-filter-climate", ["Cool Temperate"])
+        post.setlist("scenario-0-change-0-filter-moisture", ["Moist"])
+        post.setlist("scenario-0-change-0-filter-soil_type", ["High Activity Clay"])
 
         changes = _parse_changes_from_post(post, prefix="scenario-0-")
         self.assertEqual(len(changes), 1)
@@ -581,7 +666,11 @@ class CompileScenariosViewTest(TestCase):
         self.assertEqual(changes[0]["start"]["field"], "grassland_management_type")
         self.assertEqual(changes[0]["start"]["value"], "Non-Degraded")
         self.assertEqual(changes[0]["end"]["value"], "Improved Grassland")
-        self.assertEqual(changes[0]["filters"]["region"], ["Central Asia"])
+        self.assertEqual(changes[0]["filters"]["climate"], ["Cool Temperate"])
+        self.assertEqual(changes[0]["filters"]["moisture"], ["Moist"])
+        self.assertEqual(changes[0]["filters"]["soil_type"], ["High Activity Clay"])
+        # Region is global only — never appears in change.filters now.
+        self.assertNotIn("region", changes[0]["filters"])
 
     def test_parse_scenarios_from_post(self):
         from admin_scripts.views import _parse_scenarios_from_post
@@ -824,8 +913,11 @@ class HtmxScenarioPrefixTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Central Asia")
-        self.assertContains(response, 'name="scenario-0-change-0-filter-region"')
+        self.assertContains(response, 'name="scenario-0-change-0-filter-climate"')
+        self.assertContains(response, 'name="scenario-0-change-0-filter-moisture"')
+        self.assertContains(response, 'name="scenario-0-change-0-filter-soil_type"')
+        self.assertContains(response, "Cool Temperate")
+        self.assertNotContains(response, 'name="scenario-0-change-0-filter-region"')
 
     def test_htmx_add_change_with_scenario_index(self):
         self.client.login(email="staff@example.com", password="testpass123")
@@ -848,7 +940,7 @@ class HtmxScenarioPrefixTest(TestCase):
                 "scenario-0-change-0-field": "grassland_management_type",
                 "scenario-0-change-0-from_value": "Non-Degraded",
                 "scenario-0-change-0-to_value": "Improved Grassland",
-                "global_filter_soil_type": ["High Activity Clay"],
+                "global_filter_region": ["Central Asia"],
                 "scenario_index": "0",
             },
         )

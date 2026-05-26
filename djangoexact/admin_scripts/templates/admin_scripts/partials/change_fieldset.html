@@ -108,22 +108,37 @@
 
         <details class="mt-3">
             <summary class="text-xs font-medium text-gray-500 cursor-pointer">Change-level Filters</summary>
-            <div id="{{ id_prefix }}-filters-container" class="mt-2 grid grid-cols-2 gap-3"
+            <div id="{{ id_prefix }}-filters-container" class="mt-2 grid grid-cols-3 gap-3"
                  hx-get="{% url 'admin_scripts:htmx-filters' %}"
                  hx-include="[name='{{ prefix }}module_type']"
                  hx-vals='{"index": "{{ index }}", "prefix": "{{ prefix }}"}'
                  hx-trigger="change from:[name='{{ prefix }}module_type']"
                  hx-swap="innerHTML">
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Region</label>
-                    <select name="{{ prefix }}filter-region" multiple
-                            class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                    <label class="block text-xs text-gray-400 mb-1">Climate</label>
+                    <select name="{{ prefix }}filter-climate" multiple
+                            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                        {% for c in climates %}
+                        <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">Climate</label>
-                    <select name="{{ prefix }}filter-climate" multiple
-                            class="w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                    <label class="block text-xs text-gray-400 mb-1">Moisture</label>
+                    <select name="{{ prefix }}filter-moisture" multiple
+                            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                        {% for m in moistures %}
+                        <option value="{{ m }}">{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Soil Type</label>
+                    <select name="{{ prefix }}filter-soil_type" multiple
+                            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+                        {% for s in soil_types %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
