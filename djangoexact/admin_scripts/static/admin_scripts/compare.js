@@ -267,6 +267,77 @@
         });
     }
 
+    function renderBoxPlot(indices) {
+        var mount = document.getElementById("cmp-box");
+        if (!mount) return;
+        destroyChart("box");
+        var renderable = indices.filter(function (idx) {
+            var s = window.scenarioResults[idx];
+            return s && s.result && s.result.statistics && s.result.statistics.count > 0
+                   && s.result.statistics.q1 !== null && s.result.statistics.q3 !== null;
+        });
+        if (renderable.length === 0) {
+            mount.classList.add("hidden");
+            return;
+        }
+        mount.classList.remove("hidden");
+        var canvas = mount.querySelector("canvas");
+        var labels = renderable.map(function (idx) {
+            return scenarioLabel(idx, window.scenarioResults[idx]);
+        });
+        var data = renderable.map(function (idx) {
+            var s = window.scenarioResults[idx].result.statistics;
+            return {
+                min: s.min,
+                q1: s.q1,
+                median: s.median,
+                q3: s.q3,
+                max: s.max,
+                items: [s.min, s.q1, s.median, s.q3, s.max],
+            };
+        });
+        var colors = renderable.map(function (idx) { return colorForScenario(idx) + "55"; });
+        var borderColors = renderable.map(function (idx) { return colorForScenario(idx); });
+
+        charts.box = new Chart(canvas, {
+            type: "boxplot",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Distribution",
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    outlierStyle: "none",
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                var d = ctx.raw || {};
+                                var s = window.scenarioResults[renderable[ctx.dataIndex]].result.statistics;
+                                return [
+                                    "min: " + Number(d.min).toFixed(4),
+                                    "Q1: " + Number(d.q1).toFixed(4),
+                                    "median: " + Number(d.median).toFixed(4),
+                                    "Q3: " + Number(d.q3).toFixed(4),
+                                    "max: " + Number(d.max).toFixed(4),
+                                    "outliers: " + ((s.outliers_low || 0) + (s.outliers_high || 0)),
+                                ];
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+
     function renderCompare() {
         var indices = Object.keys(window.scenarioResults).sort(function (a, b) {
             return Number(a) - Number(b);
@@ -277,7 +348,8 @@
 
         renderChips(indices);
         renderBarChart(indices);
-        // Box plot, composition, table will be added in later tasks.
+        renderBoxPlot(indices);
+        // Composition stack and table will be added in later tasks.
     }
 
     window.renderCompare = renderCompare;
