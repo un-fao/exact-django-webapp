@@ -1,0 +1,50 @@
+[
+  {
+    "model": "api.statustype",
+    "pk": 1,
+    "fields": {
+      "name": "EMPTY",
+      "name_en": "EMPTY",
+      "name_fr": "VIDE",
+      "name_es": "VACÍO",
+      "name_ru": "ПУСТОЙ",
+      "value": 0.0
+    }
+  },
+  {
+    "model": "api.statustype",
+    "pk": 4,
+    "fields": {
+      "name": "IN PROGRESS",
+      "name_en": "IN PROGRESS",
+      "name_fr": "EN COURS\n",
+      "name_es": "EN CURSO",
+      "name_ru": "В ПРОЦЕССЕ",
+      "value": 0.4
+    }
+  },
+  {
+    "model": "api.statustype",
+    "pk": 2,
+    "fields": {
+      "name": "READY",
+      "name_en": "READY",
+      "name_fr": "PRÊT",
+      "name_es": "LISTO",
+      "name_ru": "ГОТОВО",
+      "value": 1.0
+    }
+  },
+  {
+    "model": "api.statustype",
+    "pk": 3,
+    "fields": {
+      "name": "SUBMODULES_EMPTY",
+      "name_en": "SUBMODULES_EMPTY",
+      "name_fr": "SOUS-MODULES_VIDE\n",
+      "name_es": "SUBMÓDULOS_VACÍOS",
+      "name_ru": "ПОДМОДУЛИ_ПУСТЫЕ",
+      "value": 0.5
+    }
+  }
+]

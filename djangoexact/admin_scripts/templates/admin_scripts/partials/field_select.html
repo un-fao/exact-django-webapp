@@ -1,0 +1,19 @@
+{% if not has_module_type %}
+<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>
+<select disabled class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+    <option>Select module type first...</option>
+</select>
+{% else %}
+<label class="block text-xs font-medium text-gray-500 mb-1">Field</label>
+<select name="{{ prefix }}field" required
+        hx-get="{{ values_url }}"
+        hx-target="#{{ id_prefix }}-values-container"
+        hx-include="[name='{{ prefix }}module_type']"
+        hx-vals='{"index": "{{ index }}", "prefix": "{{ prefix }}"}'
+        hx-trigger="change"
+        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+    <option value="">Select field...</option>
+    {% for field_name in fields %}<option value="{{ field_name }}">{{ field_name }}</option>
+    {% endfor %}
+</select>
+{% endif %}

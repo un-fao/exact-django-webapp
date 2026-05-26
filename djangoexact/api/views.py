@@ -11,6 +11,7 @@ import numpy as np
 import traceback
 
 from django.contrib.auth.models import Group
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
@@ -340,6 +341,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         new_password = serializer.validated_data["password_new"]
 
+        validate_password(new_password, user=user)
         user.set_password(new_password)
         user.save()
 
@@ -476,12 +478,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             # Ensures the table is a valid identifier, reducing the risk of SQL injection
                             if not table_name.isidentifier():
                                 raise ValueError("Invalid table name")
-                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])
+                            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosec B608
                     table_name = m._meta.db_table
                     # Ensures the table is a valid identifier, reducing the risk of SQL injection
                     if not table_name.isidentifier():
                         raise ValueError("Invalid table name")
-                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])
+                    # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosec B608
 
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
@@ -1336,7 +1340,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             logger.exception(e)
-            return utils.ErrorResponse("An unexpected error occurred while generating the PDF", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return utils.ErrorResponse(
+                f"Error generating PDF ({type(e).__name__}): {e}",
+                status=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=False, methods=["get"])
     @swagger_auto_schema(
@@ -1669,7 +1676,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             invitation.sender = self.request.user
             invitation.save()
 
-        if not invitation.status.name == utils.InvitationStatus.PENDING.value:
+        if not invitation.status.name_en == utils.InvitationStatus.PENDING.value:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.pk}")
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
 
@@ -1728,7 +1735,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
         does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
-        if new_status.name == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
+        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
             ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()

@@ -1,0 +1,5551 @@
+[
+  {
+    "model": "api.landusetype",
+    "pk": 177,
+    "fields": {
+      "name": "Abaca, manila hemp, raw",
+      "name_en": "Abaca, manila hemp, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 71,
+    "fields": {
+      "name": "Agroforestry - Default",
+      "name_en": "Agroforestry - Default",
+      "name_fr": "Agroforesterie - défaut\n",
+      "name_es": "Agroforestería - Por defecto",
+      "name_ru": "Агролесомелиорация - по умолчанию",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 46,
+    "fields": {
+      "name": "Alfalfa",
+      "name_en": "Alfalfa",
+      "name_fr": "Luzerne",
+      "name_es": "Alfalfa",
+      "name_ru": "Люцерна",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 7,
+    "fields": {
+      "name": "Alley Cropping",
+      "name_en": "Alley Cropping",
+      "name_fr": "Cultures en allées\n",
+      "name_es": "Cultivos en Fajas",
+      "name_ru": "Междурядные Культуры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 178,
+    "fields": {
+      "name": "Almonds, in shell",
+      "name_en": "Almonds, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 179,
+    "fields": {
+      "name": "Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw",
+      "name_en": "Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 1,
+    "fields": {
+      "name": "Annual Cropland",
+      "name_en": "Annual Cropland",
+      "name_fr": "Cultures annuelles",
+      "name_es": "Cultivos Anuales",
+      "name_ru": "Однолетние культуры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 2,
+    "fields": {
+      "name": "Annual Fallow",
+      "name_en": "Annual Fallow",
+      "name_fr": "Jachère annuelle\n",
+      "name_es": "Barbecho Anual",
+      "name_ru": "Однолетний пар",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 180,
+    "fields": {
+      "name": "Apples",
+      "name_en": "Apples",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 181,
+    "fields": {
+      "name": "Apricots",
+      "name_en": "Apricots",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 182,
+    "fields": {
+      "name": "Areca nuts",
+      "name_en": "Areca nuts",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 183,
+    "fields": {
+      "name": "Artichokes",
+      "name_en": "Artichokes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 184,
+    "fields": {
+      "name": "Asparagus",
+      "name_en": "Asparagus",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 185,
+    "fields": {
+      "name": "Avocados",
+      "name_en": "Avocados",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 186,
+    "fields": {
+      "name": "Bambara beans, dry",
+      "name_en": "Bambara beans, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 187,
+    "fields": {
+      "name": "Bananas",
+      "name_en": "Bananas",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 37,
+    "fields": {
+      "name": "Barley",
+      "name_en": "Barley",
+      "name_fr": "Orge",
+      "name_es": "Cebada",
+      "name_ru": "Ячмень",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 30,
+    "fields": {
+      "name": "Beans & Pulses",
+      "name_en": "Beans & Pulses",
+      "name_fr": "Haricots et légumineuses\n",
+      "name_es": "Frijoles y legumbres",
+      "name_ru": "Бобовые, зернобобовые культуры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 188,
+    "fields": {
+      "name": "Beans, dry",
+      "name_en": "Beans, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 189,
+    "fields": {
+      "name": "Blueberries",
+      "name_en": "Blueberries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 190,
+    "fields": {
+      "name": "Brazil nuts, in shell",
+      "name_en": "Brazil nuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 191,
+    "fields": {
+      "name": "Buckwheat",
+      "name_en": "Buckwheat",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 192,
+    "fields": {
+      "name": "Cabbages",
+      "name_en": "Cabbages",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 193,
+    "fields": {
+      "name": "Canary seed",
+      "name_en": "Canary seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 194,
+    "fields": {
+      "name": "Cantaloupes and other melons",
+      "name_en": "Cantaloupes and other melons",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 195,
+    "fields": {
+      "name": "Carrots and turnips",
+      "name_en": "Carrots and turnips",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 196,
+    "fields": {
+      "name": "Cashew nuts, in shell",
+      "name_en": "Cashew nuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 197,
+    "fields": {
+      "name": "Cassava, fresh",
+      "name_en": "Cassava, fresh",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 198,
+    "fields": {
+      "name": "Castor oil seeds",
+      "name_en": "Castor oil seeds",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 199,
+    "fields": {
+      "name": "Cauliflowers and broccoli",
+      "name_en": "Cauliflowers and broccoli",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 200,
+    "fields": {
+      "name": "Cereals n.e.c.",
+      "name_en": "Cereals n.e.c.",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 305,
+    "fields": {
+      "name": "Cereals, primary + (Total)",
+      "name_en": "Cereals, primary + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 201,
+    "fields": {
+      "name": "Cherries",
+      "name_en": "Cherries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 202,
+    "fields": {
+      "name": "Chestnuts, in shell",
+      "name_en": "Chestnuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 203,
+    "fields": {
+      "name": "Chick peas, dry",
+      "name_en": "Chick peas, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 204,
+    "fields": {
+      "name": "Chicory roots",
+      "name_en": "Chicory roots",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 205,
+    "fields": {
+      "name": "Chillies and peppers, green (Capsicum spp. and Pimenta spp.)",
+      "name_en": "Chillies and peppers, green (Capsicum spp. and Pimenta spp.)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 306,
+    "fields": {
+      "name": "Citrus Fruit, Total + (Total)",
+      "name_en": "Citrus Fruit, Total + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 206,
+    "fields": {
+      "name": "Cocoa beans",
+      "name_en": "Cocoa beans",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 207,
+    "fields": {
+      "name": "Coconuts, in shell",
+      "name_en": "Coconuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 208,
+    "fields": {
+      "name": "Coffee, green",
+      "name_en": "Coffee, green",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 209,
+    "fields": {
+      "name": "Coir, raw",
+      "name_en": "Coir, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 168,
+    "fields": {
+      "name": "Coniferous Forest",
+      "name_en": "Coniferous Forest",
+      "name_fr": "Forêt sempervirente boréale (Forêt de conifères)",
+      "name_es": "Bosque coníferas",
+      "name_ru": "Хвойный лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 164,
+    "fields": {
+      "name": "Continental Forest",
+      "name_en": "Continental Forest",
+      "name_fr": "Forêt continentale tempérée",
+      "name_es": "Bosque continental",
+      "name_ru": "Континентальный лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        1
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 210,
+    "fields": {
+      "name": "Cotton lint, ginned",
+      "name_en": "Cotton lint, ginned",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 211,
+    "fields": {
+      "name": "Cotton seed",
+      "name_en": "Cotton seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 212,
+    "fields": {
+      "name": "Cow peas, dry",
+      "name_en": "Cow peas, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 213,
+    "fields": {
+      "name": "Cranberries",
+      "name_en": "Cranberries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 214,
+    "fields": {
+      "name": "Cucumbers and gherkins",
+      "name_en": "Cucumbers and gherkins",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 215,
+    "fields": {
+      "name": "Currants",
+      "name_en": "Currants",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 216,
+    "fields": {
+      "name": "Dates",
+      "name_en": "Dates",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 66,
+    "fields": {
+      "name": "Default",
+      "name_en": "Default",
+      "name_fr": "Défaut",
+      "name_es": "Por defecto",
+      "name_ru": "По умолчанию",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 166,
+    "fields": {
+      "name": "Desert",
+      "name_en": "Desert",
+      "name_fr": "Désert",
+      "name_es": "Desierto",
+      "name_ru": "Пустыня",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        1
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 43,
+    "fields": {
+      "name": "Dry Bean",
+      "name_en": "Dry Bean",
+      "name_fr": "Haricot sec\n",
+      "name_es": "Frijoles",
+      "name_ru": "Сухие бобы",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 172,
+    "fields": {
+      "name": "Dry Forest",
+      "name_en": "Dry Forest",
+      "name_fr": "Forêt sèche tropicale\n",
+      "name_es": "Bosque Seco",
+      "name_ru": "Сухой лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        2,
+        3
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 217,
+    "fields": {
+      "name": "Eggplants (aubergines)",
+      "name_en": "Eggplants (aubergines)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 218,
+    "fields": {
+      "name": "Figs",
+      "name_en": "Figs",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 219,
+    "fields": {
+      "name": "Flax, raw or retted",
+      "name_en": "Flax, raw or retted",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 3,
+    "fields": {
+      "name": "Flooded Rice",
+      "name_en": "Flooded Rice",
+      "name_fr": "Riz inondé\n",
+      "name_es": "Arroz Inundado",
+      "name_ru": "Затопленный рис",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        6,
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 220,
+    "fields": {
+      "name": "Fonio",
+      "name_en": "Fonio",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 307,
+    "fields": {
+      "name": "Fruit Primary + (Total)",
+      "name_en": "Fruit Primary + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 221,
+    "fields": {
+      "name": "Ginger, raw",
+      "name_en": "Ginger, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 222,
+    "fields": {
+      "name": "Gooseberries",
+      "name_en": "Gooseberries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 24,
+    "fields": {
+      "name": "Grains",
+      "name_en": "Grains",
+      "name_fr": "Grains",
+      "name_es": "Granos",
+      "name_ru": "Зерна",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 223,
+    "fields": {
+      "name": "Grapes",
+      "name_en": "Grapes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 49,
+    "fields": {
+      "name": "Grass-Clover Mixtures",
+      "name_en": "Grass-Clover Mixtures",
+      "name_fr": "Mélanges herbe-trèfle\n",
+      "name_es": "Mezcla de Trébol-Pasto",
+      "name_ru": "Смеси травы и клевера",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 4,
+    "fields": {
+      "name": "Grassland",
+      "name_en": "Grassland",
+      "name_fr": "Prairies",
+      "name_es": "Pastizales",
+      "name_ru": "Пастбища",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 224,
+    "fields": {
+      "name": "Green garlic",
+      "name_en": "Green garlic",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 77,
+    "fields": {
+      "name": "Groundnuts",
+      "name_en": "Groundnuts",
+      "name_fr": "Arachides",
+      "name_es": "Maní/cacahuete",
+      "name_ru": "Арахис",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 225,
+    "fields": {
+      "name": "Groundnuts, excluding shelled",
+      "name_en": "Groundnuts, excluding shelled",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 226,
+    "fields": {
+      "name": "Hazelnuts, in shell",
+      "name_en": "Hazelnuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 9,
+    "fields": {
+      "name": "Hedgerow",
+      "name_en": "Hedgerow",
+      "name_fr": "Haie",
+      "name_es": "Cultivos en setos , Cercas vivas",
+      "name_ru": "Живая изгородь",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 227,
+    "fields": {
+      "name": "Hempseed",
+      "name_en": "Hempseed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 174,
+    "fields": {
+      "name": "Humid Forest",
+      "name_en": "Humid Forest",
+      "name_fr": "Forêt humide subtropicale\n",
+      "name_es": "Bosque húmedo",
+      "name_ru": "Влажный лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        2
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 228,
+    "fields": {
+      "name": "Jojoba seeds",
+      "name_en": "Jojoba seeds",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 229,
+    "fields": {
+      "name": "Jute, raw or retted",
+      "name_en": "Jute, raw or retted",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 230,
+    "fields": {
+      "name": "Kapok fruit",
+      "name_en": "Kapok fruit",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 231,
+    "fields": {
+      "name": "Karite nuts (sheanuts)",
+      "name_en": "Karite nuts (sheanuts)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 232,
+    "fields": {
+      "name": "Kiwi fruit",
+      "name_en": "Kiwi fruit",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 233,
+    "fields": {
+      "name": "Kola nuts",
+      "name_en": "Kola nuts",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 234,
+    "fields": {
+      "name": "Leeks and other alliaceous vegetables",
+      "name_en": "Leeks and other alliaceous vegetables",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 235,
+    "fields": {
+      "name": "Lemons and limes",
+      "name_en": "Lemons and limes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 236,
+    "fields": {
+      "name": "Lentils, dry",
+      "name_en": "Lentils, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 237,
+    "fields": {
+      "name": "Lettuce and chicory",
+      "name_en": "Lettuce and chicory",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 238,
+    "fields": {
+      "name": "Linseed",
+      "name_en": "Linseed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 239,
+    "fields": {
+      "name": "Locust beans (carobs)",
+      "name_en": "Locust beans (carobs)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 51,
+    "fields": {
+      "name": "Long-Term Cultivated",
+      "name_en": "Long-Term Cultivated",
+      "name_fr": "Cultivé à long terme\n",
+      "name_es": "Cultivado a largo plazo",
+      "name_ru": "Долговременно культивируемый",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 73,
+    "fields": {
+      "name": "﻿Long-Term Cultivated",
+      "name_en": "﻿Long-Term Cultivated",
+      "name_fr": "Cultivé à long terme\n",
+      "name_es": "Cultivado a largo plazo",
+      "name_ru": "Долговременно культивируемый",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 240,
+    "fields": {
+      "name": "Lupins",
+      "name_en": "Lupins",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 25,
+    "fields": {
+      "name": "Maize",
+      "name_en": "Maize",
+      "name_fr": "Maïs",
+      "name_es": "Maíz",
+      "name_ru": "Кукуруза",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 241,
+    "fields": {
+      "name": "Maize (corn)",
+      "name_en": "Maize (corn)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 242,
+    "fields": {
+      "name": "Mangoes, guavas and mangosteens",
+      "name_en": "Mangoes, guavas and mangosteens",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 155,
+    "fields": {
+      "name": "Mangrove",
+      "name_en": "Mangrove",
+      "name_fr": "Mangrove",
+      "name_es": "Mangle",
+      "name_ru": "Мангровое дерево/Мангры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        39
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 120,
+    "fields": {
+      "name": "Mangrove Forest",
+      "name_en": "Mangrove Forest",
+      "name_fr": "Forêt de mangrove\n",
+      "name_es": "Manglar",
+      "name_ru": "Мангровый лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 243,
+    "fields": {
+      "name": "Melonseed",
+      "name_en": "Melonseed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 39,
+    "fields": {
+      "name": "Millet",
+      "name_en": "Millet",
+      "name_fr": "Millet",
+      "name_es": "Mijo",
+      "name_ru": "пшено",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 244,
+    "fields": {
+      "name": "Mixed grain",
+      "name_en": "Mixed grain",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 171,
+    "fields": {
+      "name": "Moist Deciduous Forest",
+      "name_en": "Moist Deciduous Forest",
+      "name_fr": "Forêt décidue tropicale humide\n",
+      "name_es": "Bosque húmedo de hojas caducas",
+      "name_ru": "Лиственный лес, увлажненный",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        3
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 163,
+    "fields": {
+      "name": "Mountain System",
+      "name_en": "Mountain System",
+      "name_fr": "Système montagneux\n",
+      "name_es": "Sistemas montañosos",
+      "name_ru": "Горная система",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        1,
+        2,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 10,
+    "fields": {
+      "name": "Multistrata",
+      "name_en": "Multistrata",
+      "name_fr": "Multi-strates\n",
+      "name_es": "Sistemas de cultivos a diversos niveles",
+      "name_ru": "Многоярусный",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 245,
+    "fields": {
+      "name": "Mushrooms and truffles",
+      "name_en": "Mushrooms and truffles",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 246,
+    "fields": {
+      "name": "Mustard seed",
+      "name_en": "Mustard seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 33,
+    "fields": {
+      "name": "N-Fixing Forages",
+      "name_en": "N-Fixing Forages",
+      "name_fr": "Fourrages fixateurs d’azote\n",
+      "name_es": "Forrajes fijadores de N",
+      "name_ru": "N-фиксирующие корма",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 47,
+    "fields": {
+      "name": "Non-Legume Hay",
+      "name_en": "Non-Legume Hay",
+      "name_fr": "Foin sans légumineuses\n",
+      "name_es": "Heno no leguminoso",
+      "name_ru": "Небобовое сено",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 34,
+    "fields": {
+      "name": "Non-N-Fixing Forages",
+      "name_en": "Non-N-Fixing Forages",
+      "name_fr": "Fourrages non fixateurs d’azote\n",
+      "name_es": "Forrajes no fijadores de N",
+      "name_ru": "Не N-фиксирующие корма",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 247,
+    "fields": {
+      "name": "Nutmeg, mace, cardamoms, raw",
+      "name_en": "Nutmeg, mace, cardamoms, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 38,
+    "fields": {
+      "name": "Oats",
+      "name_en": "Oats",
+      "name_fr": "Avoine",
+      "name_es": "Avena",
+      "name_ru": "Овес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 165,
+    "fields": {
+      "name": "Oceanic Forest",
+      "name_en": "Oceanic Forest",
+      "name_fr": "Forêt océanique tempérée\n",
+      "name_es": "Bosque oceánico",
+      "name_ru": "Океанический/прибрежный лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        1
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 21,
+    "fields": {
+      "name": "Oil Palm",
+      "name_en": "Oil Palm",
+      "name_fr": "Palmier à huile\n",
+      "name_es": "Palma Aceitera",
+      "name_ru": "Масличная Пальма",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 248,
+    "fields": {
+      "name": "Oil palm fruit",
+      "name_en": "Oil palm fruit",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 65,
+    "fields": {
+      "name": "Oilseeds",
+      "name_en": "Oilseeds",
+      "name_fr": "Oléagineux",
+      "name_es": "Semillas oleaginosas",
+      "name_ru": "Масличные культуры",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 249,
+    "fields": {
+      "name": "Okra",
+      "name_en": "Okra",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 16,
+    "fields": {
+      "name": "Olive",
+      "name_en": "Olive",
+      "name_fr": "Olivier",
+      "name_es": "Olivo",
+      "name_ru": "Олива",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 250,
+    "fields": {
+      "name": "Olives",
+      "name_en": "Olives",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 251,
+    "fields": {
+      "name": "Onions and shallots, green",
+      "name_en": "Onions and shallots, green",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 252,
+    "fields": {
+      "name": "Oranges",
+      "name_en": "Oranges",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 17,
+    "fields": {
+      "name": "Orchard",
+      "name_en": "Orchard",
+      "name_fr": "Verger",
+      "name_es": "Huerta",
+      "name_ru": "Фруктовый сад",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 175,
+    "fields": {
+      "name": "Organic Soil",
+      "name_en": "Organic Soil",
+      "name_fr": "Sol organique\n",
+      "name_es": "Suelo Orgánico",
+      "name_ru": "Органическая почва",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        38
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 253,
+    "fields": {
+      "name": "Other beans, green",
+      "name_en": "Other beans, green",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 254,
+    "fields": {
+      "name": "Other berries and fruits of the genus vaccinium n.e.c.",
+      "name_en": "Other berries and fruits of the genus vaccinium n.e.c.",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 15,
+    "fields": {
+      "name": "Other Land",
+      "name_en": "Other Land",
+      "name_fr": "Autres terres\n",
+      "name_es": "Otras tierras",
+      "name_ru": "Прочее землепользования",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 5,
+    "fields": {
+      "name": "Other Land (Non-Vegetated)",
+      "name_en": "Other Land (Non-Vegetated)",
+      "name_fr": "Autres terres (non végétalisées)\n",
+      "name_es": "Otras Tierras (Sin Vegetación)",
+      "name_ru": "Прочее землепользования (не покрытая растительностью)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 255,
+    "fields": {
+      "name": "Palm kernels",
+      "name_en": "Palm kernels",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 256,
+    "fields": {
+      "name": "Papayas",
+      "name_en": "Papayas",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 11,
+    "fields": {
+      "name": "Parkland",
+      "name_en": "Parkland",
+      "name_fr": "Parc arboré\n",
+      "name_es": "Parques Agroforestales",
+      "name_ru": "Парковая зона",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 257,
+    "fields": {
+      "name": "Peaches and nectarines",
+      "name_en": "Peaches and nectarines",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 45,
+    "fields": {
+      "name": "Peanuts",
+      "name_en": "Peanuts",
+      "name_fr": "Cacahuètes",
+      "name_es": "Maní/cacahuete",
+      "name_ru": "Арахис",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 258,
+    "fields": {
+      "name": "Pears",
+      "name_en": "Pears",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 259,
+    "fields": {
+      "name": "Peas, green",
+      "name_en": "Peas, green",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 260,
+    "fields": {
+      "name": "Pepper (Piper spp.), raw",
+      "name_en": "Pepper (Piper spp.), raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 261,
+    "fields": {
+      "name": "Peppermint, spearmint",
+      "name_en": "Peppermint, spearmint",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 162,
+    "fields": {
+      "name": "Perennial Cropland",
+      "name_en": "Perennial Cropland",
+      "name_fr": "Cultures pérennes\n",
+      "name_es": "Cultivos perennes",
+      "name_ru": "Многолетние культуры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        40
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 8,
+    "fields": {
+      "name": "Perennial Fallow",
+      "name_en": "Perennial Fallow",
+      "name_fr": "Jachère pérenne\n",
+      "name_es": "Barbecho Mejorado",
+      "name_ru": "Многолетний Пар",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 48,
+    "fields": {
+      "name": "Perennial Grasses",
+      "name_en": "Perennial Grasses",
+      "name_fr": "Graminées pérennes\n",
+      "name_es": "Hierbas perennes",
+      "name_ru": "Многолетние травы",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 52,
+    "fields": {
+      "name": "Perennial/Tree Crop",
+      "name_en": "Perennial/Tree Crop",
+      "name_fr": "Culture pérenne/d'arbres\n",
+      "name_es": "Cultivo perenne/arbóreo",
+      "name_ru": "Многолетние/деревья-урожай",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 262,
+    "fields": {
+      "name": "Persimmons",
+      "name_en": "Persimmons",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 263,
+    "fields": {
+      "name": "Pigeon peas, dry",
+      "name_en": "Pigeon peas, dry",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 264,
+    "fields": {
+      "name": "Pineapples",
+      "name_en": "Pineapples",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 265,
+    "fields": {
+      "name": "Pistachios, in shell",
+      "name_en": "Pistachios, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 266,
+    "fields": {
+      "name": "Plantains and cooking bananas",
+      "name_en": "Plantains and cooking bananas",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 267,
+    "fields": {
+      "name": "Plums and sloes",
+      "name_en": "Plums and sloes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 268,
+    "fields": {
+      "name": "Pomelos and grapefruits",
+      "name_en": "Pomelos and grapefruits",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 269,
+    "fields": {
+      "name": "Poppy seed",
+      "name_en": "Poppy seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 44,
+    "fields": {
+      "name": "Potatoes",
+      "name_en": "Potatoes",
+      "name_fr": "Pommes de terre\n",
+      "name_es": "Patatas",
+      "name_ru": "Картофель",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 308,
+    "fields": {
+      "name": "Pulses, Total + (Total)",
+      "name_en": "Pulses, Total + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 270,
+    "fields": {
+      "name": "Pumpkins, squash and gourds",
+      "name_en": "Pumpkins, squash and gourds",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 271,
+    "fields": {
+      "name": "Quinces",
+      "name_en": "Quinces",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 272,
+    "fields": {
+      "name": "Quinoa",
+      "name_en": "Quinoa",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 82,
+    "fields": {
+      "name": "Rainforest",
+      "name_en": "Rainforest",
+      "name_fr": "Forêt dense tropicale\n",
+      "name_es": "Bosque lluvioso",
+      "name_ru": "Дождевой лес",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        3
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 273,
+    "fields": {
+      "name": "Rape or colza seed",
+      "name_en": "Rape or colza seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 274,
+    "fields": {
+      "name": "Rapeseed or canola oil, crude",
+      "name_en": "Rapeseed or canola oil, crude",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 275,
+    "fields": {
+      "name": "Raspberries",
+      "name_en": "Raspberries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 26,
+    "fields": {
+      "name": "Rice",
+      "name_en": "Rice",
+      "name_fr": "Riz",
+      "name_es": "Arroz",
+      "name_ru": "рис",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 32,
+    "fields": {
+      "name": "Root Crops",
+      "name_en": "Root Crops",
+      "name_fr": "Cultures-racines\n",
+      "name_es": "Cultivos de Raíz alimenticia",
+      "name_ru": "Корнеплоды",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 309,
+    "fields": {
+      "name": "Roots and Tubers, Total + (Total)",
+      "name_en": "Roots and Tubers, Total + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 22,
+    "fields": {
+      "name": "Rubber",
+      "name_en": "Rubber",
+      "name_fr": "Caoutchouc",
+      "name_es": "Caucho",
+      "name_ru": "Резина",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 41,
+    "fields": {
+      "name": "Rye",
+      "name_en": "Rye",
+      "name_fr": "Seigle",
+      "name_es": "Centeno",
+      "name_ru": "Рожь",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 276,
+    "fields": {
+      "name": "Safflower seed",
+      "name_en": "Safflower seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 157,
+    "fields": {
+      "name": "Seagrass",
+      "name_en": "Seagrass",
+      "name_fr": "Herbiers marins\n",
+      "name_es": "Pradera Marina",
+      "name_ru": "Морская трава",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        39
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 277,
+    "fields": {
+      "name": "Sesame seed",
+      "name_en": "Sesame seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 161,
+    "fields": {
+      "name": "Set Aside",
+      "name_en": "Set Aside",
+      "name_fr": "Jachère annuelle",
+      "name_es": "De reserva",
+      "name_ru": "Отложенный",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        33
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 53,
+    "fields": {
+      "name": "Set Aside (< 20 Yrs)",
+      "name_en": "Set Aside (< 20 Yrs)",
+      "name_fr": "Jachère annuelle (< 20 ans)",
+      "name_es": "De reserva (< 20 Yrs)",
+      "name_ru": "Отложенный (< 20 лет)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 176,
+    "fields": {
+      "name": "Settlement",
+      "name_en": "Settlement",
+      "name_fr": "Établissement",
+      "name_es": "Asentamiento",
+      "name_ru": "Поселение",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        23
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 12,
+    "fields": {
+      "name": "Shaded Perennial",
+      "name_en": "Shaded Perennial",
+      "name_fr": "Pérenne ombragé\n",
+      "name_es": "Cultivos perennes bajo sombra",
+      "name_ru": "Тенистое многолетнее растение",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        3,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 18,
+    "fields": {
+      "name": "Short Rotation Coppice",
+      "name_en": "Short Rotation Coppice",
+      "name_fr": "Taillis à courte rotation\n",
+      "name_es": "Monte bajo de ciclo corto",
+      "name_ru": "Краткосроковый пни",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 173,
+    "fields": {
+      "name": "Shrubland",
+      "name_en": "Shrubland",
+      "name_fr": "Maquis",
+      "name_es": "Arbustos",
+      "name_ru": "Кустарники",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        3
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 13,
+    "fields": {
+      "name": "Silvoarable",
+      "name_en": "Silvoarable",
+      "name_fr": "Système  sylvoarable",
+      "name_es": "Silvoarable",
+      "name_ru": "Лесоводство с сельским хозяйством",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 14,
+    "fields": {
+      "name": "Silvopasture",
+      "name_en": "Silvopasture",
+      "name_fr": "Système sylvopastoral",
+      "name_es": "Silvopastoril",
+      "name_ru": " Лесопастбище",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 40,
+    "fields": {
+      "name": "Sorghum",
+      "name_en": "Sorghum",
+      "name_fr": "Sorgho",
+      "name_es": "Sorgo",
+      "name_ru": "Сорго",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 278,
+    "fields": {
+      "name": "Sour cherries",
+      "name_en": "Sour cherries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 279,
+    "fields": {
+      "name": "Soya bean oil",
+      "name_en": "Soya bean oil",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 280,
+    "fields": {
+      "name": "Soya beans",
+      "name_en": "Soya beans",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 42,
+    "fields": {
+      "name": "Soybeans",
+      "name_en": "Soybeans",
+      "name_fr": "Soja",
+      "name_es": "Soja",
+      "name_ru": "Соя",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 281,
+    "fields": {
+      "name": "Spinach",
+      "name_en": "Spinach",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 36,
+    "fields": {
+      "name": "Spring Wheat",
+      "name_en": "Spring Wheat",
+      "name_fr": "Blé de printemps\n",
+      "name_es": "Trigo de primavera",
+      "name_ru": "Яровая пшеница",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 167,
+    "fields": {
+      "name": "Steppe",
+      "name_en": "Steppe",
+      "name_fr": "Steppe",
+      "name_es": "Estepa",
+      "name_ru": "Степь",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        1,
+        2
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 282,
+    "fields": {
+      "name": "Strawberries",
+      "name_en": "Strawberries",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 283,
+    "fields": {
+      "name": "String beans",
+      "name_en": "String beans",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 284,
+    "fields": {
+      "name": "Sugar beet",
+      "name_en": "Sugar beet",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 285,
+    "fields": {
+      "name": "Sugar cane",
+      "name_en": "Sugar cane",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 310,
+    "fields": {
+      "name": "Sugar Crops Primary + (Total)",
+      "name_en": "Sugar Crops Primary + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 27,
+    "fields": {
+      "name": "Sugarcane",
+      "name_en": "Sugarcane",
+      "name_fr": "Canne à sucre\n",
+      "name_es": "Caña de azúcar",
+      "name_ru": "Сахарный тростник",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 286,
+    "fields": {
+      "name": "Sunflower seed",
+      "name_en": "Sunflower seed",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 287,
+    "fields": {
+      "name": "Sunflower-seed oil, crude",
+      "name_en": "Sunflower-seed oil, crude",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 288,
+    "fields": {
+      "name": "Sweet potatoes",
+      "name_en": "Sweet potatoes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 289,
+    "fields": {
+      "name": "Tallow",
+      "name_en": "Tallow",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 290,
+    "fields": {
+      "name": "Tallowtree seeds",
+      "name_en": "Tallowtree seeds",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 291,
+    "fields": {
+      "name": "Tangerines, mandarins, clementines",
+      "name_en": "Tangerines, mandarins, clementines",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 292,
+    "fields": {
+      "name": "Taro",
+      "name_en": "Taro",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 19,
+    "fields": {
+      "name": "Tea",
+      "name_en": "Tea",
+      "name_fr": "Thé",
+      "name_es": "Té",
+      "name_ru": "Чай",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 293,
+    "fields": {
+      "name": "Tea leaves",
+      "name_en": "Tea leaves",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 156,
+    "fields": {
+      "name": "Tidal Marsh",
+      "name_en": "Tidal Marsh",
+      "name_fr": "Marais de marée\n",
+      "name_es": "Marisma",
+      "name_ru": "Прибрежные болота",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        39
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 159,
+    "fields": {
+      "name": "Tidal Marsh Mediterranean",
+      "name_en": "Tidal Marsh Mediterranean",
+      "name_fr": "Marais de marée méditerranéen\n",
+      "name_es": "Marisma mediterránea",
+      "name_ru": "Прибрежные болота Средиземноморья",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 294,
+    "fields": {
+      "name": "Tomatoes",
+      "name_en": "Tomatoes",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 295,
+    "fields": {
+      "name": "Triticale",
+      "name_en": "Triticale",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 31,
+    "fields": {
+      "name": "Tubers",
+      "name_en": "Tubers",
+      "name_fr": "Tubercules",
+      "name_es": "Tubérculos",
+      "name_ru": "Клубни",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 169,
+    "fields": {
+      "name": "Tundra Woodland",
+      "name_en": "Tundra Woodland",
+      "name_fr": "Forêt-toundra boréale\n",
+      "name_es": "Bosque de tundra",
+      "name_ru": "Лесная тундра",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        24
+      ],
+      "climates": [
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 296,
+    "fields": {
+      "name": "Tung nuts",
+      "name_en": "Tung nuts",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 297,
+    "fields": {
+      "name": "Unmanufactured tobacco",
+      "name_en": "Unmanufactured tobacco",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 298,
+    "fields": {
+      "name": "Vanilla, raw",
+      "name_en": "Vanilla, raw",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 64,
+    "fields": {
+      "name": "Vegetables",
+      "name_en": "Vegetables",
+      "name_fr": "Légumes",
+      "name_es": "Verduras",
+      "name_ru": "Овощи",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 311,
+    "fields": {
+      "name": "Vegetables Primary + (Total)",
+      "name_en": "Vegetables Primary + (Total)",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 299,
+    "fields": {
+      "name": "Vetches",
+      "name_en": "Vetches",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 20,
+    "fields": {
+      "name": "Vine",
+      "name_en": "Vine",
+      "name_fr": "Vigne",
+      "name_es": "Vid",
+      "name_ru": "Лоза",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        5
+      ],
+      "climates": [
+        1,
+        2,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 300,
+    "fields": {
+      "name": "Walnuts, in shell",
+      "name_en": "Walnuts, in shell",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 301,
+    "fields": {
+      "name": "Watermelons",
+      "name_en": "Watermelons",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 28,
+    "fields": {
+      "name": "Wheat",
+      "name_en": "Wheat",
+      "name_fr": "Blé",
+      "name_es": "Trigo",
+      "name_ru": "Пшеница",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 302,
+    "fields": {
+      "name": "Wine",
+      "name_en": "Wine",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 35,
+    "fields": {
+      "name": "Winter Wheat",
+      "name_en": "Winter Wheat",
+      "name_fr": "Blé d'hiver\n",
+      "name_es": "Trigo de Invierno",
+      "name_ru": "Озимая пшеница ",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 303,
+    "fields": {
+      "name": "Yams",
+      "name_en": "Yams",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 304,
+    "fields": {
+      "name": "Yautia",
+      "name_en": "Yautia",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  }
+]

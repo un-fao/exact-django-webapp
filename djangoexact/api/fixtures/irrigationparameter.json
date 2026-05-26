@@ -1,0 +1,38 @@
+[
+  {
+    "model": "api.irrigationparameter",
+    "pk": 1,
+    "fields": {
+      "name": "CONVERSION_BAR_METER_HEAD",
+      "value": 10.19,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.irrigationparameter",
+    "pk": 2,
+    "fields": {
+      "name": "ERH_ELECTRICITY",
+      "value": 2.725e-06,
+      "unit": "MWh"
+    }
+  },
+  {
+    "model": "api.irrigationparameter",
+    "pk": 4,
+    "fields": {
+      "name": "PUMPING_EFFICIENCY",
+      "value": 0.45,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.irrigationparameter",
+    "pk": 3,
+    "fields": {
+      "name": "TRANSPORTATION_LOSS",
+      "value": 0.1,
+      "unit": null
+    }
+  }
+]

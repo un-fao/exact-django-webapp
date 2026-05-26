@@ -15,6 +15,19 @@ venv/
 .vscode
 env/
 
+# Service account keys, private keys, and other credentials — never commit
+*service-account*.json
+*service_account*.json
+*-credentials.json
+*.pem
+*.key
+!package.json
+!package-lock.json
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
 # Node artifact files
 node_modules/
 dist/
@@ -78,9 +91,12 @@ djangoexact/scripts/lsipt_participants.py
 
 
 **/fixtures/
+!djangoexact/api/fixtures/
+!djangoexact/api/fixtures/**
+!djangoexact/ipcc/fixtures/
+!djangoexact/ipcc/fixtures/**
 **/starting_fixtures/
 load_starting_fixtures.py
-djangoexact/api/fixtures/
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json
@@ -155,3 +171,20 @@ CLAUDE.md
 faostat_crops.csv
 yield_items.csv
 .playwright-mcp
+djangoexact/test_minitool.db
+docs/superpowers/specs/
+.sisyphus
+pc.json
+vs2.0.txt
+STD 1019 open-source agreement_EX-ACT.docx
+.venv
+.env*
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+EXACT_guide.pdf
+2-results-report-2.xlsx
+test may 2026 (Copy).exactp
+*.sqlite3

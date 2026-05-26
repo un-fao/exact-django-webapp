@@ -25,11 +25,24 @@ Usage:
 
 from dataclasses import dataclass
 from types import SimpleNamespace
+import sys
 import api.calculators as calcs
 import api.models as api
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
+
+
+def _get_defaults_class(class_name: str):
+    """Look up a Defaults subclass by name within this module, returning None if not found.
+
+    Keeps lookup restricted to classes defined in this module so callers cannot
+    resolve arbitrary identifiers (e.g. builtins) through the factory.
+    """
+    candidate = getattr(sys.modules[__name__], class_name, None)
+    if isinstance(candidate, type) and candidate is not Defaults and issubclass(candidate, Defaults):
+        return candidate
+    return None
 
 
 class Defaults:
@@ -65,7 +78,7 @@ class DefaultsFactory:
         """
 
         module_type = type(input).__name__
-        DefaultClass: Defaults = globals().get(f"{module_type}Defaults", None)
+        DefaultClass: Defaults = _get_defaults_class(f"{module_type}Defaults")
 
         if DefaultClass is not None:
             if not input.is_ready():
@@ -124,9 +137,9 @@ class GrasslandDefaults(Defaults):
             biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
@@ -607,6 +620,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -640,6 +655,8 @@ class LargeFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_default_start,
             fui_t2_w_default=defaults.fui_default_w,
             fui_t2_wo_default=defaults.fui_default_wo,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 
@@ -672,6 +689,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=0,
             fui_t2_w_default=0,
             fui_t2_wo_default=0,
+            electricity_ef_t2_default=0,
+            country_t2_default=None
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -705,6 +724,8 @@ class SmallFisheryDefaults(Defaults):
             fui_t2_start_default=defaults.fui_start,
             fui_t2_w_default=defaults.fui_w,
             fui_t2_wo_default=defaults.fui_wo,
+            electricity_ef_t2_default=defaults.electricity_ef_value,
+            country_t2_default=defaults.country.name
         )
 
 
@@ -756,6 +777,9 @@ class IrrigationPhaseDefaults(Defaults):
     defaults: calcs.IrrigationPhaseCalculator = None
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.IrrigationPhaseCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1584,6 +1608,9 @@ class ValueChainEntryEnergyDefaultsMixin(Defaults):
     defaults: calcs.BaseValueChainCalculator = None
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.BaseValueChainCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1708,6 +1735,9 @@ class EnergyEntryDefaults(Defaults):
         ]
 
     def __post_init__(self):
+        # @dataclass generates an __init__ that bypasses Defaults.__init__, so set
+        # self.values here too (DefaultsFactory returns it for not-yet-ready modules).
+        self.values = SimpleNamespace()
         self.defaults: calcs.EnergyEntryCalculator = calcs.CalculatorFactory().get_calculator(self.input)(self.input)
 
     def get_defaults(self, calculate=False) -> dict:

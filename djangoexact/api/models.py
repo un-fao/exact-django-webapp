@@ -2513,9 +2513,16 @@ class Fishery(Module):
     fui_t2_w = models.FloatField(null=True, blank=True, verbose_name="fui_t2_w")
     fui_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fui_t2_wo")
 
-    inshore_ice_production_country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="inshore_ice_production_country_t2")
+    country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="country_t2")
+    ef_source = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="implementation_year_t2")
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and not self.ef_source:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
+
+        return super().save(*args, **kwargs)
 
 
 class SmallFishery(Fishery):
@@ -2603,6 +2610,9 @@ class InputEntry(Submodule):
 
 
 class EmissionFactorSource(models.Model):
+    OPERATING_MARGIN = "Operating Margin"
+    COMBINED_MARGIN = "Combined Margin"
+
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -2632,7 +2642,7 @@ class ElectricityTier2Mixin(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None and not self.ef_source:
-            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
 
         return super().save(*args, **kwargs)
 

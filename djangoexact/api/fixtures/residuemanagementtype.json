@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.residuemanagementtype",
+    "pk": 1,
+    "fields": {
+      "name": "Burned",
+      "name_en": "Burned",
+      "name_fr": "Brûlés",
+      "name_es": "Quemado",
+      "name_ru": "Сожжённый"
+    }
+  },
+  {
+    "model": "api.residuemanagementtype",
+    "pk": 3,
+    "fields": {
+      "name": "Exported",
+      "name_en": "Exported",
+      "name_fr": "Extraits des champs",
+      "name_es": "Exportado",
+      "name_ru": "Экспортировано"
+    }
+  },
+  {
+    "model": "api.residuemanagementtype",
+    "pk": 2,
+    "fields": {
+      "name": "Retained",
+      "name_en": "Retained",
+      "name_fr": "Retournés aux champs",
+      "name_es": "Retenido",
+      "name_ru": "Сохранено/Удержано"
+    }
+  }
+]

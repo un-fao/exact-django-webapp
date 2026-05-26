@@ -39,6 +39,9 @@ jobs:
         ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
 
     - name: Deploy
+      env:
+        DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: |
         set -x
 
@@ -51,8 +54,14 @@ jobs:
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
         sed -i 's|\$STORAGE_BUCKET|${{ vars.STORAGE_BUCKET }}|g' djangoexact/app.yaml
+        sed -i 's|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g' djangoexact/app.yaml
+        sed -i 's|\$DJANGO_DEBUG|${{ vars.DJANGO_DEBUG }}|g' djangoexact/app.yaml
+        sed -i 's|\$ALLOWED_HOSTS|${{ vars.ALLOWED_HOSTS }}|g' djangoexact/app.yaml
+        sed -i 's|\$CORS_ALLOWED_ORIGINS|${{ vars.CORS_ALLOWED_ORIGINS }}|g' djangoexact/app.yaml
+        sed -i 's|\$CLOUD_RUN_COMPUTATION_JOB_NAME|${{ vars.CLOUD_RUN_COMPUTATION_JOB_NAME }}|g' djangoexact/app.yaml
+        sed -i 's|\$CLOUD_RUN_REGION|${{ vars.CLOUD_RUN_REGION }}|g' djangoexact/app.yaml
 
-        echo "$(cat djangoexact/app.yaml)"
+        # NOTE: do NOT echo app.yaml — it contains injected DB_PASSWORD and SECRET_KEY after substitution.
 
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
@@ -76,13 +85,14 @@ jobs:
         sed -i 's|\$FIREBASE_MEASUREMENT_ID|${{ vars.FIREBASE_MEASUREMENT_ID }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$FIREBASE_SERVICE_ACCOUNT|${{ secrets.FIREBASE_SERVICE_ACCOUNT }}|g' djangoexact/djangoexact/settings.py
 
-        echo "$(cat djangoexact/djangoexact/settings.py)"
-        
+        # NOTE: do NOT echo settings.py — it contains injected DB_PASSWORD, SECRET_KEY,
+        # SMTP_USER_PASSWORD and FIREBASE_SERVICE_ACCOUNT after substitution.
+
         cd djangoexact
         
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip 'setuptools>=78.1.1' wheel
         pip install -r requirements.txt --no-cache-dir
-        pip install --force-reinstall setuptools
+        pip install --force-reinstall 'setuptools>=78.1.1'
         # - yes | python manage.py makemigrations --merge
         python manage.py migrate
         python manage.py collectstatic --noinput
@@ -95,6 +105,117 @@ jobs:
         gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+
+    - name: Build computation-job image
+      if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
+      env:
+        SHA: ${{ github.sha }}
+        PROJECT_ID: ${{ vars.PROJECT_ID }}
+      # Build with docker on the runner and push directly to gcr.io. We previously
+      # used `gcloud builds submit` but the deploy SA is blocked by an org policy
+      # from accessing the Cloud Build staging bucket; bypassing the Cloud Build
+      # API entirely sidesteps that. deploy/cloudbuild-computation-job.yaml is
+      # kept for ad-hoc manual builds via `gcloud builds submit`.
+      run: |
+        gcloud auth configure-docker gcr.io --quiet
+        docker build \
+          -f deploy/Dockerfile.computation_job \
+          -t "gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
+          -t "gcr.io/$PROJECT_ID/exact-computation-job:latest" \
+          .
+        docker push "gcr.io/$PROJECT_ID/exact-computation-job:$SHA"
+        docker push "gcr.io/$PROJECT_ID/exact-computation-job:latest"
+
+    - name: Deploy/update Cloud Run Job
+      if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
+      # GitHub Actions' interpolation of secrets into a YAML env: block adds
+      # escaping that diverges from App Engine's sed-substitution path. The
+      # observed effect is +2 chars on DB_PASSWORD and SECRET_KEY for any
+      # secret containing $ or \, which breaks psycopg2 auth against a
+      # Postgres user whose password was set via the App Engine path.
+      #
+      # Workaround: source DB credentials and SECRET_KEY from the *already
+      # deployed* App Engine version's env (where they are sed-substituted
+      # and known to match the Postgres user). Everything else continues to
+      # come from GitHub vars/secrets (those values either have no $/\ or are
+      # not auth-sensitive so a length-skew there is harmless until we can
+      # switch to Secret Manager).
+      env:
+        SHA: ${{ github.sha }}
+        REF_NAME: ${{ github.ref_name }}
+        PROJECT_ID: ${{ vars.PROJECT_ID }}
+        SERVICE_NAME: ${{ vars.SERVICE_NAME }}
+        CLOUD_RUN_REGION: ${{ vars.CLOUD_RUN_REGION }}
+        DB_INSTANCE_CONNECTION: ${{ vars.DB_INSTANCE_CONNECTION }}
+        SMTP_USER_PASSWORD: ${{ secrets.SMTP_USER_PASSWORD }}
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        EMAIL_HOST: ${{ vars.EMAIL_HOST }}
+        EMAIL_PORT: ${{ vars.EMAIL_PORT }}
+        SMTP_USER_EMAIL: ${{ vars.SMTP_USER_EMAIL }}
+        FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+        FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+        FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+        FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+        FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+        FIREBASE_MEASUREMENT_ID: ${{ vars.FIREBASE_MEASUREMENT_ID }}
+      run: |
+        LATEST=$(gcloud app versions list --service="$SERVICE_NAME" --project="$PROJECT_ID" --format="value(version.id)" --sort-by="~version.createTime" --limit=1)
+        if [ -z "$LATEST" ]; then
+          echo "No App Engine version found for service=$SERVICE_NAME — cannot source secrets." >&2
+          exit 1
+        fi
+        echo "Sourcing env from App Engine version: $LATEST"
+        gcloud app versions describe "$LATEST" --service="$SERVICE_NAME" --project="$PROJECT_ID" --format=json > /tmp/aev.json
+
+        python3 - <<'PYEOF' > /tmp/job-env.yaml
+        import json, os, sys, yaml
+        with open('/tmp/aev.json') as f:
+            aev = json.load(f).get('envVariables', {})
+        out = {
+            # From App Engine (sed-substituted): byte-for-byte parity required.
+            'DB_ENGINE': aev['DB_ENGINE'],
+            'DB_HOST': f"/cloudsql/{os.environ['DB_INSTANCE_CONNECTION']}",
+            'DB_USER': aev['DB_USERNAME'],
+            'DB_PASSWORD': aev['DB_PASSWORD'],
+            'DB_NAME': aev['DB_NAME'],
+            'DB_PORT': aev['DB_PORT'],
+            'SECRET_KEY': aev['SECRET_KEY'],
+            'ALLOWED_HOSTS': aev['ALLOWED_HOSTS'],
+            'STORAGE_BUCKET': aev['STORAGE_BUCKET'],
+            'PROJECT_ID': aev['PROJECT_ID'],
+            'DJANGO_DEBUG': aev['DJANGO_DEBUG'],
+            # Not in App Engine env_variables (sed-substituted into settings.py):
+            # pull from step env vars (GitHub vars/secrets).
+            'BRANCH_NAME': os.environ['REF_NAME'],
+            'EMAIL_HOST': os.environ['EMAIL_HOST'],
+            'EMAIL_PORT': os.environ['EMAIL_PORT'],
+            'SMTP_USER_EMAIL': os.environ['SMTP_USER_EMAIL'],
+            'SMTP_USER_PASSWORD': os.environ['SMTP_USER_PASSWORD'],
+            'FIREBASE_API_KEY': os.environ['FIREBASE_API_KEY'],
+            'FIREBASE_AUTH_DOMAIN': os.environ['FIREBASE_AUTH_DOMAIN'],
+            'FIREBASE_PROJECT_ID': os.environ['FIREBASE_PROJECT_ID'],
+            'FIREBASE_STORAGE_BUCKET': os.environ['FIREBASE_STORAGE_BUCKET'],
+            'FIREBASE_MESSAGING_SENDER_ID': os.environ['FIREBASE_MESSAGING_SENDER_ID'],
+            'FIREBASE_APP_ID': os.environ['FIREBASE_APP_ID'],
+            'FIREBASE_MEASUREMENT_ID': os.environ['FIREBASE_MEASUREMENT_ID'],
+            'FIREBASE_SERVICE_ACCOUNT': os.environ['FIREBASE_SERVICE_ACCOUNT'],
+            'JOB_NOTIFICATIONS_ENABLED': 'True',
+        }
+        yaml.safe_dump(out, sys.stdout, default_flow_style=False, allow_unicode=True)
+        PYEOF
+
+        gcloud run jobs deploy exact-computation-job \
+          --image="gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
+          --region="$CLOUD_RUN_REGION" \
+          --project="$PROJECT_ID" \
+          --service-account="$PROJECT_ID@appspot.gserviceaccount.com" \
+          --set-cloudsql-instances="$DB_INSTANCE_CONNECTION" \
+          --memory=4Gi \
+          --cpu=2 \
+          --task-timeout=3600 \
+          --max-retries=0 \
+          --env-vars-file=/tmp/job-env.yaml
 
     - name: Create Issue
       if: failure()

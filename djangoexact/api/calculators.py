@@ -96,7 +96,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
 
-from api.utilities import getattr_or_default
+from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
 
 from . import utilities as utils
 from .models import (
@@ -325,9 +325,9 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     try:
         return ipcc.FLUData.objects.get(**filters)
     except ipcc.FLUData.DoesNotExist:
-        class_lut = LandUseType.objects.filter(name=module.module_type.name).first()
+        class_lut = LandUseType.objects.filter(name_en=module.module_type.name_en).first()
         if not class_lut:
-            log.debug(f"LandUseType for {module.module_type.name} does not exist")
+            log.debug(f"LandUseType for {module.module_type.name_en} does not exist")
             return SimpleNamespace(value=1)
         filters["land_use_type"] = class_lut
         try:
@@ -1127,17 +1127,17 @@ class OtherLandUseCalculator(BaseCalculator):
             )
 
         try:
-            luc_start = module_start.land_use_type_start if module_start.land_use_type_start else LandUseType.objects.get(name=luc.module_type_start.name)
+            luc_start = module_start.land_use_type_start if module_start.land_use_type_start else LandUseType.objects.get(name_en=luc.module_type_start.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_start.name} does not exist")
 
         try:
-            luc_w = module_w.land_use_type_w if module_w.land_use_type_w else LandUseType.objects.get(name=luc.module_type_w.name)
+            luc_w = module_w.land_use_type_w if module_w.land_use_type_w else LandUseType.objects.get(name_en=luc.module_type_w.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_w.name} does not exist")
 
         try:
-            luc_wo = module_wo.land_use_type_wo if module_wo.land_use_type_wo else LandUseType.objects.get(name=luc.module_type_wo.name)
+            luc_wo = module_wo.land_use_type_wo if module_wo.land_use_type_wo else LandUseType.objects.get(name_en=luc.module_type_wo.name_en)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_wo.name} does not exist")
 
@@ -1644,6 +1644,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1706,6 +1708,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_wo,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1771,6 +1775,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1836,6 +1842,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
+                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -3158,6 +3166,12 @@ class GrasslandCalculator(LandModuleCalculator):
         return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
 
+def _resolve_electricity_emission_ef(electricity_emission: "ipcc.ElectricityEmission", ef_source) -> float:
+    if ef_source is None or ef_source.name == ef_source.__class__.OPERATING_MARGIN:
+        return electricity_emission.operating_margin
+    return electricity_emission.combined_margin
+
+
 class SmallFisheryCalculator(BaseCalculator):
     """
     Calculator for small fishery.
@@ -3172,7 +3186,8 @@ class SmallFisheryCalculator(BaseCalculator):
         self.energy_ef_default_co2: float = 0
         self.energy_ef_default_ch4: float = 0
         self.energy_ef_default_n2o: float = 0
-        self.electricity_emission: ipcc.ElectricityEmission = None
+        self.electricity_ef: ipcc.ElectricityEmission = None
+        self.electricity_ef_value: float = 0
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
@@ -3241,7 +3256,8 @@ class SmallFisheryCalculator(BaseCalculator):
                 raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
 
         try:
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef_value = _resolve_electricity_emission_ef(self.electricity_ef, self.module.ef_source)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
@@ -3293,7 +3309,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3338,7 +3354,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
@@ -3379,9 +3395,8 @@ class LargeFisheryCalculator(BaseCalculator):
         self.lost_refrigerant_default: float = 0
         self.tonnes_ice_default: float = 0
         self.kw_tonnes: float = 0
-        self.electricity_country: Country = None
-        self.electricity_emission: ipcc.ElectricityEmission = None
-
+        self.electricity_ef: ipcc.ElectricityEmission = None
+        self.electricity_ef_value: float = 0
         self.refrigerant_type_default: RefrigerantType = RefrigerantType.objects.get(name="HCFC-22 (R22)")
         self.refrigerant_gwp_ef: ipcc.ValueChainRefrigerantEmissionFactor = None
 
@@ -3451,10 +3466,10 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.country
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
+            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef_value = _resolve_electricity_emission_ef(self.electricity_ef, self.module.ef_source)
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
+            raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
         try:
             self.refrigerant_gwp_ef = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.refrigerant_type_default, gwp=self.project.gw_potential)
@@ -3504,7 +3519,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
@@ -3549,7 +3564,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "kwh_ice_per_tonne_default": self.kw_tonnes,
                 "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
                 "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": self.electricity_emission.operating_margin,
+                "operating_margin": self.electricity_ef_value,
                 "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
                 "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
@@ -3902,7 +3917,7 @@ class EnergyEntryCalculator(BaseCalculator):
 
         for scenario in utils.ScenarioTypes:
             fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name.casefold() in utils.FOSSIL_METHANE_FUELS:
+            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
@@ -3955,7 +3970,7 @@ class EnergyEntryCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected_start.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.operating_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.operating_margin
@@ -4144,7 +4159,7 @@ class ElectricityCalculator(BaseCalculator):
         try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            if self.module.ef_source.name == "Operating Margin":
+            if self.module.ef_source.name == self.module.ef_source.__class__.OPERATING_MARGIN:
                 self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
             else:
                 self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
@@ -4231,14 +4246,14 @@ class FuelCalculator(BaseCalculator):
 
         for scenario in utils.ScenarioTypes:
             fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name.casefold() in utils.FOSSIL_METHANE_FUELS:
+            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
             else:
                 setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
 
-        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
-        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
+        self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
 
     def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
         try:
@@ -4402,10 +4417,10 @@ class SettlementCalculator(LandModuleCalculator):
 
         # NOTE: SOCinitial in case of non-settlement (start) to paved settlement or infrastructure on existing land (end)
         if self.luc and not self.module.is_start():
-            is_paved_w = self.module.is_with() and self.module.settlement_type_w.name.casefold() == "paved settlement"
-            is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name.casefold() == "paved settlement"
-            is_existing_infra_w = self.module.is_with() and self.module.existing_infrastructure_w.name.casefold() == "infrastructure on existing land (no paving)"
-            is_existing_infra_wo = self.module.is_without() and self.module.existing_infrastructure_wo.name.casefold() == "infrastructure on existing land (no paving)"
+            is_paved_w = self.module.is_with() and self.module.settlement_type_w.name_en.casefold() == "paved settlement"
+            is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name_en.casefold() == "paved settlement"
+            is_existing_infra_w = self.module.is_with() and self.module.settlement_type_w.name_en.casefold() == "infrastructure on existing land (no paving)"
+            is_existing_infra_wo = self.module.is_without() and self.module.settlement_type_wo.name_en.casefold() == "infrastructure on existing land (no paving)"
 
             if is_paved_w or is_paved_wo or is_existing_infra_w or is_existing_infra_wo:
                 self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
@@ -4583,9 +4598,6 @@ class SettlementCalculator(LandModuleCalculator):
 
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
-
-        self.results_w += self.results_w
-        self.results_wo += self.results_wo
 
         for building in self.module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
@@ -6064,6 +6076,14 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
+        self.salinity_type = SalinityType.objects.get(value="<18")
+        if self.module.avg_salinity_t2:
+            self.salinity_type = self.module.avg_salinity_t2
+
+        self.soil_type_name = "Mineral"
+        if self.module.soil_type_t2:
+            self.soil_type_name = self.module.soil_type_t2.name
+
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
 
@@ -6081,9 +6101,6 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.calculate()
             self.agb_default.value = getattr_or_default(self.math_w, "agb_tier_2_default") or getattr_or_default(self.math_wo, "agb_tier_2_default")
             self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
-
-        self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
-        self.salinity_type: SalinityType = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value="<18")
 
         try:
             self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=self.module.land_use_type)
@@ -8001,13 +8018,13 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         self.methane_constant_w = self.project.gwp.ch4
         self.methane_constant_wo = self.project.gwp.ch4
 
-        if self.module.fuel_type_start.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_start and self.module.fuel_type_start.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_start = self.project.gwp.ch4_fossil
 
-        if self.module.fuel_type_w.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_w and self.module.fuel_type_w.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_w = self.project.gwp.ch4_fossil
 
-        if self.module.fuel_type_wo.name in ["Peat", "Charcoal"]:
+        if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
             self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:

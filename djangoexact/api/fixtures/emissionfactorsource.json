@@ -1,0 +1,23 @@
+[
+  {
+    "model": "api.emissionfactorsource",
+    "pk": 3,
+    "fields": {
+      "name": "Operating Margin"
+    }
+  },
+  {
+    "model": "api.emissionfactorsource",
+    "pk": 1,
+    "fields": {
+      "name": "UNFCCC -  Operating Margin"
+    }
+  },
+  {
+    "model": "api.emissionfactorsource",
+    "pk": 2,
+    "fields": {
+      "name": "UNFCCC - Combined Margin"
+    }
+  }
+]
