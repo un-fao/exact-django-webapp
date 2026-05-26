@@ -49,35 +49,58 @@
         return parts.join("|");
     }
 
+    function ingestNode(node) {
+        if (!node || node.nodeType !== 1) return false;
+        var raw = node.getAttribute("data-scenario-result") || "";
+        if (!raw) return false;
+        var result;
+        try {
+            result = JSON.parse(raw);
+        } catch (e) {
+            console.warn("compare.js: failed to parse data-scenario-result", e, raw);
+            return false;
+        }
+        var idx = node.getAttribute("data-scenario-index");
+        if (idx === null || idx === "") return false;
+        window.scenarioResults[idx] = {
+            result: result,
+            formHash: hashScenarioInputs(idx),
+            runAt: Date.now(),
+            stale: false,
+        };
+        return true;
+    }
+
     function ingestSwap(target) {
-        if (!target) return;
-        var nodes = target.matches && target.matches("[data-scenario-result]")
-            ? [target]
-            : Array.prototype.slice.call(target.querySelectorAll("[data-scenario-result]"));
-        nodes.forEach(function (node) {
-            var raw = node.getAttribute("data-scenario-result") || "";
-            if (!raw) return;
-            var result;
-            try {
-                result = JSON.parse(raw);
-            } catch (e) {
-                console.warn("compare.js: failed to parse data-scenario-result", e);
-                return;
+        var ingested = 0;
+        // Try the swap target itself, then its descendants.
+        if (target && target.nodeType === 1) {
+            if (target.matches && target.matches("[data-scenario-result]")) {
+                if (ingestNode(target)) ingested++;
             }
-            var idx = node.getAttribute("data-scenario-index");
-            if (idx === null || idx === "") return;
-            window.scenarioResults[idx] = {
-                result: result,
-                formHash: hashScenarioInputs(idx),
-                runAt: Date.now(),
-                stale: false,
-            };
-        });
+            if (target.querySelectorAll) {
+                Array.prototype.forEach.call(
+                    target.querySelectorAll("[data-scenario-result]"),
+                    function (n) { if (ingestNode(n)) ingested++; }
+                );
+            }
+        }
+        // Fallback: if the swap target didn't carry the wrapper (event target
+        // may be the request initiator in some HTMX versions), scan everything.
+        if (ingested === 0) {
+            Array.prototype.forEach.call(
+                document.querySelectorAll("[data-scenario-result]"),
+                function (n) { ingestNode(n); }
+            );
+        }
         renderCompare();
     }
 
     document.body.addEventListener("htmx:afterSwap", function (evt) {
-        ingestSwap(evt.target);
+        // HTMX 2.x: detail.target is the documented swap target. evt.target is
+        // also the swap target in most cases, but detail.target is canonical.
+        var t = (evt.detail && evt.detail.target) || evt.target;
+        ingestSwap(t);
     });
 
     function markStaleIfChanged(scenarioIndex) {
