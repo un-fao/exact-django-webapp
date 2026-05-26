@@ -129,7 +129,7 @@ from .serializers import (
     PublicTokenSerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
-    ModuleTypeIdModuleIdSerializer,
+    ModuleTypeIdModuleIdAreaSerializer,
     ProjectInvitationAcceptSerializer,
 )
 
@@ -2003,7 +2003,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(response)
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity modules", 200: ModuleTypeIdModuleIdSerializer(many=True)})
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity modules", 200: ModuleTypeIdModuleIdAreaSerializer(many=True)})
     def modules(self, request, pk=None):
         """
         Lists the modules of a given activity.
@@ -2014,7 +2014,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        modules = ModuleTypeIdModuleIdSerializer(activity.modules, many=True).data
+        modules = ModuleTypeIdModuleIdAreaSerializer(activity.modules, many=True).data
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(modules, request)

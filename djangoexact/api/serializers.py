@@ -712,11 +712,12 @@ class ActivitySerializer(serializers.ModelSerializer):
         ref_name = "Activity"
 
 
-class ModuleTypeIdModuleIdSerializer(serializers.Serializer):
+class ModuleTypeIdModuleIdAreaSerializer(serializers.Serializer):
     module_type = serializers.PrimaryKeyRelatedField(read_only=True)
     id = serializers.IntegerField(read_only=True)
     endpoint_url = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
+    area = serializers.FloatField(read_only=True)
 
     def get_status(self, obj):
         return obj.status.pk if obj.status else None
@@ -756,7 +757,7 @@ class ActivitySerializerWithModules(ActivitySerializer):
     modules = serializers.SerializerMethodField(read_only=True)
 
     def get_modules(self, obj: Activity):
-        return ModuleTypeIdModuleIdSerializer(obj.modules, many=True).data
+        return ModuleTypeIdModuleIdAreaSerializer(obj.modules, many=True).data
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
