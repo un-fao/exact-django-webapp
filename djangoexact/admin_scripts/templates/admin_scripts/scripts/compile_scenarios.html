@@ -1,4 +1,5 @@
 {% extends "admin_scripts/base.html" %}
+{% load static %}
 
 {% block title %}Compile Scenarios — Admin Scripts{% endblock %}
 
@@ -106,4 +107,13 @@ function switchScenarioTab(index) {
     }
 }
 </script>
+
+{# Chart.js + plugins for the Compare tab. CDN parity with htmx / Tom Select. #}
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4"></script>
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-error-bars@4"></script>
+<script src="{% static 'admin_scripts/compare.js' %}"></script>
 {% endblock %}
