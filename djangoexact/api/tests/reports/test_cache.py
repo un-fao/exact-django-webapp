@@ -860,3 +860,155 @@ class TestInventoryParity(unittest.TestCase):
             self.assertEqual(ci.ipcc_category, li.ipcc_category)
             self.assertEqual(ci.gas_type, li.gas_type)
             self.assertAlmostEqual(ci.value, li.value)
+
+
+# ===========================================================================
+# 16  Regression: module total must be the FULL balance (no dropped activities)
+#     Guards exact-django-webapp-jcb — the per-module report whitelists used to
+#     silently drop the "Fuel" activity (Storage/Packaging) and Settlement land
+#     emissions, under-counting "Downstream" and "New facilities".
+# ===========================================================================
+
+class TestBalanceTotalIncludesAllActivities(unittest.TestCase):
+    """BaseModuleReport._balance_total() must sum EVERY entry in the balance,
+    including activity types no extraction whitelist mentions (e.g. Fuel)."""
+
+    DURATION = 3
+
+    @staticmethod
+    def _entry(activity, gas, values):
+        # Serialized list-of-dicts format, exactly as save_results_to_cache
+        # writes it and as the .exactp export embeds it.
+        return {
+            "activity": activity,
+            "gas_type": {"name": gas},
+            "emissions": [{"value": v} for v in values],
+        }
+
+    def _report_with_balance(self, balance):
+        module = _make_module_mock(
+            cache_valid=True,
+            cached_results={
+                "balance": balance,
+                "total_w": balance,
+                "total_wo": balance,
+                "inventory": [],
+            },
+            cached_units=None,
+        )
+        activity_report = Mock()
+        activity_report.project_report.duration = self.DURATION
+
+        from api.reports.base import BaseModuleReport
+
+        @dataclass
+        class ConcreteReport(BaseModuleReport):
+            def compute(self):
+                return None
+
+        return ConcreteReport(module=module, activity_report=activity_report)
+
+    def test_fuel_activity_is_not_dropped_from_total(self):
+        """A Storage-shaped balance: Electricity+Storage+Fuel. The Fuel
+        component (which the old StorageReport whitelist ignored) must be
+        included in _balance_total()."""
+        balance = [
+            self._entry("Electricity", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Storage", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Fuel", "CO2", [-100.0, -200.0, -300.0]),
+            self._entry("Fuel", "CH4", [-1.0, -2.0, -3.0]),
+            self._entry("Fuel", "N2O", [-0.5, -0.5, -0.5]),
+        ]
+        report = self._report_with_balance(balance)
+
+        total = report._balance_total()
+
+        # Full balance sum = every entry, every year.
+        self.assertEqual(len(total), self.DURATION)
+        self.assertAlmostEqual(sum(total), -607.5)  # -600 fuel CO2, -6 CH4, -1.5 N2O
+        # Old whitelist (Electricity+Storage only) would have been 0.0 — guard it.
+        self.assertNotAlmostEqual(sum(total), 0.0)
+
+    def test_settlement_land_plus_infrastructure_all_counted(self):
+        """A Settlement-shaped balance: land (Soil CO2 / SOM N2O / Biomass)
+        plus Roads. Every component must be in the total."""
+        balance = [
+            self._entry("Soil CO2 Change", "CO2", [100.0, 100.0, 100.0]),
+            self._entry("Soil Organic Matter", "N2O", [5.0, 5.0, 5.0]),
+            self._entry("Biomass", "CO2", [0.0, 0.0, 0.0]),
+            self._entry("Roads", "CO2", [1000.0, 1000.0, 1000.0]),
+        ]
+        report = self._report_with_balance(balance)
+
+        total = report._balance_total()
+
+        self.assertAlmostEqual(sum(total), 3315.0)  # 300 + 15 + 0 + 3000
+        # Old SettlementReport whitelist = Roads only (3000), land dropped.
+        self.assertNotAlmostEqual(sum(total), 3000.0)
+
+
+# ===========================================================================
+# Regression: cached OTHER-gas entries must be extractable by gas_type filter.
+# GasTypes.OTHER.name = "OTHER" but .value = "Other"; the cache stores .name
+# while _eq used to only match against target.value, silently dropping every
+# cached OTHER entry from filtered extractions (e.g. fishery refrigerant + ice,
+# yielding inflated top "Yearly balance" and zeroed "Other GHGs" / "HFC from
+# refrigeration" / "CO2-eq from electricity" rows).
+# ===========================================================================
+
+
+class TestEqMatchesEnumNameAndValue(unittest.TestCase):
+    """_eq must match a cached string against either target.value or target.name."""
+
+    def test_eq_matches_enum_name(self):
+        from api.reports.extractors import _eq
+        from math_model.no_time_dependency_final.ghg_emissions_classes import GasTypes
+        self.assertTrue(_eq("OTHER", GasTypes.OTHER))   # cache stores .name
+        self.assertTrue(_eq("Other", GasTypes.OTHER))   # .value still works
+        self.assertTrue(_eq("CO2", GasTypes.CO2))       # name == value, unchanged
+        self.assertFalse(_eq("HFC", GasTypes.OTHER))    # unrelated string still rejected
+
+
+class TestExtractOtherGasFromCache(unittest.TestCase):
+    """extract_emissions must return cached OTHER-gas values, not zeros."""
+
+    DURATION = 3
+
+    def test_extracts_other_gas_from_dict_cache(self):
+        from api.reports.extractors import extract_emissions
+        from math_model.no_time_dependency_final.ghg_emissions_classes import (
+            ActivityTypes,
+            GasTypes,
+        )
+        # Format matches save_results_to_cache: activity is .value,
+        # gas_type is {"name": .name}.
+        cached = [
+            {
+                "activity": ActivityTypes.REFRIGERANT.value,
+                "gas_type": {"name": GasTypes.OTHER.name},
+                "emissions": [{"value": 10.0}, {"value": 20.0}, {"value": 30.0}],
+            },
+            {
+                "activity": ActivityTypes.ICE.value,
+                "gas_type": {"name": GasTypes.OTHER.name},
+                "emissions": [{"value": 1.0}, {"value": 2.0}, {"value": 3.0}],
+            },
+        ]
+
+        # Filter by gas_type only (mirrors EmissionsAggregator.other_ghgs).
+        by_gas = extract_emissions(cached, gas_type=GasTypes.OTHER, duration=self.DURATION)
+        self.assertEqual(by_gas, [11.0, 22.0, 33.0])
+
+        # Filter by (activity_type, gas_type) (mirrors per-row extraction in
+        # FisheryReport for "HFC from refrigeration" / "CO2-eq from electricity").
+        refrig = extract_emissions(
+            cached, activity_type=ActivityTypes.REFRIGERANT,
+            gas_type=GasTypes.OTHER, duration=self.DURATION,
+        )
+        self.assertEqual(refrig, [10.0, 20.0, 30.0])
+
+        ice = extract_emissions(
+            cached, activity_type=ActivityTypes.ICE,
+            gas_type=GasTypes.OTHER, duration=self.DURATION,
+        )
+        self.assertEqual(ice, [1.0, 2.0, 3.0])

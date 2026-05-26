@@ -1,0 +1,24 @@
+[
+  {
+    "model": "api.datasource",
+    "pk": 3,
+    "fields": {
+      "name": "",
+      "short_name": "IPCC",
+      "year": null,
+      "description": null,
+      "module_types": []
+    }
+  },
+  {
+    "model": "api.datasource",
+    "pk": 4,
+    "fields": {
+      "name": "",
+      "short_name": "FRA",
+      "year": null,
+      "description": null,
+      "module_types": []
+    }
+  }
+]

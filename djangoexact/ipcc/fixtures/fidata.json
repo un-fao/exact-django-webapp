@@ -1,0 +1,1322 @@
+[
+  {
+    "model": "ipcc.fidata",
+    "pk": 529,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 530,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 531,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 532,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 533,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 534,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 535,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 536,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 537,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 538,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.94
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 539,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.94
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 540,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": 8,
+      "grassland_management_type": null,
+      "value": 0.94
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 541,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 542,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 543,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 544,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 545,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 546,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 547,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 548,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 549,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 550,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.08
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 551,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.08
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 552,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": 10,
+      "grassland_management_type": null,
+      "value": 1.08
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 553,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 554,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 555,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 556,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 557,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 558,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 559,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 560,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 561,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 562,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.41
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 563,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.41
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 564,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": 11,
+      "grassland_management_type": null,
+      "value": 1.41
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 565,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 566,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 567,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 568,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 569,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 570,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 571,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 572,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 573,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 574,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 575,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 576,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": 9,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 577,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 578,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 579,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 580,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 581,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 582,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 583,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 584,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 585,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 586,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 587,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 588,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 6,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 589,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 590,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 591,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 592,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 593,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 594,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 595,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 596,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 597,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 598,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 599,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 600,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 601,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 602,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 603,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 604,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 605,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 606,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 607,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 608,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 609,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 610,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 611,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 612,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 2,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 613,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 614,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 615,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 616,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 617,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 618,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 619,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 620,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 621,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 622,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 623,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 624,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 3,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 625,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 626,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 627,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 628,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 629,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 630,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 631,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 632,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 633,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 634,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 635,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 636,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 637,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 638,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 639,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 640,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 641,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 642,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 643,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 644,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 645,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 646,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 647,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fidata",
+    "pk": 648,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "organic_input_type": null,
+      "grassland_management_type": 5,
+      "value": 1.0
+    }
+  }
+]

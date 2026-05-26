@@ -1,0 +1,14 @@
+Hi {{ user.get_short_name|default:user.email }},
+
+Your computation job #{{ job.pk }} has {{ job.get_status_display|lower }}.
+
+Module: {{ job.module_type }}
+Attribute: {{ job.attribute }}
+From: {{ job.from_value }} → To: {{ job.to_value }}
+Status: {{ job.get_status_display }}
+{% if job.error_message %}
+Error: {{ job.error_message }}
+{% endif %}
+You can view your jobs at: /api/admin-scripts/jobs/
+
+— EX-ACT Scenario Builder

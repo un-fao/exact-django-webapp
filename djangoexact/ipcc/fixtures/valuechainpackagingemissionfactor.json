@@ -1,0 +1,42 @@
+[
+  {
+    "model": "ipcc.valuechainpackagingemissionfactor",
+    "pk": 1,
+    "fields": {
+      "packaging_material_type": 1,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.valuechainpackagingemissionfactor",
+    "pk": 2,
+    "fields": {
+      "packaging_material_type": 2,
+      "value": 2.1
+    }
+  },
+  {
+    "model": "ipcc.valuechainpackagingemissionfactor",
+    "pk": 3,
+    "fields": {
+      "packaging_material_type": 3,
+      "value": 8.5
+    }
+  },
+  {
+    "model": "ipcc.valuechainpackagingemissionfactor",
+    "pk": 4,
+    "fields": {
+      "packaging_material_type": 4,
+      "value": 3.6
+    }
+  },
+  {
+    "model": "ipcc.valuechainpackagingemissionfactor",
+    "pk": 5,
+    "fields": {
+      "packaging_material_type": 5,
+      "value": 2.5
+    }
+  }
+]

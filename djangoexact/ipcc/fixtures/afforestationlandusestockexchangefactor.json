@@ -1,0 +1,2202 @@
+[
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 524,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 1,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 525,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 526,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 527,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 528,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 529,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 530,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 531,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 532,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 533,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 534,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 535,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 536,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 537,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 538,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 539,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 540,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 541,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 542,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 543,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 544,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 545,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 546,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 1,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 547,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 548,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 549,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 550,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 551,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 552,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 553,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 554,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 555,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 556,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 557,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 558,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 559,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 560,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 561,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 562,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 563,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 564,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 565,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 566,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 567,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 568,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 1,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 569,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 570,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 571,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 572,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 573,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 574,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 575,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 576,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 577,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 578,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 579,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 580,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 581,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 582,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 583,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 584,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 585,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 586,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 587,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 588,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 589,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 590,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 1,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 591,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 592,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 593,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 594,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 595,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 596,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 597,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 598,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 599,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 600,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 601,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 602,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 603,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 604,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 605,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 606,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 607,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 608,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 609,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 610,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 611,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 612,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 1,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 613,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 614,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 615,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 616,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 617,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 71,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 618,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 7,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 619,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 8,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 620,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 9,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 621,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 10,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 622,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 11,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 623,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 12,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 624,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 13,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 625,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 14,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 626,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 627,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 21,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 628,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 22,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 629,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 19,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 630,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 16,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 631,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 17,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 632,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 18,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 633,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 20,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 634,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 1,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 635,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 636,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 637,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 638,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 639,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 71,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 640,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 7,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 641,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 8,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 642,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 9,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 643,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 10,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 644,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 11,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 645,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 12,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 646,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 13,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 647,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 14,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 648,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 649,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 21,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 650,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 22,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 651,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 19,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 652,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 16,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 653,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 17,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 654,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 18,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 655,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 20,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 656,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 1,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 657,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 2,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 658,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 659,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 660,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 661,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 71,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 662,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 7,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 663,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 8,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 664,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 9,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 665,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 10,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 666,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 11,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 667,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 12,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 668,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 13,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 669,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 14,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 670,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 671,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 21,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 672,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 22,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 673,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 19,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 674,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 16,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 675,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 17,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 676,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 18,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 677,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 20,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 678,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 1,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 679,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.88
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 680,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 681,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 682,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 683,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 71,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 684,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 7,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 685,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 8,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 686,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 687,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 10,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 688,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 11,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 689,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 12,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 690,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 13,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 691,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 14,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 692,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 693,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 21,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 694,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 22,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 695,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 19,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 696,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 16,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 697,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 17,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 698,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 18,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 699,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 20,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 700,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 1,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 701,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 702,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 703,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 704,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 705,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 706,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 707,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 708,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 709,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 710,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 711,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 712,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 713,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 714,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 715,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 716,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 717,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 718,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 719,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 720,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 721,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 722,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 1,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 723,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 724,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 725,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 4,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 726,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 5,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 727,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 71,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 728,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 7,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 729,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 8,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 730,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 9,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 731,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 10,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 732,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 11,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 733,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 12,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 734,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 13,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 735,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 14,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 736,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 15,
+      "value": 0.33
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 737,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 21,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 738,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 22,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 739,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 19,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 740,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 16,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 741,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 17,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 742,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 18,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.afforestationlandusestockexchangefactor",
+    "pk": 743,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 20,
+      "value": 0.72
+    }
+  }
+]

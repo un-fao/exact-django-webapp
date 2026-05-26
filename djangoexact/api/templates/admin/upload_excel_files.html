@@ -24,6 +24,7 @@
     </ul>
 </div>
 
+{# nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-token #}
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="module aligned">

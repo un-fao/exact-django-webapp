@@ -1,0 +1,722 @@
+[
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 41,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 42,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 43,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 44,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 45,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 46,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 47,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 48,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 49,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 50,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 51,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 52,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 53,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 54,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 55,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 56,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.8,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 6.1,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 57,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 58,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 59,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 60,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.6,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 61,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 62,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 63,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 64,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 65,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 66,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 67,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 68,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 69,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 70,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 71,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 72,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 73,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 74,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 75,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 76,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 542.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 77,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 78,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 79,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionemissionfactor",
+    "pk": 80,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  }
+]

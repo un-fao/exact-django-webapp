@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
+from django.db.models import Model as DjangoModel
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import path, reverse
@@ -19,9 +20,13 @@ from .models import *
 
 excluded_models = {"FieldDefinition", "APIHealth", "CustomUser", "HandInHandAssessment", "Permission"}
 
-for model in (model for model in dir() if not model.startswith("_") and model not in excluded_models):
+_module_ns = dict(globals())
+for model_name in (name for name in _module_ns if not name.startswith("_") and name not in excluded_models):
+    candidate = _module_ns.get(model_name)
+    if not isinstance(candidate, type) or not issubclass(candidate, DjangoModel):
+        continue
     try:
-        admin.site.register(eval(model), ModelAdmin)
+        admin.site.register(candidate, ModelAdmin)
     except Exception:
         pass
 
@@ -64,9 +69,9 @@ class CustomUserAdmin(ModelAdmin):
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = "attachment; filename=customusers.csv"
         writer = csv.writer(response)
-        writer.writerow(["first_name", "last_name", "email"])
+        writer.writerow(["first_name", "last_name", "email", "is_opted_out_of_emails"])
         for user in queryset:
-            writer.writerow([user.first_name, user.last_name, user.email])
+            writer.writerow([user.first_name, user.last_name, user.email, user.is_opted_out_of_emails])
         return response
 
     export_as_csv.short_description = "Export selected users as CSV"

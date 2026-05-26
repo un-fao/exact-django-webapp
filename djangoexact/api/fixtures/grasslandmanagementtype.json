@@ -1,0 +1,68 @@
+[
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 2,
+    "fields": {
+      "name": "High Intensity Grazing",
+      "name_en": "High Intensity Grazing",
+      "name_fr": "Pâturage à haute intensité\n",
+      "name_es": "Pastoreo intensivo",
+      "name_ru": "Высокоинтенсивный выпас"
+    }
+  },
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 5,
+    "fields": {
+      "name": "Improved Grassland",
+      "name_en": "Improved Grassland",
+      "name_fr": "Prairies améliorées\n",
+      "name_es": "Pastizal mejorado",
+      "name_ru": "Улучшенные пастбища"
+    }
+  },
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 6,
+    "fields": {
+      "name": "Improved With High Inputs",
+      "name_en": "Improved With High Inputs",
+      "name_fr": "Amélioré avec des intrants élevés\n",
+      "name_es": "Pastizal mejorado con insumos altos",
+      "name_ru": "Улучшено с высокими поступлениями"
+    }
+  },
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 4,
+    "fields": {
+      "name": "Improved With Medium Inputs",
+      "name_en": "Improved With Medium Inputs",
+      "name_fr": "Amélioré avec des intrants moyens\n",
+      "name_es": "Pastizal mejorado con insumos medios",
+      "name_ru": "Улучшено со средними поступлениями"
+    }
+  },
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 1,
+    "fields": {
+      "name": "Non-Degraded",
+      "name_en": "Non-Degraded",
+      "name_fr": "Non dégradé\n",
+      "name_es": "No degradado",
+      "name_ru": "Недеградированный"
+    }
+  },
+  {
+    "model": "api.grasslandmanagementtype",
+    "pk": 3,
+    "fields": {
+      "name": "Severely Degraded",
+      "name_en": "Severely Degraded",
+      "name_fr": "Fortement dégradé\n",
+      "name_es": "Severamente degradados",
+      "name_ru": "Сильно деградированные"
+    }
+  }
+]

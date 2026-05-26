@@ -1,0 +1,45 @@
+<span class="inline-flex items-center gap-2">
+    {% if job.status == "pending" %}
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-amber-50 text-amber-700 border-amber-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+        Pending
+    </span>
+    {% elif job.status == "running" %}
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+        Running {{ job.progress }}%
+    </span>
+    {% elif job.status == "completed" %}
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-green-50 text-green-700 border-green-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+        Completed
+    </span>
+    {% elif job.status == "failed" %}
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-red-50 text-red-700 border-red-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+        Failed
+    </span>
+    {% elif job.status == "cancelled" %}
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-gray-100 text-gray-600 border-gray-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+        Cancelled
+    </span>
+    {% endif %}
+    {% if job.status == "pending" or job.status == "running" %}
+    <button hx-post="{% url 'admin_scripts:htmx-cancel-job' %}"
+            hx-vals='{"job_id": "{{ job.pk }}"}'
+            hx-target="closest span"
+            hx-swap="outerHTML"
+            hx-confirm="Cancel this job?"
+            title="Cancel job"
+            aria-label="Cancel job"
+            class="inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</span>

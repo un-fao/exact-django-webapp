@@ -1,0 +1,2927 @@
+[
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 523,
+    "fields": {
+      "input_type": 1,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 524,
+    "fields": {
+      "input_type": 1,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 525,
+    "fields": {
+      "input_type": 1,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 526,
+    "fields": {
+      "input_type": 1,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 527,
+    "fields": {
+      "input_type": 1,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 528,
+    "fields": {
+      "input_type": 1,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 529,
+    "fields": {
+      "input_type": 1,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 530,
+    "fields": {
+      "input_type": 1,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 531,
+    "fields": {
+      "input_type": 1,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 532,
+    "fields": {
+      "input_type": 1,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 533,
+    "fields": {
+      "input_type": 1,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 534,
+    "fields": {
+      "input_type": 1,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 535,
+    "fields": {
+      "input_type": 1,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 536,
+    "fields": {
+      "input_type": 1,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 537,
+    "fields": {
+      "input_type": 1,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.12,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 538,
+    "fields": {
+      "input_type": 2,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 539,
+    "fields": {
+      "input_type": 2,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 540,
+    "fields": {
+      "input_type": 2,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 541,
+    "fields": {
+      "input_type": 2,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 542,
+    "fields": {
+      "input_type": 2,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 543,
+    "fields": {
+      "input_type": 2,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 544,
+    "fields": {
+      "input_type": 2,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 545,
+    "fields": {
+      "input_type": 2,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 546,
+    "fields": {
+      "input_type": 2,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 547,
+    "fields": {
+      "input_type": 2,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 548,
+    "fields": {
+      "input_type": 2,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 549,
+    "fields": {
+      "input_type": 2,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 550,
+    "fields": {
+      "input_type": 2,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 551,
+    "fields": {
+      "input_type": 2,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 552,
+    "fields": {
+      "input_type": 2,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.13,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 553,
+    "fields": {
+      "input_type": 3,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 554,
+    "fields": {
+      "input_type": 3,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 555,
+    "fields": {
+      "input_type": 3,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 556,
+    "fields": {
+      "input_type": 3,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 557,
+    "fields": {
+      "input_type": 3,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 558,
+    "fields": {
+      "input_type": 3,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 559,
+    "fields": {
+      "input_type": 3,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 560,
+    "fields": {
+      "input_type": 3,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 561,
+    "fields": {
+      "input_type": 3,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 562,
+    "fields": {
+      "input_type": 3,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 563,
+    "fields": {
+      "input_type": 3,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 564,
+    "fields": {
+      "input_type": 3,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 565,
+    "fields": {
+      "input_type": 3,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 566,
+    "fields": {
+      "input_type": 3,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 567,
+    "fields": {
+      "input_type": 3,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.125,
+      "n2o_value": null,
+      "co2_eq_value": 0.586666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 568,
+    "fields": {
+      "input_type": 4,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 569,
+    "fields": {
+      "input_type": 4,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 570,
+    "fields": {
+      "input_type": 4,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 571,
+    "fields": {
+      "input_type": 4,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 572,
+    "fields": {
+      "input_type": 4,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 573,
+    "fields": {
+      "input_type": 4,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 574,
+    "fields": {
+      "input_type": 4,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 575,
+    "fields": {
+      "input_type": 4,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 576,
+    "fields": {
+      "input_type": 4,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 577,
+    "fields": {
+      "input_type": 4,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 578,
+    "fields": {
+      "input_type": 4,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 579,
+    "fields": {
+      "input_type": 4,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 580,
+    "fields": {
+      "input_type": 4,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 581,
+    "fields": {
+      "input_type": 4,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 582,
+    "fields": {
+      "input_type": 4,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": 0.2,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 583,
+    "fields": {
+      "input_type": 5,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 584,
+    "fields": {
+      "input_type": 5,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 585,
+    "fields": {
+      "input_type": 5,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 586,
+    "fields": {
+      "input_type": 5,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 587,
+    "fields": {
+      "input_type": 5,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 588,
+    "fields": {
+      "input_type": 5,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 589,
+    "fields": {
+      "input_type": 5,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 590,
+    "fields": {
+      "input_type": 5,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 591,
+    "fields": {
+      "input_type": 5,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 592,
+    "fields": {
+      "input_type": 5,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 593,
+    "fields": {
+      "input_type": 5,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 594,
+    "fields": {
+      "input_type": 5,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 595,
+    "fields": {
+      "input_type": 5,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 596,
+    "fields": {
+      "input_type": 5,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.016,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 597,
+    "fields": {
+      "input_type": 5,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0105,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 598,
+    "fields": {
+      "input_type": 6,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 599,
+    "fields": {
+      "input_type": 6,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 600,
+    "fields": {
+      "input_type": 6,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 601,
+    "fields": {
+      "input_type": 6,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 602,
+    "fields": {
+      "input_type": 6,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 603,
+    "fields": {
+      "input_type": 6,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 604,
+    "fields": {
+      "input_type": 6,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 605,
+    "fields": {
+      "input_type": 6,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 606,
+    "fields": {
+      "input_type": 6,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 607,
+    "fields": {
+      "input_type": 6,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 608,
+    "fields": {
+      "input_type": 6,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 609,
+    "fields": {
+      "input_type": 6,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 610,
+    "fields": {
+      "input_type": 6,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 611,
+    "fields": {
+      "input_type": 6,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 612,
+    "fields": {
+      "input_type": 6,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.003,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 613,
+    "fields": {
+      "input_type": 17,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 614,
+    "fields": {
+      "input_type": 17,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 615,
+    "fields": {
+      "input_type": 17,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 616,
+    "fields": {
+      "input_type": 17,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 617,
+    "fields": {
+      "input_type": 17,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 618,
+    "fields": {
+      "input_type": 17,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 619,
+    "fields": {
+      "input_type": 17,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 620,
+    "fields": {
+      "input_type": 17,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 621,
+    "fields": {
+      "input_type": 17,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 622,
+    "fields": {
+      "input_type": 17,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 623,
+    "fields": {
+      "input_type": 17,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 624,
+    "fields": {
+      "input_type": 17,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 625,
+    "fields": {
+      "input_type": 17,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 626,
+    "fields": {
+      "input_type": 17,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 627,
+    "fields": {
+      "input_type": 17,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": 4.766666667
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 628,
+    "fields": {
+      "input_type": 7,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 629,
+    "fields": {
+      "input_type": 7,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 630,
+    "fields": {
+      "input_type": 7,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 631,
+    "fields": {
+      "input_type": 7,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 632,
+    "fields": {
+      "input_type": 7,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 633,
+    "fields": {
+      "input_type": 7,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 634,
+    "fields": {
+      "input_type": 7,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 635,
+    "fields": {
+      "input_type": 7,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 636,
+    "fields": {
+      "input_type": 7,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 637,
+    "fields": {
+      "input_type": 7,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 638,
+    "fields": {
+      "input_type": 7,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 639,
+    "fields": {
+      "input_type": 7,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 640,
+    "fields": {
+      "input_type": 7,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 641,
+    "fields": {
+      "input_type": 7,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 642,
+    "fields": {
+      "input_type": 7,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 643,
+    "fields": {
+      "input_type": 8,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 644,
+    "fields": {
+      "input_type": 8,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 645,
+    "fields": {
+      "input_type": 8,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 646,
+    "fields": {
+      "input_type": 8,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 647,
+    "fields": {
+      "input_type": 8,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 648,
+    "fields": {
+      "input_type": 8,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 649,
+    "fields": {
+      "input_type": 8,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 650,
+    "fields": {
+      "input_type": 8,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 651,
+    "fields": {
+      "input_type": 8,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 652,
+    "fields": {
+      "input_type": 8,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 653,
+    "fields": {
+      "input_type": 8,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 654,
+    "fields": {
+      "input_type": 8,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 655,
+    "fields": {
+      "input_type": 8,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 656,
+    "fields": {
+      "input_type": 8,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 657,
+    "fields": {
+      "input_type": 8,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 658,
+    "fields": {
+      "input_type": 9,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 659,
+    "fields": {
+      "input_type": 9,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 660,
+    "fields": {
+      "input_type": 9,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 661,
+    "fields": {
+      "input_type": 9,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 662,
+    "fields": {
+      "input_type": 9,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 663,
+    "fields": {
+      "input_type": 9,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 664,
+    "fields": {
+      "input_type": 9,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 665,
+    "fields": {
+      "input_type": 9,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 666,
+    "fields": {
+      "input_type": 9,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 667,
+    "fields": {
+      "input_type": 9,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 668,
+    "fields": {
+      "input_type": 9,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 669,
+    "fields": {
+      "input_type": 9,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 670,
+    "fields": {
+      "input_type": 9,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.005,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 671,
+    "fields": {
+      "input_type": 9,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.006,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 672,
+    "fields": {
+      "input_type": 9,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": 0.0055,
+      "co2_eq_value": null
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 673,
+    "fields": {
+      "input_type": 14,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 674,
+    "fields": {
+      "input_type": 14,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 675,
+    "fields": {
+      "input_type": 14,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 676,
+    "fields": {
+      "input_type": 14,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 677,
+    "fields": {
+      "input_type": 14,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 678,
+    "fields": {
+      "input_type": 14,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 679,
+    "fields": {
+      "input_type": 14,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 680,
+    "fields": {
+      "input_type": 14,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 681,
+    "fields": {
+      "input_type": 14,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 682,
+    "fields": {
+      "input_type": 14,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 683,
+    "fields": {
+      "input_type": 14,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 684,
+    "fields": {
+      "input_type": 14,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 685,
+    "fields": {
+      "input_type": 14,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 686,
+    "fields": {
+      "input_type": 14,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 687,
+    "fields": {
+      "input_type": 14,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.733333333
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 688,
+    "fields": {
+      "input_type": 15,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 689,
+    "fields": {
+      "input_type": 15,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 690,
+    "fields": {
+      "input_type": 15,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 691,
+    "fields": {
+      "input_type": 15,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 692,
+    "fields": {
+      "input_type": 15,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 693,
+    "fields": {
+      "input_type": 15,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 694,
+    "fields": {
+      "input_type": 15,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 695,
+    "fields": {
+      "input_type": 15,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 696,
+    "fields": {
+      "input_type": 15,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 697,
+    "fields": {
+      "input_type": 15,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 698,
+    "fields": {
+      "input_type": 15,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 699,
+    "fields": {
+      "input_type": 15,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 700,
+    "fields": {
+      "input_type": 15,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 701,
+    "fields": {
+      "input_type": 15,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 702,
+    "fields": {
+      "input_type": 15,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 703,
+    "fields": {
+      "input_type": 23,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 704,
+    "fields": {
+      "input_type": 23,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 705,
+    "fields": {
+      "input_type": 23,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 706,
+    "fields": {
+      "input_type": 23,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 707,
+    "fields": {
+      "input_type": 23,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 708,
+    "fields": {
+      "input_type": 23,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 709,
+    "fields": {
+      "input_type": 23,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 710,
+    "fields": {
+      "input_type": 23,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 711,
+    "fields": {
+      "input_type": 23,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 712,
+    "fields": {
+      "input_type": 23,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 713,
+    "fields": {
+      "input_type": 23,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 714,
+    "fields": {
+      "input_type": 23,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 715,
+    "fields": {
+      "input_type": 23,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 716,
+    "fields": {
+      "input_type": 23,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 717,
+    "fields": {
+      "input_type": 23,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 14.3
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 718,
+    "fields": {
+      "input_type": 24,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 719,
+    "fields": {
+      "input_type": 24,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 720,
+    "fields": {
+      "input_type": 24,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 721,
+    "fields": {
+      "input_type": 24,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 722,
+    "fields": {
+      "input_type": 24,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 723,
+    "fields": {
+      "input_type": 24,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 724,
+    "fields": {
+      "input_type": 24,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 725,
+    "fields": {
+      "input_type": 24,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 726,
+    "fields": {
+      "input_type": 24,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 727,
+    "fields": {
+      "input_type": 24,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 728,
+    "fields": {
+      "input_type": 24,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 729,
+    "fields": {
+      "input_type": 24,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 730,
+    "fields": {
+      "input_type": 24,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 731,
+    "fields": {
+      "input_type": 24,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 732,
+    "fields": {
+      "input_type": 24,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 23.1
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 733,
+    "fields": {
+      "input_type": 25,
+      "climate": 3,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 734,
+    "fields": {
+      "input_type": 25,
+      "climate": 3,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 735,
+    "fields": {
+      "input_type": 25,
+      "climate": 3,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 736,
+    "fields": {
+      "input_type": 25,
+      "climate": 20,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 737,
+    "fields": {
+      "input_type": 25,
+      "climate": 20,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 738,
+    "fields": {
+      "input_type": 25,
+      "climate": 20,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 739,
+    "fields": {
+      "input_type": 25,
+      "climate": 4,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 740,
+    "fields": {
+      "input_type": 25,
+      "climate": 4,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 741,
+    "fields": {
+      "input_type": 25,
+      "climate": 4,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 742,
+    "fields": {
+      "input_type": 25,
+      "climate": 1,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 743,
+    "fields": {
+      "input_type": 25,
+      "climate": 1,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 744,
+    "fields": {
+      "input_type": 25,
+      "climate": 1,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 745,
+    "fields": {
+      "input_type": 25,
+      "climate": 2,
+      "moisture": 1,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 746,
+    "fields": {
+      "input_type": 25,
+      "climate": 2,
+      "moisture": 4,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  },
+  {
+    "model": "ipcc.inputemissionfactor",
+    "pk": 747,
+    "fields": {
+      "input_type": 25,
+      "climate": 2,
+      "moisture": 2,
+      "water_regime_type": null,
+      "co2_value": null,
+      "n2o_value": null,
+      "co2_eq_value": 18.7
+    }
+  }
+]

@@ -1,6 +1,8 @@
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, status

@@ -94,15 +94,15 @@ class ProjectFactory(DjangoModelFactory):
     # executing_agency = factory.fuzzy.FuzzyText()
     # status = factory.fuzzy.FuzzyChoice(statuses)
 
-    # implementation_years = factory.fuzzy.FuzzyInteger(5, 10)
-    # start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
-    # last_year_of_accounting = factory.fuzzy.FuzzyInteger(2050, 2050)
+    implementation_years = factory.fuzzy.FuzzyInteger(5, 10)
+    start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
+    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2050, 2050)
 
     # climate = selected_climate
     # moisture = factory.fuzzy.FuzzyChoice(moisture)
     # country = factory.fuzzy.FuzzyChoice(countries)
     # soil_type = factory.fuzzy.FuzzyChoice(soil_types)
-    # gw_potential = factory.fuzzy.FuzzyChoice(gw_potentials)
+    gw_potential = factory.fuzzy.FuzzyChoice(gw_potentials)
 
     # def __init__(self) -> None:
     #     super().__init__()
@@ -116,7 +116,7 @@ class ActivityFactory(DjangoModelFactory):
     name = factory.fuzzy.FuzzyText()
     # user = factory
 
-    # change_rate = def_rate
+    change_rate = def_rate
 
 
 class FisheryFactory(DjangoModelFactory):

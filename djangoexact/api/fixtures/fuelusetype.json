@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.fuelusetype",
+    "pk": 2,
+    "fields": {
+      "name": "Mobile",
+      "name_en": "Mobile",
+      "name_fr": "Mobile",
+      "name_es": "Móvil",
+      "name_ru": "Мобильный"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 3,
+    "fields": {
+      "name": "Off-Road",
+      "name_en": "Off-Road",
+      "name_fr": "Hors-route\n",
+      "name_es": "Fuera de la carretera",
+      "name_ru": "бездорожный"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 1,
+    "fields": {
+      "name": "Stationary",
+      "name_en": "Stationary",
+      "name_fr": "Stationnaire",
+      "name_es": "Estacionario",
+      "name_ru": "Стационарный"
+    }
+  }
+]

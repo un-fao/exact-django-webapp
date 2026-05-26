@@ -194,7 +194,7 @@ def search_historical_projects_for_project_name():
     """
     Search historical projects for project name
     """
-    projects = models.Project.history.filter(name__icontains="improving livelihoods in rural Kenya", owner__email="mariagiulia.crespi@fao.org", history_change_reason="delete")
+    projects = models.Project.history.filter(name__icontains="example project name", owner__email="owner@example.com", history_change_reason="delete")
     print(f"Found {projects.count()} projects")
     for project in projects:
         print(f"Project: {project.name}")
@@ -561,7 +561,7 @@ def import_fires_combustion_factors():
     """
     from ipcc.models import FiresCombustionFactor
 
-    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/FiresCombustionFactors_20260408.csv"))
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data/FiresCombustionFactors_20260518.csv"))
     for _, row in df.iterrows():
         try:
             land_use_type = models.LandUseType.objects.get(name=row["land_use_type"])
@@ -635,6 +635,120 @@ def set_all_climates_and_moistures_for_crop_nitrous_land_use_types():
         print(f"Updated {land_use_type.name}: {len(all_climates)} climates, {len(all_moistures)} moistures")
 
 
+def remove_perennial_cropland_module_from_perennial_land_use_types():
+    """
+    Remove the PerennialCropland ModuleType association from every LandUseType whose
+    name matches an ITEM marked PERENNIALS=YES in
+    CropNitrous-annualperennials.xlsx (sheet 'Annualsperennials').
+
+    Uses a single bulk delete on the LandUseType.module_types through table.
+    """
+    perennial_item_names = [
+        "Default",
+        "Abaca, manila hemp, raw",
+        "Almonds, in shell",
+        "Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw",
+        "Apples",
+        "Apricots",
+        "Areca nuts",
+        "Avocados",
+        "Bananas",
+        "Blueberries",
+        "Brazil nuts, in shell",
+        "Cashew nuts, in shell",
+        "Cherries",
+        "Chestnuts, in shell",
+        "Cocoa beans",
+        "Coconuts, in shell",
+        "Coffee, green",
+        "Coir, raw",
+        "Cranberries",
+        "Currants",
+        "Dates",
+        "Figs",
+        "Gooseberries",
+        "Grapes",
+        "Hazelnuts, in shell",
+        "Jojoba seeds",
+        "Kapok fruit",
+        "Karite nuts (sheanuts)",
+        "Kiwi fruit",
+        "Kola nuts",
+        "Lemons and limes",
+        "Locust beans (carobs)",
+        "Mangoes, guavas and mangosteens",
+        "Nutmeg, mace, cardamoms, raw",
+        "Oil palm fruit",
+        "Olives",
+        "Oranges",
+        "Other berries and fruits of the genus vaccinium n.e.c.",
+        "Palm kernels",
+        "Papayas",
+        "Peaches and nectarines",
+        "Pears",
+        "Pepper (Piper spp.), raw",
+        "Peppermint, spearmint",
+        "Persimmons",
+        "Pineapples",
+        "Pistachios, in shell",
+        "Plantains and cooking bananas",
+        "Plums and sloes",
+        "Pomelos and grapefruits",
+        "Quinces",
+        "Raspberries",
+        "Sour cherries",
+        "Tallowtree seeds",
+        "Tangerines, mandarins, clementines",
+        "Tea leaves",
+        "Tung nuts",
+        "Vanilla, raw",
+        "Walnuts, in shell",
+        "Wine",
+        "Citrus Fruit, Total + (Total)",
+        "Fruit Primary + (Total)",
+    ]
+
+    print(f"Processing {len(perennial_item_names)} perennial ITEM names from CropNitrous-annualperennials.xlsx")
+
+    try:
+        perennial_cropland = models.ModuleType.objects.get(class_name="PerennialCropland")
+    except models.ModuleType.DoesNotExist:
+        print("ModuleType with class_name='PerennialCropland' not found, aborting")
+        return
+
+    matched_land_use_types = models.LandUseType.objects.filter(name__in=perennial_item_names)
+    matched_names = set(matched_land_use_types.values_list("name", flat=True))
+    missing_names = sorted(set(perennial_item_names) - matched_names)
+
+    print(f"Matched {len(matched_names)}/{len(perennial_item_names)} ITEM names to LandUseType records")
+    if missing_names:
+        print(f"Skipping {len(missing_names)} ITEM names with no LandUseType match:")
+        for name in missing_names:
+            print(f"  - {name}")
+
+    if not matched_land_use_types.exists():
+        print("No LandUseTypes matched, nothing to remove")
+        return
+
+    through = models.LandUseType.module_types.through
+    associations = through.objects.filter(
+        landusetype__in=matched_land_use_types,
+        moduletype=perennial_cropland,
+    )
+    to_remove_count = associations.count()
+    print(f"Found {to_remove_count} LandUseType <-> PerennialCropland associations to remove")
+
+    if to_remove_count == 0:
+        print("No PerennialCropland associations present on matched LandUseTypes, nothing to do")
+        return
+
+    affected_lut_names = sorted(associations.values_list("landusetype__name", flat=True))
+    deleted, _ = associations.delete()
+    print(f"Bulk-removed {deleted} PerennialCropland associations from {len(affected_lut_names)} LandUseTypes:")
+    for name in affected_lut_names:
+        print(f"  - {name}")
+
+
 def run():
     import os
 
@@ -650,8 +764,6 @@ def run():
         change_all_other_land_flu_data_to_1()
         import_crop_nitrous_estimation_default_factors()
         import_fires_combustion_factors()
-        import_crop_nitrous_estimation_default_factors()
-        import_fires_combustion_factors()
         set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
@@ -660,8 +772,9 @@ def run():
         # import_input_types_units()
         # change_all_other_land_flu_data_to_1()
         # import_crop_nitrous_estimation_default_factors()
-        # import_fires_combustion_factors()
         # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
+        # import_fires_combustion_factors()
+        # remove_perennial_cropland_module_from_perennial_land_use_types()
         pass
 
     if app_mode == "development" or app_mode == "local":
@@ -670,7 +783,8 @@ def run():
         # change_all_other_land_flu_data_to_1()
         # import_crop_nitrous_estimation_default_factors()
         # import_fires_combustion_factors()
-        set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
+        # import_input_types_units()
+        # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
     if app_mode == "test":
