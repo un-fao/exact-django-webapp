@@ -1,0 +1,27 @@
+<div data-compare-panel class="hidden">
+    <div id="cmp-empty" class="text-sm text-gray-500 p-6 text-center bg-white border border-gray-200 rounded-lg">
+        Run at least one scenario to populate the comparison view.
+    </div>
+
+    <div id="cmp-chips" class="hidden flex flex-wrap gap-2 mb-4"></div>
+
+    <div id="cmp-bar" class="hidden bg-white border border-gray-200 rounded-lg p-5 mb-4">
+        <h3 class="text-md font-semibold text-gray-900 mb-3">Mean &plusmn; CI 95%</h3>
+        <div style="position: relative; height: 280px;"><canvas></canvas></div>
+    </div>
+
+    <div id="cmp-box" class="hidden bg-white border border-gray-200 rounded-lg p-5 mb-4">
+        <h3 class="text-md font-semibold text-gray-900 mb-3">Distribution</h3>
+        <div style="position: relative; height: 280px;"><canvas></canvas></div>
+    </div>
+
+    <div id="cmp-composition" class="hidden bg-white border border-gray-200 rounded-lg p-5 mb-4">
+        <h3 class="text-md font-semibold text-gray-900 mb-3">Per-change contribution to sum</h3>
+        <div style="position: relative; height: 280px;"><canvas></canvas></div>
+    </div>
+
+    <div id="cmp-table" class="hidden bg-white border border-gray-200 rounded-lg p-5 mb-4">
+        <h3 class="text-md font-semibold text-gray-900 mb-3">All statistics</h3>
+        <div data-cmp-table-body class="overflow-x-auto"></div>
+    </div>
+</div>
