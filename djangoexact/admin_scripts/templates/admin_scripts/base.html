@@ -10,6 +10,29 @@
     <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"
             integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
             crossorigin="anonymous"></script>
+    {# Tom Select powers the multi-select filter comboboxes. Init runs on
+       DOMContentLoaded for the initial form and on htmx:afterSettle so
+       fragments swapped in by htmx (new change panels, scenario tabs,
+       filter narrowing) get a TomSelect instance too. #}
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.min.css">
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        function initComboboxes(root) {
+            if (!root || typeof TomSelect === 'undefined') return;
+            if (!(root instanceof Element) && !(root instanceof Document)) return;
+            root.querySelectorAll('select.js-combobox:not(.tomselected)').forEach(function (el) {
+                new TomSelect(el, {
+                    plugins: ['remove_button'],
+                    persist: false,
+                    create: false,
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () { initComboboxes(document); });
+        document.addEventListener('htmx:afterSettle', function (e) { initComboboxes(e.target); });
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>

@@ -30,6 +30,34 @@ def staff_required(view_func):
     return wrapper
 
 
+def _change_record_filter_choices(qs=None):
+    """Distinct non-empty filter values from ChangeRecord.
+
+    Returns a dict with keys ``regions`` (used by the global filter) and
+    ``climates``/``moistures``/``soil_types`` (used by the per-change filter
+    block). Shared by every render path that emits the scenario form so
+    dropdowns are populated at initial server-render and don't depend on
+    the deferred htmx_filters swap firing first. Pass ``qs`` to scope (e.g.
+    by ``module_type`` for the htmx-driven per-change narrowing).
+    """
+    if qs is None:
+        qs = ChangeRecord.objects.all()
+    return {
+        "regions": list(
+            qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
+        ),
+        "climates": list(
+            qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
+        ),
+        "moistures": list(
+            qs.exclude(moisture="").values_list("moisture", flat=True).distinct().order_by("moisture")
+        ),
+        "soil_types": list(
+            qs.exclude(soil_type="").values_list("soil_type", flat=True).distinct().order_by("soil_type")
+        ),
+    }
+
+
 def _resolve_value_source(value_source):
     """Resolve a catalog value_source dict to a list of string values.
 
@@ -187,23 +215,22 @@ def _parse_changes_from_post(post_data, prefix=""):
                 "filters": {},
                 "unit": post_data.get(f"{prefix}change-{index}-unit", ""),
             }
-            region = post_data.getlist(f"{prefix}change-{index}-filter-region")
-            if region:
-                change["filters"]["region"] = region
-            climate = post_data.getlist(f"{prefix}change-{index}-filter-climate")
-            if climate:
-                change["filters"]["climate"] = climate
+            for col in ("climate", "moisture", "soil_type"):
+                values = post_data.getlist(f"{prefix}change-{index}-filter-{col}")
+                if values:
+                    change["filters"][col] = values
             changes.append(change)
         index += 1
     return changes
 
 
 def _parse_global_filters(post_data):
-    """Parse global filter fields from POST data."""
+    """Parse global filter fields from POST data.
+
+    Region is the only global filter; climate/moisture/soil_type are scoped
+    per-change.
+    """
     filters = {}
-    soil_type = post_data.getlist("global_filter_soil_type")
-    if soil_type:
-        filters["soil_type"] = soil_type
     region = post_data.getlist("global_filter_region")
     if region:
         filters["region"] = region
@@ -273,20 +300,15 @@ def compile_scenarios(request):
         "default_id_prefix": "scenario-0-change-0",
     }]
 
-    # Populate the global (scenario-level) region filter from the distinct
-    # regions present in ChangeRecord. Without this the dropdown stays empty
-    # because the template has nothing to iterate over.
-    regions = list(
-        ChangeRecord.objects.exclude(region="")
-        .values_list("region", flat=True)
-        .distinct()
-        .order_by("region")
-    )
+    # Populate the global region filter and the per-change
+    # climate/moisture/soil_type dropdowns from distinct values in ChangeRecord.
+    # Without these the dropdowns render as empty <select>s on initial load.
+    choices = _change_record_filter_choices()
 
     context = {
         "module_types": module_types,
         "scenarios": scenarios,
-        "regions": regions,
+        **choices,
     }
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
@@ -392,18 +414,14 @@ def htmx_filters(request):
         return HttpResponse("")
 
     qs = ChangeRecord.objects.filter(module_type=module_type)
-    regions = list(
-        qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
-    )
-    climates = list(
-        qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
-    )
+    choices = _change_record_filter_choices(qs)
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,
         "prefix": prefix,
-        "regions": regions,
-        "climates": climates,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -425,12 +443,16 @@ def htmx_add_change(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
         "prefix": prefix,
         "id_prefix": id_prefix,
         "scenario_index": scenario_index,
         "module_types": module_types,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -444,6 +466,7 @@ def htmx_add_scenario(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
 
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
@@ -460,6 +483,9 @@ def htmx_add_scenario(request):
             "default_prefix": default_prefix,
             "default_id_prefix": default_id_prefix,
             "active": True,
+            "climates": choices["climates"],
+            "moistures": choices["moistures"],
+            "soil_types": choices["soil_types"],
         },
     )
 
