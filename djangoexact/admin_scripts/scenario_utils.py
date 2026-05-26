@@ -267,13 +267,15 @@ def stats_for_scenario(changes, global_filters):
 
     stats = _descriptive_stats_from_values(scaled_values)
 
-    # Outlier counts past the standard 1.5*IQR fences.
-    # 0 when IQR is not defined (n < 4) — q1/q3 will be None and the
-    # comparison below is skipped.
+    # Outlier counts using the standard 1.5*IQR fences.
+    # Skipped for n < 4: quantiles from small samples are unreliable,
+    # and `_descriptive_stats_from_values` returns None quartiles only at n == 0.
     outliers_low = 0
     outliers_high = 0
-    q1, q3, iqr = stats["q1"], stats["q3"], stats["iqr"]
-    if q1 is not None and q3 is not None and iqr is not None and len(scaled_values) >= 4:
+    if len(scaled_values) >= 4:
+        q1 = stats["q1"]
+        q3 = stats["q3"]
+        iqr = stats["iqr"]
         lo_fence = q1 - 1.5 * iqr
         hi_fence = q3 + 1.5 * iqr
         for v in scaled_values:
