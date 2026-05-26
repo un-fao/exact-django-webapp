@@ -43,26 +43,15 @@
     {# Global filters (shared) #}
     <details class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
         <summary class="text-sm font-medium text-gray-700 cursor-pointer">Global Filters (applied to all scenarios)</summary>
-        <div class="mt-3 grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Soil Type</label>
-                <select name="global_filter_soil_type" multiple
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" size="3">
-                    <option value="High Activity Clay" selected>High Activity Clay</option>
-                    <option value="Low Activity Clay" selected>Low Activity Clay</option>
-                    <option value="Sandy" selected>Sandy</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Region</label>
-                <select name="global_filter_region" multiple
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" size="3">
-                    {% for r in regions %}
-                    <option value="{{ r }}">{{ r }}</option>
-                    {% endfor %}
-                </select>
-                <p class="text-xs text-gray-400 mt-1">Leave empty for all regions</p>
-            </div>
+        <div class="mt-3">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Region</label>
+            <select name="global_filter_region" multiple
+                    class="js-combobox w-full border border-gray-300 rounded px-3 py-2 text-sm" size="3">
+                {% for r in regions %}
+                <option value="{{ r }}">{{ r }}</option>
+                {% endfor %}
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Leave empty for all regions</p>
         </div>
     </details>
 

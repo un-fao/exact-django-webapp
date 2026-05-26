@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 from functools import wraps
 
-import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
@@ -12,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 from admin_scripts.catalog import get_catalog
+from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
 from admin_scripts.models import ComputationJob
@@ -28,6 +28,34 @@ def staff_required(view_func):
             return HttpResponseForbidden("You do not have permission to access this page.")
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def _change_record_filter_choices(qs=None):
+    """Distinct non-empty filter values from ChangeRecord.
+
+    Returns a dict with keys ``regions`` (used by the global filter) and
+    ``climates``/``moistures``/``soil_types`` (used by the per-change filter
+    block). Shared by every render path that emits the scenario form so
+    dropdowns are populated at initial server-render and don't depend on
+    the deferred htmx_filters swap firing first. Pass ``qs`` to scope (e.g.
+    by ``module_type`` for the htmx-driven per-change narrowing).
+    """
+    if qs is None:
+        qs = ChangeRecord.objects.all()
+    return {
+        "regions": list(
+            qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
+        ),
+        "climates": list(
+            qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
+        ),
+        "moistures": list(
+            qs.exclude(moisture="").values_list("moisture", flat=True).distinct().order_by("moisture")
+        ),
+        "soil_types": list(
+            qs.exclude(soil_type="").values_list("soil_type", flat=True).distinct().order_by("soil_type")
+        ),
+    }
 
 
 def _resolve_value_source(value_source):
@@ -187,23 +215,22 @@ def _parse_changes_from_post(post_data, prefix=""):
                 "filters": {},
                 "unit": post_data.get(f"{prefix}change-{index}-unit", ""),
             }
-            region = post_data.getlist(f"{prefix}change-{index}-filter-region")
-            if region:
-                change["filters"]["region"] = region
-            climate = post_data.getlist(f"{prefix}change-{index}-filter-climate")
-            if climate:
-                change["filters"]["climate"] = climate
+            for col in ("climate", "moisture", "soil_type"):
+                values = post_data.getlist(f"{prefix}change-{index}-filter-{col}")
+                if values:
+                    change["filters"][col] = values
             changes.append(change)
         index += 1
     return changes
 
 
 def _parse_global_filters(post_data):
-    """Parse global filter fields from POST data."""
+    """Parse global filter fields from POST data.
+
+    Region is the only global filter; climate/moisture/soil_type are scoped
+    per-change.
+    """
     filters = {}
-    soil_type = post_data.getlist("global_filter_soil_type")
-    if soil_type:
-        filters["soil_type"] = soil_type
     region = post_data.getlist("global_filter_region")
     if region:
         filters["region"] = region
@@ -273,20 +300,15 @@ def compile_scenarios(request):
         "default_id_prefix": "scenario-0-change-0",
     }]
 
-    # Populate the global (scenario-level) region filter from the distinct
-    # regions present in ChangeRecord. Without this the dropdown stays empty
-    # because the template has nothing to iterate over.
-    regions = list(
-        ChangeRecord.objects.exclude(region="")
-        .values_list("region", flat=True)
-        .distinct()
-        .order_by("region")
-    )
+    # Populate the global region filter and the per-change
+    # climate/moisture/soil_type dropdowns from distinct values in ChangeRecord.
+    # Without these the dropdowns render as empty <select>s on initial load.
+    choices = _change_record_filter_choices()
 
     context = {
         "module_types": module_types,
         "scenarios": scenarios,
-        "regions": regions,
+        **choices,
     }
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
@@ -392,18 +414,14 @@ def htmx_filters(request):
         return HttpResponse("")
 
     qs = ChangeRecord.objects.filter(module_type=module_type)
-    regions = list(
-        qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
-    )
-    climates = list(
-        qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
-    )
+    choices = _change_record_filter_choices(qs)
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,
         "prefix": prefix,
-        "regions": regions,
-        "climates": climates,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -425,12 +443,16 @@ def htmx_add_change(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
         "prefix": prefix,
         "id_prefix": id_prefix,
         "scenario_index": scenario_index,
         "module_types": module_types,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -444,6 +466,7 @@ def htmx_add_scenario(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
 
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
@@ -460,6 +483,9 @@ def htmx_add_scenario(request):
             "default_prefix": default_prefix,
             "default_id_prefix": default_id_prefix,
             "active": True,
+            "climates": choices["climates"],
+            "moistures": choices["moistures"],
+            "soil_types": choices["soil_types"],
         },
     )
 
@@ -580,61 +606,18 @@ def compile_scenarios_export(request):
     if not scenarios:
         return HttpResponse("No scenarios provided", status=400)
 
-    buffer = io.BytesIO()
-    summary_rows = []
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        for scenario in scenarios:
-            scenario_name = scenario["scenario_name"] or "Unnamed Scenario"
-            category = scenario["category"]
-            changes = scenario["changes"]
+    now = datetime.now()
+    requested_by = request.user.get_username() if request.user.is_authenticated else None
+    workbook_bytes = build_scenarios_workbook(
+        scenarios,
+        global_filters,
+        requested_by=requested_by,
+        now=now,
+    )
 
-            if not changes:
-                continue
-
-            statistics = stats_for_scenario(changes, global_filters)
-
-            summary_rows.append({
-                "Category": category,
-                "Scenario Name": scenario_name,
-                "Count": statistics.get("count", 0),
-                "Sum Total": statistics.get("sum_total"),
-                "Mean": statistics.get("mean"),
-                "Median": statistics.get("median"),
-                "Min": statistics.get("min"),
-                "Max": statistics.get("max"),
-                "Std Dev": statistics.get("std"),
-                "Q1": statistics.get("q1"),
-                "Q3": statistics.get("q3"),
-                "IQR": statistics.get("iqr"),
-                "CI 95%": statistics.get("ci_95"),
-                "CI 99%": statistics.get("ci_99"),
-            })
-
-            # Changes sheet
-            changes_sheet = f"{scenario_name} Changes"[:31]
-            changes_data = []
-            for i, change in enumerate(changes, 1):
-                changes_data.append({
-                    "Change #": i,
-                    "Module Type": change.get("module_type", ""),
-                    "Field": change["start"]["field"],
-                    "From Value": change["start"]["value"],
-                    "To Value": change["end"]["value"],
-                    "Units": change.get("unit", ""),
-                })
-            if changes_data:
-                pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)
-
-        if summary_rows:
-            pd.DataFrame(summary_rows).to_excel(writer, sheet_name="Summary", index=False)
-            writer.book.move_sheet("Summary", offset=-len(writer.book.sheetnames) + 1)
-
-    buffer.seek(0)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"scenarios_{timestamp}.xlsx"
-
+    filename = f"scenarios_{now.strftime('%Y%m%d_%H%M%S')}.xlsx"
     return FileResponse(
-        buffer,
+        io.BytesIO(workbook_bytes),
         as_attachment=True,
         filename=filename,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
