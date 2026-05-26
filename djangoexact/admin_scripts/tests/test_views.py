@@ -421,6 +421,80 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(stats["outliers_low"], 0)
         self.assertEqual(stats["outliers_high"], 0)
 
+    def test_stats_for_scenario_per_change_single_change(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 1)
+        entry = stats["per_change"][0]
+        self.assertEqual(entry["module_type"], "Grassland")
+        self.assertEqual(entry["field"], "grassland_management_type")
+        self.assertEqual(entry["from_value"], "Non-Degraded")
+        self.assertEqual(entry["to_value"], "Improved Grassland")
+        self.assertEqual(entry["unit"], 2.0)
+        self.assertEqual(entry["count"], 5)
+        self.assertAlmostEqual(entry["sum"], -20.0, places=5)
+        self.assertAlmostEqual(entry["mean"], -4.0, places=5)
+        self.assertEqual(
+            entry["label"],
+            "Grassland: Non-Degraded → Improved Grassland",
+        )
+
+    def test_stats_for_scenario_per_change_two_changes_preserves_order(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        ChangeRecord.objects.create(
+            module_type="Annual Cropland",
+            region="Central Asia",
+            climate="Cool Temperate",
+            moisture="Moist",
+            soil_type="High Activity Clay",
+            total=-0.5,
+            field="organic_input_type",
+            from_value="Low C input",
+            to_value="High C input",
+        )
+        changes = [
+            {
+                "module_type": "Annual Cropland",
+                "start": {"field": "organic_input_type", "value": "Low C input"},
+                "end": {"field": "organic_input_type", "value": "High C input"},
+                "unit": "1",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 2)
+        self.assertEqual(stats["per_change"][0]["module_type"], "Annual Cropland")
+        self.assertEqual(stats["per_change"][0]["count"], 1)
+        self.assertAlmostEqual(stats["per_change"][0]["sum"], -0.5, places=5)
+        self.assertEqual(stats["per_change"][1]["module_type"], "Grassland")
+        self.assertEqual(stats["per_change"][1]["count"], 5)
+        self.assertAlmostEqual(stats["per_change"][1]["sum"], -10.0, places=5)
+
+    def test_stats_for_scenario_per_change_skips_change_without_module_type(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [
+            {"module_type": "", "start": {"field": "", "value": ""}, "end": {"field": "", "value": ""}},
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 1)
+        self.assertEqual(stats["per_change"][0]["module_type"], "Grassland")
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
