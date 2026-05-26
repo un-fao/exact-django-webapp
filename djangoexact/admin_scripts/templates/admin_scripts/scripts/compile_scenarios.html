@@ -31,6 +31,11 @@
                 class="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
             + Add Scenario
         </button>
+    <button type="button" data-scenario-tab="compare"
+            onclick="switchScenarioTab('compare')"
+            class="ml-auto px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+        Compare
+    </button>
     </div>
 
     {# Scenario panels #}
@@ -39,6 +44,7 @@
             {% include "admin_scripts/partials/scenario_panel.html" with scenario_index=forloop.counter0 scenario=scenario module_types=module_types default_prefix=scenario.default_prefix default_id_prefix=scenario.default_id_prefix active=forloop.first %}
         {% endfor %}
     </div>
+    {% include "admin_scripts/partials/compare_panel.html" %}
 
     {# Global filters (shared) #}
     <details class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
@@ -70,15 +76,29 @@
 
 <script>
 function switchScenarioTab(index) {
+    // Hide every scenario panel and the compare panel.
     document.querySelectorAll('[data-scenario-panel]').forEach(function(p) {
         p.classList.add('hidden');
     });
+    var comparePanel = document.querySelector('[data-compare-panel]');
+    if (comparePanel) comparePanel.classList.add('hidden');
+
+    // Reset every tab's active style.
     document.querySelectorAll('[data-scenario-tab]').forEach(function(t) {
         t.classList.remove('border-blue-500', 'text-blue-600');
         t.classList.add('border-transparent', 'text-gray-500');
     });
-    var panel = document.querySelector('[data-scenario-panel="' + index + '"]');
-    if (panel) panel.classList.remove('hidden');
+
+    // Show the requested panel.
+    if (index === 'compare') {
+        if (comparePanel) comparePanel.classList.remove('hidden');
+        if (window.renderCompare) window.renderCompare();
+    } else {
+        var panel = document.querySelector('[data-scenario-panel="' + index + '"]');
+        if (panel) panel.classList.remove('hidden');
+    }
+
+    // Highlight the active tab.
     var tab = document.querySelector('[data-scenario-tab="' + index + '"]');
     if (tab) {
         tab.classList.add('border-blue-500', 'text-blue-600');
