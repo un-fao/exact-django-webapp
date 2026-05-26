@@ -355,6 +355,71 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(stats["count"], 5)
         self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
 
+    def test_stats_for_scenario_no_outliers_in_baseline_fixture(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # The five-record baseline fixture (-3.0, -2.5, -2.0, -1.5, -1.0) has no
+        # values past Q3+1.5*IQR or below Q1-1.5*IQR.
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["outliers_low"], 0)
+        self.assertEqual(stats["outliers_high"], 0)
+
+    def test_stats_for_scenario_counts_outliers_outside_iqr_fences(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # Add two extreme records - one well below Q1 - 1.5*IQR, one above.
+        # Baseline Q1=-2.75, Q3=-1.25, IQR=1.5, so fences are -5.0 / 1.0.
+        # -100 is a low outlier; 50 is a high outlier.
+        for extreme in (-100.0, 50.0):
+            ChangeRecord.objects.create(
+                module_type="Grassland",
+                region="Central Asia",
+                climate="Cool Temperate",
+                moisture="Moist",
+                soil_type="High Activity Clay",
+                total=extreme,
+                field="grassland_management_type",
+                from_value="Non-Degraded",
+                to_value="Improved Grassland",
+            )
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 7)
+        self.assertEqual(stats["outliers_low"], 1)
+        self.assertEqual(stats["outliers_high"], 1)
+
+    def test_stats_for_scenario_outlier_counts_zero_when_iqr_undefined(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # With fewer than 4 values, IQR is undefined; outlier counts must be 0.
+        ChangeRecord.objects.all().delete()
+        ChangeRecord.objects.create(
+            module_type="Grassland",
+            region="Central Asia",
+            climate="Cool Temperate",
+            moisture="Moist",
+            soil_type="High Activity Clay",
+            total=1.0,
+            field="grassland_management_type",
+            from_value="Non-Degraded",
+            to_value="Improved Grassland",
+        )
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 1)
+        self.assertEqual(stats["outliers_low"], 0)
+        self.assertEqual(stats["outliers_high"], 0)
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
