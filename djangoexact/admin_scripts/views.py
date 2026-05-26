@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 from functools import wraps
 
-import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
@@ -12,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 from admin_scripts.catalog import get_catalog
+from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
 from admin_scripts.models import ComputationJob
@@ -606,61 +606,18 @@ def compile_scenarios_export(request):
     if not scenarios:
         return HttpResponse("No scenarios provided", status=400)
 
-    buffer = io.BytesIO()
-    summary_rows = []
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        for scenario in scenarios:
-            scenario_name = scenario["scenario_name"] or "Unnamed Scenario"
-            category = scenario["category"]
-            changes = scenario["changes"]
+    now = datetime.now()
+    requested_by = request.user.get_username() if request.user.is_authenticated else None
+    workbook_bytes = build_scenarios_workbook(
+        scenarios,
+        global_filters,
+        requested_by=requested_by,
+        now=now,
+    )
 
-            if not changes:
-                continue
-
-            statistics = stats_for_scenario(changes, global_filters)
-
-            summary_rows.append({
-                "Category": category,
-                "Scenario Name": scenario_name,
-                "Count": statistics.get("count", 0),
-                "Sum Total": statistics.get("sum_total"),
-                "Mean": statistics.get("mean"),
-                "Median": statistics.get("median"),
-                "Min": statistics.get("min"),
-                "Max": statistics.get("max"),
-                "Std Dev": statistics.get("std"),
-                "Q1": statistics.get("q1"),
-                "Q3": statistics.get("q3"),
-                "IQR": statistics.get("iqr"),
-                "CI 95%": statistics.get("ci_95"),
-                "CI 99%": statistics.get("ci_99"),
-            })
-
-            # Changes sheet
-            changes_sheet = f"{scenario_name} Changes"[:31]
-            changes_data = []
-            for i, change in enumerate(changes, 1):
-                changes_data.append({
-                    "Change #": i,
-                    "Module Type": change.get("module_type", ""),
-                    "Field": change["start"]["field"],
-                    "From Value": change["start"]["value"],
-                    "To Value": change["end"]["value"],
-                    "Units": change.get("unit", ""),
-                })
-            if changes_data:
-                pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)
-
-        if summary_rows:
-            pd.DataFrame(summary_rows).to_excel(writer, sheet_name="Summary", index=False)
-            writer.book.move_sheet("Summary", offset=-len(writer.book.sheetnames) + 1)
-
-    buffer.seek(0)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"scenarios_{timestamp}.xlsx"
-
+    filename = f"scenarios_{now.strftime('%Y%m%d_%H%M%S')}.xlsx"
     return FileResponse(
-        buffer,
+        io.BytesIO(workbook_bytes),
         as_attachment=True,
         filename=filename,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
