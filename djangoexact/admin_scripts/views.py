@@ -496,21 +496,29 @@ def htmx_run_scenario(request):
     if request.method != "POST":
         return HttpResponse("POST required", status=405)
 
+    import json
+
     scenario_index = request.POST.get("scenario_index", "0")
     prefix = f"scenario-{scenario_index}-"
 
     changes = _parse_changes_from_post(request.POST, prefix=prefix)
     global_filters = _parse_global_filters(request.POST)
 
-    context = {}
+    context = {
+        "scenario_index": scenario_index,
+    }
+    stats = None
+    gaps = []
+    error = None
+    not_computed = False
+
     if not changes:
-        context["error"] = "Please add at least one change."
+        error = "Please add at least one change."
+        context["error"] = error
     else:
         stats = stats_for_scenario(changes, global_filters)
 
         if stats["count"] == 0:
-            # Check if any of the changes are gaps (no data computed yet)
-            gaps = []
             for change in changes:
                 field = change["start"]["field"]
                 from_val = change["start"]["value"]
@@ -522,7 +530,6 @@ def htmx_run_scenario(request):
                         "from_value": from_val,
                         "to_value": to_val,
                     })
-
             if gaps:
                 context["gaps"] = gaps
             else:
@@ -530,7 +537,44 @@ def htmx_run_scenario(request):
         else:
             context["statistics"] = stats
 
+    # Always-present payload for the Compare tab. ``statistics`` is included
+    # even when ``count == 0`` so the client never has to special-case.
+    payload = {
+        "scenario_index": scenario_index,
+        "scenario_name": request.POST.get(f"{prefix}scenario_name", ""),
+        "category": request.POST.get(f"{prefix}category", ""),
+        "statistics": stats if stats is not None else _empty_stats(),
+        "gaps": gaps,
+        "error": error,
+        "not_computed": not_computed,
+    }
+    context["result_json"] = json.dumps(payload, default=str)
+
     return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
+def _empty_stats():
+    """Empty stats dict in the same shape ``stats_for_scenario`` returns.
+    Used by ``htmx_run_scenario`` when no changes were provided, so the
+    Compare tab always sees a stable schema.
+    """
+    return {
+        "count": 0,
+        "sum_total": 0.0,
+        "mean": None,
+        "median": None,
+        "min": None,
+        "max": None,
+        "std": None,
+        "q1": None,
+        "q3": None,
+        "iqr": None,
+        "ci_95": None,
+        "ci_99": None,
+        "outliers_low": 0,
+        "outliers_high": 0,
+        "per_change": [],
+    }
 
 
 @login_required(login_url="/admin/login/")
