@@ -627,6 +627,8 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "change-1-module_type")
 
     def test_export_to_excel(self):
+        from openpyxl import load_workbook
+
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
             "scenario-0-scenario_name": "Test Export",
@@ -641,6 +643,63 @@ class CompileScenariosViewTest(TestCase):
             response["Content-Type"],
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+
+        body = b"".join(response.streaming_content) if response.streaming else response.content
+        wb = load_workbook(io.BytesIO(body))
+
+        # Run Info first, Summary second, then one detail sheet per scenario.
+        self.assertEqual(wb.sheetnames[0], "Run Info")
+        self.assertEqual(wb.sheetnames[1], "Summary")
+        self.assertIn("Test Export", wb.sheetnames)
+
+        summary = wb["Summary"]
+        header = [cell.value for cell in summary[1]]
+        for expected in ("Count", "Mean", "Median", "Std Dev"):
+            self.assertIn(expected, header)
+        self.assertNotIn("Distribution", header)
+        # First data row records the scenario.
+        row_values = [cell.value for cell in summary[2]]
+        self.assertEqual(row_values[header.index("Scenario Name")], "Test Export")
+        self.assertEqual(row_values[header.index("Category")], "Test")
+
+        detail = wb["Test Export"]
+        cell_values = {cell.value for row in detail.iter_rows() for cell in row}
+        for expected in ("STATISTICS", "GLOBAL FILTERS", "CHANGES", "Matched Records"):
+            self.assertIn(expected, cell_values)
+        self.assertNotIn("DISTRIBUTION", cell_values)
+
+    def test_export_to_excel_sanitizes_and_uniquifies_sheet_names(self):
+        from openpyxl import load_workbook
+
+        self.client.login(email="staff@example.com", password="testpass123")
+        # Same name twice + a name carrying chars Excel forbids in sheet titles.
+        response = self.client.post("/api/admin-scripts/compile-scenarios/export/", {
+            "scenario-0-scenario_name": "Soil/Land*Restoration?",
+            "scenario-0-category": "Cat",
+            "scenario-0-change-0-module_type": "Grassland",
+            "scenario-0-change-0-field": "grassland_management_type",
+            "scenario-0-change-0-from_value": "Non-Degraded",
+            "scenario-0-change-0-to_value": "Improved Grassland",
+            "scenario-1-scenario_name": "Soil/Land*Restoration?",
+            "scenario-1-category": "Cat",
+            "scenario-1-change-0-module_type": "Grassland",
+            "scenario-1-change-0-field": "grassland_management_type",
+            "scenario-1-change-0-from_value": "Non-Degraded",
+            "scenario-1-change-0-to_value": "Improved Grassland",
+        })
+        self.assertEqual(response.status_code, 200)
+
+        body = b"".join(response.streaming_content) if response.streaming else response.content
+        wb = load_workbook(io.BytesIO(body))
+
+        # No sheet name contains a forbidden char, both scenarios got a sheet,
+        # the second got a deduplicated " (2)" suffix.
+        for name in wb.sheetnames:
+            for forbidden in "[]:*?/\\":
+                self.assertNotIn(forbidden, name)
+        scenario_sheets = [n for n in wb.sheetnames if n not in ("Run Info", "Summary")]
+        self.assertEqual(len(scenario_sheets), 2)
+        self.assertTrue(any(s.endswith("(2)") for s in scenario_sheets))
 
     def test_export_requires_post(self):
         self.client.login(email="staff@example.com", password="testpass123")
