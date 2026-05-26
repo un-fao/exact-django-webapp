@@ -244,26 +244,47 @@ def stats_for_scenario(changes, global_filters):
     """Compute descriptive statistics over ``record.total × change.unit`` for
     every ChangeRecord matched by each change in *changes*.
 
-    A record matching multiple changes is counted once *per matching change*
-    (so its scaled value appears once for each change's unit). The unit
-    defaults to 1.0 for missing / blank / non-numeric / negative inputs,
-    which makes a scenario with no explicit units behave equivalently to the
-    legacy ``stats_for(build_scenario_query(...))`` pipeline.
+    Returns the descriptive stats dict (see ``_descriptive_stats_from_values``)
+    plus three extra keys:
+
+    - ``outliers_low``  count of scaled values below ``Q1 - 1.5*IQR``
+    - ``outliers_high`` count of scaled values above ``Q3 + 1.5*IQR``
+    - ``per_change``    list of per-change rollups in input order, one entry
+                        per change with a ``module_type``. Each entry:
+                        ``{label, module_type, field, from_value, to_value,
+                        unit, count, sum, mean}``.
     """
-    # Lazy import to keep this module import-cycle-safe.
     from minitool.models import ChangeRecord
 
     scaled_values = []
+    per_change = []
     for change in changes:
         if not change.get("module_type"):
             continue
         unit = _coerce_unit(change.get("unit"))
         q = _build_single_change_q(change, global_filters)
-        totals = ChangeRecord.objects.filter(q).values_list("total", flat=True)
-        if unit == 1.0:
-            scaled_values.extend(totals)
-        else:
-            scaled_values.extend(v * unit for v in totals)
+        # Materialize once: used for both the aggregate distribution and the
+        # per-change rollup. One query per change, identical to today.
+        totals = list(ChangeRecord.objects.filter(q).values_list("total", flat=True))
+        scaled = totals if unit == 1.0 else [v * unit for v in totals]
+        scaled_values.extend(scaled)
+
+        n_change = len(scaled)
+        sum_change = sum(scaled) if n_change else 0.0
+        mean_change = (sum_change / n_change) if n_change else None
+        from_value = change["start"]["value"]
+        to_value = change["end"]["value"]
+        per_change.append({
+            "label": f"{change['module_type']}: {from_value} → {to_value}",
+            "module_type": change["module_type"],
+            "field": change["start"]["field"],
+            "from_value": from_value,
+            "to_value": to_value,
+            "unit": unit,
+            "count": n_change,
+            "sum": sum_change,
+            "mean": mean_change,
+        })
 
     stats = _descriptive_stats_from_values(scaled_values)
 
@@ -285,5 +306,6 @@ def stats_for_scenario(changes, global_filters):
                 outliers_high += 1
     stats["outliers_low"] = outliers_low
     stats["outliers_high"] = outliers_high
+    stats["per_change"] = per_change
 
     return stats
