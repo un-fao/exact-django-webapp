@@ -413,6 +413,68 @@
         });
     }
 
+    function fmt(v, places) {
+        if (v === null || v === undefined) return "n/a";
+        return Number(v).toFixed(places === undefined ? 4 : places);
+    }
+
+    function renderTable(indices) {
+        var mount = document.getElementById("cmp-table");
+        if (!mount) return;
+        var body = mount.querySelector("[data-cmp-table-body]");
+        if (!body) return;
+        if (indices.length === 0) {
+            mount.classList.add("hidden");
+            body.innerHTML = "";
+            return;
+        }
+        mount.classList.remove("hidden");
+
+        var columns = [
+            { key: "count",     label: "n",         places: 0 },
+            { key: "sum_total", label: "Sum",       places: 2 },
+            { key: "mean",      label: "Mean",      places: 4 },
+            { key: "median",    label: "Median",    places: 4 },
+            { key: "std",       label: "Std",       places: 4 },
+            { key: "min",       label: "Min",       places: 4 },
+            { key: "max",       label: "Max",       places: 4 },
+            { key: "q1",        label: "Q1",        places: 4 },
+            { key: "q3",        label: "Q3",        places: 4 },
+            { key: "ci_95",     label: "CI 95%",    places: 4 },
+        ];
+
+        var thead = "<thead><tr class=\"text-left text-xs text-gray-500 border-b\">"
+            + "<th class=\"px-3 py-2\">Scenario</th>"
+            + columns.map(function (c) {
+                return "<th class=\"px-3 py-2 text-right\">" + c.label + "</th>";
+            }).join("")
+            + "</tr></thead>";
+
+        var rows = indices.map(function (idx) {
+            var slot = window.scenarioResults[idx];
+            var s = (slot && slot.result && slot.result.statistics) || {};
+            var name = scenarioLabel(idx, slot);
+            var color = colorForScenario(idx);
+            var cells = columns.map(function (c) {
+                return "<td class=\"px-3 py-2 text-right font-mono text-xs\">" + fmt(s[c.key], c.places) + "</td>";
+            }).join("");
+            return "<tr class=\"border-b last:border-b-0\">"
+                + "<td class=\"px-3 py-2 text-sm font-medium\" style=\"color:" + color + "\">"
+                + escapeText(name) + "</td>" + cells + "</tr>";
+        }).join("");
+
+        body.innerHTML = "<table class=\"min-w-full text-sm\">" + thead + "<tbody>" + rows + "</tbody></table>";
+    }
+
+    function escapeText(s) {
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#x27;");
+    }
+
     function renderCompare() {
         var indices = Object.keys(window.scenarioResults).sort(function (a, b) {
             return Number(a) - Number(b);
@@ -425,7 +487,7 @@
         renderBarChart(indices);
         renderBoxPlot(indices);
         renderComposition(indices);
-        // Comparison table will be added in next task.
+        renderTable(indices);
     }
 
     window.renderCompare = renderCompare;
