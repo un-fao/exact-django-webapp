@@ -265,4 +265,23 @@ def stats_for_scenario(changes, global_filters):
         else:
             scaled_values.extend(v * unit for v in totals)
 
-    return _descriptive_stats_from_values(scaled_values)
+    stats = _descriptive_stats_from_values(scaled_values)
+
+    # Outlier counts past the standard 1.5*IQR fences.
+    # 0 when IQR is not defined (n < 4) — q1/q3 will be None and the
+    # comparison below is skipped.
+    outliers_low = 0
+    outliers_high = 0
+    q1, q3, iqr = stats["q1"], stats["q3"], stats["iqr"]
+    if q1 is not None and q3 is not None and iqr is not None and len(scaled_values) >= 4:
+        lo_fence = q1 - 1.5 * iqr
+        hi_fence = q3 + 1.5 * iqr
+        for v in scaled_values:
+            if v < lo_fence:
+                outliers_low += 1
+            elif v > hi_fence:
+                outliers_high += 1
+    stats["outliers_low"] = outliers_low
+    stats["outliers_high"] = outliers_high
+
+    return stats
