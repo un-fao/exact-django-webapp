@@ -7229,7 +7229,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
                 self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
-        self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
+        # Reverse-relation managers raise on unsaved ForestManagement
+        # instances (same pattern as Settlement / FloodedRice). The
+        # permutation runner builds ForestManagement unsaved — without a
+        # pk the related disturbances queryset is empty by construction.
+        # Downstream code calls ``self.disturbances.values_list(...)`` so we
+        # keep a queryset shape via ``ForestDisturbance.objects.none()``.
+        self.disturbances: list[ForestDisturbance] = (
+            self.module.disturbances.all() if self.module.pk else ForestDisturbance.objects.none()
+        )
 
         return super().get_defaults(calculate)
 
