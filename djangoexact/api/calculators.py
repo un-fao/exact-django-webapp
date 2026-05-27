@@ -2903,7 +2903,14 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+        # Reverse-relation managers raise on unsaved FloodedRice instances
+        # ("FloodedRice instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # FloodedRice unsaved to skip DB writes — with no pk there are no
+        # related MinorSeasonFloodedRice rows to sum either.
+        minor_seasons: list[MinorSeasonFloodedRice] = (
+            list(module.minor_seasons.all()) if module.pk else []
+        )
 
         if any([not season.is_ready() for season in minor_seasons]):
             raise Exception("At least one minor season is not ready")
@@ -3998,11 +4005,18 @@ class EnergyEntryCalculator(BaseCalculator):
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
 
-            if self.module.fuel_type_start.name_en in ["Renewable"]:
+            # PackagingEntry / ProcessingEntry / TransportEntry / StorageEntry
+            # inherit FuelMixin via ValueChainSubmodule but don't always
+            # require fuel_type to be set (e.g. is_electric=False packaging).
+            # Guard the .name_en access so the calculator doesn't blow up
+            # with "'NoneType' object has no attribute 'name_en'" when the
+            # parent calculator instantiates EnergyEntryCalculator
+            # speculatively.
+            if self.module.fuel_type_start and self.module.fuel_type_start.name_en in ["Renewable"]:
                 self.electricity_ef_selected_start.value = 0
-            if self.module.fuel_type_w.name_en in ["Renewable"]:
+            if self.module.fuel_type_w and self.module.fuel_type_w.name_en in ["Renewable"]:
                 self.electricity_ef_selected_w.value = 0
-            if self.module.fuel_type_wo.name_en in ["Renewable"]:
+            if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en in ["Renewable"]:
                 self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:

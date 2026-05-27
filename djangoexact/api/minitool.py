@@ -1296,6 +1296,25 @@ def _apply_unsaved_defaults(instance, models):
                 name=models.EmissionFactorSource.OPERATING_MARGIN
             )[0]
         instance.ef_source = _apply_unsaved_defaults._ef_source
+
+    # Tier-2 override floats default to None on the mixins ("no override,
+    # use IPCC default"). When the IPCC default is also missing — e.g.
+    # ``EnergyDefaultEmissionFactor.co2 is None`` for a renewable fuel —
+    # the calculator falls back to the tier-2 value and the math throws
+    # ``unsupported operand type(s) for *: 'float' and 'NoneType'``.
+    # Replacing None with 0 keeps "no override" semantics (factor_t2 is
+    # only used via ``factor or default`` / ``factor if factor is not
+    # None`` patterns) while keeping the math arithmetic-safe.
+    from django.db.models import FloatField as _FloatField
+    for _field in instance._meta.get_fields():
+        if not isinstance(_field, _FloatField):
+            continue
+        _name = _field.attname
+        if "_t2" not in _name:
+            continue
+        if getattr(instance, _name, None) is None:
+            setattr(instance, _name, 0)
+
     return instance
 
 
@@ -1348,7 +1367,12 @@ class StorageProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.StorageFactory.build(activity=activity)
-        entry = models.StorageEntry(
+        # Use the factory so total_refrigerant_leakage_* and
+        # emission_factor_t2_* land on the instance — StorageEntryCalculator
+        # feeds them straight into MathValueChain, and bare model
+        # construction left them None, triggering "unsupported operand
+        # type(s) for *: 'NoneType' and 'float'" in the math.
+        entry = factories.StorageEntryFactory.build(
             parent=parent,
             fuel_type_start=fuel_type_start,
             fuel_type_w=fuel_type_w,
@@ -1978,6 +2002,110 @@ class PermutationComputer:
                 flat.append(item)
         return tuple(flat)
 
+    @staticmethod
+    def _build_combination_validator(module_type: str, fields_dict: dict):
+        """Return ``validator(combination) -> bool`` that filters out
+        permutations whose ``(land_use_type, climate, moisture, ...)`` tuple
+        has no matching IPCC reference-data row, or ``None`` if the module
+        has no per-permutation reference-data dependencies.
+
+        This is the planner-side "skip bad pairings" filter the user asked
+        for: it sits between the cartesian product and the worker pool, so
+        permutations that would deterministically raise "X does not exist"
+        / "is missing" inside the calculator never reach a worker — the
+        ``max_rows`` cap then applies to *processable* combinations.
+
+        The flat ``fields_dict`` keys are turned into positional indices to
+        match what ``_flatten_combo`` yields (paired ``_start``/``_w`` are
+        already split back into two positions at this point).
+        """
+        flat_keys: list[str] = []
+        for key in fields_dict.keys():
+            flat_keys.append(key)
+
+        def _idx(name: str) -> Optional[int]:
+            return flat_keys.index(name) if name in flat_keys else None
+
+        cm_idx = _idx("climate_moistures")
+        region_idx = _idx("region")
+        if cm_idx is None or region_idx is None:
+            return None
+
+        if module_type == "PerennialCropland":
+            # PerennialAGB rows are keyed by
+            # (land_use_type, climate, moisture, continent). LUTs without a
+            # matching row for the picked (climate, moisture, region) raise
+            # "PerennialAGB for X in Y climate does not exist for start
+            # scenario" inside the calculator.
+            valid_set = frozenset(
+                ipcc_models.PerennialAGB.objects.values_list(
+                    "land_use_type_id", "climate_id", "moisture_id", "continent_id",
+                )
+            )
+            if not valid_set:
+                return None
+            lut_indices = [
+                _idx(k) for k in (
+                    "land_use_type_start", "land_use_type_w", "land_use_type_wo", "land_use_type",
+                ) if _idx(k) is not None
+            ]
+            if not lut_indices:
+                return None
+
+            def validator(combo):
+                climate, moisture = combo[cm_idx]
+                region = combo[region_idx]
+                if region is None:
+                    return True
+                for li in lut_indices:
+                    lut = combo[li]
+                    if lut is None:
+                        continue
+                    if (lut.id, climate.id, moisture.id, region.id) not in valid_set:
+                        return False
+                return True
+            return validator
+
+        if module_type == "ForestManagement":
+            # ForestCombustionFactor rows are keyed by
+            # (land_use_type, climate, forest_type). Filter out combinations
+            # whose locked LUT / forest_type pair has no matching row, so we
+            # don't burn 100 permutations on "Combustion Factor Start not
+            # found for Rainforest, Cool Temperate, Natural" errors.
+            valid_set = frozenset(
+                ipcc_models.ForestCombustionFactor.objects.values_list(
+                    "land_use_type_id", "climate_id", "forest_type_id",
+                )
+            )
+            if not valid_set:
+                return None
+            forest_type_idx = _idx("forest_type")
+            if forest_type_idx is None:
+                return None
+            lut_indices = [
+                _idx(k) for k in (
+                    "land_use_type_start", "land_use_type_w", "land_use_type_wo", "land_use_type",
+                ) if _idx(k) is not None
+            ]
+            if not lut_indices:
+                return None
+
+            def validator(combo):
+                climate, _moisture = combo[cm_idx]
+                forest_type = combo[forest_type_idx]
+                if forest_type is None:
+                    return True
+                for li in lut_indices:
+                    lut = combo[li]
+                    if lut is None:
+                        continue
+                    if (lut.id, climate.id, forest_type.id) not in valid_set:
+                        return False
+                return True
+            return validator
+
+        return None
+
     def _chunked_constrained_product(self, *iterables, chunk_size: int = 1000):
         """Yield chunks of Cartesian product with ``_PairedValues`` flattening."""
         it = itertools.product(*iterables)
@@ -2089,6 +2217,14 @@ class PermutationComputer:
             total = math.prod(len(x) for x in iterables)
             logger.info(f"Total permutations (theoretical): {total:,}")
 
+        # Per-module reference-data validator. If the module has IPCC table
+        # dependencies (e.g. PerennialCropland → PerennialAGB) the validator
+        # drops combinations whose (LUT, climate, moisture, ...) tuple has no
+        # matching row, so the worker pool never sees them.
+        combination_validator = self._build_combination_validator(model.__name__, fields)
+        if combination_validator is not None:
+            logger.info(f"Per-module reference-data validator active for {model.__name__}")
+
         data = []
         errors_data = []
 
@@ -2134,6 +2270,16 @@ class PermutationComputer:
                         # futures would raise "cannot schedule new futures
                         # after shutdown" and abort the whole run.
                         break
+
+                    # Filter out combinations the per-module reference-data
+                    # validator rejects. Skipped combinations don't count
+                    # against the cap or surface as errors — they're dropped
+                    # silently so the runner spends its budget on permutations
+                    # that can actually compute.
+                    if combination_validator is not None:
+                        chunk = [c for c in chunk if combination_validator(c)]
+                        if not chunk:
+                            continue
 
                     # Use submit instead of map for better load balancing
                     futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
