@@ -373,7 +373,13 @@ def htmx_values(request):
         catalog_field = next((f for f in catalog_module.fields if f.field_name == field), None)
 
     if catalog_field:
-        values = _resolve_value_source(catalog_field.value_source)
+        # Pass module_type/field so the resolver consults MODULE_CONFIGS'
+        # filtered queryset (e.g. PerennialCropland.land_use_type is limited
+        # to perennial land use types). Without these args the dropdown lists
+        # values the test runner would later reject as out-of-range.
+        values = _resolve_value_source(
+            catalog_field.value_source, module_type, field,
+        )
     else:
         values = []
 
