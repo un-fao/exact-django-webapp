@@ -2201,6 +2201,31 @@ class PermutationComputer:
 
 
 import api.models as models
+import ipcc.models as ipcc_models
+
+
+# A handful of LandUseType / FuelType options exist in MODULE_CONFIGS'
+# querysets but lack the IPCC reference data the calculators depend on,
+# so picking them deterministically yields "X does not exist / not found
+# / is missing. Please provide a tier 2 value" errors. This page exists
+# to exercise the math, not surface reference-data gaps — so we gate the
+# querysets on the presence of the relevant IPCC record. The filters
+# below intersect each LUT/FuelType queryset with the LUT/FuelType ids
+# that appear in the required reference table.
+
+# PerennialAGB has records keyed by (climate, moisture, continent,
+# land_use_type). A LUT is "testable" for PerennialCropland only if at
+# least one PerennialAGB record exists for it.
+_PERENNIAL_TESTABLE_LUTS = ipcc_models.PerennialAGB.objects.values_list(
+    "land_use_type", flat=True,
+).distinct()
+
+# ForestCombustionFactor is keyed by (climate, forest_type,
+# land_use_type) — testable LUTs are the ones with at least one record.
+_FOREST_TESTABLE_LUTS = ipcc_models.ForestCombustionFactor.objects.values_list(
+    "land_use_type", flat=True,
+).distinct()
+
 
 # Module configurations
 MODULE_CONFIGS = {
@@ -2256,8 +2281,18 @@ MODULE_CONFIGS = {
     },
     "PerennialCropland": {
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            # id__in=_PERENNIAL_TESTABLE_LUTS drops LUTs that lack PerennialAGB
+            # reference data (e.g. "Alley Cropping" in some climates) so the
+            # runner doesn't waste 100 permutations on "PerennialAGB ... does
+            # not exist" errors that aren't actually computation bugs.
+            "land_use_type_start": models.LandUseType.objects.filter(
+                module_types__name="Perennial Cropland",
+                id__in=_PERENNIAL_TESTABLE_LUTS,
+            ).all(),
+            "land_use_type_w": models.LandUseType.objects.filter(
+                module_types__name="Perennial Cropland",
+                id__in=_PERENNIAL_TESTABLE_LUTS,
+            ).all(),
             "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
             "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
             "tillage_management_type_start": models.TillageManagementType.objects.all(),
@@ -2271,7 +2306,13 @@ MODULE_CONFIGS = {
     },
     "ForestManagement": {
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            # See _PERENNIAL_TESTABLE_LUTS note: filter to LUTs that have at
+            # least one ForestCombustionFactor record so the runner doesn't
+            # spin on "Combustion Factor not found for Rainforest, ..." errors.
+            "land_use_type_start": models.LandUseType.objects.filter(
+                module_types__name="Forest Management",
+                id__in=_FOREST_TESTABLE_LUTS,
+            ).all(),
             "forest_type": models.ForestType.objects.all(),
             "forest_condition_type": models.ForestConditionType.objects.all(),
             "average_yearly_degradation_percentage_start": [0],
