@@ -2101,8 +2101,9 @@ class PermutationComputer:
                         # producing "All N permutations failed" with N way over
                         # the cap (seen in Test Run #1 with N up to 9600).
                         if stop_at and (len(data) + len(errors_data)) >= stop_at:
-                            for proc in executor._processes.values():
-                                proc.terminate()
+                            if hasattr(executor, "_processes"):
+                                for proc in executor._processes.values():
+                                    proc.terminate()
                             executor.shutdown(wait=False, cancel_futures=True)
                             stopped_early = True
                             break
