@@ -459,6 +459,29 @@ class LargeFisheryDataBuilder(ModuleDataBuilder):
         ]
 
 
+class CoastalWetlandDataBuilder(ModuleDataBuilder):
+    """Data builder for Coastal Wetland modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("land_use_type"),
+            FieldMappingBuilder.numeric("area_under_drainage"),
+            FieldMappingBuilder.numeric("drained_area_excavated"),
+            FieldMappingBuilder.numeric("area_not_drained_or_rewetted"),
+            FieldMappingBuilder.numeric("area_w_restored_vegetation"),
+        ]
+
+
+class WaterbodyDataBuilder(ModuleDataBuilder):
+    """Data builder for Waterbody modules"""
+
+    def get_field_mappings(self) -> List[FieldMapping]:
+        return [
+            FieldMappingBuilder.single_foreign_key("waterbody_type"),
+            FieldMappingBuilder.foreign_key("trophic_type"),
+        ]
+
+
 # Implementation example of a more complex module
 # class ForestManagementDataBuilder(ModuleDataBuilder):
 #     """Example data builder for Forest Management modules - shows extensibility"""
@@ -667,6 +690,9 @@ class ModuleDataBuilderRegistry:
         self.register("ForestManagement", ForestManagementDataBuilder())
         self.register("SmallFishery", SmallFisheryDataBuilder())
         self.register("LargeFishery", LargeFisheryDataBuilder())
+        self.register("CoastalWetland", CoastalWetlandDataBuilder())
+        self.register("CoastalWetland2", CoastalWetlandDataBuilder())
+        self.register("Waterbody", WaterbodyDataBuilder())
         self.register("Energy", EnergyDataBuilder())
         self.register("Storage", StorageDataBuilder())
         self.register("Processing", ProcessingDataBuilder())
@@ -930,9 +956,17 @@ class FloodedRiceProcessor(ModuleProcessor):
             country=region.countries.order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
+        # FloodedRiceFactory does not default land_use_type, and the
+        # catalog doesn't permute it (it's fixed to "Flooded Rice"). Set
+        # it explicitly so FloodedRiceCalculator.get_biomass_ef finds it
+        # instead of raising "Missing land use type for start scenario".
+        flooded_rice_lut = models.LandUseType.objects.get(name="Flooded Rice")
         module = factories.FloodedRiceFactory.build(
             activity=a,
             area=1,
+            land_use_type_start=flooded_rice_lut,
+            land_use_type_w=flooded_rice_lut,
+            land_use_type_wo=flooded_rice_lut,
             water_management_type_before_cultivation_start=water_management_type_before_cultivation_start,
             water_management_type_before_cultivation_w=water_management_type_before_cultivation_w,
             water_management_type_before_cultivation_wo=water_management_type_before_cultivation_start,
@@ -1237,19 +1271,25 @@ def _build_project_activity(combination, factories):
 def _apply_unsaved_defaults(instance, models):
     """Set FK defaults that the model's ``save()`` would normally populate.
 
-    ``Submodule.save()`` sets ``status`` to StatusType("EMPTY") and
     ``ElectricityTier2Mixin.save()`` sets ``ef_source`` to
     EmissionFactorSource(OPERATING_MARGIN). The permutation runner uses
     ``Factory.build()`` (unsaved) to avoid DB writes per combination, so
     those defaults never fire — and calculators that read e.g.
     ``self.module.ef_source.name`` blow up with
-    ``'NoneType' object has no attribute 'name'``. Apply both defaults
-    eagerly here for any Entry/Phase instance whose calculator needs them.
+    ``'NoneType' object has no attribute 'name'``.
+
+    Status is set to READY (not the EMPTY default Submodule.save would
+    use): BaseValueChainCalculator gates its EnergyEntryCalculator
+    instantiation on ``self.module.is_ready()`` — when status is EMPTY
+    the inner calculator stays None and later
+    ``self.energy_calculator_w.get_defaults()`` / ``.calculate()`` raises
+    'NoneType' object has no attribute. For the permutation runner the
+    intent is always to run the math, so READY is the right default.
     """
     if hasattr(instance, "status") and not getattr(instance, "status", None):
-        if not hasattr(_apply_unsaved_defaults, "_status_empty"):
-            _apply_unsaved_defaults._status_empty = models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
-        instance.status = _apply_unsaved_defaults._status_empty
+        if not hasattr(_apply_unsaved_defaults, "_status_ready"):
+            _apply_unsaved_defaults._status_ready = models.StatusType.objects.get_or_create(name_en="READY")[0]
+        instance.status = _apply_unsaved_defaults._status_ready
     if hasattr(instance, "ef_source") and not getattr(instance, "ef_source", None):
         if not hasattr(_apply_unsaved_defaults, "_ef_source"):
             _apply_unsaved_defaults._ef_source = models.EmissionFactorSource.objects.get_or_create(
@@ -1452,7 +1492,13 @@ class IrrigationPhaseProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.IrrigationFactory.build(activity=activity)
-        phase = models.IrrigationPhase(
+        # Use the factory rather than the bare model constructor so all the
+        # Tier-2 defaults (ef_co2_t2, ef_ch4_t2, ef_n2o_t2, average_pressure_t2,
+        # total_dynamic_head_t2, pumping_efficiency_t2, well_depth) land on
+        # the instance. The IrrigationPhaseCalculator hard-arithmetics those
+        # values (e.g. `None + 0.1` from transmission_loss math), so leaving
+        # them None blows up with "unsupported operand type(s) for +".
+        phase = factories.IrrigationPhaseFactory.build(
             parent=parent,
             irrigation_system_type=irrigation_system_type_start,
             fuel_type_start=fuel_type_start,
@@ -2155,6 +2201,31 @@ class PermutationComputer:
 
 
 import api.models as models
+import ipcc.models as ipcc_models
+
+
+# A handful of LandUseType / FuelType options exist in MODULE_CONFIGS'
+# querysets but lack the IPCC reference data the calculators depend on,
+# so picking them deterministically yields "X does not exist / not found
+# / is missing. Please provide a tier 2 value" errors. This page exists
+# to exercise the math, not surface reference-data gaps — so we gate the
+# querysets on the presence of the relevant IPCC record. The filters
+# below intersect each LUT/FuelType queryset with the LUT/FuelType ids
+# that appear in the required reference table.
+
+# PerennialAGB has records keyed by (climate, moisture, continent,
+# land_use_type). A LUT is "testable" for PerennialCropland only if at
+# least one PerennialAGB record exists for it.
+_PERENNIAL_TESTABLE_LUTS = ipcc_models.PerennialAGB.objects.values_list(
+    "land_use_type", flat=True,
+).distinct()
+
+# ForestCombustionFactor is keyed by (climate, forest_type,
+# land_use_type) — testable LUTs are the ones with at least one record.
+_FOREST_TESTABLE_LUTS = ipcc_models.ForestCombustionFactor.objects.values_list(
+    "land_use_type", flat=True,
+).distinct()
+
 
 # Module configurations
 MODULE_CONFIGS = {
@@ -2210,8 +2281,18 @@ MODULE_CONFIGS = {
     },
     "PerennialCropland": {
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
-            "land_use_type_w": models.LandUseType.objects.filter(module_types__name="Perennial Cropland").all(),
+            # id__in=_PERENNIAL_TESTABLE_LUTS drops LUTs that lack PerennialAGB
+            # reference data (e.g. "Alley Cropping" in some climates) so the
+            # runner doesn't waste 100 permutations on "PerennialAGB ... does
+            # not exist" errors that aren't actually computation bugs.
+            "land_use_type_start": models.LandUseType.objects.filter(
+                module_types__name="Perennial Cropland",
+                id__in=_PERENNIAL_TESTABLE_LUTS,
+            ).all(),
+            "land_use_type_w": models.LandUseType.objects.filter(
+                module_types__name="Perennial Cropland",
+                id__in=_PERENNIAL_TESTABLE_LUTS,
+            ).all(),
             "organic_input_type_start": models.OrganicInputType.objects.filter(is_active=True).all(),
             "organic_input_type_w": models.OrganicInputType.objects.filter(is_active=True).all(),
             "tillage_management_type_start": models.TillageManagementType.objects.all(),
@@ -2225,7 +2306,13 @@ MODULE_CONFIGS = {
     },
     "ForestManagement": {
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.filter(module_types__name="Forest Management").all(),
+            # See _PERENNIAL_TESTABLE_LUTS note: filter to LUTs that have at
+            # least one ForestCombustionFactor record so the runner doesn't
+            # spin on "Combustion Factor not found for Rainforest, ..." errors.
+            "land_use_type_start": models.LandUseType.objects.filter(
+                module_types__name="Forest Management",
+                id__in=_FOREST_TESTABLE_LUTS,
+            ).all(),
             "forest_type": models.ForestType.objects.all(),
             "forest_condition_type": models.ForestConditionType.objects.all(),
             "average_yearly_degradation_percentage_start": [0],

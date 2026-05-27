@@ -6112,8 +6112,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
 
-        self.soil_type_name = ""
-
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
