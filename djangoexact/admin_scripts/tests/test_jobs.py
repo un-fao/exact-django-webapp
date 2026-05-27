@@ -140,30 +140,20 @@ class FiltersHashTest(TestCase):
         self.assertEqual(h1, h2)
 
     def test_hash_backward_compatible_when_keys_absent(self):
-        """A params dict without max_rows/force_key must hash the same as before
-        the keys were added, keeping existing rows reachable by enqueue_or_join."""
+        """Params without max_rows/force_key must hash to the exact pre-change
+        byte sequence. The literal is the SHA-256 of the canonical JSON of
+        {attribute, filters, from_value, module_type, to_value} for the params
+        below, locked here so any drift in compute_filters_hash's canonical
+        format will fail this test (rather than silently rehashing).
+        """
         params = {
             "module_type": "Grassland",
             "attribute": "grassland_management_type",
             "from_value": "A",
             "to_value": "B",
         }
-        # Recompute the legacy hash manually to lock the contract.
-        import hashlib, json
-        legacy = hashlib.sha256(
-            json.dumps(
-                {
-                    "module_type": "Grassland",
-                    "attribute": "grassland_management_type",
-                    "from_value": "A",
-                    "to_value": "B",
-                    "filters": {},
-                },
-                sort_keys=True,
-                separators=(",", ":"),
-            ).encode()
-        ).hexdigest()
-        self.assertEqual(compute_filters_hash(params), legacy)
+        LEGACY_HASH = "5290be0ca5be3fecbf8400abc01f7714abb6aeafe335c6084eddf3f03b7d4160"
+        self.assertEqual(compute_filters_hash(params), LEGACY_HASH)
 
     def test_hash_differs_when_max_rows_set(self):
         base = {
