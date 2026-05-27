@@ -88,3 +88,39 @@ class PlanModuleTestsTest(TestCase):
         planned, _ = plan_module_tests(catalog)
         self.assertEqual(planned[0]["module_type"], "Alpha")
         self.assertEqual(planned[1]["module_type"], "Beta")
+
+    def test_prefers_module_configs_filter_over_unfiltered_catalog(self):
+        # PerennialCropland.land_use_type in MODULE_CONFIGS is filtered to
+        # perennial-cropland types, but the catalog declares the unfiltered
+        # LandUseType model. The planner must source from MODULE_CONFIGS so
+        # the picked from/to values are values the runner can actually use.
+        from api.minitool import MODULE_CONFIGS
+        catalog = [_module("PerennialCropland", [
+            _field("land_use_type", {"kind": "queryset", "model": "LandUseType"}),
+        ])]
+        planned, skipped = plan_module_tests(catalog)
+        configs_qs = MODULE_CONFIGS["PerennialCropland"]["fields"]["land_use_type_start"]
+        valid_names = {str(obj) for obj in configs_qs}
+        # Either skipped (fewer than 2 perennial types — unlikely with
+        # reference data) or both picked values are in the filtered set.
+        if planned:
+            self.assertIn(planned[0]["from_value"], valid_names)
+            self.assertIn(planned[0]["to_value"], valid_names)
+        else:
+            self.assertTrue(skipped)
+
+    def test_land_use_change_is_skipped_with_clear_reason(self):
+        # LandUseChange's calculator requires sibling land modules on a
+        # saved Activity — the permutation runner can't provision those
+        # yet, so we surface LUC fields as Skipped instead of letting them
+        # crash with "Activity instance needs to have a primary key value".
+        catalog = [_module("LandUseChange", [
+            _field("is_fire_used", {"kind": "static", "values": [True, False]}),
+            _field("module_type", {"kind": "queryset", "model": "ModuleType"}),
+        ])]
+        planned, skipped = plan_module_tests(catalog)
+        self.assertEqual(planned, [])
+        self.assertEqual(len(skipped), 2)
+        for entry in skipped:
+            self.assertEqual(entry["module_type"], "LandUseChange")
+            self.assertIn("sibling", entry["reason"].lower())
