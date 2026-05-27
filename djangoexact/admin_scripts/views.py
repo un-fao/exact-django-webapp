@@ -16,7 +16,7 @@ from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
 from admin_scripts.models import ComputationJob
 from admin_scripts.scenario_utils import stats_for_scenario
-from django.apps import apps
+from admin_scripts.test_planner import _resolve_value_source
 from minitool.models import ChangeRecord
 
 
@@ -56,25 +56,6 @@ def _change_record_filter_choices(qs=None):
             qs.exclude(soil_type="").values_list("soil_type", flat=True).distinct().order_by("soil_type")
         ),
     }
-
-
-def _resolve_value_source(value_source):
-    """Resolve a catalog value_source dict to a list of string values.
-
-    For queryset sources, queries the model and returns str() of each instance.
-    For static sources, returns the values list as strings.
-    """
-    kind = value_source.get("kind", "")
-    if kind == "queryset":
-        model_name = value_source.get("model", "")
-        try:
-            model = apps.get_model("api", model_name)
-            return [str(obj) for obj in model.objects.all().order_by("pk")]
-        except LookupError:
-            return []
-    elif kind == "static":
-        return [str(v) for v in value_source.get("values", [])]
-    return []
 
 
 SCRIPTS = [
