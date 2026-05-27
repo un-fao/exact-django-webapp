@@ -1,18 +1,112 @@
 <div id="results-body"
      {% if not is_complete %}hx-get="{% url 'admin_scripts:test-modules-status' run.pk %}"
      hx-trigger="every 3s"
-     hx-swap="outerHTML"{% endif %}>
-    <p>total={{ counts.total }} pending={{ counts.pending }} running={{ counts.running }}
-       completed={{ counts.completed }} failed={{ counts.failed }} skipped={{ counts.skipped }}</p>
+     hx-swap="outerHTML"{% endif %}
+     class="space-y-6">
+
+    {# Summary chips #}
+    <div class="flex flex-wrap gap-2 text-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-gray-50 text-gray-700 border-gray-200">
+            Total: <strong>{{ counts.total }}</strong>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-amber-50 text-amber-700 border-amber-200">
+            Pending: <strong>{{ counts.pending }}</strong>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-blue-50 text-blue-700 border-blue-200">
+            Running: <strong>{{ counts.running }}</strong>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-green-50 text-green-700 border-green-200">
+            Completed: <strong>{{ counts.completed }}</strong>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-red-50 text-red-700 border-red-200">
+            Failed: <strong>{{ counts.failed }}</strong>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full bg-gray-100 text-gray-600 border-gray-200">
+            Skipped: <strong>{{ counts.skipped }}</strong>
+        </span>
+    </div>
+
+    {% if not groups %}
+        <div class="bg-white border border-gray-200 rounded-lg p-6 text-sm text-gray-600">
+            No fields had enough distinct values to test.
+        </div>
+    {% endif %}
+
     {% for group in groups %}
-        <h3>{{ group.module_type }}</h3>
-        <ul>
-        {% for row in group.rows %}
-            <li>{{ row.job.attribute }}: {{ row.job.status }}{% if row.summary %} count={{ row.summary.count }}{% endif %}{% if row.job.error_message %} ERR: {{ row.job.error_message|truncatechars:200 }}{% endif %}</li>
-        {% endfor %}
-        {% for s in group.skipped %}
-            <li>{{ s.field_name }}: skip ({{ s.reason }})</li>
-        {% endfor %}
-        </ul>
+    <section class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <header class="px-4 py-2 border-b border-gray-100 bg-gray-50">
+            <h2 class="text-sm font-semibold text-gray-900">{{ group.module_type }}</h2>
+        </header>
+        <table class="w-full text-sm">
+            <thead class="text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                    <th class="text-left font-medium px-4 py-2">Field</th>
+                    <th class="text-left font-medium px-4 py-2">From &rarr; To</th>
+                    <th class="text-left font-medium px-4 py-2">Status</th>
+                    <th class="text-left font-medium px-4 py-2">Result</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for row in group.rows %}
+                <tr>
+                    <td class="px-4 py-2 font-mono text-xs text-gray-800">{{ row.job.attribute }}</td>
+                    <td class="px-4 py-2 text-xs text-gray-600">
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.from_value }}</span>
+                        <span class="mx-1 text-gray-400">&rarr;</span>
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.to_value }}</span>
+                    </td>
+                    <td class="px-4 py-2">
+                        {% if row.job.status == "pending" %}
+                            <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-amber-50 text-amber-700 border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending
+                            </span>
+                        {% elif row.job.status == "running" %}
+                            <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Running {{ row.job.progress }}%
+                            </span>
+                        {% elif row.job.status == "completed" %}
+                            <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-green-50 text-green-700 border-green-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                            </span>
+                        {% elif row.job.status == "failed" %}
+                            <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-red-50 text-red-700 border-red-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Failed
+                            </span>
+                        {% elif row.job.status == "cancelled" %}
+                            <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-gray-100 text-gray-600 border-gray-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Cancelled
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-xs text-gray-700">
+                        {% if row.summary %}
+                            count={{ row.summary.count }}{% if row.summary.mean_str %} &middot; mean={{ row.summary.mean_str }}{% endif %}
+                        {% elif row.job.error_message %}
+                            <details>
+                                <summary class="cursor-pointer text-red-600 hover:text-red-700">{{ row.job.error_message|truncatechars:500 }}</summary>
+                                <pre class="mt-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded p-3 whitespace-pre-wrap break-words">{{ row.job.error_message }}</pre>
+                            </details>
+                        {% else %}
+                            <span class="text-gray-400">&mdash;</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% for s in group.skipped %}
+                <tr class="text-gray-400">
+                    <td class="px-4 py-2 font-mono text-xs">{{ s.field_name }}</td>
+                    <td class="px-4 py-2 text-xs">&mdash;</td>
+                    <td class="px-4 py-2">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-2.5 py-0.5 bg-gray-100 text-gray-500 border-gray-200">
+                            Skipped
+                        </span>
+                    </td>
+                    <td class="px-4 py-2 text-xs italic">{{ s.reason }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
     {% endfor %}
+
 </div>
