@@ -4,9 +4,11 @@ from datetime import datetime
 from functools import wraps
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 
@@ -673,8 +675,6 @@ def _summarize_completed_job(job):
     None-comparison gymnastics and lets ``mean=0.0`` render as "0.00"
     rather than being filtered out by template truthiness.
     """
-    from admin_scripts.scenario_utils import stats_for_scenario
-
     change = {
         "module_type": job.module_type,
         "start": {"field": job.attribute, "value": job.from_value},
@@ -752,29 +752,28 @@ def _run_is_complete(run) -> bool:
 @staff_required
 def test_modules(request):
     """Landing page: run button + history of the user's recent test runs."""
-    from django.shortcuts import redirect
-
     if request.method == "POST":
         catalog = get_catalog()
         planned, skipped = plan_module_tests(catalog)
 
-        run = ModuleTestRun.objects.create(requested_by=request.user)
-        new_jobs = []
-        for entry in planned:
-            job = enqueue_for_test_run(
-                user=request.user,
-                run_id=run.id,
-                module_type=entry["module_type"],
-                attribute=entry["field_name"],
-                from_value=entry["from_value"],
-                to_value=entry["to_value"],
-                max_rows=100,
-            )
-            new_jobs.append(job)
-        if new_jobs:
-            run.jobs.add(*new_jobs)
-        run.skipped = skipped
-        run.save(update_fields=["skipped"])
+        with transaction.atomic():
+            run = ModuleTestRun.objects.create(requested_by=request.user)
+            new_jobs = []
+            for entry in planned:
+                job = enqueue_for_test_run(
+                    user=request.user,
+                    run_id=run.id,
+                    module_type=entry["module_type"],
+                    attribute=entry["field_name"],
+                    from_value=entry["from_value"],
+                    to_value=entry["to_value"],
+                    max_rows=100,
+                )
+                new_jobs.append(job)
+            if new_jobs:
+                run.jobs.add(*new_jobs)
+            run.skipped = skipped
+            run.save(update_fields=["skipped"])
 
         return redirect("admin_scripts:test-modules-detail", run_id=run.id)
 
@@ -814,8 +813,6 @@ def test_modules_detail(request, run_id):
 @staff_required
 def test_modules_status(request, run_id):
     """HTMX-polled status partial. Stamps completed_at when all jobs are terminal."""
-    from django.utils import timezone
-
     run = get_object_or_404(
         ModuleTestRun, pk=run_id, requested_by=request.user,
     )
