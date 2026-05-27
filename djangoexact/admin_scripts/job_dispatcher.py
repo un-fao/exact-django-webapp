@@ -28,19 +28,26 @@ def compute_filters_hash(params: dict) -> str:
     ----------
     params:
         Must contain keys: module_type, attribute, from_value, to_value.
-        May contain: filters (dict).
+        May contain: filters (dict), max_rows (int or None),
+        force_key (str or None). max_rows and force_key are included in
+        the canonical JSON only when their value is not None, so omission
+        and None are equivalent and the hash stays backward-compatible
+        with rows created before these keys existed.
     """
-    canonical = json.dumps(
-        {
-            "module_type": params["module_type"],
-            "attribute": params["attribute"],
-            "from_value": params["from_value"],
-            "to_value": params["to_value"],
-            "filters": params.get("filters", {}),
-        },
-        sort_keys=True,
-        separators=(",", ":"),
-    )
+    canonical_dict = {
+        "module_type": params["module_type"],
+        "attribute": params["attribute"],
+        "from_value": params["from_value"],
+        "to_value": params["to_value"],
+        "filters": params.get("filters", {}),
+    }
+    max_rows = params.get("max_rows")
+    if max_rows is not None:
+        canonical_dict["max_rows"] = max_rows
+    force_key = params.get("force_key")
+    if force_key is not None:
+        canonical_dict["force_key"] = force_key
+    canonical = json.dumps(canonical_dict, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode()).hexdigest()
 
 

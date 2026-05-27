@@ -139,6 +139,63 @@ class FiltersHashTest(TestCase):
         })
         self.assertEqual(h1, h2)
 
+    def test_hash_backward_compatible_when_keys_absent(self):
+        """A params dict without max_rows/force_key must hash the same as before
+        the keys were added, keeping existing rows reachable by enqueue_or_join."""
+        params = {
+            "module_type": "Grassland",
+            "attribute": "grassland_management_type",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        # Recompute the legacy hash manually to lock the contract.
+        import hashlib, json
+        legacy = hashlib.sha256(
+            json.dumps(
+                {
+                    "module_type": "Grassland",
+                    "attribute": "grassland_management_type",
+                    "from_value": "A",
+                    "to_value": "B",
+                    "filters": {},
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        self.assertEqual(compute_filters_hash(params), legacy)
+
+    def test_hash_differs_when_max_rows_set(self):
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        with_cap = {**base, "max_rows": 100}
+        self.assertNotEqual(compute_filters_hash(base), compute_filters_hash(with_cap))
+
+    def test_hash_differs_when_force_key_set(self):
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        forced = {**base, "force_key": "run-7"}
+        self.assertNotEqual(compute_filters_hash(base), compute_filters_hash(forced))
+
+    def test_hash_treats_none_keys_as_absent(self):
+        """Passing max_rows=None or force_key=None must hash identically to omission."""
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        with_nones = {**base, "max_rows": None, "force_key": None}
+        self.assertEqual(compute_filters_hash(base), compute_filters_hash(with_nones))
+
 
 class EnqueueOrJoinTest(TransactionTestCase):
     databases = {"default"}
