@@ -1247,11 +1247,15 @@ def _apply_unsaved_defaults(instance, models):
     eagerly here for any Entry/Phase instance whose calculator needs them.
     """
     if hasattr(instance, "status") and not getattr(instance, "status", None):
-        instance.status = models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
+        if not hasattr(_apply_unsaved_defaults, "_status_empty"):
+            _apply_unsaved_defaults._status_empty = models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
+        instance.status = _apply_unsaved_defaults._status_empty
     if hasattr(instance, "ef_source") and not getattr(instance, "ef_source", None):
-        instance.ef_source = models.EmissionFactorSource.objects.get_or_create(
-            name=models.EmissionFactorSource.OPERATING_MARGIN
-        )[0]
+        if not hasattr(_apply_unsaved_defaults, "_ef_source"):
+            _apply_unsaved_defaults._ef_source = models.EmissionFactorSource.objects.get_or_create(
+                name=models.EmissionFactorSource.OPERATING_MARGIN
+            )[0]
+        instance.ef_source = _apply_unsaved_defaults._ef_source
     return instance
 
 
