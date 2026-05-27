@@ -124,6 +124,46 @@ def dispatch_job(job_pk):
         ComputationJob.objects.filter(pk=job_pk).update(pid=proc.pid)
 
 
+def enqueue_for_test_run(
+    user, run_id, module_type, attribute, from_value, to_value,
+    max_rows, filters=None,
+):
+    """Enqueue a fresh ComputationJob for a ModuleTestRun.
+
+    The job's hash is salted with ``force_key="testrun-{run_id}"`` so it
+    is structurally distinct from every other job (test or production)
+    and cannot coalesce with any existing row. The job carries
+    ``max_rows`` so the runner caps the underlying computation.
+
+    Returns the newly created ComputationJob.
+    """
+    params = {
+        "module_type": module_type,
+        "attribute": attribute,
+        "from_value": from_value,
+        "to_value": to_value,
+        "filters": filters or {},
+        "max_rows": max_rows,
+        "force_key": f"testrun-{run_id}",
+    }
+    filters_hash = compute_filters_hash(params)
+
+    with transaction.atomic():
+        job = ComputationJob.objects.create(
+            filters_hash=filters_hash,
+            module_type=module_type,
+            attribute=attribute,
+            from_value=from_value,
+            to_value=to_value,
+            filters=filters or {},
+            max_rows=max_rows,
+        )
+        job.requested_by.add(user)
+        transaction.on_commit(lambda: dispatch_job(job.pk))
+
+    return job
+
+
 def cancel_job(job_pk):
     """Cancel a pending or running computation job.
 
