@@ -2161,14 +2161,18 @@ class PermutationComputer:
             return validator
 
         if module_type == "ForestManagement":
-            # Two reference tables both gate ForestManagement permutations:
+            # Three reference tables gate ForestManagement permutations:
             #   - ForestCombustionFactor(land_use_type, climate, forest_type)
             #   - ForestManagementAGB(climate, land_use_type, region,
             #     forest_condition_type, forest_type, from_year=0)
-            # Either lookup missing → calculator raises "Combustion Factor
-            # Start not found ..." or "Reference values for AGB under 20
-            # years for ... are missing". Pre-load both as sets and require
-            # the combination to satisfy both.
+            #   - LitterDeadwoodCarbonStock(climate, forest_type,
+            #     land_use_type) — the table has no unique constraint, so
+            #     duplicate rows trip the calculator's ``.get()`` with
+            #     "get() returned more than one LitterDeadwoodCarbonStock".
+            #     Keep only the triples that have exactly one row.
+            # Any of the three lookups missing → calculator raises and the
+            # whole 100-permutation budget burns. Pre-load each as a set
+            # and require the combination to satisfy all of them.
             cf_set = frozenset(
                 ipcc_models.ForestCombustionFactor.objects.values_list(
                     "land_use_type_id", "climate_id", "forest_type_id",
@@ -2180,7 +2184,15 @@ class PermutationComputer:
                     "forest_condition_type_id", "forest_type_id",
                 )
             )
-            if not cf_set and not agb_set:
+            from django.db.models import Count as _Count
+            litter_set = frozenset(
+                ipcc_models.LitterDeadwoodCarbonStock.objects.values(
+                    "climate_id", "forest_type_id", "land_use_type_id",
+                ).annotate(_n=_Count("id")).filter(_n=1).values_list(
+                    "climate_id", "forest_type_id", "land_use_type_id",
+                )
+            )
+            if not cf_set and not agb_set and not litter_set:
                 return None
             forest_type_idx = _idx("forest_type")
             forest_condition_type_idx = _idx("forest_condition_type")
@@ -2221,6 +2233,8 @@ class PermutationComputer:
                             forest_condition_type.id, forest_type.id,
                         ) not in agb_set
                     ):
+                        return False
+                    if litter_set and (climate.id, forest_type.id, lut.id) not in litter_set:
                         return False
                 return True
             return validator
