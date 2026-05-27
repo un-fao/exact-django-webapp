@@ -1258,11 +1258,19 @@ def _build_project_activity(combination, factories):
     """
     climate_moisture, soil_type, region = combination[-3:]
     climate, moisture = climate_moisture
+    # Filter to countries with ipcc_region populated — LivestockCalculator's
+    # LivestockTAM lookup uses country.ipcc_region as a filter key, and
+    # picking a country with ipcc_region=None drove Test Run #4's
+    # "Could not find TAM (START) for ..., None" cascade.
+    country = (
+        region.countries.filter(ipcc_region__isnull=False).order_by("?").first()
+        or region.countries.order_by("?").first()
+    )
     project = factories.ProjectFactory.build(
         climate=climate,
         moisture=moisture,
         soil_type=soil_type,
-        country=region.countries.order_by("?").first(),
+        country=country,
     )
     activity = factories.ActivityFactory.build(project=project)
     return project, activity
@@ -1403,7 +1411,11 @@ class ProcessingProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.ProcessingFactory.build(activity=activity)
-        entry = models.ProcessingEntry(
+        # Use the factory so water_use_per_year_* and any future
+        # ProcessingEntry-specific defaults land on the instance —
+        # bare models.ProcessingEntry(...) leaves them None and the math
+        # falls over with "float * NoneType".
+        entry = factories.ProcessingEntryFactory.build(
             parent=parent,
             fuel_type_start=fuel_type_start,
             fuel_type_w=fuel_type_w,
@@ -1431,7 +1443,12 @@ class PackagingProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.PackagingFactory.build(activity=activity)
-        entry = models.PackagingEntry(
+        # Use the factory so quantity_consumed_per_year_* land on the
+        # PackagingEntry — when is_electric=True the calculator spawns an
+        # EnergyEntryCalculator that multiplies mwh_* (which reads from
+        # quantity_consumed_per_year_*); leaving it None crashes the math
+        # with "float * NoneType".
+        entry = factories.PackagingEntryFactory.build(
             parent=parent,
             packaging_material_type_start=packaging_material_type_start,
             packaging_material_type_w=packaging_material_type_w,
@@ -1458,7 +1475,9 @@ class TransportProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.TransportFactory.build(activity=activity)
-        entry = models.TransportEntry(
+        # Same pattern as Storage/Processing/Packaging — use the factory so
+        # any TransportEntry-specific defaults land on the instance.
+        entry = factories.TransportEntryFactory.build(
             parent=parent,
             fuel_type_start=fuel_type_start,
             fuel_type_w=fuel_type_w,
@@ -2066,6 +2085,48 @@ class PermutationComputer:
                 return True
             return validator
 
+        if module_type in ("CoastalWetland", "CoastalWetland2"):
+            # CoastalWetlandCalculator chains lookups through CoastalAGB,
+            # CoastalLitter, CoastalDeadwood, DefaultSoilCarbonStock,
+            # DrainageEmissionFactor and RewettingCarbonFactor (the latter
+            # was the source of Test Run #4's "Rewetting CO2 ... is
+            # missing" failure). Intersect against the table with the
+            # widest key — RewettingCarbonFactor's (climate, moisture,
+            # soil_type, land_use_type) — which is the strictest filter
+            # and so prunes the tuples whose downstream lookups would
+            # also fail.
+            valid_set = frozenset(
+                ipcc_models.RewettingCarbonFactor.objects.values_list(
+                    "land_use_type_id", "climate_id", "moisture_id", "soil_type_id",
+                )
+            )
+            if not valid_set:
+                return None
+            soil_idx = _idx("soil_types")
+            if soil_idx is None:
+                return None
+            lut_indices = [
+                _idx(k) for k in (
+                    "land_use_type_start", "land_use_type_w", "land_use_type_wo", "land_use_type",
+                ) if _idx(k) is not None
+            ]
+            if not lut_indices:
+                return None
+
+            def validator(combo):
+                climate, moisture = combo[cm_idx]
+                soil_type = combo[soil_idx]
+                if soil_type is None:
+                    return True
+                for li in lut_indices:
+                    lut = combo[li]
+                    if lut is None:
+                        continue
+                    if (lut.id, climate.id, moisture.id, soil_type.id) not in valid_set:
+                        return False
+                return True
+            return validator
+
         if module_type == "ForestManagement":
             # ForestCombustionFactor rows are keyed by
             # (land_use_type, climate, forest_type). Filter out combinations
@@ -2536,8 +2597,12 @@ MODULE_CONFIGS = {
     # don't have to persist the parent's `.entries.all()` relation.
     "Energy": {
         "fields": {
-            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
-            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            # Exclude Wood/Peat/Charcoal — those fuels route through
+            # gwp.ch4_fossil which is nullable on GlobalWarmingPotential
+            # and crashes the math when None. Same exclusion already used
+            # by IrrigationPhase for the same reason.
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
             "account_for_co2_start": [True, False],
             "account_for_co2_w": [True, False],
             "quantity_consumed_per_year_start": [1],
@@ -2547,8 +2612,8 @@ MODULE_CONFIGS = {
     },
     "Storage": {
         "fields": {
-            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
-            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
             "quantity_consumed_per_year_start": [1],
             "quantity_consumed_per_year_w": [1],
             "is_refrigerant_used_start": [True, False],
@@ -2560,8 +2625,8 @@ MODULE_CONFIGS = {
     },
     "Processing": {
         "fields": {
-            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
-            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
             "quantity_consumed_per_year_start": [1],
             "quantity_consumed_per_year_w": [1],
             "is_water_used_start": [True, False],
@@ -2582,8 +2647,8 @@ MODULE_CONFIGS = {
     },
     "Transport": {
         "fields": {
-            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
-            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all(),
+            "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
+            "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name__icontains="stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all(),
             "quantity_consumed_per_year_start": [1],
             "quantity_consumed_per_year_w": [1],
         },
