@@ -1,0 +1,7 @@
+{% extends "admin_scripts/base.html" %}
+{% block title %}Test All Modules{% endblock %}
+{% block content %}
+<h1>Test All Modules</h1>
+<form method="post">{% csrf_token %}<button type="submit">Run new test</button></form>
+<ul>{% for run in recent_runs %}<li>{{ run }}</li>{% endfor %}</ul>
+{% endblock %}

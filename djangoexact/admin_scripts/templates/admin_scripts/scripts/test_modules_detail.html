@@ -1,0 +1,6 @@
+{% extends "admin_scripts/base.html" %}
+{% block title %}Test Run #{{ run.pk }}{% endblock %}
+{% block content %}
+<h1>Test Run #{{ run.pk }}</h1>
+<div id="results">{% include "admin_scripts/partials/test_modules_results.html" %}</div>
+{% endblock %}

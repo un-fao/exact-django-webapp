@@ -21,4 +21,7 @@ urlpatterns = [
     path("compile-scenarios/htmx/add-scenario/", views.htmx_add_scenario, name="htmx-add-scenario"),
     path("compile-scenarios/htmx/job-status/", views.htmx_job_status, name="htmx-job-status"),
     path("compile-scenarios/htmx/cancel-job/", views.htmx_cancel_job, name="htmx-cancel-job"),
+    path("test-modules/", views.test_modules, name="test-modules"),
+    path("test-modules/<int:run_id>/", views.test_modules_detail, name="test-modules-detail"),
+    path("test-modules/<int:run_id>/status/", views.test_modules_status, name="test-modules-status"),
 ]
