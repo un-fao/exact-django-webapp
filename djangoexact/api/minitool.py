@@ -1784,13 +1784,16 @@ class SoilOrganicCarbonValidator:
 
         for climate, moisture in climate_moistures:
             for soil_type in soil_types:
-                try:
-                    # Try to get SoilOrganicCarbon record for this combination
-                    ipcc_models.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+                # SoilOrganicCarbon.value is nullable — a record can exist
+                # with value=None and still trip the calculator's
+                # ``if self.soc_start.value is None`` check. Require value
+                # to be set so this matches what the calculator treats as
+                # a valid SOC reference.
+                if ipcc_models.SoilOrganicCarbon.objects.filter(
+                    climate=climate, moisture=moisture,
+                    soil_type=soil_type, value__isnull=False,
+                ).exists():
                     valid_combinations.append((climate, moisture, soil_type))
-                except ipcc_models.SoilOrganicCarbon.DoesNotExist:
-                    # This combination is invalid - no SoilOrganicCarbon record exists
-                    continue
 
         logger.info(f"Found {len(valid_combinations)} valid climate-moisture-soiltype combinations out of {total_combinations} total combinations")
         return valid_combinations
@@ -2052,15 +2055,16 @@ class PermutationComputer:
 
         # Land modules go through LandModuleCalculator.get_defaults which
         # looks up SoilOrganicCarbon.objects.filter(climate, moisture,
-        # soil_type).first() and raises "SOC for X climate, Y moisture, and
-        # Z soil type is missing" when there's no row. The upstream
-        # SoilOrganicCarbonValidator computes the valid triples but the
-        # runner extracts (climate, moisture) and soil_type into separate
-        # dimensions, so the cartesian product re-introduces tuples whose
-        # triple was never valid. Pre-load the set here and re-check at
-        # combination time.
+        # soil_type).first() and then raises "SOC for X climate, Y
+        # moisture, and Z soil type is missing" when ``.value is None`` —
+        # the model's value field is nullable, so a row can exist but
+        # still trip the calculator's None check. Pre-load only the
+        # triples whose row has a non-null value, which mirrors what the
+        # calculator actually treats as a valid SOC reference.
         _soc_set = frozenset(
-            ipcc_models.SoilOrganicCarbon.objects.values_list(
+            ipcc_models.SoilOrganicCarbon.objects.filter(
+                value__isnull=False,
+            ).values_list(
                 "climate_id", "moisture_id", "soil_type_id",
             )
         )
