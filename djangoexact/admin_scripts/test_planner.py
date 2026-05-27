@@ -46,7 +46,7 @@ def _resolve_value_source(value_source: dict, module_type: str = "", field_name:
                         # clear "only 1 distinct value(s) available" reason
                         # rather than blowing up.
                         return [str(source)]
-        except ImportError:
+        except Exception:
             pass  # Fall through to catalog-based resolution
 
     # Catalog fallback (used by tests that pass synthetic value_sources
