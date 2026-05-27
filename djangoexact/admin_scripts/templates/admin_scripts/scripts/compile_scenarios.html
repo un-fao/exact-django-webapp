@@ -1,4 +1,5 @@
 {% extends "admin_scripts/base.html" %}
+{% load static %}
 
 {% block title %}Compile Scenarios — Admin Scripts{% endblock %}
 
@@ -27,9 +28,13 @@
                 hx-target="#scenario-panels"
                 hx-swap="beforeend"
                 hx-vals='js:{"index": document.querySelectorAll("[data-scenario-panel]").length}'
-                hx-on::after-settle="switchScenarioTab(document.querySelectorAll('[data-scenario-panel]').length - 1)"
                 class="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
             + Add Scenario
+        </button>
+        <button type="button" data-scenario-tab="compare"
+                onclick="switchScenarioTab('compare')"
+                class="ml-auto px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+            Compare
         </button>
     </div>
 
@@ -39,6 +44,7 @@
             {% include "admin_scripts/partials/scenario_panel.html" with scenario_index=forloop.counter0 scenario=scenario module_types=module_types default_prefix=scenario.default_prefix default_id_prefix=scenario.default_id_prefix active=forloop.first %}
         {% endfor %}
     </div>
+    {% include "admin_scripts/partials/compare_panel.html" %}
 
     {# Global filters (shared) #}
     <details class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
@@ -70,20 +76,54 @@
 
 <script>
 function switchScenarioTab(index) {
+    // Hide every scenario panel and the compare panel.
     document.querySelectorAll('[data-scenario-panel]').forEach(function(p) {
         p.classList.add('hidden');
     });
+    var comparePanel = document.querySelector('[data-compare-panel]');
+    if (comparePanel) comparePanel.classList.add('hidden');
+
+    // Reset every tab's active style.
     document.querySelectorAll('[data-scenario-tab]').forEach(function(t) {
         t.classList.remove('border-blue-500', 'text-blue-600');
         t.classList.add('border-transparent', 'text-gray-500');
     });
-    var panel = document.querySelector('[data-scenario-panel="' + index + '"]');
-    if (panel) panel.classList.remove('hidden');
+
+    // Show the requested panel.
+    if (index === 'compare') {
+        if (comparePanel) comparePanel.classList.remove('hidden');
+        if (window.renderCompare) window.renderCompare();
+    } else {
+        var panel = document.querySelector('[data-scenario-panel="' + index + '"]');
+        if (panel) panel.classList.remove('hidden');
+    }
+
+    // Highlight the active tab.
     var tab = document.querySelector('[data-scenario-tab="' + index + '"]');
     if (tab) {
         tab.classList.add('border-blue-500', 'text-blue-600');
         tab.classList.remove('border-transparent', 'text-gray-500');
     }
 }
+
+// htmx:afterSettle bubbles from #scenario-panels through ancestors only,
+// so a listener on the + Add Scenario button sibling would never fire.
+document.body.addEventListener('htmx:afterSettle', function (evt) {
+    var target = (evt.detail && evt.detail.target) || evt.target;
+    if (!target || target.id !== 'scenario-panels') return;
+    var panels = document.querySelectorAll('[data-scenario-panel]');
+    if (panels.length === 0) return;
+    var newPanel = panels[panels.length - 1];
+    switchScenarioTab(newPanel.dataset.scenarioPanel);
+});
 </script>
+
+{# Chart.js + plugins for the Compare tab. CDN parity with htmx / Tom Select. #}
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4"></script>
+{# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-error-bars@4"></script>
+<script src="{% static 'admin_scripts/compare.js' %}"></script>
 {% endblock %}

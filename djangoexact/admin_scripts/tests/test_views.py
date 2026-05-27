@@ -355,6 +355,146 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(stats["count"], 5)
         self.assertAlmostEqual(stats["sum_total"], -10.0, places=5)
 
+    def test_stats_for_scenario_no_outliers_in_baseline_fixture(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # The five-record baseline fixture (-3.0, -2.5, -2.0, -1.5, -1.0) has no
+        # values past Q3+1.5*IQR or below Q1-1.5*IQR.
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["outliers_low"], 0)
+        self.assertEqual(stats["outliers_high"], 0)
+
+    def test_stats_for_scenario_counts_outliers_outside_iqr_fences(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # Add two extreme records - one well below Q1 - 1.5*IQR, one above.
+        # Baseline fixture has fences ~(-5.0, 1.0); -100 sits far below the
+        # low fence and 50 sits far above the high fence regardless of how
+        # the extreme records shift Q1/Q3.
+        for extreme in (-100.0, 50.0):
+            ChangeRecord.objects.create(
+                module_type="Grassland",
+                region="Central Asia",
+                climate="Cool Temperate",
+                moisture="Moist",
+                soil_type="High Activity Clay",
+                total=extreme,
+                field="grassland_management_type",
+                from_value="Non-Degraded",
+                to_value="Improved Grassland",
+            )
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 7)
+        self.assertEqual(stats["outliers_low"], 1)
+        self.assertEqual(stats["outliers_high"], 1)
+
+    def test_stats_for_scenario_outlier_counts_zero_when_iqr_undefined(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        # With fewer than 4 values, IQR is undefined; outlier counts must be 0.
+        ChangeRecord.objects.all().delete()
+        ChangeRecord.objects.create(
+            module_type="Grassland",
+            region="Central Asia",
+            climate="Cool Temperate",
+            moisture="Moist",
+            soil_type="High Activity Clay",
+            total=1.0,
+            field="grassland_management_type",
+            from_value="Non-Degraded",
+            to_value="Improved Grassland",
+        )
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(stats["count"], 1)
+        self.assertEqual(stats["outliers_low"], 0)
+        self.assertEqual(stats["outliers_high"], 0)
+
+    def test_stats_for_scenario_per_change_single_change(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [{
+            "module_type": "Grassland",
+            "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+            "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            "unit": "2",
+        }]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 1)
+        entry = stats["per_change"][0]
+        self.assertEqual(entry["module_type"], "Grassland")
+        self.assertEqual(entry["field"], "grassland_management_type")
+        self.assertEqual(entry["from_value"], "Non-Degraded")
+        self.assertEqual(entry["to_value"], "Improved Grassland")
+        self.assertEqual(entry["unit"], 2.0)
+        self.assertEqual(entry["count"], 5)
+        self.assertAlmostEqual(entry["sum"], -20.0, places=5)
+        self.assertAlmostEqual(entry["mean"], -4.0, places=5)
+        self.assertEqual(
+            entry["label"],
+            "Grassland: Non-Degraded → Improved Grassland",
+        )
+
+    def test_stats_for_scenario_per_change_two_changes_preserves_order(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        ChangeRecord.objects.create(
+            module_type="Annual Cropland",
+            region="Central Asia",
+            climate="Cool Temperate",
+            moisture="Moist",
+            soil_type="High Activity Clay",
+            total=-0.5,
+            field="organic_input_type",
+            from_value="Low C input",
+            to_value="High C input",
+        )
+        changes = [
+            {
+                "module_type": "Annual Cropland",
+                "start": {"field": "organic_input_type", "value": "Low C input"},
+                "end": {"field": "organic_input_type", "value": "High C input"},
+                "unit": "1",
+            },
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+                "unit": "1",
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 2)
+        self.assertEqual(stats["per_change"][0]["module_type"], "Annual Cropland")
+        self.assertEqual(stats["per_change"][0]["count"], 1)
+        self.assertAlmostEqual(stats["per_change"][0]["sum"], -0.5, places=5)
+        self.assertEqual(stats["per_change"][1]["module_type"], "Grassland")
+        self.assertEqual(stats["per_change"][1]["count"], 5)
+        self.assertAlmostEqual(stats["per_change"][1]["sum"], -10.0, places=5)
+
+    def test_stats_for_scenario_per_change_skips_change_without_module_type(self):
+        from admin_scripts.scenario_utils import stats_for_scenario
+        changes = [
+            {"module_type": "", "start": {"field": "", "value": ""}, "end": {"field": "", "value": ""}},
+            {
+                "module_type": "Grassland",
+                "start": {"field": "grassland_management_type", "value": "Non-Degraded"},
+                "end": {"field": "grassland_management_type", "value": "Improved Grassland"},
+            },
+        ]
+        stats = stats_for_scenario(changes, {})
+        self.assertEqual(len(stats["per_change"]), 1)
+        self.assertEqual(stats["per_change"][0]["module_type"], "Grassland")
+
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
@@ -1068,3 +1208,143 @@ class HtmxScenarioPrefixTest(TestCase):
         self.assertIn("Scenario B Changes", wb.sheetnames)
         self.assertNotIn("Scenario A", wb.sheetnames)
         self.assertNotIn("Scenario B", wb.sheetnames)
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
+class HtmxRunScenarioContextTest(TestCase):
+    databases = {"default"}
+
+    def setUp(self):
+        self.client = Client()
+        self.staff_user = CustomUser.objects.create_user(
+            email="staff@example.com",
+            password="testpass123",
+            is_staff=True,
+            firebase_uid="staff_uid",
+        )
+        self.client.login(email="staff@example.com", password="testpass123")
+        for i, total in enumerate([-3.0, -2.5, -2.0, -1.5, -1.0]):
+            ChangeRecord.objects.create(
+                module_type="Grassland",
+                region="Central Asia",
+                climate="Cool Temperate",
+                moisture="Moist",
+                soil_type="High Activity Clay",
+                total=total,
+                field="grassland_management_type",
+                from_value="Non-Degraded",
+                to_value="Improved Grassland",
+                csv_row_data={"row": i},
+            )
+
+    def _post_run_scenario(self, scenario_index="0", scenario_name="My Scenario"):
+        return self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": scenario_index,
+                f"scenario-{scenario_index}-scenario_name": scenario_name,
+                f"scenario-{scenario_index}-category": "",
+                f"scenario-{scenario_index}-change-0-module_type": "Grassland",
+                f"scenario-{scenario_index}-change-0-field": "grassland_management_type",
+                f"scenario-{scenario_index}-change-0-from_value": "Non-Degraded",
+                f"scenario-{scenario_index}-change-0-to_value": "Improved Grassland",
+                f"scenario-{scenario_index}-change-0-unit": "1",
+            },
+        )
+
+    def test_response_contains_data_scenario_result_attribute(self):
+        response = self._post_run_scenario(scenario_index="2", scenario_name="Foo")
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode("utf-8")
+        self.assertIn('data-scenario-result=', body)
+        self.assertIn("data-scenario-index='2'", body)
+
+    def test_data_scenario_result_payload_parses_and_has_expected_keys(self):
+        import json, html
+        response = self._post_run_scenario(scenario_index="0", scenario_name="Foo")
+        body = response.content.decode("utf-8")
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertEqual(payload["scenario_index"], "0")
+        self.assertEqual(payload["scenario_name"], "Foo")
+        self.assertIn("statistics", payload)
+        self.assertEqual(payload["statistics"]["count"], 5)
+        self.assertIn("outliers_low", payload["statistics"])
+        self.assertIn("per_change", payload["statistics"])
+        self.assertEqual(payload["gaps"], [])
+        self.assertIsNone(payload["error"])
+        self.assertFalse(payload["not_computed"])
+
+    def test_data_scenario_result_present_when_no_matching_records(self):
+        import json, html
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": "0",
+                "scenario-0-scenario_name": "Empty",
+                "scenario-0-category": "",
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "scenario-0-change-0-from_value": "DoesNotExist",
+                "scenario-0-change-0-to_value": "AlsoMissing",
+                "scenario-0-change-0-unit": "1",
+            },
+        )
+        body = response.content.decode("utf-8")
+        self.assertIn("data-scenario-result=", body)
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertIn("statistics", payload)
+        self.assertEqual(payload["statistics"]["count"], 0)
+
+    def test_mixed_valid_change_and_gap_renders_stats_and_compute_prompt(self):
+        """Regression: when a scenario mixes a valid change (records present)
+        with a gap change (no underlying ChangeRecord combination), both must
+        surface — the aggregate stats panel AND the per-gap Compute prompt.
+        Previously the gap-bearing change was silently dropped because gap
+        detection only ran when stats['count'] == 0."""
+        import json, html
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": "0",
+                "scenario-0-scenario_name": "Mixed",
+                "scenario-0-category": "",
+                # Valid change: matches the 5 records seeded in setUp.
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "scenario-0-change-0-from_value": "Non-Degraded",
+                "scenario-0-change-0-to_value": "Improved Grassland",
+                "scenario-0-change-0-unit": "1",
+                # Gap change: no underlying ChangeRecord combination.
+                "scenario-0-change-1-module_type": "Grassland",
+                "scenario-0-change-1-field": "grassland_management_type",
+                "scenario-0-change-1-from_value": "DoesNotExist",
+                "scenario-0-change-1-to_value": "AlsoMissing",
+                "scenario-0-change-1-unit": "1",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode("utf-8")
+        # Stats panel renders (5 records contributed by the valid change).
+        self.assertIn("Results", body)
+        # Compute prompt renders, listing only the missing combination.
+        self.assertIn("not yet computed", body)
+        self.assertIn("DoesNotExist", body)
+        self.assertIn("AlsoMissing", body)
+        # Embedded payload exposes both to compare.js.
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertEqual(payload["statistics"]["count"], 5)
+        self.assertEqual(len(payload["gaps"]), 1)
+        self.assertEqual(payload["gaps"][0]["from_value"], "DoesNotExist")
+        self.assertEqual(payload["gaps"][0]["to_value"], "AlsoMissing")
