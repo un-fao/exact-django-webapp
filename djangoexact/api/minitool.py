@@ -2115,6 +2115,101 @@ class PermutationComputer:
                 return True
             return validator
 
+        if module_type == "Livestock":
+            # LivestockCalculator.get_defaults chains five IPCC lookups:
+            #   - LivestockTAM(category, production, ipcc_region)
+            #   - LivestockVSER(category, production, ipcc_region)
+            #   - LivestockManureEF for several (emission, manure_mgmt)
+            #     combos; the first one looked up is (CH4, PRP), and a
+            #     gap here drove Test Run #9's "Could not find EF CH4
+            #     PRP (START) for Default, Growing Swine, Cool Temperate,
+            #     Moist". The other ManureEF lookups (CH4 Systems, N2O,
+            #     N2O leaching/volatilization) share the same key shape,
+            #     so a (category, production, climate, moisture) tuple
+            #     that has the PRP row is a strong proxy for the rest.
+            # Country is picked at create_module time from
+            # region.countries.filter(ipcc_region__isnull=False); validate
+            # at the (region, ipcc_region) level by collapsing across the
+            # region's countries.
+            from collections import defaultdict as _dd
+            region_to_ipcc: _dd = _dd(set)
+            for region_id, ipcc_region_id in (
+                models.Country.objects.filter(
+                    ipcc_region__isnull=False, region__isnull=False,
+                ).values_list("region_id", "ipcc_region_id")
+            ):
+                region_to_ipcc[region_id].add(ipcc_region_id)
+
+            tam_raw = frozenset(
+                ipcc_models.LivestockTAM.objects.values_list(
+                    "livestock_category_type_id", "livestock_production_type_id", "ipcc_region_id",
+                )
+            )
+            vser_raw = frozenset(
+                ipcc_models.LivestockVSER.objects.values_list(
+                    "livestock_category_type_id", "livestock_production_type_id", "ipcc_region_id",
+                )
+            )
+            # Derive (category, production, region) tuples reachable
+            # through at least one of the region's countries.
+            tam_region_set = set()
+            vser_region_set = set()
+            for cat_id, prod_id, ipcc_id in tam_raw:
+                for region_id, ipcc_set in region_to_ipcc.items():
+                    if ipcc_id in ipcc_set:
+                        tam_region_set.add((cat_id, prod_id, region_id))
+            for cat_id, prod_id, ipcc_id in vser_raw:
+                for region_id, ipcc_set in region_to_ipcc.items():
+                    if ipcc_id in ipcc_set:
+                        vser_region_set.add((cat_id, prod_id, region_id))
+            tam_region_set = frozenset(tam_region_set)
+            vser_region_set = frozenset(vser_region_set)
+
+            manure_prp_ch4_set = frozenset(
+                ipcc_models.LivestockManureEF.objects.filter(
+                    emission_type__name="CH4",
+                    manure_management_type__name="Pasture/Range/Paddock",
+                    value__isnull=False,
+                ).values_list(
+                    "livestock_category_type_id", "livestock_production_type_id",
+                    "climate_id", "moisture_id",
+                )
+            )
+
+            if not tam_region_set and not manure_prp_ch4_set:
+                return None
+
+            cat_idx = _idx("livestock_category_types")
+            prod_start_idx = _idx("livestock_production_type_start")
+            prod_w_idx = _idx("livestock_production_type_w")
+            if cat_idx is None or prod_start_idx is None:
+                return None
+
+            def validator(combo):
+                category = combo[cat_idx]
+                if category is None:
+                    return True
+                prods = [combo[prod_start_idx]]
+                if prod_w_idx is not None:
+                    prods.append(combo[prod_w_idx])
+                climate, moisture = combo[cm_idx]
+                region = combo[region_idx]
+                if region is None:
+                    return False
+                for prod in prods:
+                    if prod is None:
+                        continue
+                    if tam_region_set and (category.id, prod.id, region.id) not in tam_region_set:
+                        return False
+                    if vser_region_set and (category.id, prod.id, region.id) not in vser_region_set:
+                        return False
+                    if manure_prp_ch4_set and (
+                        category.id, prod.id, climate.id, moisture.id,
+                    ) not in manure_prp_ch4_set:
+                        return False
+                return True
+            return validator
+
         if module_type in ("CoastalWetland", "CoastalWetland2"):
             # CoastalWetlandCalculator chains lookups through CoastalAGB,
             # CoastalLitter, CoastalDeadwood, DefaultSoilCarbonStock,
