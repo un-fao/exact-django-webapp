@@ -739,7 +739,7 @@ class ModuleProcessor(ABC):
     def create_project(self, climate: Any, moisture: Any, soil_type: Any, region: Any, factories: Any) -> Any:
         """Helper method to create a project with proper country selection"""
         # Get a random country from the region, with fallback
-        country = region.countries.order_by("?").first()
+        country = region.countries.filter(ipcc_region__isnull=False).order_by("?").first()
         if not country:
             # Skip this combination if no country is available
             raise ValueError(f"No countries found for region: {region}")
@@ -826,7 +826,7 @@ class GrasslandProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.GrasslandFactory.build(
@@ -871,7 +871,7 @@ class LivestockProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.LivestockFactory.build(
@@ -910,7 +910,7 @@ class AnnualCroplandProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.AnnualCroplandFactory.build(
@@ -953,7 +953,7 @@ class FloodedRiceProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         # FloodedRiceFactory does not default land_use_type, and the
@@ -1005,7 +1005,7 @@ class PerennialCroplandProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
             implementation_years=0,
             start_year_of_activities=2025,
             last_year_of_accounting=2026,
@@ -1053,7 +1053,7 @@ class ForestManagementProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.ForestManagementFactory.build(
@@ -1090,7 +1090,7 @@ class SmallFisheryProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.SmallFisheryFactory.build(
@@ -1126,7 +1126,7 @@ class LargeFisheryProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.LargeFisheryFactory.build(
@@ -1174,7 +1174,7 @@ class CoastalWetlandProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.CoastalWetlandFactory.build(
@@ -1218,7 +1218,7 @@ class WaterbodyProcessor(ModuleProcessor):
             climate=climate,
             moisture=moisture,
             soil_type=soil_type,
-            country=region.countries.order_by("?").first(),
+            country=region.countries.filter(ipcc_region__isnull=False).order_by("?").first(),
         )
         a = factories.ActivityFactory.build(project=p)
         module = factories.WaterbodyFactory.build(
@@ -2157,19 +2157,29 @@ class PermutationComputer:
             return validator
 
         if module_type == "ForestManagement":
-            # ForestCombustionFactor rows are keyed by
-            # (land_use_type, climate, forest_type). Filter out combinations
-            # whose locked LUT / forest_type pair has no matching row, so we
-            # don't burn 100 permutations on "Combustion Factor Start not
-            # found for Rainforest, Cool Temperate, Natural" errors.
-            valid_set = frozenset(
+            # Two reference tables both gate ForestManagement permutations:
+            #   - ForestCombustionFactor(land_use_type, climate, forest_type)
+            #   - ForestManagementAGB(climate, land_use_type, region,
+            #     forest_condition_type, forest_type, from_year=0)
+            # Either lookup missing → calculator raises "Combustion Factor
+            # Start not found ..." or "Reference values for AGB under 20
+            # years for ... are missing". Pre-load both as sets and require
+            # the combination to satisfy both.
+            cf_set = frozenset(
                 ipcc_models.ForestCombustionFactor.objects.values_list(
                     "land_use_type_id", "climate_id", "forest_type_id",
                 )
             )
-            if not valid_set:
+            agb_set = frozenset(
+                ipcc_models.ForestManagementAGB.objects.filter(from_year=0).values_list(
+                    "climate_id", "land_use_type_id", "region_id",
+                    "forest_condition_type_id", "forest_type_id",
+                )
+            )
+            if not cf_set and not agb_set:
                 return None
             forest_type_idx = _idx("forest_type")
+            forest_condition_type_idx = _idx("forest_condition_type")
             if forest_type_idx is None:
                 return None
             lut_indices = [
@@ -2185,13 +2195,28 @@ class PermutationComputer:
                     return False
                 climate, _moisture = combo[cm_idx]
                 forest_type = combo[forest_type_idx]
+                forest_condition_type = (
+                    combo[forest_condition_type_idx]
+                    if forest_condition_type_idx is not None else None
+                )
+                region = combo[region_idx]
                 if forest_type is None:
                     return True
                 for li in lut_indices:
                     lut = combo[li]
                     if lut is None:
                         continue
-                    if (lut.id, climate.id, forest_type.id) not in valid_set:
+                    if cf_set and (lut.id, climate.id, forest_type.id) not in cf_set:
+                        return False
+                    if (
+                        agb_set
+                        and forest_condition_type is not None
+                        and region is not None
+                        and (
+                            climate.id, lut.id, region.id,
+                            forest_condition_type.id, forest_type.id,
+                        ) not in agb_set
+                    ):
                         return False
                 return True
             return validator
