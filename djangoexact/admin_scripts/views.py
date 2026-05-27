@@ -518,23 +518,23 @@ def htmx_run_scenario(request):
     else:
         stats = stats_for_scenario(changes, global_filters)
 
-        if stats["count"] == 0:
-            for change in changes:
-                field = change["start"]["field"]
-                from_val = change["start"]["value"]
-                to_val = change["end"]["value"]
-                if detect_gap(change["module_type"], field, from_val, to_val):
-                    gaps.append({
-                        "module_type": change["module_type"],
-                        "field": field,
-                        "from_value": from_val,
-                        "to_value": to_val,
-                    })
-            if gaps:
-                context["gaps"] = gaps
-            else:
-                context["statistics"] = stats
-        else:
+        # Per-change so mixed valid+gap scenarios surface both panels.
+        for change in changes:
+            field = change["start"]["field"]
+            from_val = change["start"]["value"]
+            to_val = change["end"]["value"]
+            if detect_gap(change["module_type"], field, from_val, to_val):
+                gaps.append({
+                    "module_type": change["module_type"],
+                    "field": field,
+                    "from_value": from_val,
+                    "to_value": to_val,
+                })
+
+        if gaps:
+            context["gaps"] = gaps
+        # Hide stats only when every change is a gap (preserves prior UX).
+        if stats["count"] > 0 or not gaps:
             context["statistics"] = stats
 
     # Always-present payload for the Compare tab. ``statistics`` is included

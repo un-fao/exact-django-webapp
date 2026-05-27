@@ -1302,3 +1302,49 @@ class HtmxRunScenarioContextTest(TestCase):
         payload = json.loads(raw)
         self.assertIn("statistics", payload)
         self.assertEqual(payload["statistics"]["count"], 0)
+
+    def test_mixed_valid_change_and_gap_renders_stats_and_compute_prompt(self):
+        """Regression: when a scenario mixes a valid change (records present)
+        with a gap change (no underlying ChangeRecord combination), both must
+        surface — the aggregate stats panel AND the per-gap Compute prompt.
+        Previously the gap-bearing change was silently dropped because gap
+        detection only ran when stats['count'] == 0."""
+        import json, html
+        response = self.client.post(
+            "/api/admin-scripts/compile-scenarios/htmx/run-scenario/",
+            {
+                "scenario_index": "0",
+                "scenario-0-scenario_name": "Mixed",
+                "scenario-0-category": "",
+                # Valid change: matches the 5 records seeded in setUp.
+                "scenario-0-change-0-module_type": "Grassland",
+                "scenario-0-change-0-field": "grassland_management_type",
+                "scenario-0-change-0-from_value": "Non-Degraded",
+                "scenario-0-change-0-to_value": "Improved Grassland",
+                "scenario-0-change-0-unit": "1",
+                # Gap change: no underlying ChangeRecord combination.
+                "scenario-0-change-1-module_type": "Grassland",
+                "scenario-0-change-1-field": "grassland_management_type",
+                "scenario-0-change-1-from_value": "DoesNotExist",
+                "scenario-0-change-1-to_value": "AlsoMissing",
+                "scenario-0-change-1-unit": "1",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode("utf-8")
+        # Stats panel renders (5 records contributed by the valid change).
+        self.assertIn("Results", body)
+        # Compute prompt renders, listing only the missing combination.
+        self.assertIn("not yet computed", body)
+        self.assertIn("DoesNotExist", body)
+        self.assertIn("AlsoMissing", body)
+        # Embedded payload exposes both to compare.js.
+        marker = "data-scenario-result='"
+        start = body.index(marker) + len(marker)
+        end = body.index("'", start)
+        raw = html.unescape(body[start:end])
+        payload = json.loads(raw)
+        self.assertEqual(payload["statistics"]["count"], 5)
+        self.assertEqual(len(payload["gaps"]), 1)
+        self.assertEqual(payload["gaps"][0]["from_value"], "DoesNotExist")
+        self.assertEqual(payload["gaps"][0]["to_value"], "AlsoMissing")

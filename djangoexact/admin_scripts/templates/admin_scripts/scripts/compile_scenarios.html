@@ -28,7 +28,6 @@
                 hx-target="#scenario-panels"
                 hx-swap="beforeend"
                 hx-vals='js:{"index": document.querySelectorAll("[data-scenario-panel]").length}'
-                hx-on::after-settle="switchScenarioTab(document.querySelectorAll('[data-scenario-panel]').length - 1)"
                 class="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
             + Add Scenario
         </button>
@@ -106,6 +105,17 @@ function switchScenarioTab(index) {
         tab.classList.remove('border-transparent', 'text-gray-500');
     }
 }
+
+// htmx:afterSettle bubbles from #scenario-panels through ancestors only,
+// so a listener on the + Add Scenario button sibling would never fire.
+document.body.addEventListener('htmx:afterSettle', function (evt) {
+    var target = (evt.detail && evt.detail.target) || evt.target;
+    if (!target || target.id !== 'scenario-panels') return;
+    var panels = document.querySelectorAll('[data-scenario-panel]');
+    if (panels.length === 0) return;
+    var newPanel = panels[panels.length - 1];
+    switchScenarioTab(newPanel.dataset.scenarioPanel);
+});
 </script>
 
 {# Chart.js + plugins for the Compare tab. CDN parity with htmx / Tom Select. #}
