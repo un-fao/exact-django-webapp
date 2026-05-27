@@ -173,5 +173,32 @@ class EnqueueOrJoinTest(TransactionTestCase):
         enqueue_or_join(
             self.user2, "Grassland", "grassland_management_type", "A", "B",
         )
-        # dispatch_job called via on_commit — only the first enqueue triggers it
+        # dispatch_job called via on_commit -- only the first enqueue triggers it
         mock_dispatch.assert_called_once()
+
+
+class ModuleTestRunModelTest(TestCase):
+    databases = {"default"}
+
+    def test_create_run(self):
+        from admin_scripts.models import ModuleTestRun
+        from api.models import CustomUser
+
+        user = CustomUser.objects.create_user(
+            email="run@example.com", password="x", firebase_uid="r1"
+        )
+        run = ModuleTestRun.objects.create(requested_by=user)
+        self.assertEqual(run.jobs.count(), 0)
+        self.assertEqual(run.skipped, [])
+        self.assertIsNone(run.completed_at)
+        self.assertIn(f"TestRun #{run.pk}", str(run))
+
+    def test_max_rows_defaults_to_null(self):
+        job = ComputationJob.objects.create(
+            filters_hash="mr_null_hash",
+            module_type="Grassland",
+            attribute="x",
+            from_value="A",
+            to_value="B",
+        )
+        self.assertIsNone(job.max_rows)

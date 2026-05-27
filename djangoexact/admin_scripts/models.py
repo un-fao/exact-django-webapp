@@ -21,6 +21,11 @@ class ComputationJob(models.Model):
     from_value = models.CharField(max_length=255)
     to_value = models.CharField(max_length=255)
     filters = models.JSONField(default=dict, blank=True)
+    max_rows = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Row cap for compute_module_slice. Null means runner default (10000).",
+    )
 
     # Process tracking (for cancellation)
     pid = models.IntegerField(null=True, blank=True)
@@ -55,3 +60,27 @@ class ComputationJob(models.Model):
 
     def __str__(self):
         return f"{self.module_type}/{self.attribute} [{self.status}]"
+
+
+class ModuleTestRun(models.Model):
+    """A single "test all modules" execution. Owns the ComputationJobs it spawned."""
+
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="module_test_runs",
+    )
+    jobs = models.ManyToManyField(
+        ComputationJob,
+        related_name="test_runs",
+        blank=True,
+    )
+    skipped = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"TestRun #{self.pk} ({self.created_at:%Y-%m-%d %H:%M})"
