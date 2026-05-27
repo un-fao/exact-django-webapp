@@ -2178,10 +2178,41 @@ class PermutationComputer:
                     "land_use_type_id", "climate_id", "forest_type_id",
                 )
             )
-            agb_set = frozenset(
-                ipcc_models.ForestManagementAGB.objects.filter(from_year=0).values_list(
+            # ForestManagementAGB's value fields are individually nullable.
+            # The calculator's checks are
+            #   any(x is None for x in [agb_min, agb_max])         (under-20 + over-20)
+            #   any(x is None for x in [agb_growth_min, agb_growth_max])  (growth under-20)
+            # so a row that exists with one of those fields NULL still
+            # raises "Reference values for AGB ... missing". Require all
+            # four to be set for the from_year=0 row; from_year=21 row
+            # (used by Secondary forest_condition for the over-20 check)
+            # only needs agb_min/agb_max.
+            agb_year0_set = frozenset(
+                ipcc_models.ForestManagementAGB.objects.filter(
+                    from_year=0,
+                    agb_min__isnull=False, agb_max__isnull=False,
+                    agb_growth_min__isnull=False, agb_growth_max__isnull=False,
+                ).values_list(
                     "climate_id", "land_use_type_id", "region_id",
                     "forest_condition_type_id", "forest_type_id",
+                )
+            )
+            agb_year21_set = frozenset(
+                ipcc_models.ForestManagementAGB.objects.filter(
+                    from_year=21,
+                    agb_min__isnull=False, agb_max__isnull=False,
+                ).values_list(
+                    "climate_id", "land_use_type_id", "region_id",
+                    "forest_condition_type_id", "forest_type_id",
+                )
+            )
+            # ForestManagementAGBGrowth: required by calculator at line
+            # 7066, raises AGB_GROWTH_NOT_FOUND when missing. Keyed by
+            # (climate, forest_type, land_use_type, region). Values are
+            # non-null on the model so existence check is enough.
+            agb_growth_set = frozenset(
+                ipcc_models.ForestManagementAGBGrowth.objects.values_list(
+                    "climate_id", "forest_type_id", "land_use_type_id", "region_id",
                 )
             )
             from django.db.models import Count as _Count
@@ -2192,7 +2223,7 @@ class PermutationComputer:
                     "climate_id", "forest_type_id", "land_use_type_id",
                 )
             )
-            if not cf_set and not agb_set and not litter_set:
+            if not cf_set and not agb_year0_set and not litter_set:
                 return None
             forest_type_idx = _idx("forest_type")
             forest_condition_type_idx = _idx("forest_condition_type")
@@ -2218,23 +2249,45 @@ class PermutationComputer:
                 region = combo[region_idx]
                 if forest_type is None:
                     return True
+                is_secondary = (
+                    forest_condition_type is not None
+                    and "Secondary" in (forest_condition_type.name or "")
+                )
                 for li in lut_indices:
                     lut = combo[li]
                     if lut is None:
                         continue
                     if cf_set and (lut.id, climate.id, forest_type.id) not in cf_set:
                         return False
+                    if litter_set and (climate.id, forest_type.id, lut.id) not in litter_set:
+                        return False
                     if (
-                        agb_set
+                        agb_growth_set
+                        and region is not None
+                        and (
+                            climate.id, forest_type.id, lut.id, region.id,
+                        ) not in agb_growth_set
+                    ):
+                        return False
+                    if (
+                        agb_year0_set
                         and forest_condition_type is not None
                         and region is not None
                         and (
                             climate.id, lut.id, region.id,
                             forest_condition_type.id, forest_type.id,
-                        ) not in agb_set
+                        ) not in agb_year0_set
                     ):
                         return False
-                    if litter_set and (climate.id, forest_type.id, lut.id) not in litter_set:
+                    if (
+                        is_secondary
+                        and agb_year21_set
+                        and region is not None
+                        and (
+                            climate.id, lut.id, region.id,
+                            forest_condition_type.id, forest_type.id,
+                        ) not in agb_year21_set
+                    ):
                         return False
                 return True
             return validator
