@@ -57,7 +57,7 @@
 
     <div id="scenario-{{ scenario_index }}-results">
         {% if scenario.statistics %}
-            {% include "admin_scripts/partials/scenario_results.html" with statistics=scenario.statistics %}
+            {% include "admin_scripts/partials/scenario_results.html" with statistics=scenario.statistics scenario_index=scenario_index %}
         {% endif %}
     </div>
 </div>

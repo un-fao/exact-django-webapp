@@ -4,19 +4,21 @@ from datetime import datetime
 from functools import wraps
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 from admin_scripts.catalog import get_catalog
 from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.gap_detector import detect_gap
-from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
-from admin_scripts.models import ComputationJob
+from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enqueue_or_join
+from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
-from django.apps import apps
+from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
 from minitool.models import ChangeRecord
 
 
@@ -58,25 +60,6 @@ def _change_record_filter_choices(qs=None):
     }
 
 
-def _resolve_value_source(value_source):
-    """Resolve a catalog value_source dict to a list of string values.
-
-    For queryset sources, queries the model and returns str() of each instance.
-    For static sources, returns the values list as strings.
-    """
-    kind = value_source.get("kind", "")
-    if kind == "queryset":
-        model_name = value_source.get("model", "")
-        try:
-            model = apps.get_model("api", model_name)
-            return [str(obj) for obj in model.objects.all().order_by("pk")]
-        except LookupError:
-            return []
-    elif kind == "static":
-        return [str(v) for v in value_source.get("values", [])]
-    return []
-
-
 SCRIPTS = [
     {
         "name": "Example Script",
@@ -92,6 +75,11 @@ SCRIPTS = [
         "name": "Jobs",
         "url": "jobs-list",
         "description": "View computation job status and history.",
+    },
+    {
+        "name": "Test All Modules",
+        "url": "test-modules",
+        "description": "Systematically run a capped computation for every module/field in the catalog and report success/failure per pair.",
     },
 ]
 
@@ -496,41 +484,85 @@ def htmx_run_scenario(request):
     if request.method != "POST":
         return HttpResponse("POST required", status=405)
 
+    import json
+
     scenario_index = request.POST.get("scenario_index", "0")
     prefix = f"scenario-{scenario_index}-"
 
     changes = _parse_changes_from_post(request.POST, prefix=prefix)
     global_filters = _parse_global_filters(request.POST)
 
-    context = {}
+    context = {
+        "scenario_index": scenario_index,
+    }
+    stats = None
+    gaps = []
+    error = None
+    not_computed = False
+
     if not changes:
-        context["error"] = "Please add at least one change."
+        error = "Please add at least one change."
+        context["error"] = error
     else:
         stats = stats_for_scenario(changes, global_filters)
 
-        if stats["count"] == 0:
-            # Check if any of the changes are gaps (no data computed yet)
-            gaps = []
-            for change in changes:
-                field = change["start"]["field"]
-                from_val = change["start"]["value"]
-                to_val = change["end"]["value"]
-                if detect_gap(change["module_type"], field, from_val, to_val):
-                    gaps.append({
-                        "module_type": change["module_type"],
-                        "field": field,
-                        "from_value": from_val,
-                        "to_value": to_val,
-                    })
+        # Per-change so mixed valid+gap scenarios surface both panels.
+        for change in changes:
+            field = change["start"]["field"]
+            from_val = change["start"]["value"]
+            to_val = change["end"]["value"]
+            if detect_gap(change["module_type"], field, from_val, to_val):
+                gaps.append({
+                    "module_type": change["module_type"],
+                    "field": field,
+                    "from_value": from_val,
+                    "to_value": to_val,
+                })
 
-            if gaps:
-                context["gaps"] = gaps
-            else:
-                context["statistics"] = stats
-        else:
+        if gaps:
+            context["gaps"] = gaps
+        # Hide stats only when every change is a gap (preserves prior UX).
+        if stats["count"] > 0 or not gaps:
             context["statistics"] = stats
 
+    # Always-present payload for the Compare tab. ``statistics`` is included
+    # even when ``count == 0`` so the client never has to special-case.
+    payload = {
+        "scenario_index": scenario_index,
+        "scenario_name": request.POST.get(f"{prefix}scenario_name", ""),
+        "category": request.POST.get(f"{prefix}category", ""),
+        "statistics": stats if stats is not None else _empty_stats(),
+        "gaps": gaps,
+        "error": error,
+        "not_computed": not_computed,
+    }
+    context["result_json"] = json.dumps(payload, default=str)
+
     return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
+def _empty_stats():
+    """Empty stats dict in the same shape ``stats_for_scenario`` returns.
+    Used by ``htmx_run_scenario`` when no changes were provided, so the
+    Compare tab always sees a stable schema.
+    """
+    return {
+        "count": 0,
+        "sum_total": 0.0,
+        "mean": None,
+        "median": None,
+        "min": None,
+        "max": None,
+        "std": None,
+        "q1": None,
+        "q3": None,
+        "iqr": None,
+        "ci_95": None,
+        "ci_99": None,
+        "outliers_low": 0,
+        "outliers_high": 0,
+        "per_change": [],
+    }
 
 
 @login_required(login_url="/admin/login/")
@@ -621,4 +653,182 @@ def compile_scenarios_export(request):
         as_attachment=True,
         filename=filename,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test All Modules
+# ---------------------------------------------------------------------------
+
+TERMINAL_STATUSES = {
+    ComputationJob.Status.COMPLETED,
+    ComputationJob.Status.FAILED,
+    ComputationJob.Status.CANCELLED,
+}
+
+
+def _summarize_completed_job(job):
+    """Compute a tiny count/mean summary for a completed test-run job.
+
+    Returns a dict with ``count`` (int) and ``mean_str`` (formatted string
+    or empty). Preformatting in Python keeps the template free of
+    None-comparison gymnastics and lets ``mean=0.0`` render as "0.00"
+    rather than being filtered out by template truthiness.
+    """
+    change = {
+        "module_type": job.module_type,
+        "start": {"field": job.attribute, "value": job.from_value},
+        "end": {"field": job.attribute, "value": job.to_value},
+        "filters": {},
+        "unit": "",
+    }
+    stats = stats_for_scenario([change], {})
+    mean = stats["mean"]
+    mean_str = f"{mean:.2f}" if mean is not None else ""
+    return {"count": stats["count"], "mean_str": mean_str}
+
+
+def _build_run_rows(run):
+    """Build the per-job rows shown on the detail page, grouped by module.
+
+    Returns a tuple ``(groups, counts)`` where:
+      - groups: ``[{"module_type": str, "rows": [row, ...]}, ...]`` in catalog order
+      - counts: dict with totals for the summary chips
+    """
+    catalog = get_catalog()
+    module_order = [m.module_type for m in catalog]
+
+    jobs_by_module: dict[str, list] = {m: [] for m in module_order}
+    counts = {
+        "total": 0, "pending": 0, "running": 0,
+        "completed": 0, "failed": 0, "cancelled": 0,
+        "skipped": len(run.skipped),
+    }
+    for job in run.jobs.all().order_by("module_type", "attribute"):
+        summary = None
+        if job.status == ComputationJob.Status.COMPLETED:
+            summary = _summarize_completed_job(job)
+        jobs_by_module.setdefault(job.module_type, []).append({
+            "job": job,
+            "summary": summary,
+        })
+        counts["total"] += 1
+        counts[job.status] = counts.get(job.status, 0) + 1
+
+    skipped_by_module: dict[str, list] = {m: [] for m in module_order}
+    for entry in run.skipped:
+        skipped_by_module.setdefault(entry["module_type"], []).append(entry)
+
+    groups = []
+    for module_type in module_order:
+        rows = jobs_by_module.get(module_type, [])
+        skipped = skipped_by_module.get(module_type, [])
+        if rows or skipped:
+            groups.append({
+                "module_type": module_type,
+                "rows": rows,
+                "skipped": skipped,
+            })
+    # Any unexpected module names (legacy data) tacked on at the end.
+    for module_type, rows in jobs_by_module.items():
+        if module_type not in module_order and rows:
+            groups.append({
+                "module_type": module_type, "rows": rows, "skipped": [],
+            })
+
+    return groups, counts
+
+
+def _run_is_complete(run) -> bool:
+    """A run is complete iff it has at least one job and all jobs are terminal."""
+    statuses = list(run.jobs.values_list("status", flat=True))
+    if not statuses:
+        # No jobs at all (every field was skipped): treat as complete immediately.
+        return True
+    return all(s in TERMINAL_STATUSES for s in statuses)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules(request):
+    """Landing page: run button + history of the user's recent test runs."""
+    if request.method == "POST":
+        catalog = get_catalog()
+        planned, skipped = plan_module_tests(catalog)
+
+        with transaction.atomic():
+            run = ModuleTestRun.objects.create(requested_by=request.user)
+            new_jobs = []
+            for entry in planned:
+                job = enqueue_for_test_run(
+                    user=request.user,
+                    run_id=run.id,
+                    module_type=entry["module_type"],
+                    attribute=entry["field_name"],
+                    from_value=entry["from_value"],
+                    to_value=entry["to_value"],
+                    max_rows=100,
+                )
+                new_jobs.append(job)
+            if new_jobs:
+                run.jobs.add(*new_jobs)
+            run.skipped = skipped
+            run.save(update_fields=["skipped"])
+
+        return redirect("admin_scripts:test-modules-detail", run_id=run.id)
+
+    recent_runs = (
+        ModuleTestRun.objects
+        .filter(requested_by=request.user)
+        .order_by("-created_at")[:20]
+    )
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules.html",
+        {"recent_runs": recent_runs},
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_detail(request, run_id):
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    groups, counts = _build_run_rows(run)
+    is_complete = _run_is_complete(run)
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules_detail.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_status(request, run_id):
+    """HTMX-polled status partial. Stamps completed_at when all jobs are terminal."""
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    is_complete = _run_is_complete(run)
+    if is_complete and run.completed_at is None:
+        run.completed_at = timezone.now()
+        run.save(update_fields=["completed_at"])
+
+    groups, counts = _build_run_rows(run)
+    return render(
+        request,
+        "admin_scripts/partials/test_modules_results.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
     )

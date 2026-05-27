@@ -98,7 +98,7 @@ class Command(BaseCommand):
             from_value=job.from_value,
             to_value=job.to_value,
             chunk_size=10000,
-            max_rows=10000,
+            max_rows=job.max_rows or 10000,
             max_workers=None,
             save_results=True,
             progress_callback=_update_progress,
