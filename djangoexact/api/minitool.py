@@ -1261,11 +1261,10 @@ def _build_project_activity(combination, factories):
     # Filter to countries with ipcc_region populated — LivestockCalculator's
     # LivestockTAM lookup uses country.ipcc_region as a filter key, and
     # picking a country with ipcc_region=None drove Test Run #4's
-    # "Could not find TAM (START) for ..., None" cascade.
-    country = (
-        region.countries.filter(ipcc_region__isnull=False).order_by("?").first()
-        or region.countries.order_by("?").first()
-    )
+    # "Could not find TAM (START) for ..., None" cascade. The companion
+    # filter at PermutationComputer-region level removes regions that have
+    # zero such countries, so this pick should always succeed.
+    country = region.countries.filter(ipcc_region__isnull=False).order_by("?").first()
     project = factories.ProjectFactory.build(
         climate=climate,
         moisture=moisture,
@@ -2047,8 +2046,33 @@ class PermutationComputer:
 
         cm_idx = _idx("climate_moistures")
         region_idx = _idx("region")
+        soil_idx = _idx("soil_types")
         if cm_idx is None or region_idx is None:
             return None
+
+        # Land modules go through LandModuleCalculator.get_defaults which
+        # looks up SoilOrganicCarbon.objects.filter(climate, moisture,
+        # soil_type).first() and raises "SOC for X climate, Y moisture, and
+        # Z soil type is missing" when there's no row. The upstream
+        # SoilOrganicCarbonValidator computes the valid triples but the
+        # runner extracts (climate, moisture) and soil_type into separate
+        # dimensions, so the cartesian product re-introduces tuples whose
+        # triple was never valid. Pre-load the set here and re-check at
+        # combination time.
+        _soc_set = frozenset(
+            ipcc_models.SoilOrganicCarbon.objects.values_list(
+                "climate_id", "moisture_id", "soil_type_id",
+            )
+        )
+
+        def _soc_ok(combo) -> bool:
+            if soil_idx is None or not _soc_set:
+                return True
+            climate, moisture = combo[cm_idx]
+            soil_type = combo[soil_idx]
+            if soil_type is None:
+                return True
+            return (climate.id, moisture.id, soil_type.id) in _soc_set
 
         if module_type == "PerennialCropland":
             # PerennialAGB rows are keyed by
@@ -2072,6 +2096,8 @@ class PermutationComputer:
                 return None
 
             def validator(combo):
+                if not _soc_ok(combo):
+                    return False
                 climate, moisture = combo[cm_idx]
                 region = combo[region_idx]
                 if region is None:
@@ -2114,6 +2140,9 @@ class PermutationComputer:
                 return None
 
             def validator(combo):
+                # RewettingCarbonFactor's key already includes
+                # (climate, moisture, soil_type) so a hit here implies SOC
+                # would also pass — no separate _soc_ok call needed.
                 climate, moisture = combo[cm_idx]
                 soil_type = combo[soil_idx]
                 if soil_type is None:
@@ -2152,6 +2181,8 @@ class PermutationComputer:
                 return None
 
             def validator(combo):
+                if not _soc_ok(combo):
+                    return False
                 climate, _moisture = combo[cm_idx]
                 forest_type = combo[forest_type_idx]
                 if forest_type is None:
@@ -2218,9 +2249,16 @@ class PermutationComputer:
 
         logger.info(f"After SoilOrganicCarbon validation: {len(valid_climate_moistures)} climate-moisture combinations and {len(valid_soil_types)} soil types")
 
-        # Filter regions to only include those with countries
-        # Use a more efficient database query
-        regions_with_countries = list(models.Region.objects.filter(countries__isnull=False).distinct())
+        # Filter regions to only include those with countries that have
+        # ipcc_region set — LivestockCalculator's LivestockTAM lookup
+        # filters by country.ipcc_region and crashes with "Could not find
+        # TAM (START) for ..., None" otherwise.
+        regions_with_countries = list(
+            models.Region.objects.filter(
+                countries__isnull=False,
+                countries__ipcc_region__isnull=False,
+            ).distinct()
+        )
 
         logger.info(f"Found {len(regions_with_countries)} regions with countries (out of {models.Region.objects.count()} total regions)")
 
