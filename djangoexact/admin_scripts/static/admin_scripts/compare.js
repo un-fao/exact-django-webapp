@@ -21,6 +21,10 @@
 
     window.scenarioResults = window.scenarioResults || {};
 
+    // Indices last passed to renderCompare(); used by accordion toggle
+    // handlers to lazily render charts when the user opens a collapsed panel.
+    var lastIndices = [];
+
     function colorForScenario(index) {
         return PALETTE[Number(index) % PALETTE.length];
     }
@@ -151,10 +155,39 @@
         obs.observe(container, { childList: true });
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", observeScenarioRemoval);
-    } else {
+    // Wire <details> toggle so a chart is created/refreshed when the user
+    // expands a previously-collapsed accordion. Renderers skip work while
+    // the accordion is collapsed (Chart.js would render to a 0x0 canvas).
+    function wireAccordionToggles() {
+        var pairs = [
+            { id: "cmp-bar", render: renderBarChart, key: "bar" },
+            { id: "cmp-box", render: renderBoxPlot, key: "box" },
+            { id: "cmp-composition", render: renderComposition, key: "composition" },
+        ];
+        pairs.forEach(function (p) {
+            var el = document.getElementById(p.id);
+            if (!el) return;
+            el.addEventListener("toggle", function () {
+                if (el.open) {
+                    p.render(lastIndices);
+                } else if (charts[p.key]) {
+                    // Free the chart instance when collapsed so a later open
+                    // creates a fresh chart sized to the now-visible canvas.
+                    destroyChart(p.key);
+                }
+            });
+        });
+    }
+
+    function bootCompare() {
         observeScenarioRemoval();
+        wireAccordionToggles();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", bootCompare);
+    } else {
+        bootCompare();
     }
 
     function classifyChip(slot) {
@@ -254,17 +287,24 @@
     function renderBarChart(indices) {
         var mount = document.getElementById("cmp-bar");
         if (!mount) return;
-        destroyChart("bar");
         var renderable = indices.filter(function (idx) {
             var s = window.scenarioResults[idx];
             return s && s.result && s.result.statistics && s.result.statistics.count > 0
                    && s.result.statistics.mean !== null;
         });
         if (renderable.length === 0) {
+            destroyChart("bar");
             mount.classList.add("hidden");
             return;
         }
         mount.classList.remove("hidden");
+        // Chart.js needs a sized canvas; skip when the accordion is collapsed
+        // and let the toggle handler re-render on open.
+        if (mount.tagName === "DETAILS" && !mount.open) {
+            destroyChart("bar");
+            return;
+        }
+        destroyChart("bar");
         var canvas = mount.querySelector("canvas");
         var labels = renderable.map(function (idx) {
             return scenarioLabel(idx, window.scenarioResults[idx]);
@@ -319,17 +359,22 @@
     function renderBoxPlot(indices) {
         var mount = document.getElementById("cmp-box");
         if (!mount) return;
-        destroyChart("box");
         var renderable = indices.filter(function (idx) {
             var s = window.scenarioResults[idx];
             return s && s.result && s.result.statistics && s.result.statistics.count > 0
                    && s.result.statistics.q1 !== null && s.result.statistics.q3 !== null;
         });
         if (renderable.length === 0) {
+            destroyChart("box");
             mount.classList.add("hidden");
             return;
         }
         mount.classList.remove("hidden");
+        if (mount.tagName === "DETAILS" && !mount.open) {
+            destroyChart("box");
+            return;
+        }
+        destroyChart("box");
         var canvas = mount.querySelector("canvas");
         var labels = renderable.map(function (idx) {
             return scenarioLabel(idx, window.scenarioResults[idx]);
@@ -400,17 +445,22 @@
     function renderComposition(indices) {
         var mount = document.getElementById("cmp-composition");
         if (!mount) return;
-        destroyChart("composition");
         var renderable = indices.filter(function (idx) {
             var s = window.scenarioResults[idx];
             var pc = s && s.result && s.result.statistics && s.result.statistics.per_change;
             return pc && pc.length > 0;
         });
         if (renderable.length === 0) {
+            destroyChart("composition");
             mount.classList.add("hidden");
             return;
         }
         mount.classList.remove("hidden");
+        if (mount.tagName === "DETAILS" && !mount.open) {
+            destroyChart("composition");
+            return;
+        }
+        destroyChart("composition");
         var canvas = mount.querySelector("canvas");
 
         // Collect the union of change labels across all scenarios.
@@ -528,6 +578,7 @@
         var indices = Object.keys(window.scenarioResults).sort(function (a, b) {
             return Number(a) - Number(b);
         });
+        lastIndices = indices;
         var empty = document.getElementById("cmp-empty");
         var hasAny = indices.length > 0;
         if (empty) empty.classList.toggle("hidden", hasAny);
