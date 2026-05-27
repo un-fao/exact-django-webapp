@@ -1296,6 +1296,25 @@ def _apply_unsaved_defaults(instance, models):
                 name=models.EmissionFactorSource.OPERATING_MARGIN
             )[0]
         instance.ef_source = _apply_unsaved_defaults._ef_source
+
+    # Tier-2 override floats default to None on the mixins ("no override,
+    # use IPCC default"). When the IPCC default is also missing — e.g.
+    # ``EnergyDefaultEmissionFactor.co2 is None`` for a renewable fuel —
+    # the calculator falls back to the tier-2 value and the math throws
+    # ``unsupported operand type(s) for *: 'float' and 'NoneType'``.
+    # Replacing None with 0 keeps "no override" semantics (factor_t2 is
+    # only used via ``factor or default`` / ``factor if factor is not
+    # None`` patterns) while keeping the math arithmetic-safe.
+    from django.db.models import FloatField as _FloatField
+    for _field in instance._meta.get_fields():
+        if not isinstance(_field, _FloatField):
+            continue
+        _name = _field.attname
+        if "_t2" not in _name:
+            continue
+        if getattr(instance, _name, None) is None:
+            setattr(instance, _name, 0)
+
     return instance
 
 
@@ -1348,7 +1367,12 @@ class StorageProcessor(ModuleProcessor):
 
         project, activity = _build_project_activity(combination, factories)
         parent = factories.StorageFactory.build(activity=activity)
-        entry = models.StorageEntry(
+        # Use the factory so total_refrigerant_leakage_* and
+        # emission_factor_t2_* land on the instance — StorageEntryCalculator
+        # feeds them straight into MathValueChain, and bare model
+        # construction left them None, triggering "unsupported operand
+        # type(s) for *: 'NoneType' and 'float'" in the math.
+        entry = factories.StorageEntryFactory.build(
             parent=parent,
             fuel_type_start=fuel_type_start,
             fuel_type_w=fuel_type_w,
