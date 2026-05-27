@@ -1,0 +1,18 @@
+<div id="results-body"
+     {% if not is_complete %}hx-get="{% url 'admin_scripts:test-modules-status' run.pk %}"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML"{% endif %}>
+    <p>total={{ counts.total }} pending={{ counts.pending }} running={{ counts.running }}
+       completed={{ counts.completed }} failed={{ counts.failed }} skipped={{ counts.skipped }}</p>
+    {% for group in groups %}
+        <h3>{{ group.module_type }}</h3>
+        <ul>
+        {% for row in group.rows %}
+            <li>{{ row.job.attribute }}: {{ row.job.status }}{% if row.summary %} count={{ row.summary.count }}{% endif %}{% if row.job.error_message %} ERR: {{ row.job.error_message|truncatechars:200 }}{% endif %}</li>
+        {% endfor %}
+        {% for s in group.skipped %}
+            <li>{{ s.field_name }}: skip ({{ s.reason }})</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+</div>

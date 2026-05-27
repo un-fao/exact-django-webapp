@@ -13,10 +13,10 @@ from django.urls import reverse
 from admin_scripts.catalog import get_catalog
 from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.gap_detector import detect_gap
-from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
-from admin_scripts.models import ComputationJob
+from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enqueue_or_join
+from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
-from admin_scripts.test_planner import _resolve_value_source
+from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
 from minitool.models import ChangeRecord
 
 
@@ -73,6 +73,11 @@ SCRIPTS = [
         "name": "Jobs",
         "url": "jobs-list",
         "description": "View computation job status and history.",
+    },
+    {
+        "name": "Test All Modules",
+        "url": "test-modules",
+        "description": "Systematically run a capped computation for every module/field in the catalog and report success/failure per pair.",
     },
 ]
 
@@ -646,4 +651,187 @@ def compile_scenarios_export(request):
         as_attachment=True,
         filename=filename,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test All Modules
+# ---------------------------------------------------------------------------
+
+TERMINAL_STATUSES = {
+    ComputationJob.Status.COMPLETED,
+    ComputationJob.Status.FAILED,
+    ComputationJob.Status.CANCELLED,
+}
+
+
+def _summarize_completed_job(job):
+    """Compute a tiny count/mean summary for a completed test-run job.
+
+    Returns a dict with ``count`` (int) and ``mean_str`` (formatted string
+    or empty). Preformatting in Python keeps the template free of
+    None-comparison gymnastics and lets ``mean=0.0`` render as "0.00"
+    rather than being filtered out by template truthiness.
+    """
+    from admin_scripts.scenario_utils import stats_for_scenario
+
+    change = {
+        "module_type": job.module_type,
+        "start": {"field": job.attribute, "value": job.from_value},
+        "end": {"field": job.attribute, "value": job.to_value},
+        "filters": {},
+        "unit": "",
+    }
+    stats = stats_for_scenario([change], {})
+    mean = stats["mean"]
+    mean_str = f"{mean:.2f}" if mean is not None else ""
+    return {"count": stats["count"], "mean_str": mean_str}
+
+
+def _build_run_rows(run):
+    """Build the per-job rows shown on the detail page, grouped by module.
+
+    Returns a tuple ``(groups, counts)`` where:
+      - groups: ``[{"module_type": str, "rows": [row, ...]}, ...]`` in catalog order
+      - counts: dict with totals for the summary chips
+    """
+    catalog = get_catalog()
+    module_order = [m.module_type for m in catalog]
+
+    jobs_by_module: dict[str, list] = {m: [] for m in module_order}
+    counts = {
+        "total": 0, "pending": 0, "running": 0,
+        "completed": 0, "failed": 0, "cancelled": 0,
+        "skipped": len(run.skipped),
+    }
+    for job in run.jobs.all().order_by("module_type", "attribute"):
+        summary = None
+        if job.status == ComputationJob.Status.COMPLETED:
+            summary = _summarize_completed_job(job)
+        jobs_by_module.setdefault(job.module_type, []).append({
+            "job": job,
+            "summary": summary,
+        })
+        counts["total"] += 1
+        counts[job.status] = counts.get(job.status, 0) + 1
+
+    skipped_by_module: dict[str, list] = {m: [] for m in module_order}
+    for entry in run.skipped:
+        skipped_by_module.setdefault(entry["module_type"], []).append(entry)
+
+    groups = []
+    for module_type in module_order:
+        rows = jobs_by_module.get(module_type, [])
+        skipped = skipped_by_module.get(module_type, [])
+        if rows or skipped:
+            groups.append({
+                "module_type": module_type,
+                "rows": rows,
+                "skipped": skipped,
+            })
+    # Any unexpected module names (legacy data) tacked on at the end.
+    for module_type, rows in jobs_by_module.items():
+        if module_type not in module_order and rows:
+            groups.append({
+                "module_type": module_type, "rows": rows, "skipped": [],
+            })
+
+    return groups, counts
+
+
+def _run_is_complete(run) -> bool:
+    """A run is complete iff it has at least one job and all jobs are terminal."""
+    statuses = list(run.jobs.values_list("status", flat=True))
+    if not statuses:
+        # No jobs at all (every field was skipped): treat as complete immediately.
+        return True
+    return all(s in TERMINAL_STATUSES for s in statuses)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules(request):
+    """Landing page: run button + history of the user's recent test runs."""
+    from django.shortcuts import redirect
+
+    if request.method == "POST":
+        catalog = get_catalog()
+        planned, skipped = plan_module_tests(catalog)
+
+        run = ModuleTestRun.objects.create(requested_by=request.user)
+        new_jobs = []
+        for entry in planned:
+            job = enqueue_for_test_run(
+                user=request.user,
+                run_id=run.id,
+                module_type=entry["module_type"],
+                attribute=entry["field_name"],
+                from_value=entry["from_value"],
+                to_value=entry["to_value"],
+                max_rows=100,
+            )
+            new_jobs.append(job)
+        if new_jobs:
+            run.jobs.add(*new_jobs)
+        run.skipped = skipped
+        run.save(update_fields=["skipped"])
+
+        return redirect("admin_scripts:test-modules-detail", run_id=run.id)
+
+    recent_runs = (
+        ModuleTestRun.objects
+        .filter(requested_by=request.user)
+        .order_by("-created_at")[:20]
+    )
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules.html",
+        {"recent_runs": recent_runs},
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_detail(request, run_id):
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    groups, counts = _build_run_rows(run)
+    is_complete = _run_is_complete(run)
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules_detail.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_status(request, run_id):
+    """HTMX-polled status partial. Stamps completed_at when all jobs are terminal."""
+    from django.utils import timezone
+
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    is_complete = _run_is_complete(run)
+    if is_complete and run.completed_at is None:
+        run.completed_at = timezone.now()
+        run.save(update_fields=["completed_at"])
+
+    groups, counts = _build_run_rows(run)
+    return render(
+        request,
+        "admin_scripts/partials/test_modules_results.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
     )
