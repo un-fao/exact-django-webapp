@@ -6,7 +6,8 @@ from unittest.mock import patch
 
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import compute_filters_hash, enqueue_or_join
-from admin_scripts.models import ComputationJob
+from admin_scripts.models import ComputationJob, ModuleTestRun
+from api.models import CustomUser
 from minitool.models import ChangeRecord
 
 
@@ -54,6 +55,16 @@ class ComputationJobModelTest(TestCase):
                 from_value="C",
                 to_value="D",
             )
+
+    def test_max_rows_defaults_to_null(self):
+        job = ComputationJob.objects.create(
+            filters_hash="mr_null_hash",
+            module_type="Grassland",
+            attribute="x",
+            from_value="A",
+            to_value="B",
+        )
+        self.assertIsNone(job.max_rows)
 
 
 class GapDetectorTest(TestCase):
@@ -181,9 +192,6 @@ class ModuleTestRunModelTest(TestCase):
     databases = {"default"}
 
     def test_create_run(self):
-        from admin_scripts.models import ModuleTestRun
-        from api.models import CustomUser
-
         user = CustomUser.objects.create_user(
             email="run@example.com", password="x", firebase_uid="r1"
         )
@@ -192,13 +200,3 @@ class ModuleTestRunModelTest(TestCase):
         self.assertEqual(run.skipped, [])
         self.assertIsNone(run.completed_at)
         self.assertIn(f"TestRun #{run.pk}", str(run))
-
-    def test_max_rows_defaults_to_null(self):
-        job = ComputationJob.objects.create(
-            filters_hash="mr_null_hash",
-            module_type="Grassland",
-            attribute="x",
-            from_value="A",
-            to_value="B",
-        )
-        self.assertIsNone(job.max_rows)
