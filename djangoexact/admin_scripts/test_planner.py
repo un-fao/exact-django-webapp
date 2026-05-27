@@ -10,12 +10,47 @@ from __future__ import annotations
 from django.apps import apps
 
 
-def _resolve_value_source(value_source: dict) -> list[str]:
-    """Resolve a catalog value_source dict to a list of string values.
+# LandUseChange runs against three sibling land modules attached to the same
+# saved Activity (`activity.annualcropland.first()` etc.). The permutation
+# runner builds Activity unsaved and does not provision siblings, so any LUC
+# permutation crashes inside `LandUseChange.get_modules()`. Until the runner
+# learns to build siblings, surface LUC fields as Skipped with a clear reason
+# rather than failing the run. Tracked in LandUseChangeProcessor docstring.
+_UNTESTABLE_MODULES = frozenset({"LandUseChange"})
+_UNTESTABLE_REASON = "LandUseChange permutations need sibling fixtures (TODO)"
 
-    For queryset sources, queries the model and returns str() of each
-    instance. For static sources, returns the values list as strings.
+
+def _resolve_value_source(value_source: dict, module_type: str = "", field_name: str = "") -> list[str]:
+    """Resolve a catalog value_source to a list of string values.
+
+    Prefer the live MODULE_CONFIGS field declaration over the catalog spec.
+    The catalog declares ``{kind: queryset, model: LandUseType}`` (unfiltered),
+    while MODULE_CONFIGS may apply per-module filters such as
+    ``LandUseType.objects.filter(module_types__name="Perennial Cropland")``.
+    Picking from the unfiltered global list produces from/to pairs the runner
+    later rejects in ``_find_instance_by_name`` ("Could not find 'X' in [...]").
+    Reading from MODULE_CONFIGS keeps the planner and runner in lockstep.
     """
+    if module_type and field_name:
+        try:
+            from api.minitool import MODULE_CONFIGS
+            fields = MODULE_CONFIGS.get(module_type, {}).get("fields", {})
+            for key in (f"{field_name}_start", field_name):
+                if key in fields:
+                    source = fields[key]
+                    try:
+                        return [str(item) for item in source]
+                    except TypeError:
+                        # A single model instance — not iterable. Treat as
+                        # a one-value source so the planner skips with a
+                        # clear "only 1 distinct value(s) available" reason
+                        # rather than blowing up.
+                        return [str(source)]
+        except ImportError:
+            pass  # Fall through to catalog-based resolution
+
+    # Catalog fallback (used by tests that pass synthetic value_sources
+    # without a matching MODULE_CONFIGS entry).
     kind = value_source.get("kind", "")
     if kind == "queryset":
         model_name = value_source.get("model", "")
@@ -67,8 +102,19 @@ def plan_module_tests(catalog) -> tuple[list[dict], list[dict]]:
     skipped: list[dict] = []
 
     for module in catalog:
+        if module.module_type in _UNTESTABLE_MODULES:
+            for field in module.fields:
+                skipped.append({
+                    "module_type": module.module_type,
+                    "field_name": field.field_name,
+                    "reason": _UNTESTABLE_REASON,
+                })
+            continue
+
         for field in module.fields:
-            values = _ordered_unique(_resolve_value_source(field.value_source))
+            values = _ordered_unique(_resolve_value_source(
+                field.value_source, module.module_type, field.field_name,
+            ))
             if len(values) == 0:
                 skipped.append({
                     "module_type": module.module_type,

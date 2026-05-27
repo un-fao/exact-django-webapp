@@ -1108,6 +1108,96 @@ class LargeFisheryProcessor(ModuleProcessor):
         return module
 
 
+class CoastalWetlandProcessor(ModuleProcessor):
+    """Processor for CoastalWetland modules.
+
+    The calculator only reads direct fields and FKs (no reverse relations),
+    so an unsaved instance is fine. Registered for both ``CoastalWetland``
+    and ``CoastalWetland2`` MODULE_CONFIGS keys — the two configs vary
+    different field subsets (drained vs. rewetted) against the same model.
+    """
+
+    data_builder_key = "CoastalWetland"
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            land_use_type,
+            area_under_drainage_start,
+            area_under_drainage_w,
+            drained_area_excavated_start,
+            drained_area_excavated_w,
+            area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w,
+            area_w_restored_vegetation_start,
+            area_w_restored_vegetation_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.CoastalWetlandFactory.build(
+            activity=a,
+            area=1,
+            land_use_type=land_use_type,
+            area_under_drainage_start=area_under_drainage_start,
+            area_under_drainage_w=area_under_drainage_w,
+            area_under_drainage_wo=area_under_drainage_start,
+            drained_area_excavated_start=drained_area_excavated_start,
+            drained_area_excavated_w=drained_area_excavated_w,
+            drained_area_excavated_wo=drained_area_excavated_start,
+            area_not_drained_or_rewetted_start=area_not_drained_or_rewetted_start,
+            area_not_drained_or_rewetted_w=area_not_drained_or_rewetted_w,
+            area_not_drained_or_rewetted_wo=area_not_drained_or_rewetted_start,
+            area_w_restored_vegetation_start=area_w_restored_vegetation_start,
+            area_w_restored_vegetation_w=area_w_restored_vegetation_w,
+            area_w_restored_vegetation_wo=area_w_restored_vegetation_start,
+        )
+        return module
+
+
+class WaterbodyProcessor(ModuleProcessor):
+    """Processor for Waterbody modules.
+
+    Calculator reads direct fields only — unsaved instance is safe.
+    """
+
+    def create_module(self, combination: Tuple, factories: Any, models: Any) -> Any:
+        (
+            waterbody_type,
+            trophic_type_start,
+            trophic_type_w,
+            climate_moisture,
+            soil_type,
+            region,
+        ) = combination
+        climate, moisture = climate_moisture
+
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=region.countries.order_by("?").first(),
+        )
+        a = factories.ActivityFactory.build(project=p)
+        module = factories.WaterbodyFactory.build(
+            activity=a,
+            area=1,
+            waterbody_type=waterbody_type,
+            trophic_type_start=trophic_type_start,
+            trophic_type_w=trophic_type_w,
+            trophic_type_wo=trophic_type_start,
+        )
+        return module
+
+
 # ---------------------------------------------------------------------------
 # Processors for modules with a parent + submodule shape
 #
@@ -1144,6 +1234,27 @@ def _build_project_activity(combination, factories):
     return project, activity
 
 
+def _apply_unsaved_defaults(instance, models):
+    """Set FK defaults that the model's ``save()`` would normally populate.
+
+    ``Submodule.save()`` sets ``status`` to StatusType("EMPTY") and
+    ``ElectricityTier2Mixin.save()`` sets ``ef_source`` to
+    EmissionFactorSource(OPERATING_MARGIN). The permutation runner uses
+    ``Factory.build()`` (unsaved) to avoid DB writes per combination, so
+    those defaults never fire — and calculators that read e.g.
+    ``self.module.ef_source.name`` blow up with
+    ``'NoneType' object has no attribute 'name'``. Apply both defaults
+    eagerly here for any Entry/Phase instance whose calculator needs them.
+    """
+    if hasattr(instance, "status") and not getattr(instance, "status", None):
+        instance.status = models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
+    if hasattr(instance, "ef_source") and not getattr(instance, "ef_source", None):
+        instance.ef_source = models.EmissionFactorSource.objects.get_or_create(
+            name=models.EmissionFactorSource.OPERATING_MARGIN
+        )[0]
+    return instance
+
+
 class EnergyProcessor(ModuleProcessor):
     """Build Energy parent + a single EnergyEntry submodule.
 
@@ -1174,7 +1285,7 @@ class EnergyProcessor(ModuleProcessor):
             quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
             account_for_co2=account_for_co2_start,
         )
-        return entry
+        return _apply_unsaved_defaults(entry, models)
 
 
 class StorageProcessor(ModuleProcessor):
@@ -1206,7 +1317,7 @@ class StorageProcessor(ModuleProcessor):
             refrigerant_type_w=refrigerant_type_w,
             refrigerant_type_wo=refrigerant_type_start,
         )
-        return entry
+        return _apply_unsaved_defaults(entry, models)
 
 
 class ProcessingProcessor(ModuleProcessor):
@@ -1234,7 +1345,7 @@ class ProcessingProcessor(ModuleProcessor):
             quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
             is_water_used=is_water_used_start,
         )
-        return entry
+        return _apply_unsaved_defaults(entry, models)
 
 
 class PackagingProcessor(ModuleProcessor):
@@ -1262,7 +1373,7 @@ class PackagingProcessor(ModuleProcessor):
             kg_of_packaging_material_wo=kg_of_packaging_material_start,
             is_electric=is_electric_start,
         )
-        return entry
+        return _apply_unsaved_defaults(entry, models)
 
 
 class TransportProcessor(ModuleProcessor):
@@ -1288,7 +1399,7 @@ class TransportProcessor(ModuleProcessor):
             quantity_consumed_per_year_w=quantity_consumed_per_year_w,
             quantity_consumed_per_year_wo=quantity_consumed_per_year_start,
         )
-        return entry
+        return _apply_unsaved_defaults(entry, models)
 
 
 class IrrigationSystemProcessor(ModuleProcessor):
@@ -1320,7 +1431,7 @@ class IrrigationSystemProcessor(ModuleProcessor):
             ef_t2_w=ef_t2_w,
             ef_t2_wo=ef_t2_start,
         )
-        return system
+        return _apply_unsaved_defaults(system, models)
 
 
 class IrrigationPhaseProcessor(ModuleProcessor):
@@ -1350,7 +1461,7 @@ class IrrigationPhaseProcessor(ModuleProcessor):
             gross_irrigation_water_w=gross_irrigation_water_w,
             gross_irrigation_water_wo=gross_irrigation_water_start,
         )
-        return phase
+        return _apply_unsaved_defaults(phase, models)
 
 
 class SettlementProcessor(ModuleProcessor):
@@ -1382,7 +1493,7 @@ class SettlementProcessor(ModuleProcessor):
             biomass_t2_w=biomass_t2_w,
             biomass_t2_wo=biomass_t2_start,
         )
-        return settlement
+        return _apply_unsaved_defaults(settlement, models)
 
 
 class BuildingProcessor(ModuleProcessor):
@@ -1408,7 +1519,7 @@ class BuildingProcessor(ModuleProcessor):
             ef_t2_w=ef_t2_w,
             ef_t2_wo=ef_t2_start,
         )
-        return building
+        return _apply_unsaved_defaults(building, models)
 
 
 class RoadProcessor(ModuleProcessor):
@@ -1434,7 +1545,7 @@ class RoadProcessor(ModuleProcessor):
             width_m_w=width_m_w,
             width_m_wo=width_m_start,
         )
-        return road
+        return _apply_unsaved_defaults(road, models)
 
 
 class OtherInfrastructureProcessor(ModuleProcessor):
@@ -1458,7 +1569,7 @@ class OtherInfrastructureProcessor(ModuleProcessor):
             ef_t2_w=ef_t2_w,
             ef_t2_wo=ef_t2_start,
         )
-        return other
+        return _apply_unsaved_defaults(other, models)
 
 
 class LandUseChangeProcessor(ModuleProcessor):
@@ -1512,6 +1623,12 @@ class ProcessorRegistry:
         self.register("ForestManagement", ForestManagementProcessor(self._data_builder_registry))
         self.register("SmallFishery", SmallFisheryProcessor(self._data_builder_registry))
         self.register("LargeFishery", LargeFisheryProcessor(self._data_builder_registry))
+        # CoastalWetland2 reuses the same processor — the two MODULE_CONFIGS
+        # entries vary different field subsets (drained vs. rewetted) against
+        # one model class with one calculator.
+        self.register("CoastalWetland", CoastalWetlandProcessor(self._data_builder_registry))
+        self.register("CoastalWetland2", CoastalWetlandProcessor(self._data_builder_registry))
+        self.register("Waterbody", WaterbodyProcessor(self._data_builder_registry))
         self.register("Energy", EnergyProcessor(self._data_builder_registry))
         self.register("Storage", StorageProcessor(self._data_builder_registry))
         self.register("Processing", ProcessingProcessor(self._data_builder_registry))
@@ -1960,18 +2077,30 @@ class PermutationComputer:
                 else:
                     chunk_iter = self.chunked_product(*iterables, chunk_size=optimal_chunk_size)
 
+                stopped_early = False
                 for chunk in chunk_iter:
+                    if stopped_early:
+                        # Executor is already shut down — submitting more
+                        # futures would raise "cannot schedule new futures
+                        # after shutdown" and abort the whole run.
+                        break
+
                     # Use submit instead of map for better load balancing
                     futures = [executor.submit(processor.process_combination, combo) for combo in chunk]
 
                     for future in futures:
                         result = future.result()
 
-                        if stop_at and len(data) >= stop_at:
-                            # Terminate worker processes
+                        # stop_at caps total work — successes AND errors. Without
+                        # the errors term, a run where every permutation raises
+                        # exhausts the full Cartesian product before exiting,
+                        # producing "All N permutations failed" with N way over
+                        # the cap (seen in Test Run #1 with N up to 9600).
+                        if stop_at and (len(data) + len(errors_data)) >= stop_at:
                             for proc in executor._processes.values():
                                 proc.terminate()
                             executor.shutdown(wait=False, cancel_futures=True)
+                            stopped_early = True
                             break
 
                         if result.success:
@@ -2049,8 +2178,11 @@ MODULE_CONFIGS = {
     },
     "AnnualCropland": {
         "fields": {
-            "land_use_type_start": models.LandUseType.objects.get(name="Default"),
-            "land_use_type_w": models.LandUseType.objects.get(name="Default"),
+            # Filtered querysets (not .get()) — _constrain_fields_for_change
+            # iterates every paired _start/_w value, including ones held fixed,
+            # via `list(fields[key])`. A single ORM instance is not iterable.
+            "land_use_type_start": models.LandUseType.objects.filter(name="Default"),
+            "land_use_type_w": models.LandUseType.objects.filter(name="Default"),
             "tillage_management_type_start": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "tillage_management_type_w": models.TillageManagementType.objects.all(),  # NOTE: To be used in LandUseChange permutation
             "organic_input_type_start": models.OrganicInputType.objects.all(),  # NOTE: To be used in LandUseChange permutation

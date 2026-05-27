@@ -4618,17 +4618,23 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
 
-        for building in self.module.buildings.all():
-            r_w, r_wo = BuildingCalculator(building).calculate()
+        # Reverse-relation managers raise on unsaved Settlement instances
+        # ("Settlement instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # Settlement unsaved to skip DB writes — when there's no pk, there
+        # can be no related Buildings or Roads to sum either.
+        if self.module.pk:
+            for building in self.module.buildings.all():
+                r_w, r_wo = BuildingCalculator(building).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
-        for road in self.module.roads.all():
-            r_w, r_wo = RoadCalculator(road).calculate()
+            for road in self.module.roads.all():
+                r_w, r_wo = RoadCalculator(road).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
         log.debug("END SettlementCalculator.calculate")
         return (self.results_w, self.results_wo)
