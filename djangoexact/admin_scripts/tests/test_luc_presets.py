@@ -96,7 +96,6 @@ class ExpandPresetStartSideTest(TestCase):
         # PerennialCropland's MODULE_CONFIGS filters land_use_type to
         # ``module_types__name="Perennial Cropland"``; the expansion must
         # use that filtered queryset (not the unfiltered LandUseType.all()).
-        from api import models
         from api.minitool import MODULE_CONFIGS
         expected_names = {
             str(o) for o in MODULE_CONFIGS["PerennialCropland"]["fields"]["land_use_type_start"]

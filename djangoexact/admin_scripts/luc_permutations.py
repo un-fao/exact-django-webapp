@@ -26,17 +26,24 @@ class Side(enum.Enum):
 
 
 def _resolve_fk_by_name(model_cls, name: str):
-    """Look up a row by ``name`` or ``name_en``. Raises if not found."""
+    """Look up a row by ``name_en`` then ``name``. Raises ValueError if neither matches.
+
+    A ``FieldError`` on ``name_en`` means the model doesn't carry that
+    translated-name field; fall through to ``name``. Any other exception
+    (``MultipleObjectsReturned``, DB issues, etc.) propagates so callers
+    see real failures instead of a misleading "no row" error.
+    """
+    from django.core.exceptions import FieldError
+
     for field_name in ("name_en", "name"):
         try:
             return model_cls.objects.get(**{field_name: name})
         except model_cls.DoesNotExist:
             continue
-        except Exception:
-            # name_en may not be a field on this model; fall through to name.
+        except FieldError:
             continue
     raise ValueError(
-        f"{model_cls.__name__}: no row with name='{name}' or name_en='{name}'"
+        f"{model_cls.__name__}: no row with name_en='{name}' or name='{name}'"
     )
 
 
@@ -55,9 +62,14 @@ def _field_value_choices(class_name: str, field_name: str, selector: Any) -> lis
     source = fields.get(f"{field_name}_start") or fields.get(field_name)
 
     if isinstance(selector, Fixed):
+        # Scalar Fixed values bypass FK lookup. Today only ``bool`` lands
+        # here (``is_biomass_burned``); ints/floats from MODULE_CONFIGS
+        # entries that hold plain Python lists (e.g. ``fire_periodicity_*``,
+        # ``area_m2_*``) would otherwise fall through to ``source.model``
+        # and crash, so treat any non-queryset source as already a value list.
         if isinstance(selector.name, bool):
             return [selector.name]
-        if source is None:
+        if source is None or not hasattr(source, "model"):
             return [selector.name]
         # source is a queryset of FK rows; resolve by name.
         model_cls = source.model
