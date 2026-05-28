@@ -22,6 +22,7 @@ class ComputeModuleSliceLucRoutingTest(SimpleTestCase):
                 to_value="Grassland#0",
                 save_results=False,
                 progress_callback=None,
+                max_rows=10000,
             )
             self.assertEqual(data, [{"ok": 1}])
             self.assertEqual(errors, [])
