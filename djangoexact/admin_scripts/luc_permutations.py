@@ -141,3 +141,28 @@ def parse_identifier(value: str) -> tuple[str, int]:
     except ValueError as exc:
         raise ValueError(f"LUC identifier has non-integer index: {value!r}") from exc
 
+
+def plan_luc_pairs() -> list[dict]:
+    """Return one planner entry per directed (start_template, w_template) pair.
+
+    Each entry slots into ``plan_module_tests``'s ``planned`` list with the
+    same shape used for non-LUC modules:
+
+        {"module_type": "LandUseChange",
+         "field_name": "module_type",
+         "from_value": "<ClassName>#<idx>",
+         "to_value":   "<ClassName>#<idx>"}
+    """
+    templates = list_preset_templates()
+    entries: list[dict] = []
+    for start_class, start_idx in templates:
+        from_value = format_identifier(start_class, start_idx)
+        for w_class, w_idx in templates:
+            entries.append({
+                "module_type": "LandUseChange",
+                "field_name": "module_type",
+                "from_value": from_value,
+                "to_value": format_identifier(w_class, w_idx),
+            })
+    return entries
+
