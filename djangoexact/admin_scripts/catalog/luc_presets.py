@@ -14,7 +14,7 @@ root; future changes happen here in Python, not in the spreadsheet.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
