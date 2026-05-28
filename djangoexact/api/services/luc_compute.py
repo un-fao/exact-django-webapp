@@ -134,19 +134,37 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
     return luc
 
 
-def _serialize_result(luc, start_values, w_values, result, from_value, to_value) -> dict:
-    """Reduce one calculator result to a dict for DataManager / ChangeRecord."""
+def _serialize_result(luc, start_values, w_values, balance, from_value, to_value) -> dict:
+    """Reduce one calculator result to a dict for DataManager / ChangeRecord.
+
+    Shape matches the per-row dicts that the non-LUC PermutationComputer
+    emits, so the same importer
+    (api.services.minitool_changes_import.import_changes_from_data) can
+    write ChangeRecord rows without a LUC-specific branch. The
+    ``module_type_start`` / ``module_type_w`` pair is what
+    ``_iter_column_pairs`` reads to produce a ``field="module_type"`` row
+    carrying the preset-identifier from/to values that the scenario builder
+    dropdown emits and queries against.
+    """
     def _str(v):
         return None if v is None else str(v)
 
+    project = luc.activity.project
+    region_obj = project.country.region if project.country else None
     return {
+        "region": _str(region_obj) or "",
+        "climate": _str(project.climate) or "",
+        "moisture": _str(project.moisture) or "",
+        "soil_type": _str(project.soil_type) or "",
+        "total": balance,
+        "module_type_start": from_value,
+        "module_type_w": to_value,
         "from_value": from_value,
         "to_value": to_value,
         "start_class": luc.module_type_start.class_name,
         "w_class": luc.module_type_w.class_name,
         "start_values": {k: _str(v) for k, v in start_values.items()},
         "w_values": {k: _str(v) for k, v in w_values.items()},
-        "result": result,
     }
 
 
@@ -172,7 +190,7 @@ def _compute_luc_slice(
     """
     from django.db import transaction
     from admin_scripts.luc_permutations import parse_identifier
-    from api.calculators import LandUseChangeCalculator
+    from api.calculators import CalculatorFactory
 
     start_spec = parse_identifier(from_value)
     w_spec = parse_identifier(to_value)
@@ -191,9 +209,12 @@ def _compute_luc_slice(
                     start_class=start_spec[0], start_values=start_values,
                     w_class=w_spec[0], w_values=w_values,
                 )
-                result = LandUseChangeCalculator(luc).calculate()
+                # Mirror the non-LUC PermutationComputer: take the scalar
+                # balance from breakdown(TOTAL)[2] so ChangeRecord.total is
+                # a float, not a Python object the scenario UI can't aggregate.
+                balance = CalculatorFactory().calculate_result(luc)[0][2]
                 data.append(_serialize_result(
-                    luc, start_values, w_values, result,
+                    luc, start_values, w_values, balance,
                     from_value, to_value,
                 ))
             except Exception as exc:
@@ -211,6 +232,12 @@ def _compute_luc_slice(
     if save_results and data:
         from api.minitool import DataManager
         DataManager().save_data(data, errors, "LandUseChange")
+        # Persist to ChangeRecord too. Without this the scenario-builder /
+        # test-modules detail view (which queries ChangeRecord via
+        # stats_for_scenario) shows count=0 for every "Completed" LUC job
+        # because the GCS CSV upload is the only thing that ran.
+        from api.services.minitool_changes_import import import_changes_from_data
+        import_changes_from_data(data, "LandUseChange")
 
     logger.info(
         "LUC slice %s -> %s: %d data, %d errors (from %d combos)",
