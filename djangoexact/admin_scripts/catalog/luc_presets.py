@@ -41,7 +41,11 @@ class Cycle:
         return self.filter == other.filter
 
     def __hash__(self):
-        return hash(("Cycle", frozenset((self.filter or {}).items())))
+        items = (
+            (k, tuple(v) if isinstance(v, list) else v)
+            for k, v in (self.filter or {}).items()
+        )
+        return hash(("Cycle", frozenset(items)))
 
 
 LUC_PRESETS: dict[str, list[dict[str, Any]]] = {
