@@ -350,7 +350,7 @@ modules:
       kind: static
       values:
       - 1
-# Parent modules with multiple submodule types — each submodule becomes its
+# Parent modules with multiple submodule types - each submodule becomes its
 # own catalog entry, named after the submodule. The processor still builds
 # the parent + that one submodule behind the scenes; ChangeRecord.module_type
 # stores the submodule name so the UI / queries line up 1-1.
@@ -483,10 +483,3 @@ modules:
     value_source:
       kind: queryset
       model: ModuleType
-  - field_name: is_fire_used
-    label: Is Fire Used
-    value_source:
-      kind: static
-      values:
-      - true
-      - false

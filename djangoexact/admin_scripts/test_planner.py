@@ -10,14 +10,10 @@ from __future__ import annotations
 from django.apps import apps
 
 
-# LandUseChange runs against three sibling land modules attached to the same
-# saved Activity (`activity.annualcropland.first()` etc.). The permutation
-# runner builds Activity unsaved and does not provision siblings, so any LUC
-# permutation crashes inside `LandUseChange.get_modules()`. Until the runner
-# learns to build siblings, surface LUC fields as Skipped with a clear reason
-# rather than failing the run. Tracked in LandUseChangeProcessor docstring.
-_UNTESTABLE_MODULES = frozenset({"LandUseChange"})
-_UNTESTABLE_REASON = "LandUseChange permutations need sibling fixtures (TODO)"
+# LandUseChange permutations now route through a dedicated saved-fixtures
+# runner; the planner emits one entry per (start_template, w_template) pair
+# from admin_scripts.luc_permutations.plan_luc_pairs(). See
+# api/services/luc_compute.py for the runner.
 
 
 def _resolve_value_source(value_source: dict, module_type: str = "", field_name: str = "") -> list[str]:
@@ -41,7 +37,7 @@ def _resolve_value_source(value_source: dict, module_type: str = "", field_name:
                     try:
                         return [str(item) for item in source]
                     except TypeError:
-                        # A single model instance — not iterable. Treat as
+                        # A single model instance, not iterable. Treat as
                         # a one-value source so the planner skips with a
                         # clear "only 1 distinct value(s) available" reason
                         # rather than blowing up.
@@ -102,13 +98,11 @@ def plan_module_tests(catalog) -> tuple[list[dict], list[dict]]:
     skipped: list[dict] = []
 
     for module in catalog:
-        if module.module_type in _UNTESTABLE_MODULES:
-            for field in module.fields:
-                skipped.append({
-                    "module_type": module.module_type,
-                    "field_name": field.field_name,
-                    "reason": _UNTESTABLE_REASON,
-                })
+        if module.module_type == "LandUseChange":
+            # LUC pairs come from plan_luc_pairs(); the catalog entry's
+            # fields are informational only for LUC.
+            from admin_scripts.luc_permutations import plan_luc_pairs
+            planned.extend(plan_luc_pairs())
             continue
 
         for field in module.fields:
