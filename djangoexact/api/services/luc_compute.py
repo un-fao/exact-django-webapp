@@ -64,9 +64,12 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
     nothing persists to the database.
     """
     from api import models as api_models
+    import api.tests.factories as factories
 
-    project = api_models.Project.objects.create()
-    activity = api_models.Activity.objects.create(project=project)
+    owner = factories.UserFactory.create()
+    country = api_models.Country.objects.first()
+    project = factories.ProjectFactory.create(owner=owner, country=country)
+    activity = factories.ActivityFactory.create(project=project)
 
     if start_class == w_class:
         _save_sibling(activity, start_class, start_values, w_values)
