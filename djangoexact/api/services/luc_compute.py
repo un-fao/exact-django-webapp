@@ -110,3 +110,79 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
         is_fire_used_wo=False,
     )
     return luc
+
+
+def _serialize_result(luc, start_values, w_values, result, from_value, to_value) -> dict:
+    """Reduce one calculator result to a dict for DataManager / ChangeRecord."""
+    def _str(v):
+        return None if v is None else str(v)
+
+    return {
+        "from_value": from_value,
+        "to_value": to_value,
+        "start_class": luc.module_type_start.class_name,
+        "w_class": luc.module_type_w.class_name,
+        "start_values": {k: _str(v) for k, v in start_values.items()},
+        "w_values": {k: _str(v) for k, v in w_values.items()},
+        "result": result,
+    }
+
+
+def _compute_luc_slice(
+    from_value: str,
+    to_value: str,
+    *,
+    save_results: bool = True,
+    progress_callback=None,
+) -> tuple[list[dict], list[dict]]:
+    """Iterate concrete LUC combinations and run LandUseChangeCalculator.
+
+    Each combination builds saved fixtures inside ``transaction.atomic``
+    and rolls back after the calculator returns. Errors are captured per
+    combination so a single bad combo doesn't abort the slice.
+    """
+    from django.db import transaction
+    from admin_scripts.luc_permutations import parse_identifier
+    from api.calculators import LandUseChangeCalculator
+
+    start_spec = parse_identifier(from_value)
+    w_spec = parse_identifier(to_value)
+
+    data: list[dict] = []
+    errors: list[dict] = []
+
+    combos = list(iterate_concrete_combos(start_spec, w_spec))
+    total = len(combos)
+    for i, (start_values, w_values) in enumerate(combos):
+        with transaction.atomic():
+            try:
+                luc = build_luc_fixture(
+                    start_class=start_spec[0], start_values=start_values,
+                    w_class=w_spec[0], w_values=w_values,
+                )
+                result = LandUseChangeCalculator(luc).calculate()
+                data.append(_serialize_result(
+                    luc, start_values, w_values, result,
+                    from_value, to_value,
+                ))
+            except Exception as exc:
+                errors.append({
+                    "from_value": from_value,
+                    "to_value": to_value,
+                    "error_type": type(exc).__name__,
+                    "error_message": str(exc),
+                })
+            finally:
+                transaction.set_rollback(True)
+        if progress_callback and total:
+            progress_callback(int(100 * (i + 1) / total))
+
+    if save_results and data:
+        from api.minitool import DataManager
+        DataManager().save_data(data, errors, "LandUseChange")
+
+    logger.info(
+        "LUC slice %s -> %s: %d data, %d errors (from %d combos)",
+        from_value, to_value, len(data), len(errors), total,
+    )
+    return data, errors
