@@ -65,10 +65,25 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
     """
     from api import models as api_models
     import api.tests.factories as factories
+    from ipcc import models as ipcc_models
 
     owner = factories.UserFactory.create()
     country = api_models.Country.objects.first()
-    project = factories.ProjectFactory.create(owner=owner, country=country)
+    # The LUC calculator dereferences project.climate.name, project.moisture,
+    # and project.soil_type without None-guards (api/calculators.py SOC
+    # lookups). Pick a climate/moisture/soil_type triple that has a
+    # SoilOrganicCarbon record so those lookups succeed downstream.
+    soc = ipcc_models.SoilOrganicCarbon.objects.filter(value__isnull=False).first()
+    if soc is None:
+        raise RuntimeError("No SoilOrganicCarbon reference data; cannot build LUC fixture")
+    climate, moisture, soil_type = soc.climate, soc.moisture, soc.soil_type
+    project = factories.ProjectFactory.create(
+        owner=owner,
+        country=country,
+        climate=climate,
+        moisture=moisture,
+        soil_type=soil_type,
+    )
     activity = factories.ActivityFactory.create(project=project)
 
     if start_class == w_class:
