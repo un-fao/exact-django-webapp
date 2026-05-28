@@ -21,6 +21,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: fire_impact
     label: Fire Impact
     value_source:
@@ -48,6 +49,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
 - module_type: AnnualCropland
   label: Annual Cropland
   config_name: annual_cropland
@@ -117,12 +119,6 @@ modules:
       values:
       - true
       - false
-  - field_name: fire_periodicity_t2
-    label: Fire Periodicity T2
-    value_source:
-      kind: static
-      values:
-      - 1
 - module_type: ForestManagement
   label: Forest Management
   config_name: forest_management
@@ -264,6 +260,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
 - module_type: Storage
   label: Storage
   config_name: storage
@@ -279,6 +276,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: is_refrigerant_used
     label: Is Refrigerant Used
     value_source:
@@ -306,6 +304,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: is_water_used
     label: Is Water Used
     value_source:
@@ -328,6 +327,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: is_electric
     label: Is Electric
     value_source:
@@ -350,6 +350,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
 # Parent modules with multiple submodule types - each submodule becomes its
 # own catalog entry, named after the submodule. The processor still builds
 # the parent + that one submodule behind the scenes; ChangeRecord.module_type
@@ -369,11 +370,6 @@ modules:
       kind: static
       values:
       - 1
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
       - 0
 - module_type: IrrigationPhase
   label: IrrigationPhase
@@ -395,12 +391,14 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: gross_irrigation_water
     label: Gross Irrigation Water
     value_source:
       kind: static
       values:
       - 1
+      - 0
 - module_type: Settlement
   label: Settlement
   config_name: settlement
@@ -410,12 +408,6 @@ modules:
     value_source:
       kind: queryset
       model: SettlementType
-  - field_name: biomass_t2
-    label: Biomass Tier 2
-    value_source:
-      kind: static
-      values:
-      - 0
 - module_type: Building
   label: Building
   config_name: building
@@ -431,11 +423,6 @@ modules:
       kind: static
       values:
       - 1
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
       - 0
 - module_type: Road
   label: Road
@@ -452,12 +439,14 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: width_m
     label: Width (m)
     value_source:
       kind: static
       values:
       - 1
+      - 0
 - module_type: OtherInfrastructure
   label: OtherInfrastructure
   config_name: other_infrastructure
@@ -468,11 +457,6 @@ modules:
       kind: static
       values:
       - 1
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
       - 0
 - module_type: LandUseChange
   label: LandUseChange
