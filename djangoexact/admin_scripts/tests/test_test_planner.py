@@ -109,18 +109,15 @@ class PlanModuleTestsTest(TestCase):
         else:
             self.assertTrue(skipped)
 
-    def test_land_use_change_is_skipped_with_clear_reason(self):
-        # LandUseChange's calculator requires sibling land modules on a
-        # saved Activity — the permutation runner can't provision those
-        # yet, so we surface LUC fields as Skipped instead of letting them
-        # crash with "Activity instance needs to have a primary key value".
+    def test_land_use_change_pairs_are_planned_not_skipped(self):
+        # LUC fields now route through plan_luc_pairs (saved-fixtures runner).
+        # The planner must not surface LUC entries in `skipped`, and the
+        # 144 LUC pair entries (one per template pair) must be in `planned`.
         catalog = [_module("LandUseChange", [
-            _field("is_fire_used", {"kind": "static", "values": [True, False]}),
             _field("module_type", {"kind": "queryset", "model": "ModuleType"}),
         ])]
         planned, skipped = plan_module_tests(catalog)
-        self.assertEqual(planned, [])
-        self.assertEqual(len(skipped), 2)
-        for entry in skipped:
-            self.assertEqual(entry["module_type"], "LandUseChange")
-            self.assertIn("sibling", entry["reason"].lower())
+        luc_skipped = [e for e in skipped if e["module_type"] == "LandUseChange"]
+        luc_planned = [e for e in planned if e["module_type"] == "LandUseChange"]
+        self.assertEqual(luc_skipped, [])
+        self.assertEqual(len(luc_planned), 144)
