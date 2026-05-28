@@ -106,3 +106,20 @@ class ExpandPresetStartSideTest(TestCase):
         for c in combos:
             self.assertEqual(str(c["tillage_management_type"]), "Full Tillage")
             self.assertEqual(c["is_biomass_burned"], True)
+
+
+class ExpandPresetDestinationOverrideTest(TestCase):
+    databases = {"default"}
+
+    def test_forest_management_w_side_restricts_to_secondary(self):
+        # Without override: 2 forest_types x 2 conditions = 4 combos.
+        # With override: 2 forest_types x 1 condition (Secondary) = 2 combos.
+        combos = expand_preset("ForestManagement", 0, Side.W)
+        self.assertEqual(len(combos), 2)
+        for c in combos:
+            self.assertEqual(str(c["forest_condition_type"]), "Secondary")
+
+    def test_destination_override_does_not_leak_to_start_side(self):
+        start_combos = expand_preset("ForestManagement", 0, Side.START)
+        conditions = {str(c["forest_condition_type"]) for c in start_combos}
+        self.assertEqual(conditions, {"Primary", "Secondary"})
