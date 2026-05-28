@@ -101,7 +101,7 @@ class PlanModuleTestsTest(TestCase):
         planned, skipped = plan_module_tests(catalog)
         configs_qs = MODULE_CONFIGS["PerennialCropland"]["fields"]["land_use_type_start"]
         valid_names = {str(obj) for obj in configs_qs}
-        # Either skipped (fewer than 2 perennial types — unlikely with
+        # Either skipped (fewer than 2 perennial types, unlikely with
         # reference data) or both picked values are in the filtered set.
         if planned:
             self.assertIn(planned[0]["from_value"], valid_names)
