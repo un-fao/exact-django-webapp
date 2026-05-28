@@ -119,13 +119,6 @@ modules:
       values:
       - true
       - false
-  - field_name: fire_periodicity_t2
-    label: Fire Periodicity T2
-    value_source:
-      kind: static
-      values:
-      - 1
-      - 0
 - module_type: ForestManagement
   label: Forest Management
   config_name: forest_management
@@ -378,12 +371,6 @@ modules:
       values:
       - 1
       - 0
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
-      - 0
 - module_type: IrrigationPhase
   label: IrrigationPhase
   config_name: irrigation_phase
@@ -421,12 +408,6 @@ modules:
     value_source:
       kind: queryset
       model: SettlementType
-  - field_name: biomass_t2
-    label: Biomass Tier 2
-    value_source:
-      kind: static
-      values:
-      - 0
 - module_type: Building
   label: Building
   config_name: building
@@ -442,12 +423,6 @@ modules:
       kind: static
       values:
       - 1
-      - 0
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
       - 0
 - module_type: Road
   label: Road
@@ -482,12 +457,6 @@ modules:
       kind: static
       values:
       - 1
-      - 0
-  - field_name: ef_t2
-    label: EF Tier 2
-    value_source:
-      kind: static
-      values:
       - 0
 - module_type: LandUseChange
   label: LandUseChange
