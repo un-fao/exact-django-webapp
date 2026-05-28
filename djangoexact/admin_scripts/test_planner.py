@@ -27,6 +27,25 @@ def _resolve_value_source(value_source: dict, module_type: str = "", field_name:
     later rejects in ``_find_instance_by_name`` ("Could not find 'X' in [...]").
     Reading from MODULE_CONFIGS keeps the planner and runner in lockstep.
     """
+    # LandUseChange.module_type does not pair through MODULE_CONFIGS like
+    # other modules: the saved-fixtures runner in api.services.luc_compute
+    # consumes preset identifiers ("<ClassName>#<idx>") via
+    # admin_scripts.luc_permutations.parse_identifier, and ChangeRecord rows
+    # produced by plan_luc_pairs() store those same strings. Falling through
+    # to the MODULE_CONFIGS path would yield ModuleType __str__ values
+    # ("(6) Flooded Rice (LUC)") that the runner rejects and that never
+    # match a stored ChangeRecord (so the scenario UI would always show a
+    # spurious "Data not yet computed" gap).
+    if module_type == "LandUseChange" and field_name == "module_type":
+        from admin_scripts.luc_permutations import (
+            format_identifier,
+            list_preset_templates,
+        )
+        return [
+            format_identifier(class_name, idx)
+            for class_name, idx in list_preset_templates()
+        ]
+
     if module_type and field_name:
         try:
             from api.minitool import MODULE_CONFIGS

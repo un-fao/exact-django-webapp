@@ -8,7 +8,7 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from admin_scripts.catalog import CatalogField, CatalogModule
-from admin_scripts.test_planner import plan_module_tests
+from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
 
 
 def _module(module_type, fields):
@@ -121,3 +121,30 @@ class PlanModuleTestsTest(TestCase):
         luc_planned = [e for e in planned if e["module_type"] == "LandUseChange"]
         self.assertEqual(luc_skipped, [])
         self.assertEqual(len(luc_planned), 144)
+
+    def test_resolve_value_source_returns_luc_preset_identifiers(self):
+        # The scenario-builder UI feeds resolved values back as from/to
+        # POST params. For LandUseChange.module_type those eventually reach
+        # admin_scripts.luc_permutations.parse_identifier (via
+        # api.services.luc_compute._compute_luc_slice), which only accepts
+        # the "<ClassName>#<idx>" format. If this resolver returned ModuleType
+        # __str__ ("(6) Flooded Rice (LUC)") the runner would raise
+        # "LUC identifier missing '#'". Pin the identifier format here.
+        from admin_scripts.luc_permutations import (
+            list_preset_templates,
+            parse_identifier,
+        )
+
+        values = _resolve_value_source(
+            {"kind": "queryset", "model": "ModuleType"},
+            "LandUseChange",
+            "module_type",
+        )
+        expected = [
+            f"{class_name}#{idx}"
+            for class_name, idx in list_preset_templates()
+        ]
+        self.assertEqual(values, expected)
+        # Round-trip: every value parses cleanly via parse_identifier.
+        for value in values:
+            parse_identifier(value)
