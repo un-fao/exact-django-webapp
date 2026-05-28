@@ -483,10 +483,3 @@ modules:
     value_source:
       kind: queryset
       model: ModuleType
-  - field_name: is_fire_used
-    label: Is Fire Used
-    value_source:
-      kind: static
-      values:
-      - true
-      - false
