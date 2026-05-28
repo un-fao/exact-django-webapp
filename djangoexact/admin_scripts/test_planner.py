@@ -37,7 +37,7 @@ def _resolve_value_source(value_source: dict, module_type: str = "", field_name:
                     try:
                         return [str(item) for item in source]
                     except TypeError:
-                        # A single model instance — not iterable. Treat as
+                        # A single model instance, not iterable. Treat as
                         # a one-value source so the planner skips with a
                         # clear "only 1 distinct value(s) available" reason
                         # rather than blowing up.
