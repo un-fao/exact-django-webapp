@@ -91,6 +91,12 @@ LUC_PRESETS: dict[str, list[dict[str, Any]]] = {
     ],
     "ForestManagement": [
         {
+            # land_use_type is required by the calculator (calculators.py:1130
+            # fallback tries to look up a LUT named after the ModuleType, which
+            # doesn't exist for "Forest Management"). The Excel reads "NO OTHER
+            # INPUT" for Forest beyond forest_type/forest_condition, so a single
+            # Fixed value matches that scope.
+            "land_use_type": Fixed("Coniferous Forest"),
             "forest_type": Cycle(),
             "forest_condition_type": Cycle(),
             "_destination_overrides": {
