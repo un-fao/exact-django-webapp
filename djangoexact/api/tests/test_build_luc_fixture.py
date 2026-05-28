@@ -71,3 +71,38 @@ class BuildLucFixtureTest(TestCase):
             self.assertIsNotNone(sibling.forest_type)
             self.assertIsNotNone(sibling.forest_condition_type)
             transaction.set_rollback(True)
+
+    def test_siblings_status_is_ready_so_calculator_gate_passes(self):
+        # OtherLandUseCalculator and DeforestationCalculator both gate on
+        # module.status == StatusType(name_en="READY"). Module.status is
+        # nullable with no default, so a sibling saved without an explicit
+        # status assignment falls through to "All modules ... must be ready"
+        # (regression seen in Test Run #12: 138/144 LUC pairs failed).
+        from api import models
+        ready = models.StatusType.objects.get(name_en="READY")
+
+        # Exercise both different-class and same-class paths.
+        start_values_diff = expand_preset("AnnualCropland", 0, Side.START)[0]
+        w_values_diff = expand_preset("Grassland", 0, Side.W)[0]
+        with transaction.atomic():
+            luc = build_luc_fixture(
+                start_class="AnnualCropland", start_values=start_values_diff,
+                w_class="Grassland", w_values=w_values_diff,
+            )
+            for module in luc.get_modules():
+                self.assertEqual(
+                    module.status, ready,
+                    f"{module.__class__.__name__}.status must be READY",
+                )
+            transaction.set_rollback(True)
+
+        start_values_same = expand_preset("ForestManagement", 0, Side.START)[0]
+        w_values_same = start_values_same
+        with transaction.atomic():
+            luc = build_luc_fixture(
+                start_class="ForestManagement", start_values=start_values_same,
+                w_class="ForestManagement", w_values=w_values_same,
+            )
+            for module in luc.get_modules():
+                self.assertEqual(module.status, ready)
+            transaction.set_rollback(True)
