@@ -49,3 +49,25 @@ class BuildLucFixtureTest(TestCase):
             self.assertEqual(str(sibling.tillage_management_type_w), "No Tillage")
             self.assertEqual(str(sibling.tillage_management_type_wo), "Full Tillage")
             transaction.set_rollback(True)
+
+    def test_forest_management_sibling_persists_non_sided_fields(self):
+        from api import models
+        from admin_scripts.luc_permutations import Side, expand_preset
+        # ForestManagement has non-sided forest_type and forest_condition_type
+        # FK fields. _save_sibling must write to the plain attributes (not
+        # the _start/_w/_wo variants, which don't exist on the model).
+        start_values = expand_preset("ForestManagement", 0, Side.START)[0]
+        # Pick the same combo on the w side too so we exercise the same-class
+        # path that hits the single-sibling branch.
+        w_values = start_values
+
+        with transaction.atomic():
+            build_luc_fixture(
+                start_class="ForestManagement", start_values=start_values,
+                w_class="ForestManagement", w_values=w_values,
+            )
+            sibling = models.ForestManagement.objects.last()
+            self.assertIsNotNone(sibling)
+            self.assertIsNotNone(sibling.forest_type)
+            self.assertIsNotNone(sibling.forest_condition_type)
+            transaction.set_rollback(True)

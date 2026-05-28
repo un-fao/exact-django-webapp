@@ -35,20 +35,33 @@ def iterate_concrete_combos(
 def _save_sibling(activity, sibling_class, start_values, w_values):
     """Save one land-module sibling on ``activity`` with start/w/wo fields.
 
-    Each base field in ``start_values`` is written to the model's
-    ``_start`` attribute. The corresponding ``_w`` attribute uses
-    ``w_values[field]`` when the key exists (same-class case) or the
-    start value as filler (different-class case). ``_wo`` mirrors start
-    (matches LandUseChangeProcessor's existing convention).
+    For each base field name in ``start_values``, write to the model's
+    ``_start`` / ``_w`` / ``_wo`` triplet when those attributes exist
+    (the LandModule convention), otherwise write to the bare attribute
+    (some FK fields like ``ForestManagement.forest_type`` are plain
+    scalars without a triplet). ``_w`` falls back to the start value
+    when ``w_values`` doesn't have an entry for the same key
+    (different-class case).
     """
     from api import models as api_models
 
     model_cls = getattr(api_models, sibling_class)
     instance = model_cls(activity=activity)
+
+    field_names = {f.name for f in model_cls._meta.get_fields()}
+
     for field_name, start_val in start_values.items():
-        setattr(instance, f"{field_name}_start", start_val)
-        setattr(instance, f"{field_name}_w", w_values.get(field_name, start_val))
-        setattr(instance, f"{field_name}_wo", start_val)
+        sided_start = f"{field_name}_start"
+        if sided_start in field_names:
+            setattr(instance, sided_start, start_val)
+            setattr(instance, f"{field_name}_w", w_values.get(field_name, start_val))
+            setattr(instance, f"{field_name}_wo", start_val)
+        else:
+            # Non-sided FK field (e.g. ForestManagement.forest_type).
+            # Use the start value; same-class transitions can drift via w_values
+            # only when the field actually varies between sides, but plain
+            # scalar FK fields on a single sibling can hold only one value.
+            setattr(instance, field_name, start_val)
     # area is required on every LandModule but isn't part of the preset.
     if hasattr(instance, "area"):
         instance.area = 1
@@ -134,12 +147,19 @@ def _compute_luc_slice(
     *,
     save_results: bool = True,
     progress_callback=None,
+    max_rows: int | None = None,
 ) -> tuple[list[dict], list[dict]]:
     """Iterate concrete LUC combinations and run LandUseChangeCalculator.
 
     Each combination builds saved fixtures inside ``transaction.atomic``
     and rolls back after the calculator returns. Errors are captured per
     combination so a single bad combo doesn't abort the slice.
+
+    ``max_rows`` caps the number of concrete combos actually run (i.e.
+    ``combos = combos[:max_rows]`` before the loop), not the number of
+    rows in the resulting ``data`` list. A combo can still yield zero
+    rows by erroring out, so ``len(data) <= max_rows`` is the only
+    guarantee.
     """
     from django.db import transaction
     from admin_scripts.luc_permutations import parse_identifier
@@ -152,6 +172,8 @@ def _compute_luc_slice(
     errors: list[dict] = []
 
     combos = list(iterate_concrete_combos(start_spec, w_spec))
+    if max_rows is not None:
+        combos = combos[:max_rows]
     total = len(combos)
     for i, (start_values, w_values) in enumerate(combos):
         with transaction.atomic():

@@ -159,6 +159,7 @@ def compute_module_slice(
             to_value=to_value,
             save_results=save_results,
             progress_callback=progress_callback,
+            max_rows=max_rows,
         )
 
     from api.minitool import (
