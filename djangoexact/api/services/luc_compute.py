@@ -48,6 +48,15 @@ def _save_sibling(activity, sibling_class, start_values, w_values):
     model_cls = getattr(api_models, sibling_class)
     instance = model_cls(activity=activity)
 
+    # The LUC calculator gates on module.status == READY for every sibling
+    # (api/calculators.py:1117 in OtherLandUseCalculator, :823 in
+    # DeforestationCalculator). Module.status is nullable with no default,
+    # so a fresh instance has status=None and the calculator raises
+    # "All modules associated with the land use change must be ready" or
+    # "Forest module is not complete". Mirror the factories.py convention
+    # and set it explicitly.
+    instance.status = api_models.StatusType.objects.get(name_en="READY")
+
     field_names = {f.name for f in model_cls._meta.get_fields()}
 
     for field_name, start_val in start_values.items():
