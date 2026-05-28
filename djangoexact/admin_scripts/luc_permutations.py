@@ -113,3 +113,31 @@ def expand_preset(class_name: str, template_idx: int, side: Side) -> list[dict[s
         dict(zip(field_names, combo))
         for combo in itertools.product(*per_field_values)
     ]
+
+
+def list_preset_templates() -> list[tuple[str, int]]:
+    """Return [(class_name, template_idx), ...] for every entry in LUC_PRESETS,
+    ordered by class-name insertion order then template index.
+    """
+    out: list[tuple[str, int]] = []
+    for class_name, templates in LUC_PRESETS.items():
+        for idx in range(len(templates)):
+            out.append((class_name, idx))
+    return out
+
+
+def format_identifier(class_name: str, template_idx: int) -> str:
+    """Encode a (class_name, template_idx) tuple as a from/to_value string."""
+    return f"{class_name}#{template_idx}"
+
+
+def parse_identifier(value: str) -> tuple[str, int]:
+    """Inverse of :func:`format_identifier`. Raises ``ValueError`` on bad input."""
+    if "#" not in value:
+        raise ValueError(f"LUC identifier missing '#': {value!r}")
+    class_name, _, idx_str = value.partition("#")
+    try:
+        return class_name, int(idx_str)
+    except ValueError as exc:
+        raise ValueError(f"LUC identifier has non-integer index: {value!r}") from exc
+
