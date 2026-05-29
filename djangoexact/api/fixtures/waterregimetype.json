@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.waterregimetype",
+    "pk": 1,
+    "fields": {
+      "name": "Irrigated, Continuously Flooded",
+      "name_en": "Irrigated, Continuously Flooded",
+      "name_fr": "Irrigué, inondé en permanence\n",
+      "name_es": "Irrigadas, Inundadas permanentemente",
+      "name_ru": "Орошаемый, постоянно затопленный"
+    }
+  },
+  {
+    "model": "api.waterregimetype",
+    "pk": 3,
+    "fields": {
+      "name": "Irrigated, Multiple Drainage Periods",
+      "name_en": "Irrigated, Multiple Drainage Periods",
+      "name_fr": "Irrigué de manière intermittente – aération multiple\n",
+      "name_es": "Irrigadas, Inundados intermitentemente – aireación múltiple",
+      "name_ru": "Орошаемый, с неоднократным периодом осушения"
+    }
+  },
+  {
+    "model": "api.waterregimetype",
+    "pk": 2,
+    "fields": {
+      "name": "Irrigated, Single Drainage Period",
+      "name_en": "Irrigated, Single Drainage Period",
+      "name_fr": "Irrigué de manière intermittente – aération simple\n",
+      "name_es": "Irrigadas, Inundados intermitentemente – aireación simple",
+      "name_ru": "Орошаемое, с одним периодом осушения"
+    }
+  }
+]

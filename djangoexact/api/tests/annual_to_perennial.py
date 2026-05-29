@@ -8,7 +8,7 @@ from ipcc.models import *
 from .factories import *
 import api.tests.base_test_classes as t
 
-import api.reports as reports
+from api.reports import generate_excel_report
 
 
 class AnnualToPerennial(t.LandUseChangeTest):
@@ -26,8 +26,7 @@ class AnnualToPerennial(t.LandUseChangeTest):
     def test(self):
         self.calculate_results()
 
-        report = reports.BaseProjectReport(self.project)
-        report.build_report()
+        generate_excel_report(self.project)
 
 
 AnnualToPerennial().test()

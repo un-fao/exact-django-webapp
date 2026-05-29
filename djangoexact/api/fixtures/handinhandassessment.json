@@ -1,0 +1,153 @@
+[
+  {
+    "model": "api.handinhandassessment",
+    "pk": 1,
+    "fields": {
+      "country": 1,
+      "name": "test assessment",
+      "link": "https://example.com/assessment",
+      "year": 2020,
+      "files_list": [
+        {
+          "url": "https://storage.googleapis.com/fao-exact-review-uploads/hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
+          "name": "2735-results-report.xlsx",
+          "size": 27548,
+          "blob_path": "hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
+          "uploaded_at": "2025-10-13T11:41:21.976071"
+        }
+      ]
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 6,
+    "fields": {
+      "country": 2,
+      "name": "Burundi HiH 2025",
+      "link": "https://exact.apps.fao.org/public/project/18dpo/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 11,
+    "fields": {
+      "country": 2,
+      "name": "Burundi HiH 2025 - lapin",
+      "link": "https://exact.apps.fao.org/public/project/2jxwq/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 13,
+    "fields": {
+      "country": 2,
+      "name": "Burundi HiH 2025 - manioc",
+      "link": "https://exact.apps.fao.org/public/project/2jjh0/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 12,
+    "fields": {
+      "country": 2,
+      "name": "Burundi HiH 2025 - soja",
+      "link": "https://exact.apps.fao.org/public/project/2jwgr/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 10,
+    "fields": {
+      "country": 2,
+      "name": "Burundi HiH 2025 - tomate",
+      "link": "https://exact.apps.fao.org/public/project/2ikto/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 7,
+    "fields": {
+      "country": 5,
+      "name": "Djibouti HiH 2025",
+      "link": "https://exact.apps.fao.org/public/project/1nnr3/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 8,
+    "fields": {
+      "country": 7,
+      "name": "Ethiopia HiH 2025",
+      "link": "https://exact.apps.fao.org/public/project/1ngj8/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 3,
+    "fields": {
+      "country": 16,
+      "name": "Nepal HiH 2025 - Honey",
+      "link": "https://exact.apps.fao.org/public/project/1fvoh/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 4,
+    "fields": {
+      "country": 16,
+      "name": "Nepal HiH 2025- Mandarin Orange",
+      "link": "https://exact.apps.fao.org/public/project/17z9y/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 5,
+    "fields": {
+      "country": 16,
+      "name": "Nepal HiH 2025- Timur",
+      "link": "https://exact.apps.fao.org/public/project/1i7ev/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 2,
+    "fields": {
+      "country": 16,
+      "name": "Nepal HiH 2025- Yak Cheese",
+      "link": "https://exact.apps.fao.org/public/project/1bdzl/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 9,
+    "fields": {
+      "country": 27,
+      "name": "Paraguay HiH 2025",
+      "link": "https://exact.apps.fao.org/public/project/1n23i/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  }
+]

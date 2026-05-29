@@ -66,26 +66,38 @@ class Command(BaseCommand):
 
             self.import_single_module(file_path, module_type, clear_existing, aggregate_only, show_progress)
 
+    def _safe_table(self, model):
+        """Return the model's DB table name after validating it is a bare identifier.
+
+        Raises ValueError if the table name is not a safe identifier, preventing any
+        possibility of SQL injection via unexpected `_meta.db_table` values.
+        """
+        table_name = model._meta.db_table
+        if not table_name.isidentifier():
+            raise ValueError(f"Invalid table name: {table_name!r}")
+        return table_name
+
     def fast_clear_data(self, module_type, show_progress):
         """Fast data clearing using raw SQL instead of Django ORM."""
         module_type_formatted = module_type.replace("-", " ").title()
 
-        # Get actual table names from Django models
-        change_record_table = ChangeRecord._meta.db_table
-        change_aggregate_table = ChangeAggregate._meta.db_table
+        change_record_table = self._safe_table(ChangeRecord)
+        change_aggregate_table = self._safe_table(ChangeAggregate)
 
-        # Use the minitool database connection
-        minitool_connection = connections["minitool"]
+        # Use the default database connection
+        minitool_connection = connections["default"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting records to delete...")
 
-            # Count records first to show progress.
-            # Table names come from Django Model._meta.db_table (trusted); module_type is parameterized.
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
+            # Count records first to show progress. Table names are validated identifiers;
+            # values are passed as bound parameters.
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -102,35 +114,40 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Deleting individual records...")
 
-            # Delete ChangeRecord entries (table name from Django _meta.db_table, module_type parameterized).
-            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
+            # Delete ChangeRecord entries
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"DELETE FROM {change_record_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
 
             if show_progress:
                 self.stdout.write("  - Deleting aggregate records...")
 
-            # Delete ChangeAggregate entries (table name from Django _meta.db_table, module_type parameterized).
-            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosemgrep
+            # Delete ChangeAggregate entries
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"DELETE FROM {change_aggregate_table} WHERE module_type LIKE %s", [f"%{module_type_formatted}%"])  # nosec B608
 
             if show_progress:
                 self.stdout.write(f"  - Successfully deleted {total_to_delete:,} records")
 
     def fast_clear_all_data(self, show_progress):
         """Ultra-fast clearing of ALL data using TRUNCATE (fastest possible)."""
-        # Get actual table names from Django models
-        change_record_table = ChangeRecord._meta.db_table
-        change_aggregate_table = ChangeAggregate._meta.db_table
+        change_record_table = self._safe_table(ChangeRecord)
+        change_aggregate_table = self._safe_table(ChangeAggregate)
 
-        # Use the minitool database connection
-        minitool_connection = connections["minitool"]
+        # Use the default database connection
+        minitool_connection = connections["default"]
         with minitool_connection.cursor() as cursor:
             if show_progress:
                 self.stdout.write("  - Counting all records...")
 
-            # Count all records first. Table names come from Django _meta.db_table; no user input in query.
-            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosemgrep
+            # Count all records first. Table names are validated identifiers.
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosec B608
             change_records_count = cursor.fetchone()[0]
 
-            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosemgrep
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosec B608
             aggregate_records_count = cursor.fetchone()[0]
 
             total_to_delete = change_records_count + aggregate_records_count
@@ -147,9 +164,13 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Deleting all records (fastest method)...")
 
-            # Delete all records from both tables. Table names come from Django _meta.db_table; no user input in query.
-            cursor.execute(f"DELETE FROM {change_record_table}")  # nosemgrep
-            cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosemgrep
+            # Delete all records from both tables
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"DELETE FROM {change_record_table}")  # nosec B608
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosec B608
 
             # For SQLite, we can also run VACUUM to reclaim space immediately
             cursor.execute("VACUUM")

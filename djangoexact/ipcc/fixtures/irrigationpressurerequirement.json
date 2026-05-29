@@ -1,0 +1,134 @@
+[
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 20,
+    "fields": {
+      "irrigation_system_type": 7,
+      "initial_denomination": null,
+      "bar_start": 1.0,
+      "bar_end": 3.0,
+      "avg_pressure": 2.0,
+      "head": 21.399
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 21,
+    "fields": {
+      "irrigation_system_type": 9,
+      "initial_denomination": null,
+      "bar_start": 0.5,
+      "bar_end": 3.0,
+      "avg_pressure": 0.9,
+      "head": 9.62955
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 22,
+    "fields": {
+      "irrigation_system_type": 10,
+      "initial_denomination": null,
+      "bar_start": 0.5,
+      "bar_end": 2.0,
+      "avg_pressure": 1.25,
+      "head": 13.374375
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 23,
+    "fields": {
+      "irrigation_system_type": 11,
+      "initial_denomination": null,
+      "bar_start": 2.0,
+      "bar_end": 5.0,
+      "avg_pressure": 3.5,
+      "head": 37.44825
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 24,
+    "fields": {
+      "irrigation_system_type": 8,
+      "initial_denomination": null,
+      "bar_start": 2.0,
+      "bar_end": 8.0,
+      "avg_pressure": 5.0,
+      "head": 53.4975
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 25,
+    "fields": {
+      "irrigation_system_type": 1,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 26,
+    "fields": {
+      "irrigation_system_type": 2,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 27,
+    "fields": {
+      "irrigation_system_type": 3,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 28,
+    "fields": {
+      "irrigation_system_type": 4,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 29,
+    "fields": {
+      "irrigation_system_type": 5,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  },
+  {
+    "model": "ipcc.irrigationpressurerequirement",
+    "pk": 30,
+    "fields": {
+      "irrigation_system_type": 6,
+      "initial_denomination": null,
+      "bar_start": null,
+      "bar_end": null,
+      "avg_pressure": 2.53,
+      "head": 27.069735
+    }
+  }
+]

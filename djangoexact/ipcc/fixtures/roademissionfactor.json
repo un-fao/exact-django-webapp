@@ -1,0 +1,34 @@
+[
+  {
+    "model": "ipcc.roademissionfactor",
+    "pk": 1,
+    "fields": {
+      "road_type": 1,
+      "value": 17.5
+    }
+  },
+  {
+    "model": "ipcc.roademissionfactor",
+    "pk": 2,
+    "fields": {
+      "road_type": 2,
+      "value": 73.33333333
+    }
+  },
+  {
+    "model": "ipcc.roademissionfactor",
+    "pk": 3,
+    "fields": {
+      "road_type": 3,
+      "value": 86.0
+    }
+  },
+  {
+    "model": "ipcc.roademissionfactor",
+    "pk": 4,
+    "fields": {
+      "road_type": 4,
+      "value": 8.88
+    }
+  }
+]

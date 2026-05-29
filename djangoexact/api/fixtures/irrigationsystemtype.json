@@ -1,0 +1,173 @@
+[
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 7,
+    "fields": {
+      "name": "Center-Pivot Sprinkler",
+      "name_en": "Center-Pivot Sprinkler",
+      "name_fr": "Irrigation á pivot central\n",
+      "name_es": "Aspersor de pivote central",
+      "name_ru": "Центробежное орошение",
+      "module_types": [
+        36,
+        37
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 5,
+    "fields": {
+      "name": "Hand Moved Sprinkler",
+      "name_en": "Hand Moved Sprinkler",
+      "name_fr": "Arroseur mobile manuel\n",
+      "name_es": "Aspersor movido a mano",
+      "name_ru": "Ручной передвижной спринклер",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 10,
+    "fields": {
+      "name": "Micro Sprinkler",
+      "name_en": "Micro Sprinkler",
+      "name_fr": "Micro-arroseur\n",
+      "name_es": "Micro Aspersor",
+      "name_ru": "Микроорашиватель",
+      "module_types": [
+        37
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 14,
+    "fields": {
+      "name": "Other (set up Tier 2)",
+      "name_en": "Other (set up Tier 2)",
+      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_es": null,
+      "name_ru": null,
+      "module_types": [
+        37
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 4,
+    "fields": {
+      "name": "Permanent Sprinkler",
+      "name_en": "Permanent Sprinkler",
+      "name_fr": "Arroseur permanent\n",
+      "name_es": "Aspersor permanente",
+      "name_ru": "Постоянный орошатель",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 6,
+    "fields": {
+      "name": "Solid Roll Sprinkler",
+      "name_en": "Solid Roll Sprinkler",
+      "name_fr": "Arroseur à rouleau solide\n",
+      "name_es": "Aspersor de rodillo macizo",
+      "name_ru": "Твёрдый вращающийся орошатель",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 3,
+    "fields": {
+      "name": "Solid Set Sprinkler",
+      "name_en": "Solid Set Sprinkler",
+      "name_fr": "Arroseur fixe\n",
+      "name_es": "Conjunto de aspersores solidos",
+      "name_ru": "Твёрдое орошение",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 11,
+    "fields": {
+      "name": "Sprinkler",
+      "name_en": "Sprinkler",
+      "name_fr": "Arroseur",
+      "name_es": "Aspersor",
+      "name_ru": "Орошатель",
+      "module_types": [
+        37
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 2,
+    "fields": {
+      "name": "Surface With IRRS",
+      "name_en": "Surface With IRRS",
+      "name_fr": "Irrigation avec système de récupération des eaux de ruissellement",
+      "name_es": "De superficie con sistema de retorno de a escorrentía",
+      "name_ru": "Поверхностное орошение с системой возврата оросительного стока",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 1,
+    "fields": {
+      "name": "Surface Without IRRS",
+      "name_en": "Surface Without IRRS",
+      "name_fr": "Irrigation sans système de récupération des eaux de ruissellement",
+      "name_es": "De superficie sin sistema de retorno de a escorrentía",
+      "name_ru": "Поверхностное орошение без системы возврата оросительного стока",
+      "module_types": [
+        36
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 8,
+    "fields": {
+      "name": "Traveler Sprinkler",
+      "name_en": "Traveler Sprinkler",
+      "name_fr": "Arroseur mobile\n",
+      "name_es": "Aspersor viajero",
+      "name_ru": "Перемещающийся орошатель",
+      "module_types": [
+        36,
+        37
+      ]
+    }
+  },
+  {
+    "model": "api.irrigationsystemtype",
+    "pk": 9,
+    "fields": {
+      "name": "Trickle",
+      "name_en": "Trickle",
+      "name_fr": "Irrigation goutte-à-goutte\n",
+      "name_es": "Riego por goteo",
+      "name_ru": "Капельное орошение",
+      "module_types": [
+        36,
+        37
+      ]
+    }
+  }
+]

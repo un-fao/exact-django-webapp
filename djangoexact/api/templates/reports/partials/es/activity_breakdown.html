@@ -22,7 +22,9 @@
                             el último año de contabilidad en {{ activity.last_year_of_accounting }}.
                         </p>
                         <p>
-                            Bajo el escenario Con Proyecto, la actividad impactará {{ activity.area }} {{ activity.main_impact }}
+                            Bajo el escenario Con Proyecto, la actividad impactará
+                            {% if activity.is_fishery %}{{ activity.catch|floatformat:2|intcomma }}{% else %}{{ activity.area }}{% endif %}
+                            {{ activity.main_impact }}
                             {% if activity.secondary_impacts %}, además de emisiones relativas a {{ activity.secondary_impacts }}.{% endif %}
                         </p>
                         <p>

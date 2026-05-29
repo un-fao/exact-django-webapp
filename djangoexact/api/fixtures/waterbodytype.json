@@ -1,0 +1,46 @@
+[
+  {
+    "model": "api.waterbodytype",
+    "pk": 2,
+    "fields": {
+      "name": "Brackishwater Pond",
+      "name_en": "Brackishwater Pond",
+      "name_fr": "Étang d'eau saumâtre\n",
+      "name_es": "Estanque de agua salobre",
+      "name_ru": "Солоноватый пруд"
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 3,
+    "fields": {
+      "name": "Canals & Ditches",
+      "name_en": "Canals & Ditches",
+      "name_fr": "Canaux et fossés\n",
+      "name_es": "Canales y Acequia",
+      "name_ru": "Каналы, Канавы"
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 1,
+    "fields": {
+      "name": "Freshwater Pond",
+      "name_en": "Freshwater Pond",
+      "name_fr": "Étang d'eau douce\n",
+      "name_es": "Estanque de agua dulce",
+      "name_ru": "Пресноводный пруд"
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 4,
+    "fields": {
+      "name": "Saline Pond",
+      "name_en": "Saline Pond",
+      "name_fr": "Étang salin\n",
+      "name_es": "Estanque Salino",
+      "name_ru": "Солёный пруд"
+    }
+  }
+]

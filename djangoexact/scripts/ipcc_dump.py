@@ -5131,6 +5131,32 @@ def update_forest_management_agb_and_rshoot_data():
         #     )
         #     print(f"Created {climate} {region} {forest_type} {land_use_type} {threshold} {rshoot}")
 
+def update_value_chain_refrigerant_emission_factors():
+    """
+    Update the Value Chain Refrigerant Emission Factors.
+    """
+    from ipcc.models import ValueChainRefrigerantEmissionFactor
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
+        header=0,
+        sep=",",
+    )
+    for i, row in df.iterrows():
+        print(row["refrigerant_type"], row["gwp"], row["value"])
+        refrigerant_type = RefrigerantType.objects.get_or_create(name=row["refrigerant_type"])[0]
+        gwp = GlobalWarmingPotential.objects.get(name__iexact=row["gwp"])
+        value = parse_csv_number(row["value"])
+        if value is None:
+            value = 0
+        ef = ValueChainRefrigerantEmissionFactor.objects.filter(refrigerant_type=refrigerant_type, gwp=gwp).first()
+        if ef:
+            ef.value = value
+            ef.save()
+            print(f"Updated {refrigerant_type} {gwp} {value}")
+        else:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=gwp, value=value)
+            print(f"Created {refrigerant_type} {gwp} {value}")
 
 def run():
     import os
@@ -5143,10 +5169,16 @@ def run():
         add_fi_data_for_all_grassland_management_types()
         add_flu_data_for_all_grassland_management_types()
         add_fmg_data_for_all_grassland_management_types()
+        update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
+        update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "development":
@@ -5155,11 +5187,16 @@ def run():
         # delete_and_import_forest_management_agb()
         # delete_and_import_forest_total_biomass()
         # delete_and_import_forest_combustion_factor()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "local":
         # TODO: Run in local
-        update_forest_management_agb_and_rshoot_data()
+        # update_forest_management_agb_and_rshoot_data()
+        # update_value_chain_refrigerant_emission_factors()
+        # delete_and_import_total_biomass_after_defo()
+        # delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "test":

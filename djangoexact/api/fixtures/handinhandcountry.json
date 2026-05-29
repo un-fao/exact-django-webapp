@@ -1,0 +1,272 @@
+[
+  {
+    "model": "api.handinhandcountry",
+    "pk": 1,
+    "fields": {
+      "region": 1,
+      "name": "Angola",
+      "iso_code": "AO"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 2,
+    "fields": {
+      "region": 1,
+      "name": "Burundi",
+      "iso_code": "BI"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 3,
+    "fields": {
+      "region": 1,
+      "name": "Cabo Verde",
+      "iso_code": "CV"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 4,
+    "fields": {
+      "region": 1,
+      "name": "Chad",
+      "iso_code": "TD"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 5,
+    "fields": {
+      "region": 1,
+      "name": "Djibouti",
+      "iso_code": "DJ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 6,
+    "fields": {
+      "region": 1,
+      "name": "Eritrea",
+      "iso_code": "ER"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 7,
+    "fields": {
+      "region": 1,
+      "name": "Ethiopia",
+      "iso_code": "ET"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 8,
+    "fields": {
+      "region": 1,
+      "name": "Gambia",
+      "iso_code": "GM"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 9,
+    "fields": {
+      "region": 1,
+      "name": "Somalia",
+      "iso_code": "SO"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 10,
+    "fields": {
+      "region": 1,
+      "name": "South Sudan",
+      "iso_code": "SS"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 11,
+    "fields": {
+      "region": 1,
+      "name": "Uganda",
+      "iso_code": "UG"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 12,
+    "fields": {
+      "region": 1,
+      "name": "Zambia",
+      "iso_code": "ZM"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 13,
+    "fields": {
+      "region": 2,
+      "name": "Bangladesh",
+      "iso_code": "BD"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 14,
+    "fields": {
+      "region": 2,
+      "name": "Lao People's Democratic Republic",
+      "iso_code": "LA"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 15,
+    "fields": {
+      "region": 2,
+      "name": "Mongolia",
+      "iso_code": "MN"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 16,
+    "fields": {
+      "region": 2,
+      "name": "Nepal",
+      "iso_code": "NP"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 18,
+    "fields": {
+      "region": 2,
+      "name": "Papua New Guinea",
+      "iso_code": "PG"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 17,
+    "fields": {
+      "region": 2,
+      "name": "Philippines",
+      "iso_code": "PH"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 19,
+    "fields": {
+      "region": 2,
+      "name": "Tuvalu",
+      "iso_code": "TV"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 20,
+    "fields": {
+      "region": 3,
+      "name": "Tajikistan",
+      "iso_code": "TJ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 21,
+    "fields": {
+      "region": 4,
+      "name": "Bolivia",
+      "iso_code": "BO"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 22,
+    "fields": {
+      "region": 4,
+      "name": "Colombia",
+      "iso_code": "CO"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 23,
+    "fields": {
+      "region": 4,
+      "name": "Dominican Republic",
+      "iso_code": "DO"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 24,
+    "fields": {
+      "region": 4,
+      "name": "El Salvador",
+      "iso_code": "SV"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 25,
+    "fields": {
+      "region": 4,
+      "name": "Guatemala",
+      "iso_code": "GT"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 26,
+    "fields": {
+      "region": 4,
+      "name": "Mexico",
+      "iso_code": "MX"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 27,
+    "fields": {
+      "region": 4,
+      "name": "Paraguay",
+      "iso_code": "PY"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 28,
+    "fields": {
+      "region": 4,
+      "name": "Peru",
+      "iso_code": "PE"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 29,
+    "fields": {
+      "region": 5,
+      "name": "Iraq",
+      "iso_code": "IQ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 30,
+    "fields": {
+      "region": 5,
+      "name": "Mauritania",
+      "iso_code": "MR"
+    }
+  }
+]

@@ -1,0 +1,189 @@
+[
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 118,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 21,
+      "co2": 2.27486259,
+      "ch4": 0.000328263,
+      "n2o": 1.96958e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 119,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 22,
+      "co2": 2.6669331,
+      "ch4": 0.00035991,
+      "n2o": 2.15946e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 120,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 18,
+      "co2": 2.799327,
+      "ch4": 0.0003819,
+      "n2o": 2.2914e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 121,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 24,
+      "co2": 1.59080779,
+      "ch4": 0.000126055,
+      "n2o": 2.52109e-06
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 122,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 23,
+      "co2": 0.00206807,
+      "ch4": 1.84e-07,
+      "n2o": 3.69e-09
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 123,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 56,
+      "co2": 2.27486259,
+      "ch4": 0.001083268,
+      "n2o": 0.000105044
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 124,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 57,
+      "co2": 2.6669331,
+      "ch4": 0.000140365,
+      "n2o": 0.000140365
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 125,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 60,
+      "co2": 0.00206807,
+      "ch4": 3.39e-06,
+      "n2o": 1.11e-07
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 126,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 59,
+      "co2": 1.59080779,
+      "ch4": 0.001563076,
+      "n2o": 5.04218e-06
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 127,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 25,
+      "co2": 0.032084208,
+      "ch4": 0.000382968,
+      "n2o": 0.0
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 128,
+    "fields": {
+      "fuel_use_type": 2,
+      "fuel_type": 26,
+      "co2": 0.032084208,
+      "ch4": 0.00553176,
+      "n2o": 0.000872316
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 129,
+    "fields": {
+      "fuel_use_type": 3,
+      "fuel_type": 27,
+      "co2": 2.6669331,
+      "ch4": 0.000149363,
+      "n2o": 0.001029343
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 130,
+    "fields": {
+      "fuel_use_type": 3,
+      "fuel_type": 28,
+      "co2": 2.27486259,
+      "ch4": 0.004595682,
+      "n2o": 1.31305e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 131,
+    "fields": {
+      "fuel_use_type": 3,
+      "fuel_type": 29,
+      "co2": 2.27486259,
+      "ch4": 0.002626104,
+      "n2o": 6.56526e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 132,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 30,
+      "co2": 1.7472,
+      "ch4": 0.00468,
+      "n2o": 6.24e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 133,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 31,
+      "co2": 1.03456,
+      "ch4": 0.002928,
+      "n2o": 1.3664e-05
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 134,
+    "fields": {
+      "fuel_use_type": 1,
+      "fuel_type": 32,
+      "co2": 3.304,
+      "ch4": 0.0059,
+      "n2o": 2.95e-05
+    }
+  }
+]

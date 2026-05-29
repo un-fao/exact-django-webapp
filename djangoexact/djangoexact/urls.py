@@ -26,5 +26,6 @@ urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
     path("api/blog/", include("blog.urls")),
     path("api/minitool/", include("minitool.urls")),
+    path("api/admin-scripts/", include("admin_scripts.urls")),
     path("_ah/warmup", warmup),
 ]

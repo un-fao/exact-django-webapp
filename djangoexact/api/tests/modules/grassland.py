@@ -7,7 +7,7 @@ from ipcc.models import *
 
 from ..factories import *
 import api.tests.base_test_classes as t
-import api.reports as reports
+from api.reports import generate_excel_report
 
 
 class GrasslandTest(t.ModuleTest):
@@ -19,8 +19,7 @@ class GrasslandTest(t.ModuleTest):
     def test(self):
         self.calculate_results()
 
-        rep = reports.BaseProjectReport(self.project)
-        rep.build_report()
+        generate_excel_report(self.project)
 
 
 GrasslandTest().test()

@@ -1,0 +1,6842 @@
+[
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 452,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.31,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.2,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 453,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.31,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.2,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 454,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 455,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 456,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 457,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 458,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 459,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 460,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 461,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 462,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.31,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.2,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 463,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.31,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 3.2,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 464,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 465,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 466,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 467,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 468,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 469,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 470,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 471,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 472,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 473,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 474,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 475,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 476,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 477,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 478,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 479,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 480,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 481,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 482,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 483,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 484,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 485,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 486,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 487,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 488,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 489,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 490,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 491,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 492,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 493,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 494,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 495,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 496,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 497,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 498,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 499,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 500,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 501,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 502,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.7,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.4,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 9.5,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 503,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.7,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.4,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 9.5,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 504,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 27.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.9,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 505,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 27.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.9,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 506,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 27.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.9,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 507,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 27.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.9,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 508,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 509,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 510,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 511,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 512,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 513,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 514,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 515,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 516,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 517,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 518,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 519,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 520,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 521,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 522,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 523,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 524,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 525,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 526,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 527,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 528,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 529,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 530,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 531,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 532,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 533,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 534,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 535,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 536,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 537,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 538,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 539,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 540,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 541,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 542,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.93,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.22,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 543,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.93,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.22,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 544,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 545,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 546,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 547,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 548,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 549,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 550,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 551,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.3,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 4.9,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 552,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.93,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.22,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 553,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.93,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.22,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 554,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 555,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 556,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 557,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 2.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.8,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 558,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 559,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 560,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 561,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 10.83333333,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 9.633333333,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 2.25,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 562,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 563,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 564,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 565,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 566,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 567,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 568,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 569,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 570,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 571,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 572,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 573,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 574,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 575,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 576,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 577,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 7.9,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 13.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 578,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 579,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 580,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 581,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 14.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 582,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 583,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 584,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 585,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 586,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 587,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 588,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 589,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 590,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 591,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.4,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 143.5,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.4,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 592,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.7,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.4,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 9.5,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 593,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 5.7,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.4,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 9.5,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 594,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 4.85,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.8,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 595,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 4.85,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.8,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 596,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 4.85,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.8,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 597,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 4.85,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1.8,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 4.3,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 598,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 599,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 600,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 601,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 9.6,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 7.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 5.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 602,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 603,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 604,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 605,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 606,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 607,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 608,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 609,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 610,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 611,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 612,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 613,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 614,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 615,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 616,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 617,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 618,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 619,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 620,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 621,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 622,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 623,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 624,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 625,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 626,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 627,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 628,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 629,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 630,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 631,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 1,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 632,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 633,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 634,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 635,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 636,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 637,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 638,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 639,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 640,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 641,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 642,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 643,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 644,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 645,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 646,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 647,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 648,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 649,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 650,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 651,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 652,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 653,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 654,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 655,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 656,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 657,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 658,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 659,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 660,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 661,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 662,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 663,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 664,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 665,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 666,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 667,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 668,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 669,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 670,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 671,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 672,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 673,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 674,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 675,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 676,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 677,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 678,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 679,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 680,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 681,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 682,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 683,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 684,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 685,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 686,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 687,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 688,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 689,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 690,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 691,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 692,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 693,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 694,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 695,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 696,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 697,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 698,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 699,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 700,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 701,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 702,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 703,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 704,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 705,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 706,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 707,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 708,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 709,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 710,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 711,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 712,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 713,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 714,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 715,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 716,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 717,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 718,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 719,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 720,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 721,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 2,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 722,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 723,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 724,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 725,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 726,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 727,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 728,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 729,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 730,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 731,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 24,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 732,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 733,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 734,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 735,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 736,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 737,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 217.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 738,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 739,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 740,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 741,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 52,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 742,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 743,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 744,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 745,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 746,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 747,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 748,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 749,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 750,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 751,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 4,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 752,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 753,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 754,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 755,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 756,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 757,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 1165.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 758,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 759,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 760,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 761,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 5,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 762,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 763,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 764,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 765,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 766,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 767,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 768,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 769,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 770,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 771,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 6,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 772,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 773,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.12,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 774,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 775,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 776,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 777,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.31,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 527.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 778,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 779,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 780,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 781,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 7,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.82,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 2259.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 782,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 783,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 784,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 785,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 786,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 787,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 788,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 789,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 790,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 791,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 23,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 792,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 793,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 794,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 795,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 796,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 797,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 798,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 799,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 800,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 801,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 54,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 802,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 803,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 804,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 805,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 806,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 807,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 808,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 809,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 810,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  },
+  {
+    "model": "ipcc.organicsoildrainageemissionfactor",
+    "pk": 811,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "module_type": 30,
+      "peat_type": 1,
+      "site_location_type": 2,
+      "co2": 0.0,
+      "co2_unit": "tC/ha/yr",
+      "doc": 0.0,
+      "doc_unit": "tC/ha/yr",
+      "ch4": 0.0,
+      "ch4_unit": "kg CH4/ha/yr",
+      "n2o": 0.0,
+      "n2o_unit": "kg N2O/ha/yr"
+    }
+  }
+]

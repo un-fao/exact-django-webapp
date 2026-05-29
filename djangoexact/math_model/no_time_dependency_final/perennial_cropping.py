@@ -144,7 +144,7 @@ class PerennialCropland(LandModule):
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_soil_emissions], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,self.soc_start * self.hectares_start, ActivityTypes.SOIL_CO2_CHANGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,self.soc_start * self.hectares_start*44/12, ActivityTypes.SOIL_CO2_CHANGE))
 
             except Exception as e:
                 traceback.print_exc()
@@ -167,21 +167,29 @@ class PerennialCropland(LandModule):
                         agb_rate = self.agb_rate_default * 44 / 12 if self.agb_rate_tier_2 is None else self.agb_rate_tier_2 * 44 / 12
                         bgb_rate = self.bgb_rate_default * 44 / 12 if self.bgb_rate_tier_2 is None else self.bgb_rate_tier_2 * 44 / 12
 
-                        if self.agb_rate_tier_2:
-                            if self.agb_maximum_c_tier_2:
-                                max_agb = self.agb_maximum_c_tier_2 * 44 / 12
-                            else:
-                                # If agb_maximum_c_tier_2 is not provided, we use the default value
-                                max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12    
+                        # A user-supplied tier-2 max AGB is an explicit cap even when
+                        # it is exactly 0.0. "None" means "not provided" (fall back to
+                        # the IPCC/default behaviour); "0.0" means "the cap
+                        # really is zero" and must be honoured
+                        cap_provided = self.agb_maximum_c_tier_2 is not None
+
+                        if cap_provided:
+                            max_agb = self.agb_maximum_c_tier_2 * 44 / 12
+                        elif self.agb_rate_tier_2:
+                            # agb_maximum_c_tier_2 not provided: max_agb == 0 here is
+                            # a deliberate "no cap" sentinel, not a real cap
+                            max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
                         else:
-                            if self.agb_maximum_c_tier_2:
-                                max_agb = self.agb_maximum_c_tier_2 * 44 / 12
-                            else:
-                                max_agb = self.agb_maximum_c * 44 / 12
+                            max_agb = self.agb_maximum_c * 44 / 12
 
                         biomass_accumulation_rate = agb_rate + bgb_rate
 
-                        max_years_growth = math.floor((max_agb - self.agb_start * (44/12)) / agb_rate) if max_agb != 0 else self.implementation_time + self.capitalization_time
+                        # Ensures a provided cap (incl. 0.0) applies the tabular clamp; only
+                        # the "no cap" sentinel (max_agb == 0 and not user-provided)
+                        # takes the uncapped path
+                        capped = cap_provided or max_agb != 0
+
+                        max_years_growth = math.floor((max_agb - self.agb_start * (44/12)) / agb_rate) if capped else self.implementation_time + self.capitalization_time
                         if max_years_growth < 0:
                             # NOTE: This means that the biomass_start is already greater than the maximum agb, so we have to return an error
                             raise ValueError("The biomass_start is greater than the maximum agb in one of the Project scenarios, which is not allowed. Check tier 2 values")
@@ -192,7 +200,7 @@ class PerennialCropland(LandModule):
                         calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
                         tabular = ((max_agb - self.agb_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
 
-                        total = -min(calculated, tabular) if (max_agb != 0 and self.hectares_end != 0) else -calculated
+                        total = -min(calculated, tabular) if (capped and self.hectares_end != 0) else -calculated
 
 
                         # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
@@ -200,11 +208,12 @@ class PerennialCropland(LandModule):
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
-                        inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start * self.hectares_start, ActivityTypes.BIOMASS)
-                        self.inventory.emissions_by_sector_by_gas(inventory)
-                        
                 else:
                     pass
+
+                # TODO: Do wherever we have the same biomass emissions logic in other land modules
+                inventory = InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start * self.hectares_start * 44/12, ActivityTypes.BIOMASS)
+                self.inventory.emissions_by_sector_by_gas(inventory)
 
             except Exception as e:
                 traceback.print_exc()
