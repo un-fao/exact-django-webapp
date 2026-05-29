@@ -1,0 +1,26 @@
+{% extends "admin_scripts/base.html" %}
+{% block title %}Test Run #{{ run.pk }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Test Run #{{ run.pk }}</h1>
+            <p class="text-xs text-gray-500 mt-1">
+                Started {{ run.created_at|date:'M d, Y H:i:s' }}
+                {% if run.completed_at %}
+                    &middot; finished {{ run.completed_at|date:'H:i:s' }}
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'admin_scripts:test-modules' %}"
+           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition">
+            &larr; Test All Modules
+        </a>
+    </div>
+
+    {% include "admin_scripts/partials/test_modules_results.html" %}
+
+</div>
+{% endblock %}

@@ -10,11 +10,62 @@
     <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"
             integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
             crossorigin="anonymous"></script>
+    {% comment %}
+    Tom Select powers the multi-select filter comboboxes. Init runs on
+    DOMContentLoaded for the initial form and on htmx:afterSettle so
+    fragments swapped in by htmx (new change panels, scenario tabs,
+    filter narrowing) get a TomSelect instance too.
+    {% endcomment %}
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.min.css">
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+    <style>
+        /* TomSelect copies the source <select>'s classes onto its wrapper, so the
+           wrapper inherits Tailwind's `border/rounded/px-*/py-*` while TomSelect's
+           own `.ts-control` already renders a border — producing a double border.
+           The init script above strips those classes before TomSelect runs; this
+           CSS is a belt-and-suspenders guard for any future utility that slips
+           through. Specificity is bumped via `.tomselected` so we beat Tailwind
+           Play's late-injected utility rules even without `!important` parity. */
+        .ts-wrapper.tomselected {
+            border: 0 !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+    </style>
+    <script>
+        // TomSelect copies the source <select>'s classes onto its `.ts-wrapper`
+        // div. Stripping the Tailwind border/padding/rounding utilities here
+        // (before init) keeps both the source select and the wrapper free of
+        // them, so only TomSelect's own `.ts-control` border is rendered.
+        // Templates still ship those classes so a no-JS fallback select looks
+        // sensible.
+        var TS_STRIP_CLASSES = [
+            'border', 'border-gray-300', 'rounded',
+            'px-1', 'px-2', 'px-3', 'py-1', 'py-2', 'py-3',
+        ];
+        function initComboboxes(root) {
+            if (!root || typeof TomSelect === 'undefined') return;
+            if (!(root instanceof Element) && !(root instanceof Document)) return;
+            root.querySelectorAll('select.js-combobox:not(.tomselected)').forEach(function (el) {
+                TS_STRIP_CLASSES.forEach(function (c) { el.classList.remove(c); });
+                new TomSelect(el, {
+                    plugins: ['remove_button'],
+                    persist: false,
+                    create: false,
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () { initComboboxes(document); });
+        document.addEventListener('htmx:afterSettle', function (e) { initComboboxes(e.target); });
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <nav class="bg-white border-b border-gray-200 px-6 py-4">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
             <a href="{% url 'admin_scripts:dashboard' %}" class="text-lg font-semibold text-gray-900">
                 Admin Scripts
             </a>
@@ -24,7 +75,7 @@
             </div>
         </div>
     </nav>
-    <main class="max-w-4xl mx-auto px-6 py-8">
+    <main class="max-w-6xl mx-auto px-6 py-8">
         {% block content %}{% endblock %}
     </main>
 </body>

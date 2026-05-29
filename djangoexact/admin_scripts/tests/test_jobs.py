@@ -6,7 +6,8 @@ from unittest.mock import patch
 
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import compute_filters_hash, enqueue_or_join
-from admin_scripts.models import ComputationJob
+from admin_scripts.models import ComputationJob, ModuleTestRun
+from api.models import CustomUser
 from minitool.models import ChangeRecord
 
 
@@ -54,6 +55,16 @@ class ComputationJobModelTest(TestCase):
                 from_value="C",
                 to_value="D",
             )
+
+    def test_max_rows_defaults_to_null(self):
+        job = ComputationJob.objects.create(
+            filters_hash="mr_null_hash",
+            module_type="Grassland",
+            attribute="x",
+            from_value="A",
+            to_value="B",
+        )
+        self.assertIsNone(job.max_rows)
 
 
 class GapDetectorTest(TestCase):
@@ -128,6 +139,53 @@ class FiltersHashTest(TestCase):
         })
         self.assertEqual(h1, h2)
 
+    def test_hash_backward_compatible_when_keys_absent(self):
+        """Params without max_rows/force_key must hash to the exact pre-change
+        byte sequence. The literal is the SHA-256 of the canonical JSON of
+        {attribute, filters, from_value, module_type, to_value} for the params
+        below, locked here so any drift in compute_filters_hash's canonical
+        format will fail this test (rather than silently rehashing).
+        """
+        params = {
+            "module_type": "Grassland",
+            "attribute": "grassland_management_type",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        LEGACY_HASH = "5290be0ca5be3fecbf8400abc01f7714abb6aeafe335c6084eddf3f03b7d4160"
+        self.assertEqual(compute_filters_hash(params), LEGACY_HASH)
+
+    def test_hash_differs_when_max_rows_set(self):
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        with_cap = {**base, "max_rows": 100}
+        self.assertNotEqual(compute_filters_hash(base), compute_filters_hash(with_cap))
+
+    def test_hash_differs_when_force_key_set(self):
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        forced = {**base, "force_key": "run-7"}
+        self.assertNotEqual(compute_filters_hash(base), compute_filters_hash(forced))
+
+    def test_hash_treats_none_keys_as_absent(self):
+        """Passing max_rows=None or force_key=None must hash identically to omission."""
+        base = {
+            "module_type": "Grassland",
+            "attribute": "x",
+            "from_value": "A",
+            "to_value": "B",
+        }
+        with_nones = {**base, "max_rows": None, "force_key": None}
+        self.assertEqual(compute_filters_hash(base), compute_filters_hash(with_nones))
+
 
 class EnqueueOrJoinTest(TransactionTestCase):
     databases = {"default"}
@@ -173,5 +231,19 @@ class EnqueueOrJoinTest(TransactionTestCase):
         enqueue_or_join(
             self.user2, "Grassland", "grassland_management_type", "A", "B",
         )
-        # dispatch_job called via on_commit — only the first enqueue triggers it
+        # dispatch_job called via on_commit -- only the first enqueue triggers it
         mock_dispatch.assert_called_once()
+
+
+class ModuleTestRunModelTest(TestCase):
+    databases = {"default"}
+
+    def test_create_run(self):
+        user = CustomUser.objects.create_user(
+            email="run@example.com", password="x", firebase_uid="r1"
+        )
+        run = ModuleTestRun.objects.create(requested_by=user)
+        self.assertEqual(run.jobs.count(), 0)
+        self.assertEqual(run.skipped, [])
+        self.assertIsNone(run.completed_at)
+        self.assertIn(f"TestRun #{run.pk}", str(run))
