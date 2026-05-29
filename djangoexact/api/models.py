@@ -994,6 +994,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         return self.get_livestock_modules_heads()
 
     @property
+    def catch(self):
+        return self.get_fishery_modules_catch()
+
+    @property
     def start_year(self):
         return self.start_year_t2 if self.start_year_t2 is not None else self.project.start_year_of_activities
 
@@ -1056,6 +1060,13 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
             if isinstance(module, Livestock):
                 heads += module.heads_number_w
         return heads
+
+    def get_fishery_modules_catch(self) -> float:
+        catch = 0
+        for module in self.modules:
+            if isinstance(module, Fishery):
+                catch += module.total_catch_yr_w or 0
+        return catch
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
