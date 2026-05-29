@@ -20,6 +20,9 @@
                         <p>
                             {% if activity.is_livestock %}
                                 Impact: {{ activity.heads }} heads of livestock
+                            {% elif activity.is_fishery %}
+                                Impact: {{ activity.catch|floatformat:2|intcomma }} {{ activity.main_impact }}
+                                .
                             {% else %}
                                 Impact: {{ activity.area }} {{ activity.main_impact }}
                                 .
