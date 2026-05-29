@@ -78,6 +78,38 @@ def _save_sibling(activity, sibling_class, start_values, w_values):
     return instance
 
 
+def _pick_country_for_slice(api_models, ipcc_models, start_class, start_values, climate):
+    """Pick a Country whose region satisfies the calculator's region-restricted
+    reference-data lookups for this slice.
+
+    The DeforestationCalculator path (start_class=ForestManagement) queries
+    ``ForestManagementAGB`` by ``(land_use_type, climate, region, forest_type)``
+    and raises when no row matches. ``Country.objects.first()`` returns an
+    Oceania country, but in the review DB AGB coverage for ``Coniferous
+    Forest`` in ``Boreal`` climate only exists in Asian regions, Europe,
+    and North America. Pick a country from one of those regions so the
+    lookup hits a row instead of raising.
+
+    For non-ForestManagement starts the OtherLandUseCalculator path is used,
+    which does not need a region-restricted AGB row, so the same fallback
+    (``Country.objects.first()``) is fine.
+    """
+    if start_class != "ForestManagement":
+        return api_models.Country.objects.first()
+    forest_lut = start_values.get("land_use_type")
+    if forest_lut is None:
+        return api_models.Country.objects.first()
+    covered_region_ids = list(
+        ipcc_models.ForestManagementAGB.objects
+        .filter(land_use_type=forest_lut, climate=climate)
+        .values_list("region_id", flat=True).distinct()
+    )
+    return (
+        api_models.Country.objects.filter(region_id__in=covered_region_ids).first()
+        or api_models.Country.objects.first()
+    )
+
+
 def build_luc_fixture(start_class, start_values, w_class, w_values):
     """Build & save Project, Activity, sibling(s), and a LandUseChange.
 
@@ -90,7 +122,6 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
     from ipcc import models as ipcc_models
 
     owner = factories.UserFactory.create()
-    country = api_models.Country.objects.first()
     # The LUC calculator dereferences project.climate.name, project.moisture,
     # and project.soil_type without None-guards (api/calculators.py SOC
     # lookups). Pick a climate/moisture/soil_type triple that has a
@@ -99,6 +130,7 @@ def build_luc_fixture(start_class, start_values, w_class, w_values):
     if soc is None:
         raise RuntimeError("No SoilOrganicCarbon reference data; cannot build LUC fixture")
     climate, moisture, soil_type = soc.climate, soc.moisture, soc.soil_type
+    country = _pick_country_for_slice(api_models, ipcc_models, start_class, start_values, climate)
     project = factories.ProjectFactory.create(
         owner=owner,
         country=country,
