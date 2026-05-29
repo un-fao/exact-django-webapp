@@ -1664,7 +1664,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1728,7 +1728,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1795,7 +1795,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter if self.minor_n_estimation_factor_w.dry_matter is not None else 1,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1862,7 +1862,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter if self.minor_n_estimation_factor_wo.dry_matter is not None else 1,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
