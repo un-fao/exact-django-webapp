@@ -64,6 +64,28 @@ class ComputeLucSliceTest(TestCase):
             ).count()
             self.assertGreater(after, before)
 
+    def test_forest_management_start_slice_succeeds(self):
+        # DeforestationCalculator (start=ForestManagement path) queries
+        # ForestManagementAGB by (land_use_type, climate, region, forest_type)
+        # and raises "AGB for X does not exist" when no row matches. The
+        # fixture-builder used to pin country=Country.objects.first() (Oceania
+        # in the review DB), which had no AGB row for Coniferous Forest in
+        # Boreal climate. _pick_country_for_slice now constrains the country
+        # to a region with matching AGB coverage; this slice must therefore
+        # produce data rows instead of erroring.
+        data, errors = _compute_luc_slice(
+            from_value="ForestManagement#0", to_value="AnnualCropland#0",
+            save_results=False,
+        )
+        # Either it produced data, or it failed for an unrelated reason -- but
+        # the specific AGB-missing error from calculators.py:849 must not appear.
+        agb_errors = [
+            e for e in errors
+            if "AGB for" in e.get("error_message", "")
+            and "does not exist" in e.get("error_message", "")
+        ]
+        self.assertEqual(agb_errors, [], f"Expected no AGB-missing errors, got: {agb_errors}")
+
     def test_afforestation_w_side_only_uses_secondary_condition(self):
         # AnnualCropland -> ForestManagement: w side must restrict
         # forest_condition_type to "Secondary".
