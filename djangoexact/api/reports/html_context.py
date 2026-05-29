@@ -275,14 +275,10 @@ def _compute_indicator_aggregates(activities_by_name: dict, project) -> dict:
 
     livestock_heads = [x for x in livestock_heads if x["value_w"] != 0 or x["value_wo"] != 0]
     small_fishery_types = [x for x in small_fishery_types if x["value_w"] != 0 or x["value_wo"] != 0]
-    large_fishery_data = (
-        {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0
-        else large_fishery_data
-    )
-    aquaculture_data = (
-        {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0
-        else aquaculture_data
-    )
+    if large_fishery_data["value_w"] == 0 and large_fishery_data["value_wo"] == 0:
+        large_fishery_data = {}
+    if aquaculture_data["value_w"] == 0 and aquaculture_data["value_wo"] == 0:
+        aquaculture_data = {}
     land_types = [x for x in land_types if x["value_w"] != 0 or x["value_wo"] != 0]
 
     total_heads = sum(lh["value_w"] for lh in livestock_heads)

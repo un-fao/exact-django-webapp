@@ -1645,7 +1645,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1709,7 +1709,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1776,7 +1776,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter if self.minor_n_estimation_factor_w.dry_matter is not None else 1,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1843,7 +1843,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter if self.minor_n_estimation_factor_wo.dry_matter is not None else 1,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -2884,7 +2884,14 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+        # Reverse-relation managers raise on unsaved FloodedRice instances
+        # ("FloodedRice instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # FloodedRice unsaved to skip DB writes — with no pk there are no
+        # related MinorSeasonFloodedRice rows to sum either.
+        minor_seasons: list[MinorSeasonFloodedRice] = (
+            list(module.minor_seasons.all()) if module.pk else []
+        )
 
         if any([not season.is_ready() for season in minor_seasons]):
             raise Exception("At least one minor season is not ready")
@@ -3979,11 +3986,18 @@ class EnergyEntryCalculator(BaseCalculator):
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
 
-            if self.module.fuel_type_start.name_en in ["Renewable"]:
+            # PackagingEntry / ProcessingEntry / TransportEntry / StorageEntry
+            # inherit FuelMixin via ValueChainSubmodule but don't always
+            # require fuel_type to be set (e.g. is_electric=False packaging).
+            # Guard the .name_en access so the calculator doesn't blow up
+            # with "'NoneType' object has no attribute 'name_en'" when the
+            # parent calculator instantiates EnergyEntryCalculator
+            # speculatively.
+            if self.module.fuel_type_start and self.module.fuel_type_start.name_en in ["Renewable"]:
                 self.electricity_ef_selected_start.value = 0
-            if self.module.fuel_type_w.name_en in ["Renewable"]:
+            if self.module.fuel_type_w and self.module.fuel_type_w.name_en in ["Renewable"]:
                 self.electricity_ef_selected_w.value = 0
-            if self.module.fuel_type_wo.name_en in ["Renewable"]:
+            if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en in ["Renewable"]:
                 self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:
@@ -4599,17 +4613,23 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
 
-        for building in self.module.buildings.all():
-            r_w, r_wo = BuildingCalculator(building).calculate()
+        # Reverse-relation managers raise on unsaved Settlement instances
+        # ("Settlement instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # Settlement unsaved to skip DB writes — when there's no pk, there
+        # can be no related Buildings or Roads to sum either.
+        if self.module.pk:
+            for building in self.module.buildings.all():
+                r_w, r_wo = BuildingCalculator(building).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
-        for road in self.module.roads.all():
-            r_w, r_wo = RoadCalculator(road).calculate()
+            for road in self.module.roads.all():
+                r_w, r_wo = RoadCalculator(road).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
         log.debug("END SettlementCalculator.calculate")
         return (self.results_w, self.results_wo)
@@ -6087,8 +6107,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
 
-        self.soil_type_name = ""
-
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
@@ -7192,7 +7210,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
                 self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
-        self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
+        # Reverse-relation managers raise on unsaved ForestManagement
+        # instances (same pattern as Settlement / FloodedRice). The
+        # permutation runner builds ForestManagement unsaved — without a
+        # pk the related disturbances queryset is empty by construction.
+        # Downstream code calls ``self.disturbances.values_list(...)`` so we
+        # keep a queryset shape via ``ForestDisturbance.objects.none()``.
+        self.disturbances: list[ForestDisturbance] = (
+            self.module.disturbances.all() if self.module.pk else ForestDisturbance.objects.none()
+        )
 
         return super().get_defaults(calculate)
 
