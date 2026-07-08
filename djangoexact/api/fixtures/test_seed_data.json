@@ -1,0 +1,34 @@
+[
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "Admin"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 2,
+    "fields": {
+      "name": "Second Reviewer"
+    }
+  },
+  {
+    "model": "api.customuser",
+    "pk": 1000,
+    "fields": {
+      "email": "testuser@example.com",
+      "password": "pbkdf2_sha256$1000000$tcncAAFZZt7rILMzEobab5$uDcsHgKhw+8xbYFsFJzD+aLAiT6dk2meKnpI6wo92dg=",
+      "is_active": true
+    }
+  },
+  {
+    "model": "api.customuser",
+    "pk": 1001,
+    "fields": {
+      "email": "test@user.org",
+      "password": "pbkdf2_sha256$1000000$BQPg0oszbSi85yZcDbMubz$vDKmURr3YVVmXEDSBIlBquIH0msHW74Y6jql7dmHmb4=",
+      "is_active": true
+    }
+  }
+]
