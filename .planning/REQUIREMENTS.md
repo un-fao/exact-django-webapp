@@ -26,7 +26,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [ ] **SEC-01**: Integration tests cover the Firebase auth sync matrix: valid token with no matching local firebase_uid returns a clean 401 without leaking internal exception text; a Firebase-vs-local email mismatch is authenticated by UID with the mismatch behavior asserted; concurrent registrations for the same email leave no orphaned Firebase user
 - [ ] **SEC-02**: Auth endpoints (register, login, password-reset, token-refresh) enforce a tighter per-IP rate than the global anon throttle, returning HTTP 429 beyond it, while non-auth endpoint rates stay unchanged
-- [ ] **SEC-03**: A Django system check fails deploy/startup when APP_MODE is production and either DEBUG is True or CORS_ALLOWED_ORIGINS is empty, wired into CI so a bad production config never reaches App Engine
+- [x] **SEC-03**: A Django system check fails deploy/startup when APP_MODE is production and either DEBUG is True or CORS_ALLOWED_ORIGINS is empty, wired into CI so a bad production config never reaches App Engine
 
 ### Performance
 
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | CI-01 | Phase 1 | Pending |
 | CI-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Complete |
 | CALC-01 | Phase 2 | Pending |
 | CALC-02 | Phase 2 | Pending |
 | CALC-03 | Phase 2 | Pending |
@@ -94,6 +94,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-02 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 17 total
 - Mapped to phases: 17
 - Unmapped: 0
