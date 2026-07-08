@@ -186,6 +186,12 @@ class BaseActivityReport:
         total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
         total_catch_yearly = [0.0] * self.project_report.duration
+        # A single activity's land modules all describe the SAME physical parcel:
+        # a land-use change carries a "with" module and a "without" module over
+        # the same hectares. Only the first contributing land module is counted
+        # so the area is not double-counted (mirrors the break in
+        # Activity.get_land_modules_area()). See exact-django-webapp-gz3.
+        hectares_counted = False
 
         for module in self.activity.modules:
             report_cls = get_report_class(module)
@@ -202,14 +208,17 @@ class BaseActivityReport:
                 total_emissions, result.total_emissions, fillvalue=0
             )))
 
-            if module.is_with() and result.units_breakdown_w:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_w, fillvalue=0
-                )))
-            elif module.is_without() and result.units_breakdown_wo:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
-                )))
+            if not hectares_counted:
+                if module.is_with() and result.units_breakdown_w:
+                    total_hectares_yearly = list(map(sum, zip_longest(
+                        total_hectares_yearly, result.units_breakdown_w, fillvalue=0
+                    )))
+                    hectares_counted = True
+                elif module.is_without() and result.units_breakdown_wo:
+                    total_hectares_yearly = list(map(sum, zip_longest(
+                        total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
+                    )))
+                    hectares_counted = True
 
             if result.units_heads_w:
                 total_heads_yearly = list(map(sum, zip_longest(
