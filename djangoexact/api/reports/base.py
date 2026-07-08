@@ -191,7 +191,7 @@ class BaseActivityReport:
         # the same hectares. Only the first contributing land module is counted
         # so the area is not double-counted (mirrors the break in
         # Activity.get_land_modules_area()). See exact-django-webapp-gz3.
-        hectares_counted = False
+        land_hectares_counted = False
 
         for module in self.activity.modules:
             report_cls = get_report_class(module)
