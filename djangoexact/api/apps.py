@@ -8,3 +8,4 @@ class ApiConfig(AppConfig):
     def ready(self):
         from .signals import create_default_api_status
         post_migrate.connect(create_default_api_status, sender=self)
+        from . import checks  # noqa: F401  registers the deploy check
