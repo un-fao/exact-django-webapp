@@ -29,7 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. The CI test job runs pytest against a real Postgres service container after `manage.py migrate` and `manage.py load_reference_data --app=all`, and `test_reference_bootstrap.py` passes (job runtime exceeds 30 seconds, confirming fixtures actually loaded, not a red-herring green).
   3. A HIGH-severity bandit finding or a known-CVE pip-audit result in the same gated job blocks the deploy.
   4. `manage.py check --deploy` exits non-zero when APP_MODE is production and either DEBUG is True or CORS_ALLOWED_ORIGINS is empty, and CI invokes that check so a bad production config never reaches App Engine.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 01-01-PLAN.md — Production config deploy check (api/checks.py + registration + DB-free unit test) [SEC-03]
+- [ ] 01-02-PLAN.md — CI test-DB prerequisites: settings TEST.NAME, test_seed_data.json, requirements-dev.txt pins [CI-01, CI-02]
+- [ ] 01-03-PLAN.md — Wire the gated test job + deploy needs/APP_MODE/check --deploy into deploy.yaml [CI-01, CI-02, SEC-03]
 
 ### Phase 2: Calculator Correctness Safety-Net
 **Goal**: Audit-flagged fragile calculator paths are pinned by tolerance-based golden files, missing scenario inputs fail fast, and the three known tier-2 bugs are fixed with regression tests.
@@ -72,7 +75,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. CI Test Gate & Production Config Guard | 0/TBD | Not started | - |
+| 1. CI Test Gate & Production Config Guard | 0/3 | Not started | - |
 | 2. Calculator Correctness Safety-Net | 0/TBD | Not started | - |
 | 3. Calculators Decomposition & ScenarioType Enum | 0/TBD | Not started | - |
 | 4. Performance & Auth Hardening | 0/TBD | Not started | - |
