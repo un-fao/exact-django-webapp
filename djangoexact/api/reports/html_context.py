@@ -342,8 +342,19 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request, lang: str) -> dict:
-    """Return the full context dict for the PDF HTML template."""
+def build_template_context(result: ProjectResult, request, lang: str, activities=None) -> dict:
+    """Return the full context dict for the PDF HTML template.
+
+    Args:
+        result: The (already activity-filtered) ProjectResult to render.
+        request: The current request (used for locale).
+        lang: Language code to activate for locale-aware labels.
+        activities: Optional queryset / list of Activity instances the report is
+            restricted to. When ``None`` the full ``project.activities.all()`` set
+            is used. Passing the same selection used to compute ``result`` keeps
+            the indicator aggregates (total_area, heads, catch, land types) in
+            sync with the filtered on-screen results.
+    """
     activate(lang)
     project = result.project
 
@@ -362,10 +373,13 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     def _direction(v):
         return INCREASES if v >= 0 else DECREASES
 
-    # Per-activity processed data (plain queryset, iterated once and stored as a dict)
+    # Per-activity processed data (plain queryset, iterated once and stored as a dict).
+    # Restrict to the selected activities so the narrative report matches the
+    # activity-filtered on-screen results; fall back to the full project set.
+    source_activities = activities if activities is not None else project.activities.all()
     activities_by_name = {
         a.name: a
-        for a in project.activities.all()
+        for a in source_activities
     }
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
 

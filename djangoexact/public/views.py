@@ -151,15 +151,15 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             log.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        if request.query_params.get("template", None):
-            response = self.template(request, pk=pk)
-            return response
-
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
             selected_activities = None
         else:
             selected_activities = project.activities.filter(pk__in=selected_activities)
+
+        if request.query_params.get("template", None):
+            response = self.template(request, pk=pk, activities=selected_activities)
+            return response
 
         try:
             from api.reports import generate_excel_report
@@ -187,7 +187,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
-    def template(self, request, pk=None):
+    def template(self, request, pk=None, activities=None):
         template_name = request.query_params.get("template")
         lang = request.query_params.get("lang", "en")
         if hasattr(request, "LANGUAGE_CODE"):
@@ -205,8 +205,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             from api.reports.html_context import build_template_context
 
             project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
-            result = compute_project_result(project)
-            context = build_template_context(result, request, lang)
+            result = compute_project_result(project, activities=activities)
+            context = build_template_context(result, request, lang, activities=activities)
             html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
             from weasyprint import HTML
             pdf = HTML(string=html).write_pdf()

@@ -153,6 +153,103 @@ class TestBuildTemplateContextActivitiesQuery(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Regression: build_template_context honors the activities filter
+# ---------------------------------------------------------------------------
+
+class TestBuildTemplateContextActivitiesFilter(unittest.TestCase):
+    """The narrative/PDF report must reflect the selected activities.
+
+    When the report is requested with an activity selection, the template
+    context (and therefore the indicator aggregates such as total_area,
+    livestock heads, catch and land types) must be built from ONLY the selected
+    activities, not from project.activities.all(). Previously the narrative
+    report always used the full project, so activity-filtered on-screen results
+    did not translate into the downloadable report.
+    """
+
+    _GAS_TOTALS = {
+        "gas_totals_w": {g: 0.0 for g in ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]},
+        "gas_totals_wo": {g: 0.0 for g in ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]},
+        "primary_ghg": "CO2", "primary_ghg_emissions": 0.0,
+        "secondary_ghg": "CH4", "secondary_ghg_emissions": 0.0,
+        "tertiary_ghg": "N2O", "tertiary_ghg_emissions": 0.0,
+    }
+    _INDICATORS = {
+        "total_area": 0, "total_heads": 0, "total_tonnes_of_catch": 0,
+        "livestock_heads": [], "small_fishery_types": [],
+        "large_fishery_data": {}, "aquaculture_data": {},
+        "land_types": [], "soc": None,
+    }
+
+    def test_activities_param_restricts_activities_by_name(self):
+        """A restricted activities list is used instead of project.activities.all()."""
+        project = _make_project()
+        activity_a = Mock()
+        activity_a.name = "Activity A"
+        activity_b = Mock()
+        activity_b.name = "Activity B"
+        # The full project contains BOTH activities.
+        project.activities.all.return_value = [activity_a, activity_b]
+
+        result = _make_project_result(project=project)
+
+        with (
+            patch("api.reports.html_context._compute_gas_totals", return_value=self._GAS_TOTALS),
+            patch("api.reports.html_context._compute_activity_contexts") as mock_act_ctx,
+            patch("api.reports.html_context._compute_indicator_aggregates") as mock_indicators,
+            patch("api.reports.html_context._build_chart_data", return_value=("b64", "b64")),
+            patch("api.reports.html_context._load_fao_logo", return_value="b64logo"),
+            patch("django.utils.translation.activate"),
+        ):
+            mock_act_ctx.return_value = []
+            mock_indicators.return_value = dict(self._INDICATORS)
+            from api.reports.html_context import build_template_context
+            # Only Activity A is selected.
+            build_template_context(result, Mock(), "en", activities=[activity_a])
+
+        # activities_by_name passed to the per-activity context builder must
+        # contain ONLY the selected activity.
+        act_ctx_arg = mock_act_ctx.call_args[0][1]
+        self.assertIn("Activity A", act_ctx_arg)
+        self.assertNotIn("Activity B", act_ctx_arg)
+
+        # activities_by_name passed to the indicator aggregator (total_area,
+        # heads, catch, land types) must ALSO be restricted to the selection.
+        indicators_arg = mock_indicators.call_args[0][0]
+        self.assertIn("Activity A", indicators_arg)
+        self.assertNotIn("Activity B", indicators_arg)
+
+        # When an explicit filter is provided, the full-project queryset must
+        # NOT be consulted.
+        project.activities.all.assert_not_called()
+
+    def test_activities_none_falls_back_to_full_project(self):
+        """Backward-compatible: activities=None uses project.activities.all()."""
+        project = _make_project()
+        activity = Mock()
+        activity.name = "Deforestation"
+        project.activities.all.return_value = [activity]
+
+        result = _make_project_result(project=project)
+
+        with (
+            patch("api.reports.html_context._compute_gas_totals", return_value=self._GAS_TOTALS),
+            patch("api.reports.html_context._compute_activity_contexts") as mock_act_ctx,
+            patch("api.reports.html_context._compute_indicator_aggregates", return_value=dict(self._INDICATORS)),
+            patch("api.reports.html_context._build_chart_data", return_value=("b64", "b64")),
+            patch("api.reports.html_context._load_fao_logo", return_value="b64logo"),
+            patch("django.utils.translation.activate"),
+        ):
+            mock_act_ctx.return_value = []
+            from api.reports.html_context import build_template_context
+            build_template_context(result, Mock(), "en")
+
+        act_ctx_arg = mock_act_ctx.call_args[0][1]
+        self.assertIn("Deforestation", act_ctx_arg)
+        project.activities.all.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
 # Fix 2 — SoilOrganicCarbon.objects.get() error handling
 # ---------------------------------------------------------------------------
 
