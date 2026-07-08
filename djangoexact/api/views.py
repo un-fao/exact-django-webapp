@@ -703,7 +703,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         if request.query_params.get("template", None):
-            response = self.template(request, pk=pk)
+            response = self.template(request, pk=pk, activities=selected_activities)
             return response
 
         try:
@@ -1306,7 +1306,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
-    def template(self, request, pk=None):
+    def template(self, request, pk=None, activities=None):
         template_name = request.query_params.get("template")
         lang = request.query_params.get("lang", "en")
         if hasattr(request, "LANGUAGE_CODE"):
@@ -1325,8 +1325,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             project: Project = self.get_object()
 
-            result = compute_project_result(project)
-            context = build_template_context(result, request, lang)
+            result = compute_project_result(project, activities=activities)
+            context = build_template_context(result, request, lang, activities=activities)
             html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
