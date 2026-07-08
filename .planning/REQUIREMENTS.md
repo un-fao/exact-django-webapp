@@ -9,8 +9,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### CI / Test Automation
 
-- [ ] **CI-01**: CI runs the full pytest suite against a real Postgres (service container or proxied instance) on every push/PR, and the App Engine deploy job cannot start unless the test job passes (needs: gating in deploy.yaml)
-- [ ] **CI-02**: CI runs bandit (HIGH-severity threshold) and pip-audit in the same gated job, so a high-severity finding or known CVE blocks deploy
+- [x] **CI-01**: CI runs the full pytest suite against a real Postgres (service container or proxied instance) on every push/PR, and the App Engine deploy job cannot start unless the test job passes (needs: gating in deploy.yaml)
+- [x] **CI-02**: CI runs bandit (HIGH-severity threshold) and pip-audit in the same gated job, so a high-severity finding or known CVE blocks deploy
 
 ### Calculation Correctness
 
@@ -75,8 +75,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CI-01 | Phase 1 | Pending |
-| CI-02 | Phase 1 | Pending |
+| CI-01 | Phase 1 | Complete |
+| CI-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | CALC-01 | Phase 2 | Pending |
 | CALC-02 | Phase 2 | Pending |
