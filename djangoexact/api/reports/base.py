@@ -186,11 +186,13 @@ class BaseActivityReport:
         total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
         total_catch_yearly = [0.0] * self.project_report.duration
-        # A single activity's land modules all describe the SAME physical parcel:
-        # a land-use change carries a "with" module and a "without" module over
-        # the same hectares. Only the first contributing land module is counted
-        # so the area is not double-counted (mirrors the break in
-        # Activity.get_land_modules_area()). See exact-django-webapp-gz3.
+        # Hectares are single-counted per activity for LandModule instances: a
+        # land-use change carries a "with" and a "without" LandModule over the
+        # SAME parcel, so only the first LandModule's hectares are counted
+        # (mirrors the break in Activity.get_land_modules_area()). Modules that
+        # are NOT LandModules (e.g. CoastalWetland) are counted normally, so an
+        # activity holding a CoastalWetland and a LandModule still counts both.
+        # See exact-django-webapp-gz3.
         land_hectares_counted = False
 
         for module in self.activity.modules:
@@ -208,17 +210,21 @@ class BaseActivityReport:
                 total_emissions, result.total_emissions, fillvalue=0
             )))
 
-            if not hectares_counted:
+            is_land_module = isinstance(module, api_models.LandModule)
+            if not (is_land_module and land_hectares_counted):
+                counted = False
                 if module.is_with() and result.units_breakdown_w:
-                    total_hectares_yearly = list(map(sum, zip_longest(
-                        total_hectares_yearly, result.units_breakdown_w, fillvalue=0
-                    )))
-                    hectares_counted = True
+                    total_hectares_yearly = _add(
+                        total_hectares_yearly, result.units_breakdown_w
+                    )
+                    counted = True
                 elif module.is_without() and result.units_breakdown_wo:
-                    total_hectares_yearly = list(map(sum, zip_longest(
-                        total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
-                    )))
-                    hectares_counted = True
+                    total_hectares_yearly = _add(
+                        total_hectares_yearly, result.units_breakdown_wo
+                    )
+                    counted = True
+                if counted and is_land_module:
+                    land_hectares_counted = True
 
             if result.units_heads_w:
                 total_heads_yearly = list(map(sum, zip_longest(

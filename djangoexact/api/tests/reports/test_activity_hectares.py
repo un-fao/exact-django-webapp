@@ -44,6 +44,17 @@ def _land_module(*, is_with, is_without, result):
     return module
 
 
+def _coastal_module(*, is_with, is_without, result):
+    # CoastalWetland is a Module, NOT a LandModule, so the single-count guard
+    # must not apply to it (mirrors the separate branch in get_land_modules_area).
+    from api.models import CoastalWetland
+    module = MagicMock(spec=CoastalWetland)
+    module.is_with.return_value = is_with
+    module.is_without.return_value = is_without
+    module._result = result
+    return module
+
+
 class _FakeReport:
     """Stand-in module report: returns the module's preset ModuleResult."""
 
@@ -122,6 +133,44 @@ class TestActivityHectaresNoDoubleCount(unittest.TestCase):
         result = self._compute([mod])
 
         self.assertEqual(result.total_hectares_yearly, [7.5, 7.5, 7.5])
+
+    def test_coastal_wetland_and_land_module_both_counted(self):
+        # CoastalWetland is NOT a LandModule; get_land_modules_area() counts it
+        # separately from the first LandModule, so both must be counted. The
+        # LandModule single-count guard must not swallow the CoastalWetland.
+        coastal = _coastal_module(
+            is_with=True, is_without=True,
+            result=_module_result([4.0, 4.0, 4.0], [4.0, 4.0, 4.0], self.DURATION),
+        )
+        land = _land_module(
+            is_with=True, is_without=True,
+            result=_module_result([6.0, 6.0, 6.0], [6.0, 6.0, 6.0], self.DURATION),
+        )
+
+        result = self._compute([coastal, land])
+
+        # 4 ha coastal + 6 ha land = 10 ha.
+        self.assertEqual(result.total_hectares_yearly, [10.0, 10.0, 10.0])
+
+    def test_land_modules_single_counted_alongside_coastal(self):
+        # A LUC pair of LandModules (same 6 ha parcel) plus a distinct 4 ha
+        # CoastalWetland: land counted once, coastal added -> 10 ha, not 16.
+        land_w = _land_module(
+            is_with=True, is_without=False,
+            result=_module_result([6.0, 6.0, 6.0], [6.0, 6.0, 6.0], self.DURATION),
+        )
+        land_wo = _land_module(
+            is_with=False, is_without=True,
+            result=_module_result([6.0, 6.0, 6.0], [6.0, 6.0, 6.0], self.DURATION),
+        )
+        coastal = _coastal_module(
+            is_with=True, is_without=True,
+            result=_module_result([4.0, 4.0, 4.0], [4.0, 4.0, 4.0], self.DURATION),
+        )
+
+        result = self._compute([land_w, land_wo, coastal])
+
+        self.assertEqual(result.total_hectares_yearly, [10.0, 10.0, 10.0])
 
 
 if __name__ == "__main__":
