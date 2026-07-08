@@ -17,6 +17,7 @@ import numpy as np
 import api.models as api_models
 import api.calculators as calculators
 import ipcc.models as ipcc_models
+from .aggregation import HectaresContribution, cumulative_activity_hectares
 from .constants import SPC_INCREASE_RATE
 from .data_types import (
     ActivityResult,
@@ -183,9 +184,15 @@ class BaseActivityReport:
         module_results: list[ModuleResult] = []
         module_reports: list[BaseModuleReport] = []
         total_emissions = [0.0] * self.project_report.duration
-        total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
         total_catch_yearly = [0.0] * self.project_report.duration
+
+        # Land-area contributions, tagged by their land-use-change group so the
+        # shared hectares of a LUC activity (its start / with / without land
+        # modules plus the LandUseChange module all describe the *same* physical
+        # area) are counted once instead of 2-3x. Aggregated after the loop by
+        # cumulative_activity_hectares() to match the app's total_hectares.
+        land_contribs: list[HectaresContribution] = []
 
         for module in self.activity.modules:
             report_cls = get_report_class(module)
@@ -202,14 +209,18 @@ class BaseActivityReport:
                 total_emissions, result.total_emissions, fillvalue=0
             )))
 
-            if module.is_with() and result.units_breakdown_w:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_w, fillvalue=0
-                )))
-            elif module.is_without() and result.units_breakdown_wo:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
-                )))
+            if isinstance(module, api_models.LandUseChange):
+                luc_group = module.pk
+            else:
+                luc = getattr(module, "land_use_change", None)
+                luc_group = luc.pk if luc is not None else None
+            land_contribs.append(HectaresContribution(
+                luc_group=luc_group,
+                is_with=module.is_with(),
+                is_without=module.is_without(),
+                units_breakdown_w=result.units_breakdown_w,
+                units_breakdown_wo=result.units_breakdown_wo,
+            ))
 
             if result.units_heads_w:
                 total_heads_yearly = list(map(sum, zip_longest(
@@ -220,6 +231,10 @@ class BaseActivityReport:
                 total_catch_yearly = list(map(sum, zip_longest(
                     total_catch_yearly, result.units_catch_w, fillvalue=0
                 )))
+
+        total_hectares_yearly = cumulative_activity_hectares(
+            self.project_report.duration, land_contribs
+        )
 
         t2_overrides = []
         if self.activity.climate_t2:
