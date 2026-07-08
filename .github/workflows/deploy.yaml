@@ -166,6 +166,8 @@ jobs:
           pip-audit -r requirements.txt
 
   deploy:
+    needs: test
+    if: github.event_name == 'push'
     runs-on: ubuntu-22.04
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
@@ -197,6 +199,7 @@ jobs:
 
     - name: Deploy
       env:
+        APP_MODE: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
         DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: |
@@ -252,6 +255,7 @@ jobs:
         pip install --force-reinstall 'setuptools>=78.1.1'
         # - yes | python manage.py makemigrations --merge
         python manage.py migrate
+        python manage.py check --deploy
         python manage.py collectstatic --noinput
 
         pip list
