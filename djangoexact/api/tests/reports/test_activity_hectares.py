@@ -36,7 +36,8 @@ def _module_result(units_w, units_wo, duration):
 
 
 def _land_module(*, is_with, is_without, result):
-    module = MagicMock()
+    from api.models import LandModule
+    module = MagicMock(spec=LandModule)
     module.is_with.return_value = is_with
     module.is_without.return_value = is_without
     module._result = result
