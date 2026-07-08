@@ -6,8 +6,165 @@ on:
       - main
       - review
       - feature/id-responses
+  pull_request:
+    branches:
+      - develop
+      - main
+      - review
 
-jobs:  
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: exact_ci
+          POSTGRES_PASSWORD: exact_ci
+          POSTGRES_DB: exact_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_ENGINE: django.db.backends.postgresql
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_USER: exact_ci
+      DB_PASSWORD: exact_ci
+      DB_NAME: exact_ci
+      SECRET_KEY: ci-dummy-secret-key-not-for-production
+      DJANGO_DEBUG: "True"
+      # APP_MODE is intentionally left unset here per D-07: the suite does not
+      # require it, and setting it to production would make the smoke
+      # `check --deploy` step below fail on test-env DEBUG/CORS values.
+    steps:
+      - name: 'Checkout Code'
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: djangoexact/requirements*.txt
+
+      - name: Install dependencies
+        run: |
+          cd djangoexact
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Generate throwaway Firebase credential
+        # NOTE: the resulting value is a secret (a freshly generated, throwaway
+        # private key) and must not be echoed; it is written straight to
+        # $GITHUB_ENV without ever being printed to the job log.
+        run: |
+          cd djangoexact
+          echo "FIREBASE_SERVICE_ACCOUNT=$(python - <<'PYEOF'
+          from cryptography.hazmat.primitives import serialization
+          from cryptography.hazmat.primitives.asymmetric import rsa
+          import base64, json
+          key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+          pem = key.private_bytes(
+              encoding=serialization.Encoding.PEM,
+              format=serialization.PrivateFormat.TraditionalOpenSSL,
+              encryption_algorithm=serialization.NoEncryption(),
+          ).decode()
+          fake_sa = {
+              "type": "service_account", "project_id": "ci-dummy-project",
+              "private_key_id": "dummy", "private_key": pem,
+              "client_email": "ci-dummy@ci-dummy-project.iam.gserviceaccount.com",
+              "client_id": "123456789",
+              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+              "token_uri": "https://oauth2.googleapis.com/token",
+              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+              "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ci-dummy%40ci-dummy-project.iam.gserviceaccount.com",
+          }
+          print(base64.b64encode(json.dumps(fake_sa).encode()).decode())
+          PYEOF
+          )" >> "$GITHUB_ENV"
+
+      - name: Migrate and load reference data
+        run: |
+          cd djangoexact
+          python manage.py migrate
+          python manage.py load_reference_data --app=all
+          python manage.py loaddata test_seed_data
+
+      - name: Run test suite
+        # NOTE: the label list below must be re-verified against the first
+        # real CI run's reported test count (Assumption A2, Pitfall 1). Do NOT
+        # pass a bare `api` or `api.tests` label; api/tests/old/ contains
+        # legacy, non-test scripts that crash collection (Finding 8a), and
+        # most of api/tests/unit/ does not match either runner's default
+        # discovery pattern and would be silently skipped (Finding 8b).
+        run: |
+          cd djangoexact
+          python manage.py test --keepdb \
+            api.tests.test_reference_bootstrap \
+            api.tests.test_faostat_service \
+            api.tests.test_build_luc_fixture \
+            api.tests.test_compute_luc_slice \
+            api.tests.test_compute_module_slice_luc_routing \
+            api.tests.test_luc_compute_iterator \
+            api.tests.test_project_export \
+            api.tests.test_production_config_check \
+            api.tests.unit.test_soc_t2_w_unit_simple \
+            api.tests.unit.test_sync_firebase_emails \
+            api.tests.unit.activity \
+            api.tests.unit.annual_cropland \
+            api.tests.unit.aquaculture \
+            api.tests.unit.coastal_wetland \
+            api.tests.unit.energy \
+            api.tests.unit.flooded_rice \
+            api.tests.unit.forest_management \
+            api.tests.unit.grassland \
+            api.tests.unit.irrigation \
+            api.tests.unit.land_use_change \
+            api.tests.unit.land_use_change_examples \
+            api.tests.unit.large_fishery \
+            api.tests.unit.livestock \
+            api.tests.unit.packaging \
+            api.tests.unit.perennial_cropland \
+            api.tests.unit.processing \
+            api.tests.unit.project \
+            api.tests.unit.settlement \
+            api.tests.unit.small_fishery \
+            api.tests.unit.storage \
+            api.tests.unit.transport \
+            api.tests.unit.waterbody \
+            api.tests.reports.test_activity_hectares \
+            api.tests.reports.test_cache \
+            api.tests.reports.test_flooded_rice_seasons \
+            api.tests.reports.test_html_context \
+            accounts \
+            blog \
+            public \
+            minitool \
+            ipcc \
+            admin_scripts.tests
+
+      - name: Production config smoke check
+        run: |
+          cd djangoexact
+          python manage.py check --deploy
+
+      - name: bandit
+        run: |
+          cd djangoexact
+          bandit -r . -x ./venv,./node_modules --severity-level high
+
+      - name: pip-audit
+        # NOTE: `--ignore-vuln <ID>` plus an inline justification comment is
+        # the documented escape hatch for an unfixable pin; not used by
+        # default.
+        run: |
+          cd djangoexact
+          pip-audit -r requirements.txt
+
   deploy:
     runs-on: ubuntu-22.04
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
