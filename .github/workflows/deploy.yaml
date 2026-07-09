@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - review
+      - develop
       - feature/id-responses
   pull_request:
     branches:
@@ -178,7 +179,10 @@ jobs:
 
   deploy:
     needs: test
-    if: github.event_name == 'push'
+    # WR-04: pushes to develop run the test job only; develop has no deploy
+    # target, so the ref guard keeps deploy off while the merged state of
+    # the default branch still gets exercised by the gate.
+    if: github.event_name == 'push' && github.ref_name != 'develop'
     runs-on: ubuntu-22.04
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
