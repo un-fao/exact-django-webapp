@@ -202,6 +202,10 @@ jobs:
         APP_MODE: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
         DJANGO_DEBUG: ${{ vars.DJANGO_DEBUG }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        # CR-01: `check --deploy` reads settings.CORS_ALLOWED_ORIGINS from the
+        # shell env; export the same value that gets sed-substituted into
+        # app.yaml so api.E002 validates what actually ships.
+        CORS_ALLOWED_ORIGINS: ${{ vars.CORS_ALLOWED_ORIGINS }}
       run: |
         set -x
 
