@@ -13,7 +13,7 @@ This milestone hardens the live EX-ACT backend in strict dependency order, witho
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: CI Test Gate & Production Config Guard** - Every deploy is blocked unless the full suite passes on real Postgres, security scans are clean, and production config is safe (completed 2026-07-08)
+- [ ] **Phase 1: CI Test Gate & Production Config Guard** - Every deploy is blocked unless the full suite passes on real Postgres, security scans are clean, and production config is safe (executed 2026-07-08; awaiting human verification of first CI run, see 01-UAT.md)
 - [ ] **Phase 2: Calculator Correctness Safety-Net** - Fragile calculator paths are pinned by golden files, missing inputs fail fast, and three known tier-2 bugs are fixed
 - [ ] **Phase 3: Calculators Decomposition & ScenarioType Enum** - One calculator domain moves into an api/calculators/ package behind a re-export shim, with scenario literals replaced by an enum and no numeric drift
 - [ ] **Phase 4: Performance & Auth Hardening** - Retrieval endpoints run constant queries, IPCC lookups cache per worker, and auth endpoints gain sync tests plus per-IP rate limiting
