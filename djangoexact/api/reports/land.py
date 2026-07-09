@@ -776,9 +776,14 @@ def _flooded_rice_minor_season_metadata_writes(
     ]:
         if not is_state:
             continue
+        cultivation_period_t2 = getattr(season, f"cultivation_period_t2_{sfx}")
         writes += [
             MetadataWrite(base_row + 0, col, season.area),
-            MetadataWrite(base_row + 1, col, season_calc.efc_default.cultivation_period),
+            MetadataWrite(
+                base_row + 1,
+                col,
+                season_calc.efc_default.cultivation_period if cultivation_period_t2 is None else cultivation_period_t2,
+            ),
             MetadataWrite(base_row + 2, col, getattr(season, f"water_management_type_before_cultivation_{sfx}").name),
             MetadataWrite(base_row + 3, col, getattr(season, f"water_management_type_after_cultivation_{sfx}").name),
             MetadataWrite(base_row + 4, col, getattr(season, f"organic_amendment_type_{sfx}").name),
