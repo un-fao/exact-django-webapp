@@ -1,14 +1,14 @@
 [
   {
     "model": "auth.group",
-    "pk": 1,
+    "pk": 1000,
     "fields": {
       "name": "Admin"
     }
   },
   {
     "model": "auth.group",
-    "pk": 2,
+    "pk": 1001,
     "fields": {
       "name": "Second Reviewer"
     }
@@ -18,7 +18,7 @@
     "pk": 1000,
     "fields": {
       "email": "testuser@example.com",
-      "password": "pbkdf2_sha256$1000000$tcncAAFZZt7rILMzEobab5$uDcsHgKhw+8xbYFsFJzD+aLAiT6dk2meKnpI6wo92dg=",
+      "password": "!unusable-test-account",
       "is_active": true
     }
   },
@@ -27,7 +27,7 @@
     "pk": 1001,
     "fields": {
       "email": "test@user.org",
-      "password": "pbkdf2_sha256$1000000$BQPg0oszbSi85yZcDbMubz$vDKmURr3YVVmXEDSBIlBquIH0msHW74Y6jql7dmHmb4=",
+      "password": "!unusable-test-account",
       "is_active": true
     }
   }
