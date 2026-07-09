@@ -152,6 +152,17 @@ jobs:
           cd djangoexact
           python manage.py check --deploy
 
+      - name: Guard actually fires under APP_MODE=production
+        # WR-01: negative smoke test proving the check is registered and
+        # wired end-to-end. This job runs with DEBUG=True, so under
+        # APP_MODE=production `check --deploy` MUST fail with api.E001;
+        # if it passes, the guard has been silently disconnected.
+        run: |
+          cd djangoexact
+          if APP_MODE=production python manage.py check --deploy; then
+            echo "api.E001 guard did not fire" >&2; exit 1
+          fi
+
       - name: bandit
         run: |
           cd djangoexact
