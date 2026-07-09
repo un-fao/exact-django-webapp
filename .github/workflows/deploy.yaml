@@ -269,8 +269,10 @@ jobs:
         pip install -r requirements.txt --no-cache-dir
         pip install --force-reinstall 'setuptools>=78.1.1'
         # - yes | python manage.py makemigrations --merge
-        python manage.py migrate
+        # WR-02: validate config BEFORE migrate so a rejected config aborts
+        # the deploy without mutating the production schema.
         python manage.py check --deploy
+        python manage.py migrate
         python manage.py collectstatic --noinput
 
         pip list
