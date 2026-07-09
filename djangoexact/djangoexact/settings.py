@@ -165,9 +165,6 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
-            "TEST": {
-                "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
-            },
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
@@ -176,6 +173,12 @@ else:
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
     }
+    if os.getenv("CI", "").lower() == "true":
+        # CI only: reuse the pre-seeded database via `manage.py test --keepdb`.
+        # GitHub Actions always sets CI=true. Outside CI, Django's default
+        # test_<name> database is used, so a local `manage.py test` can never
+        # drop or flush the developer's real database.
+        DATABASES["default"]["TEST"] = {"NAME": os.getenv("DB_NAME", default="$DB_NAME")}
 
 DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
