@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-08 — Phase 1 execution started
+Last activity: 2026-07-09 - Completed quick task 260709-ear: rice Excel report metadata fix
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -84,6 +84,12 @@ None yet.
 
 - Phase 1 (from research): confirm APP_MODE=test and .env.test loading in CI so migrations run against the test DB, not a fallback SQLite.
 - Phase 4 (from research): confirm App Engine worker count, autoscaling, Memorystore/Redis availability, and DRF NUM_PROXIES before wiring shared-cache rate limiting.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260709-ear | Fix Excel report rice metadata: minor season used hardcoded IPCC default (113 days) instead of the Tier-2 override, and the rice metadata block was unlabeled and misaligned vs other activities | 2026-07-09 | 23ee2769 | [260709-ear-fix-excel-report-rice-metadata-second-cr](./quick/260709-ear-fix-excel-report-rice-metadata-second-cr/) |
 
 ## Deferred Items
 
