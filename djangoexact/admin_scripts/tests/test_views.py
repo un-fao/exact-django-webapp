@@ -1,7 +1,7 @@
 import io
 
 from django.test import TestCase, Client, override_settings
-from api.models import CustomUser
+from api.models import Climate, CustomUser, Moisture, SoilType
 from minitool.models import ChangeRecord
 
 # The DatabaseConnectionMiddleware calls connections.close_all() after every
@@ -20,6 +20,33 @@ MIDDLEWARE_WITHOUT_DB_CLEANUP = [
     "auditlog.middleware.AuditlogMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
+
+
+def _seed_reference_filter_options():
+    """Seed the canonical climate/moisture/soil_type reference tables.
+
+    The scenario builder sources the per-change override dropdowns from these
+    tables (api.Climate / api.Moisture / api.SoilType), not from ChangeRecord,
+    so any test asserting those options must seed them. Each table gets active
+    values that ARE present in the test ChangeRecord rows, an active value that
+    is NOT present in any ChangeRecord, and one inactive value, so the tests can
+    prove the options track the full active reference set and honour the active
+    flags (Climate/Moisture use ``is_active``, SoilType uses ``active``).
+    """
+    for name, is_active in [
+        ("Cool Temperate", True), ("Warm Temperate", True),
+        ("Tropical", True), ("Boreal", False),
+    ]:
+        Climate.objects.create(name=name, is_active=is_active)
+    for name, is_active in [
+        ("Moist", True), ("Dry", True), ("Wet", True), ("Aquic", False),
+    ]:
+        Moisture.objects.create(name=name, is_active=is_active)
+    for name, active in [
+        ("High Activity Clay", True), ("Sandy", True),
+        ("Organic", True), ("Wetland", False),
+    ]:
+        SoilType.objects.create(name=name, active=active)
 
 
 @override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
@@ -525,6 +552,7 @@ class CompileScenariosViewTest(TestCase):
             moisture="Moist", soil_type="High Activity Clay", total=-0.5,
             field="organic_input_type", from_value="Low C input", to_value="High C input",
         )
+        _seed_reference_filter_options()
 
     def test_compile_scenarios_get_returns_form(self):
         self.client.login(email="staff@example.com", password="testpass123")
@@ -557,34 +585,45 @@ class CompileScenariosViewTest(TestCase):
         self.assertNotContains(response, 'name="global_filter_soil_type"')
 
     def test_compile_scenarios_per_change_climate_filter_populated(self):
-        """The per-change Climate dropdown must list distinct ChangeRecord
-        climates at initial render."""
+        """The per-change Climate dropdown must list the active api.Climate
+        reference values at initial render, including one (``Tropical``) that is
+        absent from every ChangeRecord row, and must exclude inactive climates."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="scenario-0-change-0-filter-climate"')
         self.assertContains(response, '<option value="Cool Temperate">Cool Temperate</option>', count=1)
         self.assertContains(response, '<option value="Warm Temperate">Warm Temperate</option>', count=1)
+        self.assertContains(response, '<option value="Tropical">Tropical</option>', count=1)
+        self.assertNotContains(response, '<option value="Boreal">Boreal</option>')
 
     def test_compile_scenarios_per_change_moisture_filter_populated(self):
-        """The per-change Moisture dropdown must list distinct ChangeRecord
-        moisture values at initial render."""
+        """The per-change Moisture dropdown must list the active api.Moisture
+        reference values at initial render, including one (``Wet``) that is
+        absent from every ChangeRecord row, and must exclude inactive values."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="scenario-0-change-0-filter-moisture"')
         self.assertContains(response, '<option value="Moist">Moist</option>', count=1)
         self.assertContains(response, '<option value="Dry">Dry</option>', count=1)
+        self.assertContains(response, '<option value="Wet">Wet</option>', count=1)
+        self.assertNotContains(response, '<option value="Aquic">Aquic</option>')
 
     def test_compile_scenarios_per_change_soil_type_filter_populated(self):
-        """The per-change Soil Type dropdown must list distinct ChangeRecord
-        soil_type values at initial render."""
+        """The per-change Soil Type dropdown must list the active api.SoilType
+        reference values at initial render, including one (``Organic``) that is
+        absent from every ChangeRecord row, and must exclude inactive values.
+        This is the dimension the bug truncated most (users saw only the handful
+        of soil types that had been computed into ChangeRecord)."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="scenario-0-change-0-filter-soil_type"')
         self.assertContains(response, '<option value="High Activity Clay">High Activity Clay</option>', count=1)
         self.assertContains(response, '<option value="Sandy">Sandy</option>', count=1)
+        self.assertContains(response, '<option value="Organic">Organic</option>', count=1)
+        self.assertNotContains(response, '<option value="Wetland">Wetland</option>')
 
     def test_htmx_add_change_populates_filter_dropdowns(self):
         """htmx_add_change must pass climate/moisture/soil_type choices so the
@@ -732,9 +771,11 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "Select module type and field first")
 
     def test_htmx_filters(self):
-        """htmx_filters narrows the per-change filter dropdowns to the chosen
-        module_type. Returns climate/moisture/soil_type options scoped to the
-        module — region is global, not per-change, and must not appear."""
+        """htmx_filters serves the full active reference set for the per-change
+        climate/moisture/soil_type overrides, independent of the chosen
+        module_type. It must include active reference values absent from any
+        Grassland ChangeRecord (``Tropical``/``Wet``/``Organic``) and exclude
+        inactive ones. Region is global, not per-change, and must not appear."""
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get(
             "/api/admin-scripts/compile-scenarios/htmx/filters/",
@@ -754,6 +795,14 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "Dry")
         self.assertContains(response, "High Activity Clay")
         self.assertContains(response, "Sandy")
+        # Reference-only values (never computed into a Grassland ChangeRecord)
+        # must still be offered now that options come from the reference tables.
+        self.assertContains(response, "Tropical")
+        self.assertContains(response, "Wet")
+        self.assertContains(response, "Organic")
+        # Inactive reference values must not be offered.
+        self.assertNotContains(response, "Boreal")
+        self.assertNotContains(response, "Wetland")
         self.assertNotContains(response, 'name="change-0-filter-region"')
 
     def test_htmx_add_change(self):
@@ -1075,6 +1124,7 @@ class HtmxScenarioPrefixTest(TestCase):
             field="grassland_management_type", from_value="Non-Degraded",
             to_value="Improved Grassland",
         )
+        _seed_reference_filter_options()
 
     def test_htmx_fields_with_scenario_prefix(self):
         self.client.login(email="staff@example.com", password="testpass123")
