@@ -1,6 +1,6 @@
 ---
 slug: scenario-builder-overrides
-status: diagnosed
+status: resolved
 trigger: "in /admin-scripts scenario builder, the per-change climate and soil-type overrides are not showing all available options. Why?"
 created: 2026-07-13
 updated: 2026-07-13
@@ -33,7 +33,11 @@ test: Static code reading of the render paths (compile_scenarios, htmx_add_chang
   the templates (change_fieldset.html, filter_options.html), and the reference models.
 expecting: If confirmed, the option lists trace to ChangeRecord.values_list(...).distinct()
   and never to api.Climate/api.SoilType, and htmx_filters scopes the queryset by module_type.
-next_action: Root cause confirmed. Diagnosis-only mode: do NOT apply a fix. Report produced.
+next_action: RESOLVED (2026-07-13). Fix applied per the product-owner call: the per-change
+  climate/moisture/soil_type override dropdowns are now sourced from the canonical reference
+  tables (api.Climate / api.Moisture / api.SoilType, active-filtered) via the new
+  _reference_filter_options() helper, and htmx_filters no longer narrows them by module_type.
+  py_compile passed; DB-backed suite updated and must run in CI (no local Postgres/Docker).
 
 ## Evidence
 
@@ -81,6 +85,27 @@ next_action: Root cause confirmed. Diagnosis-only mode: do NOT apply a fix. Repo
     but the scenario builder never queries them; it queries ChangeRecord instead. This is the
     exact source vs expectation mismatch behind the symptom.
 
+- timestamp: 2026-07-13
+  checked: djangoexact/minitool.db snapshot (sqlite3, 57,622 minitool_changerecord rows)
+    vs api/fixtures/climate.json, soiltype.json, moisture.json
+  found: ChangeRecord contains all 5 reference climates and all 3 moistures, but only
+    3 of 9 active reference soil types (High Activity Clay, Low Activity Clay, Sandy).
+    Missing: Aggregated, Mineral, Organic, Spodic, Volcanic, Wetland. Every module_type
+    carries the same 5/3/3 distinct set, so the htmx_filters per-module narrowing is
+    currently a no-op on this data. Note: deployed environments store minitool models in
+    the default Postgres DB; minitool.db is a local snapshot.
+  implication: Confirms the root cause empirically. Soil type is the dimension users see
+    truncated (3 of 9). The missing values were never computed, consistent with rows being
+    generated on demand.
+
+- timestamp: 2026-07-13
+  checked: user decision at fix checkpoint
+  found: "ChangeRecord rows are computed on demand by users: populate the overrides from
+    api.Climate/Moisture/SoilType." This settles the scoping-intent ambiguity flagged in
+    the Specialist Review: constraining options to computed data is NOT intended behaviour.
+  implication: Fix should source the three override dropdowns from the reference tables
+    (active-filtered) in _change_record_filter_choices and htmx_filters.
+
 ## Eliminated
 
 - hypothesis: Template bug (options passed to context but not rendered, or {% include %}
@@ -100,16 +125,19 @@ next_action: Root cause confirmed. Diagnosis-only mode: do NOT apply a fix. Repo
 
 ## Specialist Review
 
-- specialist_hint: python (maps to python-expert-best-practices-code-review)
-- status: deferred
-- decision: This is a find_root_cause_only, autonomous session. No fix is applied here, so
-  the specialist fix-direction review has no concrete change to gate. The python-expert
-  review should run at fix-planning time (e.g. /gsd-plan-phase --gaps) against the proposed
-  direction: sourcing the per-change climate/moisture/soil_type override options from the
-  canonical reference models (api.Climate / api.Moisture / api.SoilType, filtered by active
-  flags) rather than from ChangeRecord distinct values. Reviewer should confirm whether the
-  existing per-module_type scoping in htmx_filters is intended (constrain to computed data)
-  or a bug (should expose the full reference set).
+- specialist_hint: python (maps to python-expert / python-pro best-practices review)
+- status: completed (2026-07-13, run against the actual diff after the fix was applied)
+- verdict: SUGGEST_CHANGE (minor, low-risk, in-scope), otherwise LOOKS_GOOD.
+- checks: queryset idioms (idiomatic, column-narrow values_list, no N+1); import placement
+  (api.models at module top, no circular-import risk since admin_scripts depends on api and
+  not vice versa); dict-merge correctness (spread keys climates/moistures/soil_types do not
+  collide with regions); behavioural regression (the only caller that passed qs for
+  climate/moisture/soil narrowing, htmx_filters, was rewritten to bypass
+  _change_record_filter_choices, so no caller silently loses expected narrowing; regions
+  untouched).
+- change applied: added return annotation `-> dict[str, list[str]]` to the new
+  `_reference_filter_options` helper to document the flat-string-list contract the templates
+  depend on. No behavioural change; re-ran py_compile clean.
 
 ## Resolution
 
@@ -129,13 +157,28 @@ root_cause: The per-change climate and soil-type override dropdowns are populate
   Result: the overrides show only the intersection of "value exists in ChangeRecord" and (after
   module selection) "value exists for this module_type", which is a strict subset of the full
   reference set the user expects.
-fix: (diagnosis only -- not applied) Direction: source the per-change climate/moisture/soil_type
-  override option lists from the canonical reference models (api.Climate / api.Moisture /
-  api.SoilType, filtered by their active flags) instead of from ChangeRecord distinct values, in
-  admin_scripts.views._change_record_filter_choices (or a new helper) and correspondingly in
-  htmx_filters. Keep ChangeRecord-derived values only if the intent is truly to constrain to
-  computed data; otherwise reference tables give the full set. Confirm desired behaviour with the
-  product owner before changing, since htmx_filters was deliberately written to scope by module_type.
-verification: (not performed -- diagnosis only; dev sandbox has no DB so runtime verification is
-  not possible here)
-files_changed: []
+fix: Added a new helper admin_scripts.views._reference_filter_options() that sources the per-change
+  climate/moisture/soil_type override option lists from the canonical reference tables
+  (api.Climate.filter(is_active=True), api.Moisture.filter(is_active=True),
+  api.SoilType.filter(active=True), each ordered by name, returned as FLAT name lists).
+  _change_record_filter_choices now keeps regions ChangeRecord-derived but spreads
+  _reference_filter_options() for the three override lists, so every valid option is offered
+  regardless of what has been computed into ChangeRecord. htmx re-render decision: htmx_filters is
+  KEPT (minimal change) but no longer scopes by module_type; it now calls _reference_filter_options()
+  directly and simply re-serves the full active reference set when a module_type is (re)chosen. The
+  templates (change_fieldset.html / filter_options.html) were not touched (context keys
+  climates/moistures/soil_types and their loop variables are unchanged).
+verification: python -m py_compile passed on both touched files (admin_scripts/views.py,
+  admin_scripts/tests/test_views.py). Static view/template cross-check confirmed all four render
+  paths (compile_scenarios, htmx_add_change, htmx_add_scenario, htmx_filters) still supply
+  climates/moistures/soil_types as flat string lists matching the unchanged template loops, and that
+  regions/field/from/to logic was left intact. Existing DB-backed tests in test_views.py were updated
+  (not newly created) to seed api.Climate/Moisture/SoilType reference rows and to assert the corrected
+  behaviour, including a regression-proof case: active reference values absent from any Grassland
+  ChangeRecord (Tropical / Wet / Organic) now appear, and inactive reference values (Boreal / Wetland /
+  Aquic) do not. DB-backed runtime verification (running the suite / server) was NOT possible locally:
+  this dev sandbox has no Postgres or Docker, so the updated TestCase suite must be exercised in CI or
+  on a DB-equipped machine. py_compile is the reliable local gate and it passed.
+files_changed:
+  - djangoexact/admin_scripts/views.py
+  - djangoexact/admin_scripts/tests/test_views.py
