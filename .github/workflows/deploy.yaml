@@ -89,6 +89,15 @@ jobs:
           )" >> "$GITHUB_ENV"
 
       - name: Migrate and load reference data
+        # TEMPORARILY DISABLED (exact-django-webapp-bbz): this step only exists
+        # to seed the DB for the "Run test suite" step below, which is itself
+        # disabled (if: false, exact-django-webapp-1b8). load_reference_data
+        # --app=all takes ~25 min and is the sole reason the test gate runs
+        # ~29 min, needlessly blocking deploys. Nothing after it (check --deploy,
+        # bandit, pip-audit) needs the DB seeded. Re-enable together with the
+        # test suite. The ~25 min load time is itself abnormal and is tracked
+        # separately under exact-django-webapp-bbz.
+        if: false
         run: |
           cd djangoexact
           python manage.py migrate
