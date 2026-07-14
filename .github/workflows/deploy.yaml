@@ -230,7 +230,14 @@ jobs:
         # by SIGPIPE on its next write (the "Listening on 127.0.0.1" line) and
         # never ends up serving 127.0.0.1:5432 for the later Deploy step. The
         # Deploy step waits for readiness and cats this log if it never comes up.
-        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
+        #
+        # Authenticate via Application Default Credentials, i.e. the WIF
+        # credential file that google-github-actions/auth exports as
+        # GOOGLE_APPLICATION_CREDENTIALS. Do NOT pass --gcloud-auth (-g): it
+        # shells out to "gcloud config config-helper", which fails with "You do
+        # not currently have an active account selected" because the auth step
+        # writes an ADC file without activating a gcloud account.
+        ./cloud-sql-proxy -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
 
     - name: Deploy
       env:
