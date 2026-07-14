@@ -89,6 +89,15 @@ jobs:
           )" >> "$GITHUB_ENV"
 
       - name: Migrate and load reference data
+        # TEMPORARILY DISABLED (exact-django-webapp-bbz): this step only exists
+        # to seed the DB for the "Run test suite" step below, which is itself
+        # disabled (if: false, exact-django-webapp-1b8). load_reference_data
+        # --app=all takes ~25 min and is the sole reason the test gate runs
+        # ~29 min, needlessly blocking deploys. Nothing after it (check --deploy,
+        # bandit, pip-audit) needs the DB seeded. Re-enable together with the
+        # test suite. The ~25 min load time is itself abnormal and is tracked
+        # separately under exact-django-webapp-bbz.
+        if: false
         run: |
           cd djangoexact
           python manage.py migrate
@@ -230,7 +239,14 @@ jobs:
         # by SIGPIPE on its next write (the "Listening on 127.0.0.1" line) and
         # never ends up serving 127.0.0.1:5432 for the later Deploy step. The
         # Deploy step waits for readiness and cats this log if it never comes up.
-        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
+        #
+        # Authenticate via Application Default Credentials, i.e. the WIF
+        # credential file that google-github-actions/auth exports as
+        # GOOGLE_APPLICATION_CREDENTIALS. Do NOT pass --gcloud-auth (-g): it
+        # shells out to "gcloud config config-helper", which fails with "You do
+        # not currently have an active account selected" because the auth step
+        # writes an ADC file without activating a gcloud account.
+        ./cloud-sql-proxy -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
 
     - name: Deploy
       env:
