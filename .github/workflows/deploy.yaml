@@ -225,7 +225,12 @@ jobs:
       run: |
         curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
         chmod +x cloud-sql-proxy
-        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+        # Redirect the proxy's output to a file. When this step ends its log
+        # pipe closes; without the redirect the backgrounded Go proxy is killed
+        # by SIGPIPE on its next write (the "Listening on 127.0.0.1" line) and
+        # never ends up serving 127.0.0.1:5432 for the later Deploy step. The
+        # Deploy step waits for readiness and cats this log if it never comes up.
+        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
 
     - name: Deploy
       env:
@@ -288,6 +293,26 @@ jobs:
         pip install -r requirements.txt --no-cache-dir
         pip install --force-reinstall 'setuptools>=78.1.1'
         # - yes | python manage.py makemigrations --merge
+
+        # Wait for the backgrounded cloud-sql-proxy (previous step) to be
+        # listening before any DB-touching command. Fail loudly with the proxy
+        # log if it never comes up, so an auth/instance error is visible instead
+        # of a bare "connection refused" from migrate.
+        echo "Waiting for cloud-sql-proxy on 127.0.0.1:${{ vars.DB_PORT }}..."
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/${{ vars.DB_PORT }}) 2>/dev/null; then
+            echo "cloud-sql-proxy is accepting connections."
+            break
+          fi
+          if [ "$i" -eq 30 ]; then
+            echo "cloud-sql-proxy never started listening on 127.0.0.1:${{ vars.DB_PORT }}." >&2
+            echo "----- cloud-sql-proxy log -----" >&2
+            cat /tmp/cloud-sql-proxy.log >&2 || true
+            exit 1
+          fi
+          sleep 1
+        done
+
         # WR-02: validate config BEFORE migrate so a rejected config aborts
         # the deploy without mutating the production schema.
         python manage.py check --deploy
