@@ -19,6 +19,7 @@ from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enque
 from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
 from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
+from api.models import Climate, Moisture, SoilType
 from minitool.models import ChangeRecord
 
 
@@ -32,15 +33,48 @@ def staff_required(view_func):
     return wrapper
 
 
+def _reference_filter_options() -> dict[str, list[str]]:
+    """Canonical climate/moisture/soil_type override options as flat name lists.
+
+    Sourced from the reference tables (api.Climate / api.Moisture /
+    api.SoilType), active-filtered and ordered by name. These enumerate the
+    full option set known to the system. They are deliberately NOT derived from
+    minitool.ChangeRecord distinct values: ChangeRecord rows are computed on
+    demand, so a data-derived list would omit any valid option that has not yet
+    been computed (product-owner decision, 2026-07-13). Note the differing
+    active-flag field names: Climate/Moisture use ``is_active``, SoilType uses
+    ``active``.
+    """
+    return {
+        "climates": list(
+            Climate.objects.filter(is_active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+        "moistures": list(
+            Moisture.objects.filter(is_active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+        "soil_types": list(
+            SoilType.objects.filter(active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+    }
+
+
 def _change_record_filter_choices(qs=None):
-    """Distinct non-empty filter values from ChangeRecord.
+    """Filter option lists for the scenario form.
 
     Returns a dict with keys ``regions`` (used by the global filter) and
     ``climates``/``moistures``/``soil_types`` (used by the per-change filter
     block). Shared by every render path that emits the scenario form so
-    dropdowns are populated at initial server-render and don't depend on
-    the deferred htmx_filters swap firing first. Pass ``qs`` to scope (e.g.
-    by ``module_type`` for the htmx-driven per-change narrowing).
+    dropdowns are populated at initial server-render and don't depend on the
+    deferred htmx_filters swap firing first.
+
+    ``regions`` stays ChangeRecord-derived (distinct non-empty stored values);
+    pass ``qs`` to scope it. The per-change climate/moisture/soil_type overrides
+    come from the canonical reference tables via ``_reference_filter_options``,
+    so every valid option is offered regardless of what has been computed into
+    ChangeRecord. ``qs`` therefore no longer narrows those three lists.
     """
     if qs is None:
         qs = ChangeRecord.objects.all()
@@ -48,15 +82,7 @@ def _change_record_filter_choices(qs=None):
         "regions": list(
             qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
         ),
-        "climates": list(
-            qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
-        ),
-        "moistures": list(
-            qs.exclude(moisture="").values_list("moisture", flat=True).distinct().order_by("moisture")
-        ),
-        "soil_types": list(
-            qs.exclude(soil_type="").values_list("soil_type", flat=True).distinct().order_by("soil_type")
-        ),
+        **_reference_filter_options(),
     }
 
 
@@ -407,8 +433,12 @@ def htmx_filters(request):
     if not module_type:
         return HttpResponse("")
 
-    qs = ChangeRecord.objects.filter(module_type=module_type)
-    choices = _change_record_filter_choices(qs)
+    # The climate/moisture/soil_type overrides are the canonical reference set
+    # and no longer narrow by module_type (product-owner decision, 2026-07-13).
+    # This endpoint is kept so the selects are (re)populated when a module_type
+    # is first chosen; it simply re-serves the full reference options rather than
+    # a ChangeRecord-scoped subset.
+    choices = _reference_filter_options()
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,

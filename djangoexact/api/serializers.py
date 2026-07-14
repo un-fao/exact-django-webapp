@@ -1168,11 +1168,16 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 organic_soil.save()
                 module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
 
-            self.sanitize_input_entries()
-
             self.instance.module_types.add(*module_types_to_append)
             if (luc or was_luc_added) and not was_luc_removed:
                 self.instance.module_types.add(ModuleType.objects.get(class_name="LandUseChange").id)
+
+            # Sanitize AFTER module_types are re-populated: Activity.modules is derived
+            # from module_types.all(), so running this while the M2M is cleared (see the
+            # module_types.clear() above) would iterate zero modules and clear nothing.
+            # This is what leaves stale _start/_w/_wo values behind when a LUC's module
+            # roles are swapped.
+            self.sanitize_input_entries()
 
             self.instance.save()
 
