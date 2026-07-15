@@ -1917,7 +1917,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity_dict = SerializerClass(activity).data
             return activity_dict
 
-        activities_list = Activity.objects.filter(project__id=project_id)
+        # Prefetch module_types in a single query: both the optional status
+        # filter below and activity serialization walk each activity's modules,
+        # so this trims the per-activity relation fetch. It mitigates but does
+        # not remove the N+1 in Activity.status (the per-subclass module queries
+        # and StatusType lookups remain); a full fix is the persisted-status TODO.
+        activities_list = Activity.objects.filter(project__id=project_id).prefetch_related("module_types")
         if is_b_intact_param is not None:
             activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
 
