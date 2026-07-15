@@ -162,6 +162,13 @@ project_id = openapi.Parameter(
     description="ID of project related to the activity",
     type=openapi.TYPE_INTEGER,
 )
+activity_status = openapi.Parameter(
+    "status",
+    openapi.IN_QUERY,
+    description="Filter activities by computed status",
+    type=openapi.TYPE_STRING,
+    enum=["READY", "IN PROGRESS", "EMPTY"],
+)
 include_related = openapi.Parameter(
     "include_related",
     openapi.IN_QUERY,
@@ -1788,6 +1795,12 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
+# The three statuses Activity.status (api/models.py __get_status) can resolve to.
+# This is intentionally a subset of the StatusType table (which also holds
+# module-level values like SUBMODULES_EMPTY): only these apply at activity level.
+ACTIVITY_STATUS_VALUES = {"READY", "IN PROGRESS", "EMPTY"}
+
+
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows activities to be viewed or edited.
@@ -1872,7 +1885,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id],
+        manual_parameters=[project_id, activity_status],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -1882,6 +1895,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
+
+        Optionally filter by computed activity status with a `status` query parameter
+        (one of `READY`, `IN PROGRESS`, `EMPTY`).
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
@@ -1903,6 +1919,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         activities_list = Activity.objects.filter(project__id=project_id)
         if is_b_intact_param is not None:
             activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
+
+        # `status` is a computed property derived from module statuses
+        # (Activity.__get_status), not a DB column, so it cannot be filtered in
+        # SQL. Re-derive it in Python from the same property the endpoint already
+        # serializes, so the filter can never diverge from the reported status.
+        # Only this branch materializes the queryset before pagination, which is
+        # fine at per-project activity counts; the unfiltered path stays lazy.
+        status_param = request.query_params.get("status", None)
+        if status_param is not None:
+            normalized_status = status_param.strip().upper().replace("_", " ")
+            if normalized_status not in ACTIVITY_STATUS_VALUES:
+                raise ValidationError(f"Invalid status '{status_param}'. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
+            activities_list = [activity for activity in activities_list if activity.status.name_en == normalized_status]
 
         # Start measuring time
         start = time.time()
