@@ -32,7 +32,7 @@ RICE_CULTIVATION_DAYS = 113
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import RegexValidator
-import threading
+from django.apps import apps
 
 alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 
@@ -586,6 +586,45 @@ class BaseModel(models.Model):
         abstract = True
 
 
+# Cache columns nulled to invalidate a module's cached results. Matches the set nulled by
+# CachedResultMixin.invalidate_cached_results() so the persisted state is identical; nulling
+# last_cached_at is what makes is_cached_results_valid() return False.
+_MODULE_CACHE_INVALIDATION = {
+    "last_cached_at": None,
+    "cached_results_total": None,
+    "cached_results_by_activity": None,
+    "cached_results_by_gas": None,
+    "cached_results_by_activity_by_gas": None,
+    "cached_units_breakdown": None,
+}
+
+
+def invalidate_module_caches(*, project=None, activity=None):
+    """Bulk-invalidate cached module results for a whole project or a single activity.
+
+    Replaces the old fan-out: Project.save() used to spawn one thread (and therefore one DB
+    connection) per module, which on large projects (hundreds of modules) exhausted the
+    Postgres connection limit and timed the request out, so finalizing/editing such a project
+    failed. Both call sites now issue a small number of synchronous bulk UPDATEs (one per
+    concrete module model) on the request's own connection, producing the same persisted state
+    without the thread/connection storm. This mirrors the existing bulk pattern in
+    scripts/invalidate_results_cache.py.
+
+    Only concrete Module subclasses are touched, matching the previous behaviour (the members of
+    Activity.modules are Modules, never Submodules).
+    """
+    if project is not None:
+        filter_kwargs = {"activity__project": project}
+    elif activity is not None:
+        filter_kwargs = {"activity": activity}
+    else:
+        return
+
+    for model in apps.get_app_config("api").get_models():
+        if issubclass(model, Module) and not model._meta.abstract:
+            model.objects.filter(**filter_kwargs).update(**_MODULE_CACHE_INVALIDATION)
+
+
 class Project(Historical, DirtyFieldsMixin):
     class Meta:
         verbose_name_plural = "Projects"
@@ -679,19 +718,17 @@ class Project(Historical, DirtyFieldsMixin):
         if self.pk:
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
-                exclude_fields = ["is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at"]
+                # Lifecycle/metadata flags that never affect emission calculations, so they must
+                # NOT invalidate every module's cached results. Toggling one of these on a large
+                # project would otherwise spawn one thread + DB connection per module (hundreds to
+                # thousands), exhausting connections and timing the request out (finalize failure).
+                exclude_fields = [
+                    "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
+                    "is_finalized", "is_public", "is_archived", "archived_at",
+                ]
 
-                threads: list[threading.Thread] = []
-
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
-                    for activity in self.activities.all():
-                        activity: Activity
-                        for module in activity.modules:
-                            module: Module
-                            threads.append(threading.Thread(target=module.invalidate_cached_results))
-
-                for thread in threads:
-                    thread.start()
+                if any(field not in exclude_fields for field in dirty_fields):
+                    invalidate_module_caches(project=self)
 
         super().save(*args, **kwargs)
 
@@ -1081,9 +1118,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
                 exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
 
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
-                    for module in self.modules:
-                        module.invalidate_cached_results()
+                if any(field not in exclude_fields for field in dirty_fields):
+                    invalidate_module_caches(activity=self)
         super().save(*args, **kwargs)
 
     def __get_delay(self) -> int:
