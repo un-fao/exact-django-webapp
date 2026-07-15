@@ -727,7 +727,7 @@ class Project(Historical, DirtyFieldsMixin):
                     "is_finalized", "is_public", "is_archived", "archived_at",
                 ]
 
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
+                if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(project=self)
 
         super().save(*args, **kwargs)
@@ -1118,7 +1118,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
                 exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
 
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
+                if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(activity=self)
         super().save(*args, **kwargs)
 
