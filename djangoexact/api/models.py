@@ -679,7 +679,14 @@ class Project(Historical, DirtyFieldsMixin):
         if self.pk:
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
-                exclude_fields = ["is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at"]
+                # Lifecycle/metadata flags that never affect emission calculations, so they must
+                # NOT invalidate every module's cached results. Toggling one of these on a large
+                # project would otherwise spawn one thread + DB connection per module (hundreds to
+                # thousands), exhausting connections and timing the request out (finalize failure).
+                exclude_fields = [
+                    "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
+                    "is_finalized", "is_public", "is_archived", "archived_at",
+                ]
 
                 threads: list[threading.Thread] = []
 
