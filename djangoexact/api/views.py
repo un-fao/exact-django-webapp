@@ -165,9 +165,9 @@ project_id = openapi.Parameter(
 activity_status = openapi.Parameter(
     "status",
     openapi.IN_QUERY,
-    description="Filter activities by computed status",
-    type=openapi.TYPE_STRING,
-    enum=["READY", "IN PROGRESS", "EMPTY"],
+    description="Filter activities by computed status. Accepts one or more values as a comma-separated list and/or a repeated parameter (e.g. status=IN PROGRESS,EMPTY).",
+    type=openapi.TYPE_ARRAY,
+    items={"type": openapi.TYPE_STRING, "enum": ["READY", "IN PROGRESS", "EMPTY"]},
 )
 include_related = openapi.Parameter(
     "include_related",
@@ -1896,8 +1896,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
 
-        Optionally filter by computed activity status with a `status` query parameter
-        (one of `READY`, `IN PROGRESS`, `EMPTY`).
+        Optionally filter by computed activity status with a `status` query parameter.
+        Accepts one or more of `READY`, `IN PROGRESS`, `EMPTY`, given as a comma-separated
+        list and/or a repeated parameter (e.g. `status=IN PROGRESS,EMPTY`).
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
@@ -1926,12 +1927,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # serializes, so the filter can never diverge from the reported status.
         # Only this branch materializes the queryset before pagination, which is
         # fine at per-project activity counts; the unfiltered path stays lazy.
-        status_param = request.query_params.get("status", None)
-        if status_param is not None:
-            normalized_status = status_param.strip().upper().replace("_", " ")
-            if normalized_status not in ACTIVITY_STATUS_VALUES:
-                raise ValidationError(f"Invalid status '{status_param}'. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
-            activities_list = [activity for activity in activities_list if activity.status.name_en == normalized_status]
+        #
+        # Multiple statuses may be requested as a comma-separated list and/or a
+        # repeated query param (e.g. ?status=IN PROGRESS,EMPTY), so callers can
+        # ask for any subset of statuses in one call.
+        requested_statuses = {
+            value.strip().upper().replace("_", " ")
+            for raw in request.query_params.getlist("status")
+            for value in raw.split(",")
+            if value.strip()
+        }
+        if requested_statuses:
+            invalid_statuses = requested_statuses - ACTIVITY_STATUS_VALUES
+            if invalid_statuses:
+                raise ValidationError(f"Invalid status value(s): {', '.join(sorted(invalid_statuses))}. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
+            activities_list = [activity for activity in activities_list if activity.status.name_en in requested_statuses]
 
         # Start measuring time
         start = time.time()
