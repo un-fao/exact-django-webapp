@@ -162,6 +162,19 @@ project_id = openapi.Parameter(
     description="ID of project related to the activity",
     type=openapi.TYPE_INTEGER,
 )
+activity_status = openapi.Parameter(
+    "status",
+    openapi.IN_QUERY,
+    description="Filter activities by computed status. Accepts one or more values as a comma-separated list and/or a repeated parameter (e.g. status=IN PROGRESS,EMPTY).",
+    type=openapi.TYPE_ARRAY,
+    items={"type": openapi.TYPE_STRING, "enum": ["READY", "IN PROGRESS", "EMPTY"]},
+)
+activity_ready = openapi.Parameter(
+    "ready",
+    openapi.IN_QUERY,
+    description="Convenience status filter: true returns only READY activities, false returns the rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.",
+    type=openapi.TYPE_BOOLEAN,
+)
 include_related = openapi.Parameter(
     "include_related",
     openapi.IN_QUERY,
@@ -1788,6 +1801,12 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
+# The three statuses Activity.status (api/models.py __get_status) can resolve to.
+# This is intentionally a subset of the StatusType table (which also holds
+# module-level values like SUBMODULES_EMPTY): only these apply at activity level.
+ACTIVITY_STATUS_VALUES = {"READY", "IN PROGRESS", "EMPTY"}
+
+
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows activities to be viewed or edited.
@@ -1872,7 +1891,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id],
+        manual_parameters=[project_id, activity_status, activity_ready],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -1882,6 +1901,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
+
+        Optionally filter by computed activity status:
+        - `status`: one or more of `READY`, `IN PROGRESS`, `EMPTY`, given as a comma-separated
+          list and/or a repeated parameter (e.g. `status=IN PROGRESS,EMPTY`).
+        - `ready`: convenience toggle; `true` returns only READY activities, `false` returns the
+          rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
@@ -1900,9 +1925,54 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity_dict = SerializerClass(activity).data
             return activity_dict
 
-        activities_list = Activity.objects.filter(project__id=project_id)
+        # Prefetch module_types in a single query: both the optional status
+        # filter below and activity serialization walk each activity's modules,
+        # so this trims the per-activity relation fetch. It mitigates but does
+        # not remove the N+1 in Activity.status (the per-subclass module queries
+        # and StatusType lookups remain); a full fix is the persisted-status TODO.
+        activities_list = Activity.objects.filter(project__id=project_id).prefetch_related("module_types")
         if is_b_intact_param is not None:
             activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
+
+        # `status` is a computed property derived from module statuses
+        # (Activity.__get_status), not a DB column, so it cannot be filtered in
+        # SQL. Re-derive it in Python from the same property the endpoint already
+        # serializes, so the filter can never diverge from the reported status.
+        # Filtering here materializes the queryset before pagination, which is
+        # fine at per-project activity counts; the unfiltered path stays lazy.
+        #
+        # Two query params narrow the status, both resolved to a set of allowed
+        # StatusType names:
+        #   - `status`: explicit values, as a comma-separated list and/or a
+        #     repeated param (e.g. ?status=IN PROGRESS,EMPTY).
+        #   - `ready`: convenience toggle; true -> {READY}, false -> the
+        #     complement {IN PROGRESS, EMPTY}.
+        # When both are given they intersect (AND); a contradictory pair (e.g.
+        # ?ready=true&status=EMPTY) yields an empty result, which is correct.
+        allowed_statuses = None  # None means "no status constraint"
+
+        requested_statuses = {
+            value.strip().upper().replace("_", " ")
+            for raw in request.query_params.getlist("status")
+            for value in raw.split(",")
+            if value.strip()
+        }
+        if requested_statuses:
+            invalid_statuses = requested_statuses - ACTIVITY_STATUS_VALUES
+            if invalid_statuses:
+                raise ValidationError(f"Invalid status value(s): {', '.join(sorted(invalid_statuses))}. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
+            allowed_statuses = requested_statuses
+
+        ready_param = request.query_params.get("ready", None)
+        if ready_param is not None:
+            normalized_ready = ready_param.strip().lower()
+            if normalized_ready not in ("true", "false"):
+                raise ValidationError(f"Invalid ready value '{ready_param}'. Allowed values: true, false")
+            ready_statuses = {"READY"} if normalized_ready == "true" else ACTIVITY_STATUS_VALUES - {"READY"}
+            allowed_statuses = ready_statuses if allowed_statuses is None else allowed_statuses & ready_statuses
+
+        if allowed_statuses is not None:
+            activities_list = [activity for activity in activities_list if activity.status.name_en in allowed_statuses]
 
         # Start measuring time
         start = time.time()
