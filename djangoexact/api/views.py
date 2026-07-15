@@ -169,6 +169,12 @@ activity_status = openapi.Parameter(
     type=openapi.TYPE_ARRAY,
     items={"type": openapi.TYPE_STRING, "enum": ["READY", "IN PROGRESS", "EMPTY"]},
 )
+activity_ready = openapi.Parameter(
+    "ready",
+    openapi.IN_QUERY,
+    description="Convenience status filter: true returns only READY activities, false returns the rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.",
+    type=openapi.TYPE_BOOLEAN,
+)
 include_related = openapi.Parameter(
     "include_related",
     openapi.IN_QUERY,
@@ -1885,7 +1891,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id, activity_status],
+        manual_parameters=[project_id, activity_status, activity_ready],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -1896,9 +1902,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
 
-        Optionally filter by computed activity status with a `status` query parameter.
-        Accepts one or more of `READY`, `IN PROGRESS`, `EMPTY`, given as a comma-separated
-        list and/or a repeated parameter (e.g. `status=IN PROGRESS,EMPTY`).
+        Optionally filter by computed activity status:
+        - `status`: one or more of `READY`, `IN PROGRESS`, `EMPTY`, given as a comma-separated
+          list and/or a repeated parameter (e.g. `status=IN PROGRESS,EMPTY`).
+        - `ready`: convenience toggle; `true` returns only READY activities, `false` returns the
+          rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
@@ -1930,12 +1938,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # (Activity.__get_status), not a DB column, so it cannot be filtered in
         # SQL. Re-derive it in Python from the same property the endpoint already
         # serializes, so the filter can never diverge from the reported status.
-        # Only this branch materializes the queryset before pagination, which is
+        # Filtering here materializes the queryset before pagination, which is
         # fine at per-project activity counts; the unfiltered path stays lazy.
         #
-        # Multiple statuses may be requested as a comma-separated list and/or a
-        # repeated query param (e.g. ?status=IN PROGRESS,EMPTY), so callers can
-        # ask for any subset of statuses in one call.
+        # Two query params narrow the status, both resolved to a set of allowed
+        # StatusType names:
+        #   - `status`: explicit values, as a comma-separated list and/or a
+        #     repeated param (e.g. ?status=IN PROGRESS,EMPTY).
+        #   - `ready`: convenience toggle; true -> {READY}, false -> the
+        #     complement {IN PROGRESS, EMPTY}.
+        # When both are given they intersect (AND); a contradictory pair (e.g.
+        # ?ready=true&status=EMPTY) yields an empty result, which is correct.
+        allowed_statuses = None  # None means "no status constraint"
+
         requested_statuses = {
             value.strip().upper().replace("_", " ")
             for raw in request.query_params.getlist("status")
@@ -1946,7 +1961,18 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             invalid_statuses = requested_statuses - ACTIVITY_STATUS_VALUES
             if invalid_statuses:
                 raise ValidationError(f"Invalid status value(s): {', '.join(sorted(invalid_statuses))}. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
-            activities_list = [activity for activity in activities_list if activity.status.name_en in requested_statuses]
+            allowed_statuses = requested_statuses
+
+        ready_param = request.query_params.get("ready", None)
+        if ready_param is not None:
+            normalized_ready = ready_param.strip().lower()
+            if normalized_ready not in ("true", "false"):
+                raise ValidationError(f"Invalid ready value '{ready_param}'. Allowed values: true, false")
+            ready_statuses = {"READY"} if normalized_ready == "true" else ACTIVITY_STATUS_VALUES - {"READY"}
+            allowed_statuses = ready_statuses if allowed_statuses is None else allowed_statuses & ready_statuses
+
+        if allowed_statuses is not None:
+            activities_list = [activity for activity in activities_list if activity.status.name_en in allowed_statuses]
 
         # Start measuring time
         start = time.time()
