@@ -86,9 +86,11 @@ class BaseModuleReport:
 
         from api.calculators import Result
 
-        self.emissions_set    = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
-        self.emissions_set_w  = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
-        self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
+        combined_result = Result(*self.result)
+
+        self.emissions_set    = combined_result.balance.yearly_emissions_by_sector_by_gas
+        self.emissions_set_w  = combined_result.total_w.yearly_emissions_by_sector_by_gas
+        self.emissions_set_wo = combined_result.total_wo.yearly_emissions_by_sector_by_gas
 
         try:
             from .cache import save_results_to_cache
