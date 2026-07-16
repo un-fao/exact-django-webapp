@@ -95,8 +95,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
         response = serialized_project
@@ -155,8 +155,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
             selected_activities = None
         else:
             selected_activities = project.activities.filter(pk__in=selected_activities)

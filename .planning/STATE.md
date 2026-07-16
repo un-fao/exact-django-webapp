@@ -6,7 +6,7 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-16T09:59:18.340Z"
+last_updated: "2026-07-16T10:38:05.279Z"
 last_activity: 2026-07-16
 last_activity_desc: "Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation"
 progress:
@@ -91,6 +91,7 @@ None yet.
 | 260709-ear | Fix Excel report rice metadata: minor season used hardcoded IPCC default (113 days) instead of the Tier-2 override, and the rice metadata block was unlabeled and misaligned vs other activities | 2026-07-09 | 23ee2769 | [260709-ear-fix-excel-report-rice-metadata-second-cr](./quick/260709-ear-fix-excel-report-rice-metadata-second-cr/) |
 | 260716-g2x | Memoize IPCC/ModuleType/StatusType reference lookups and single-Result construction to speed up Excel/PDF report generation | 2026-07-16 | 15790cb0 | [260716-g2x-the-excel-report-generation-is-painfully](./quick/260716-g2x-the-excel-report-generation-is-painfully/) |
 | 260716-gu0 | Applied R3: opt-in per-instance Activity module-list memoization plus select_related("status"), shared across the Excel readiness pre-pass/compute and the PDF template context | 2026-07-16 | fe5323fe | [260716-gu0-apply-r3-fetch-modules-once-per-activity](./quick/260716-gu0-apply-r3-fetch-modules-once-per-activity/) |
+| 260716-fast | Fix Gemini PR #211 finding: strip empty values from activities query param before pk__in at 4 sites (api+public results/report) | 2026-07-16 | ba719cdb | n/a (inline fast task) |
 
 ## Deferred Items
 
