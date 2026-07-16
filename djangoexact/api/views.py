@@ -704,7 +704,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = [pk for pk in request.query_params.get("activities", "").split(",") if pk]
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
         if not selected_activities:
             selected_activities = project.activities.all()
         else:
