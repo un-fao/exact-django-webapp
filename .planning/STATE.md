@@ -6,7 +6,7 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-16T10:38:05.279Z"
+last_updated: "2026-07-16T14:58:24.989Z"
 last_activity: 2026-07-16
 last_activity_desc: "Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation"
 progress:
@@ -92,6 +92,7 @@ None yet.
 | 260716-g2x | Memoize IPCC/ModuleType/StatusType reference lookups and single-Result construction to speed up Excel/PDF report generation | 2026-07-16 | 15790cb0 | [260716-g2x-the-excel-report-generation-is-painfully](./quick/260716-g2x-the-excel-report-generation-is-painfully/) |
 | 260716-gu0 | Applied R3: opt-in per-instance Activity module-list memoization plus select_related("status"), shared across the Excel readiness pre-pass/compute and the PDF template context | 2026-07-16 | fe5323fe | [260716-gu0-apply-r3-fetch-modules-once-per-activity](./quick/260716-gu0-apply-r3-fetch-modules-once-per-activity/) |
 | 260716-fast | Fix Gemini PR #211 finding: strip empty values from activities query param before pk__in at 4 sites (api+public results/report) | 2026-07-16 | ba719cdb | n/a (inline fast task) |
+| 260716-cap | Cap max activities per project to 50 across create, build, and copy paths | 2026-07-16 | eb9011e5 | n/a (inline fast task) |
 
 ## Deferred Items
 
