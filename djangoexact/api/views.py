@@ -706,9 +706,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
-            selected_activities = None
+            selected_activities = project.activities.all()
         else:
             selected_activities = project.activities.filter(pk__in=selected_activities)
+        selected_activities = list(selected_activities)
 
         if not project.is_ready(selected_activities):
             logging.error("Project is not ready")
