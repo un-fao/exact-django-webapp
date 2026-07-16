@@ -648,7 +648,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk for pk in request.query_params.get("activities", "").split(",") if pk]
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
