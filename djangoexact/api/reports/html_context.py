@@ -362,11 +362,14 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     def _direction(v):
         return INCREASES if v >= 0 else DECREASES
 
-    # Per-activity processed data (plain queryset, iterated once and stored as a dict)
-    activities_by_name = {
-        a.name: a
-        for a in project.activities.all()
-    }
+    # Per-activity processed data (plain queryset, iterated once and stored as a
+    # dict). Prime each activity's module list memo here so the many derived
+    # property reads below (is_luc, is_fishery, is_livestock, is_energy, area,
+    # and the indicator aggregation loop) all reuse the same fetched list.
+    activities_by_name = {}
+    for a in project.activities.all():
+        a.cache_modules()
+        activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
 
     # Indicator aggregates
