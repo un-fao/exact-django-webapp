@@ -58,6 +58,7 @@ from .models import (
     LandUseType,
     LargeFishery,
     Livestock,
+    MAX_ACTIVITIES_PER_PROJECT,
     MacroFuelType,
     MacroInputType,
     MinorSeasonAnnualCropland,
@@ -742,6 +743,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         if project.is_finalized:
             return serializers.ValidationError("Finalized projects cannot have activities added")
 
+        if not self.instance and project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
+
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
@@ -851,6 +855,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_finalized:
             raise serializers.ValidationError("Finalized projects cannot have activities added")
+
+        if not self.instance and project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")

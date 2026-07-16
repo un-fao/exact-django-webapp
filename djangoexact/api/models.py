@@ -28,6 +28,9 @@ pc_as_float = validators.RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly fo
 
 RICE_CULTIVATION_DAYS = 113
 
+# Hard cap on activities per project; enforced on every creation path (create, build, copy).
+MAX_ACTIVITIES_PER_PROJECT = 50
+
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser, BaseUserManager
