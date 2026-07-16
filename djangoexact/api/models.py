@@ -773,7 +773,7 @@ class Project(Historical, DirtyFieldsMixin):
             activities = self.activities.all()
 
         for activity in activities:
-            for module in activity.modules:
+            for module in activity.cache_modules():
                 if not module.is_ready():
                     return False
         return True
@@ -1030,7 +1030,30 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     @property
     def modules(self) -> list["Module"]:
+        memo = getattr(self, "_modules_memo", None)
+        if memo is not None:
+            return memo
         return self.__get_all_modules()
+
+    def cache_modules(self) -> list["Module"]:
+        """Prime the per-instance module list memo consulted by ``modules``.
+
+        Read-only report paths call this once per Activity instance so later
+        ``modules`` reads and the derived properties (is_luc, is_fishery,
+        area, and friends) reuse one fetched list instead of re-running the
+        per-type queries on every access. Idempotent: calling it more than
+        once on the same instance is a no-op after the first call, since an
+        empty activity memoizes ``[]``, which is not None and will not
+        re-fetch (this is intended).
+
+        Never call this around code that adds or removes modules on the
+        activity: the memo lives only for this Python instance's lifetime
+        and is never persisted, so it will not observe mutations made after
+        it is primed.
+        """
+        if getattr(self, "_modules_memo", None) is None:
+            self._modules_memo = self.__get_all_modules()
+        return self._modules_memo
 
     @property
     def status(self):
@@ -1185,7 +1208,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(list(getattr(self, module_type.class_name.lower()).all()))
+            modules.extend(list(getattr(self, module_type.class_name.lower()).all().select_related("status")))
 
         return modules
 
