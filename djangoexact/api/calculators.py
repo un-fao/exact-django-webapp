@@ -142,7 +142,6 @@ from .models import (
     SetAside,
     SmallFishery,
     SoilType,
-    StatusType,
     Waterbody,
     ModuleType,
     MinorSeasonFloodedRice,
@@ -165,6 +164,7 @@ from .models import (
     ValueChainSubmodule,
     EnergyEntry,
     RefrigerantType,
+    get_ready_status,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -603,7 +603,8 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
+            ready_status = get_ready_status()
+            if any(module.status != ready_status for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -820,7 +821,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name_en="READY"):
+        if module.status != get_ready_status():
             raise Exception("Forest module is not complete")
 
         dry_matter_w = luc.dry_matter_w if luc else None
@@ -1114,7 +1115,8 @@ class OtherLandUseCalculator(BaseCalculator):
         soc_t2_w: float | None = getattr(module_w, "soc_t2_w") if getattr(module_w, "soc_t2_w") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
         soc_t2_wo: float | None = getattr(module_wo, "soc_t2_wo") if getattr(module_wo, "soc_t2_wo") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
 
-        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
+        ready_status = get_ready_status()
+        ready = all(module.status == ready_status for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
