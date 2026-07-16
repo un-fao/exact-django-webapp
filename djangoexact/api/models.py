@@ -1,5 +1,6 @@
 import uuid
 from abc import abstractmethod
+from functools import lru_cache
 
 from django.contrib.auth import models as auth_models
 from django.core import exceptions, validators
@@ -444,6 +445,30 @@ class ModuleType(models.Model):
         verbose_name_plural = "Module types"
 
 
+@lru_cache(maxsize=None)
+def module_type_for_class(class_name: str):
+    """Return the ModuleType row for a given model class name.
+
+    Reference data is immutable at runtime (loaded via load_reference_data);
+    this memo is per-process. Reloading reference data requires a process
+    restart or calling module_type_for_class.cache_clear(). The returned
+    instance is shared and must be treated as read-only.
+    """
+    return ModuleType.objects.get(class_name=class_name)
+
+
+@lru_cache(maxsize=1)
+def get_ready_status():
+    """Return the READY StatusType row.
+
+    Reference data is immutable at runtime (loaded via load_reference_data);
+    this memo is per-process. Reloading reference data requires a process
+    restart or calling get_ready_status.cache_clear(). The returned instance
+    is shared and must be treated as read-only.
+    """
+    return StatusType.objects.get(name_en="READY")
+
+
 class DataSource(models.Model):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=255, unique=True)
@@ -748,7 +773,7 @@ class Project(Historical, DirtyFieldsMixin):
             activities = self.activities.all()
 
         for activity in activities:
-            for module in activity.modules:
+            for module in activity.cache_modules():
                 if not module.is_ready():
                     return False
         return True
@@ -1005,7 +1030,30 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     @property
     def modules(self) -> list["Module"]:
+        memo = getattr(self, "_modules_memo", None)
+        if memo is not None:
+            return memo
         return self.__get_all_modules()
+
+    def cache_modules(self) -> list["Module"]:
+        """Prime the per-instance module list memo consulted by ``modules``.
+
+        Read-only report paths call this once per Activity instance so later
+        ``modules`` reads and the derived properties (is_luc, is_fishery,
+        area, and friends) reuse one fetched list instead of re-running the
+        per-type queries on every access. Idempotent: calling it more than
+        once on the same instance is a no-op after the first call, since an
+        empty activity memoizes ``[]``, which is not None and will not
+        re-fetch (this is intended).
+
+        Never call this around code that adds or removes modules on the
+        activity: the memo lives only for this Python instance's lifetime
+        and is never persisted, so it will not observe mutations made after
+        it is primed.
+        """
+        if getattr(self, "_modules_memo", None) is None:
+            self._modules_memo = self.__get_all_modules()
+        return self._modules_memo
 
     @property
     def status(self):
@@ -1160,7 +1208,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(list(getattr(self, module_type.class_name.lower()).all()))
+            modules.extend(list(getattr(self, module_type.class_name.lower()).all().select_related("status")))
 
         return modules
 
@@ -1311,7 +1359,7 @@ class Submodule(Historical, CachedResultMixin):
 
     @property
     def module_type(self):
-        return ModuleType.objects.get(class_name=self.__class__.__name__)
+        return module_type_for_class(self.__class__.__name__)
 
     @property
     def project(self):
@@ -1401,7 +1449,7 @@ class Module(Historical, CachedResultMixin):
 
     @property
     def module_type(self):
-        return ModuleType.objects.get(class_name=self.__class__.__name__)
+        return module_type_for_class(self.__class__.__name__)
 
     @property
     def project(self):
