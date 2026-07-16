@@ -47,7 +47,12 @@ def generate_excel_report(project, activities=None) -> bytes:
     if activities is None:
         activities = project.activities.filter(is_b_intact=False)
     else:
-        activities = activities.filter(is_b_intact=False)
+        # Keep the caller's Activity instances (memoized module lists from
+        # the readiness pre-pass) instead of re-cloning the queryset, which
+        # would re-query and discard the memo. is_b_intact is a non-nullable
+        # BooleanField(default=False), so this Python-level exclusion is
+        # behavior-identical to the ORM filter used in the None branch above.
+        activities = [a for a in activities if not a.is_b_intact]
     result = compute_project_result(project, activities)
     return ExcelRenderer(result).render()
 

@@ -97,6 +97,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
+from api import reference_cache
 
 from . import utilities as utils
 from .models import (
@@ -142,7 +143,6 @@ from .models import (
     SetAside,
     SmallFishery,
     SoilType,
-    StatusType,
     Waterbody,
     ModuleType,
     MinorSeasonFloodedRice,
@@ -165,6 +165,7 @@ from .models import (
     ValueChainSubmodule,
     EnergyEntry,
     RefrigerantType,
+    get_ready_status,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -603,7 +604,8 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
+            ready_status = get_ready_status()
+            if any(module.status != ready_status for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -820,7 +822,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name_en="READY"):
+        if module.status != get_ready_status():
             raise Exception("Forest module is not complete")
 
         dry_matter_w = luc.dry_matter_w if luc else None
@@ -828,13 +830,13 @@ class DeforestationCalculator(BaseCalculator):
 
         # BUG: Aren't these handled in the parent class?
         try:
-            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc_ref = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
             else:
                 soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
-        som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+        som = reference_cache.get_nitrous_emission_factor(moisture.pk)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
         total_biomass_wo = SimpleNamespace(value=0)
@@ -853,7 +855,7 @@ class DeforestationCalculator(BaseCalculator):
 
         mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
 
-        bgb_start = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+        bgb_start = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
         if not bgb_start:
             raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
 
@@ -863,7 +865,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_w = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
+                litter_dw_w = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
 
@@ -880,7 +882,7 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
 
-            bgb_w = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_w = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
             if not bgb_w:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
@@ -890,7 +892,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_wo = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_wo = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+                litter_dw_wo = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
 
@@ -907,12 +909,12 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
 
-            bgb_wo = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_wo = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_w_id, mean)
             if not bgb_wo:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
-        combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
-        combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+        combustion_factor_w = reference_cache.get_forest_combustion_factor(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
+        combustion_factor_wo = reference_cache.get_forest_combustion_factor(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
 
         module_start = module_w = module_wo = module
         if luc:
@@ -1087,7 +1089,7 @@ class OtherLandUseCalculator(BaseCalculator):
 
         # BUG: Isn't this handled in the parent class?
         try:
-            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
@@ -1114,7 +1116,8 @@ class OtherLandUseCalculator(BaseCalculator):
         soc_t2_w: float | None = getattr(module_w, "soc_t2_w") if getattr(module_w, "soc_t2_w") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
         soc_t2_wo: float | None = getattr(module_wo, "soc_t2_wo") if getattr(module_wo, "soc_t2_wo") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
 
-        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
+        ready_status = get_ready_status()
+        ready = all(module.status == ready_status for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
@@ -1213,7 +1216,7 @@ class OtherLandUseCalculator(BaseCalculator):
         c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
         try:
-            som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+            som = reference_cache.get_nitrous_emission_factor(moisture.pk)
         except ipcc.NitrousEmissionFactor.DoesNotExist:
             raise Exception(f"LandUseNitrousEmissionFactor for {moisture.name} moisture does not exist")
 
