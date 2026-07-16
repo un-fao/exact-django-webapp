@@ -8,7 +8,7 @@ status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
 last_updated: "2026-07-16T09:59:18.340Z"
 last_activity: 2026-07-16
-last_activity_desc: "Completed quick task 260716-g2x: Excel/PDF report generation performance (reference-lookup memoization, single Result construction)"
+last_activity_desc: "Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-16 - Completed quick task 260716-g2x: Excel/PDF report generation performance (reference-lookup memoization, single Result construction)
+Last activity: 2026-07-16 - Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -90,6 +90,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260709-ear | Fix Excel report rice metadata: minor season used hardcoded IPCC default (113 days) instead of the Tier-2 override, and the rice metadata block was unlabeled and misaligned vs other activities | 2026-07-09 | 23ee2769 | [260709-ear-fix-excel-report-rice-metadata-second-cr](./quick/260709-ear-fix-excel-report-rice-metadata-second-cr/) |
 | 260716-g2x | Memoize IPCC/ModuleType/StatusType reference lookups and single-Result construction to speed up Excel/PDF report generation | 2026-07-16 | 15790cb0 | [260716-g2x-the-excel-report-generation-is-painfully](./quick/260716-g2x-the-excel-report-generation-is-painfully/) |
+| 260716-gu0 | Applied R3: opt-in per-instance Activity module-list memoization plus select_related("status"), shared across the Excel readiness pre-pass/compute and the PDF template context | 2026-07-16 | fe5323fe | [260716-gu0-apply-r3-fetch-modules-once-per-activity](./quick/260716-gu0-apply-r3-fetch-modules-once-per-activity/) |
 
 ## Deferred Items
 
