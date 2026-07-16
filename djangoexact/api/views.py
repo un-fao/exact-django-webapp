@@ -62,6 +62,7 @@ from .models import (
     Note,
     FieldDefinition,
     LandModule,
+    MAX_ACTIVITIES_PER_PROJECT,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -2100,6 +2101,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Cannot copy activity from an archived project", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if activity.project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            return utils.ErrorResponse(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities", status=http_status.HTTP_400_BAD_REQUEST)
 
         new_activity = utils.copy_activity(activity, owner=self.request.user)
 
