@@ -197,7 +197,7 @@ class BaseActivityReport:
         # See exact-django-webapp-gz3.
         land_hectares_counted = False
 
-        for module in self.activity.modules:
+        for module in self.activity.cache_modules():
             report_cls = get_report_class(module)
             if report_cls is None:
                 log.warning(f"No report class for {module.module_type.name}, skipping")
