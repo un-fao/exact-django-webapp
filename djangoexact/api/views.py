@@ -76,6 +76,7 @@ from .models import (
     LargeFishery,
     PublicToken,
     HandInHandAssessment,
+    AsyncJob,
 )
 from .serializers import (
     ActionTypes,
@@ -131,6 +132,7 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ProjectInvitationAcceptSerializer,
+    AsyncJobSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -3017,6 +3019,16 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
             cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
 
         return Response(response_data)
+
+
+class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
+    """Poll endpoint for background jobs. Users see only their own jobs."""
+
+    serializer_class = AsyncJobSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AsyncJob.objects.filter(created_by=self.request.user)
 
 
 class MinitoolProcessingView(APIView):

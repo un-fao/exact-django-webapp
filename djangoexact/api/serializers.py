@@ -105,6 +105,7 @@ from .models import (
     HandInHandRegion,
     HandInHandCountry,
     HandInHandAssessment,
+    AsyncJob,
 )
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
@@ -4101,3 +4102,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         result.sort(key=lambda x: x["name"])
 
         return result
+
+
+class AsyncJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AsyncJob
+        fields = [
+            "id", "kind", "status", "progress", "result", "error_message",
+            "created_at", "started_at", "completed_at", "project",
+        ]
+        read_only_fields = fields
