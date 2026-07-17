@@ -3,9 +3,11 @@ import types
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from rest_framework.test import APITestCase
 
 from api.models import AsyncJob
 from api.services import async_jobs
+from api.tests.factories import UserFactory
 import api.services as services_pkg
 
 
@@ -126,3 +128,22 @@ class RunAsyncJobCommandTestCase(TestCase):
             m_run.assert_not_called()
         job.refresh_from_db()
         self.assertEqual(job.status, AsyncJob.Status.CANCELLED)
+
+
+class AsyncJobEndpointTestCase(APITestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.other = UserFactory()
+        self.client.force_authenticate(self.user)
+
+    def test_owner_can_read_own_job(self):
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={}, created_by=self.user)
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["status"], "pending")
+        self.assertEqual(resp.data["kind"], "report")
+
+    def test_other_user_cannot_read_job(self):
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={}, created_by=self.other)
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/")
+        self.assertEqual(resp.status_code, 404)
