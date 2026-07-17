@@ -1,3 +1,4 @@
+import io
 import sys
 import types
 from datetime import timedelta
@@ -243,3 +244,59 @@ class ReportJobRunTestCase(TestCase):
         self.assertEqual(result["gcs_path"], "reports/7/1.pdf")
         self.assertEqual(result["content_type"], "application/pdf")
         m_upload.assert_called_once()
+
+
+class ReportDownloadTestCase(APITestCase):
+    def setUp(self):
+        self.user = UserFactory(email="report-download-owner@example.com")
+        self.client.force_authenticate(self.user)
+
+    def test_download_streams_completed_report(self):
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.COMPLETED,
+            created_by=self.user,
+            result={"gcs_path": "reports/7/1.pdf", "filename": "standard.pdf",
+                    "content_type": "application/pdf"},
+        )
+        fake_blob = mock.Mock()
+        fake_blob.open.return_value = io.BytesIO(b"%PDF-1.7")
+        with mock.patch("api.views.storage.Client") as m_client:
+            m_client.return_value.bucket.return_value.blob.return_value = fake_blob
+            resp = self.client.get(f"/api/async-jobs/{job.pk}/download/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Content-Type"], "application/pdf")
+        self.assertIn("standard.pdf", resp["Content-Disposition"])
+
+    def test_download_404_when_not_completed(self):
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.RUNNING, created_by=self.user,
+        )
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/download/")
+        self.assertEqual(resp.status_code, 404)
+
+    def test_download_404_for_wrong_kind(self):
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.PROJECT_COPY, status=AsyncJob.Status.COMPLETED,
+            created_by=self.user, result={"gcs_path": "reports/7/1.pdf"},
+        )
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/download/")
+        self.assertEqual(resp.status_code, 404)
+
+    def test_download_404_when_missing_gcs_path(self):
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.COMPLETED,
+            created_by=self.user, result={"filename": "standard.pdf"},
+        )
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/download/")
+        self.assertEqual(resp.status_code, 404)
+
+    def test_other_user_cannot_download_job(self):
+        other = UserFactory(email="report-download-other@example.com")
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.COMPLETED,
+            created_by=other,
+            result={"gcs_path": "reports/7/1.pdf", "filename": "standard.pdf",
+                    "content_type": "application/pdf"},
+        )
+        resp = self.client.get(f"/api/async-jobs/{job.pk}/download/")
+        self.assertEqual(resp.status_code, 404)
