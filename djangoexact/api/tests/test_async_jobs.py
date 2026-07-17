@@ -1,8 +1,10 @@
 import sys
 import types
+from datetime import timedelta
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from api.models import AsyncJob
@@ -147,3 +149,23 @@ class AsyncJobEndpointTestCase(APITestCase):
         job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={}, created_by=self.other)
         resp = self.client.get(f"/api/async-jobs/{job.pk}/")
         self.assertEqual(resp.status_code, 404)
+
+
+class ReconcileStaleAsyncJobsTestCase(TestCase):
+    def test_marks_old_running_job_failed(self):
+        from django.core.management import call_command
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.RUNNING, params={})
+        AsyncJob.objects.filter(pk=job.pk).update(
+            started_at=timezone.now() - timedelta(hours=2),
+        )
+        call_command("reconcile_stale_async_jobs")
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertIn("stale", job.error_message.lower())
+
+    def test_leaves_recent_running_job(self):
+        from django.core.management import call_command
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.RUNNING, params={})
+        call_command("reconcile_stale_async_jobs")
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.RUNNING)
