@@ -150,6 +150,7 @@ import base64
 import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from api.services import async_jobs
 
 logger = logging.getLogger("console")
 
@@ -739,6 +740,48 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["post"], url_path="report/async")
+    def report_async(self, request, pk=None):
+        """Enqueue a report for background generation. Returns 202 + job id.
+
+        The existing synchronous `report/` action is unchanged. Poll the job at
+        GET /api/async-jobs/{id}/ then download via that job's /download/ action.
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
+            activity_ids = None
+            selected_activities = project.activities.all()
+        else:
+            activity_ids = [int(pk) for pk in selected_activities]
+            selected_activities = project.activities.filter(pk__in=selected_activities)
+        selected_activities = list(selected_activities)
+
+        if not project.is_ready(selected_activities):
+            logging.error("Project is not ready")
+            return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        template_name = request.query_params.get("template")
+        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
+
+        if fmt == "pdf" and not template_name:
+            return utils.ErrorResponse("Template name is required for PDF", status=http_status.HTTP_400_BAD_REQUEST)
+
+        params = {
+            "project_id": project.pk,
+            "activity_ids": activity_ids,
+            "format": fmt,
+            "template": template_name,
+            "lang": lang,
+        }
+        job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
+        return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(

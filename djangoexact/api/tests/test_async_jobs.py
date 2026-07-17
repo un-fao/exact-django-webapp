@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 
 from api.models import AsyncJob
 from api.services import async_jobs
-from api.tests.factories import UserFactory
+from api.tests.factories import ProjectFactory, UserFactory
 import api.services as services_pkg
 
 
@@ -149,6 +149,58 @@ class AsyncJobEndpointTestCase(APITestCase):
         job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={}, created_by=self.other)
         resp = self.client.get(f"/api/async-jobs/{job.pk}/")
         self.assertEqual(resp.status_code, 404)
+
+
+class ReportAsyncEndpointTestCase(APITestCase):
+    def setUp(self):
+        self.user = UserFactory(email="report-async-owner@example.com")
+        self.client.force_authenticate(self.user)
+
+    def test_enqueues_pdf_report_job(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard&lang=en")
+        self.assertEqual(resp.status_code, 202)
+        self.assertIn("job_id", resp.data)
+        job = AsyncJob.objects.get(pk=resp.data["job_id"])
+        self.assertEqual(job.kind, AsyncJob.Kind.REPORT)
+        self.assertEqual(job.params["template"], "standard")
+        self.assertEqual(job.params["format"], "pdf")
+        self.assertEqual(job.params["project_id"], project.pk)
+        self.assertIsNone(job.params["activity_ids"])
+        self.assertEqual(job.status, AsyncJob.Status.PENDING)
+
+    def test_enqueues_xlsx_report_job_with_selected_activities(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?activities=1,2")
+        self.assertEqual(resp.status_code, 202)
+        job = AsyncJob.objects.get(pk=resp.data["job_id"])
+        self.assertEqual(job.params["format"], "xlsx")
+        self.assertIsNone(job.params["template"])
+        self.assertEqual(job.params["activity_ids"], [1, 2])
+
+    def test_pdf_format_without_template_returns_400(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?format=pdf")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_not_ready_project_returns_400_and_does_not_enqueue(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=False), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
 
 class ReconcileStaleAsyncJobsTestCase(TestCase):
