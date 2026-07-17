@@ -1211,7 +1211,21 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(list(getattr(self, module_type.class_name.lower()).all().select_related("status")))
+            manager = getattr(self, module_type.class_name.lower())
+            # Land modules carry a forward land_use_change relation (used by
+            # is_with/is_without); select it along with status here to avoid
+            # a per-module query. This covers all concrete top-level land
+            # types (AnnualCropland, PerennialCropland, ForestManagement via
+            # LandModule; FloodedRice, Grassland via LandModuleFixed, which
+            # subclasses LandModule). The abstract LandModuleNoScenarios /
+            # LandSubmodule also carry land_use_change but have no concrete
+            # top-level subclasses today. Only a forward relation on the
+            # module itself is added here, never activity, to keep the
+            # shared parent Activity instance intact for cache_modules.
+            related = ["status"]
+            if issubclass(manager.model, LandModule):
+                related.append("land_use_change")
+            modules.extend(list(manager.all().select_related(*related)))
 
         return modules
 
