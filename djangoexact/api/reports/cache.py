@@ -10,10 +10,53 @@ The cached and calculated paths are entirely separate:
 """
 from __future__ import annotations
 
+import logging as log
+from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
 from .data_types import InventoryItem
+
+
+class CacheWriteBatch:
+    """Collects module cache writes during one project compute and flushes
+    them as a single bulk_update per concrete module class.
+
+    Registered modules are keyed by (type(module), module.pk) so that a
+    module re-registered later in the same compute (e.g. the land-module
+    minor-season re-saves) dedupes to the same entry; the in-memory field
+    values on the module instance at flush time win naturally since
+    register() always receives the same instance.
+    """
+
+    def __init__(self) -> None:
+        self._entries: dict[tuple[type, Any], tuple[Any, set]] = {}
+
+    def register(self, module, update_fields) -> None:
+        key = (type(module), module.pk)
+        _, fields = self._entries.get(key, (module, set()))
+        fields = fields | set(update_fields)
+        self._entries[key] = (module, fields)
+
+    def flush(self) -> None:
+        by_class: dict[type, list] = defaultdict(list)
+        fields_by_class: dict[type, set] = defaultdict(set)
+        for (model_class, _pk), (module, fields) in self._entries.items():
+            by_class[model_class].append(module)
+            fields_by_class[model_class] |= fields
+
+        for model_class, objs in by_class.items():
+            fields = sorted(fields_by_class[model_class])
+            if not objs or not fields:
+                continue
+            try:
+                model_class.objects.bulk_update(objs, fields)
+            except Exception as e:
+                log.warning(
+                    f"Could not bulk_update cache writes for {model_class.__name__}: {e}"
+                )
+
+        self._entries = {}
 
 
 @dataclass
@@ -80,13 +123,26 @@ def build_inventory_from_cache(
     return items
 
 
-def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_wo, inventory) -> None:
+def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_wo, inventory, batch=None) -> None:
     """Persist calculator output to the module's cache after a fresh calculation.
 
     Only updates cached_results_by_activity_by_gas and last_cached_at so that
     future report runs hit the cache.  The other breakdown fields
     (cached_results_total, cached_results_by_activity, cached_results_by_gas)
     are left untouched; views.py will populate them on the next API call.
+
+    When ``batch`` is provided (a CacheWriteBatch active for the current
+    project compute), the in-memory field assignments below are made as
+    usual but the actual write is deferred to the batch's single
+    bulk_update per concrete module class, run once at the end of the
+    project compute (see BaseProjectReport.compute). This is the R6
+    cold-path write-batching optimization; the field assignments and their
+    semantics are unchanged from the immediate-save path.
+
+    cache_units_breakdown (a separate write, land modules only) is
+    intentionally NOT part of this batch: it stays on the normal
+    CachedResultMixin.save() path so its narrower, already-audited
+    semantics are untouched.
     """
     from django.utils import timezone
 
@@ -124,4 +180,9 @@ def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_
         update_fields.append("last_modified")
     if hasattr(module, "skip_history_when_saving"):
         module.skip_history_when_saving = True
+
+    if batch is not None:
+        batch.register(module, update_fields)
+        return
+
     module.save(update_fields=update_fields)
