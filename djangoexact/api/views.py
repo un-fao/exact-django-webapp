@@ -139,7 +139,7 @@ from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
@@ -3072,6 +3072,33 @@ class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return AsyncJob.objects.filter(created_by=self.request.user)
+
+    @action(detail=True, methods=["get"])
+    def download(self, request, pk=None):
+        """Stream the stored report blob back as an attachment.
+
+        get_object() scopes to the requesting user's own jobs (via
+        get_queryset), so this 404s for another user's job before it ever
+        reaches the kind/status checks below.
+        """
+        job = self.get_object()
+        if job.kind != AsyncJob.Kind.REPORT or job.status != AsyncJob.Status.COMPLETED:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+        gcs_path = (job.result or {}).get("gcs_path")
+        if not gcs_path:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+
+        client = storage.Client()
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+        blob = bucket.blob(gcs_path)
+        stream = blob.open("rb")
+        response = FileResponse(
+            stream,
+            content_type=job.result.get("content_type", "application/octet-stream"),
+        )
+        filename = job.result.get("filename", "report")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
 
 class MinitoolProcessingView(APIView):
