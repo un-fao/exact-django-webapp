@@ -348,3 +348,7 @@ CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
 # Job Notifications
 # Set to True to enable email notifications for completed jobs.
 JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
+
+# Projects whose (activities + module-type) count exceeds this are copied via a
+# background job instead of synchronously in the request. Small copies stay sync.
+PROJECT_COPY_ASYNC_THRESHOLD = int(os.environ.get("PROJECT_COPY_ASYNC_THRESHOLD", "40"))
