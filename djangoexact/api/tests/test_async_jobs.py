@@ -169,3 +169,25 @@ class ReconcileStaleAsyncJobsTestCase(TestCase):
         call_command("reconcile_stale_async_jobs")
         job.refresh_from_db()
         self.assertEqual(job.status, AsyncJob.Status.RUNNING)
+
+
+class ReportJobRunTestCase(TestCase):
+    def test_pdf_path_uploads_and_returns_metadata(self):
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "standard", "lang": "en"},
+        )
+        fake_project = mock.Mock(pk=7, name="P")
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}), \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf") as m_upload:
+            m_project.objects.get.return_value = fake_project
+            result = report_jobs.run(job)
+        self.assertEqual(result["gcs_path"], "reports/7/1.pdf")
+        self.assertEqual(result["content_type"], "application/pdf")
+        m_upload.assert_called_once()
