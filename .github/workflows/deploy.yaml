@@ -443,6 +443,14 @@ jobs:
         yaml.safe_dump(out, sys.stdout, default_flow_style=False, allow_unicode=True)
         PYEOF
 
+        # This image now also serves `run_async_job` (async report generation and
+        # async project copy, see djangoexact/docs/guides/async-jobs.md): the same
+        # deployed Cloud Run Job below is invoked with overridden container args,
+        # so the WeasyPrint dependencies added to the Dockerfile for that work ship
+        # here too, not via a separate job resource.
+        # --task-timeout=3600 intentionally matches the 1h STALE_THRESHOLD used by
+        # `reconcile_stale_async_jobs` (and by the older `reconcile_stale_jobs`):
+        # keep them in sync if either value changes.
         gcloud run jobs deploy exact-computation-job \
           --image="gcr.io/$PROJECT_ID/exact-computation-job:$SHA" \
           --region="$CLOUD_RUN_REGION" \
