@@ -44,7 +44,10 @@ class Command(BaseCommand):
         except Exception as e:
             # The container may have forked from the web app; the inherited DB
             # connection can be unusable. Drop it so the status write reconnects.
-            connection.close()
+            # Skip inside an atomic block (e.g. TestCase) where closing would
+            # poison the connection the finally-block save still needs.
+            if not connection.in_atomic_block:
+                connection.close()
             log.exception(e)
             job.status = AsyncJob.Status.FAILED
             job.error_message = str(e)[:2000]
