@@ -136,12 +136,19 @@ copies are still timing out requests.
 ## Reconciliation of stale jobs
 
 `python manage.py reconcile_stale_async_jobs`
-(`api/management/commands/reconcile_stale_async_jobs.py`) marks any `AsyncJob` that is
-still `running` and was `started_at` more than `STALE_THRESHOLD` (1 hour) ago as `failed`,
-with an explanatory `error_message`. The 1-hour threshold intentionally matches the Cloud
-Run Job's `--task-timeout=3600` (see the deploy pipeline note below): if a job execution
-were killed by the platform for exceeding that timeout, the row would otherwise stay
-`running` forever with nothing to correct it.
+(`api/management/commands/reconcile_stale_async_jobs.py`) marks two classes of stuck
+`AsyncJob` as `failed` with an explanatory `error_message`:
+
+1. jobs still `running` whose `started_at` is more than `STALE_THRESHOLD` (1 hour) ago, and
+2. jobs still `pending` whose `created_at` is more than `STALE_THRESHOLD` ago.
+
+Case 2 covers a job whose dispatch succeeded (so it was never marked `failed` by the
+dispatcher) but whose container crashed at startup before flipping the row to `running`
+(missing native library, import error, OOM, image-pull failure). Without this sweep such a
+job would stay `pending` forever, invisible to a running-only reconciler. The 1-hour
+threshold intentionally matches the Cloud Run Job's `--task-timeout=3600` (see the deploy
+pipeline note below): if a job execution were killed by the platform for exceeding that
+timeout, the row would otherwise stay `running` forever with nothing to correct it.
 
 This mirrors the existing `admin_scripts` command `reconcile_stale_jobs`, which does the
 same thing for the older `ComputationJob` model and its own 1-hour `STALE_THRESHOLD`. As
