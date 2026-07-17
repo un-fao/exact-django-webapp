@@ -1,9 +1,33 @@
+import sys
+import types
 from unittest import mock
 
 from django.test import TestCase, override_settings
 
 from api.models import AsyncJob
 from api.services import async_jobs
+import api.services as services_pkg
+
+
+def _stub_handler_module(dotted_name):
+    """Build an in-memory stand-in for a not-yet-implemented api.services
+    handler module (e.g. report_jobs / copy_jobs, added by later tasks).
+
+    A real ``mock.patch("api.services.report_jobs.run", ...)`` cannot resolve
+    its target while the module has no backing file on disk: patch's target
+    lookup imports "api.services.report_jobs" itself, which raises
+    ModuleNotFoundError before it ever gets to the "run" attribute, and that
+    error is not something a plain ``create=True`` papers over. Registering a
+    throwaway ModuleType under both sys.modules and the api.services package
+    attribute (so `from api.services import report_jobs` resolves via either
+    lookup path CPython's import system may take) lets `mock.patch` find and
+    replace a real "run" attribute on it, so the test exercises the actual
+    lazy `from api.services import report_jobs` in the command rather than a
+    stand-in for the whole call.
+    """
+    mod = types.ModuleType(dotted_name)
+    mod.run = lambda *args, **kwargs: None
+    return mod
 
 
 class AsyncJobModelTestCase(TestCase):
@@ -58,3 +82,47 @@ class AsyncJobDispatchTestCase(TestCase):
         self.assertEqual(job.status, AsyncJob.Status.FAILED)
         self.assertIn("boom", job.error_message)
         self.assertIsNotNone(job.completed_at)
+
+
+class RunAsyncJobCommandTestCase(TestCase):
+    def _run(self, job_id):
+        from django.core.management import call_command
+        call_command("run_async_job", "--job-id", str(job_id))
+
+    def test_dispatches_report_kind_and_marks_completed(self):
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={})
+        stub = _stub_handler_module("api.services.report_jobs")
+        with mock.patch.dict(sys.modules, {"api.services.report_jobs": stub}), \
+                mock.patch.object(services_pkg, "report_jobs", stub, create=True):
+            with mock.patch("api.services.report_jobs.run", return_value={"gcs_path": "x"}) as m_run:
+                self._run(job.pk)
+            m_run.assert_called_once()
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.COMPLETED)
+        self.assertEqual(job.progress, 100)
+        self.assertEqual(job.result, {"gcs_path": "x"})
+        self.assertIsNotNone(job.completed_at)
+
+    def test_marks_failed_on_handler_exception(self):
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.PROJECT_COPY, params={})
+        stub = _stub_handler_module("api.services.copy_jobs")
+        with mock.patch.dict(sys.modules, {"api.services.copy_jobs": stub}), \
+                mock.patch.object(services_pkg, "copy_jobs", stub, create=True):
+            with mock.patch("api.services.copy_jobs.run", side_effect=RuntimeError("boom")):
+                self._run(job.pk)
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertIn("boom", job.error_message)
+
+    def test_skips_non_pending_job(self):
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.CANCELLED, params={},
+        )
+        stub = _stub_handler_module("api.services.report_jobs")
+        with mock.patch.dict(sys.modules, {"api.services.report_jobs": stub}), \
+                mock.patch.object(services_pkg, "report_jobs", stub, create=True):
+            with mock.patch("api.services.report_jobs.run") as m_run:
+                self._run(job.pk)
+            m_run.assert_not_called()
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.CANCELLED)
