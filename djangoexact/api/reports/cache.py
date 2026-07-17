@@ -24,9 +24,12 @@ class CacheWriteBatch:
 
     Registered modules are keyed by (type(module), module.pk) so that a
     module re-registered later in the same compute (e.g. the land-module
-    minor-season re-saves) dedupes to the same entry; the in-memory field
-    values on the module instance at flush time win naturally since
-    register() always receives the same instance.
+    minor-season re-saves) dedupes to the same entry. In the current design
+    register() always receives the same instance per key (modules come from
+    the shared Activity.cache_modules memo), but as a defensive measure, if
+    two different instances of the same row are ever registered, the newly
+    updated fields are copied onto the first-registered instance which stays
+    the single source of truth, so no accumulated update is lost.
     """
 
     def __init__(self) -> None:
@@ -34,7 +37,11 @@ class CacheWriteBatch:
 
     def register(self, module, update_fields) -> None:
         key = (type(module), module.pk)
-        _, fields = self._entries.get(key, (module, set()))
+        existing_module, fields = self._entries.get(key, (None, set()))
+        if existing_module is not None and existing_module is not module:
+            for f in update_fields:
+                setattr(existing_module, f, getattr(module, f))
+            module = existing_module
         fields = fields | set(update_fields)
         self._entries[key] = (module, fields)
 
