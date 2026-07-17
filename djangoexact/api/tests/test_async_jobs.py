@@ -132,8 +132,8 @@ class RunAsyncJobCommandTestCase(TestCase):
 
 class AsyncJobEndpointTestCase(APITestCase):
     def setUp(self):
-        self.user = UserFactory()
-        self.other = UserFactory()
+        self.user = UserFactory(email="owner@example.com")
+        self.other = UserFactory(email="other@example.com")
         self.client.force_authenticate(self.user)
 
     def test_owner_can_read_own_job(self):
