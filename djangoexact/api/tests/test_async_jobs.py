@@ -223,12 +223,32 @@ class ReconcileStaleAsyncJobsTestCase(TestCase):
         job.refresh_from_db()
         self.assertEqual(job.status, AsyncJob.Status.RUNNING)
 
+    def test_marks_old_pending_job_failed(self):
+        from django.core.management import call_command
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.PENDING, params={})
+        AsyncJob.objects.filter(pk=job.pk).update(
+            created_at=timezone.now() - timedelta(hours=2),
+        )
+        call_command("reconcile_stale_async_jobs")
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertIn("stuck", job.error_message.lower())
+
+    def test_leaves_recent_pending_job(self):
+        from django.core.management import call_command
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.PENDING, params={})
+        call_command("reconcile_stale_async_jobs")
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.PENDING)
+
 
 class ReportJobRunTestCase(TestCase):
     def test_pdf_path_uploads_and_returns_metadata(self):
         from api.services import report_jobs
+        requester = UserFactory(email="report-job-requester@example.com")
         job = AsyncJob.objects.create(
             kind=AsyncJob.Kind.REPORT,
+            created_by=requester,
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
                     "template": "standard", "lang": "en"},
         )
@@ -236,7 +256,7 @@ class ReportJobRunTestCase(TestCase):
         with mock.patch("api.services.report_jobs.Project") as m_project, \
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}), \
-             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>") as m_render, \
              mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf") as m_upload:
             m_project.objects.get.return_value = fake_project
@@ -244,6 +264,9 @@ class ReportJobRunTestCase(TestCase):
         self.assertEqual(result["gcs_path"], "reports/7/1.pdf")
         self.assertEqual(result["content_type"], "application/pdf")
         m_upload.assert_called_once()
+        m_render.assert_called_once()
+        rendered_context = m_render.call_args.args[1]
+        self.assertEqual(rendered_context["user"], requester)
 
 
 class ReportDownloadTestCase(APITestCase):
