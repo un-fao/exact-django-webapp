@@ -1247,6 +1247,37 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ReadProjectSerializer(new_project, context={"request": request})
         return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=["post"], url_path="copy/async")
+    def copy_async(self, request, pk=None):
+        """Smart copy: inline (201) for small projects, offloaded (202) for large.
+
+        The legacy synchronous `copy/` action is unchanged. New clients should call
+        this endpoint and handle both 201 (body is the new project) and 202
+        (poll GET /api/async-jobs/{job_id}/, then GET /api/projects/{new_project_id}/).
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        activity_count = project.activities.count()
+        module_count = sum(a.module_types.count() for a in project.activities.all())
+        threshold = getattr(settings, "PROJECT_COPY_ASYNC_THRESHOLD", 40)
+
+        if activity_count + module_count <= threshold:
+            new_project = utils.copy_project(project, request.user)
+            serializer = ReadProjectSerializer(new_project, context={"request": request})
+            return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
+
+        with transaction.atomic():
+            shell = utils.create_project_shell(project, request.user)
+        params = {"source_project_id": project.pk, "target_project_id": shell.pk}
+        job = async_jobs.enqueue(AsyncJob.Kind.PROJECT_COPY, params, user=request.user, project=shell)
+        return Response(
+            {"job_id": job.pk, "new_project_id": shell.pk, "status": job.status},
+            status=http_status.HTTP_202_ACCEPTED,
+        )
+
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipReadSerializer})
     def memberships(self, request, pk=None):
