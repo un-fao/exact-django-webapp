@@ -30,7 +30,7 @@ def run(job: AsyncJob) -> dict:
 
     if fmt == "pdf":
         template_name = params["template"]
-        content = _render_pdf(project, activities, template_name, lang)
+        content = _render_pdf(project, activities, template_name, lang, job.created_by)
         content_type = "application/pdf"
         ext = "pdf"
         default_name = f"{template_name}.pdf"
@@ -49,9 +49,10 @@ def run(job: AsyncJob) -> dict:
     }
 
 
-def _render_pdf(project, activities, template_name, lang):
+def _render_pdf(project, activities, template_name, lang, user):
     result = compute_project_result(project, activities)
     context = build_template_context(result, None, lang)
+    context["user"] = user
     html = render_to_string(f"reports/{template_name}_{lang}.html", context)
     return _weasyprint_pdf(html)
 
