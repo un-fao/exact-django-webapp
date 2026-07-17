@@ -93,6 +93,7 @@ None yet.
 | 260716-gu0 | Applied R3: opt-in per-instance Activity module-list memoization plus select_related("status"), shared across the Excel readiness pre-pass/compute and the PDF template context | 2026-07-16 | fe5323fe | [260716-gu0-apply-r3-fetch-modules-once-per-activity](./quick/260716-gu0-apply-r3-fetch-modules-once-per-activity/) |
 | 260716-fast | Fix Gemini PR #211 finding: strip empty values from activities query param before pk__in at 4 sites (api+public results/report) | 2026-07-16 | ba719cdb | n/a (inline fast task) |
 | 260716-cap | Cap max activities per project to 50 across create, build, and copy paths | 2026-07-16 | eb9011e5 | n/a (inline fast task) |
+| 260717-fkc | Report perf round 4: drop 2 redundant deepcopies in Result balance (N1), select_related land_use_change for land modules (N3), batch cold-path cache writes via bulk_update (R6). Researched R4-R8 + new wins; deferred profiling/N2/R5/R8 | 2026-07-17 | a68e9fa8 | [260717-fkc-the-project-report-generation-is-still-q](./quick/260717-fkc-the-project-report-generation-is-still-q/) |
 
 ## Deferred Items
 

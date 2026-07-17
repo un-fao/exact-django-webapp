@@ -405,7 +405,7 @@ class Result:
     def __init__(self, w: MathResult, wo: MathResult, balance: MathResult = None) -> None:
         self.total_w = w
         self.total_wo = wo
-        self.balance = copy.deepcopy(w) - copy.deepcopy(wo) if balance is None else copy.deepcopy(balance)
+        self.balance = w - wo if balance is None else copy.deepcopy(balance)
 
     def __str__(self):
         return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
