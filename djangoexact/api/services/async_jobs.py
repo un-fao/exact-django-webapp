@@ -13,6 +13,7 @@ import tempfile
 
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from api.models import AsyncJob
 
@@ -38,20 +39,30 @@ def dispatch(job_pk):
 
 
 def _dispatch_cloud_run(job_pk):
-    from google.cloud import run_v2
+    try:
+        from google.cloud import run_v2
 
-    client = run_v2.JobsClient()
-    overrides = run_v2.RunJobRequest.Overrides(
-        container_overrides=[
-            run_v2.RunJobRequest.Overrides.ContainerOverride(
-                args=["python", "manage.py", "run_async_job", "--job-id", str(job_pk)],
-            ),
-        ],
-    )
-    request = run_v2.RunJobRequest(
-        name=settings.CLOUD_RUN_COMPUTATION_JOB_NAME, overrides=overrides,
-    )
-    operation = client.run_job(request=request)
+        client = run_v2.JobsClient()
+        overrides = run_v2.RunJobRequest.Overrides(
+            container_overrides=[
+                run_v2.RunJobRequest.Overrides.ContainerOverride(
+                    args=["python", "manage.py", "run_async_job", "--job-id", str(job_pk)],
+                ),
+            ],
+        )
+        request = run_v2.RunJobRequest(
+            name=settings.CLOUD_RUN_COMPUTATION_JOB_NAME, overrides=overrides,
+        )
+        operation = client.run_job(request=request)
+    except Exception as e:
+        log.exception(e)
+        AsyncJob.objects.filter(pk=job_pk).update(
+            status=AsyncJob.Status.FAILED,
+            error_message=f"Cloud Run dispatch failed: {e}"[:2000],
+            completed_at=timezone.now(),
+        )
+        return
+
     execution_name = ""
     try:
         # google-cloud-run >= 0.11 returns an Operation whose metadata carries
@@ -65,7 +76,12 @@ def _dispatch_cloud_run(job_pk):
 
 def _dispatch_subprocess(job_pk):
     log_dir = os.environ.get("EXACT_JOB_LOG_DIR")
-    if not log_dir:
+    if log_dir:
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+        except OSError:
+            log_dir = tempfile.gettempdir()
+    else:
         base = getattr(settings, "BASE_DIR", None)
         candidate = os.path.join(str(base), "logs") if base else None
         try:

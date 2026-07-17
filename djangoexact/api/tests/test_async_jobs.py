@@ -46,3 +46,15 @@ class AsyncJobDispatchTestCase(TestCase):
         with mock.patch("api.services.async_jobs._dispatch_cloud_run") as m_cr:
             async_jobs.dispatch(job.pk)
         m_cr.assert_called_once_with(job.pk)
+
+    @override_settings(CLOUD_RUN_COMPUTATION_JOB_NAME="projects/p/locations/l/jobs/exact-computation-job")
+    def test_cloud_run_dispatch_failure_marks_job_failed(self):
+        job = AsyncJob.objects.create(kind=AsyncJob.Kind.REPORT, params={})
+        fake_run_v2 = mock.MagicMock()
+        fake_run_v2.JobsClient.return_value.run_job.side_effect = RuntimeError("boom")
+        with mock.patch.dict("sys.modules", {"google.cloud": mock.MagicMock(run_v2=fake_run_v2)}):
+            async_jobs._dispatch_cloud_run(job.pk)  # must not raise
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertIn("boom", job.error_message)
+        self.assertIsNotNone(job.completed_at)
