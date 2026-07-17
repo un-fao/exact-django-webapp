@@ -1239,7 +1239,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return error
 
         new_project = utils.copy_project(project, self.request.user)
-        ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
+        # (removed) ProjectMembership.objects.create(...): copy_project already
+        # creates the Admin membership inside its transaction. The old call ran
+        # outside that transaction and could orphan a committed project on failure,
+        # or duplicate the membership.
 
         serializer = ReadProjectSerializer(new_project, context={"request": request})
         return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
