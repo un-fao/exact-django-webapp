@@ -1,0 +1,15 @@
+Hi {{ user.get_short_name|default:user.email }},
+
+Your EX-ACT report is ready to download.
+{% if project %}
+Project: {{ project.name }}{% endif %}
+File: {{ filename }}
+
+Download it here:
+{{ download_url }}
+
+This link expires in {{ expiry_hours }} hours. After that the file is removed and
+the link stops working. If you still need the report, generate it again from EX-ACT.
+
+Thanks,
+The EX-ACT team
