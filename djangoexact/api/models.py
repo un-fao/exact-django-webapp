@@ -2,6 +2,7 @@ import uuid
 from abc import abstractmethod
 from functools import lru_cache
 
+from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import exceptions, validators
 from django.db import models as models
@@ -3495,3 +3496,53 @@ class HandInHandAssessment(models.Model):
 
     def __str__(self):
         return f"{self.country.name} - {self.name} ({self.year})"
+
+
+class AsyncJob(models.Model):
+    """Generic background job tracked in the DB and executed by the
+    exact-computation-job Cloud Run Job (or a local subprocess). Used for
+    async report generation and large project copies. Not Historical: these
+    rows are ephemeral operational state, matching admin_scripts.ComputationJob.
+    """
+
+    class Kind(models.TextChoices):
+        REPORT = "report", "Report generation"
+        PROJECT_COPY = "project_copy", "Project copy"
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        RUNNING = "running", "Running"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    kind = models.CharField(max_length=32, choices=Kind.choices)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
+    progress = models.PositiveSmallIntegerField(default=0)
+    params = models.JSONField(default=dict)
+    result = models.JSONField(default=dict, blank=True)
+    error_message = models.TextField(default="", blank=True)
+    pid = models.IntegerField(null=True, blank=True)
+    cloud_run_execution_name = models.CharField(max_length=255, default="", blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="async_jobs",
+    )
+    project = models.ForeignKey(
+        "api.Project", null=True, blank=True,
+        on_delete=models.CASCADE, related_name="async_jobs",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["kind", "status"]),
+        ]
+
+    def __str__(self):
+        return f"AsyncJob<{self.pk} {self.kind} {self.status}>"

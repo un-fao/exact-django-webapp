@@ -342,8 +342,15 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request, lang: str) -> dict:
-    """Return the full context dict for the PDF HTML template."""
+def build_template_context(result: ProjectResult, request=None, lang: str = "en") -> dict:
+    """Return the full context dict for the PDF HTML template.
+
+    ``request`` is accepted for backward compatibility with the synchronous
+    view call sites (which pass it positionally) but is not read by this
+    function; all i18n is driven by ``lang`` via ``activate(lang)``. It may
+    be omitted (or ``None``) when calling from a non-request context, such
+    as the async report worker.
+    """
     activate(lang)
     project = result.project
 
