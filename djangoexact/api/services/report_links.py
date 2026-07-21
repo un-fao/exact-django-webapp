@@ -33,4 +33,5 @@ def load_download_token(token):
 def build_download_url(job):
     """Build the absolute, tokenized download URL for a completed report job."""
     token = urllib.parse.quote(make_download_token(job.pk))
-    return f"{settings.BACKEND_BASE_URL}/api/async-jobs/{job.pk}/download/?token={token}"
+    base = settings.BACKEND_BASE_URL.rstrip("/")
+    return f"{base}/api/async-jobs/{job.pk}/download/?token={token}"

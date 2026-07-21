@@ -173,10 +173,18 @@ despite the viewset's class-level `IsAuthenticated`; DRF honors per-action
 
 ### Environment variables
 
-- `BACKEND_BASE_URL` (`djangoexact/djangoexact/settings.py`): absolute URL to this API host,
-  used as the base of the emailed download link. Empty locally unless set; set it to the
-  deployed API origin (for example `https://exact.apps.fao.org` if the API is served there)
-  so links in emails are clickable.
+- `BACKEND_BASE_URL` (`djangoexact/djangoexact/settings.py`): absolute URL to this API host
+  (no trailing slash), used as the base of the emailed download link. Empty locally unless
+  set. In deployment it is provisioned as a per-environment **GitHub environment variable**
+  and wired in by `.github/workflows/deploy.yaml`: sed-substituted into `app.yaml` for App
+  Engine, and written into the Cloud Run job env file (`/tmp/job-env.yaml`) so the worker,
+  which is what actually sends the email, has it. Current values:
+  - develop: `https://exact-dev-dot-fao-exact-review.ew.r.appspot.com`
+  - review: `https://fao-exact-review.ew.r.appspot.com`
+  - production: `https://fao-exact.ew.r.appspot.com`
+
+  `build_download_url` strips any trailing slash defensively, so a value set with or without
+  one is safe.
 - `REPORT_READY_EMAIL_ENABLED` (`djangoexact/djangoexact/settings.py`, default `true`):
   master switch for the report-ready email. Set to `false` to disable sending. This is
   distinct from `JOB_NOTIFICATIONS_ENABLED` (default `false`), which gates the older
