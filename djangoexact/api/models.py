@@ -82,6 +82,11 @@ class CustomUser(AbstractUser):
 
     is_opted_out_of_emails = models.BooleanField(default=False)
 
+    # Free-form store the frontend owns for persisting frontend-only state
+    # (UI preferences, dismissed banners, etc.). Defaults to {} so the client
+    # always receives a JSON object and never has to null-check.
+    metadata = models.JSONField(default=dict, blank=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
