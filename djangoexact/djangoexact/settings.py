@@ -31,6 +31,14 @@ if app_mode:
 else:
     FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
 
+# Absolute URL to this API host. Used to build self-contained, emailable report
+# download links (see api/services/report_links.py). Empty locally unless set.
+BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "")
+
+# Send the "your report is ready" email when an async report job completes.
+# Default True; distinct from JOB_NOTIFICATIONS_ENABLED (ComputationJob emails).
+REPORT_READY_EMAIL_ENABLED = os.environ.get("REPORT_READY_EMAIL_ENABLED", "true").lower() in ("true", "1", "yes")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -339,7 +347,7 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
 DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 
-# Computation Jobs — Cloud Run
+# Computation Jobs - Cloud Run
 # Set to a Cloud Run Job resource name to enable GCP dispatch.
 # Empty string = subprocess fallback (local dev).
 CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
