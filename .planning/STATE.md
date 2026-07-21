@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-16T14:58:24.989Z"
-last_activity: 2026-07-16
-last_activity_desc: "Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation"
+last_updated: "2026-07-21T14:00:42.000Z"
+last_activity: 2026-07-21
+last_activity_desc: "Completed quick task 260721-m3y: add metadata JSONField to CustomUser for frontend persistence"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -95,6 +95,7 @@ None yet.
 | 260716-cap | Cap max activities per project to 50 across create, build, and copy paths | 2026-07-16 | eb9011e5 | n/a (inline fast task) |
 | 260717-fkc | Report perf round 4: drop 2 redundant deepcopies in Result balance (N1), select_related land_use_change for land modules (N3), batch cold-path cache writes via bulk_update (R6). Researched R4-R8 + new wins; deferred profiling/N2/R5/R8 | 2026-07-17 | a68e9fa8 | [260717-fkc-the-project-report-generation-is-still-q](./quick/260717-fkc-the-project-report-generation-is-still-q/) |
 | 20260721-eco | Async report emails the requester a signed 24h download link on completion (tokenized backend URL, no login); cleanup_expired_reports deletes the GCS file + clears gcs_path after 24h; docs + lifecycle-rule backstop | 2026-07-21 | 08258909 | [20260721-async-report-email-link](./quick/20260721-async-report-email-link/) |
+| 260721-m3y | Add metadata JSONField (default=dict) to CustomUser; exposed read+write via UserRead/UserWriteSerializer (whoami + PATCH /api/users/{pk}/); hand-written migration adds field to customuser + historicalcustomuser | 2026-07-21 | a234ee85 | [260721-m3y-add-a-metadata-jsonfield-to-customuser](./quick/260721-m3y-add-a-metadata-jsonfield-to-customuser/) |
 
 ## Deferred Items
 
