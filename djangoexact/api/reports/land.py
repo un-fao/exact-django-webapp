@@ -219,6 +219,7 @@ class PerennialCroplandReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
@@ -330,6 +331,7 @@ class AnnualCroplandReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
@@ -855,6 +857,7 @@ class FloodedRiceReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
