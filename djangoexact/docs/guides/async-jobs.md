@@ -270,6 +270,12 @@ response body), above it the copy is offloaded to an `AsyncJob`. Raise this if p
 that should still be fast are tipping into the async path, or lower it if large synchronous
 copies are still timing out requests.
 
+The project detail (`ReadProjectSerializer`) and list (`ProjectSummarySerializer`) payloads
+now expose read-only `activity_count` and `module_count` integers so the frontend can make
+the same sync/async decision before calling an endpoint. `module_count` is the number of
+activity -> module_types join rows across the project's activities, matching the copy
+threshold formula (`activity_count + module_count` vs `PROJECT_COPY_ASYNC_THRESHOLD`).
+
 ## Reconciliation of stale jobs
 
 `python manage.py reconcile_stale_async_jobs`

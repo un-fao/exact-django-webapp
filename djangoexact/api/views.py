@@ -14,7 +14,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -527,6 +527,31 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
+    def _attach_project_counts(self, projects):
+        """Attach _activity_count/_module_count to each Project in one query.
+
+        Batches the counts so the serializer getters never hit the DB per object
+        (and never inside the ThreadPoolExecutor used for serialization below).
+        module_count mirrors the copy_async threshold formula: the number of
+        activity -> module_types join rows across the project's activities.
+        """
+        ids = [p.pk for p in projects]
+        if not ids:
+            return
+        rows = (
+            Project.objects.filter(pk__in=ids)
+            .annotate(
+                _ac=Count("activities", distinct=True),
+                _mc=Count("activities__module_types"),
+            )
+            .values_list("pk", "_ac", "_mc")
+        )
+        counts = {pk: (ac, mc) for pk, ac, mc in rows}
+        for p in projects:
+            ac, mc = counts.get(p.pk, (0, 0))
+            p._activity_count = ac
+            p._module_count = mc
+
     @swagger_auto_schema(
         manual_parameters=[
             name,
@@ -609,10 +634,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
+            self._attach_project_counts(page)
             with ThreadPoolExecutor(max_workers=10) as executor:
                 response = list(executor.map(serialize_project, page))
             return paginator.get_paginated_response(response)
 
+        self._attach_project_counts(ordered_projects)
         return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     activities = openapi.Parameter(
