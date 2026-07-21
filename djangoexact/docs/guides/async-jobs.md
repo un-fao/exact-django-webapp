@@ -126,12 +126,26 @@ does not need to grant anything to end users.
 
 ## Report-ready email notification
 
+Email is the **primary** way users receive reports; the in-app poll
+(`GET /api/async-jobs/{id}/`) plus download (`GET /api/async-jobs/{id}/download/`) endpoints
+remain unchanged and act as the fallback.
+
 When a `report` job finishes as `completed`, the worker emails the requesting user
 (`job.created_by`) a link to download the report. This is fired from
 `run_async_job`'s `finally` block, after the job row is saved as `completed`, and only
 for `report` kind. The call is wrapped in its own `try/except` and the sender itself
 (`api/services/report_notifications.py::send_report_ready_email`) swallows and logs any
-failure, so a mail problem can never fail or alter the job outcome.
+failure, so a mail problem can never fail or alter the job outcome. The success send now
+uses `fail_silently=False`, so an SMTP error is caught by the surrounding `try/except`
+and **logged** (rather than silently dropped) while still never propagating to the job.
+
+When a `report` job finishes as `failed`, the worker instead sends a failure email
+(`api/services/report_notifications.py::send_report_failed_email`) telling the user the
+report could not be generated and to try again. This email carries **no download link**,
+so, unlike the ready email, it does **not** gate on `BACKEND_BASE_URL` and still sends
+when that setting is unset. It obeys the same `REPORT_READY_EMAIL_ENABLED` switch,
+`report`-kind check, and recipient check, and is likewise best-effort (wrapped in
+`try/except`, `fail_silently=False`, never raises).
 
 The email is a no-op (nothing sent, no error) unless all of the following hold:
 
@@ -141,7 +155,10 @@ The email is a no-op (nothing sent, no error) unless all of the following hold:
 
 The body is rendered from `api/templates/api/emails/report_ready.txt` (plain text) and
 `api/templates/api/emails/report_ready.html` (HTML alternative), and sent via
-`EmailMultiAlternatives(..., fail_silently=True)` from `DEFAULT_FROM_EMAIL`.
+`EmailMultiAlternatives` with `send(fail_silently=False)` from `DEFAULT_FROM_EMAIL`, so an
+SMTP error is caught and logged by the surrounding `try/except` rather than swallowed. The
+failure email uses `api/templates/api/emails/report_failed.{txt,html}` the same way (no
+link).
 
 ### The tokenized 24-hour download link
 

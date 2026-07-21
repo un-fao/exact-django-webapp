@@ -57,12 +57,18 @@ class Command(BaseCommand):
                 "status", "progress", "result", "error_message",
                 "completed_at", "updated_at",
             ])
-            # Email the requester a signed download link once a report job is
-            # done. Isolated in its own try/except so it can never change the
-            # job outcome the finally-block just committed.
-            if job.status == AsyncJob.Status.COMPLETED and job.kind == AsyncJob.Kind.REPORT:
+            # Email the requester the outcome of a report job: a signed download
+            # link when it completed, or a "could not be generated" notice when
+            # it failed. Isolated in its own try/except so it can never change
+            # the job outcome the finally-block just committed. The save above
+            # already reconnected the DB (the except-block may have closed it),
+            # so reading job.created_by/job.project here is safe.
+            if job.kind == AsyncJob.Kind.REPORT:
                 try:
                     from api.services import report_notifications
-                    report_notifications.send_report_ready_email(job)
+                    if job.status == AsyncJob.Status.COMPLETED:
+                        report_notifications.send_report_ready_email(job)
+                    elif job.status == AsyncJob.Status.FAILED:
+                        report_notifications.send_report_failed_email(job)
                 except Exception as e:
                     log.exception(e)

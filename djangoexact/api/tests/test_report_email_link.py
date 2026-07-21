@@ -20,7 +20,10 @@ from rest_framework.test import APITestCase
 
 from api.models import AsyncJob
 from api.services import report_links
-from api.services.report_notifications import send_report_ready_email
+from api.services.report_notifications import (
+    send_report_failed_email,
+    send_report_ready_email,
+)
 from api.tests.factories import ProjectFactory, UserFactory
 
 LOCMEM_EMAIL = "django.core.mail.backends.locmem.EmailBackend"
@@ -131,6 +134,116 @@ class SendReportReadyEmailTestCase(TestCase):
         )
         send_report_ready_email(job)
         self.assertEqual(len(mail.outbox), 0)
+
+
+class SendReportFailedEmailTestCase(TestCase):
+    @override_settings(
+        EMAIL_BACKEND=LOCMEM_EMAIL,
+        REPORT_READY_EMAIL_ENABLED=True,
+        BACKEND_BASE_URL="",
+    )
+    def test_sends_email_without_link_even_without_base_url(self):
+        mail.outbox = []
+        user = UserFactory(email="report-failed@example.com")
+        project = ProjectFactory(owner=user)
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.FAILED,
+            created_by=user, project=project,
+            error_message="Boom: something went wrong deep in the calculator.",
+        )
+        send_report_failed_email(job)
+
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.to, ["report-failed@example.com"])
+        # A failure email carries no download link, so it must still send with
+        # BACKEND_BASE_URL unset and must not contain a tokenized link.
+        self.assertNotIn("/download/?token=", msg.body)
+        self.assertEqual(len(msg.alternatives), 1)
+        html_body, mimetype = msg.alternatives[0]
+        self.assertEqual(mimetype, "text/html")
+        self.assertNotIn("/download/?token=", html_body)
+
+    @override_settings(EMAIL_BACKEND=LOCMEM_EMAIL, REPORT_READY_EMAIL_ENABLED=False)
+    def test_disabled_sends_nothing(self):
+        mail.outbox = []
+        user = UserFactory(email="report-failed-disabled@example.com")
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.FAILED,
+            created_by=user, error_message="Boom",
+        )
+        send_report_failed_email(job)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(EMAIL_BACKEND=LOCMEM_EMAIL, REPORT_READY_EMAIL_ENABLED=True)
+    def test_non_report_kind_sends_nothing(self):
+        mail.outbox = []
+        user = UserFactory(email="report-failed-copy-kind@example.com")
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.PROJECT_COPY, status=AsyncJob.Status.FAILED,
+            created_by=user, error_message="Boom",
+        )
+        send_report_failed_email(job)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(EMAIL_BACKEND=LOCMEM_EMAIL, REPORT_READY_EMAIL_ENABLED=True)
+    def test_no_recipient_sends_nothing(self):
+        mail.outbox = []
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.FAILED,
+            created_by=None, error_message="Boom",
+        )
+        send_report_failed_email(job)
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class ReportEmailBestEffortTestCase(TestCase):
+    """A send failure must be swallowed and logged, never raised to the caller.
+
+    Sends now use fail_silently=False, so the surrounding try/except in each
+    sender is what isolates the job from an SMTP error.
+    """
+
+    @override_settings(
+        EMAIL_BACKEND=LOCMEM_EMAIL,
+        REPORT_READY_EMAIL_ENABLED=True,
+        BACKEND_BASE_URL="https://api.example.org",
+    )
+    @mock.patch(
+        "api.services.report_notifications.EmailMultiAlternatives.send",
+        side_effect=Exception("smtp is down"),
+    )
+    def test_ready_email_swallows_send_failure(self, _mock_send):
+        user = UserFactory(email="best-effort-ready@example.com")
+        project = ProjectFactory(owner=user)
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.COMPLETED,
+            created_by=user, project=project,
+            result={"gcs_path": "reports/1/1.pdf", "filename": "standard.pdf"},
+        )
+        # Must not raise despite the send blowing up.
+        self.assertIsNone(send_report_ready_email(job))
+        _mock_send.assert_called_once()
+
+    @override_settings(
+        EMAIL_BACKEND=LOCMEM_EMAIL,
+        REPORT_READY_EMAIL_ENABLED=True,
+        BACKEND_BASE_URL="",
+    )
+    @mock.patch(
+        "api.services.report_notifications.EmailMultiAlternatives.send",
+        side_effect=Exception("smtp is down"),
+    )
+    def test_failed_email_swallows_send_failure(self, _mock_send):
+        user = UserFactory(email="best-effort-failed@example.com")
+        project = ProjectFactory(owner=user)
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT, status=AsyncJob.Status.FAILED,
+            created_by=user, project=project, error_message="Boom",
+        )
+        # Must not raise despite the send blowing up.
+        self.assertIsNone(send_report_failed_email(job))
+        _mock_send.assert_called_once()
 
 
 class ReportDownloadTokenEndpointTestCase(APITestCase):
