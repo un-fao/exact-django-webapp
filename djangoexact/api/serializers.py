@@ -58,6 +58,7 @@ from .models import (
     LandUseType,
     LargeFishery,
     Livestock,
+    MAX_ACTIVITIES_PER_PROJECT,
     MacroFuelType,
     MacroInputType,
     MinorSeasonAnnualCropland,
@@ -742,6 +743,15 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         if project.is_finalized:
             return serializers.ValidationError("Finalized projects cannot have activities added")
 
+        # Enforce the activity cap on creation and when an existing activity is
+        # reassigned to a different project (the destination would gain an activity).
+        # Note: on update, `project` above is pinned to the instance's current
+        # project, so the destination must be read from the incoming data.
+        target_project: Project = data.get("project") or project
+        is_reassignment = self.instance is not None and target_project != self.instance.project
+        if (not self.instance or is_reassignment) and target_project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
+
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
@@ -851,6 +861,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_finalized:
             raise serializers.ValidationError("Finalized projects cannot have activities added")
+
+        if not self.instance and project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")

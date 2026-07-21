@@ -100,11 +100,23 @@ class BaseModuleReport:
                 self.emissions_set_w,
                 self.emissions_set_wo,
                 self.inventory,
+                batch=self._cache_batch,
             )
         except Exception as e:
             log.warning(
                 f"Could not save results to cache for module {self.module.pk}: {e}"
             )
+
+    @property
+    def _cache_batch(self):
+        """Return the active CacheWriteBatch for the current project compute,
+        or None when no project compute is in progress (e.g. a module
+        report constructed standalone). None falls back to an immediate
+        module.save() in save_results_to_cache (see cache.py, R6).
+        """
+        if self.activity_report is None:
+            return None
+        return self.activity_report.project_report.cache_batch
 
     @property
     def _project_duration(self) -> int:
@@ -274,8 +286,11 @@ class BaseProjectReport:
     activities: Any = None  # QuerySet or list; None → use project.activities.all()
 
     def __post_init__(self):
+        from .cache import CacheWriteBatch
+
         if self.activities is None:
             self.activities = self.project.activities.all()
+        self.cache_batch = CacheWriteBatch()
 
     @property
     def duration(self) -> int:
@@ -293,6 +308,12 @@ class BaseProjectReport:
         """Run all calculations and return the complete ProjectResult."""
         activity_reports = [BaseActivityReport(self, a) for a in self.activities]
         activity_results = [ar.compute() for ar in activity_reports]
+        # Flush the batched cold-path cache writes once, after every
+        # module in every activity has computed and registered its
+        # cache update (see cache.CacheWriteBatch, R6). flush() swallows
+        # per-class errors so a cache-write failure never breaks the
+        # report, matching the prior per-module save() tolerance.
+        self.cache_batch.flush()
 
         aggregated = self._build_aggregated(activity_results)
         cumulative_hectares = self._build_cumulative_hectares(activity_results)
