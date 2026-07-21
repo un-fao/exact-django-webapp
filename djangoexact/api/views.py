@@ -151,6 +151,7 @@ import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from api.services import async_jobs
+from api.services import report_links
 
 logger = logging.getLogger("console")
 
@@ -3107,15 +3108,39 @@ class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return AsyncJob.objects.filter(created_by=self.request.user)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])
     def download(self, request, pk=None):
         """Stream the stored report blob back as an attachment.
 
-        get_object() scopes to the requesting user's own jobs (via
-        get_queryset), so this 404s for another user's job before it ever
-        reaches the kind/status checks below.
+        Two access paths:
+        - Signed token (email link): a valid ``token`` query param carries the
+          job pk (see api.services.report_links) and grants access with no
+          session, so the emailed 24-hour link works straight from an inbox.
+        - Authenticated owner: with no token (or an invalid one), the caller
+          must be authenticated and the job is scoped to created_by=request.user,
+          exactly as before. self.get_object() cannot serve the token path
+          because get_queryset() filters on request.user, which is Anonymous
+          there; AllowAny on this action lets that path run despite the
+          class-level IsAuthenticated (DRF honors per-action permission_classes
+          via get_permissions).
         """
-        job = self.get_object()
+        job = None
+        token = request.query_params.get("token")
+        if token:
+            token_job_pk = report_links.load_download_token(token)
+            if token_job_pk is not None:
+                # Trust the signed pk from the token, not the URL pk: this path
+                # is unfiltered (no owner scope), so binding to the URL pk would
+                # let a valid token for one job unlock any other job by swapping
+                # the pk in the URL.
+                job = AsyncJob.objects.filter(pk=token_job_pk).first()
+        if job is None:
+            if not request.user.is_authenticated:
+                return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+            job = AsyncJob.objects.filter(pk=pk, created_by=request.user).first()
+
+        if job is None:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
         if job.kind != AsyncJob.Kind.REPORT or job.status != AsyncJob.Status.COMPLETED:
             return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
         gcs_path = (job.result or {}).get("gcs_path")

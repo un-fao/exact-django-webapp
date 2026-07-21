@@ -65,9 +65,11 @@ working exactly as before.
 - `GET /api/async-jobs/{id}/download/` (`AsyncJobViewSet.download`)
   Streams the generated report back as an attachment once the job is `completed`. Returns
   `404` if the job is not a `report` job, is not yet `completed`, or has no stored GCS path
-  (defensive: should not happen for a genuinely completed report job). No signed URLs are
-  used; Django itself streams the GCS blob through to the client via `FileResponse`, so the
-  requesting user's session/JWT is the only thing gating access to the bytes.
+  (defensive: should not happen for a genuinely completed report job). Django itself streams
+  the GCS blob through to the client via `FileResponse`; there is no direct client access to
+  the bucket. Access is gated either by the requesting user's session/JWT (authenticated
+  owner) or by a valid signed `token` query param (the emailed 24-hour link). See
+  "Report-ready email notification" below for the token path.
 
 ## Execution: dispatcher and worker
 
@@ -119,8 +121,118 @@ gs://{STORAGE_BUCKET}/reports/{project_id}/{job_id}.{ext}
 
 where `ext` is `pdf` or `xlsx`. The `result` JSON on the `AsyncJob` stores `gcs_path`,
 `filename`, and `content_type`. The download endpoint above reads those back and streams
-the blob through Django; there are no signed URLs and no direct client access to the
-bucket, so bucket IAM does not need to grant anything to end users.
+the blob through Django; there are no direct client access to the bucket, so bucket IAM
+does not need to grant anything to end users.
+
+## Report-ready email notification
+
+When a `report` job finishes as `completed`, the worker emails the requesting user
+(`job.created_by`) a link to download the report. This is fired from
+`run_async_job`'s `finally` block, after the job row is saved as `completed`, and only
+for `report` kind. The call is wrapped in its own `try/except` and the sender itself
+(`api/services/report_notifications.py::send_report_ready_email`) swallows and logs any
+failure, so a mail problem can never fail or alter the job outcome.
+
+The email is a no-op (nothing sent, no error) unless all of the following hold:
+
+- `REPORT_READY_EMAIL_ENABLED` is true (see env vars below),
+- the job is `kind == report`,
+- `job.created_by` is set and has a non-empty `email`.
+
+The body is rendered from `api/templates/api/emails/report_ready.txt` (plain text) and
+`api/templates/api/emails/report_ready.html` (HTML alternative), and sent via
+`EmailMultiAlternatives(..., fail_silently=True)` from `DEFAULT_FROM_EMAIL`.
+
+### The tokenized 24-hour download link
+
+The link in the email points at the existing download endpoint with a signed token:
+
+```text
+{BACKEND_BASE_URL}/api/async-jobs/{job_id}/download/?token=<signed-token>
+```
+
+The token is produced by `django.core.signing.dumps({"job": job_pk}, salt="report-download")`
+and verified by `django.core.signing.loads(token, salt="report-download", max_age=86400)`
+(exactly 24 hours). It is signed with `SECRET_KEY`, stateless (no DB row, no server-side
+token store), and self-contained, so it works from an inbox with no login.
+
+The `download` action now accepts two access paths, and is backward compatible:
+
+- **Signed token (email link):** a valid `token` query param carries the job pk and grants
+  access with no session. The endpoint trusts the pk inside the signed token (not the pk in
+  the URL) and loads the job unscoped, so the emailed link works for the recipient without
+  authentication. A tampered or expired token is treated as no token.
+- **Authenticated owner (unchanged):** with no token, or an invalid/expired one, the caller
+  must be authenticated and the job is scoped to `created_by=request.user`, exactly as
+  before. An owner can still download without any token, and another user still 404s.
+
+The action carries `permission_classes=[permissions.AllowAny]` so the token path can run
+despite the viewset's class-level `IsAuthenticated`; DRF honors per-action
+`permission_classes` via `get_permissions`. All the existing guards after job resolution
+(`kind == report`, `status == completed`, `gcs_path` present) are unchanged.
+
+### Environment variables
+
+- `BACKEND_BASE_URL` (`djangoexact/djangoexact/settings.py`): absolute URL to this API host,
+  used as the base of the emailed download link. Empty locally unless set; set it to the
+  deployed API origin (for example `https://exact.apps.fao.org` if the API is served there)
+  so links in emails are clickable.
+- `REPORT_READY_EMAIL_ENABLED` (`djangoexact/djangoexact/settings.py`, default `true`):
+  master switch for the report-ready email. Set to `false` to disable sending. This is
+  distinct from `JOB_NOTIFICATIONS_ENABLED` (default `false`), which gates the older
+  `ComputationJob` completion emails in `admin_scripts`.
+
+## Report link expiry and file cleanup
+
+The download link expires 24 hours after it is minted (the token `max_age`), and the file
+itself is removed from GCS on the same horizon, so an expired link resolves to a `404`
+(the download endpoint 404s once `gcs_path` is cleared or the object is gone). Deletion is
+defense-in-depth: an in-repo management command for precise 24h enforcement, plus a bucket
+lifecycle rule as a backstop.
+
+### `cleanup_expired_reports` command
+
+`python manage.py cleanup_expired_reports`
+(`api/management/commands/cleanup_expired_reports.py`) selects `report` jobs that are
+`completed` with `completed_at` more than 24 hours ago and, for each whose `result.gcs_path`
+is still set:
+
+1. deletes the GCS blob at `result["gcs_path"]` in `STORAGE_BUCKET`, each delete wrapped in
+   its own `try/except` so one failure (already-gone object, transient GCS error) logs and
+   continues rather than aborting the whole sweep, and
+2. pops `gcs_path` from `result` and saves the row, so the download endpoint 404s afterward.
+
+It is idempotent: a job whose `gcs_path` is already cleared is skipped by the truthiness
+check, so re-running the command is safe.
+
+Provision an **hourly** trigger for it, out-of-band from the app deploy, the same way the
+reconciler above is scheduled. Hourly cadence bounds the worst-case overshoot: a file
+expires at 24h but is only swept on the next hourly run, so it can linger up to roughly 25
+hours, which is acceptable given the token has already expired at exactly 24h and the link
+no longer works. Reuse the existing `exact-computation-job` Cloud Run Job by overriding the
+container args (no new IAM, same mechanism `_dispatch_cloud_run` uses):
+
+```json
+["python", "manage.py", "cleanup_expired_reports"]
+```
+
+### GCS lifecycle rule (defense-in-depth backstop)
+
+Add a bucket lifecycle rule that deletes report objects after 1 day, as a backstop in case
+the command is not scheduled or fails to run. Lifecycle granularity is **days**, and
+lifecycle actions run **asynchronously** (objects are deleted within a day of meeting the
+condition, not at an exact time), which is precisely why the `cleanup_expired_reports`
+command exists for tight 24h enforcement; treat the lifecycle rule as a safety net, not the
+primary mechanism.
+
+```bash
+# lifecycle.json
+# {"rule":[{"action":{"type":"Delete"},"condition":{"age":1,"matchesPrefix":["reports/"]}}]}
+gcloud storage buckets update gs://$STORAGE_BUCKET --lifecycle-file=lifecycle.json
+```
+
+Confirm `STORAGE_BUCKET` does not hold other long-lived prefixes that should survive before
+applying this; the `matchesPrefix` scoping to `reports/` is what keeps it safe.
 
 ## Project copy threshold
 
@@ -187,10 +299,15 @@ not find evidence that it is.
 
 ## GCS lifecycle for report objects
 
-Report files accumulate under `reports/{project_id}/{job_id}.{ext}` in `STORAGE_BUCKET`
-and are never deleted by application code (the async report flow only writes; nothing in
-this codebase issues a delete for these objects). Left alone, this prefix grows without
-bound.
+> Note: this section predates the 24-hour email-link feature. For report objects that
+> back an emailed download link, the authoritative expiry/cleanup mechanism is now the
+> `cleanup_expired_reports` command plus a 1-day lifecycle rule described under "Report
+> link expiry and file cleanup" above. The generic guidance below still applies to any
+> report objects that outlive that flow.
+
+Report files accumulate under `reports/{project_id}/{job_id}.{ext}` in `STORAGE_BUCKET`.
+Absent the cleanup command above, nothing else in this codebase issues a delete for these
+objects, so left alone this prefix grows without bound.
 
 Recommended: a lifecycle rule on the bucket that deletes objects under `reports/` after N
 days (7 is a reasonable default: long enough to cover any reasonable "I meant to download

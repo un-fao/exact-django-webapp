@@ -57,3 +57,12 @@ class Command(BaseCommand):
                 "status", "progress", "result", "error_message",
                 "completed_at", "updated_at",
             ])
+            # Email the requester a signed download link once a report job is
+            # done. Isolated in its own try/except so it can never change the
+            # job outcome the finally-block just committed.
+            if job.status == AsyncJob.Status.COMPLETED and job.kind == AsyncJob.Kind.REPORT:
+                try:
+                    from api.services import report_notifications
+                    report_notifications.send_report_ready_email(job)
+                except Exception as e:
+                    log.exception(e)
