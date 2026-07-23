@@ -349,8 +349,13 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
 
     activity = module_from.activity
 
-    can_view_comments = security.check_permission("can_view_comment", owner, activity.project)
-    if owner is not None and can_view_comments:
+    # check_permission returns None when the user HAS the permission and an
+    # ErrorResponse when they do not, so its result must be compared against
+    # None rather than used as a truthiness test. The codename was also wrong:
+    # "can_view_comment" is declared nowhere in the project, so the lookup always
+    # failed for non-superusers and logged an error for every module copied.
+    permission_error = security.check_permission("view_comment", owner, activity.project)
+    if owner is not None and permission_error is None:
         copy_threads(module_from, module_to)
     else:
         clear_threads(module_to)
