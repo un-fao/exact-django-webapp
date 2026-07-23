@@ -1,6 +1,6 @@
 """Unit tests for FloodedRiceReport minor-season aggregation and metadata layout.
 
-Guards beads issues:
+Guards the following regressions (ids are from the retired beads tracker):
 - exact-django-webapp-h8z: report uses FloodedRiceSeasonCalculator (main only) while
   production uses FloodedRiceCalculator (main + minor seasons)
 - exact-django-webapp-ttm: minor-season loop adds MAIN module start, not minor's own
