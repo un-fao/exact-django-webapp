@@ -69,3 +69,4 @@ google-cloud-run==0.16.0
 factory-boy==3.3.3
 faostat==2.0.1
 tqdm==4.67.1
+whitenoise==6.12.0
