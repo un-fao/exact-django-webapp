@@ -90,7 +90,9 @@ class Command(BaseCommand):
                     # delete rolls the unlink back instead of orphaning the
                     # job with a dangling project reference.
                     job.project = None
-                    job.save(update_fields=["project"])
+                    # updated_at is auto_now: with update_fields it is only
+                    # written if listed explicitly.
+                    job.save(update_fields=["project", "updated_at"])
                     project.delete()
                 deleted += 1
             except Exception as exc:
