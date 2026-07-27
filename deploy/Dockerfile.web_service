@@ -69,11 +69,20 @@ COPY djangoexact/ /app/
 # caller for this build alone and arrives over a BuildKit secret mount, so it is
 # absent from every layer and from image history.
 #
+# DB_ENGINE and DB_NAME are also required at build time: Django resolves the
+# default database backend while importing models (auth included), so without a
+# real engine settings.py falls back to the literal "$DB_ENGINE" placeholder and
+# django.setup() dies with ImproperlyConfigured before any static file is
+# collected. collectstatic never opens a connection, so a throwaway sqlite file
+# under /tmp satisfies the import without touching the real Postgres.
+#
 # STATIC_ROOT is the same directory as the source static/ tree (settings.py:236),
 # so the collected admin/unfold/ckeditor/drf_yasg assets land alongside the four
 # committed source files. That is pre-existing behaviour and is preserved.
 RUN --mount=type=secret,id=build_firebase_cred,required=true \
     DJANGO_DEBUG=True \
+    DB_ENGINE=django.db.backends.sqlite3 \
+    DB_NAME=/tmp/collectstatic.sqlite3 \
     FIREBASE_SERVICE_ACCOUNT="$(cat /run/secrets/build_firebase_cred)" \
     python manage.py collectstatic --noinput
 
