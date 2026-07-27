@@ -133,6 +133,14 @@ jobs:
         run: |
           set -eu
 
+          # settings.py reads DB_USER, but the repo variable is DB_USERNAME. The
+          # App Engine path seds the real name into the settings default; this
+          # env-only path runs unsubstituted source, so bridge the name for the
+          # runner-side commands here, the same mapping the service manifest
+          # applies for the container. Sourced from the dumped $GITHUB_ENV value
+          # so it stays byte-for-byte literal.
+          export DB_USER="$DB_USERNAME"
+
           echo "Waiting for cloud-sql-proxy on 127.0.0.1:${{ vars.DB_PORT }}..."
           for i in $(seq 1 30); do
             if (echo > /dev/tcp/127.0.0.1/${{ vars.DB_PORT }}) 2>/dev/null; then
