@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-16T14:58:24.989Z"
-last_activity: 2026-07-23
-last_activity_desc: "Completed quick task 260723-jas: App Engine to Cloud Run migration feasibility evaluation"
+last_updated: "2026-07-27T10:33:26.494Z"
+last_activity: 2026-07-27
+last_activity_desc: "Completed quick task 260727-h79: extend reconcile_stale_async_jobs with a deferred orphaned shell project sweep"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-23 - Completed quick task 260723-jas: App Engine to Cloud Run migration feasibility evaluation
+Last activity: 2026-07-27 - Completed quick task 260727-h79: extend reconcile_stale_async_jobs with a deferred orphaned shell project sweep
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -96,6 +96,7 @@ None yet.
 | 260717-fkc | Report perf round 4: drop 2 redundant deepcopies in Result balance (N1), select_related land_use_change for land modules (N3), batch cold-path cache writes via bulk_update (R6). Researched R4-R8 + new wins; deferred profiling/N2/R5/R8 | 2026-07-17 | a68e9fa8 | [260717-fkc-the-project-report-generation-is-still-q](./quick/260717-fkc-the-project-report-generation-is-still-q/) |
 | 20260721-eco | Async report emails the requester a signed 24h download link on completion (tokenized backend URL, no login); cleanup_expired_reports deletes the GCS file + clears gcs_path after 24h; docs + lifecycle-rule backstop | 2026-07-21 | 08258909 | [20260721-async-report-email-link](./quick/20260721-async-report-email-link/) |
 | 260723-jas | Feasibility review: migrating the web API from App Engine to Cloud Run. Evaluation only, no code changed. Verdict: feasible and largely de-risked by the existing Cloud Run Job image; sequence behind Secret Manager migration and an FAO IT answer on ingress/domain | 2026-07-23 | (docs) | [260723-jas-cloud-run-migration-feasibility](./quick/260723-jas-cloud-run-migration-feasibility/) |
+| 260727-h79 | Extend reconcile_stale_async_jobs with a deferred second pass that deletes orphaned shell Projects from failed PROJECT_COPY jobs after a 24h grace period, guarded by activities-emptiness and source/target params checks; job row preserved with project set NULL | 2026-07-27 | d7252388 | [260727-h79-extend-reconcile-stale-async-jobs-with-d](./quick/260727-h79-extend-reconcile-stale-async-jobs-with-d/) |
 
 ## Deferred Items
 
