@@ -184,6 +184,8 @@ router.register(r"refrigerant-types", views.public_generic_viewset(models.Refrig
 router.register(r"data-sources", views.public_generic_viewset(models.DataSource), basename="datasource")
 router.register(r"hih-assessments", views.HandInHandAssessmentViewSet, basename="handinhandassessment")
 
+router.register(r"async-jobs", views.AsyncJobViewSet, basename="async-job")
+
 urlpatterns = [
     path("health/", views.APIHealthView.as_view(), name="api-health"),
     path("minitool/process/", views.MinitoolProcessingView.as_view(), name="minitool-process"),

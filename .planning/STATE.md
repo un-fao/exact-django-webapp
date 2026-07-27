@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-16T14:58:24.989Z"
-last_activity: 2026-07-16
-last_activity_desc: "Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation"
+last_updated: "2026-07-24T09:21:09.083Z"
+last_activity: 2026-07-24
+last_activity_desc: "Completed quick task 260724-eut: additive Cloud Run deployment path for review (WhiteNoise, Dockerfile.web_service, cloudrun-service.yaml, deploy-cloudrun.yaml, operator guide)"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-16 - Completed quick task 260716-gu0: apply R3 (fetch modules once per activity) to Excel/PDF report generation
+Last activity: 2026-07-24 - Completed quick task 260724-eut: additive Cloud Run deployment path for review (WhiteNoise, Dockerfile.web_service, cloudrun-service.yaml, deploy-cloudrun.yaml, operator guide)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -94,6 +94,9 @@ None yet.
 | 260716-fast | Fix Gemini PR #211 finding: strip empty values from activities query param before pk__in at 4 sites (api+public results/report) | 2026-07-16 | ba719cdb | n/a (inline fast task) |
 | 260716-cap | Cap max activities per project to 50 across create, build, and copy paths | 2026-07-16 | eb9011e5 | n/a (inline fast task) |
 | 260717-fkc | Report perf round 4: drop 2 redundant deepcopies in Result balance (N1), select_related land_use_change for land modules (N3), batch cold-path cache writes via bulk_update (R6). Researched R4-R8 + new wins; deferred profiling/N2/R5/R8 | 2026-07-17 | a68e9fa8 | [260717-fkc-the-project-report-generation-is-still-q](./quick/260717-fkc-the-project-report-generation-is-still-q/) |
+| 20260721-eco | Async report emails the requester a signed 24h download link on completion (tokenized backend URL, no login); cleanup_expired_reports deletes the GCS file + clears gcs_path after 24h; docs + lifecycle-rule backstop | 2026-07-21 | 08258909 | [20260721-async-report-email-link](./quick/20260721-async-report-email-link/) |
+| 260723-jas | Feasibility review: migrating the web API from App Engine to Cloud Run. Evaluation only, no code changed. Verdict: feasible and largely de-risked by the existing Cloud Run Job image; sequence behind Secret Manager migration and an FAO IT answer on ingress/domain | 2026-07-23 | (docs) | [260723-jas-cloud-run-migration-feasibility](./quick/260723-jas-cloud-run-migration-feasibility/) |
+| 260724-eut | Additive Cloud Run deployment path for review: WhiteNoise static serving, forked web-service Dockerfile, Knative service manifest, review-only GitHub Actions workflow, and operator setup guide. App Engine and existing computation Job untouched | 2026-07-24 | 7dec6f85 | [260724-eut-prepare-the-api-to-be-deployed-to-cloud-](./quick/260724-eut-prepare-the-api-to-be-deployed-to-cloud-/) |
 
 ## Deferred Items
 

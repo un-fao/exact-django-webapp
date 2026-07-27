@@ -179,12 +179,13 @@ STD 1019 open-source agreement_EX-ACT.docx
 .venv
 .env*
 
-# Beads / Dolt files (added by bd init)
-.dolt/
+# Stray local database files (minitool.db and test_db.sqlite3 are already
+# tracked and stay tracked; this only stops new ones being committed).
 *.db
-.beads-credential-key
 EXACT_guide.pdf
 2-results-report-2.xlsx
 test may 2026 (Copy).exactp
 *.sqlite3
 .superpowers/
+README.pdf
+.venv-main

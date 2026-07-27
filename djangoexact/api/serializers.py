@@ -5,7 +5,7 @@ import uuid
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.utils import timezone
@@ -105,6 +105,7 @@ from .models import (
     HandInHandRegion,
     HandInHandCountry,
     HandInHandAssessment,
+    AsyncJob,
 )
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
@@ -319,10 +320,12 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
     tags = ProjectTagSerializer(many=True, read_only=True)
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -334,6 +337,18 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
         user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
         return [group.group.name for group in user_project_group] if user_project_group else []
+
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
 
 
 class ProjectResultSerializer(serializers.Serializer):
@@ -354,11 +369,25 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     total_catch = serializers.SerializerMethodField()
     total_livestock = serializers.SerializerMethodField()
     note = serializers.SerializerMethodField()
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     capitalization_years = serializers.FloatField(read_only=True)
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
+
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -4107,3 +4136,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         result.sort(key=lambda x: x["name"])
 
         return result
+
+
+class AsyncJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AsyncJob
+        fields = [
+            "id", "kind", "status", "progress", "result", "error_message",
+            "created_at", "started_at", "completed_at", "project",
+        ]
+        read_only_fields = fields

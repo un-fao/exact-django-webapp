@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your EX-ACT report is ready</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7; font-family:Arial, Helvetica, sans-serif; color:#1a1a1a;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7; padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+          <tr>
+            <td style="background-color:#2e7d32; padding:20px 28px; color:#ffffff; font-size:18px; font-weight:bold;">
+              EX-ACT
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px;">
+              <p style="margin:0 0 16px;">Hi {{ user.get_short_name|default:user.email }},</p>
+              <p style="margin:0 0 16px;">Your EX-ACT report is ready to download.</p>
+              {% if project %}<p style="margin:0 0 8px;"><strong>Project:</strong> {{ project.name }}</p>{% endif %}
+              <p style="margin:0 0 24px;"><strong>File:</strong> {{ filename }}</p>
+              <p style="margin:0 0 24px;">
+                <a href="{{ download_url }}" style="display:inline-block; background-color:#2e7d32; color:#ffffff; text-decoration:none; padding:12px 24px; border-radius:4px; font-weight:bold;">
+                  Download report
+                </a>
+              </p>
+              <p style="margin:0 0 8px; font-size:13px; color:#555555;">
+                If the button does not work, copy and paste this link into your browser:
+              </p>
+              <p style="margin:0 0 24px; font-size:13px; word-break:break-all;">
+                <a href="{{ download_url }}" style="color:#2e7d32;">{{ download_url }}</a>
+              </p>
+              <p style="margin:0 0 16px; font-size:13px; color:#555555;">
+                This link expires in {{ expiry_hours }} hours. After that the file is removed and
+                the link stops working. If you still need the report, generate it again from EX-ACT.
+              </p>
+              <p style="margin:24px 0 0;">Thanks,<br>The EX-ACT team</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
