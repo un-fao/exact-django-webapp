@@ -5,7 +5,7 @@ import uuid
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.utils import timezone
@@ -58,6 +58,7 @@ from .models import (
     LandUseType,
     LargeFishery,
     Livestock,
+    MAX_ACTIVITIES_PER_PROJECT,
     MacroFuelType,
     MacroInputType,
     MinorSeasonAnnualCropland,
@@ -104,6 +105,7 @@ from .models import (
     HandInHandRegion,
     HandInHandCountry,
     HandInHandAssessment,
+    AsyncJob,
 )
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
@@ -317,10 +319,12 @@ class ProjectTagSerializer(serializers.ModelSerializer):
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     tags = ProjectTagSerializer(many=True, read_only=True)
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -333,6 +337,18 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
         return [group.group.name for group in user_project_group] if user_project_group else []
 
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
+
 
 class ProjectResultSerializer(serializers.Serializer):
     # activities = serializers.ListField(child=ResultSerializer())
@@ -341,11 +357,29 @@ class ProjectResultSerializer(serializers.Serializer):
 
 class ReadProjectSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
+    total_hectares = serializers.SerializerMethodField()
+    total_catch = serializers.SerializerMethodField()
+    total_livestock = serializers.SerializerMethodField()
+    note = serializers.SerializerMethodField()
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     capitalization_years = serializers.FloatField(read_only=True)
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
+
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -775,6 +809,15 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         if project.is_finalized:
             return serializers.ValidationError("Finalized projects cannot have activities added")
 
+        # Enforce the activity cap on creation and when an existing activity is
+        # reassigned to a different project (the destination would gain an activity).
+        # Note: on update, `project` above is pinned to the instance's current
+        # project, so the destination must be read from the incoming data.
+        target_project: Project = data.get("project") or project
+        is_reassignment = self.instance is not None and target_project != self.instance.project
+        if (not self.instance or is_reassignment) and target_project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
+
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
@@ -884,6 +927,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_finalized:
             raise serializers.ValidationError("Finalized projects cannot have activities added")
+
+        if not self.instance and project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -1197,11 +1243,16 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 organic_soil.save()
                 module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
 
-            self.sanitize_input_entries()
-
             self.instance.module_types.add(*module_types_to_append)
             if (luc or was_luc_added) and not was_luc_removed:
                 self.instance.module_types.add(ModuleType.objects.get(class_name="LandUseChange").id)
+
+            # Sanitize AFTER module_types are re-populated: Activity.modules is derived
+            # from module_types.all(), so running this while the M2M is cleared (see the
+            # module_types.clear() above) would iterate zero modules and clear nothing.
+            # This is what leaves stale _start/_w/_wo values behind when a LUC's module
+            # roles are swapped.
+            self.sanitize_input_entries()
 
             self.instance.save()
 
@@ -4086,3 +4137,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         result.sort(key=lambda x: x["name"])
 
         return result
+
+
+class AsyncJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AsyncJob
+        fields = [
+            "id", "kind", "status", "progress", "result", "error_message",
+            "created_at", "started_at", "completed_at", "project",
+        ]
+        read_only_fields = fields

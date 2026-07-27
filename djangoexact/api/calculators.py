@@ -97,6 +97,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
+from api import reference_cache
 
 from . import utilities as utils
 from .models import (
@@ -142,7 +143,6 @@ from .models import (
     SetAside,
     SmallFishery,
     SoilType,
-    StatusType,
     Waterbody,
     ModuleType,
     MinorSeasonFloodedRice,
@@ -165,6 +165,7 @@ from .models import (
     ValueChainSubmodule,
     EnergyEntry,
     RefrigerantType,
+    get_ready_status,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -404,7 +405,7 @@ class Result:
     def __init__(self, w: MathResult, wo: MathResult, balance: MathResult = None) -> None:
         self.total_w = w
         self.total_wo = wo
-        self.balance = copy.deepcopy(w) - copy.deepcopy(wo) if balance is None else copy.deepcopy(balance)
+        self.balance = w - wo if balance is None else copy.deepcopy(balance)
 
     def __str__(self):
         return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
@@ -603,7 +604,8 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
+            ready_status = get_ready_status()
+            if any(module.status != ready_status for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -820,7 +822,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name_en="READY"):
+        if module.status != get_ready_status():
             raise Exception("Forest module is not complete")
 
         dry_matter_w = luc.dry_matter_w if luc else None
@@ -828,13 +830,13 @@ class DeforestationCalculator(BaseCalculator):
 
         # BUG: Aren't these handled in the parent class?
         try:
-            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc_ref = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
             else:
                 soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
-        som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+        som = reference_cache.get_nitrous_emission_factor(moisture.pk)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
         total_biomass_wo = SimpleNamespace(value=0)
@@ -853,7 +855,7 @@ class DeforestationCalculator(BaseCalculator):
 
         mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
 
-        bgb_start = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+        bgb_start = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
         if not bgb_start:
             raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
 
@@ -863,7 +865,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_w = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
+                litter_dw_w = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
 
@@ -880,7 +882,7 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
 
-            bgb_w = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_w = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
             if not bgb_w:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
@@ -890,7 +892,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_wo = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_wo = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+                litter_dw_wo = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
 
@@ -907,12 +909,12 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
 
-            bgb_wo = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_wo = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_w_id, mean)
             if not bgb_wo:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
-        combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
-        combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+        combustion_factor_w = reference_cache.get_forest_combustion_factor(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
+        combustion_factor_wo = reference_cache.get_forest_combustion_factor(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
 
         module_start = module_w = module_wo = module
         if luc:
@@ -1087,7 +1089,7 @@ class OtherLandUseCalculator(BaseCalculator):
 
         # BUG: Isn't this handled in the parent class?
         try:
-            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
@@ -1114,7 +1116,8 @@ class OtherLandUseCalculator(BaseCalculator):
         soc_t2_w: float | None = getattr(module_w, "soc_t2_w") if getattr(module_w, "soc_t2_w") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
         soc_t2_wo: float | None = getattr(module_wo, "soc_t2_wo") if getattr(module_wo, "soc_t2_wo") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
 
-        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
+        ready_status = get_ready_status()
+        ready = all(module.status == ready_status for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
@@ -1213,7 +1216,7 @@ class OtherLandUseCalculator(BaseCalculator):
         c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
         try:
-            som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+            som = reference_cache.get_nitrous_emission_factor(moisture.pk)
         except ipcc.NitrousEmissionFactor.DoesNotExist:
             raise Exception(f"LandUseNitrousEmissionFactor for {moisture.name} moisture does not exist")
 
@@ -1664,7 +1667,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1728,7 +1731,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1795,7 +1798,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter if self.minor_n_estimation_factor_w.dry_matter is not None else 1,
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1862,7 +1865,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
-                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter,
+                "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter if self.minor_n_estimation_factor_wo.dry_matter is not None else 1,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -2903,7 +2906,14 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+        # Reverse-relation managers raise on unsaved FloodedRice instances
+        # ("FloodedRice instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # FloodedRice unsaved to skip DB writes — with no pk there are no
+        # related MinorSeasonFloodedRice rows to sum either.
+        minor_seasons: list[MinorSeasonFloodedRice] = (
+            list(module.minor_seasons.all()) if module.pk else []
+        )
 
         if any([not season.is_ready() for season in minor_seasons]):
             raise Exception("At least one minor season is not ready")
@@ -3998,11 +4008,18 @@ class EnergyEntryCalculator(BaseCalculator):
                 self.electricity_ef_selected_w.value = self.electricity_ef_default.combined_margin
                 self.electricity_ef_selected_wo.value = self.electricity_ef_default.combined_margin
 
-            if self.module.fuel_type_start.name_en in ["Renewable"]:
+            # PackagingEntry / ProcessingEntry / TransportEntry / StorageEntry
+            # inherit FuelMixin via ValueChainSubmodule but don't always
+            # require fuel_type to be set (e.g. is_electric=False packaging).
+            # Guard the .name_en access so the calculator doesn't blow up
+            # with "'NoneType' object has no attribute 'name_en'" when the
+            # parent calculator instantiates EnergyEntryCalculator
+            # speculatively.
+            if self.module.fuel_type_start and self.module.fuel_type_start.name_en in ["Renewable"]:
                 self.electricity_ef_selected_start.value = 0
-            if self.module.fuel_type_w.name_en in ["Renewable"]:
+            if self.module.fuel_type_w and self.module.fuel_type_w.name_en in ["Renewable"]:
                 self.electricity_ef_selected_w.value = 0
-            if self.module.fuel_type_wo.name_en in ["Renewable"]:
+            if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en in ["Renewable"]:
                 self.electricity_ef_selected_wo.value = 0
 
         except ipcc.ElectricityEmission.DoesNotExist:
@@ -4618,17 +4635,23 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w += self.results_start_w
         self.results_wo += self.results_start_wo
 
-        for building in self.module.buildings.all():
-            r_w, r_wo = BuildingCalculator(building).calculate()
+        # Reverse-relation managers raise on unsaved Settlement instances
+        # ("Settlement instance needs to have a primary key value before
+        # this relationship can be used"). The permutation runner builds
+        # Settlement unsaved to skip DB writes — when there's no pk, there
+        # can be no related Buildings or Roads to sum either.
+        if self.module.pk:
+            for building in self.module.buildings.all():
+                r_w, r_wo = BuildingCalculator(building).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
-        for road in self.module.roads.all():
-            r_w, r_wo = RoadCalculator(road).calculate()
+            for road in self.module.roads.all():
+                r_w, r_wo = RoadCalculator(road).calculate()
 
-            self.results_w += r_w
-            self.results_wo += r_wo
+                self.results_w += r_w
+                self.results_wo += r_wo
 
         log.debug("END SettlementCalculator.calculate")
         return (self.results_w, self.results_wo)
@@ -6106,8 +6129,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
 
-        self.soil_type_name = ""
-
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
@@ -7211,7 +7232,15 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.litter_dw_start_wo.litter = self.litter_dw_max_wo.litter
                 self.litter_dw_start_wo.dw = self.litter_dw_max_wo.dw
 
-        self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
+        # Reverse-relation managers raise on unsaved ForestManagement
+        # instances (same pattern as Settlement / FloodedRice). The
+        # permutation runner builds ForestManagement unsaved — without a
+        # pk the related disturbances queryset is empty by construction.
+        # Downstream code calls ``self.disturbances.values_list(...)`` so we
+        # keep a queryset shape via ``ForestDisturbance.objects.none()``.
+        self.disturbances: list[ForestDisturbance] = (
+            self.module.disturbances.all() if self.module.pk else ForestDisturbance.objects.none()
+        )
 
         return super().get_defaults(calculate)
 

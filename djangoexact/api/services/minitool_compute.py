@@ -152,6 +152,16 @@ def compute_module_slice(
         ``(data, errors)`` -- data is list of successful computation dicts,
         errors is list of error dicts.
     """
+    if module_type == "LandUseChange":
+        from api.services.luc_compute import _compute_luc_slice
+        return _compute_luc_slice(
+            from_value=from_value,
+            to_value=to_value,
+            save_results=save_results,
+            progress_callback=progress_callback,
+            max_rows=max_rows,
+        )
+
     from api.minitool import (
         MODULE_CONFIGS,
         ModuleDataBuilderRegistry,

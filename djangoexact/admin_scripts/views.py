@@ -3,20 +3,23 @@ import re
 from datetime import datetime
 from functools import wraps
 
-import pandas as pd
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 from admin_scripts.catalog import get_catalog
+from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.gap_detector import detect_gap
-from admin_scripts.job_dispatcher import cancel_job, enqueue_or_join
-from admin_scripts.models import ComputationJob
+from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enqueue_or_join
+from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
-from django.apps import apps
+from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
+from api.models import Climate, Moisture, SoilType
 from minitool.models import ChangeRecord
 
 
@@ -30,23 +33,57 @@ def staff_required(view_func):
     return wrapper
 
 
-def _resolve_value_source(value_source):
-    """Resolve a catalog value_source dict to a list of string values.
+def _reference_filter_options() -> dict[str, list[str]]:
+    """Canonical climate/moisture/soil_type override options as flat name lists.
 
-    For queryset sources, queries the model and returns str() of each instance.
-    For static sources, returns the values list as strings.
+    Sourced from the reference tables (api.Climate / api.Moisture /
+    api.SoilType), active-filtered and ordered by name. These enumerate the
+    full option set known to the system. They are deliberately NOT derived from
+    minitool.ChangeRecord distinct values: ChangeRecord rows are computed on
+    demand, so a data-derived list would omit any valid option that has not yet
+    been computed (product-owner decision, 2026-07-13). Note the differing
+    active-flag field names: Climate/Moisture use ``is_active``, SoilType uses
+    ``active``.
     """
-    kind = value_source.get("kind", "")
-    if kind == "queryset":
-        model_name = value_source.get("model", "")
-        try:
-            model = apps.get_model("api", model_name)
-            return [str(obj) for obj in model.objects.all().order_by("pk")]
-        except LookupError:
-            return []
-    elif kind == "static":
-        return [str(v) for v in value_source.get("values", [])]
-    return []
+    return {
+        "climates": list(
+            Climate.objects.filter(is_active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+        "moistures": list(
+            Moisture.objects.filter(is_active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+        "soil_types": list(
+            SoilType.objects.filter(active=True)
+            .order_by("name").values_list("name", flat=True)
+        ),
+    }
+
+
+def _change_record_filter_choices(qs=None):
+    """Filter option lists for the scenario form.
+
+    Returns a dict with keys ``regions`` (used by the global filter) and
+    ``climates``/``moistures``/``soil_types`` (used by the per-change filter
+    block). Shared by every render path that emits the scenario form so
+    dropdowns are populated at initial server-render and don't depend on the
+    deferred htmx_filters swap firing first.
+
+    ``regions`` stays ChangeRecord-derived (distinct non-empty stored values);
+    pass ``qs`` to scope it. The per-change climate/moisture/soil_type overrides
+    come from the canonical reference tables via ``_reference_filter_options``,
+    so every valid option is offered regardless of what has been computed into
+    ChangeRecord. ``qs`` therefore no longer narrows those three lists.
+    """
+    if qs is None:
+        qs = ChangeRecord.objects.all()
+    return {
+        "regions": list(
+            qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
+        ),
+        **_reference_filter_options(),
+    }
 
 
 SCRIPTS = [
@@ -64,6 +101,11 @@ SCRIPTS = [
         "name": "Jobs",
         "url": "jobs-list",
         "description": "View computation job status and history.",
+    },
+    {
+        "name": "Test All Modules",
+        "url": "test-modules",
+        "description": "Systematically run a capped computation for every module/field in the catalog and report success/failure per pair.",
     },
 ]
 
@@ -187,23 +229,22 @@ def _parse_changes_from_post(post_data, prefix=""):
                 "filters": {},
                 "unit": post_data.get(f"{prefix}change-{index}-unit", ""),
             }
-            region = post_data.getlist(f"{prefix}change-{index}-filter-region")
-            if region:
-                change["filters"]["region"] = region
-            climate = post_data.getlist(f"{prefix}change-{index}-filter-climate")
-            if climate:
-                change["filters"]["climate"] = climate
+            for col in ("climate", "moisture", "soil_type"):
+                values = post_data.getlist(f"{prefix}change-{index}-filter-{col}")
+                if values:
+                    change["filters"][col] = values
             changes.append(change)
         index += 1
     return changes
 
 
 def _parse_global_filters(post_data):
-    """Parse global filter fields from POST data."""
+    """Parse global filter fields from POST data.
+
+    Region is the only global filter; climate/moisture/soil_type are scoped
+    per-change.
+    """
     filters = {}
-    soil_type = post_data.getlist("global_filter_soil_type")
-    if soil_type:
-        filters["soil_type"] = soil_type
     region = post_data.getlist("global_filter_region")
     if region:
         filters["region"] = region
@@ -273,20 +314,15 @@ def compile_scenarios(request):
         "default_id_prefix": "scenario-0-change-0",
     }]
 
-    # Populate the global (scenario-level) region filter from the distinct
-    # regions present in ChangeRecord. Without this the dropdown stays empty
-    # because the template has nothing to iterate over.
-    regions = list(
-        ChangeRecord.objects.exclude(region="")
-        .values_list("region", flat=True)
-        .distinct()
-        .order_by("region")
-    )
+    # Populate the global region filter and the per-change
+    # climate/moisture/soil_type dropdowns from distinct values in ChangeRecord.
+    # Without these the dropdowns render as empty <select>s on initial load.
+    choices = _change_record_filter_choices()
 
     context = {
         "module_types": module_types,
         "scenarios": scenarios,
-        "regions": regions,
+        **choices,
     }
     return render(request, "admin_scripts/scripts/compile_scenarios.html", context)
 
@@ -363,7 +399,13 @@ def htmx_values(request):
         catalog_field = next((f for f in catalog_module.fields if f.field_name == field), None)
 
     if catalog_field:
-        values = _resolve_value_source(catalog_field.value_source)
+        # Pass module_type/field so the resolver consults MODULE_CONFIGS'
+        # filtered queryset (e.g. PerennialCropland.land_use_type is limited
+        # to perennial land use types). Without these args the dropdown lists
+        # values the test runner would later reject as out-of-range.
+        values = _resolve_value_source(
+            catalog_field.value_source, module_type, field,
+        )
     else:
         values = []
 
@@ -391,19 +433,19 @@ def htmx_filters(request):
     if not module_type:
         return HttpResponse("")
 
-    qs = ChangeRecord.objects.filter(module_type=module_type)
-    regions = list(
-        qs.exclude(region="").values_list("region", flat=True).distinct().order_by("region")
-    )
-    climates = list(
-        qs.exclude(climate="").values_list("climate", flat=True).distinct().order_by("climate")
-    )
+    # The climate/moisture/soil_type overrides are the canonical reference set
+    # and no longer narrow by module_type (product-owner decision, 2026-07-13).
+    # This endpoint is kept so the selects are (re)populated when a module_type
+    # is first chosen; it simply re-serves the full reference options rather than
+    # a ChangeRecord-scoped subset.
+    choices = _reference_filter_options()
 
     return render(request, "admin_scripts/partials/filter_options.html", {
         "index": index,
         "prefix": prefix,
-        "regions": regions,
-        "climates": climates,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -425,12 +467,16 @@ def htmx_add_change(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
     return render(request, "admin_scripts/partials/change_fieldset.html", {
         "index": index,
         "prefix": prefix,
         "id_prefix": id_prefix,
         "scenario_index": scenario_index,
         "module_types": module_types,
+        "climates": choices["climates"],
+        "moistures": choices["moistures"],
+        "soil_types": choices["soil_types"],
     })
 
 
@@ -444,6 +490,7 @@ def htmx_add_scenario(request):
 
     catalog = get_catalog()
     module_types = [m.module_type for m in catalog]
+    choices = _change_record_filter_choices()
 
     default_prefix = f"scenario-{scenario_index}-change-0-"
     default_id_prefix = f"scenario-{scenario_index}-change-0"
@@ -460,6 +507,9 @@ def htmx_add_scenario(request):
             "default_prefix": default_prefix,
             "default_id_prefix": default_id_prefix,
             "active": True,
+            "climates": choices["climates"],
+            "moistures": choices["moistures"],
+            "soil_types": choices["soil_types"],
         },
     )
 
@@ -470,41 +520,85 @@ def htmx_run_scenario(request):
     if request.method != "POST":
         return HttpResponse("POST required", status=405)
 
+    import json
+
     scenario_index = request.POST.get("scenario_index", "0")
     prefix = f"scenario-{scenario_index}-"
 
     changes = _parse_changes_from_post(request.POST, prefix=prefix)
     global_filters = _parse_global_filters(request.POST)
 
-    context = {}
+    context = {
+        "scenario_index": scenario_index,
+    }
+    stats = None
+    gaps = []
+    error = None
+    not_computed = False
+
     if not changes:
-        context["error"] = "Please add at least one change."
+        error = "Please add at least one change."
+        context["error"] = error
     else:
         stats = stats_for_scenario(changes, global_filters)
 
-        if stats["count"] == 0:
-            # Check if any of the changes are gaps (no data computed yet)
-            gaps = []
-            for change in changes:
-                field = change["start"]["field"]
-                from_val = change["start"]["value"]
-                to_val = change["end"]["value"]
-                if detect_gap(change["module_type"], field, from_val, to_val):
-                    gaps.append({
-                        "module_type": change["module_type"],
-                        "field": field,
-                        "from_value": from_val,
-                        "to_value": to_val,
-                    })
+        # Per-change so mixed valid+gap scenarios surface both panels.
+        for change in changes:
+            field = change["start"]["field"]
+            from_val = change["start"]["value"]
+            to_val = change["end"]["value"]
+            if detect_gap(change["module_type"], field, from_val, to_val):
+                gaps.append({
+                    "module_type": change["module_type"],
+                    "field": field,
+                    "from_value": from_val,
+                    "to_value": to_val,
+                })
 
-            if gaps:
-                context["gaps"] = gaps
-            else:
-                context["statistics"] = stats
-        else:
+        if gaps:
+            context["gaps"] = gaps
+        # Hide stats only when every change is a gap (preserves prior UX).
+        if stats["count"] > 0 or not gaps:
             context["statistics"] = stats
 
+    # Always-present payload for the Compare tab. ``statistics`` is included
+    # even when ``count == 0`` so the client never has to special-case.
+    payload = {
+        "scenario_index": scenario_index,
+        "scenario_name": request.POST.get(f"{prefix}scenario_name", ""),
+        "category": request.POST.get(f"{prefix}category", ""),
+        "statistics": stats if stats is not None else _empty_stats(),
+        "gaps": gaps,
+        "error": error,
+        "not_computed": not_computed,
+    }
+    context["result_json"] = json.dumps(payload, default=str)
+
     return render(request, "admin_scripts/partials/scenario_results.html", context)
+
+
+def _empty_stats():
+    """Empty stats dict in the same shape ``stats_for_scenario`` returns.
+    Used by ``htmx_run_scenario`` when no changes were provided, so the
+    Compare tab always sees a stable schema.
+    """
+    return {
+        "count": 0,
+        "sum_total": 0.0,
+        "mean": None,
+        "median": None,
+        "min": None,
+        "max": None,
+        "std": None,
+        "q1": None,
+        "q3": None,
+        "iqr": None,
+        "ci_95": None,
+        "ci_99": None,
+        "outliers_low": 0,
+        "outliers_high": 0,
+        "per_change": [],
+    }
 
 
 @login_required(login_url="/admin/login/")
@@ -580,62 +674,197 @@ def compile_scenarios_export(request):
     if not scenarios:
         return HttpResponse("No scenarios provided", status=400)
 
-    buffer = io.BytesIO()
-    summary_rows = []
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        for scenario in scenarios:
-            scenario_name = scenario["scenario_name"] or "Unnamed Scenario"
-            category = scenario["category"]
-            changes = scenario["changes"]
+    now = datetime.now()
+    requested_by = request.user.get_username() if request.user.is_authenticated else None
+    workbook_bytes = build_scenarios_workbook(
+        scenarios,
+        global_filters,
+        requested_by=requested_by,
+        now=now,
+    )
 
-            if not changes:
-                continue
-
-            statistics = stats_for_scenario(changes, global_filters)
-
-            summary_rows.append({
-                "Category": category,
-                "Scenario Name": scenario_name,
-                "Count": statistics.get("count", 0),
-                "Sum Total": statistics.get("sum_total"),
-                "Mean": statistics.get("mean"),
-                "Median": statistics.get("median"),
-                "Min": statistics.get("min"),
-                "Max": statistics.get("max"),
-                "Std Dev": statistics.get("std"),
-                "Q1": statistics.get("q1"),
-                "Q3": statistics.get("q3"),
-                "IQR": statistics.get("iqr"),
-                "CI 95%": statistics.get("ci_95"),
-                "CI 99%": statistics.get("ci_99"),
-            })
-
-            # Changes sheet
-            changes_sheet = f"{scenario_name} Changes"[:31]
-            changes_data = []
-            for i, change in enumerate(changes, 1):
-                changes_data.append({
-                    "Change #": i,
-                    "Module Type": change.get("module_type", ""),
-                    "Field": change["start"]["field"],
-                    "From Value": change["start"]["value"],
-                    "To Value": change["end"]["value"],
-                    "Units": change.get("unit", ""),
-                })
-            if changes_data:
-                pd.DataFrame(changes_data).to_excel(writer, sheet_name=changes_sheet, index=False)
-
-        if summary_rows:
-            pd.DataFrame(summary_rows).to_excel(writer, sheet_name="Summary", index=False)
-            writer.book.move_sheet("Summary", offset=-len(writer.book.sheetnames) + 1)
-
-    buffer.seek(0)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"scenarios_{timestamp}.xlsx"
-
+    filename = f"scenarios_{now.strftime('%Y%m%d_%H%M%S')}.xlsx"
     return FileResponse(
-        buffer,
+        io.BytesIO(workbook_bytes),
         as_attachment=True,
         filename=filename,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test All Modules
+# ---------------------------------------------------------------------------
+
+TERMINAL_STATUSES = {
+    ComputationJob.Status.COMPLETED,
+    ComputationJob.Status.FAILED,
+    ComputationJob.Status.CANCELLED,
+}
+
+
+def _summarize_completed_job(job):
+    """Compute a tiny count/mean summary for a completed test-run job.
+
+    Returns a dict with ``count`` (int) and ``mean_str`` (formatted string
+    or empty). Preformatting in Python keeps the template free of
+    None-comparison gymnastics and lets ``mean=0.0`` render as "0.00"
+    rather than being filtered out by template truthiness.
+    """
+    change = {
+        "module_type": job.module_type,
+        "start": {"field": job.attribute, "value": job.from_value},
+        "end": {"field": job.attribute, "value": job.to_value},
+        "filters": {},
+        "unit": "",
+    }
+    stats = stats_for_scenario([change], {})
+    mean = stats["mean"]
+    mean_str = f"{mean:.2f}" if mean is not None else ""
+    return {"count": stats["count"], "mean_str": mean_str}
+
+
+def _build_run_rows(run):
+    """Build the per-job rows shown on the detail page, grouped by module.
+
+    Returns a tuple ``(groups, counts)`` where:
+      - groups: ``[{"module_type": str, "rows": [row, ...]}, ...]`` in catalog order
+      - counts: dict with totals for the summary chips
+    """
+    catalog = get_catalog()
+    module_order = [m.module_type for m in catalog]
+
+    jobs_by_module: dict[str, list] = {m: [] for m in module_order}
+    counts = {
+        "total": 0, "pending": 0, "running": 0,
+        "completed": 0, "failed": 0, "cancelled": 0,
+        "skipped": len(run.skipped),
+    }
+    for job in run.jobs.all().order_by("module_type", "attribute"):
+        summary = None
+        if job.status == ComputationJob.Status.COMPLETED:
+            summary = _summarize_completed_job(job)
+        jobs_by_module.setdefault(job.module_type, []).append({
+            "job": job,
+            "summary": summary,
+        })
+        counts["total"] += 1
+        counts[job.status] = counts.get(job.status, 0) + 1
+
+    skipped_by_module: dict[str, list] = {m: [] for m in module_order}
+    for entry in run.skipped:
+        skipped_by_module.setdefault(entry["module_type"], []).append(entry)
+
+    groups = []
+    for module_type in module_order:
+        rows = jobs_by_module.get(module_type, [])
+        skipped = skipped_by_module.get(module_type, [])
+        if rows or skipped:
+            groups.append({
+                "module_type": module_type,
+                "rows": rows,
+                "skipped": skipped,
+            })
+    # Any unexpected module names (legacy data) tacked on at the end.
+    for module_type, rows in jobs_by_module.items():
+        if module_type not in module_order and rows:
+            groups.append({
+                "module_type": module_type, "rows": rows, "skipped": [],
+            })
+
+    return groups, counts
+
+
+def _run_is_complete(run) -> bool:
+    """A run is complete iff it has at least one job and all jobs are terminal."""
+    statuses = list(run.jobs.values_list("status", flat=True))
+    if not statuses:
+        # No jobs at all (every field was skipped): treat as complete immediately.
+        return True
+    return all(s in TERMINAL_STATUSES for s in statuses)
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules(request):
+    """Landing page: run button + history of the user's recent test runs."""
+    if request.method == "POST":
+        catalog = get_catalog()
+        planned, skipped = plan_module_tests(catalog)
+
+        with transaction.atomic():
+            run = ModuleTestRun.objects.create(requested_by=request.user)
+            new_jobs = []
+            for entry in planned:
+                job = enqueue_for_test_run(
+                    user=request.user,
+                    run_id=run.id,
+                    module_type=entry["module_type"],
+                    attribute=entry["field_name"],
+                    from_value=entry["from_value"],
+                    to_value=entry["to_value"],
+                    max_rows=100,
+                )
+                new_jobs.append(job)
+            if new_jobs:
+                run.jobs.add(*new_jobs)
+            run.skipped = skipped
+            run.save(update_fields=["skipped"])
+
+        return redirect("admin_scripts:test-modules-detail", run_id=run.id)
+
+    recent_runs = (
+        ModuleTestRun.objects
+        .filter(requested_by=request.user)
+        .order_by("-created_at")[:20]
+    )
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules.html",
+        {"recent_runs": recent_runs},
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_detail(request, run_id):
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    groups, counts = _build_run_rows(run)
+    is_complete = _run_is_complete(run)
+    return render(
+        request,
+        "admin_scripts/scripts/test_modules_detail.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
+    )
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def test_modules_status(request, run_id):
+    """HTMX-polled status partial. Stamps completed_at when all jobs are terminal."""
+    run = get_object_or_404(
+        ModuleTestRun, pk=run_id, requested_by=request.user,
+    )
+    is_complete = _run_is_complete(run)
+    if is_complete and run.completed_at is None:
+        run.completed_at = timezone.now()
+        run.save(update_fields=["completed_at"])
+
+    groups, counts = _build_run_rows(run)
+    return render(
+        request,
+        "admin_scripts/partials/test_modules_results.html",
+        {
+            "run": run,
+            "groups": groups,
+            "counts": counts,
+            "is_complete": is_complete,
+        },
     )

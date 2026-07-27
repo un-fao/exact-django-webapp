@@ -31,6 +31,14 @@ if app_mode:
 else:
     FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
 
+# Absolute URL to this API host. Used to build self-contained, emailable report
+# download links (see api/services/report_links.py). Empty locally unless set.
+BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "")
+
+# Send the "your report is ready" email when an async report job completes.
+# Default True; distinct from JOB_NOTIFICATIONS_ENABLED (ComputationJob emails).
+REPORT_READY_EMAIL_ENABLED = os.environ.get("REPORT_READY_EMAIL_ENABLED", "true").lower() in ("true", "1", "yes")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -173,6 +181,12 @@ else:
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },
     }
+    if os.getenv("CI", "").lower() == "true":
+        # CI only: reuse the pre-seeded database via `manage.py test --keepdb`.
+        # GitHub Actions always sets CI=true. Outside CI, Django's default
+        # test_<name> database is used, so a local `manage.py test` can never
+        # drop or flush the developer's real database.
+        DATABASES["default"]["TEST"] = {"NAME": os.getenv("DB_NAME", default="$DB_NAME")}
 
 DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
@@ -333,7 +347,7 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
 DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 
-# Computation Jobs — Cloud Run
+# Computation Jobs - Cloud Run
 # Set to a Cloud Run Job resource name to enable GCP dispatch.
 # Empty string = subprocess fallback (local dev).
 CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
@@ -342,3 +356,7 @@ CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
 # Job Notifications
 # Set to True to enable email notifications for completed jobs.
 JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
+
+# Projects whose (activities + module-type) count exceeds this are copied via a
+# background job instead of synchronously in the request. Small copies stay sync.
+PROJECT_COPY_ASYNC_THRESHOLD = int(os.environ.get("PROJECT_COPY_ASYNC_THRESHOLD", "40"))

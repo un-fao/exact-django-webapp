@@ -275,14 +275,10 @@ def _compute_indicator_aggregates(activities_by_name: dict, project) -> dict:
 
     livestock_heads = [x for x in livestock_heads if x["value_w"] != 0 or x["value_wo"] != 0]
     small_fishery_types = [x for x in small_fishery_types if x["value_w"] != 0 or x["value_wo"] != 0]
-    large_fishery_data = (
-        {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0
-        else large_fishery_data
-    )
-    aquaculture_data = (
-        {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0
-        else aquaculture_data
-    )
+    if large_fishery_data["value_w"] == 0 and large_fishery_data["value_wo"] == 0:
+        large_fishery_data = {}
+    if aquaculture_data["value_w"] == 0 and aquaculture_data["value_wo"] == 0:
+        aquaculture_data = {}
     land_types = [x for x in land_types if x["value_w"] != 0 or x["value_wo"] != 0]
 
     total_heads = sum(lh["value_w"] for lh in livestock_heads)
@@ -346,8 +342,15 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request, lang: str) -> dict:
-    """Return the full context dict for the PDF HTML template."""
+def build_template_context(result: ProjectResult, request=None, lang: str = "en") -> dict:
+    """Return the full context dict for the PDF HTML template.
+
+    ``request`` is accepted for backward compatibility with the synchronous
+    view call sites (which pass it positionally) but is not read by this
+    function; all i18n is driven by ``lang`` via ``activate(lang)``. It may
+    be omitted (or ``None``) when calling from a non-request context, such
+    as the async report worker.
+    """
     activate(lang)
     project = result.project
 
@@ -366,11 +369,14 @@ def build_template_context(result: ProjectResult, request, lang: str) -> dict:
     def _direction(v):
         return INCREASES if v >= 0 else DECREASES
 
-    # Per-activity processed data (plain queryset, iterated once and stored as a dict)
-    activities_by_name = {
-        a.name: a
-        for a in project.activities.all()
-    }
+    # Per-activity processed data (plain queryset, iterated once and stored as a
+    # dict). Prime each activity's module list memo here so the many derived
+    # property reads below (is_luc, is_fishery, is_livestock, is_energy, area,
+    # and the indicator aggregation loop) all reuse the same fetched list.
+    activities_by_name = {}
+    for a in project.activities.all():
+        a.cache_modules()
+        activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
 
     # Indicator aggregates

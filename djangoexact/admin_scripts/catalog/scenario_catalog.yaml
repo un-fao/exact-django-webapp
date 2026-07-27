@@ -21,6 +21,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
   - field_name: fire_impact
     label: Fire Impact
     value_source:
@@ -48,6 +49,7 @@ modules:
       kind: static
       values:
       - 1
+      - 0
 - module_type: AnnualCropland
   label: Annual Cropland
   config_name: annual_cropland
@@ -117,12 +119,6 @@ modules:
       values:
       - true
       - false
-  - field_name: fire_periodicity_t2
-    label: Fire Periodicity T2
-    value_source:
-      kind: static
-      values:
-      - 1
 - module_type: ForestManagement
   label: Forest Management
   config_name: forest_management
@@ -239,3 +235,235 @@ modules:
     value_source:
       kind: queryset
       model: TrophicType
+# Parent modules with a single submodule type. The catalog entry is named
+# after the parent module (the value stored in ChangeRecord.module_type);
+# fields and values come from the corresponding *Entry submodule.
+- module_type: Energy
+  label: Energy
+  config_name: energy
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: account_for_co2
+    label: Account For CO2
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Storage
+  label: Storage
+  config_name: storage
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_refrigerant_used
+    label: Is Refrigerant Used
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+  - field_name: refrigerant_type
+    label: Refrigerant Type
+    value_source:
+      kind: queryset
+      model: RefrigerantType
+- module_type: Processing
+  label: Processing
+  config_name: processing
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_water_used
+    label: Is Water Used
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+- module_type: Packaging
+  label: Packaging
+  config_name: packaging
+  fields:
+  - field_name: packaging_material_type
+    label: Packaging Material Type
+    value_source:
+      kind: queryset
+      model: PackagingMaterialType
+  - field_name: kg_of_packaging_material
+    label: Kg Of Packaging Material
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_electric
+    label: Is Electric
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+- module_type: Transport
+  label: Transport
+  config_name: transport
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+# Parent modules with multiple submodule types - each submodule becomes its
+# own catalog entry, named after the submodule. The processor still builds
+# the parent + that one submodule behind the scenes; ChangeRecord.module_type
+# stores the submodule name so the UI / queries line up 1-1.
+- module_type: IrrigationSystem
+  label: IrrigationSystem
+  config_name: irrigation_system
+  fields:
+  - field_name: irrigation_system_type
+    label: Irrigation System Type
+    value_source:
+      kind: queryset
+      model: IrrigationSystemType
+  - field_name: ha
+    label: Ha
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: IrrigationPhase
+  label: IrrigationPhase
+  config_name: irrigation_phase
+  fields:
+  - field_name: irrigation_system_type
+    label: Irrigation System Type
+    value_source:
+      kind: queryset
+      model: IrrigationSystemType
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: ha
+    label: Ha
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: gross_irrigation_water
+    label: Gross Irrigation Water
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Settlement
+  label: Settlement
+  config_name: settlement
+  fields:
+  - field_name: settlement_type
+    label: Settlement Type
+    value_source:
+      kind: queryset
+      model: SettlementType
+- module_type: Building
+  label: Building
+  config_name: building
+  fields:
+  - field_name: building_type
+    label: Building Type
+    value_source:
+      kind: queryset
+      model: BuildingType
+  - field_name: area_m2
+    label: Area m²
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Road
+  label: Road
+  config_name: road
+  fields:
+  - field_name: road_type
+    label: Road Type
+    value_source:
+      kind: queryset
+      model: RoadType
+  - field_name: length_km
+    label: Length (km)
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: width_m
+    label: Width (m)
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: OtherInfrastructure
+  label: OtherInfrastructure
+  config_name: other_infrastructure
+  fields:
+  - field_name: area_m2
+    label: Area m²
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: LandUseChange
+  label: LandUseChange
+  config_name: land_use_change
+  fields:
+  - field_name: module_type
+    label: Module Type Transition
+    value_source:
+      kind: queryset
+      model: ModuleType

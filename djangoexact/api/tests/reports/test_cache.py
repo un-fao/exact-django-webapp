@@ -945,3 +945,70 @@ class TestBalanceTotalIncludesAllActivities(unittest.TestCase):
         self.assertAlmostEqual(sum(total), 3315.0)  # 300 + 15 + 0 + 3000
         # Old SettlementReport whitelist = Roads only (3000), land dropped.
         self.assertNotAlmostEqual(sum(total), 3000.0)
+
+
+# ===========================================================================
+# Regression: cached OTHER-gas entries must be extractable by gas_type filter.
+# GasTypes.OTHER.name = "OTHER" but .value = "Other"; the cache stores .name
+# while _eq used to only match against target.value, silently dropping every
+# cached OTHER entry from filtered extractions (e.g. fishery refrigerant + ice,
+# yielding inflated top "Yearly balance" and zeroed "Other GHGs" / "HFC from
+# refrigeration" / "CO2-eq from electricity" rows).
+# ===========================================================================
+
+
+class TestEqMatchesEnumNameAndValue(unittest.TestCase):
+    """_eq must match a cached string against either target.value or target.name."""
+
+    def test_eq_matches_enum_name(self):
+        from api.reports.extractors import _eq
+        from math_model.no_time_dependency_final.ghg_emissions_classes import GasTypes
+        self.assertTrue(_eq("OTHER", GasTypes.OTHER))   # cache stores .name
+        self.assertTrue(_eq("Other", GasTypes.OTHER))   # .value still works
+        self.assertTrue(_eq("CO2", GasTypes.CO2))       # name == value, unchanged
+        self.assertFalse(_eq("HFC", GasTypes.OTHER))    # unrelated string still rejected
+
+
+class TestExtractOtherGasFromCache(unittest.TestCase):
+    """extract_emissions must return cached OTHER-gas values, not zeros."""
+
+    DURATION = 3
+
+    def test_extracts_other_gas_from_dict_cache(self):
+        from api.reports.extractors import extract_emissions
+        from math_model.no_time_dependency_final.ghg_emissions_classes import (
+            ActivityTypes,
+            GasTypes,
+        )
+        # Format matches save_results_to_cache: activity is .value,
+        # gas_type is {"name": .name}.
+        cached = [
+            {
+                "activity": ActivityTypes.REFRIGERANT.value,
+                "gas_type": {"name": GasTypes.OTHER.name},
+                "emissions": [{"value": 10.0}, {"value": 20.0}, {"value": 30.0}],
+            },
+            {
+                "activity": ActivityTypes.ICE.value,
+                "gas_type": {"name": GasTypes.OTHER.name},
+                "emissions": [{"value": 1.0}, {"value": 2.0}, {"value": 3.0}],
+            },
+        ]
+
+        # Filter by gas_type only (mirrors EmissionsAggregator.other_ghgs).
+        by_gas = extract_emissions(cached, gas_type=GasTypes.OTHER, duration=self.DURATION)
+        self.assertEqual(by_gas, [11.0, 22.0, 33.0])
+
+        # Filter by (activity_type, gas_type) (mirrors per-row extraction in
+        # FisheryReport for "HFC from refrigeration" / "CO2-eq from electricity").
+        refrig = extract_emissions(
+            cached, activity_type=ActivityTypes.REFRIGERANT,
+            gas_type=GasTypes.OTHER, duration=self.DURATION,
+        )
+        self.assertEqual(refrig, [10.0, 20.0, 30.0])
+
+        ice = extract_emissions(
+            cached, activity_type=ActivityTypes.ICE,
+            gas_type=GasTypes.OTHER, duration=self.DURATION,
+        )
+        self.assertEqual(ice, [1.0, 2.0, 3.0])

@@ -295,9 +295,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
         self,
     ):
         try:
-            factor_co2 = self.emissions_factor_co2 or self.specific_factor_co2
-            factor_ch4 = self.emissions_factor_ch4 or self.specific_factor_ch4
-            factor_n2o = self.emissions_factor_n2o or self.specific_factor_n2o
+            factor_co2 = self.emissions_factor_co2 if self.emissions_factor_co2 is not None else self.specific_factor_co2
+            factor_ch4 = self.emissions_factor_ch4 if self.emissions_factor_ch4 is not None else self.specific_factor_ch4
+            factor_n2o = self.emissions_factor_n2o if self.emissions_factor_n2o is not None else self.specific_factor_n2o
 
             annual_start_co2 = factor_co2 * self.mwh_start
             annual_end_co2 = factor_co2 * self.mwh_end

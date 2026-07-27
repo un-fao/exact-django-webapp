@@ -219,6 +219,7 @@ class PerennialCroplandReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
@@ -330,6 +331,7 @@ class AnnualCroplandReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
@@ -755,6 +757,7 @@ def _flooded_rice_minor_season_metadata_writes(
     season,
     season_calc,
     base_row: int,
+    season_index: int,
     *,
     is_start: bool,
     is_with: bool,
@@ -766,9 +769,23 @@ def _flooded_rice_minor_season_metadata_writes(
     water_before, water_after, organic_amendment, yield), so the caller must
     pass ``base_row = 8 + 6 * season_index`` to avoid overlap between seasons.
 
+    Following the _forest_disturbance_metadata_writes precedent, the col-1
+    label for every row is emitted once, up front, prefixed with
+    "Minor season {n}:" (n = season_index + 1) so stacked minor seasons are
+    distinguishable and every data row lines up under a label, like every
+    other land activity.
+
     See exact-django-webapp-65h.
     """
-    writes: list[MetadataWrite] = []
+    n = season_index + 1
+    writes: list[MetadataWrite] = [
+        MetadataWrite(base_row + 0, 1, f"Minor season {n}: Hectares"),
+        MetadataWrite(base_row + 1, 1, f"Minor season {n}: Cultivation period (days)"),
+        MetadataWrite(base_row + 2, 1, f"Minor season {n}: Water management before cultivation"),
+        MetadataWrite(base_row + 3, 1, f"Minor season {n}: Water management after cultivation"),
+        MetadataWrite(base_row + 4, 1, f"Minor season {n}: Organic amendment"),
+        MetadataWrite(base_row + 5, 1, f"Minor season {n}: Yield"),
+    ]
     for col, is_state, sfx in [
         (2, is_start, "start"),
         (3, is_with, "w"),
@@ -776,9 +793,14 @@ def _flooded_rice_minor_season_metadata_writes(
     ]:
         if not is_state:
             continue
+        cultivation_period_t2 = getattr(season, f"cultivation_period_t2_{sfx}")
         writes += [
             MetadataWrite(base_row + 0, col, season.area),
-            MetadataWrite(base_row + 1, col, season_calc.efc_default.cultivation_period),
+            MetadataWrite(
+                base_row + 1,
+                col,
+                season_calc.efc_default.cultivation_period if cultivation_period_t2 is None else cultivation_period_t2,
+            ),
             MetadataWrite(base_row + 2, col, getattr(season, f"water_management_type_before_cultivation_{sfx}").name),
             MetadataWrite(base_row + 3, col, getattr(season, f"water_management_type_after_cultivation_{sfx}").name),
             MetadataWrite(base_row + 4, col, getattr(season, f"organic_amendment_type_{sfx}").name),
@@ -835,6 +857,7 @@ class FloodedRiceReport(LandModuleReport):
                         self.emissions_set_w,
                         self.emissions_set_wo,
                         self.inventory,
+                        batch=self._cache_batch,
                     )
                 except Exception as e:
                     log.warning(
@@ -864,7 +887,16 @@ class FloodedRiceReport(LandModuleReport):
 
         # Metadata: row 1 = number of seasons (col 2), rows 2-7 = main season data
         n_seasons = len(minor_seasons) + 1
-        mw = [MetadataWrite(1, 2, n_seasons)]
+        mw = [
+            MetadataWrite(1, 2, n_seasons),
+            MetadataWrite(1, 1, "Number of seasons"),
+            MetadataWrite(2, 1, "Hectares"),
+            MetadataWrite(3, 1, "Cultivation period (days)"),
+            MetadataWrite(4, 1, "Water management before cultivation"),
+            MetadataWrite(5, 1, "Water management after cultivation"),
+            MetadataWrite(6, 1, "Organic amendment"),
+            MetadataWrite(7, 1, "Yield"),
+        ]
 
         # Main season rows 2-7
         efc = self.calculator.efc_default
@@ -891,6 +923,7 @@ class FloodedRiceReport(LandModuleReport):
                 season,
                 season_calc,
                 base_row=8 + 6 * i,
+                season_index=i,
                 is_start=m.is_start(),
                 is_with=m.is_with(),
                 is_without=m.is_without(),

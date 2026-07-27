@@ -86,9 +86,11 @@ class BaseModuleReport:
 
         from api.calculators import Result
 
-        self.emissions_set    = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
-        self.emissions_set_w  = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
-        self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
+        combined_result = Result(*self.result)
+
+        self.emissions_set    = combined_result.balance.yearly_emissions_by_sector_by_gas
+        self.emissions_set_w  = combined_result.total_w.yearly_emissions_by_sector_by_gas
+        self.emissions_set_wo = combined_result.total_wo.yearly_emissions_by_sector_by_gas
 
         try:
             from .cache import save_results_to_cache
@@ -98,11 +100,23 @@ class BaseModuleReport:
                 self.emissions_set_w,
                 self.emissions_set_wo,
                 self.inventory,
+                batch=self._cache_batch,
             )
         except Exception as e:
             log.warning(
                 f"Could not save results to cache for module {self.module.pk}: {e}"
             )
+
+    @property
+    def _cache_batch(self):
+        """Return the active CacheWriteBatch for the current project compute,
+        or None when no project compute is in progress (e.g. a module
+        report constructed standalone). None falls back to an immediate
+        module.save() in save_results_to_cache (see cache.py, R6).
+        """
+        if self.activity_report is None:
+            return None
+        return self.activity_report.project_report.cache_batch
 
     @property
     def _project_duration(self) -> int:
@@ -186,8 +200,16 @@ class BaseActivityReport:
         total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
         total_catch_yearly = [0.0] * self.project_report.duration
+        # Hectares are single-counted per activity for LandModule instances: a
+        # land-use change carries a "with" and a "without" LandModule over the
+        # SAME parcel, so only the first LandModule's hectares are counted
+        # (mirrors the break in Activity.get_land_modules_area()). Modules that
+        # are NOT LandModules (e.g. CoastalWetland) are counted normally, so an
+        # activity holding a CoastalWetland and a LandModule still counts both.
+        # See exact-django-webapp-gz3.
+        land_hectares_counted = False
 
-        for module in self.activity.modules:
+        for module in self.activity.cache_modules():
             report_cls = get_report_class(module)
             if report_cls is None:
                 log.warning(f"No report class for {module.module_type.name}, skipping")
@@ -202,14 +224,21 @@ class BaseActivityReport:
                 total_emissions, result.total_emissions, fillvalue=0
             )))
 
-            if module.is_with() and result.units_breakdown_w:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_w, fillvalue=0
-                )))
-            elif module.is_without() and result.units_breakdown_wo:
-                total_hectares_yearly = list(map(sum, zip_longest(
-                    total_hectares_yearly, result.units_breakdown_wo, fillvalue=0
-                )))
+            is_land_module = isinstance(module, api_models.LandModule)
+            if not (is_land_module and land_hectares_counted):
+                counted = False
+                if module.is_with() and result.units_breakdown_w:
+                    total_hectares_yearly = _add(
+                        total_hectares_yearly, result.units_breakdown_w
+                    )
+                    counted = True
+                elif module.is_without() and result.units_breakdown_wo:
+                    total_hectares_yearly = _add(
+                        total_hectares_yearly, result.units_breakdown_wo
+                    )
+                    counted = True
+                if counted and is_land_module:
+                    land_hectares_counted = True
 
             if result.units_heads_w:
                 total_heads_yearly = list(map(sum, zip_longest(
@@ -257,8 +286,11 @@ class BaseProjectReport:
     activities: Any = None  # QuerySet or list; None → use project.activities.all()
 
     def __post_init__(self):
+        from .cache import CacheWriteBatch
+
         if self.activities is None:
             self.activities = self.project.activities.all()
+        self.cache_batch = CacheWriteBatch()
 
     @property
     def duration(self) -> int:
@@ -276,6 +308,12 @@ class BaseProjectReport:
         """Run all calculations and return the complete ProjectResult."""
         activity_reports = [BaseActivityReport(self, a) for a in self.activities]
         activity_results = [ar.compute() for ar in activity_reports]
+        # Flush the batched cold-path cache writes once, after every
+        # module in every activity has computed and registered its
+        # cache update (see cache.CacheWriteBatch, R6). flush() swallows
+        # per-class errors so a cache-write failure never breaks the
+        # report, matching the prior per-module save() tolerance.
+        self.cache_batch.flush()
 
         aggregated = self._build_aggregated(activity_results)
         cumulative_hectares = self._build_cumulative_hectares(activity_results)

@@ -5,7 +5,7 @@
 functions-framework==3.*
 
 # Django and database
-Django==4.2.1
+Django==4.2.30
 psycopg2-binary==2.9.6
 
 # Google Cloud services
@@ -15,14 +15,14 @@ google-cloud-logging==3.8.0
 # Data processing
 pandas==2.0.1
 numpy==1.24.3
-tqdm==4.66.1
+tqdm==4.67.1
 
 # Configuration
 PyYAML==6.0
-python-dotenv==1.0.0
+python-dotenv==1.2.2
 
 # Django REST framework (if needed for models)
-djangorestframework==3.14.0
+djangorestframework==3.15.2
 
 # Additional dependencies from main requirements
 django-filter==23.5
@@ -32,5 +32,5 @@ python-dateutil==2.8.2
 pytz==2023.3
 
 # Minimal additional packages for functionality
-requests==2.31.0
-urllib3==1.26.19
+requests==2.33.0
+urllib3==2.7.0
