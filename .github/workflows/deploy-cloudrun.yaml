@@ -35,6 +35,12 @@ jobs:
         run: echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
 
       - name: Resolve deployment identifiers
+        # github context reaches the script through env: rather than being
+        # interpolated into the run body. A branch name is attacker-influenced
+        # input, so interpolating it directly would let it inject shell code
+        # (SAST: github context in a run step). Mirrors deploy.yaml.
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -eu
           if [ -z "${PROJECT_ID:-}" ]; then
@@ -53,7 +59,7 @@ jobs:
           echo "REQUEST_TIMEOUT_SECONDS=${REQUEST_TIMEOUT_SECONDS:-300}" >> "$GITHUB_ENV"
           echo "CPU_LIMIT=${CPU_LIMIT:-2}" >> "$GITHUB_ENV"
           echo "MEMORY_LIMIT=${MEMORY_LIMIT:-4Gi}" >> "$GITHUB_ENV"
-          echo "BRANCH_NAME=${{ github.ref_name }}" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=$REF_NAME" >> "$GITHUB_ENV"
           # Cloud Run gets its own host settings so tightening or widening them
           # can never reach App Engine. They fall back to the App Engine values,
           # which do not yet contain the *.run.app hostname; see the deploy guide.
@@ -62,28 +68,31 @@ jobs:
           echo "CLOUDRUN_BACKEND_BASE_URL=${CLOUDRUN_BACKEND_BASE_URL:-${BACKEND_BASE_URL:-}}" >> "$GITHUB_ENV"
 
       - name: Resolve image tags
+        # github.run_number via env: for the same reason as REF_NAME above.
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -eu
           base="$CLOUD_RUN_REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_REPO/$CLOUD_RUN_SERVICE_NAME"
-          echo "TAG=$base:${{ github.run_number }}" >> "$GITHUB_ENV"
+          echo "TAG=$base:$RUN_NUMBER" >> "$GITHUB_ENV"
           echo "TAG_LATEST=$base:latest" >> "$GITHUB_ENV"
 
       - name: 'Checkout Code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           lfs: true
 
       - name: Authenticate to Google Cloud
-        uses: 'google-github-actions/auth@v2'
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.9
         with:
           workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
           service_account: ${{ vars.SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
           cache: pip
@@ -290,4 +299,4 @@ jobs:
 
       - name: Create Issue
         if: failure()
-        uses: un-fao/fao-ga-create-issue@v2
+        uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2
