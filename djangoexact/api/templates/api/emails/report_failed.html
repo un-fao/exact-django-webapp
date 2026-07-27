@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your EX-ACT report could not be generated</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7; font-family:Arial, Helvetica, sans-serif; color:#1a1a1a;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7; padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+          <tr>
+            <td style="background-color:#2e7d32; padding:20px 28px; color:#ffffff; font-size:18px; font-weight:bold;">
+              EX-ACT
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px;">
+              <p style="margin:0 0 16px;">Hi {{ user.get_short_name|default:user.email }},</p>
+              <p style="margin:0 0 16px;">We could not generate your EX-ACT report.</p>
+              {% if project %}<p style="margin:0 0 16px;"><strong>Project:</strong> {{ project.name }}</p>{% endif %}
+              <p style="margin:0 0 16px;">
+                Please try generating it again from EX-ACT. If it keeps happening, contact
+                support so we can help.
+              </p>
+              {% if error_message %}<p style="margin:0 0 16px; font-size:13px; color:#555555; word-break:break-all;">
+                Reference detail (for support): {{ error_message|truncatechars:200 }}
+              </p>{% endif %}
+              <p style="margin:24px 0 0;">Thanks,<br>The EX-ACT team</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -14,7 +14,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -76,6 +76,7 @@ from .models import (
     LargeFishery,
     PublicToken,
     HandInHandAssessment,
+    AsyncJob,
 )
 from .serializers import (
     ActionTypes,
@@ -131,13 +132,14 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ProjectInvitationAcceptSerializer,
+    AsyncJobSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
@@ -148,6 +150,8 @@ import base64
 import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from api.services import async_jobs
+from api.services import report_links
 
 logger = logging.getLogger("console")
 
@@ -523,6 +527,31 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
+    def _attach_project_counts(self, projects):
+        """Attach _activity_count/_module_count to each Project in one query.
+
+        Batches the counts so the serializer getters never hit the DB per object
+        (and never inside the ThreadPoolExecutor used for serialization below).
+        module_count mirrors the copy_async threshold formula: the number of
+        activity -> module_types join rows across the project's activities.
+        """
+        ids = [p.pk for p in projects]
+        if not ids:
+            return
+        rows = (
+            Project.objects.filter(pk__in=ids)
+            .annotate(
+                _ac=Count("activities", distinct=True),
+                _mc=Count("activities__module_types"),
+            )
+            .values_list("pk", "_ac", "_mc")
+        )
+        counts = {pk: (ac, mc) for pk, ac, mc in rows}
+        for p in projects:
+            ac, mc = counts.get(p.pk, (0, 0))
+            p._activity_count = ac
+            p._module_count = mc
+
     @swagger_auto_schema(
         manual_parameters=[
             name,
@@ -605,10 +634,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
+            self._attach_project_counts(page)
             with ThreadPoolExecutor(max_workers=10) as executor:
                 response = list(executor.map(serialize_project, page))
             return paginator.get_paginated_response(response)
 
+        self._attach_project_counts(ordered_projects)
         return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     activities = openapi.Parameter(
@@ -737,6 +768,48 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["post"], url_path="report/async")
+    def report_async(self, request, pk=None):
+        """Enqueue a report for background generation. Returns 202 + job id.
+
+        The existing synchronous `report/` action is unchanged. Poll the job at
+        GET /api/async-jobs/{id}/ then download via that job's /download/ action.
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
+            activity_ids = None
+            selected_activities = project.activities.all()
+        else:
+            activity_ids = [int(pk) for pk in selected_activities]
+            selected_activities = project.activities.filter(pk__in=selected_activities)
+        selected_activities = list(selected_activities)
+
+        if not project.is_ready(selected_activities):
+            logging.error("Project is not ready")
+            return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        template_name = request.query_params.get("template")
+        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
+
+        if fmt == "pdf" and not template_name:
+            return utils.ErrorResponse("Template name is required for PDF", status=http_status.HTTP_400_BAD_REQUEST)
+
+        params = {
+            "project_id": project.pk,
+            "activity_ids": activity_ids,
+            "format": fmt,
+            "template": template_name,
+            "lang": lang,
+        }
+        job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
+        return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
@@ -1194,10 +1267,44 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return error
 
         new_project = utils.copy_project(project, self.request.user)
-        ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
+        # (removed) ProjectMembership.objects.create(...): copy_project already
+        # creates the Admin membership inside its transaction. The old call ran
+        # outside that transaction and could orphan a committed project on failure,
+        # or duplicate the membership.
 
         serializer = ReadProjectSerializer(new_project, context={"request": request})
         return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="copy/async")
+    def copy_async(self, request, pk=None):
+        """Smart copy: inline (201) for small projects, offloaded (202) for large.
+
+        The legacy synchronous `copy/` action is unchanged. New clients should call
+        this endpoint and handle both 201 (body is the new project) and 202
+        (poll GET /api/async-jobs/{job_id}/, then GET /api/projects/{new_project_id}/).
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        activity_count = project.activities.count()
+        module_count = sum(a.module_types.count() for a in project.activities.all())
+        threshold = getattr(settings, "PROJECT_COPY_ASYNC_THRESHOLD", 40)
+
+        if activity_count + module_count <= threshold:
+            new_project = utils.copy_project(project, request.user)
+            serializer = ReadProjectSerializer(new_project, context={"request": request})
+            return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
+
+        with transaction.atomic():
+            shell = utils.create_project_shell(project, request.user)
+        params = {"source_project_id": project.pk, "target_project_id": shell.pk}
+        job = async_jobs.enqueue(AsyncJob.Kind.PROJECT_COPY, params, user=request.user, project=shell)
+        return Response(
+            {"job_id": job.pk, "new_project_id": shell.pk, "status": job.status},
+            status=http_status.HTTP_202_ACCEPTED,
+        )
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipReadSerializer})
@@ -3017,6 +3124,67 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
             cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
 
         return Response(response_data)
+
+
+class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
+    """Poll endpoint for background jobs. Users see only their own jobs."""
+
+    serializer_class = AsyncJobSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AsyncJob.objects.filter(created_by=self.request.user)
+
+    @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])
+    def download(self, request, pk=None):
+        """Stream the stored report blob back as an attachment.
+
+        Two access paths:
+        - Signed token (email link): a valid ``token`` query param carries the
+          job pk (see api.services.report_links) and grants access with no
+          session, so the emailed 24-hour link works straight from an inbox.
+        - Authenticated owner: with no token (or an invalid one), the caller
+          must be authenticated and the job is scoped to created_by=request.user,
+          exactly as before. self.get_object() cannot serve the token path
+          because get_queryset() filters on request.user, which is Anonymous
+          there; AllowAny on this action lets that path run despite the
+          class-level IsAuthenticated (DRF honors per-action permission_classes
+          via get_permissions).
+        """
+        job = None
+        token = request.query_params.get("token")
+        if token:
+            token_job_pk = report_links.load_download_token(token)
+            if token_job_pk is not None:
+                # Trust the signed pk from the token, not the URL pk: this path
+                # is unfiltered (no owner scope), so binding to the URL pk would
+                # let a valid token for one job unlock any other job by swapping
+                # the pk in the URL.
+                job = AsyncJob.objects.filter(pk=token_job_pk).first()
+        if job is None:
+            if not request.user.is_authenticated:
+                return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+            job = AsyncJob.objects.filter(pk=pk, created_by=request.user).first()
+
+        if job is None:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+        if job.kind != AsyncJob.Kind.REPORT or job.status != AsyncJob.Status.COMPLETED:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+        gcs_path = (job.result or {}).get("gcs_path")
+        if not gcs_path:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+
+        client = storage.Client()
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+        blob = bucket.blob(gcs_path)
+        stream = blob.open("rb")
+        response = FileResponse(
+            stream,
+            content_type=job.result.get("content_type", "application/octet-stream"),
+        )
+        filename = job.result.get("filename", "report")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
 
 class MinitoolProcessingView(APIView):

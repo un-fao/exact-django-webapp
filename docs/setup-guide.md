@@ -637,7 +637,7 @@ This should drop you into a PostgreSQL shell connected to the remote database.
 The "Production (READ-ONLY)" label in `launch.json` is a convention, not an enforcement. To make it physically impossible to write to production while connected through your local machine, do one of:
 
 1. **Use a read-only Postgres role.** Ask the project lead for an `exact_readonly` user and put its credentials in `.env.production`. This is the recommended approach.
-2. **Force every transaction to be read-only** in `.env.production` by setting `DB_OPTIONS_OPTIONS='-c default_transaction_read_only=on'` (the project's settings.py honours `DB_OPTIONS_*` env vars if you wire them in; if it doesn't yet, file a beads issue rather than skipping this step).
+2. **Force every transaction to be read-only** in `.env.production` by setting `DB_OPTIONS_OPTIONS='-c default_transaction_read_only=on'` (the project's settings.py honours `DB_OPTIONS_*` env vars if you wire them in; if it doesn't yet, add it to `.planning/BACKLOG.md` rather than skipping this step).
 3. **Don't run with `APP_MODE=production` at all** unless you have a documented reason. Use `review` for almost everything.
 
 Any `UPDATE`, `INSERT`, or `DELETE` you accidentally run with full credentials will land on live user data with no undo. Treat the production proxy connection as a footgun.

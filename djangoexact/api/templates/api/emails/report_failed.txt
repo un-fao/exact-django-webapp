@@ -1,0 +1,13 @@
+Hi {{ user.get_short_name|default:user.email }},
+
+We could not generate your EX-ACT report.
+{% if project %}
+Project: {{ project.name }}{% endif %}
+
+Please try generating it again from EX-ACT. If it keeps happening, contact
+support so we can help.
+{% if error_message %}
+Reference detail (for support): {{ error_message|truncatechars:200 }}{% endif %}
+
+Thanks,
+The EX-ACT team

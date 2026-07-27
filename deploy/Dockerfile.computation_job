@@ -32,9 +32,24 @@ RUN pip install --upgrade pip 'setuptools>=78.1.1' wheel \
  && pip install --prefix=/install --force-reinstall 'setuptools>=78.1.1'
 
 FROM base AS runtime
+# libpq5: psycopg2 runtime. The rest are WeasyPrint (report PDF) runtime
+# dependencies: Pango/Cairo/GDK-PixBuf/libffi for rendering, plus fontconfig
+# and base fonts so report typography matches the synchronous (App Engine)
+# rendering path. run_async_job renders PDF reports via WeasyPrint in this
+# image, unlike the LUC compute job which never needed these.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         libpq5 \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libpangoft2-1.0-0 \
+        libcairo2 \
+        libgdk-pixbuf-2.0-0 \
+        libffi8 \
+        shared-mime-info \
+        fontconfig \
+        fonts-dejavu \
+        fonts-liberation \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /install /usr/local
