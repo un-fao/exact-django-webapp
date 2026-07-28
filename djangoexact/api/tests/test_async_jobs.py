@@ -8,9 +8,9 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
-from api.models import AsyncJob
+from api.models import AsyncJob, Project
 from api.services import async_jobs
-from api.tests.factories import ProjectFactory, UserFactory
+from api.tests.factories import ActivityFactory, ProjectFactory, UserFactory
 import api.services as services_pkg
 
 
@@ -240,6 +240,114 @@ class ReconcileStaleAsyncJobsTestCase(TestCase):
         call_command("reconcile_stale_async_jobs")
         job.refresh_from_db()
         self.assertEqual(job.status, AsyncJob.Status.PENDING)
+
+
+class ReconcileOrphanedShellProjectsTestCase(TestCase):
+    """Covers the deferred second pass of reconcile_stale_async_jobs, which
+    deletes the empty shell Project of a failed PROJECT_COPY job once the
+    24 hour grace period has elapsed.
+    """
+
+    def setUp(self):
+        self.user = UserFactory(email="orphan-shell-owner@example.com")
+
+    def _make_copy_job(self, *, kind=AsyncJob.Kind.PROJECT_COPY, status=AsyncJob.Status.FAILED,
+                        hours_ago=25, job_project=None, target_id=None, source_id=None):
+        """Build a backdated AsyncJob plus its linked project, defaulting to
+        the happy path: a failed PROJECT_COPY job whose completed_at is well
+        past the grace period, correctly targeting its own project.
+        """
+        shell = job_project or ProjectFactory(owner=self.user)
+        source = ProjectFactory(owner=self.user)
+        params = {
+            "source_project_id": source.pk if source_id is None else source_id,
+            "target_project_id": shell.pk if target_id is None else target_id,
+        }
+        job = AsyncJob.objects.create(
+            kind=kind, status=status, project=shell, params=params,
+            error_message="copy failed: boom",
+        )
+        if hours_ago is not None:
+            AsyncJob.objects.filter(pk=job.pk).update(
+                completed_at=timezone.now() - timedelta(hours=hours_ago),
+            )
+            job.refresh_from_db()
+        return job, shell, source
+
+    def test_deletes_empty_shell_and_preserves_the_job(self):
+        from django.core.management import call_command
+        job, shell, _source = self._make_copy_job()
+        buf = io.StringIO()
+        call_command("reconcile_stale_async_jobs", stdout=buf)
+        self.assertFalse(Project.objects.filter(pk=shell.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertEqual(job.error_message, "copy failed: boom")
+        self.assertIsNone(job.project_id)
+        self.assertIn("Deleted 1 orphaned shell project", buf.getvalue())
+
+    def test_shell_with_activity_survives(self):
+        from django.core.management import call_command
+        job, shell, _source = self._make_copy_job()
+        ActivityFactory(project=shell)
+        call_command("reconcile_stale_async_jobs")
+        self.assertTrue(Project.objects.filter(pk=shell.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.project_id, shell.pk)
+
+    def test_recently_failed_job_survives_grace_period(self):
+        from django.core.management import call_command
+        job, shell, _source = self._make_copy_job(hours_ago=1)
+        call_command("reconcile_stale_async_jobs")
+        self.assertTrue(Project.objects.filter(pk=shell.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.project_id, shell.pk)
+
+    def test_wrong_kind_is_out_of_scope(self):
+        from django.core.management import call_command
+        job, shell, _source = self._make_copy_job(kind=AsyncJob.Kind.REPORT)
+        call_command("reconcile_stale_async_jobs")
+        self.assertTrue(Project.objects.filter(pk=shell.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.project_id, shell.pk)
+
+    def test_only_failed_status_is_swept(self):
+        from django.core.management import call_command
+        job, shell, _source = self._make_copy_job(status=AsyncJob.Status.COMPLETED)
+        call_command("reconcile_stale_async_jobs")
+        self.assertTrue(Project.objects.filter(pk=shell.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.project_id, shell.pk)
+
+    def test_source_project_is_never_deleted(self):
+        from django.core.management import call_command
+        source_project = ProjectFactory(owner=self.user)
+        job, _project_used, _source = self._make_copy_job(
+            job_project=source_project,
+            source_id=source_project.pk,
+            target_id=source_project.pk + 999999,
+        )
+        call_command("reconcile_stale_async_jobs")
+        self.assertTrue(Project.objects.filter(pk=source_project.pk).exists())
+        job.refresh_from_db()
+        self.assertEqual(job.project_id, source_project.pk)
+
+    def test_flip_and_sweep_do_not_delete_in_the_same_run(self):
+        from django.core.management import call_command
+        shell = ProjectFactory(owner=self.user)
+        source = ProjectFactory(owner=self.user)
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.PROJECT_COPY, status=AsyncJob.Status.RUNNING, project=shell,
+            params={"source_project_id": source.pk, "target_project_id": shell.pk},
+        )
+        AsyncJob.objects.filter(pk=job.pk).update(
+            started_at=timezone.now() - timedelta(hours=2),
+        )
+        call_command("reconcile_stale_async_jobs")
+        job.refresh_from_db()
+        self.assertEqual(job.status, AsyncJob.Status.FAILED)
+        self.assertTrue(Project.objects.filter(pk=shell.pk).exists())
+        self.assertEqual(job.project_id, shell.pk)
 
 
 class ReportJobRunTestCase(TestCase):
