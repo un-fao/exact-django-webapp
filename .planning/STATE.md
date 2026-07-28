@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-27T10:33:26.494Z"
-last_activity: 2026-07-27
-last_activity_desc: "Completed quick task 260727-h79: extend reconcile_stale_async_jobs with a deferred orphaned shell project sweep"
+last_updated: "2026-07-28T08:41:58.866Z"
+last_activity: 2026-07-28
+last_activity_desc: "Completed quick task 260728-euz: exact-api-dev Cloud Run deployment pipeline for feature/id-responses on the review DB (live deploy gated on confirmation)"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-27 - Completed quick task 260727-h79: extend reconcile_stale_async_jobs with a deferred orphaned shell project sweep
+Last activity: 2026-07-28 - Completed quick task 260728-euz: exact-api-dev Cloud Run deployment pipeline for feature/id-responses on the review DB (live deploy gated on confirmation)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -98,6 +98,7 @@ None yet.
 | 260723-jas | Feasibility review: migrating the web API from App Engine to Cloud Run. Evaluation only, no code changed. Verdict: feasible and largely de-risked by the existing Cloud Run Job image; sequence behind Secret Manager migration and an FAO IT answer on ingress/domain | 2026-07-23 | (docs) | [260723-jas-cloud-run-migration-feasibility](./quick/260723-jas-cloud-run-migration-feasibility/) |
 | 260724-eut | Additive Cloud Run deployment path for review: WhiteNoise static serving, forked web-service Dockerfile, Knative service manifest, review-only GitHub Actions workflow, and operator setup guide. App Engine and existing computation Job untouched | 2026-07-24 | 7dec6f85 | [260724-eut-prepare-the-api-to-be-deployed-to-cloud-](./quick/260724-eut-prepare-the-api-to-be-deployed-to-cloud-/) |
 | 260727-h79 | Extend reconcile_stale_async_jobs with a deferred second pass that deletes orphaned shell Projects from failed PROJECT_COPY jobs after a 24h grace period, guarded by activities-emptiness and source/target params checks; job row preserved with project set NULL | 2026-07-27 | d7252388 | [260727-h79-extend-reconcile-stale-async-jobs-with-d](./quick/260727-h79-extend-reconcile-stale-async-jobs-with-d/) |
+| 260728-euz | New exact-api-dev Cloud Run service in fao-exact-review deploying feature/id-responses code against the shared review DB; additive skip-migrate dev pipeline mirroring the review Cloud Run workflow, wired to the develop GitHub environment with all config resolved in-workflow (App Engine dev untouched). Live push/deploy gated on user confirmation | 2026-07-28 | ba630742 | [260728-euz-create-exact-api-dev-cloud-run-deploymen](./quick/260728-euz-create-exact-api-dev-cloud-run-deploymen/) |
 
 ## Deferred Items
 
