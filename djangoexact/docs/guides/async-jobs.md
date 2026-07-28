@@ -293,6 +293,39 @@ threshold intentionally matches the Cloud Run Job's `--task-timeout=3600` (see t
 pipeline note below): if a job execution were killed by the platform for exceeding that
 timeout, the row would otherwise stay `running` forever with nothing to correct it.
 
+### Deferred cleanup of orphaned shell projects
+
+The same command also runs a second, deferred pass: it deletes the empty shell `Project`
+left behind by a failed `PROJECT_COPY` `AsyncJob`. The async copy path creates the
+destination project up front (`views.py`, `create_project_shell`) and hands its id back to
+the client immediately, before the worker has done any copying. If the worker job then
+fails, that shell project has no activities and no further use, but stays in the user's
+project list forever unless something removes it.
+
+This pass only ever runs against `PROJECT_COPY` jobs that are `failed`, and it is deferred
+by a 24-hour grace period measured from `completed_at`. The grace period exists so a client
+polling `GET /api/async-jobs/{id}/` still has time to read the failure and its
+`error_message` while the job is attached to a real project, before the project link is
+removed.
+
+Before deleting, the sweep checks three conditions, all of which must hold:
+
+- the linked project has zero activities,
+- `params["target_project_id"]` equals the job's `project_id`, confirming the linked project
+  is the copy's destination, and
+- `params["source_project_id"]` does not equal the job's `project_id`, so the sweep can
+  never touch a user's source project even if a row is hand-edited or otherwise malformed.
+
+The `AsyncJob` row itself is preserved: it is unlinked from the project (`project` set to
+`None`) before the project is deleted, both inside one `transaction.atomic` block, so the
+failed job and its `error_message` remain available for support and debugging after the
+shell is gone.
+
+Known limitation: a `failed` row with a null `completed_at` is skipped, since there is no
+timestamp to anchor the grace window against. This does not occur today because every
+current failure path (dispatch failure, `run_async_job` handler exception, and the stale
+flip above) stamps `completed_at` when it marks a job `failed`.
+
 This mirrors the existing `admin_scripts` command `reconcile_stale_jobs`, which does the
 same thing for the older `ComputationJob` model and its own 1-hour `STALE_THRESHOLD`. As
 of this task, neither command has a Cloud Scheduler (or other automated trigger) wired up
@@ -327,6 +360,10 @@ Scheduler job targeting one of:
 Either mechanism should also cover the older `reconcile_stale_jobs` command for
 `ComputationJob` if it is not already scheduled somewhere outside this repo; this task did
 not find evidence that it is.
+
+The same hourly schedule also covers the orphaned shell project sweep described above,
+since both passes run inside the one `reconcile_stale_async_jobs` invocation. No separate
+schedule is needed for that cleanup.
 
 ## GCS lifecycle for report objects
 
