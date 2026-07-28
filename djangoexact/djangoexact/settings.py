@@ -66,6 +66,16 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).s
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
+# Behind the App Engine / Cloud Run TLS-terminating proxy the container is
+# reached over plain http with the original scheme in X-Forwarded-Proto. Trust
+# that header so request.is_secure() reflects the external https request.
+# Without it Django computes the same-origin as http://<host> and rejects a
+# browser https POST with "Origin checking failed ... does not match any trusted
+# origins" (the admin and DRF session views). Google recommends this exact
+# setting for Django on App Engine, so it is correct on both platforms; the
+# container is never reachable except through the proxy, which sets the header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 # Application definition
 
@@ -105,6 +115,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves STATIC_ROOT for the Cloud Run web service. Stays inert on App
+    # Engine, where the app.yaml `- url: /static` handler intercepts those
+    # requests before Django sees them.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
