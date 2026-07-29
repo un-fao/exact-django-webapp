@@ -140,7 +140,7 @@ from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
 from django.http import FileResponse, HttpResponse
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
@@ -530,8 +530,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def _attach_project_counts(self, projects):
         """Attach _activity_count/_module_count to each Project in one query.
 
-        Batches the counts so the serializer getters never hit the DB per object
-        (and never inside the ThreadPoolExecutor used for serialization below).
+        Batches the counts so the serializer getters never hit the DB per object.
         module_count mirrors the copy_async threshold formula: the number of
         activity -> module_types join rows across the project's activities.
         """
@@ -635,8 +634,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
             self._attach_project_counts(page)
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                response = list(executor.map(serialize_project, page))
+            # Serialized on the request's own connection: a thread pool here
+            # costs one Postgres connection per worker per request (see
+            # api/concurrency.py). default_language() preserves the response
+            # bytes, since thread-pool workers never inherited the request
+            # language and always rendered in settings.LANGUAGE_CODE.
+            with concurrency.default_language():
+                response = [serialize_project(project) for project in page]
             return paginator.get_paginated_response(response)
 
         self._attach_project_counts(ordered_projects)
@@ -693,20 +697,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit all tasks to the executor
-            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+        def log_activity_failure(activity_pk, exc):
+            logging.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-            for future in as_completed(future_to_pk):
-                pk = future_to_pk[future]
-                try:
-                    data = future.result()
-                except Exception as exc:
-                    logging.error(f"Activity {pk} generated an exception: {exc}")
-                    # You can choose to handle exceptions differently if needed
-                else:
-                    response["activities"].append(data)
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
+        response["activities"] = concurrency.map_in_bounded_threads(
+            process_activity,
+            activity_pks,
+            on_error=log_activity_failure,
+        )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -2089,9 +2089,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
-                logger.debug(f"Time taken to process activities: {time.time() - start}")
+            response = concurrency.map_in_bounded_threads(process_activity, page)
+            logger.debug(f"Time taken to process activities: {time.time() - start}")
             return paginator.get_paginated_response(response)
 
         # End measuring time
