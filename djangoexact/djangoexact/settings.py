@@ -1,5 +1,13 @@
 import os
 
+from datetime import timedelta
+from pathlib import Path
+import json
+import base64
+
+import firebase_admin
+from dotenv import load_dotenv
+
 """
 Django settings for djangoexact project.
 
@@ -12,46 +20,81 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from datetime import timedelta
-from pathlib import Path
-import json
-import base64
-
-import firebase_admin
-import pyrebase
-from dotenv import load_dotenv
-
 load_dotenv()
+
+app_mode = os.getenv("APP_MODE", None)
+if app_mode:
+    print(f"Running in {app_mode} mode")
+    dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
+    load_dotenv(dotenv_file)
+    FRONTEND_URL = "https://exact.review.fao.org" if app_mode == "review" else "https://exact.apps.fao.org"
+else:
+    FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
+
+# Absolute URL to this API host. Used to build self-contained, emailable report
+# download links (see api/services/report_links.py). Empty locally unless set.
+BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "")
+
+# Send the "your report is ready" email when an async report job completes.
+# Default True; distinct from JOB_NOTIFICATIONS_ENABLED (ComputationJob emails).
+REPORT_READY_EMAIL_ENABLED = os.environ.get("REPORT_READY_EMAIL_ENABLED", "true").lower() in ("true", "1", "yes")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv("GAE_APPLICATION", None) else "$SECRET_KEY"
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Fail fast in non-DEBUG environments when SECRET_KEY is not provided.
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only-do-not-use-in-production"
+    else:
+        from django.core.exceptions import ImproperlyConfigured
 
-CORS_ORIGIN_ALLOW_ALL = True
+        raise ImproperlyConfigured("SECRET_KEY environment variable is required when DEBUG is False.")
+
+_default_hosts = "localhost,127.0.0.1,0.0.0.0"
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).split(",") if h.strip()]
+
+# CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
+# Behind the App Engine / Cloud Run TLS-terminating proxy the container is
+# reached over plain http with the original scheme in X-Forwarded-Proto. Trust
+# that header so request.is_secure() reflects the external https request.
+# Without it Django computes the same-origin as http://<host> and rejects a
+# browser https POST with "Origin checking failed ... does not match any trusted
+# origins" (the admin and DRF session views). Google recommends this exact
+# setting for Django on App Engine, so it is correct on both platforms; the
+# container is never reachable except through the proxy, which sets the header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
 
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
     "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "drf_yasg",
     "django_extensions",
     "django_archive",
@@ -62,23 +105,32 @@ INSTALLED_APPS = [
     "simple_history",
     "ipcc",
     "api",
+    "public",
+    "blog",
+    "ckeditor",
+    "minitool",
+    "admin_scripts",
+    "corsheaders",
 ]
-
-if DEBUG:
-    INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves STATIC_ROOT for the Cloud Run web service. Stays inert on App
+    # Engine, where the app.yaml `- url: /static` handler intercepts those
+    # requests before Django sees them.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "minitool.middleware.DatabaseConnectionMiddleware",  # Add connection cleanup middleware
 ]
 
 ROOT_URLCONF = "djangoexact.urls"
@@ -118,7 +170,13 @@ if os.getenv("GAE_APPLICATION", None):
             "TEST": {
                 "NAME": "$DB_NAME",
             },
-        }
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+                "application_name": "djangoexact",  # Help identify connections
+            },
+            "CONN_MAX_AGE": 0,  # Close connections immediately after use
+            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
+        },
     }
 else:
     DATABASES = {
@@ -129,8 +187,25 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
-        }
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+                "application_name": "djangoexact",  # Help identify connections
+            },
+            "CONN_MAX_AGE": 0,  # Close connections immediately after use
+            "ATOMIC_REQUESTS": False,  # Disable automatic transactions
+        },
     }
+    if os.getenv("CI", "").lower() == "true":
+        # CI only: reuse the pre-seeded database via `manage.py test --keepdb`.
+        # GitHub Actions always sets CI=true. Outside CI, Django's default
+        # test_<name> database is used, so a local `manage.py test` can never
+        # drop or flush the developer's real database.
+        DATABASES["default"]["TEST"] = {"NAME": os.getenv("DB_NAME", default="$DB_NAME")}
+
+DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
+
+# Database connection management
+DATABASE_CONNECTION_POOLING = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -154,19 +229,30 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+LANGUAGE_CODE = "en"
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+    ("ru", "Russian"),
+]
 
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-STATIC_ROOT = "static"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = "/static/"
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -182,6 +268,14 @@ REST_FRAMEWORK = {
         "accounts.firebase.FirebaseAuthentication",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "1000/min",
+    },
 }
 
 # Auditlog Settings
@@ -249,8 +343,8 @@ try:
         "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
     }
 
-    firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
-    auth = firebase.auth()
+    from accounts.firebase_auth import FirebaseAuth
+    auth = FirebaseAuth(FIREBASE_CONFIG["apiKey"])
     firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
@@ -261,3 +355,22 @@ UNFOLD = {
         "show_all_applications": True,  # Dropdown with all applications and models
     },
 }
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
+DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
+
+# Computation Jobs - Cloud Run
+# Set to a Cloud Run Job resource name to enable GCP dispatch.
+# Empty string = subprocess fallback (local dev).
+CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
+CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
+
+# Job Notifications
+# Set to True to enable email notifications for completed jobs.
+JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
+
+# Projects whose (activities + module-type) count exceeds this are copied via a
+# background job instead of synchronously in the request. Small copies stay sync.
+PROJECT_COPY_ASYNC_THRESHOLD = int(os.environ.get("PROJECT_COPY_ASYNC_THRESHOLD", "40"))

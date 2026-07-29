@@ -7,8 +7,8 @@ class FirebaseAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # If it's login or register endpoint, skip authentication
-        if request.path in ["/api/accounts/register/", "/api/accounts/login/"]:
+        # If it's login or register or token refresh or public endpoint, skip authentication
+        if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/api/public/"]:
             response = self.get_response(request)
             return response
 

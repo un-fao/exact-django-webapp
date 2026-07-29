@@ -1,0 +1,35 @@
+[
+{
+  "model": "api.watermanagementtypebeforecultivation",
+  "pk": 2,
+  "fields": {
+    "name": "Non Flooded Pre-Season <180 D",
+    "name_en": "Non Flooded Pre-Season <180 D",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypebeforecultivation",
+  "pk": 3,
+  "fields": {
+    "name": "Non Flooded Pre-Season >180 D",
+    "name_en": "Non Flooded Pre-Season >180 D",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.watermanagementtypebeforecultivation",
+  "pk": 4,
+  "fields": {
+    "name": "Flooded Pre-Season > 30 D",
+    "name_en": "Flooded Pre-Season > 30 D",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+}
+]

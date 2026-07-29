@@ -12,7 +12,7 @@ from api.models import (
     Country,
     Group,
     Moisture,
-    PerennialCropping,
+    PerennialCropland,
     Project,
     SoilType,
     ProjectMembership,
@@ -20,7 +20,7 @@ from api.models import (
 from api.models import CustomUser as User
 from api.tests.factories import (
     ActivityFactory,
-    PerennialCroppingFactory,
+    PerennialCroplandFactory,
     ProjectFactory,
 )
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
@@ -80,7 +80,7 @@ sleep(1)
 
 a: Activity = ActivityFactory.create(project=p)
 
-perennials: PerennialCropping = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+perennials: PerennialCropland = PerennialCroplandFactory.create_batch(BATCH_SIZE, activity=a)
 
 total_livestocks = perennials.__len__()
 passed_livestocks = 0

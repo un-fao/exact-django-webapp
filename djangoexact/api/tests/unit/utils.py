@@ -1,0 +1,532 @@
+from rest_framework.test import APIRequestFactory, APITestCase
+from django.urls import reverse
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet, CommentViewSet
+import api.models as models
+import ipcc.models as ipcc_models
+from rest_framework.test import force_authenticate
+from factory.fuzzy import FuzzyText, FuzzyInteger
+import logging as log
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework import status
+import public.views as public_views
+import logging
+
+
+logging.disable(logging.ERROR)
+
+
+class APITestCaseMixin(APITestCase):
+    def setUp(self):
+        """
+        Set up the test environment for the project lock tests.
+
+        This method initializes the following attributes:
+        - self.user: A CustomUser instance with the email "testuser@example.com".
+        - self.user2: A CustomUser instance with the email "test@user.org".
+        - self.group: A Group instance with the name "Second Reviewer".
+        - self.country: A randomly selected Country instance.
+        - self.climate: A randomly selected Climate instance.
+        - self.moisture: A randomly selected Moisture instance associated with the selected Climate.
+        - self.soil_type: A randomly selected SoilType instance.
+        - self.project_data: A dictionary containing project data with the following keys:
+            - "name": A randomly generated string.
+            - "start_year_of_activities": The year 2024.
+            - "implementation_years": The number 10.
+            - "last_year_of_accounting": The year 2040.
+            - "country": The ID of the selected Country instance.
+            - "climate": The ID of the selected Climate instance.
+            - "moisture": The ID of the selected Moisture instance.
+            - "soil_type": The ID of the selected SoilType instance.
+            - "gw_potential": The ID of a randomly selected GlobalWarmingPotential instance.
+        """
+        log.getLogger().setLevel(log.INFO)
+        log.debug("Setting up ProjectLockTestCase")
+        self.request_factory = APIRequestFactory(enforce_csrf_checks=False)
+        self.user = models.CustomUser.objects.get(email="testuser@example.com")
+        self.user2 = models.CustomUser.objects.get(email="test@user.org")
+        self.group = models.Group.objects.get(name="Second Reviewer")
+        self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()
+        self.climate = models.Climate.objects.order_by("?").first()
+        self.moisture = self.climate.moistures.order_by("?").first()
+        self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
+        self.module_type = models.ModuleType.objects.filter(is_luc=True).order_by("?").first()
+        self.change_rate = models.ChangeRate.objects.get(name="linear")
+        self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
+        self.project_data = {
+            "name": FuzzyText().fuzz(),
+            "start_year_of_activities": 2024,
+            "implementation_years": 10,
+            "last_year_of_accounting": 2040,
+            "country": self.country.id,
+            "climate": self.climate.id,
+            "moisture": self.moisture.id,
+            "soil_type": self.soil_type.id,
+            "gw_potential": self.gw_potential.id,
+            "soc_ref_t2": FuzzyInteger(0, 100).fuzz(),
+        }
+
+    def create_project(self):
+        """
+        Create a project using the ProjectViewSet.
+
+        This method creates a project by sending a POST request to the 'project-list' endpoint
+        with the provided project data in JSON format. The request is authenticated with the test user,
+        and the response is returned.
+        """
+        log.debug("Creating project")
+        factory = APIRequestFactory(enforce_csrf_checks=False)
+        view = ProjectViewSet.as_view({"post": "create"})
+
+        request = self.request_factory.post(
+            reverse("project-list"),
+            self.project_data,
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def unlock_project(self, project, user):
+        """
+        Unlock a project using the ProjectViewSet.
+        """
+        log.debug("Unlocking project")
+        view = ProjectViewSet.as_view({"post": "unlock"})
+        request = self.request_factory.post(
+            reverse("project-unlock", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def send_project_invitation(self, project, user, group):
+        """
+        Send a project invitation using the ProjectViewSet.
+
+        This method sends a project invitation by sending a POST request to the 'project-invite' endpoint
+        with the provided project data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Sending project invitation")
+        view = ProjectInvitationViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectinvitation-list"),
+            {"email": user.email, "project": project.id, "group": group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def create_project_membership(self, project, user, group=None):
+        """
+        Create a project membership for a user.
+
+        This method creates a project membership for the provided user and project.
+        """
+        log.debug("Creating project membership")
+
+        if group is None:
+            group = self.group
+
+        view = ProjectMembershipViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectmembership-list"),
+            {"user": user.id, "project": project.id, "group": group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def get_project_memberships(self, project):
+        """
+        Get project memberships for a project.
+        """
+        log.debug("Getting project memberships")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(reverse("project-list"), format="json")
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
+
+    def get_project_memberships_filter_by_user(self, project):
+        """
+        Get project memberships for a project, filtered by user.
+        """
+        log.debug("Getting project memberships filtered by user")
+        view = ProjectViewSet.as_view({"get": "memberships"})
+        request = self.request_factory.get(reverse("project-list"), {"user": self.user.id}, format="json")
+        force_authenticate(request, user=self.user)
+        return view(request, pk=project.id)
+
+    def edit_project(self, project, user, data):
+        """
+        Edit a project using the ProjectViewSet.
+
+        This method edits a project by sending a PATCH request to the 'project-detail' endpoint
+        with the provided project data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Editing project")
+        view = ProjectViewSet.as_view({"patch": "partial_update"})
+
+        request = self.request_factory.patch(
+            reverse("project-detail", args=[project.id]),
+            data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def upload_project_file(self, project, user, file=None):
+        """
+        Upload a project file using the ProjectViewSet.
+
+        This method uploads a project file by sending a POST request to the 'project-upload' endpoint
+        with the provided file data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Uploading project file")
+        view = ProjectFileAttachmentViewSet.as_view({"post": "create"})
+
+        if file is None:
+            sample_content = b"Sample file content for testing."
+            file = SimpleUploadedFile("testfile.txt", sample_content, content_type="text/plain")
+
+        request = self.request_factory.post(
+            reverse("projectattachment-list"),
+            {"file": file, "project": project.id},
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request)
+
+    def create_activity(self, project, user, module_types=None, land_use_change=False):
+        """
+        Create an activity using the ActivityViewSet.
+
+        This method creates an activity by sending a POST request to the 'activity-build' endpoint
+        with the provided activity data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Creating activity")
+
+        activity_builder_data = {
+            "name": FuzzyText().fuzz(),
+            "project": project.id,
+            "area": 100,
+            "change_rate": self.change_rate.id,
+            "cost": 0,
+        }
+
+        if land_use_change:
+            activity_builder_data["land_use_change"] = {
+                "module_type_start": module_types[0].id,
+                "module_type_w": module_types[1].id,
+                "module_type_wo": module_types[2].id,
+            }
+        elif module_types:
+            activity_builder_data["module_types"] = [module_type.id for module_type in module_types]
+        else:
+            activity_builder_data["module_types"] = [self.module_type.id]
+
+        view = ActivityViewSet.as_view({"post": "build"})
+        request = self.request_factory.post(
+            reverse("activities-list"),
+            activity_builder_data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+
+        response = view(request)
+        log.error(response.data) if response.status_code != status.HTTP_200_OK else None
+
+        return response
+
+    def edit_activity(self, activity, user, data):
+        """
+        Edit an activity using the ActivityViewSet.
+
+        This method edits an activity by sending a PATCH request to the 'activity-detail' endpoint
+        with the provided activity data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Editing activity")
+        view = ActivityViewSet.as_view({"patch": "partial_update"})
+
+        request = self.request_factory.patch(
+            reverse("activities-detail", args=[activity.id]),
+            data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def copy_activity(self, activity, user):
+        """
+        Copy an activity using the ActivityViewSet.
+
+        This method copies an activity by sending a POST request to the 'activity-copy' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Copying activity")
+        view = ActivityViewSet.as_view({"post": "copy"})
+
+        request = self.request_factory.post(
+            reverse("activities-copy", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def delete_activity(self, activity, user):
+        """
+        Delete an activity using the ActivityViewSet.
+
+        This method deletes an activity by sending a DELETE request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Deleting activity")
+        view = ActivityViewSet.as_view({"delete": "destroy"})
+
+        request = self.request_factory.delete(
+            reverse("activities-detail", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def get_module_details(self, module, user):
+        """
+        Get module details using the ModuleViewSet.
+        """
+        log.debug("Getting module details")
+        view = generic_module_viewset(module.__class__).as_view({"get": "retrieve"})
+        request = self.request_factory.get(reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]), format="json")
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
+
+    def edit_module(self, module, user, data, put=False):
+        """
+        Edit a module using the ModuleViewSet.
+
+        This method edits a module by sending a PATCH or PUT request to the 'module-detail' endpoint
+        with the provided module data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+
+        Args:
+            module: The module to edit
+            user: The user making the request
+            data: The data to update the module with
+            put: If True, do a PUT request instead of PATCH, transferring all module data
+        """
+        log.debug(f"Editing module: {module.__class__.__name__}")
+        log.debug(f"Data: {data}")
+        if put:
+            view = generic_module_viewset(module.__class__).as_view({"put": "update"})
+        else:
+            view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
+
+        http_method = self.request_factory.put if put else self.request_factory.patch
+
+        request = http_method(
+            reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]),
+            data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
+
+    def create_submodule(self, SubmoduleClass, user, data):
+        """
+        Create a submodule using the ModuleViewSet.
+
+        This method creates a submodule by sending a POST request to the 'module-list' endpoint
+        with the provided submodule data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug(f"Creating submodule with data: {data}")
+        view = generic_module_viewset(SubmoduleClass).as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse(f"{SubmoduleClass.__name__.lower()}-list"),
+            data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        response = view(request)
+        return response
+
+    def get_module_defaults(self, module, user):
+        """
+        Get module defaults using the ModuleViewSet.
+
+        This method retrieves module defaults by sending a GET request to the 'module-defaults' endpoint
+        with the provided module ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Getting module defaults")
+        view = generic_module_viewset(module.__class__).as_view({"get": "defaults"})
+        request = self.request_factory.get(
+            reverse(f"{module.__class__.__name__.lower()}-defaults", args=[module.pk]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
+
+    def calculate_project_results(self, project, user):
+        """
+        Calculate project results using the ProjectViewSet.
+
+        This method calculates project results by sending a POST request to the 'project-calculate' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Calculating project results")
+        view = ProjectViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("results", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def calculate_activity_results(self, activity, user):
+        """
+        Calculate activity results using the ActivityViewSet.
+
+        This method calculates activity results by sending a POST request to the 'activity-calculate' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Calculating activity results")
+        view = ActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activities-results", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def calculate_activity_results_anonimously(self, activity):
+        """
+        Calculate activity results without authentication.
+        This method calculates activity results by sending a GET request to the 'activity-results' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.debug("Calculating activity results without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "results"})
+        request = self.request_factory.get(
+            reverse("activity-results", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
+
+    def get_activity_anonimously(self, activity):
+        """
+        Get activity data without authentication.
+        This method retrieves activity data by sending a GET request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is not authenticated, and the response is returned.
+        """
+        log.debug("Getting activity data without authentication")
+        view = public_views.PublicActivityViewSet.as_view({"get": "retrieve"})
+        request = self.request_factory.get(
+            reverse("activity-detail", args=[activity.id]),
+            format="json",
+        )
+        return view(request, pk=activity.id)
+
+    def get_report(self, project, user, template=None):
+        """
+        Get project report data.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Getting project report data")
+        view = ProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if template:
+            queryparams = {"template": template}
+        request = self.request_factory.get(
+            reverse("project-report", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def get_report_anonimously(self, project, templated=False):
+        """
+        Get project report data without authentication.
+        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.debug("Getting project report data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "report"})
+        queryparams = None
+        if templated:
+            queryparams = {"template": "fao"}
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.id]),
+            queryparams,
+            format="json",
+        )
+        return view(request, pk=project.id)
+
+    def get_activities_anonimously(self, project):
+        """
+        Get activities data without authentication.
+        This method retrieves activities data by sending a GET request to the 'activities-list' endpoint
+        with the provided project ID. The request is not authenticated, and the response is returned.
+        """
+        log.debug("Getting activities data without authentication")
+        view = public_views.PublicProjectViewSet.as_view({"get": "activities"})
+        request = self.request_factory.get(
+            reverse("project-detail", args=[project.pk]),
+            format="json",
+        )
+        return view(request, pk=project.pk)
+
+    def add_comment(self, thread: models.CommentThread, text: str):
+        """
+        Add a comment to a module using the ModuleViewSet.
+
+        This method adds a comment to a module by sending a POST request to the 'module-comment' endpoint
+        with the provided module data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.debug("Adding comment to module")
+
+        view = CommentViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("comments-list"),
+            {"thread": thread.id, "content": text},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def send_recap_email(self, project, user):
+        """
+        Send a recap email using the ProjectViewSet.
+        """
+        log.debug("Sending recap email")
+        view = ProjectViewSet.as_view({"post": "recap"})
+        request = self.request_factory.post(
+            reverse("project-recap", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)
+
+    def copy_project(self, project, user):
+        """
+        Copy a project using the ProjectViewSet.
+        """
+        log.debug("Copying project")
+        view = ProjectViewSet.as_view({"post": "copy"})
+        request = self.request_factory.post(
+            reverse("project-copy", args=[project.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=project.id)

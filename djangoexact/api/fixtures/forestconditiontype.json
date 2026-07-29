@@ -1,0 +1,24 @@
+[
+  {
+    "model": "api.forestconditiontype",
+    "pk": 1,
+    "fields": {
+      "name": "Primary",
+      "name_en": "Primary",
+      "name_fr": "Primaire",
+      "name_es": "Primario",
+      "name_ru": "Первичный"
+    }
+  },
+  {
+    "model": "api.forestconditiontype",
+    "pk": 5,
+    "fields": {
+      "name": "Secondary",
+      "name_en": "Secondary",
+      "name_fr": "Secondaire",
+      "name_es": "Secundario",
+      "name_ru": "Вторичный"
+    }
+  }
+]

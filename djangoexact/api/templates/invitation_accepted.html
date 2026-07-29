@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EX-ACT</title>
+    {# Tailwind Play CDN is dynamically generated per-request, so SRI is not applicable. #}
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -16,7 +18,7 @@
                 of <b>{{ group }}</b>.</p>
         </div>
         <div class="text-center">
-            <a href="https://fao-exact-frontend-mesob2hoya-ew.a.run.app/"
+            <a href="{{link}}"
                 class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Go to EX-ACT</a>
         </div>
     </div>

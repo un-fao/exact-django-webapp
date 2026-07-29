@@ -4,6 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
+from api.reports import generate_excel_report
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -17,6 +18,8 @@ class LargeFisheryTest(t.ModuleTest):
 
     def test(self):
         self.calculate_results()
+
+        generate_excel_report(self.project)
 
 
 LargeFisheryTest().test()

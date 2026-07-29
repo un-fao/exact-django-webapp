@@ -1,0 +1,1187 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-25 11:19+0200\n"
+"PO-Revision-Date: 2024-12-31 06:05+0000\n"
+"Last-Translator: Your Name <your.email@example.com>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Loco-Source-Locale: it_IT\n"
+
+#: api/models.py:2981
+msgid "Field Definition"
+msgstr "Определение поля"
+
+#: api/models.py:2982
+msgid "Field Definitions"
+msgstr "Определения полей"
+
+#: api/views.py:944
+msgid "increases"
+msgstr "увеличивается"
+
+#: api/views.py:945
+msgid "decreases"
+msgstr "уменьшается"
+
+#: api/views.py:993
+msgid "hectares"
+msgstr "гектары"
+
+#: api/views.py:995
+msgid "tonnes of catch"
+msgstr "тонны улова"
+
+#: api/views.py:997
+#, fuzzy
+#| msgid "Livestock"
+msgid "livestock heads"
+msgstr "Домашний скот"
+
+#: api/views.py:1000
+msgid "energy consumption"
+msgstr "потребление энергии"
+
+#: api/views.py:1002
+msgid "packaging material"
+msgstr "упаковочный материал"
+
+#: api/views.py:1004
+#, fuzzy
+#| msgid "Agricultural Buildings (Metal)"
+msgid "agricultural inputs use"
+msgstr "Сельскохозяйственные постройки (металл)"
+
+#, fuzzy
+#~ msgid "land_use_change"
+#~ msgstr "Изменение землепользования"
+
+#, fuzzy
+#~ msgid "organic_soil"
+#~ msgstr "Органическая почва"
+
+#, fuzzy
+#~ msgid "production_w"
+#~ msgstr "Образование"
+
+#, fuzzy
+#~ msgid "production_wo"
+#~ msgstr "Образование"
+
+#, fuzzy
+#~ msgid "waterbody_type"
+#~ msgstr "Водоём"
+
+#, fuzzy
+#~ msgid "trophic_type_w"
+#~ msgstr "Эвтрофный"
+
+#, fuzzy
+#~ msgid "electricity_used_t2_w"
+#~ msgstr "Электричество"
+
+#, fuzzy
+#~ msgid "electricity_used_t2_wo"
+#~ msgstr "Электричество"
+
+#, fuzzy
+#~ msgid "electricity_ef_t2_w"
+#~ msgstr "Электричество"
+
+#, fuzzy
+#~ msgid "electricity_ef_t2_wo"
+#~ msgstr "Электричество"
+
+#, fuzzy
+#~ msgid "irrigation_system_type"
+#~ msgstr "Система орошения"
+
+#, fuzzy
+#~ msgid "building_type"
+#~ msgstr "Здание"
+
+#, fuzzy
+#~ msgid "settlement_type_w"
+#~ msgstr "Поселение"
+
+#, fuzzy
+#~ msgid "settlement_type_wo"
+#~ msgstr "Поселение"
+
+#, fuzzy
+#~ msgid "moisture"
+#~ msgstr "Влажный"
+
+#, fuzzy
+#~ msgid "created_at"
+#~ msgstr "совокупный"
+
+#, fuzzy
+#~ msgid "project"
+#~ msgstr "Проект"
+
+#, fuzzy
+#~ msgid "description"
+#~ msgstr "Образование"
+
+#, fuzzy
+#~ msgid "duration_t2"
+#~ msgstr "Образование"
+
+#, fuzzy
+#~ msgid "activity"
+#~ msgstr "деятельность"
+
+#~ msgid "pending"
+#~ msgstr "В ожидании"
+
+#~ msgid "accepted"
+#~ msgstr "одобренный"
+
+#~ msgid "rejected"
+#~ msgstr "Отклонено"
+
+#~ msgid "canceled"
+#~ msgstr "Отменённый"
+
+#~ msgid "Natural"
+#~ msgstr "Естественный"
+
+#~ msgid "Plantation"
+#~ msgstr "Плантация"
+
+#~ msgid "Primary"
+#~ msgstr "Первичный"
+
+#~ msgid "Secondary"
+#~ msgstr "Вторичный"
+
+#~ msgid "On-Site"
+#~ msgstr "на месте, локальный"
+
+#~ msgid "Off-Site"
+#~ msgstr "Вне участка"
+
+#~ msgid "EMPTY"
+#~ msgstr "ПУСТОЙ"
+
+#~ msgid "READY"
+#~ msgstr "ГОТОВО"
+
+#~ msgid "SUBMODULES_EMPTY"
+#~ msgstr "ПОДМОДУЛИ_ПУСТЫЕ"
+
+#~ msgid "IN PROGRESS"
+#~ msgstr "В ПРОЦЕССЕ"
+
+#~ msgid "Barley"
+#~ msgstr "Ячмень"
+
+#~ msgid "Oats"
+#~ msgstr "Овес"
+
+#~ msgid "Millet"
+#~ msgstr "пшено"
+
+#~ msgid "Rice"
+#~ msgstr "рис"
+
+#~ msgid "Sorghum"
+#~ msgstr "Сорго"
+
+#~ msgid "Rye"
+#~ msgstr "Рожь"
+
+#~ msgid "Generic Value"
+#~ msgstr "Общая ценность"
+
+#~ msgid "Soybeans"
+#~ msgstr "Соя"
+
+#~ msgid "Dry Bean"
+#~ msgstr "Сухие бобы"
+
+#~ msgid "Potatoes"
+#~ msgstr "Картофель"
+
+#~ msgid "N-Fixing Forages"
+#~ msgstr "Азотфиксирующие корма"
+
+#~ msgid "Non-N-Fixing Forages"
+#~ msgstr "Неазотфиксирующие корма"
+
+#~ msgid "Winter Wheat"
+#~ msgstr " Озимая пшеница "
+
+#~ msgid "Spring Wheat"
+#~ msgstr "Яровая пшеница"
+
+#~ msgid "Non-Legume Hay"
+#~ msgstr "Небобовое сено"
+
+#~ msgid "Perennial Grasses"
+#~ msgstr "Многолетние травы"
+
+#~ msgid "Grass-Clover Mixtures"
+#~ msgstr "Смеси травы и клевера"
+
+#~ msgid "Long-Term Cultivated"
+#~ msgstr "Долгосрочно культивируемый"
+
+#~ msgid "Perennial/Tree Crop"
+#~ msgstr "Многолетние/деревья-урожай"
+
+#~ msgid "Set Aside (< 20 Yrs)"
+#~ msgstr "Отложенный (< 20 лет)"
+
+#~ msgid "Default"
+#~ msgstr "По умолчанию"
+
+#~ msgid "Peanuts"
+#~ msgstr "Арахис"
+
+#~ msgid "Alley Cropping"
+#~ msgstr "Полосное земледелие"
+
+#~ msgid "Perennial Fallow"
+#~ msgstr "Многолетний залеж"
+
+#~ msgid "Hedgerow"
+#~ msgstr "Живая изгородь"
+
+#~ msgid "Multistrata"
+#~ msgstr "Multistrata"
+
+#~ msgid "Parkland"
+#~ msgstr "Парковая зона"
+
+#~ msgid "Shaded Perennial"
+#~ msgstr "Тенистое многолетнее растение"
+
+#~ msgid "Silvoarable"
+#~ msgstr "Лесоводство с сельским хозяйством"
+
+#~ msgid "Silvopasture"
+#~ msgstr " Лесопастбище"
+
+#~ msgid "Olive"
+#~ msgstr "Олива"
+
+#~ msgid "Orchard"
+#~ msgstr " Плодовый сад"
+
+#~ msgid "Short Rotation Coppice"
+#~ msgstr "Краткосроковый пни"
+
+#~ msgid "Tea"
+#~ msgstr "Чай"
+
+#~ msgid "Vine"
+#~ msgstr "Лоза"
+
+#~ msgid "Oil Palm"
+#~ msgstr "Масличная пальма"
+
+#~ msgid "Rubber"
+#~ msgstr "Резина"
+
+#~ msgid "Alfalfa"
+#~ msgstr "Люцерна"
+
+#~ msgid "Agroforestry - Default"
+#~ msgstr "Агролесоводство - по умолчанию"
+
+#~ msgid "Annual Cropland"
+#~ msgstr "Однолетние посевы"
+
+#~ msgid "Annual Fallow"
+#~ msgstr "Ежегодное залежное земледелие"
+
+#~ msgid "Flooded Rice"
+#~ msgstr "Затопленный рис"
+
+#~ msgid "Grassland"
+#~ msgstr "Пастбища"
+
+#~ msgid "Other Land (Non-Vegetated)"
+#~ msgstr "Прочая земля (не покрытая растительностью)"
+
+#~ msgid "Wheat"
+#~ msgstr "Пшеница"
+
+#~ msgid "Beans & Pulses"
+#~ msgstr "Бобовые, зернобобовые культуры"
+
+#~ msgid "Tubers"
+#~ msgstr "Клубни"
+
+#~ msgid "Root Crops"
+#~ msgstr "Корнеплоды"
+
+#~ msgid "Shrubland"
+#~ msgstr "Кустарники"
+
+#~ msgid "Humid Forest"
+#~ msgstr "Влажный лес"
+
+#~ msgid "﻿Long-Term Cultivated"
+#~ msgstr "Долгосрочно культивируемый"
+
+#~ msgid "Mangrove Forest"
+#~ msgstr "Мангровый лес"
+
+#~ msgid "Mangrove"
+#~ msgstr "Мангровое дерево/Мангры"
+
+#~ msgid "Tidal Marsh"
+#~ msgstr "Прибрежные болота"
+
+#~ msgid "Seagrass"
+#~ msgstr "Морская трава"
+
+#~ msgid "Tidal Marsh Mediterranean"
+#~ msgstr "Прибрежные болота Средиземноморья"
+
+#~ msgid "Set Aside"
+#~ msgstr "Отложенный"
+
+#~ msgid "Perennial Cropland"
+#~ msgstr "Многолетние сельскохозяйственные угодья"
+
+#~ msgid "Vegetables"
+#~ msgstr "Овощи"
+
+#~ msgid "Oilseeds"
+#~ msgstr "Масличные культуры"
+
+#~ msgid "Groundnuts"
+#~ msgstr "Арахис"
+
+#~ msgid "Rainforest"
+#~ msgstr "Тропический лес"
+
+#~ msgid "Moist Deciduous Forest"
+#~ msgstr "Влажный лиственный лес"
+
+#~ msgid "Dry Forest"
+#~ msgstr "Сухой лес"
+
+#~ msgid "Oceanic Forest"
+#~ msgstr "Океанический/прибрежный лес"
+
+#~ msgid "Continental Forest"
+#~ msgstr "Континентальный лес"
+
+#~ msgid "Desert"
+#~ msgstr "Пустыня"
+
+#~ msgid "Steppe"
+#~ msgstr "Степь"
+
+#~ msgid "Coniferous Forest"
+#~ msgstr "Хвойный лес"
+
+#~ msgid "Tundra Woodland"
+#~ msgstr "Лесная тундра"
+
+#~ msgid "Mountain System"
+#~ msgstr "Mountain System"
+
+#~ msgid "Other Land"
+#~ msgstr "Прочая земля"
+
+#~ msgid "Grains"
+#~ msgstr "Зерна"
+
+#~ msgid "Maize"
+#~ msgstr "Кукуруза"
+
+#~ msgid "Sugarcane"
+#~ msgstr "Сахарный тростник"
+
+#~ msgid "Infrastructure on existing land (no paving)"
+#~ msgstr "Инфраструктура на существующей земле (без асфальтирования)"
+
+#~ msgid "Paved settlement"
+#~ msgstr "Асфальтированное поселение"
+
+#~ msgid "Turfgrass"
+#~ msgstr "Газонные травы"
+
+#~ msgid "Wooded area"
+#~ msgstr "Лесистая местность"
+
+#~ msgid "Cultivated soil"
+#~ msgstr "Обрабатываемая почва"
+
+#~ msgid "High Activity Clay"
+#~ msgstr "Высокоактивная глина"
+
+#~ msgid "Low Activity Clay"
+#~ msgstr "Глина с низкой активностью"
+
+#~ msgid "Sandy"
+#~ msgstr "Песчаный"
+
+#~ msgid "Spodic"
+#~ msgstr "Сподичный"
+
+#~ msgid "Volcanic"
+#~ msgstr "Вулканический"
+
+#~ msgid "Wetland"
+#~ msgstr "Влажные земли"
+
+#~ msgid "Organic"
+#~ msgstr "Органический"
+
+#~ msgid "Mineral"
+#~ msgstr "Минерал"
+
+#~ msgid "Full Tillage"
+#~ msgstr "Полная обработка почвы"
+
+#~ msgid "Reduced Tillage"
+#~ msgstr "Сниженная обработка почвы"
+
+#~ msgid "No Tillage"
+#~ msgstr "Без обработки почвы"
+
+#~ msgid "Low C input"
+#~ msgstr "Низкий углеродный ввод"
+
+#~ msgid "Medium C input"
+#~ msgstr "Средний углеродный ввод"
+
+#~ msgid "High C input, no manure"
+#~ msgstr "Высокое содержание углерода, без навоза"
+
+#~ msgid "High C input, with manure"
+#~ msgstr "Высокое содержание углерода, с навозом"
+
+#~ msgid "Burned"
+#~ msgstr "Сожжённый"
+
+#~ msgid "Retained"
+#~ msgstr "Сохранено/Удержано"
+
+#~ msgid "Exported"
+#~ msgstr "Экспортировано"
+
+#~ msgid "Irrigated, Continuously Flooded"
+#~ msgstr "Орошаемое, постоянно затопленное"
+
+#~ msgid "Irrigated, Single Drainage Period"
+#~ msgstr "Орошаемое, с одним периодом осушения"
+
+#~ msgid "Irrigated, Multiple Drainage Periods"
+#~ msgstr "Орошаемое, с несколькими периодами осушения"
+
+#~ msgid "Straw Burnt"
+#~ msgstr "Сожженная солома  "
+
+#~ msgid "Straw Exported"
+#~ msgstr "Экспортированная солома"
+
+#~ msgid "Compost"
+#~ msgstr "Компост"
+
+#~ msgid "Farm Yard Manure"
+#~ msgstr "Навоз для фермерского двора"
+
+#~ msgid "Green Manure"
+#~ msgstr "Зеленое удобрение"
+
+#~ msgid "Straw Incorporated Long (>30 Days) Before Cultivation"
+#~ msgstr "Солома, внесённая за долго до посева (>30 дней)"
+
+#~ msgid "Straw Incorporated Shortly (<30 Days) Before Cultivation"
+#~ msgstr "Солома, внесённая за долго до посева (<30 дней)"
+
+#~ msgid "Non-Degraded"
+#~ msgstr "Не деградированный"
+
+#~ msgid "High Intensity Grazing"
+#~ msgstr "Высокоинтенсивный выпас"
+
+#~ msgid "Severely Degraded"
+#~ msgstr "Сильно деградированные"
+
+#~ msgid "Improved With Medium Inputs"
+#~ msgstr "Улучшено с использованием средних затрат"
+
+#~ msgid "Improved Grassland"
+#~ msgstr "Улучшенные пастбища"
+
+#~ msgid "Improved With High Inputs"
+#~ msgstr "Улучшено с использованием высоких затрат"
+
+#~ msgid "Dairy Cattle"
+#~ msgstr "дойная корова"
+
+#~ msgid "Other Cattle"
+#~ msgstr "Другие крупный рогатый скот"
+
+#~ msgid "Camels"
+#~ msgstr "Верблюды"
+
+#~ msgid "Horses"
+#~ msgstr "Лошади"
+
+#~ msgid "Mules And Asses"
+#~ msgstr "Mules And Asses"
+
+#~ msgid "Other Buffalo"
+#~ msgstr "Другие буйволы"
+
+#~ msgid "Dairy Buffalo"
+#~ msgstr "дойная буйвола"
+
+#~ msgid "Dairy Sheep"
+#~ msgstr "дойная овца"
+
+#~ msgid "Other Sheep"
+#~ msgstr "Другие виды овец"
+
+#~ msgid "Growing Swine"
+#~ msgstr "Разведение свиней"
+
+#~ msgid "Breeding Swine"
+#~ msgstr "Разведение свиней"
+
+#~ msgid "Goats"
+#~ msgstr "Козы"
+
+#~ msgid "Deer"
+#~ msgstr "Олень"
+
+#~ msgid "Ostrich"
+#~ msgstr "Страус"
+
+#~ msgid "Chicken Layer"
+#~ msgstr "Курица несушка"
+
+#~ msgid "Chicken Broiler"
+#~ msgstr "Цыпленок-бройлер"
+
+#~ msgid "Llamas And Alpacas"
+#~ msgstr "Ламы и альпаки"
+
+#~ msgid "High-Productivity"
+#~ msgstr "Высокая производительность"
+
+#~ msgid "Low-Productivity"
+#~ msgstr "Низкая продуктивность"
+
+#~ msgid "Pasture/Range/Paddock"
+#~ msgstr "Пастбище/Выпас/Паддок"
+
+#~ msgid "Daily Spread"
+#~ msgstr "Ежедневное распределение"
+
+#~ msgid "Digester"
+#~ msgstr "Дигестер"
+
+#~ msgid "Burned For Fuel"
+#~ msgstr "Сожжённый в качестве топлива"
+
+#~ msgid "Pit<1Month"
+#~ msgstr "Яма <1 месяц"
+
+#~ msgid "Pit>1Month"
+#~ msgstr "Яма >1 месяц"
+
+#~ msgid "Poultry Manure"
+#~ msgstr "Птичий навоз"
+
+#~ msgid "Deep Bedding"
+#~ msgstr "Глубокая подстилка"
+
+#~ msgid "Composting"
+#~ msgstr "Компостирование"
+
+#~ msgid "Aerobic Treatment"
+#~ msgstr "Аэробная обработка"
+
+#~ msgid "Lagoon"
+#~ msgstr "Лагуна"
+
+#~ msgid "Liquid/Slurry"
+#~ msgstr "Жидкость/Жижа"
+
+#~ msgid "Solid Storage"
+#~ msgstr "Твёрдое хранение"
+
+#~ msgid "Dry Lot"
+#~ msgstr "Сухой загон"
+
+#~ msgid "Other (Pls. Go Tier 2)"
+#~ msgstr "Прочее (уровень 2/Tier 2)"
+
+#~ msgid "Other (pls. Go Tier 2)"
+#~ msgstr "Прочее (пожалуйста, перейдите ко второму уровню)"
+
+#~ msgid "Forest Management"
+#~ msgstr "Управление лесным хозяйством"
+
+#~ msgid "Road"
+#~ msgstr "Дорога"
+
+#~ msgid "Energy"
+#~ msgstr "Энергия"
+
+#~ msgid "Irrigation"
+#~ msgstr "Орошение"
+
+#~ msgid "Operation Phase of Irrigation"
+#~ msgstr "Фаза эксплуатации ирригации"
+
+#~ msgid "OtherLandUse"
+#~ msgstr "Прочее использование земли"
+
+#~ msgid "Flooded Rice Minor Season"
+#~ msgstr "Малый сезон затопленного риса"
+
+#~ msgid "Perennial Cropland Minor Season"
+#~ msgstr "Многолетние сельскохозяйственные угодья, не основной сезон"
+
+#~ msgid "Annual Cropland Minor Season"
+#~ msgstr "Однолетние посевы вторичного сезона"
+
+#~ msgid "Small Fishery"
+#~ msgstr "Небольшое рыболовство"
+
+#~ msgid "Large Fishery"
+#~ msgstr "Крупное рыболовное хозяйство"
+
+#~ msgid "Aquaculture"
+#~ msgstr "Аквакультура"
+
+#~ msgid "Coastal Wetland"
+#~ msgstr "Прибрежное водно-болотное угодье"
+
+#~ msgid "Other Infrastructure"
+#~ msgstr "Прочая инфраструктура"
+
+#~ msgid "Fuel"
+#~ msgstr "Топливо"
+
+#~ msgid "Input"
+#~ msgstr "входные ресурсы"
+
+#~ msgid "Input Entry"
+#~ msgstr "Input Entry"
+
+#~ msgid "Forest Disturbance"
+#~ msgstr "Нарушение лесного покрова"
+
+#~ msgid "Wildfire Undrained Peat"
+#~ msgstr " Торф, не высушенный лесным пожаром"
+
+#~ msgid "Wildfire Drained Peat"
+#~ msgstr "Торф, высушенный лесным пожаром"
+
+#~ msgid "Prescribed Fire (E.G. Land Mgnt)"
+#~ msgstr "Предписанный огонь (например, управление земельными ресурсами)"
+
+#~ msgid "Nutrient Rich"
+#~ msgstr "Богат питательными веществами"
+
+#~ msgid "Nutrient Poor"
+#~ msgstr "Бедный питательными веществами"
+
+#~ msgid "Freshwater Pond"
+#~ msgstr "Пресноводный пруд"
+
+#~ msgid "Brackishwater Pond"
+#~ msgstr "Солоноватый пруд"
+
+#~ msgid "Canals & Ditches"
+#~ msgstr "Каналы, Канавы"
+
+#~ msgid "Saline Pond"
+#~ msgstr "Солёный пруд"
+
+#~ msgid "Oligotrophic"
+#~ msgstr "Олиготрофный"
+
+#~ msgid "Mesotrophic"
+#~ msgstr "Мезоэутрофный"
+
+#~ msgid "Hypereutrophic"
+#~ msgstr "Гиперэвтрофный"
+
+#~ msgid "Marine"
+#~ msgstr "Морской"
+
+#~ msgid "Inland"
+#~ msgstr "Внутренний"
+
+#~ msgid "Unmotorized Fishing"
+#~ msgstr "Ручное рыболовство"
+
+#~ msgid "Dredges"
+#~ msgstr "Драги"
+
+#~ msgid "Other Or Mixed"
+#~ msgstr "Прочее или смешанное"
+
+#~ msgid "Mobile Seine"
+#~ msgstr "Мобильный сачок"
+
+#~ msgid "Not Specified"
+#~ msgstr "Не указан"
+
+#~ msgid "Bottom Trawls"
+#~ msgstr "Донные тралы"
+
+#~ msgid "Gillnets And Entangling Nets"
+#~ msgstr "Ловчие и запутывающие сети"
+
+#~ msgid "Hooks And Lines"
+#~ msgstr "Крючки и лески"
+
+#~ msgid "Midwater Trawls"
+#~ msgstr "Травы средней воды"
+
+#~ msgid "Traps And Lift Nets"
+#~ msgstr "Ловушки и подъёмные сети"
+
+#~ msgid "Surrounding Nets"
+#~ msgstr "Окружающие сети"
+
+#~ msgid "Trawls"
+#~ msgstr "Травли"
+
+#~ msgid "Multiple"
+#~ msgstr "Multiple"
+
+#~ msgid "Pots And Traps"
+#~ msgstr "Ловушки и кошели"
+
+#, fuzzy
+#~ msgid "Abalones, Winkles And Conchs"
+#~ msgstr "Морские ушки, улитки и ракушки"
+
+#~ msgid "Clams, Cockles And Arkshells"
+#~ msgstr "Моллюски, Моллюски семейства сердцевидок и Арковидные моллюски"
+
+#~ msgid "Cods, Hakes And Haddocks"
+#~ msgstr "Треска, Пикша, Морской окунь "
+
+#~ msgid "Flounders, Halibuts And Soles"
+#~ msgstr "Камбалы, палтусы и Солевая рыба"
+
+#~ msgid "Herrings, Sardines And Anchovies"
+#~ msgstr "Сельдь, сардины и анчоусы"
+
+#~ msgid "Jacks, Mullets And Sauries"
+#~ msgstr "Джековые рыбы, Кефаль и Сайра"
+
+#~ msgid "Krill And Plankton"
+#~ msgstr "Криль и планктон"
+
+#~ msgid "Mackerels, Snoeks And Cutlassfish"
+#~ msgstr "Скумбрия, зубатки и рыбы-сабли"
+
+#~ msgid "Miscellaneous Marine Crustaceans"
+#~ msgstr "Разнообразные морские ракообразные"
+
+#~ msgid "Miscellaneous Marine Fishes"
+#~ msgstr "Разнообразные морские рыбы"
+
+#~ msgid "Miscellaneous Marine Molluscs"
+#~ msgstr "Разнообразные морские моллюски"
+
+#~ msgid "Mussels"
+#~ msgstr "Mussels"
+
+#~ msgid "Redfish, Basses And Congers"
+#~ msgstr "Красная рыба, окуни и угри"
+
+#~ msgid "Salmons, Trots And Smelts"
+#~ msgstr "Лососи, форели и смельты"
+
+#~ msgid "Scallops And Pectens"
+#~ msgstr "Гребешки и пектены"
+
+#~ msgid "Shads"
+#~ msgstr "Пузанковые сельди"
+
+#~ msgid "Sharks And Rays"
+#~ msgstr "Акулы и скаты"
+
+#~ msgid "Shrimps And Prawns"
+#~ msgstr "Креветки и раки"
+
+#~ msgid "Squat Lobsters"
+#~ msgstr "Карликовые омары"
+
+#~ msgid "Squids, Cuttlefish And Octopuses"
+#~ msgstr "Кальмары, каракатицы и осьминоги"
+
+#~ msgid "Tunas, Bonitos And Billfishes"
+#~ msgstr "Тунцы, бонито и рыбы-марлины"
+
+#~ msgid "Lobsters And Spiny-rock Lobsters"
+#~ msgstr "Омары и лангусты"
+
+#~ msgid "Sea-spiders And Crabs"
+#~ msgstr "Морские пауки и крабы"
+
+#~ msgid "Solid (tdm)"
+#~ msgstr "Твёрдый (тонн сухого вещества)"
+
+#~ msgid "Liquid or gaseous (m3)"
+#~ msgstr "Жидкость или газ (м3)"
+
+#~ msgid "Stationary"
+#~ msgstr "Стационарный"
+
+#~ msgid "Mobile"
+#~ msgstr "Мобильный"
+
+#~ msgid "Off-Road"
+#~ msgstr "бездорожный"
+
+#~ msgid "Ethanol (Cars)"
+#~ msgstr "Этанол (Автомобили)"
+
+#~ msgid "Ethanol (Trucks)"
+#~ msgstr "Этанол (Грузовики)"
+
+#~ msgid "Diesel"
+#~ msgstr "Дизель"
+
+#~ msgid "Gasoline (2-Stroke)"
+#~ msgstr "Бензин (для двухтактных двигателей)"
+
+#~ msgid "Gasoline (4-Stroke)"
+#~ msgstr "Бензин (для четырехтактных двигателей)"
+
+#~ msgid "Wood"
+#~ msgstr "Древесина"
+
+#~ msgid "Peat"
+#~ msgstr "Торф"
+
+#~ msgid "Charcoal"
+#~ msgstr "Уголь"
+
+#~ msgid "Motor Gasoline"
+#~ msgstr "Motor Gasoline"
+
+#~ msgid "Gasoil /Diesel Oil"
+#~ msgstr "Газообразное/Дизельное топливо"
+
+#~ msgid "Waste Oil / Lubrificants"
+#~ msgstr "Отработанное масло/Смазочные жидкости"
+
+#~ msgid "Lpg"
+#~ msgstr "сжиженный газ"
+
+#~ msgid "Natural Gas"
+#~ msgstr "Природный газ"
+
+#~ msgid "Solar"
+#~ msgstr "Солнечный"
+
+#~ msgid "Cereals"
+#~ msgstr "Злаки"
+
+#~ msgid "Pulses"
+#~ msgstr "Бобовые культуры"
+
+#~ msgid "Roots And Tubers"
+#~ msgstr "Корни и клубни"
+
+#~ msgid "Beans"
+#~ msgstr "Бобы"
+
+#~ msgid "Agroforestry - default"
+#~ msgstr "Агролесоводство - по умолчанию"
+
+#~ msgid "Alley cropping"
+#~ msgstr "Полосное агролесоводство"
+
+#~ msgid "Oil palm"
+#~ msgstr "Масличная пальма"
+
+#~ msgid "Perennial fallow"
+#~ msgstr "Многолетний залеж"
+
+#~ msgid "Shaded perennial"
+#~ msgstr "Тенистое многолетнее растение"
+
+#~ msgid "Fire"
+#~ msgstr "Огонь"
+
+#~ msgid "Insects"
+#~ msgstr "Насекомые"
+
+#~ msgid "Lime Application"
+#~ msgstr "Применение извести"
+
+#~ msgid "Synthetic Fertilizers"
+#~ msgstr "Синтетические удобрения"
+
+#~ msgid "N-Fertilizers On Irrigated Rice"
+#~ msgstr "Азотные удобрения на орошаемом рисе"
+
+#~ msgid "Organic N-Fertilizers"
+#~ msgstr "Органические азотные удобрения"
+
+#~ msgid "Pesticides"
+#~ msgstr "Пестициды"
+
+#~ msgid "Animal Feed"
+#~ msgstr "Корм для животных"
+
+#~ msgid "Limestone"
+#~ msgstr "Известняк"
+
+#~ msgid "Dolomite"
+#~ msgstr "Доломит"
+
+#~ msgid "Urea"
+#~ msgstr "Kарбамид"
+
+#~ msgid "Synthetic N-Fertilizers Other Than Urea"
+#~ msgstr "Синтетические азотные удобрения, кроме карбамидa"
+
+#~ msgid "Sewage"
+#~ msgstr "Канализация"
+
+#~ msgid "Rendering Waste, Brewery Waste, Guano"
+#~ msgstr "Отходы переработки, отходы пивоварни, гуано"
+
+#~ msgid "Potassium"
+#~ msgstr "Калий"
+
+#~ msgid "Fungicides"
+#~ msgstr "Фунгициды"
+
+#~ msgid "Herbicides"
+#~ msgstr "Гербициды"
+
+#~ msgid "Insecticides"
+#~ msgstr "Инсектициды"
+
+#~ msgid "N-Fertilizers In Continuously Irrigated Rice"
+#~ msgstr "Азотные удобрения в постоянно орошаемом рисе"
+
+#~ msgid "N-Fertilizers In Wet And Dry Irrigated Rice"
+#~ msgstr ""
+#~ "Азотные удобрения в орошаемом рисе в условиях влажного и сухого полива"
+
+#~ msgid "Phosphorous"
+#~ msgstr "Фосфор"
+
+#~ msgid "User Defined Animal Feed (tier 2)"
+#~ msgstr "Кормление животных, определяемое пользователем (Уровень 2/Tier 2)"
+
+#~ msgid "User Defined Input (tier 2)"
+#~ msgstr "Пользовательский ввод (уровень 2/Tier 2)"
+
+#~ msgid "Surface Without IRRS"
+#~ msgstr "Поверхностное орошение без системы возврата оросительного стока"
+
+#~ msgid "Surface With IRRS"
+#~ msgstr "Поверхностное орошение с системой возврата оросительного стока"
+
+#~ msgid "Solid Set Sprinkler"
+#~ msgstr "Твёрдое орошение"
+
+#~ msgid "Permanent Sprinkler"
+#~ msgstr "Постоянный орошатель"
+
+#~ msgid "Hand Moved Sprinkler"
+#~ msgstr "Ручной передвижной спринклер"
+
+#~ msgid "Solid Roll Sprinkler"
+#~ msgstr "Твёрдый вращающийся орошатель"
+
+#~ msgid "Center-Pivot Sprinkler"
+#~ msgstr "Центробежное орошение"
+
+#~ msgid "Traveler Sprinkler"
+#~ msgstr "Перемещающийся орошатель"
+
+#~ msgid "Trickle"
+#~ msgstr "Капельное орошение"
+
+#~ msgid "Micro Sprinkler"
+#~ msgstr "Микроорашиватель"
+
+#~ msgid "Sprinkler"
+#~ msgstr "Орошатель"
+
+#~ msgid "Housing (Concrete)"
+#~ msgstr "Жилье (Бетон)"
+
+#~ msgid "Agricultural Buildings (Concrete)"
+#~ msgstr "Сельскохозяйственные постройки (бетон)"
+
+#~ msgid "Industrial Buildings (Concrete)"
+#~ msgstr "Промышленные здания (бетон)"
+
+#~ msgid "Industrial Buildings (Metal)"
+#~ msgstr "Промышленные здания (металл)"
+
+#~ msgid "Garage (Concrete)"
+#~ msgstr "Гараж (Бетон)"
+
+#~ msgid "Garage (Metal)"
+#~ msgstr "Гараж (Металлический)"
+
+#~ msgid "Offices (Concrete)"
+#~ msgstr "Офисы (бетонные)"
+
+#~ msgid "Offices (Metal)"
+#~ msgstr "Офисы (металлические)"
+
+#~ msgid "Food Sales (Retail Or Wholesale)"
+#~ msgstr "Продажа продуктов питания (розничная или оптовая)"
+
+#~ msgid "Food Service (Restaurants)"
+#~ msgstr "Общественное питание (рестораны)"
+
+#~ msgid "Warehouse And Storage"
+#~ msgstr "Склад и хранение"
+
+#~ msgid "Health Care (Metal)"
+#~ msgstr "Здравоохранение (Металл)"
+
+#~ msgid "Road (Bitumen)"
+#~ msgstr "Дорога (Битум)"
+
+#~ msgid "Road (Asphalt)"
+#~ msgstr "Дорога (Асфальт)"
+
+#~ msgid "Road (Reinforced Concrete)"
+#~ msgstr "Дорога (Армированный бетон)"
+
+#~ msgid "Road Rehabilitated (Pavement)"
+#~ msgstr "Реконструкция дорог (Покрытие)"
+
+#~ msgid "Cool Temperate"
+#~ msgstr "Прохладный умеренный климат"
+
+#~ msgid "Warm Temperate"
+#~ msgstr "Тёплый умеренный"
+
+#~ msgid "Tropical"
+#~ msgstr "Тропический"
+
+#~ msgid "Boreal"
+#~ msgstr "Бореальный"
+
+#~ msgid "Tropical Montane"
+#~ msgstr "Тропическая горная местность"
+
+#~ msgid "Dry"
+#~ msgstr "Сухой"
+
+#~ msgid "Wet"
+#~ msgstr "Влажный"
+
+#~ msgid "Temperate"
+#~ msgstr "Умеренный"
+
+#~ msgid "Eastern Africa"
+#~ msgstr "Восточная Африка"
+
+#~ msgid "Central Africa"
+#~ msgstr "Центральная Африка"
+
+#~ msgid "Northern Africa"
+#~ msgstr "Северная Африка"
+
+#~ msgid "Southern Africa"
+#~ msgstr "Южная Африка"
+
+#~ msgid "Western Africa"
+#~ msgstr "Западная Африка"
+
+#~ msgid "Central Asia"
+#~ msgstr "Центральная Азия"
+
+#~ msgid "Eastern Asia"
+#~ msgstr "Восточная Азия"
+
+#~ msgid "South-Eastern Asia"
+#~ msgstr "Юго-восточная Азия"
+
+#~ msgid "Southern Asia"
+#~ msgstr "Южная Азия"
+
+#~ msgid "Western Asia"
+#~ msgstr "Западная Азия"
+
+#~ msgid "Europe"
+#~ msgstr "Европа"
+
+#~ msgid "Oceania"
+#~ msgstr "Океания"
+
+#~ msgid "North America"
+#~ msgstr "Северная Америка"
+
+#~ msgid "South America"
+#~ msgstr "Южная Америка"
+
+#~ msgid "Central America"
+#~ msgstr "Центральная Америка"
+
+#~ msgid "Caribbean"
+#~ msgstr "Карибский"
+
+#~ msgid "Western Europe"
+#~ msgstr "Западная Европа"
+
+#~ msgid "Eastern Europe"
+#~ msgstr "Восточная Европа"
+
+#~ msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+#~ msgstr ""
+#~ "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
+
+#~ msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+#~ msgstr ""
+#~ "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
+
+#~ msgid "IPCC Sixth Assessment Report (AR6)"
+#~ msgstr "Шестой оценочный отчет МГЭИК (ОД6)"
+
+#~ msgid "IPCC Fourth Assessment Report (AR4)"
+#~ msgstr "Четвертый оценочный отчет МГЭИК (ОД4)"
+
+#~ msgid "IPCC Second Assessment Report (SAR)"
+#~ msgstr "Второй оценочный отчет МГЭИК (SAR)"
+
+#~ msgid "Non Flooded Pre-Season <180 D"
+#~ msgstr "Не затопленные до сезона, менее 180 дней"
+
+#~ msgid "Non Flooded Pre-Season >180 D"
+#~ msgstr "Не затопленные до сезона, более 180 дней"
+
+#~ msgid "Flooded Pre-Season > 30 D"
+#~ msgstr "Затопленный предсезонный период > 30 дней"
+
+#~ msgid "Rainfed, Wet Season (Regular Rainfed)"
+#~ msgstr "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
+
+#~ msgid "Rainfed, Dry Season (Drought Prone)"
+#~ msgstr "Дождевое орошение, сухой сезон (подвержено засухе)"
+
+#~ msgid "Rainfed, Deep Water"
+#~ msgstr "Дождевое орошение, глубокие воды"

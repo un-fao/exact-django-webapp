@@ -8,7 +8,7 @@ import pandas as pd
 import xlwings as xw
 from api.models import (
     Activity,
-    AnnualCropping,
+    AnnualCropland,
     Climate,
     Country,
     Group,
@@ -18,7 +18,7 @@ from api.models import (
     ProjectMembership,
 )
 from api.models import CustomUser as User
-from api.tests.factories import ActivityFactory, AnnualCroppingFactory, ProjectFactory
+from api.tests.factories import ActivityFactory, AnnualCroplandFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
 PROJECT_SIZE = 5
@@ -42,7 +42,7 @@ for i in range(PROJECT_SIZE):
     climate = random.choice(climates)
     moisture = random.choice(climate.moistures.all())
     soil_type = random.choice(soil_types)
-    gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+    gw_potential = GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 
     print(f"\n\nCountry: {country}")
     print(f"Region: {region}")
@@ -78,7 +78,7 @@ for i in range(PROJECT_SIZE):
 
     a: Activity = ActivityFactory.create(project=p)
 
-    annuals: list[AnnualCropping] = AnnualCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+    annuals: list[AnnualCropland] = AnnualCroplandFactory.create_batch(BATCH_SIZE, activity=a)
 
     total_livestocks = annuals.__len__()
     passed_livestocks = 0
@@ -110,19 +110,19 @@ for i in range(PROJECT_SIZE):
         sheet["G25"].value = annual.tillage_management_type_start.name
         sheet["I25"].value = annual.organic_input_type_start.name
         sheet["K25"].value = annual.residue_management_type_start.name
-        sheet["M25"].value = annual.crop_yield_start
+        sheet["M25"].value = annual.crop_yield_t2_start
 
         sheet["E26"].value = annual.land_use_type_wo.name
         sheet["G26"].value = annual.tillage_management_type_wo.name
         sheet["I26"].value = annual.organic_input_type_wo.name
         sheet["K26"].value = annual.residue_management_type_wo.name
-        sheet["M26"].value = annual.crop_yield_wo
+        sheet["M26"].value = annual.crop_yield_t2_wo
 
         sheet["E27"].value = annual.land_use_type_w.name
         sheet["G27"].value = annual.tillage_management_type_w.name
         sheet["I27"].value = annual.organic_input_type_w.name
         sheet["K27"].value = annual.residue_management_type_w.name
-        sheet["M27"].value = annual.crop_yield_w
+        sheet["M27"].value = annual.crop_yield_t2_w
 
         has_tillage_changed_wo = sheet["G26"].value != sheet["G25"].value
         has_organic_changed_wo = sheet["I26"].value != sheet["I25"].value

@@ -1,0 +1,35 @@
+[
+{
+  "model": "api.firetype",
+  "pk": 1,
+  "fields": {
+    "name": "Wildfire Undrained Peat",
+    "name_en": "Wildfire Undrained Peat",
+    "name_fr": null,
+    "name_es": "Incendio forestal en Turba sin drenar",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.firetype",
+  "pk": 2,
+  "fields": {
+    "name": "Wildfire Drained Peat",
+    "name_en": "Wildfire Drained Peat",
+    "name_fr": null,
+    "name_es": "Incendio forestal en Turba Drenada",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.firetype",
+  "pk": 3,
+  "fields": {
+    "name": "Prescribed Fire (E.G. Land Mgnt)",
+    "name_en": "Prescribed Fire (E.G. Land Mgnt)",
+    "name_fr": null,
+    "name_es": "Quema controlada (p. ej. Gestión de tierras)",
+    "name_ru": null
+  }
+}
+]

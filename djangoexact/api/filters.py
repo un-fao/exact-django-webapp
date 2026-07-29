@@ -1,4 +1,9 @@
+import sys
+
 import django_filters as filters
+from .models import FuelType, SoilType
+from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey, ManyToManyField
+from rest_framework.filters import BaseFilterBackend
 
 
 def get_model_filter(model_arg):
@@ -7,7 +12,103 @@ def get_model_filter(model_arg):
             model = model_arg
             fields = "__all__"
 
-    try:
-        return globals()[f"{model_arg.__name__}Filter"]
-    except KeyError:
-        return GenericModelFilter
+    filter_name = f"{model_arg.__name__}Filter"
+    candidate = getattr(sys.modules[__name__], filter_name, None)
+    if isinstance(candidate, type) and issubclass(candidate, filters.FilterSet):
+        return candidate
+    return GenericModelFilter
+
+
+class FuelTypeFilter(filters.FilterSet):
+    fuel_use_type = filters.CharFilter(field_name="fuel_use_type", method="filter_fuel_use_type")
+
+    def filter_fuel_use_type(self, queryset, name, value):
+        # Split the comma-separated values
+        fuel_use_types = value.split(",")
+        query = Q()
+        for fuel_use_type in fuel_use_types:
+            query |= Q(**{f"{name}__name__iexact": fuel_use_type.strip()})
+        return queryset.filter(query)
+
+    class Meta:
+        model = FuelType
+        fields = ["fuel_use_type"]
+
+
+class SoilTypeFilter(filters.FilterSet):
+    active = filters.BooleanFilter(field_name="active", initial=True)
+    is_coastal = filters.BooleanFilter(field_name="is_coastal", initial=False)
+
+    class Meta:
+        model = SoilType
+        fields = ["active", "is_coastal"]
+
+
+class DynamicSearchAndFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        search_terms = request.query_params.getlist("s")
+        if search_terms:
+            search_fields = getattr(view, "search_fields", None)
+            if search_fields is None:
+                # Automatically discover applicable fields
+                model = queryset.model
+                search_fields = []
+                for field in model._meta.fields:
+                    if isinstance(field, (CharField, TextField)):
+                        search_fields.append(field.name)
+                    elif isinstance(field, (FloatField, IntegerField)):
+                        search_fields.append(field.name)
+                    elif isinstance(field, ForeignKey):
+                        search_fields.append(f"{field.name}__name")
+
+                # Add ManyToMany fields for search
+                for field in model._meta.many_to_many:
+                    if isinstance(field, ManyToManyField):
+                        search_fields.append(f"{field.name}__name")
+
+            query = Q()
+            for search_term in search_terms:
+                term_query = Q()
+                # Split the search term by spaces to handle multiple words
+                sub_terms = search_term.split()
+                for sub_term in sub_terms:
+                    sub_term_query = Q()
+                    for field in search_fields:
+                        try:
+                            # Attempt numeric match for numeric fields
+                            query_value = float(sub_term)
+                            sub_term_query |= Q(**{f"{field}": query_value})
+                        except ValueError:
+                            sub_term_query |= Q(**{f"{field}__icontains": sub_term})
+                    term_query &= sub_term_query  # Combine all conditions for the current sub-term (AND)
+                query |= term_query  # Combine all conditions for the current term (OR)
+
+            queryset = queryset.filter(query)
+
+        query_params = request.query_params
+        model_fields = {field.name for field in queryset.model._meta.fields}
+        # Add ManyToMany field names for filtering
+        m2m_fields = {field.name for field in queryset.model._meta.many_to_many}
+
+        # Handle dynamic filtering for other query parameters
+        filters = {}
+        for param, value in query_params.items():
+            if param == "s":  # Skip 'search' as it's handled separately
+                continue
+            if param in model_fields:
+                filters[param] = value
+            elif param in m2m_fields:
+                # Handle ManyToMany filtering (support comma-separated values)
+                if "," in value:
+                    # Multiple values: filter by any of the provided IDs
+                    ids = [int(id_val.strip()) for id_val in value.split(",") if id_val.strip().isdigit()]
+                    if ids:
+                        filters[f"{param}__in"] = ids
+                else:
+                    # Single value
+                    if value.isdigit():
+                        filters[param] = int(value)
+                    else:
+                        # Try filtering by name if not a digit
+                        filters[f"{param}__name__icontains"] = value
+        return queryset.filter(**filters).distinct()

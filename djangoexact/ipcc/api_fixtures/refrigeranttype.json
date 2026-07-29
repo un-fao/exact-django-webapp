@@ -1,0 +1,121 @@
+[
+{
+  "model": "api.refrigeranttype",
+  "pk": 1,
+  "fields": {
+    "name": "HFC-23"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 2,
+  "fields": {
+    "name": "HFC-32"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 3,
+  "fields": {
+    "name": "HFC-125"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 4,
+  "fields": {
+    "name": "HFC-134a"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 5,
+  "fields": {
+    "name": "HFC-143a"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 6,
+  "fields": {
+    "name": "HFC-152a"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 7,
+  "fields": {
+    "name": "HFC-227ea"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 8,
+  "fields": {
+    "name": "HFC-236fa"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 9,
+  "fields": {
+    "name": "HFC-245fa"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 10,
+  "fields": {
+    "name": "HFC-365mfc"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 11,
+  "fields": {
+    "name": "HFC-43-10mee"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 12,
+  "fields": {
+    "name": "HFO-1234yf"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 13,
+  "fields": {
+    "name": "HFO-1234ze(E)"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 14,
+  "fields": {
+    "name": "HFO-1336mzz(Z)"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 15,
+  "fields": {
+    "name": "HFO-1336mzz(E)"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 16,
+  "fields": {
+    "name": "HCFO-1233zd(E)"
+  }
+},
+{
+  "model": "api.refrigeranttype",
+  "pk": 17,
+  "fields": {
+    "name": "HCFO-1224yd(Z)"
+  }
+}
+]

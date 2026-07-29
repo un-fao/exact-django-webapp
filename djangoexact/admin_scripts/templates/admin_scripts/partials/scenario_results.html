@@ -1,0 +1,64 @@
+<div data-scenario-result='{{ result_json|default:""|escape }}'
+     data-scenario-index='{{ scenario_index|default:"" }}'>
+
+    {% if statistics %}
+        {% if statistics.count > 0 %}
+        <div class="bg-white border border-gray-200 rounded-lg p-5 mt-4">
+            <h3 class="text-md font-semibold text-gray-900 mb-3">Results</h3>
+            <div class="grid grid-cols-3 gap-4 text-sm">
+                <div><span class="text-gray-500">Count:</span> <span class="font-medium">{{ statistics.count }}</span></div>
+                <div><span class="text-gray-500">Mean:</span> <span class="font-medium">{{ statistics.mean|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Median:</span> <span class="font-medium">{{ statistics.median|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Std Dev:</span> <span class="font-medium">{{ statistics.std|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Min:</span> <span class="font-medium">{{ statistics.min|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Max:</span> <span class="font-medium">{{ statistics.max|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Q1:</span> <span class="font-medium">{{ statistics.q1|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Q3:</span> <span class="font-medium">{{ statistics.q3|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">IQR:</span> <span class="font-medium">{{ statistics.iqr|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">CI 95%:</span> <span class="font-medium">{{ statistics.ci_95|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">CI 99%:</span> <span class="font-medium">{{ statistics.ci_99|floatformat:4 }}</span></div>
+                <div><span class="text-gray-500">Sum Total:</span> <span class="font-medium">{{ statistics.sum_total|floatformat:4 }}</span></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-white border border-gray-200 rounded-lg p-5 mt-4">
+            <p class="text-sm text-gray-500">No matching records for this scenario.</p>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% if gaps %}
+    <div class="mt-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg p-4 text-sm">
+        <p class="font-medium">Data not yet computed</p>
+        <p class="mt-1">The following combinations have no pre-computed results:</p>
+        <ul class="mt-2 list-disc list-inside">
+            {% for gap in gaps %}
+            <li>
+                {{ gap.module_type }} / {{ gap.field }}: {{ gap.from_value }} &rarr; {{ gap.to_value }}
+                <button type="button"
+                        hx-post="{% url 'admin_scripts:htmx-enqueue-job' %}"
+                        hx-vals='{"module_type": "{{ gap.module_type }}", "attribute": "{{ gap.field }}", "from_value": "{{ gap.from_value }}", "to_value": "{{ gap.to_value }}"}'
+                        hx-target="closest li"
+                        hx-swap="outerHTML"
+                        class="ml-2 text-xs text-blue-600 hover:text-blue-800 underline">
+                    Compute
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if not_computed %}
+    <div class="mt-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg p-4 text-sm">
+        <p class="font-medium">Data not yet computed</p>
+        <p class="mt-1">No pre-computed results exist for this scenario combination.</p>
+    </div>
+    {% endif %}
+</div>

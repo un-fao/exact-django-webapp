@@ -1,0 +1,24 @@
+[
+  {
+    "model": "api.foresttype",
+    "pk": 1,
+    "fields": {
+      "name": "Natural",
+      "name_en": "Natural",
+      "name_fr": "Naturel",
+      "name_es": "Natural",
+      "name_ru": "Естественный"
+    }
+  },
+  {
+    "model": "api.foresttype",
+    "pk": 2,
+    "fields": {
+      "name": "Plantation",
+      "name_en": "Plantation",
+      "name_fr": "Plantation",
+      "name_es": "Plantación",
+      "name_ru": "Плантация"
+    }
+  }
+]

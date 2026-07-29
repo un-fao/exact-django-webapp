@@ -1,0 +1,55 @@
+<div data-compare-panel class="hidden">
+    <div id="cmp-empty" class="text-sm text-gray-500 p-6 text-center bg-white border border-gray-200 rounded-lg">
+        Run at least one scenario to populate the comparison view.
+    </div>
+
+    <div id="cmp-chips" class="hidden flex flex-wrap gap-2 mb-4"></div>
+
+    <details id="cmp-box" class="hidden bg-white border border-gray-200 rounded-lg mb-4 group" open>
+        <summary class="cursor-pointer select-none flex items-center justify-between p-5 text-md font-semibold text-gray-900">
+            <span>Distribution</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </summary>
+        <div class="px-5 pb-5">
+            <div style="position: relative; height: 280px;"><canvas></canvas></div>
+        </div>
+    </details>
+
+    <details id="cmp-composition" class="hidden bg-white border border-gray-200 rounded-lg mb-4 group">
+        <summary class="cursor-pointer select-none flex items-center justify-between p-5 text-md font-semibold text-gray-900">
+            <span>Per-change contribution to sum</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </summary>
+        <div class="px-5 pb-5">
+            <div style="position: relative; height: 280px;"><canvas></canvas></div>
+        </div>
+    </details>
+
+    <details id="cmp-bar" class="hidden bg-white border border-gray-200 rounded-lg mb-4 group">
+        <summary class="cursor-pointer select-none flex items-center justify-between p-5 text-md font-semibold text-gray-900">
+            <span>Mean &plusmn; CI 95%</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </summary>
+        <div class="px-5 pb-5">
+            <div style="position: relative; height: 280px;"><canvas></canvas></div>
+        </div>
+    </details>
+
+    <details id="cmp-table" class="hidden bg-white border border-gray-200 rounded-lg mb-4 group" open>
+        <summary class="cursor-pointer select-none flex items-center justify-between p-5 text-md font-semibold text-gray-900">
+            <span>All statistics</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </summary>
+        <div class="px-5 pb-5">
+            <div data-cmp-table-body class="overflow-x-auto"></div>
+        </div>
+    </details>
+</div>

@@ -1,0 +1,469 @@
+modules:
+- module_type: Grassland
+  label: Grassland
+  config_name: grassland
+  fields:
+  - field_name: grassland_management_type
+    label: Grassland Management Type
+    value_source:
+      kind: queryset
+      model: GrasslandManagementType
+  - field_name: is_fire_used
+    label: Is Fire Used
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+  - field_name: fire_periodicity
+    label: Fire Periodicity
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: fire_impact
+    label: Fire Impact
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Livestock
+  label: Livestock
+  config_name: livestock
+  fields:
+  - field_name: livestock_category_types
+    label: Livestock Category Types
+    value_source:
+      kind: queryset
+      model: LivestockCategoryType
+  - field_name: livestock_production_type
+    label: Livestock Production Type
+    value_source:
+      kind: queryset
+      model: LivestockProductionType
+  - field_name: heads_number
+    label: Heads Number
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: AnnualCropland
+  label: Annual Cropland
+  config_name: annual_cropland
+  fields:
+  # - field_name: land_use_type
+  #   label: Land Use Type
+  #   value_source:
+  #     kind: queryset
+  #     model: LandUseType
+  - field_name: tillage_management_type
+    label: Tillage Management Type
+    value_source:
+      kind: queryset
+      model: TillageManagementType
+  - field_name: organic_input_type
+    label: Organic Input Type
+    value_source:
+      kind: queryset
+      model: OrganicInputType
+  - field_name: residue_management_type
+    label: Residue Management Type
+    value_source:
+      kind: queryset
+      model: ResidueManagementType
+- module_type: FloodedRice
+  label: Flooded Rice
+  config_name: flooded_rice
+  fields:
+  - field_name: water_management_type_before_cultivation
+    label: Water Management Type Before Cultivation
+    value_source:
+      kind: queryset
+      model: WaterManagementTypeBeforeCultivation
+  - field_name: water_management_type_after_cultivation
+    label: Water Management Type After Cultivation
+    value_source:
+      kind: queryset
+      model: WaterManagementTypeAfterCultivation
+  - field_name: organic_amendment_type
+    label: Organic Amendment Type
+    value_source:
+      kind: queryset
+      model: OrganicAmendmentType
+- module_type: PerennialCropland
+  label: Perennial Cropland
+  config_name: perennial_cropland
+  fields:
+  - field_name: land_use_type
+    label: Land Use Type
+    value_source:
+      kind: queryset
+      model: LandUseType
+  - field_name: organic_input_type
+    label: Organic Input Type
+    value_source:
+      kind: queryset
+      model: OrganicInputType
+  - field_name: tillage_management_type
+    label: Tillage Management Type
+    value_source:
+      kind: queryset
+      model: TillageManagementType
+  - field_name: is_biomass_burned
+    label: Is Biomass Burned
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+- module_type: ForestManagement
+  label: Forest Management
+  config_name: forest_management
+  fields:
+  - field_name: land_use_type
+    label: Land Use Type
+    value_source:
+      kind: queryset
+      model: LandUseType
+  - field_name: forest_type
+    label: Forest Type
+    value_source:
+      kind: queryset
+      model: ForestType
+  - field_name: forest_condition_type
+    label: Forest Condition Type
+    value_source:
+      kind: queryset
+      model: ForestConditionType
+  - field_name: average_yearly_degradation_percentage
+    label: Average Yearly Degradation Percentage
+    value_source:
+      kind: static
+      values:
+      - 0
+- module_type: SmallFishery
+  label: Small Fishery
+  config_name: small_fishery
+  fields:
+  - field_name: gear_type
+    label: Gear Type
+    value_source:
+      kind: queryset
+      model: SmallFisheryGearType
+  - field_name: fishery_type
+    label: Fishery Type
+    value_source:
+      kind: queryset
+      model: FisheryType
+  - field_name: total_catch_yr
+    label: Total Catch Yr
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: LargeFishery
+  label: Large Fishery
+  config_name: large_fishery
+  fields:
+  - field_name: gear_type
+    label: Gear Type
+    value_source:
+      kind: queryset
+      model: LargeFisheryGearType
+  - field_name: fish_type
+    label: Fish Type
+    value_source:
+      kind: queryset
+      model: FishType
+  - field_name: total_catch_yr
+    label: Total Catch Yr
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: CoastalWetland
+  label: Coastal Wetland
+  config_name: coastal_wetland
+  fields:
+  - field_name: land_use_type
+    label: Land Use Type
+    value_source:
+      kind: queryset
+      model: LandUseType
+  - field_name: area_under_drainage
+    label: Area Under Drainage
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: drained_area_excavated
+    label: Drained Area Excavated
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: area_not_drained_or_rewetted
+    label: Area Not Drained Or Rewetted
+    value_source:
+      kind: static
+      values:
+      - 0
+  - field_name: area_w_restored_vegetation
+    label: Area W Restored Vegetation
+    value_source:
+      kind: static
+      values:
+      - 0
+- module_type: Waterbody
+  label: Waterbody
+  config_name: waterbody
+  fields:
+  - field_name: waterbody_type
+    label: Waterbody Type
+    value_source:
+      kind: queryset
+      model: WaterbodyType
+  - field_name: trophic_type
+    label: Trophic Type
+    value_source:
+      kind: queryset
+      model: TrophicType
+# Parent modules with a single submodule type. The catalog entry is named
+# after the parent module (the value stored in ChangeRecord.module_type);
+# fields and values come from the corresponding *Entry submodule.
+- module_type: Energy
+  label: Energy
+  config_name: energy
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: account_for_co2
+    label: Account For CO2
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Storage
+  label: Storage
+  config_name: storage
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_refrigerant_used
+    label: Is Refrigerant Used
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+  - field_name: refrigerant_type
+    label: Refrigerant Type
+    value_source:
+      kind: queryset
+      model: RefrigerantType
+- module_type: Processing
+  label: Processing
+  config_name: processing
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_water_used
+    label: Is Water Used
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+- module_type: Packaging
+  label: Packaging
+  config_name: packaging
+  fields:
+  - field_name: packaging_material_type
+    label: Packaging Material Type
+    value_source:
+      kind: queryset
+      model: PackagingMaterialType
+  - field_name: kg_of_packaging_material
+    label: Kg Of Packaging Material
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: is_electric
+    label: Is Electric
+    value_source:
+      kind: static
+      values:
+      - true
+      - false
+- module_type: Transport
+  label: Transport
+  config_name: transport
+  fields:
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: quantity_consumed_per_year
+    label: Quantity Consumed Per Year
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+# Parent modules with multiple submodule types - each submodule becomes its
+# own catalog entry, named after the submodule. The processor still builds
+# the parent + that one submodule behind the scenes; ChangeRecord.module_type
+# stores the submodule name so the UI / queries line up 1-1.
+- module_type: IrrigationSystem
+  label: IrrigationSystem
+  config_name: irrigation_system
+  fields:
+  - field_name: irrigation_system_type
+    label: Irrigation System Type
+    value_source:
+      kind: queryset
+      model: IrrigationSystemType
+  - field_name: ha
+    label: Ha
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: IrrigationPhase
+  label: IrrigationPhase
+  config_name: irrigation_phase
+  fields:
+  - field_name: irrigation_system_type
+    label: Irrigation System Type
+    value_source:
+      kind: queryset
+      model: IrrigationSystemType
+  - field_name: fuel_type
+    label: Fuel Type
+    value_source:
+      kind: queryset
+      model: FuelType
+  - field_name: ha
+    label: Ha
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: gross_irrigation_water
+    label: Gross Irrigation Water
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Settlement
+  label: Settlement
+  config_name: settlement
+  fields:
+  - field_name: settlement_type
+    label: Settlement Type
+    value_source:
+      kind: queryset
+      model: SettlementType
+- module_type: Building
+  label: Building
+  config_name: building
+  fields:
+  - field_name: building_type
+    label: Building Type
+    value_source:
+      kind: queryset
+      model: BuildingType
+  - field_name: area_m2
+    label: Area m²
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: Road
+  label: Road
+  config_name: road
+  fields:
+  - field_name: road_type
+    label: Road Type
+    value_source:
+      kind: queryset
+      model: RoadType
+  - field_name: length_km
+    label: Length (km)
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+  - field_name: width_m
+    label: Width (m)
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: OtherInfrastructure
+  label: OtherInfrastructure
+  config_name: other_infrastructure
+  fields:
+  - field_name: area_m2
+    label: Area m²
+    value_source:
+      kind: static
+      values:
+      - 1
+      - 0
+- module_type: LandUseChange
+  label: LandUseChange
+  config_name: land_use_change
+  fields:
+  - field_name: module_type
+    label: Module Type Transition
+    value_source:
+      kind: queryset
+      model: ModuleType

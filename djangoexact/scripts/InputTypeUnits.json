@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Limestone",
+        "unit": "t/yr"
+    },
+    {
+        "name": "Dolomite",
+        "unit": "t/yr"
+    },
+    {
+        "name": "Not specified",
+        "unit": "t/yr"
+    },
+    {
+        "name": "Urea",
+        "unit": "t urea/yr"
+    },
+    {
+        "name": "Synthetic N-fertilizers other than Urea",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "Phosphorous",
+        "unit": "t P₂O₅/yr"
+    },
+    {
+        "name": "Potassium",
+        "unit": "t K₂O/yr"
+    },
+    {
+        "name": "N-fertilizers in continuously irrigated rice",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "N-fertilizers in wet and dry irrigated rice",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "Sewage",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "Compost",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "Rendering waste, brewery waste, guano",
+        "unit": "t N/yr"
+    },
+    {
+        "name": "Fungicides",
+        "unit": "t active ingredient/yr"
+    },
+    {
+        "name": "Herbicides",
+        "unit": "t active ingredient/yr"
+    },
+    {
+        "name": "Insecticides",
+        "unit": "t active ingredient/yr"
+    }
+]

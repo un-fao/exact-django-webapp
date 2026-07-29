@@ -1,12 +1,12 @@
 import math
 import traceback
+from .ghg_inventory_class import InventoryPerGasPerActivity
 
 from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    breakdown_proportionally_to_values,
+    soil_emissions,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
     som_emissions,
     biomass_emissions
 )
@@ -22,29 +22,29 @@ from .generalized_modules import LandModule
 from dataclasses import dataclass, field
 from typing import Optional
 
-@dataclass
+@dataclass(kw_only=True)
 class FloodedRice(LandModule):
     EFc_ref: float
-    EFc_tier_2: Optional[float]
+    EFc_tier_2: Optional[float] = None
     SFw_ref: float
-    SFw_tier_2: Optional[float]
+    SFw_tier_2: Optional[float] = None
     SFp_ref: float
-    SFp_tier_2: Optional[float]
+    SFp_tier_2: Optional[float] = None
     cfoa: float
-    SFo_tier_2: Optional[float]
-    adjusted_daily_ef_methane_tier_2: Optional[float]
+    SFo_tier_2: Optional[float] = None
+    adjusted_daily_ef_methane_tier_2: Optional[float] = None
     yield_ref: float
-    yield_tier_2: Optional[float]
+    yield_tier_2: Optional[float] = None
     rice_slope: float
     rice_intercept: float
-    straw_tonnes_tier_2: Optional[float]
+    straw_tonnes_tier_2: Optional[float] = None
     methane_ef: float
     rice_cf: float
     nitrous_ef: float
     nitrous_constant: float
     methane_constant: float
     cultivation_period_ref: float
-    cultivation_period_tier_2: Optional[float]
+    cultivation_period_tier_2: Optional[float] = None
     straw_burnt: float
     delay: int 
     is_minor_season: bool = True
@@ -52,14 +52,14 @@ class FloodedRice(LandModule):
     def __post_init__(self):
         super().__post_init__()
 
-        self.EFc = self.EFc_tier_2 or self.EFc_ref
-        self.SFw = self.SFw_tier_2 or self.SFw_ref
-        self.SFp = self.SFp_tier_2 or self.SFp_ref
+        self.EFc = self.EFc_tier_2 if self.EFc_tier_2 is not None else self.EFc_ref
+        self.SFw = self.SFw_tier_2 if self.SFw_tier_2 is not None else self.SFw_ref
+        self.SFp = self.SFp_tier_2 if self.SFp_tier_2 is not None else self.SFp_ref
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
         self.straw_tonnes_tier_2_default = self.yield_ref * self.rice_slope + self.rice_intercept
-        self.SFo_tier_2_default = 1 + (self.straw_tonnes_tier_2 or self.straw_tonnes_tier_2_default) * self.cfoa * 0.59
-        self.adjusted_daily_ef_methane_tier_2_default = self.EFc * self.SFw * self.SFp * (self.SFo_tier_2 or self.SFo_tier_2_default)
+        self.SFo_tier_2_default = (1 + (self.straw_tonnes_tier_2 if self.straw_tonnes_tier_2 is not None else self.straw_tonnes_tier_2_default) * self.cfoa) ** 0.59
+        self.adjusted_daily_ef_methane_tier_2_default = self.EFc * self.SFw * self.SFp * (self.SFo_tier_2 if self.SFo_tier_2 is not None else self.SFo_tier_2_default)
 
 
     def calculate_emissions(
@@ -67,28 +67,29 @@ class FloodedRice(LandModule):
     ):
         def calculate_ch4_emitted():
             try:
-                yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
-                straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
-                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
+                yield_value = self.yield_ref if self.yield_tier_2 is None else self.yield_tier_2
+                straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if self.straw_tonnes_tier_2 is None else self.straw_tonnes_tier_2
+                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if self.SFo_tier_2 is None else self.SFo_tier_2
 
                 if self.hectares_start == 0 and self.hectares_end == 0:
                     adjusted_daily_ef_methane_ref = 0
                 else:
-                    adjusted_daily_ef_methane_ref = self.EFc * self.SFw * self.SFp * SFo if not self.adjusted_daily_ef_methane_tier_2 else self.adjusted_daily_ef_methane_tier_2
+                    adjusted_daily_ef_methane_ref = self.EFc * self.SFw * self.SFp * SFo if self.adjusted_daily_ef_methane_tier_2 is None else self.adjusted_daily_ef_methane_tier_2
 
-                cultivation_period = self.cultivation_period_ref if not self.cultivation_period_tier_2 else self.cultivation_period_tier_2
+                cultivation_period = self.cultivation_period_ref if self.cultivation_period_tier_2 is None else self.cultivation_period_tier_2
 
                 kg_methane_cultivation_period = adjusted_daily_ef_methane_ref * cultivation_period
 
                 ch4_emitted_total = kg_methane_cultivation_period * sum(self.hectares_total) * self.methane_constant / 1000
-                ch4_emitted_yearly = breakdown_according_to_values(ch4_emitted_total, self.hectares_total)
+                ch4_emitted_yearly = breakdown_proportionally_to_values(ch4_emitted_total, self.hectares_total)
 
                 ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_emitted_yearly], ActivityTypes.CH4_EMITTED_RICE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
-
-            except:
+                inventory = InventoryPerGasPerActivity(GasTypes.CH4,ch4_emitted_total*self.hectares_start,ActivityTypes.CH4_EMITTED_RICE)
+                self.inventory.emissions_by_sector_by_gas(inventory)
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_straw_burning():
             try:
@@ -96,35 +97,38 @@ class FloodedRice(LandModule):
                     pass
 
                 else:
-                    yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
-                    straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
+                    yield_value = self.yield_ref if self.yield_tier_2 is None else self.yield_tier_2
+                    straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if self.straw_tonnes_tier_2 is None else self.straw_tonnes_tier_2
                     straw_methane_co2 = straw_tonnes_ref * self.rice_cf * self.methane_ef * self.methane_constant / 1000
                     straw_nitrous_co2 = straw_tonnes_ref * self.rice_cf * self.nitrous_ef * self.nitrous_constant / 1000
 
                     total_methane = straw_methane_co2 * sum(self.hectares_total)
                     total_nitrous = straw_nitrous_co2 * sum(self.hectares_total)
 
-                    # TODO: check if this should be breakdown according to hectares_total or hectares_under_20
-                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
-                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
 
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
-            except:
+
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4,0,ActivityTypes.STRAW_BURNING))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O,0,ActivityTypes.STRAW_BURNING))
+                    
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_soil_emissions():
             try:
                 if self.calculate_soc_som and not self.is_minor_season:
-                    soil_emissions_yearly, soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                    soil_emissions_yearly, soil_emissions_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-
-            except:
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2,0,ActivityTypes.SOIL_CO2_CHANGE))
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_emissions_som():
             try:
@@ -133,16 +137,26 @@ class FloodedRice(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                inventory =  InventoryPerGasPerActivity(GasTypes.N2O,self.soc_start*self.hectares_start,ActivityTypes.SOM)
+                self.inventory.emissions_by_sector_by_gas(inventory)
+
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
 
             # NOTE: should this be calculated only for main season?
             try:
-                emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                if self.calculate_biomass:
+                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+                    inventory =  InventoryPerGasPerActivity(GasTypes.CO2,self.biomass_start*self.hectares_start *44/12,ActivityTypes.BIOMASS)
+                    self.inventory.emissions_by_sector_by_gas(inventory)
+                else:
+                    pass
 
             except Exception as e:
                 traceback.print_exc()

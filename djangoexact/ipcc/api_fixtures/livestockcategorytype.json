@@ -1,0 +1,206 @@
+[
+{
+  "model": "api.livestockcategorytype",
+  "pk": 40,
+  "fields": {
+    "name": "Dairy Cattle",
+    "name_en": "Dairy Cattle",
+    "name_fr": null,
+    "name_es": "Vacas lecheras",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 41,
+  "fields": {
+    "name": "Other Cattle",
+    "name_en": "Other Cattle",
+    "name_fr": null,
+    "name_es": "Vacuno otro",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 46,
+  "fields": {
+    "name": "Camels",
+    "name_en": "Camels",
+    "name_fr": null,
+    "name_es": "Camellos",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 47,
+  "fields": {
+    "name": "Horses",
+    "name_en": "Horses",
+    "name_fr": null,
+    "name_es": "Caballos",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 48,
+  "fields": {
+    "name": "Mules And Asses",
+    "name_en": "Mules And Asses",
+    "name_fr": null,
+    "name_es": "Mulas y asnos",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 49,
+  "fields": {
+    "name": "Other Buffalo",
+    "name_en": "Other Buffalo",
+    "name_fr": null,
+    "name_es": "Búfalo otro",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 50,
+  "fields": {
+    "name": "Dairy Buffalo",
+    "name_en": "Dairy Buffalo",
+    "name_fr": null,
+    "name_es": "Búfala lechera",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 51,
+  "fields": {
+    "name": "Dairy Sheep",
+    "name_en": "Dairy Sheep",
+    "name_fr": null,
+    "name_es": "Oveja lechera",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 52,
+  "fields": {
+    "name": "Other Sheep",
+    "name_en": "Other Sheep",
+    "name_fr": null,
+    "name_es": "Ovino otro",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 53,
+  "fields": {
+    "name": "Growing Swine",
+    "name_en": "Growing Swine",
+    "name_fr": null,
+    "name_es": "Porcino en crecimiento",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 54,
+  "fields": {
+    "name": "Breeding Swine",
+    "name_en": "Breeding Swine",
+    "name_fr": null,
+    "name_es": "Porcino reproductivo",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 55,
+  "fields": {
+    "name": "Goats",
+    "name_en": "Goats",
+    "name_fr": null,
+    "name_es": "Cabras",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 56,
+  "fields": {
+    "name": "Deer",
+    "name_en": "Deer",
+    "name_fr": null,
+    "name_es": "Ciervo",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 57,
+  "fields": {
+    "name": "Ostrich",
+    "name_en": "Ostrich",
+    "name_fr": null,
+    "name_es": "Avestruz",
+    "name_ru": null,
+    "is_active": false
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 58,
+  "fields": {
+    "name": "Chicken Layer",
+    "name_en": "Chicken Layer",
+    "name_fr": null,
+    "name_es": "Gallinas ponedoras",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 59,
+  "fields": {
+    "name": "Chicken Broiler",
+    "name_en": "Chicken Broiler",
+    "name_fr": null,
+    "name_es": "Pollos parrilleros",
+    "name_ru": null,
+    "is_active": true
+  }
+},
+{
+  "model": "api.livestockcategorytype",
+  "pk": 60,
+  "fields": {
+    "name": "Llamas And Alpacas",
+    "name_en": "Llamas And Alpacas",
+    "name_fr": null,
+    "name_es": "Llamas y Alpacas",
+    "name_ru": null,
+    "is_active": false
+  }
+}
+]

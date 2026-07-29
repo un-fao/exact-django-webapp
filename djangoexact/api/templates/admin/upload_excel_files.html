@@ -1,0 +1,91 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:api_handinhandassessment_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="module aligned">
+    <h2>Selected Assessments</h2>
+    <ul>
+        {% for assessment in queryset %}
+        <li><strong>{{ assessment.country.name }}</strong> - {{ assessment.name }} ({{ assessment.year }})</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{# False positive: csrf_token is present on the line after the form tag, but the rule's #}
+{# generic-mode ellipsis cannot span this form's full body, so it fires anyway. #}
+{# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token #}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="module aligned">
+        <h2>Upload Excel Files</h2>
+        <div class="form-row">
+            <div>
+                <label for="id_excel_files">Excel Files:</label>
+                <input type="file" name="excel_files" id="id_excel_files" multiple accept=".xlsx,.xls" required>
+                <p class="help">Select one or more Excel files (.xlsx, .xls) to upload. Files will be uploaded to the "hih_uploads" folder in the storage bucket.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="submit-row">
+        <input type="submit" value="Upload Files" class="default" name="_save">
+        <a href="{% url 'admin:api_handinhandassessment_changelist' %}" class="button cancel-link">Cancel</a>
+    </div>
+</form>
+
+<script>
+document.getElementById('id_excel_files').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const fileList = document.createElement('ul');
+    fileList.innerHTML = '<h4>Selected Files:</h4>';
+    
+    for (let i = 0; i < files.length; i++) {
+        const li = document.createElement('li');
+        li.textContent = files[i].name + ' (' + Math.round(files[i].size / 1024) + ' KB)';
+        fileList.appendChild(li);
+    }
+    
+    // Remove previous file list if it exists
+    const existingList = document.querySelector('.file-list');
+    if (existingList) {
+        existingList.remove();
+    }
+    
+    fileList.className = 'file-list';
+    document.querySelector('.module.aligned').appendChild(fileList);
+});
+</script>
+
+<style>
+.file-list {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.file-list h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.file-list li {
+    margin: 5px 0;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

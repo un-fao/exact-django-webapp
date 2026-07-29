@@ -106,9 +106,9 @@ for i, rice in enumerate(rices):
     print(f"Organic Amendment W/O: {rice.organic_amendment_type_wo}")
     print(f"Organic Amendment W: {rice.organic_amendment_type_w}")
 
-    print(f"Crop Yield START: {rice.crop_yield_start}")
-    print(f"Crop Yield W/O: {rice.crop_yield_wo}")
-    print(f"Crop Yield W: {rice.crop_yield_w}")
+    print(f"Crop Yield START: {rice.crop_yield_t2_start}")
+    print(f"Crop Yield W/O: {rice.crop_yield_t2_wo}")
+    print(f"Crop Yield W: {rice.crop_yield_t2_w}")
 
     # print(f"livestock_category_type_start: {rice.livestock_category_type.name}")
     # print(f"livestock_category_type_wo: {rice.livestock_category_type.name}")

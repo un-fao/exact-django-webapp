@@ -1,0 +1,27 @@
+<div>
+    <label class="block text-xs text-gray-400 mb-1">Climate</label>
+    <select name="{{ prefix }}filter-climate" multiple
+            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+        {% for c in climates %}
+        <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div>
+    <label class="block text-xs text-gray-400 mb-1">Moisture</label>
+    <select name="{{ prefix }}filter-moisture" multiple
+            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+        {% for m in moistures %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div>
+    <label class="block text-xs text-gray-400 mb-1">Soil Type</label>
+    <select name="{{ prefix }}filter-soil_type" multiple
+            class="js-combobox w-full border border-gray-300 rounded px-2 py-1 text-xs" size="2">
+        {% for s in soil_types %}
+        <option value="{{ s }}">{{ s }}</option>
+        {% endfor %}
+    </select>
+</div>

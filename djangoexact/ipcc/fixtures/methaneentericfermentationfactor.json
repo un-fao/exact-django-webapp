@@ -1,0 +1,5102 @@
+[
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1021,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 86.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1022,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1023,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1024,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1025,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1026,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1027,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1028,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1029,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1030,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1031,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1032,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1033,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1034,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1035,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1036,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1037,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1038,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 96.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1039,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 43.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1040,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1041,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1042,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1043,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1044,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1045,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1046,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1047,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1048,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1049,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1050,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1051,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1052,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1053,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1054,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1055,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 138.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1056,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 64.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1057,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1058,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1059,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1060,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1061,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1062,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1063,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1064,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1065,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1066,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1067,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1068,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1069,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1070,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1071,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1072,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 103.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1073,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 55.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1074,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1075,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1076,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1077,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1078,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1079,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1080,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1081,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1082,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1083,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1084,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1085,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1086,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1087,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1088,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1089,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 126.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1090,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 52.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1091,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1092,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1093,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1094,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1095,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1096,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1097,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1098,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1099,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1100,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1101,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1102,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1103,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1104,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1105,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1106,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1107,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1108,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1109,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1110,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1111,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1112,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1113,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1114,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1115,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1116,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1117,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1118,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1119,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1120,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1121,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1122,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1123,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1124,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1125,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1126,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1127,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1128,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1129,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1130,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1131,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1132,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1133,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1134,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1135,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1136,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1137,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1138,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1139,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1140,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1141,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 63.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1142,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1143,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1144,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1145,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1146,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1147,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1148,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1149,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1150,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1151,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1152,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1153,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1154,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1155,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1156,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1157,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 94.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1158,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 61.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1159,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1160,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1161,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1162,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1163,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1164,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1165,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1166,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1167,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1168,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1169,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1170,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1171,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1172,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1173,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1174,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 70.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1175,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 41.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1176,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1177,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1178,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1179,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1180,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1181,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1182,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 9.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1183,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1184,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1185,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1186,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1187,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1188,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1189,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1190,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1191,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 66.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1192,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 48.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1193,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1194,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1195,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1196,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1197,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1198,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1199,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1200,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1201,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1202,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1203,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1204,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1205,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1206,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1207,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1208,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 71.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1209,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 56.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1210,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1211,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1212,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1213,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1214,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1215,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1216,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1217,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1218,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1219,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1220,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1221,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1222,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1223,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1224,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1225,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 138.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1226,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 64.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1227,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1228,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1229,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1230,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1231,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1232,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1233,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1234,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1235,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1236,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1237,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1238,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1239,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1240,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1241,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1242,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1243,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1244,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1245,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1246,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1247,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1248,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1249,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1250,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1251,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1252,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1253,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1254,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1255,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1256,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1257,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1258,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1259,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 126.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1260,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 52.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1261,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1262,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1263,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1264,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1265,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1266,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1267,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1268,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1269,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1270,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1271,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1272,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1273,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1274,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1275,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1276,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1277,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1278,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1279,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1280,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1281,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1282,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1283,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1284,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1285,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1286,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1287,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1288,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1289,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1290,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1291,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1292,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1293,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1294,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1295,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1296,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1297,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1298,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1299,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1300,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1301,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1302,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1303,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1304,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1305,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1306,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1307,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1308,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1309,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1310,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1311,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 63.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1312,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1313,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1314,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1315,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1316,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1317,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1318,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1319,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1320,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1321,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1322,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1323,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1324,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1325,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1326,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1327,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 62.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1328,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 55.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1329,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1330,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1331,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1332,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1333,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1334,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1335,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1336,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1337,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1338,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1339,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1340,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1341,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1342,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1343,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1344,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 74.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1345,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 47.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1346,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1347,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1348,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1349,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1350,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1351,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1352,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1353,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1354,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1355,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1356,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1357,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1358,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1359,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1360,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1361,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1362,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 52.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1363,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1364,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 81.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1365,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1366,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1367,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1368,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1369,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1370,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1371,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1372,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1373,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1374,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1375,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1376,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1377,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1378,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1379,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 54.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1380,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1381,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1382,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1383,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1384,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1385,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1386,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1387,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1388,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1389,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1390,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1391,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1392,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1393,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1394,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1395,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 138.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1396,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 64.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1397,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1398,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1399,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1400,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1401,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1402,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1403,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1404,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1405,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1406,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1407,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1408,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1409,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1410,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1411,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1412,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 87.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1413,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 56.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1414,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1415,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1416,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1417,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1418,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1419,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1420,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1421,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1422,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1423,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1424,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1425,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1426,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1427,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1428,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1429,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 126.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1430,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 52.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1431,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1432,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 78.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1433,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1434,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1435,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1436,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1437,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1438,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1439,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1440,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1441,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1442,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1443,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1444,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1445,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1446,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1447,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1448,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1449,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1450,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1451,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1452,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1453,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1454,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1455,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1456,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1457,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1458,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1459,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1460,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1461,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1462,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1463,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1464,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 58.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1465,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1466,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 68.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1467,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1468,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1469,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1470,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1471,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1472,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1473,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1474,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1475,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1476,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1477,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1478,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1479,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1480,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 93.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1481,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 63.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1482,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1483,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1484,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1485,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1486,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1487,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1488,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1489,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1490,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1491,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1492,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1493,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1494,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1495,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1496,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1497,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 76.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1498,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 60.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1499,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1500,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1501,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1502,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1503,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1504,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1505,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1506,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1507,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1508,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1509,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1510,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1511,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1512,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1513,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1514,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 73.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1515,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1516,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1517,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1518,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1519,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1520,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1521,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1522,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1523,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1524,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 46.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1525,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 10.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1526,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 20.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1527,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1528,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1529,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 4.86831e-05
+    }
+  },
+  {
+    "model": "ipcc.methaneentericfermentationfactor",
+    "pk": 1530,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 8.0
+    }
+  }
+]

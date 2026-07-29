@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.tillagemanagementtype",
+    "pk": 1,
+    "fields": {
+      "name": "Full Tillage",
+      "name_en": "Full Tillage",
+      "name_fr": null,
+      "name_es": "Laboreo Total",
+      "name_ru": "Полная обработка почвы"
+    }
+  },
+  {
+    "model": "api.tillagemanagementtype",
+    "pk": 3,
+    "fields": {
+      "name": "No Tillage",
+      "name_en": "No Tillage",
+      "name_fr": null,
+      "name_es": "Sin Laboreo",
+      "name_ru": "Без обработки почвы"
+    }
+  },
+  {
+    "model": "api.tillagemanagementtype",
+    "pk": 2,
+    "fields": {
+      "name": "Reduced Tillage",
+      "name_en": "Reduced Tillage",
+      "name_fr": null,
+      "name_es": "Laboreo Reducido",
+      "name_ru": "Сниженная обработка почвы"
+    }
+  }
+]

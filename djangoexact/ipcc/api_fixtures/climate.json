@@ -1,0 +1,82 @@
+[
+{
+  "model": "api.climate",
+  "pk": 1,
+  "fields": {
+    "name": "Cool Temperate",
+    "name_en": "Cool Temperate",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "is_active": true,
+    "moistures": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "api.climate",
+  "pk": 2,
+  "fields": {
+    "name": "Warm Temperate",
+    "name_en": "Warm Temperate",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "is_active": true,
+    "moistures": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "api.climate",
+  "pk": 4,
+  "fields": {
+    "name": "Boreal",
+    "name_en": "Boreal",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "is_active": true,
+    "moistures": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "api.climate",
+  "pk": 3,
+  "fields": {
+    "name": "Tropical",
+    "name_en": "Tropical",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "is_active": true,
+    "moistures": [
+      1,
+      2,
+      4
+    ]
+  }
+},
+{
+  "model": "api.climate",
+  "pk": 20,
+  "fields": {
+    "name": "Tropical Montane",
+    "name_en": "Tropical Montane",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null,
+    "is_active": true,
+    "moistures": [
+      1
+    ]
+  }
+}
+]

@@ -44,21 +44,21 @@ Not Specified;Cool Temperate;Moist;0,125;;0,586666667
 Not Specified;Warm Temperate;Dry;0,125;;0,586666667
 Not Specified;Warm Temperate;Wet;0,125;;0,586666667
 Not Specified;Warm Temperate;Moist;0,125;;0,586666667
-Urea;Tropical;Dry;;0,005;4,766666667
-Urea;Tropical;Wet;;0,016;4,766666667
-Urea;Tropical;Moist;;0,0105;4,766666667
-Urea;Tropical Montane;Dry;;0,005;4,766666667
-Urea;Tropical Montane;Wet;;0,005;4,766666667
-Urea;Tropical Montane;Moist;;0,005;4,766666667
-Urea;Boreal;Dry;;0,005;4,766666667
-Urea;Boreal;Wet;;0,016;4,766666667
-Urea;Boreal;Moist;;0,0105;4,766666667
-Urea;Cool Temperate;Dry;;0,005;4,766666667
-Urea;Cool Temperate;Wet;;0,016;4,766666667
-Urea;Cool Temperate;Moist;;0,0105;4,766666667
-Urea;Warm Temperate;Dry;;0,005;4,766666667
-Urea;Warm Temperate;Wet;;0,016;4,766666667
-Urea;Warm Temperate;Moist;;0,0105;4,766666667
+Urea;Tropical;Dry;0,2;0,005;4,766666667
+Urea;Tropical;Wet;0,2;0,016;4,766666667
+Urea;Tropical;Moist;0,2;0,0105;4,766666667
+Urea;Tropical Montane;Dry;0,2;0,005;4,766666667
+Urea;Tropical Montane;Wet;0,2;0,005;4,766666667
+Urea;Tropical Montane;Moist;0,2;0,005;4,766666667
+Urea;Boreal;Dry;0,2;0,005;4,766666667
+Urea;Boreal;Wet;0,2;0,016;4,766666667
+Urea;Boreal;Moist;0,2;0,0105;4,766666667
+Urea;Cool Temperate;Dry;0,2;0,005;4,766666667
+Urea;Cool Temperate;Wet;0,2;0,016;4,766666667
+Urea;Cool Temperate;Moist;0,2;0,0105;4,766666667
+Urea;Warm Temperate;Dry;0,2;0,005;4,766666667
+Urea;Warm Temperate;Wet;0,2;0,016;4,766666667
+Urea;Warm Temperate;Moist;0,2;0,0105;4,766666667
 Synthetic N-Fertilizers Other Than Urea;Tropical;Dry;;0,005;4,766666667
 Synthetic N-Fertilizers Other Than Urea;Tropical;Wet;;0,016;4,766666667
 Synthetic N-Fertilizers Other Than Urea;Tropical;Moist;;0,0105;4,766666667

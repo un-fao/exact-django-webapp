@@ -1,7 +1,7 @@
 import re
 import traceback
 
-from .general_functions import yearly_time_dependent_parameter_breakdown
+from .general_functions import compute_yearly_or_half_year_cumulative
 from .generalized_modules import BaseModule
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -10,26 +10,35 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
+
+from .ghg_inventory_class import InventoryPerGasPerActivity
 from dataclasses import dataclass
 from typing import Optional
 
-@dataclass
+
+@dataclass(kw_only=True)
 class Fishery(BaseModule):
     catch_start: float
     catch_end: float
-    ef_diesel_default: float
-    ef_diesel_start_tier_2: Optional[float]
-    ef_diesel_tier_2_end: Optional[float]
+    ef_diesel_default_co2: float
+    ef_diesel_co2_start_tier_2: Optional[float] = None
+    ef_diesel_co2_end_tier_2: Optional[float] = None
+    ef_diesel_default_n2o: float
+    ef_diesel_n2o_start_tier_2: Optional[float] = None
+    ef_diesel_n2o_end_tier_2: Optional[float] = None
+    ef_diesel_default_ch4: float
+    ef_diesel_ch4_start_tier_2: Optional[float] = None
+    ef_diesel_ch4_end_tier_2: Optional[float] = None
     fui_default_start: float
     fui_default_end: float
-    fui_start_tier_2: Optional[float]
-    fui_end_tier_2: Optional[float]
+    fui_start_tier_2: Optional[float] = None
+    fui_end_tier_2: Optional[float] = None
     gwp_refrigerant_default: float
-    gwp_refrigerant_start_tier_2: Optional[float]
-    gwp_refrigerant_end_tier_2: Optional[float]
+    gwp_refrigerant_start_tier_2: Optional[float] = None
+    gwp_refrigerant_end_tier_2: Optional[float] = None
     quantity_lost_refrigerant_default: float
-    quantity_lost_refrigerant_start_tier_2: Optional[float]
-    quantity_lost_refrigerant_end_tier_2: Optional[float]
+    quantity_lost_refrigerant_start_tier_2: Optional[float] = None
+    quantity_lost_refrigerant_end_tier_2: Optional[float] = None
     percentage_refrigerant_start: float
     percentage_refrigerant_end: float
     tonnes_ice_default: float
@@ -42,42 +51,74 @@ class Fishery(BaseModule):
     percentage_ice_start: float
     percentage_ice_end: float
 
+    def __post_init__(self):
+        super().__post_init__()
+
+        self.tonnes_catch_yearly_breakdown = compute_yearly_or_half_year_cumulative(self.catch_start, self.catch_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
     def calculate_emissions(self):
         def calculate_catch_emissions():
             try:
-                ef_diesel_start = self.ef_diesel_start_tier_2 or self.ef_diesel_default
-                ef_diesel_end = self.ef_diesel_tier_2_end or self.ef_diesel_default
+                ef_diesel_co2_start = self.ef_diesel_co2_start_tier_2 if self.ef_diesel_co2_start_tier_2 is not None else self.ef_diesel_default_co2
+                ef_diesel_co2_end = self.ef_diesel_co2_end_tier_2 if self.ef_diesel_co2_end_tier_2 is not None else self.ef_diesel_default_co2
 
-                fui_start = self.fui_start_tier_2 or self.fui_default_start
-                fui_end = self.fui_end_tier_2 or self.fui_default_end
+                ef_diesel_n2o_start = self.ef_diesel_n2o_start_tier_2 if self.ef_diesel_n2o_start_tier_2 is not None else self.ef_diesel_default_n2o
+                ef_diesel_n2o_end = self.ef_diesel_n2o_end_tier_2 if self.ef_diesel_n2o_end_tier_2 is not None else self.ef_diesel_default_n2o
 
-                ef_start = fui_start * ef_diesel_start / 1000
-                ef_end = fui_end * ef_diesel_end / 1000
+                ef_diesel_ch4_start = self.ef_diesel_ch4_start_tier_2 if self.ef_diesel_ch4_start_tier_2 is not None else self.ef_diesel_default_ch4
+                ef_diesel_ch4_end = self.ef_diesel_ch4_end_tier_2 if self.ef_diesel_ch4_end_tier_2 is not None else self.ef_diesel_default_ch4
 
-                annual_start = self.catch_start * ef_start
-                annual_end = self.catch_end * ef_end
+                fui_start = self.fui_start_tier_2 if self.fui_start_tier_2 is not None else self.fui_default_start
+                fui_end = self.fui_end_tier_2 if self.fui_end_tier_2 is not None else self.fui_default_end
 
-                emissions_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                # co2 calculation
+                ef_co2_start = fui_start * ef_diesel_co2_start / 1000
+                ef_co2_end = fui_end * ef_diesel_co2_end / 1000
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.CO2,
-                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_catch_yearly],
-                        activity=ActivityTypes.CATCH,
-                        delay=self.delay
-                    )
-                )
+                annual_co2_start = self.catch_start * ef_co2_start
+                annual_co2_end = self.catch_end * ef_co2_end
+
+                emissions_co2_catch_yearly = compute_yearly_or_half_year_cumulative(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_co2_start, ActivityTypes.CATCH ))
+                
+                # n2o calculation
+                ef_n2o_start = fui_start * ef_diesel_n2o_start / 1000
+                ef_n2o_end = fui_end * ef_diesel_n2o_end / 1000
+
+                annual_n2o_start = self.catch_start * ef_n2o_start
+                annual_n2o_end = self.catch_end * ef_n2o_end
+
+                emissions_n2o_catch_yearly = compute_yearly_or_half_year_cumulative(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_n2o_start, ActivityTypes.CATCH ))
+
+                # ch4 calculation
+
+                ef_ch4_start = fui_start * ef_diesel_ch4_start / 1000
+                ef_ch4_end = fui_end * ef_diesel_ch4_end / 1000
+
+                annual_ch4_start = self.catch_start * ef_ch4_start
+                annual_ch4_end = self.catch_end * ef_ch4_end
+
+                emissions_ch4_catch_yearly = compute_yearly_or_half_year_cumulative(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, annual_ch4_start, ActivityTypes.CATCH ))
+
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_refrigerant_emissions():
             try:
-                gwp_refrigerant_start = self.gwp_refrigerant_start_tier_2 or self.gwp_refrigerant_default
-                gwp_refrigerant_end = self.gwp_refrigerant_end_tier_2 or self.gwp_refrigerant_default
+                gwp_refrigerant_start = self.gwp_refrigerant_start_tier_2 if self.gwp_refrigerant_start_tier_2 is not None else self.gwp_refrigerant_default
+                gwp_refrigerant_end = self.gwp_refrigerant_end_tier_2 if self.gwp_refrigerant_end_tier_2 is not None else self.gwp_refrigerant_default
 
-                quantity_lost_refrigerant_start = self.quantity_lost_refrigerant_start_tier_2 or self.quantity_lost_refrigerant_default
-                quantity_lost_refrigerant_end = self.quantity_lost_refrigerant_end_tier_2 or self.quantity_lost_refrigerant_default
+                quantity_lost_refrigerant_start = self.quantity_lost_refrigerant_start_tier_2 if self.quantity_lost_refrigerant_start_tier_2 is not None else self.quantity_lost_refrigerant_default
+                quantity_lost_refrigerant_end = self.quantity_lost_refrigerant_end_tier_2 if self.quantity_lost_refrigerant_end_tier_2 is not None else self.quantity_lost_refrigerant_default
 
                 catch_with_refrigerant_start = self.catch_start * self.percentage_refrigerant_start
                 catch_with_refrigerant_end = self.catch_end * self.percentage_refrigerant_end
@@ -85,27 +126,22 @@ class Fishery(BaseModule):
                 annual_start = gwp_refrigerant_start * quantity_lost_refrigerant_start * catch_with_refrigerant_start / 1000
                 annual_end = gwp_refrigerant_end * quantity_lost_refrigerant_end * catch_with_refrigerant_end / 1000
 
-                emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_refrigerant_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.OTHER,
-                        emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly],
-                        activity=ActivityTypes.REFRIGERANT,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly], activity=ActivityTypes.REFRIGERANT, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.OTHER, annual_start, ActivityTypes.REFRIGERANT))
+
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_ice_emissions():
             try:
-                tonnes_ice_start = self.tonnes_ice_start_tier_2 or self.tonnes_ice_default
-                tonnes_ice_end = self.tonnes_ice_end_tier_2 or self.tonnes_ice_default
+                tonnes_ice_start = self.tonnes_ice_start_tier_2 if self.tonnes_ice_start_tier_2 is not None else self.tonnes_ice_default
+                tonnes_ice_end = self.tonnes_ice_end_tier_2 if self.tonnes_ice_end_tier_2 is not None else self.tonnes_ice_default
 
-                kwh_ice_per_tonne_start = self.kwh_ice_per_tonne_start_tier_2 or self.kwh_ice_per_tonne_default
-                kwh_ice_per_tonne_end = self.kwh_ice_per_tonne_end_tier_2 or self.kwh_ice_per_tonne_default
+                kwh_ice_per_tonne_start = self.kwh_ice_per_tonne_start_tier_2 if self.kwh_ice_per_tonne_start_tier_2 is not None else self.kwh_ice_per_tonne_default
+                kwh_ice_per_tonne_end = self.kwh_ice_per_tonne_end_tier_2 if self.kwh_ice_per_tonne_end_tier_2 is not None else self.kwh_ice_per_tonne_default
 
                 ice_ef_start = tonnes_ice_start * kwh_ice_per_tonne_start * self.operating_margin / 1000
                 ice_ef_end = tonnes_ice_end * kwh_ice_per_tonne_end * self.operating_margin / 1000
@@ -116,25 +152,20 @@ class Fishery(BaseModule):
                 annual_start = ice_ef_start * catch_with_refrigerant_start
                 annual_end = ice_ef_end * catch_with_refrigerant_end
 
-                emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_ice_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.OTHER,
-                        emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly],
-                        activity=ActivityTypes.ICE,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly], activity=ActivityTypes.ICE, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.OTHER, annual_start, ActivityTypes.ICE ))
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_catch_emissions()
         calculate_refrigerant_emissions()
         calculate_ice_emissions()
 
-@dataclass
+
+@dataclass(kw_only=True)
 class CoastalAquaculture(BaseModule):
     production_start: float
     production_end: float
@@ -152,55 +183,42 @@ class CoastalAquaculture(BaseModule):
     def calculate_emissions(self):
         def calculate_nitrous_emissions():
             try:
-                nitrous_ef_start = self.nitrous_ef_start_tier_2 or self.nitrous_ef_default
-                nitrous_ef_end = self.nitrous_ef_end_tier_2 or self.nitrous_ef_default
+                nitrous_ef_start = self.nitrous_ef_start_tier_2 if self.nitrous_ef_start_tier_2 is not None else self.nitrous_ef_default
+                nitrous_ef_end = self.nitrous_ef_end_tier_2 if self.nitrous_ef_end_tier_2 is not None else self.nitrous_ef_default
 
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant * 44 / 28
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant * 44 / 28
 
-                emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(
-                    annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type
-                )
+                emissions_nitrous_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0, gas_type=GasTypes.N2O,
-                        emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly],
-                        activity=ActivityTypes.N20_FIELD, delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, annual_start, ActivityTypes.N20_FIELD ))
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_co2_emissions():
             try:
-                electricity_used_start = self.electricity_used_start_tier_2 or self.electricity_used_default
-                electricity_used_end = self.electricity_used_end_tier_2 or self.electricity_used_default
-                ef_electricity_start = self.ef_electricity_start_tier_2 or self.ef_electricity_default
-                ef_electricity_end = self.ef_electricity_end_tier_2 or self.ef_electricity_default
+                electricity_used_start = self.electricity_used_start_tier_2 if self.electricity_used_start_tier_2 is not None else self.electricity_used_default
+                electricity_used_end = self.electricity_used_end_tier_2 if self.electricity_used_end_tier_2 is not None else self.electricity_used_default
+                ef_electricity_start = self.ef_electricity_start_tier_2 if self.ef_electricity_start_tier_2 is not None else self.ef_electricity_default
+                ef_electricity_end = self.ef_electricity_end_tier_2 if self.ef_electricity_end_tier_2 is not None else self.ef_electricity_default
 
                 annual_start = electricity_used_start * self.production_start * ef_electricity_start
                 annual_end = electricity_used_end * self.production_end * ef_electricity_end
 
-                emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(
-                    annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type
-                )
+                emissions_co2_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0, gas_type=GasTypes.CO2,
-                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly],
-                        activity=ActivityTypes.ELECTRICITY, delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY ))
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_nitrous_emissions()
         calculate_co2_emissions()
-
 
 
 # # TEST FISHERIES
@@ -270,5 +288,3 @@ class CoastalAquaculture(BaseModule):
 # )
 
 # fishery.calculate_emissions()
-
-

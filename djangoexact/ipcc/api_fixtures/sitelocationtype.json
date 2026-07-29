@@ -1,0 +1,24 @@
+[
+{
+  "model": "api.sitelocationtype",
+  "pk": 1,
+  "fields": {
+    "name": "On-Site",
+    "name_en": "On-Site",
+    "name_fr": null,
+    "name_es": "In Situ",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.sitelocationtype",
+  "pk": 2,
+  "fields": {
+    "name": "Off-Site",
+    "name_en": "Off-Site",
+    "name_fr": null,
+    "name_es": "Fuera del Sitio",
+    "name_ru": null
+  }
+}
+]

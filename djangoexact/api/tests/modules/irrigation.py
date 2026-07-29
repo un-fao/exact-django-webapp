@@ -4,6 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
+from api.reports import generate_excel_report
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -18,10 +19,12 @@ class IrrigationTest(t.ModuleWithSubmodulesTest):
             ModuleType.objects.get(class_name="IrrigationPhase"),
         ]
         self.create_module()
-        self.create_submodules()
+        self.create_submodules(n=4)
 
     def test(self):
         self.calculate_results()
+
+        generate_excel_report(self.project)
 
 
 IrrigationTest().test()
