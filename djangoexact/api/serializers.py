@@ -205,7 +205,11 @@ class _SerializerRegistry(dict):
 
     def __missing__(self, key):
         self._refresh()
-        return dict.__getitem__(self, key)
+        # dict.__getitem__ on a subclass re-enters __missing__ for an absent
+        # key, so raise directly instead of re-indexing after the refresh.
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        raise KeyError(key)
 
     def __contains__(self, key):
         if dict.__contains__(self, key):
