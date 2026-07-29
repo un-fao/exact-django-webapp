@@ -10,7 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework import status as http_status
 from rest_framework.response import Response
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import api.concurrency as concurrency
 from api import security
 import api.utilities as utils
 from rest_framework.decorators import action
@@ -108,19 +108,22 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit all tasks to the executor
-            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+        def log_activity_failure(activity_pk, exc):
+            log.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-            for future in as_completed(future_to_pk):
-                pk = future_to_pk[future]
-                try:
-                    data = future.result()
-                    response["activities"].append(data)
-                except Exception as exc:
-                    log.error(f"Activity {pk} generated an exception: {exc}")
-                    # You can choose to handle exceptions differently if needed
+        # Bounded fan-out: every worker opens its own Postgres connection, so the
+        # width of this pool is a per-App-Engine-instance connection cost shared
+        # with api/views.py (see api/concurrency.py). This endpoint is
+        # unauthenticated, so it is the most load-exposed of the four.
+        #
+        # The activities now come back in activity_pks order. The previous
+        # as_completed loop appended in completion order, which was not stable
+        # from one request to the next, so nothing could have depended on it.
+        response["activities"] = concurrency.map_in_bounded_threads(
+            process_activity,
+            activity_pks,
+            on_error=log_activity_failure,
+        )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -266,8 +269,12 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
+            # Was a bare ThreadPoolExecutor(), i.e. min(32, os.cpu_count() + 4)
+            # workers. At DefaultPagination.max_page_size (100) that let one
+            # unauthenticated request open up to 32 Postgres connections, which
+            # is 4 x 33 = 132 per App Engine instance on its own: the exact
+            # failure mode diagnosed for api/views.py. See api/concurrency.py.
+            response = concurrency.map_in_bounded_threads(process_activity, page)
             return paginator.get_paginated_response(response)
 
         return Response(data=self.serializer_class(activities_list, many=True).data, status=http_status.HTTP_200_OK)
