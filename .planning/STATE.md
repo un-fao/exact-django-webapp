@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-07-24 - Completed quick task 260724-eut: additive Cloud Run deployment path for review (WhiteNoise, Dockerfile.web_service, cloudrun-service.yaml, deploy-cloudrun.yaml, operator guide)
+Last activity: 2026-07-29 - Completed quick task 260729-exi: removed the residual Staff auth Group and its membership traces from the review environment database
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -97,6 +97,7 @@ None yet.
 | 20260721-eco | Async report emails the requester a signed 24h download link on completion (tokenized backend URL, no login); cleanup_expired_reports deletes the GCS file + clears gcs_path after 24h; docs + lifecycle-rule backstop | 2026-07-21 | 08258909 | [20260721-async-report-email-link](./quick/20260721-async-report-email-link/) |
 | 260723-jas | Feasibility review: migrating the web API from App Engine to Cloud Run. Evaluation only, no code changed. Verdict: feasible and largely de-risked by the existing Cloud Run Job image; sequence behind Secret Manager migration and an FAO IT answer on ingress/domain | 2026-07-23 | (docs) | [260723-jas-cloud-run-migration-feasibility](./quick/260723-jas-cloud-run-migration-feasibility/) |
 | 260724-eut | Additive Cloud Run deployment path for review: WhiteNoise static serving, forked web-service Dockerfile, Knative service manifest, review-only GitHub Actions workflow, and operator setup guide. App Engine and existing computation Job untouched | 2026-07-24 | 7dec6f85 | [260724-eut-prepare-the-api-to-be-deployed-to-cloud-](./quick/260724-eut-prepare-the-api-to-be-deployed-to-cloud-/) |
+| 260729-exi | Removed the residual Staff auth Group (id=5) and its traces from the review environment DB via cloud-sql-proxy. Inspection found zero linked users, memberships, or invitations; deleted the group row plus its 1253 auth_group_permissions links inside one transaction. All 7 verification checks passed; users and is_staff flags untouched | 2026-07-29 | (docs) | [260729-exi-remove-staff-role-and-membership-traces-](./quick/260729-exi-remove-staff-role-and-membership-traces-/) |
 
 ## Deferred Items
 

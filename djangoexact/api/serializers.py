@@ -182,6 +182,56 @@ def validate_module_fields(data, mandatory_fields: list):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
 
+class _SerializerRegistry(dict):
+    """Lazily-populated allowlist of DRF serializer classes resolvable by
+    dynamic name.
+
+    Populated from this module's namespace on first miss and refreshed on
+    later misses rather than snapshotted at import time: some lookups run
+    while the module is still being imported (class bodies below call
+    get_model_serializer), so an early snapshot would miss classes defined
+    later and change resolution behavior. Hits cost O(1); a miss rescans the
+    namespace before failing, which is what every lookup cost before caching.
+    Restricting entries to serializer classes keeps dynamically-built,
+    model-derived names from indexing arbitrary module globals.
+    """
+
+    def _refresh(self):
+        self.update(
+            (name, obj)
+            for name, obj in globals().items()
+            if isinstance(obj, type) and issubclass(obj, serializers.BaseSerializer)
+        )
+
+    def __missing__(self, key):
+        self._refresh()
+        # dict.__getitem__ on a subclass re-enters __missing__ for an absent
+        # key, so raise directly instead of re-indexing after the refresh.
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        raise KeyError(key)
+
+    def __contains__(self, key):
+        if dict.__contains__(self, key):
+            return True
+        self._refresh()
+        return dict.__contains__(self, key)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+_SERIALIZER_REGISTRY = _SerializerRegistry()
+
+
+def _serializer_registry() -> dict:
+    """Return the lazily-populated serializer allowlist registry."""
+    return _SERIALIZER_REGISTRY
+
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -193,7 +243,7 @@ def get_model_serializer(model_arg):
             super().__init__(*args, **kwargs)
 
     try:
-        return globals()[model_arg.__name__ + "Serializer"]
+        return _serializer_registry()[model_arg.__name__ + "Serializer"]
     except KeyError:
         return GenericSerializer
 
@@ -202,9 +252,9 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
     try:
         match action:
             case ActionTypes.CREATE | ActionTypes.UPDATE:
-                return globals()[model_arg.__name__ + "WriteSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "WriteSerializer"]
             case ActionTypes.RETRIEVE:
-                return globals()[model_arg.__name__ + "ReadSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
         raise ValueError(f"Serializer for {model_arg.__name__} not found")
 
@@ -1520,7 +1570,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         return super().validate(data)
 
     def parent_validation(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        ParentWriteSerializer = _serializer_registry().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
 
