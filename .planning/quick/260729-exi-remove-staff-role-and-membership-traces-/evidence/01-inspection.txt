@@ -1,0 +1,31 @@
+[DEBUG 2026-07-29 08:54:17,703] __init__ 	 matplotlib data path: /home/sirvosterzo/Developer/FAO/EXACT/exact-django-webapp/.venv/lib/python3.11/site-packages/matplotlib/mpl-data
+[DEBUG 2026-07-29 08:54:17,705] __init__ 	 CONFIGDIR=/home/sirvosterzo/.config/matplotlib
+[DEBUG 2026-07-29 08:54:17,705] __init__ 	 interactive is False
+[DEBUG 2026-07-29 08:54:17,705] __init__ 	 platform is linux
+[DEBUG 2026-07-29 08:54:17,724] __init__ 	 CACHEDIR=/home/sirvosterzo/.cache/matplotlib
+[DEBUG 2026-07-29 08:54:17,725] font_manager 	 Using fontManager instance from /home/sirvosterzo/.cache/matplotlib/fontlist-v330.json
+[DEBUG 2026-07-29 08:54:17,794] pyplot 	 Loaded backend agg version v2.2.
+[DEBUG 2026-07-29 08:54:17,947] _opentelemetry_tracing 	 This service is instrumented using OpenTelemetry. OpenTelemetry or one of its components could not be imported; please add compatible versions of opentelemetry-api and opentelemetry-instrumentation packages in order to get Storage Tracing data.
+Running in review mode
+279 objects imported automatically (use -v 2 for details).
+
+STAFF_GROUP_ID=5
+STAFF_GROUP_NAME='Staff'
+STAFF_GROUP_PERMISSION_COUNT=1253
+THROUGH_TABLE_NAME=api_customuser_groups
+STAFF_LINKED_USER_COUNT=0
+STAFF_MEMBERSHIP_COUNT=0
+STAFF_INVITATION_COUNT=0
+STAFF_INVITATION_HISTORY_ROWS=0
+COLLECTOR_VIEW_START
+COLLECTOR_VIEW_NOTE: this excludes signal-driven cascade_delete_history deletions on ProjectInvitation history, so it is a floor on the true footprint.
+COLLECTOR_MODEL label=auth.Group count=1
+COLLECTOR_MODEL label=auth.Group_permissions count=1253
+COLLECTOR_VIEW_END
+BASELINE_TOTAL_USERS=82
+BASELINE_USERS_WITH_IS_STAFF_TRUE=6
+BASELINE_TOTAL_GROUPS=4
+BASELINE_TOTAL_PROJECT_MEMBERSHIPS=734
+BASELINE_TOTAL_PROJECT_INVITATIONS=86
+BASELINE_TOTAL_THROUGH_TABLE_ROWS=0
+RESULT: INSPECTION_COMPLETE
