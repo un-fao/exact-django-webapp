@@ -1,0 +1,61 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+
+</style>
+{% endblock %}
+
+{% block field_sets %}
+{{ block.super }}
+
+{% if original %}
+<div class="file-management">
+    <div class="upload-section" style="margin-bottom: 20px;">
+        <h4>Upload New Excel File</h4>
+        <div class="upload-controls">
+            <input type="file" name="excel_file" accept=".xlsx,.xls" style="margin-bottom: 10px;">
+            <br>
+            <button
+                type="submit"
+                class="button"
+                style="background-color: #007cba; color: white;"
+                formaction="{% url 'admin:api_handinhandassessment_upload_file' object_id=original.id %}"
+                formenctype="multipart/form-data"
+                formmethod="post"
+                formnovalidate
+            >
+                Upload File
+            </button>
+        </div>
+    </div>
+
+    <!-- Debug info: files_list = {{ original.files_list }} -->
+    {% if original.files_list %}
+        <h4>Uploaded Files ({{ original.files_list|length }} files)</h4>
+        {% for file_info in original.files_list %}
+        <div class="file-item">
+            <div class="file-item-header">
+                <div class="file-info">
+                    <strong>{{ file_info.name }}</strong><br>
+                    <small>
+                        Size: {{ file_info.size }} bytes | Uploaded: {{ file_info.uploaded_at|slice:":10"|default:"Unknown" }}
+                    </small>
+                </div>
+                <div class="file-actions">
+                    <a href="{{ file_info.url }}" target="_blank" class="button download-btn">Download</a>
+                    <a href="?delete_file={{ forloop.counter0 }}&id={{ original.id }}" 
+                       class="button delete-btn" 
+                       onclick="return confirm('Are you sure you want to delete this file?')">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No files uploaded yet.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

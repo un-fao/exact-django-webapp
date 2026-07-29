@@ -1,3 +1,9 @@
+# Git worktrees
+.worktrees/
+
+# GSD research tool cache (hash-named response blobs)
+.planning/research/.cache/
+
 # These are some examples of commonly ignored file patterns.
 # You should customize this list as applicable to your project.
 # Learn more about .gitignore:
@@ -11,6 +17,19 @@ venv/
 /env
 *.env
 .vscode
+
+# Service account keys, private keys, and other credentials — never commit
+*service-account*.json
+*service_account*.json
+*-credentials.json
+*.pem
+*.key
+!package.json
+!package-lock.json
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
 
 # Node artifact files
 node_modules/
@@ -75,9 +94,12 @@ djangoexact/scripts/lsipt_participants.py
 
 
 **/fixtures/
+!djangoexact/api/fixtures/
+!djangoexact/api/fixtures/**
+!djangoexact/ipcc/fixtures/
+!djangoexact/ipcc/fixtures/**
 **/starting_fixtures/
 load_starting_fixtures.py
-djangoexact/api/fixtures/
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json
@@ -85,3 +107,85 @@ djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.
 csv
 djangoexact/ipcc_dump_csv.zip
 djangoexact/scripts/Ex_Act_Definitions_LM_0108.xlsx
+djangoexact/annual_cropland_results.xlsx
+
+graphs/
+/reports/
+static/
+staticfiles/
+djangoexact/scripts/ipcc_data/ForestManagementAGBRevised.csv
+djangoexact/docs/EX-ACT VC migration.docx
+docs/docs/
+djangoexact/docker-compose.yml
+djangoexact/Dockerfile
+djangoexact/djangoexact/.env.development
+djangoexact/djangoexact/.env.production
+djangoexact/djangoexact/.env.review
+
+djangoexact/matrices/
+djangoexact/djangoexact/.env.development
+djangoexact/djangoexact/.env.production
+djangoexact/djangoexact/.env.review
+pyproject.toml
+djangoexact/scripts/minitool/
+djangoexact/djangoexact/.env.test
+djangoexact/djangoexact/.env.scenario
+CHANGES.md
+djangoexact/.commitizen/openai_cache.json
+djangoexact/djangoexact/.env.minitool
+djangoexact/minitool/data/*
+.cursor/
+ipcc_data/
+djangoexact/minitool_config.yml
+djangoexact/docs/architecture/caching_strategy.md
+djangoexact/docs/architecture/CONNECTION_MANAGEMENT.md
+gcp-deployment/
+djangoexact/api/management/commands/run_minitool_gcp.py
+
+djangoexact/scripts/minitool copy/*
+djangoexact/minitool/data copy/*
+scripts/minitool/landusechange_errors.csv
+scripts/minitool/landusechange.csv
+scripts/minitool/progress/landusechange_progress.json
+.3b-config.json
+.branchflow
+djangoexact/reports/*
+djangoexact/scripts/README_scenario_adaptation.md
+djangoexact/scripts/plots/*
+djangoexact/plots/*
+scripts/minitool/progress/agroforestry_systems_1_progress.json
+scripts/minitool/progress/agrosilvopastural_systems_1_progress.json
+scripts/minitool/progress/riverbank_restoration_1_progress.json
+scripts/minitool/progress/soil_remediation_2_progress.json
+djangoexact/djangoexact/.env.local
+djangoexact/scripts/forest_t2.csv
+TODOS.md
+djangoexact/scripts/forest_t2 copy.csv
+djangoexact/scripts/forman_agb_revisedrevised.csv
+docs/plans/
+
+.claude
+.serena
+CLAUDE.md
+faostat_crops.csv
+yield_items.csv
+.playwright-mcp
+djangoexact/test_minitool.db
+docs/superpowers/specs/
+.sisyphus
+pc.json
+vs2.0.txt
+STD 1019 open-source agreement_EX-ACT.docx
+.venv
+.env*
+
+# Stray local database files (minitool.db and test_db.sqlite3 are already
+# tracked and stay tracked; this only stops new ones being committed).
+*.db
+EXACT_guide.pdf
+2-results-report-2.xlsx
+test may 2026 (Copy).exactp
+*.sqlite3
+.superpowers/
+README.pdf
+.venv-main

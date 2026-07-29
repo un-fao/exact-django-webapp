@@ -1,0 +1,57 @@
+[
+{
+  "model": "api.waterbodytype",
+  "pk": 5,
+  "fields": {
+    "name": "﻿Freshwater Pond",
+    "name_en": "﻿Freshwater Pond",
+    "name_fr": null,
+    "name_es": null,
+    "name_ru": null
+  }
+},
+{
+  "model": "api.waterbodytype",
+  "pk": 1,
+  "fields": {
+    "name": "Freshwater Pond",
+    "name_en": "Freshwater Pond",
+    "name_fr": null,
+    "name_es": "Estanque de agua dulce",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.waterbodytype",
+  "pk": 2,
+  "fields": {
+    "name": "Brackishwater Pond",
+    "name_en": "Brackishwater Pond",
+    "name_fr": null,
+    "name_es": "Estanque de agua salobre",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.waterbodytype",
+  "pk": 3,
+  "fields": {
+    "name": "Canals & Ditches",
+    "name_en": "Canals & Ditches",
+    "name_fr": null,
+    "name_es": "Canales y Acequia",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.waterbodytype",
+  "pk": 4,
+  "fields": {
+    "name": "Saline Pond",
+    "name_en": "Saline Pond",
+    "name_fr": null,
+    "name_es": "Estanque Salino",
+    "name_ru": null
+  }
+}
+]

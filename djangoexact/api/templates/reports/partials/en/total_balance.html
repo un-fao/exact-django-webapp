@@ -1,0 +1,36 @@
+{% load humanize %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>GHG Assessment Results</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <h4 class="text-center">
+                    <b>Total Carbon Balance</b>
+                </h4>
+                <hr />
+                <div class="col-sm-6 text-start">
+                    <p>
+                        {{ project.name }} has an estimated total carbon balance of
+                        <b>{{ total_carbon_balance|floatformat:2|intcomma }}</b>
+                        tCO2e over the entire period of accounting of {{ total_project_years }}
+                        years.
+                    </p>
+                    <p>
+                        The carbon balance represents the difference of GHG emissions and
+                        removals between the With project scenario and the Without project
+                        scenario (what would happen if the project was not implemented).
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
+                                 alt="BalanceChart"
+                                 id="balanceChart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from api.models import *
 from ipcc.models import *
+import scripts.import_definitions as import_definitions
 
 
 def capitalize_all(string):
@@ -450,64 +451,7 @@ with open("scripts/ipcc_data/GrasslandSOC.csv", "r") as f:
             grassland_management_type=grassland_management_type, value=value
         )
 
-with open("scripts/ipcc_data/EnergyDefaultEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        fuel_type = FuelType.objects.get(name__iexact=sanitize(row[0]).title())
-
-        foo = EnergyDefaultEmissionFactor()
-        foo.fuel_type = fuel_type
-        foo.t_co2_eq_m3 = row[1] if row[1] != "" else None
-        foo.tj_gg = row[2] if row[2] != "" else None
-        foo.kg_ch4_tj = row[3] if row[3] != "" else None
-        foo.kg_n2o_tj = row[4] if row[4] != "" else None
-        foo.density_kg_m3 = row[5] if row[5] != "" else None
-        foo.co2_emissions = row[6] if row[6] != "" else None
-        foo.ch4_emissions = row[7] if row[7] != "" else None
-        foo.n2o_emissions = row[8] if row[8] != "" else None
-        foo.save()
-
-        print(
-            f"{fuel_type}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}, {row[8]}"
-        )
-
-
-with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        country = Country.objects.get(name__iexact=sanitize(row[0]).title())
-        continent = Continent.objects.get(name__iexact=sanitize(row[1]).title())
-
-        i = 2
-
-        ef_grid = row[i + 0] if row[i + 0] != "" else None
-        year = row[i + 1] if row[i + 1] != "" else None
-        final_ef = row[i + 2] if row[i + 2] != "" else None
-        op_margin = row[i + 3] if row[i + 3] != "" else None
-        combined_margin = row[i + 4] if row[i + 4] != "" else None
-
-        print(
-            f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}"
-        )
-
-        ElectricityEmission.objects.get(
-            country=country,
-            continent=continent,
-            ef_grid=ef_grid,
-            year=year,
-            final_ef_grid=final_ef,
-            operating_margin=op_margin,
-            combined_margin=combined_margin,
-        )
 LivestockManureEF.objects.all().delete()
-
-
-
-
 
 # print("AO")
 # nsed = LargeFisheryFUI.objects.filter(gear_type__name__iexact="Not Specified")
@@ -525,38 +469,6 @@ with open("scripts/ipcc_data/ListRegionsIPCC.csv", "r") as f:
 
     for row in data:
         ipcc_region = IPCCRegion.objects.get(name__iexact=row[0])
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    continent = Continent.objects.get(name__iexact=row["EX-ACT"])
-    gleam_region = GLEAMRegion.objects.get(name__iexact=row["GLEAM"])
-    ipcc_region = IPCCRegion.objects.get(name__iexact=row["IPCC"])
-
-    country = Country.objects.filter(name__iexact=row["Countries"]).first()
-
-    if country:
-        country.continent = continent
-        country.gleam_region = gleam_region
-        country.ipcc_region = ipcc_region
-        country.save()
-
-
-
-
-
-
-
-
-
-
 
 
 with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
@@ -702,38 +614,6 @@ with open("scripts/ipcc_data/Atwood.csv", "r") as f:
             mg_c_ha=mg_c_ha,
             sd=sd,
             score=score,
-        )
-
-ElectricityEmission.objects.all().delete()
-
-with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        country = Country.objects.get(name__iexact=capitalize_all(row[0]))
-        continent = Continent.objects.get(name__iexact=capitalize_all(row[1]))
-
-        i = 2
-
-        ef_grid = row[i + 0] if row[i + 0] != "" else None
-        year = row[i + 1] if row[i + 1] != "" else None
-        final_ef = row[i + 2] if row[i + 2] != "" else None
-        op_margin = row[i + 3] if row[i + 3] != "" else None
-        combined_margin = row[i + 4] if row[i + 4] != "" else None
-
-        print(
-            f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}"
-        )
-
-        ElectricityEmission.objects.get(
-            country=country,
-            continent=continent,
-            ef_grid=ef_grid,
-            year=year,
-            final_ef_grid=final_ef,
-            operating_margin=op_margin,
-            combined_margin=combined_margin,
         )
 
 with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
@@ -1045,35 +925,6 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    continent = Continent.objects.get(name__iexact=sanitize(row["EX-ACT"]))
-    gleam_region = GLEAMRegion.objects.get(name__iexact=sanitize(row["GLEAM"]))
-    ipcc_region = IPCCRegion.objects.get(name__iexact=sanitize(row["IPCC"]))
-
-    country = Country.objects.get(name__iexact=sanitize(row["Countries"]))
-
-    print(
-        continent,
-        gleam_region,
-        ipcc_region,
-        country,
-    )
-
-    if country:
-        country.continent = continent
-        country.gleam_region = gleam_region
-        country.ipcc_region = ipcc_region
-        country.save()
-
 df2 = pd.read_csv(
     os.path.join(
         os.path.dirname(__file__), "ipcc_data", "LivestockManureEFLeeching.csv"
@@ -1176,93 +1027,6 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LiquidFuelTypes.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    macro_fuel_type = (
-        MacroFuelType.objects.get(name__iexact=sanitize(row["macro_fuel_type"]))
-        if row["macro_fuel_type"]
-        else None
-    )
-    fuel_use_type = (
-        FuelUseType.objects.get(name__iexact=sanitize(row["fuel_use_type"]))
-        if pd.notna(row["fuel_use_type"])
-        else None
-    )
-    fuel_type = (
-        FuelType.objects.get(
-            name__iexact=sanitize(row["fuel_type"]),
-            macro_type=macro_fuel_type,
-            fuel_use_type=fuel_use_type,
-        )
-        if row["fuel_type"]
-        else None
-    )
-
-    print(
-        fuel_type,
-        row["t_co2_eq"],
-        row["co2"],
-        row["ch4"],
-        row["n2o"],
-        row["density"],
-        row["net_calorific_value"],
-    )
-
-    EnergyDefaultEmissionFactor.objects.get(
-        fuel_type=fuel_type,
-        t_co2_eq=parse_csv_number(row["t_co2_eq"], nan_value=None),
-        co2=parse_csv_number(row["co2"], nan_value=None),
-        ch4=parse_csv_number(row["ch4"], nan_value=None),
-        n2o=parse_csv_number(row["n2o"], nan_value=None),
-        density=parse_csv_number(row["density"], nan_value=None),
-        net_calorific_value=parse_csv_number(
-            row["net_calorific_value"], nan_value=None
-        ),
-    )
-
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    fuel_type = FuelType.objects.get(
-        name__iexact=sanitize(row["fuel_type"]),
-    )
-
-    print(
-        fuel_type,
-        row["emission_factor"],
-        row["calorific_value"],
-        row["co2_emissions"],
-        row["ch4_emissions"],
-        row["n2o_emissions"],
-        row["density"],
-    )
-
-    data = IrrigationPhaseData.objects.get(
-        fuel_type=fuel_type,
-        emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
-        calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
-        co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
-        ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
-        n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
-        density=parse_csv_number(row["density"], nan_value=None),
-    )
 
 PerennialMaxAGB.objects.all().delete()
 
@@ -1429,39 +1193,6 @@ for i, row in enumerate(df_dict2):
         value=value,
     )
 
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "OrganicSoilGefEmissionFactor.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    co2 = parse_csv_number(row["co2"], nan_value=0)
-    ch4 = parse_csv_number(row["ch4"], nan_value=0)
-    co = parse_csv_number(row["co"], nan_value=0)
-
-    print(
-        climate,
-        moisture,
-        co2,
-        ch4,
-        co,
-    )
-
-    OrganicSoilGefEmissionFactor.objects.get(
-        climate=climate,
-        moisture=moisture,
-        co2=co2,
-        ch4=ch4,
-        co=co,
-    )
-
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "RewettingEmissionFactor.csv"),
     header=0,
@@ -1497,7 +1228,7 @@ for i, row in enumerate(df_dict2):
 
         if j == len(df_headers2) - 1:
             break
-            
+
 
 
 df2 = pd.read_csv(
@@ -1731,50 +1462,6 @@ with open("scripts/ipcc_data/AboveGroundBiomass.csv", "r") as f:
                 value=parse_csv_number(row[i + 1])
             )
 
-# ForestManagementAGB
-ForestManagementAGB.objects.all().delete()
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    continent = Continent.objects.get(name__iexact=sanitize(row["continent"]))
-    forest_condition_type = ForestConditionType.objects.get(name__iexact=sanitize(row["forest_condition_type"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-    agb_min = parse_csv_number(row["agb_min"], nan_value=0)
-    agb_max = parse_csv_number(row["agb_max"], nan_value=0)
-    agb_growth_min = parse_csv_number(row["agb_growth_min"], nan_value=0)
-    agb_growth_max = parse_csv_number(row["agb_growth_max"], nan_value=0)
-
-    print(
-        land_use_type,
-        continent,
-        forest_condition_type,
-        forest_type,
-        agb_min,
-        agb_max,
-        agb_growth_min,
-        agb_growth_max,
-    )
-    
-    ForestManagementAGB.objects.get(
-        land_use_type=land_use_type,
-        continent=continent,
-        forest_condition_type=forest_condition_type,
-        forest_type=forest_type,
-        agb_min=agb_min,
-        agb_max=agb_max,
-        agb_growth_min=agb_growth_min,
-        agb_growth_max=agb_growth_max,
-    )
-
 # BelowGroundBiomass
 BelowGroundBiomass.objects.all().delete()
 with open("scripts/ipcc_data/BelowGroundBiomass.csv", "r") as f:
@@ -1825,35 +1512,6 @@ for row in df.to_dict("records"):
         value_after_20_years = gt_20_yrs,
         value_upto_20_years = le_20_yrs
     )
-
-# CoastalLitter
-
-CoastalLitter.objects.all().delete()
-with open("scripts/ipcc_data/CoastalLitter.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        land_use_type = LandUseType.objects.get(name__iexact=head)
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get(name__iexact=sanitize(row[0]))
-            moisture = Moisture.objects.get(name__iexact=sanitize(row[1]))
-
-            value = parse_csv_number(row[i + 2])
-
-            print(f"{land_use_type}, {climate}, {moisture}, {value}")
-
-            CoastalLitter.objects.get(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 # DefaultSoilCarbonStock1Meter
 
@@ -1961,7 +1619,7 @@ for i, row in enumerate(df_dict2):
         agb_growth_min,
         agb_growth_max,
     )
-    
+
     ForestManagementAGB.objects.get(
         land_use_type=land_use_type,
         continent=continent,
@@ -2030,64 +1688,6 @@ for i, row in df.iterrows():
         name__iexact=name,
         value=value,
     )
-CropYieldStats.objects.all().delete()
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
-    yr_2016 = parse_csv_number(row["2016"])
-    yr_2017 = parse_csv_number(row["2017"])
-    yr_2018 = parse_csv_number(row["2018"])
-    yr_2019 = parse_csv_number(row["2019"])
-    yr_2020 = parse_csv_number(row["2020"])
-
-    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
-
-    print(
-        f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
-    )
-
-    stat = CropYieldStats.objects.get(
-        land_use_type=land_use_type,
-        continent=continent,
-        year_2016=yr_2016,
-        year_2017=yr_2017,
-        year_2018=yr_2018,
-        year_2019=yr_2019,
-        year_2020=yr_2020,
-        average=average,
-    )
-
-
-
-
-LargeFisheryFUI.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
-    header=[0],
-    sep=";",
-)
-
-rows = df.to_dict("records")
-
-for row in rows:
-    gear_type = row["gear_type"]
-    fish_type = row["fish_type"]
-    value = parse_csv_number(row["value"])
-
-    print(f"{gear_type}, {fish_type}, {value}")
-
-    gear_type = LargeFisheryGearType.objects.get(name__iexact=capitalize_all(gear_type))
-    fish_type = FishType.objects.get(name__iexact=capitalize_all(fish_type))
-
-    LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type, value=value)
-
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockVSER.csv"),
@@ -2164,51 +1764,6 @@ for i, row in enumerate(df_dict2):
         if j + 5 == len(df_headers2) - 1:
             break
 
-ForestManagementAGB.objects.all().delete()
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    print(row)
-
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
-    forest_condition_type = ForestConditionType.objects.get(name__iexact=sanitize(row["forest_condition_type"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-    agb_min = parse_csv_number(row["agb_min"], nan_value=0)
-    agb_max = parse_csv_number(row["agb_max"], nan_value=0)
-    agb_growth_min = parse_csv_number(row["agb_growth_min"], nan_value=0)
-    agb_growth_max = parse_csv_number(row["agb_growth_max"], nan_value=0)
-
-    print(
-        land_use_type,
-        continent,
-        forest_condition_type,
-        forest_type,
-        agb_min,
-        agb_max,
-        agb_growth_min,
-        agb_growth_max,
-    )
-
-    ForestManagementAGB.objects.get(
-        land_use_type=land_use_type,
-        continent=continent,
-        forest_condition_type=forest_condition_type,
-        forest_type=forest_type,
-        agb_min=agb_min,
-        agb_max=agb_max,
-        agb_growth_min=agb_growth_min,
-        agb_growth_max=agb_growth_max,
-    )
-
 with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
     reader = csv.reader(f)
     header = next(reader, None)
@@ -2225,42 +1780,6 @@ with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
             # FIXME: N/A and NO mean 2 different things. Differentiate them
             value = row[i + 2] if row[i + 2] not in ["", "N/A", "NO"] else None
             SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type, value=value)
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-    value = parse_csv_number(row["cf"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.get(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGBGrowth.csv"),
@@ -2280,29 +1799,6 @@ for i, row in df.iterrows():
         print(climate, region, forest_type, land_use_type, gt_20_yrs, le_20_yrs)
 
         ForestManagementAGBGrowth.objects.get(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, value_after_20_years=gt_20_yrs, value_upto_20_years=le_20_yrs)
-    except Exception as e:
-        print(row)
-        print(e)
-
-LitterDeadwoodCarbonStock.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LitterDeadwoodCarbonStock.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    try:
-        climate = Climate.objects.get(name__iexact=row["climate"])
-        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
-        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-        litter = parse_csv_number(row["litter"])
-        dw = parse_csv_number(row["deadwood"])
-
-        print(climate, forest_type, land_use_type, litter, dw)
-
-        LitterDeadwoodCarbonStock.objects.get(climate=climate, forest_type=forest_type, land_use_type=land_use_type, litter=litter, dw=dw)
     except Exception as e:
         print(row)
         print(e)
@@ -2408,153 +1904,6 @@ for i, row in enumerate(rows):
             else:
                 foo.value = value
                 foo.save()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
-    header=0,
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    print(row)
-
-    # TODO: Clarify with Lorenzo what sub-tropical is in terms of climate. Skip for now.
-    if row["climate"] == "Sub-tropical":
-        continue
-
-    if row["climate"] == "Tropical":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Tropical"]).all()]
-    elif row["climate"] == "Temperate":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Temperate"]).all()]
-    else:
-        climates = [Climate.objects.get(name__iexact=row["climate"])]
-
-    print(row["land_use_type"])
-    land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-
-    regions = []
-    if "South" in row["region"] and "America" in row["region"]:
-        print("South America")
-        regions += [region for region in Region.objects.filter(name__in=["South America", "Caribbean", "Central America"])]
-    if "North" in row["region"] and "America" in row["region"]:
-        print("North America")
-        regions += [region for region in Region.objects.filter(name__in=["North America"])]
-    if "Asia" in row["region"]:
-        print("Asia")
-        regions += [region for region in Region.objects.filter(name__in=["Southern Asia", "Eastern Asia", "South-Eastern Asia", "Western Asia", "Central Asia"])]
-    if "Africa" in row["region"]:
-        print("Africa")
-        regions += [region for region in Region.objects.filter(name__in=["Northern Africa", "Western Africa", "Central Africa", "Eastern Africa", "Southern Africa"])]
-
-    if not regions:
-        print("No regions found for ", row["region"])
-        regions += [Region.objects.get(name__iexact=row["region"])]
-
-    print(regions)
-
-    forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
-
-    forest_types = ForestType.objects.filter(name__in=["Natural", "Plantaion"]).all()
-
-    if not isinstance(row["agb_range"], float) and len(row["agb_range"].split("-")) == 2:
-        agb_range_min = parse_csv_number(row["agb_range"].split("-"))
-        agb_range_max = parse_csv_number(row["agb_range"].split("-")[1])
-    elif row["agb_range"] != "n.a.":
-        agb_range_min = parse_csv_number(row["agb_range"])
-        agb_range_max = parse_csv_number(row["agb_range"])
-
-    if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
-        agb_growth_min = parse_csv_number(row["agb_growth"].split("-"))
-        agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
-    elif row["agb_growth"] != "n.a.":
-        agb_growth_min = parse_csv_number(row["agb_growth"])
-        agb_growth_max = parse_csv_number(row["agb_growth"])
-
-    if not isinstance(row["agb_range_plantation"], float) and len(row["agb_range_plantation"].split("-")) == 2:
-        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"].split("-"))
-        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[1])
-    elif row["agb_range_plantation"] != "n.a.":
-        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"])
-        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"])
-
-    if not isinstance(row["agb_growth_plantation"], float) and len(row["agb_growth_plantation"].split("-")) == 2:
-        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"].split("-"))
-        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[1])
-    elif row["agb_growth_plantation"] != "n.a.":
-        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"])
-        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"])
-
-    print("Climates: ", climates)
-    print("Regions: ", regions)
-    print("Forest Types: ", forest_types)
-
-    for region in regions:
-        for climate in climates:
-            for type in forest_types:
-                if type.name == "Plantation" and row["agb_range_plantation"] == "n.a." and row["agb_growth_plantation"] == "n.a.":
-                    continue
-                if type.name == "Natural" and row["agb_range"] == "n.a." and row["agb_growth"] == "n.a.":
-                    continue
-                if type.name == "Plantation" and forest_condition_type.name == "Primary":
-                    continue
-
-                print(
-                    land_use_type,
-                    region,
-                    climate,
-                    forest_condition_type,
-                    type,
-                    agb_range_min,
-                    agb_range_max,
-                    agb_growth_min,
-                    agb_growth_max,
-                    agb_range_min_plantation,
-                    agb_range_max_plantation,
-                    agb_growth_min_plantation,
-                    agb_growth_max_plantation,
-                )
-
-                ForestManagementAGB.objects.get(
-                    land_use_type=land_use_type,
-                    region=region,
-                    climate=climate,
-                    forest_condition_type=forest_condition_type,
-                    forest_type=type,
-                    agb_min=agb_range_min,
-                    agb_max=agb_range_max,
-                    agb_growth_min=agb_growth_min,
-                    agb_growth_max=agb_growth_max,
-                )
-
-# ForestManagementBGB.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB_EasternAfrica_Addendum.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    try:
-        climate = Climate.objects.get(name__iexact=row["climate"])
-        region = Region.objects.get(name__iexact=row["region"])
-        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
-        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-        threshold = row["threshold"]
-        if threshold == "> 125" or threshold == ">75":
-            threshold = None
-        elif "125" in threshold:
-            threshold = 125
-        elif "75" in threshold:
-            threshold = 75
-        value = parse_csv_number(row["value"])
-
-        print(climate, region, forest_type, land_use_type, threshold, value)
-
-        ForestManagementBGB.objects.get(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
-    except Exception as e:
-        print(row)
-        print(e)
 
 soil = SoilType.objects.get(name__iexact="Mineral")
 for climate in Climate.objects.all():
@@ -2834,49 +2183,6 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 
-print("Deleting all MethaneManureManagementFactor...")
-LivestockAWMS.objects.all().delete()
-print("Deleted all MethaneManureManagementFactor.")
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
-
-    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
-
-    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
-
-    for j, header in enumerate(df_headers, start=3):
-
-        if j == len(df_headers):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
-
-        print(manure_management_type)
-
-        LivestockAWMS.objects.create(
-            manure_management_type=manure_management_type,
-            livestock_category_type=livestock_category_type,
-            livestock_production_type=livestock_production_type,
-            ipcc_region=ipcc_region,
-            value=parse_csv_number(row[df_headers[j]]),
-        )
-"""
-
-
-"""
-
 # Climate.objects.get(name__iexact="Tropical Montane").delete()
 Moisture.objects.get(name__iexact="Montane").delete()
 Climate.objects.create(name="Tropical Montane")
@@ -2918,93 +2224,6 @@ for i, row in enumerate(rows):
     name = row["name"]
     SettlementType.objects.create(name=name)
     print(f"Added {name}")
-
-SettlementEF.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementEF.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-climates = Climate.objects.filter(name__in=["Tropical", "Warm Temperate", "Cool Temperate", "Boreal"]).all()
-moistures = Moisture.objects.filter(name__in=["Wet", "Dry", "Moist"]).all()
-
-for i, row in enumerate(rows):
-    settlement_type = SettlementType.objects.get(name__iexact=row["settlement_type"])
-    str_climate = row["climate"]
-    str_moisture = row["moisture"]
-
-    print(settlement_type, str_climate, str_moisture, row["flu"], row["fi"], row["fmg"], row["biomass"])
-
-    if str_climate == "All" and str_moisture == "All":
-        for climate in climates:
-            print(f"Creating for {climate}")
-            for moisture in moistures:
-                print(f"Creating for {moisture}")
-                SettlementEF.objects.create(
-                    settlement_type=settlement_type,
-                    climate=climate,
-                    moisture=moisture,
-                    flu=parse_csv_number(row["flu"]),
-                    fi=parse_csv_number(row["fi"]),
-                    fmg=parse_csv_number(row["fmg"]),
-                    biomass=parse_csv_number(row["biomass"]),
-                )
-    elif str_climate == "All":
-        for climate in climates:
-            print(f"Creating for {climate}")
-            moisture = Moisture.objects.get(name__iexact=str_moisture)
-            SettlementEF.objects.create(
-                settlement_type=settlement_type,
-                climate=climate,
-                moisture=moisture,
-                flu=parse_csv_number(row["flu"]),
-                fi=parse_csv_number(row["fi"]),
-                fmg=parse_csv_number(row["fmg"]),
-                biomass=parse_csv_number(row["biomass"]),
-            )
-    elif str_moisture == "All":
-        for moisture in moistures:
-            print(f"Creating for {moisture}")
-            if str_climate == "Temperate":
-                for climate in Climate.objects.filter(name__in=["Warm Temperate", "Cool Temperate"]).all():
-                    SettlementEF.objects.create(
-                        settlement_type=settlement_type,
-                        climate=climate,
-                        moisture=moisture,
-                        flu=parse_csv_number(row["flu"]),
-                        fi=parse_csv_number(row["fi"]),
-                        fmg=parse_csv_number(row["fmg"]),
-                        biomass=parse_csv_number(row["biomass"]),
-                    )
-            else:
-                climate = Climate.objects.get(name__iexact=str_climate)
-                SettlementEF.objects.create(
-                    settlement_type=settlement_type,
-                    climate=climate,
-                    moisture=moisture,
-                    flu=parse_csv_number(row["flu"]),
-                    fi=parse_csv_number(row["fi"]),
-                    fmg=parse_csv_number(row["fmg"]),
-                    biomass=parse_csv_number(row["biomass"]),
-                )
-    else:
-        climate = Climate.objects.get(name__iexact=str_climate)
-        moisture = Moisture.objects.get(name__iexact=str_moisture)
-
-        SettlementEF.objects.create(
-            settlement_type=settlement_type,
-            climate=climate,
-            moisture=moisture,
-            flu=parse_csv_number(row["flu"]),
-            fi=parse_csv_number(row["fi"]),
-            fmg=parse_csv_number(row["fmg"]),
-            biomass=parse_csv_number(row["biomass"]),
-        )
 
 LandUseCarbonStockExchangeFactor.objects.all().delete()
 
@@ -3196,38 +2415,6 @@ for i, row in enumerate(rows):
             value=value,
             # unit="tC/ha/yr",
         )
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "OtherConstructedWaterbodiesEmissionFactors.csv"),
-    header=[0],
-    sep=",",
-)
-
-with open("scripts/ipcc_data/OtherConstructedWaterbodiesEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        waterbody_type = WaterbodyType.objects.get(name__iexact=head)
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get(name__iexact=sanitize(row[0]))
-            moisture = Moisture.objects.get(name__iexact=sanitize(row[1]))
-
-            value = row[i + 2]
-
-            print(f"{waterbody_type}, {climate}, {moisture}, {value}")
-
-            OtherConstructedWaterbodiesEmissionFactor.objects.create(
-                waterbody_type=waterbody_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 DefaultSoilCarbonStock1Meter.objects.all().delete()
 DefaultSoilCarbonStock.objects.all().delete()
@@ -3434,26 +2621,6 @@ for i, row in enumerate(rows):
             moisture=moisture,
             value=value,
         )
-
-GrasslandAGB.objects.all().delete()
-
-with open("scripts/ipcc_data/GrasslandAGB.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        climate = Climate.objects.get(name__iexact=row[0])
-        moisture = Moisture.objects.get(name__iexact=row[1])
-
-        value = parse_csv_number(row[2])
-
-        if pd.isna(value):
-            continue
-
-        print(f"{climate}, {moisture}, {value}")
-
-        GrasslandAGB.objects.create(climate=climate, moisture=moisture, value=value)
-
 
 GrasslandStockExchangeFactor.objects.all().delete()
 
@@ -3854,6 +3021,568 @@ for i, row in enumerate(rows):
             value=value,
         )
 
+IrrigationPressureRequirement.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPressureRequirements.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+irrigation_system_types = df["irrigation_system_type"].unique()
+irrigation_system_types = irrigation_system_types[irrigation_system_types != "Other"]
+
+for i, row in enumerate(df_dict):
+    irrigation_system_type = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+
+    print(
+        irrigation_system_type,
+        row["bar"],
+        row["avg_pressure"],
+        row["head"],
+    )
+
+    if irrigation_system_type.name == "Other":
+        bar_start = None
+        bar_end = None
+
+        for system in IrrigationSystemType.objects.all().exclude(name__in=irrigation_system_types):
+            IrrigationPressureRequirement.objects.create(
+                irrigation_system_type=system,
+                bar_start=bar_start,
+                bar_end=bar_end,
+                avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
+                head=parse_csv_number(row["head"], nan_value=None),
+            )
+
+    else:
+        try:
+            bar_ranges = row["bar"].split("-")
+        except AttributeError:
+            bar_ranges = [row["bar"], row["bar"]]
+
+        bar_start = parse_csv_number(bar_ranges[0], nan_value=None)
+        bar_end = parse_csv_number(bar_ranges[1], nan_value=None)
+
+        IrrigationPressureRequirement.objects.create(
+            irrigation_system_type=irrigation_system_type,
+            bar_start=bar_start,
+            bar_end=bar_end,
+            avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
+            head=parse_csv_number(row["head"], nan_value=None),
+        )
+
+FMGData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+    grassland_management_type = None
+    tillage_management_type = None
+
+    if not pd.isna(row["grassland_management_type"]):
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+    if not pd.isna(row["tillage_management_type"]):
+        tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"])
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        tillage_management_type,
+        grassland_management_type,
+        value,
+    )
+
+    FMGData.objects.create(
+        climate=climate,
+        moisture=moisture,
+        tillage_management_type=tillage_management_type,
+        grassland_management_type=grassland_management_type,
+        value=value,
+    )
+
+FIData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+    grassland_management_type = None
+    organic_input_type = None
+
+    if not pd.isna(row["grassland_management_type"]):
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+    if not pd.isna(row["organic_input_type"]):
+        organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"])
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        organic_input_type,
+        grassland_management_type,
+        value,
+    )
+
+    FIData.objects.create(
+        climate=climate,
+        moisture=moisture,
+        organic_input_type=organic_input_type,
+        grassland_management_type=grassland_management_type,
+        value=value,
+    )
+
+    if i == len(df) - 1:
+        break
+
+FLUData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+    header=[0],
+    sep=";",
+)
+
+annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropland").all()
+perennials = perennials.exclude(name__in=["Agroforestry - Default", "Alley Cropping", "Perennial Fallow", "Hedgerow", "Multistrata", "Parkland", "Shaded Perennial", "Silvoarable", "Silvopasture", "Oil Palm", "Rubber", "Tea", "Olive", "Orchard", "Short Rotation Coppice", "Vine"])
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+    land_use_type = None
+    if not pd.isna(row["land_use_type"]) and row["land_use_type"] != "Perennial Cropland":
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+    value = parse_csv_number(row["value"])
+
+    if land_use_type == annualcropland:
+        for crop in crops:
+            print(
+                climate,
+                moisture,
+                crop,
+                value,
+            )
+            FLUData.objects.create(
+                climate=climate,
+                moisture=moisture,
+                land_use_type=crop,
+                value=value,
+            )
+    elif row["land_use_type"] == "Perennial Cropland":
+        for perennial in perennials:
+            print(
+                climate,
+                moisture,
+                perennial,
+                value,
+            )
+            FLUData.objects.create(
+                climate=climate,
+                moisture=moisture,
+                land_use_type=perennial,
+                value=value,
+            )
+    else:
+        grassland_management_type = None
+        if not pd.isna(row["grassland_management_type"]):
+            grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+        print(
+            climate,
+            moisture,
+            land_use_type,
+            grassland_management_type,
+            value,
+        )
+
+        FLUData.objects.create(
+            climate=climate,
+            moisture=moisture,
+            land_use_type=land_use_type,
+            grassland_management_type=grassland_management_type,
+            value=value,
+        )
+
+
+PerennialBGB.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+    continent = Region.objects.get(name__iexact=sanitize(row["region"]))
+
+    for j, header in enumerate(headers, start=3):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+
+        if pd.isna(value):
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            continent,
+            value,
+        )
+
+        PerennialBGB.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            continent=continent,
+            value=value,
+        )
+
+LivestockManureEF.objects.filter(value=None).all().update(value=0)
+
+IrrigationSystemData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    irrigation_system = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+    value = parse_csv_number(row["value"], nan_value=None)
+
+    print(irrigation_system, value)
+
+    IrrigationSystemData.objects.create(
+        irrigation_system_type=irrigation_system,
+        value=value,
+    )
+
+OtherConstructedWaterbodiesEmissionFactor.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "OtherConstructedWaterbodiesEmissionFactors.csv"),
+    header=[0],
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+print(headers)
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+    print(row)
+
+    for j, header in enumerate(headers, start=2):
+
+        if j == len(headers):
+            break
+
+        print(header)
+
+        waterbody_type = WaterbodyType.objects.get(name__iexact=headers[j])
+
+        value = parse_csv_number(row[headers[j]])
+
+        print(
+            waterbody_type,
+            climate,
+            moisture,
+            value,
+        )
+
+        OtherConstructedWaterbodiesEmissionFactor.objects.create(
+            waterbody_type=waterbody_type,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+        )
+
+
+LargeFisheryFUI.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
+    header=[0],
+    sep=";",
+)
+
+rows = df.to_dict("records")
+
+for row in rows:
+    gear_type = row["gear_type"]
+    fish_type = row["fish_type"]
+    value = parse_csv_number(row["value"])
+
+    print(f"{gear_type}, {fish_type}, {value}")
+
+    gear_type = LargeFisheryGearType.objects.get(name__iexact=gear_type)
+    fish_type = FishType.objects.get(name__iexact=fish_type)
+
+    LargeFisheryFUI.objects.create(fish_type=fish_type, gear_type=gear_type, value=value)
+
+
+SettlementEF.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementEF.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+climates = Climate.objects.all()
+moistures = Moisture.objects.all()
+
+for i, row in enumerate(rows):
+    settlement_type = SettlementType.objects.get(name__iexact=row["settlement_type"])
+    str_climate = row["climate"]
+    str_moisture = row["moisture"]
+
+    print(settlement_type, str_climate, str_moisture, row["flu"], row["fi"], row["fmg"], row["biomass"])
+
+    if str_climate == "All" and str_moisture == "All":
+        for climate in climates:
+            print(f"\t{climate}")
+            for moisture in moistures:
+                print(f"\t\t{moisture}")
+                SettlementEF.objects.create(
+                    settlement_type=settlement_type,
+                    climate=climate,
+                    moisture=moisture,
+                    flu=parse_csv_number(row["flu"]),
+                    fi=parse_csv_number(row["fi"]),
+                    fmg=parse_csv_number(row["fmg"]),
+                    biomass=parse_csv_number(row["biomass"]),
+                )
+    elif str_climate == "All":
+        for climate in climates:
+            print(f"\t\t{climate}")
+            moisture = Moisture.objects.get(name__iexact=str_moisture)
+            SettlementEF.objects.create(
+                settlement_type=settlement_type,
+                climate=climate,
+                moisture=moisture,
+                flu=parse_csv_number(row["flu"]),
+                fi=parse_csv_number(row["fi"]),
+                fmg=parse_csv_number(row["fmg"]),
+                biomass=parse_csv_number(row["biomass"]),
+            )
+    elif str_moisture == "All":
+        for moisture in moistures:
+            print(f"\t\t{moisture}")
+            if str_climate == "Temperate":
+                for climate in Climate.objects.filter(name__in=["Warm Temperate", "Cool Temperate"]).all():
+                    SettlementEF.objects.create(
+                        settlement_type=settlement_type,
+                        climate=climate,
+                        moisture=moisture,
+                        flu=parse_csv_number(row["flu"]),
+                        fi=parse_csv_number(row["fi"]),
+                        fmg=parse_csv_number(row["fmg"]),
+                        biomass=parse_csv_number(row["biomass"]),
+                    )
+            else:
+                climate = Climate.objects.get(name__iexact=str_climate)
+                SettlementEF.objects.create(
+                    settlement_type=settlement_type,
+                    climate=climate,
+                    moisture=moisture,
+                    flu=parse_csv_number(row["flu"]),
+                    fi=parse_csv_number(row["fi"]),
+                    fmg=parse_csv_number(row["fmg"]),
+                    biomass=parse_csv_number(row["biomass"]),
+                )
+    else:
+        climate = Climate.objects.get(name__iexact=str_climate)
+        moisture = Moisture.objects.get(name__iexact=str_moisture)
+
+        SettlementEF.objects.create(
+            settlement_type=settlement_type,
+            climate=climate,
+            moisture=moisture,
+            flu=parse_csv_number(row["flu"]),
+            fi=parse_csv_number(row["fi"]),
+            fmg=parse_csv_number(row["fmg"]),
+            biomass=parse_csv_number(row["biomass"]),
+        )
+
+log.debug("Updating all GlobalWarmingPotential objects...")
+# NOTE: This will delete all projects in review. Change to iexact update
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    name = row["name"]
+    co2 = parse_csv_number(row["co2"])
+    ch4 = parse_csv_number(row["ch4"])
+    n2o = parse_csv_number(row["n2o"])
+    ch4_fossil = parse_csv_number(row["ch4_fossil"])
+
+    import re
+
+    filter_name = re.search(r"\((.*?)\)", name).group(1)
+
+    print(
+        name,
+        co2,
+        ch4,
+        n2o,
+        ch4_fossil,
+    )
+
+    # Look for existing GWP containing the name
+
+    gwp = GlobalWarmingPotential.objects.filter(name__icontains=filter_name).first()
+
+    if gwp:
+        print(f"Updating {gwp.name}")
+        gwp.co2 = co2
+        gwp.ch4 = ch4
+        gwp.n2o = n2o
+        gwp.ch4_fossil = ch4_fossil
+        gwp.save()
+    else:
+        print(f"Creating {name}")
+        GlobalWarmingPotential.objects.create(
+            name=name,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+            ch4_fossil=ch4_fossil,
+        )
+
+
+ForestManagementRootToShoot.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    try:
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        region = Region.objects.get(name__iexact=row["region"])
+        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        threshold = row["threshold"]
+        if threshold == "> 125" or threshold == ">75":
+            threshold = None
+        elif "125" in threshold:
+            threshold = 125
+        elif "75" in threshold:
+            threshold = 75
+        value = parse_csv_number(row["value"])
+
+        print(climate, region, forest_type, land_use_type, threshold, value)
+
+        ForestManagementRootToShoot.objects.create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
+    except Exception as e:
+        print(row)
+        print(e)
+
+ModuleType.objects.filter(class_name="DegradedLand").update(name="Other Land", class_name="OtherLand")
+LandUseType.objects.filter(name="Degraded Land").update(name="Other Land")
+
+ModuleType.objects.filter(class_name="AnnualCropping").update(name="Annual Cropland", class_name="AnnualCropland")
+LandUseType.objects.filter(name="Annual Cropping").update(name="Annual Cropland")
+
+ModuleType.objects.filter(class_name="PerennialCropping").update(name="Perennial Cropland", class_name="PerennialCropland")
+LandUseType.objects.filter(name="Perennial Cropping").update(name="Perennial Cropland")
+
+# Get all LandUseTypes where module_type__class_name is AnnualCropland
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+# Set all crops to have all climates and moistures
+for crop in crops:
+    crop.climates.set(Climate.objects.all())
+    crop.moistures.set(Moisture.objects.all())
+    crop.save()
+
+
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    region = Region.objects.get(name__iexact=sanitize(row["EX-ACT"]))
+    gleam_region = GLEAMRegion.objects.get(name__iexact=sanitize(row["GLEAM"]))
+    ipcc_region = IPCCRegion.objects.get(name__iexact=sanitize(row["IPCC"]))
+
+    try:
+        country = Country.objects.get(name__iexact=sanitize(row["Countries"]))
+    except Country.DoesNotExist:
+        country = Country.objects.create(name=sanitize(row["Countries"]), region=region, gleam_region=gleam_region, ipcc_region=ipcc_region)
+
+    print(
+        region,
+        gleam_region,
+        ipcc_region,
+        country,
+    )
+
+    if country:
+        country.region = region
+        country.gleam_region = gleam_region
+        country.ipcc_region = ipcc_region
+        country.save()
+
 
 LivestockManureEF.objects.all().delete()
 
@@ -4033,11 +3762,12 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
-
-IrrigationPressureRequirement.objects.all().delete()
+print("Deleting all MethaneManureManagementFactor...")
+LivestockAWMS.objects.all().delete()
+print("Deleted all MethaneManureManagementFactor.")
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPressureRequirements.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
     header=0,
     sep=";",
 )
@@ -4045,419 +3775,1432 @@ df = pd.read_csv(
 df_headers = df.columns.values.tolist()
 df_dict = df.to_dict("records")
 
-irrigation_system_types = df["irrigation_system_type"].unique()
-irrigation_system_types = irrigation_system_types[irrigation_system_types != "Other"]
+awms_list = []
 
 for i, row in enumerate(df_dict):
-    irrigation_system_type = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
 
-    print(
-        irrigation_system_type,
-        row["bar"],
-        row["avg_pressure"],
-        row["head"],
-    )
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
 
-    if irrigation_system_type.name == "Other":
-        bar_start = None
-        bar_end = None
+    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
 
-        for system in IrrigationSystemType.objects.all().exclude(name__in=irrigation_system_types):
-            IrrigationPressureRequirement.objects.create(
-                irrigation_system_type=system,
-                bar_start=bar_start,
-                bar_end=bar_end,
-                avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
-                head=parse_csv_number(row["head"], nan_value=None),
+    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
+
+    for j, header in enumerate(df_headers, start=3):
+
+        if j == len(df_headers):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
+
+        print(manure_management_type, row[df_headers[j]])
+
+        awms_list.append(
+            LivestockAWMS(
+                manure_management_type=manure_management_type,
+                livestock_category_type=livestock_category_type,
+                livestock_production_type=livestock_production_type,
+                ipcc_region=ipcc_region,
+                value=parse_csv_number(row[df_headers[j]]),
             )
-
-    else:
-        try:
-            bar_ranges = row["bar"].split("-")
-        except AttributeError:
-            bar_ranges = [row["bar"], row["bar"]]
-
-        bar_start = parse_csv_number(bar_ranges[0], nan_value=None)
-        bar_end = parse_csv_number(bar_ranges[1], nan_value=None)
-
-        IrrigationPressureRequirement.objects.create(
-            irrigation_system_type=irrigation_system_type,
-            bar_start=bar_start,
-            bar_end=bar_end,
-            avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
-            head=parse_csv_number(row["head"], nan_value=None),
         )
 
+LivestockAWMS.objects.bulk_create(awms_list)
 
-log.debug("Deleting all GlobalWarmingPotential objects...")
-GlobalWarmingPotential.objects.all().delete()
+log.debug("Deleting all GrasslandBiomass objects...")
+ipcc.GrasslandBiomass.objects.all().delete()
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "GrasslandBiomass.csv"),
     header=0,
     sep=";",
 )
 
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    name = row["name"]
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+    agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
+    agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
+    bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
+    bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
 
     print(
-        name,
-        co2,
-        ch4,
-        n2o,
+        climate,
+        moisture,
+        agb_t_dm_ha,
+        agb_t_c_ha,
+        bgb_t_dm_ha,
+        bgb_t_c_ha,
     )
 
-    GlobalWarmingPotential.objects.create(
-        name=name,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
+    ipcc.GrasslandBiomass.objects.create(
+        climate=climate,
+        moisture=moisture,
+        agb_t_dm_ha=agb_t_dm_ha,
+        agb_t_c_ha=agb_t_c_ha,
+        bgb_t_dm_ha=bgb_t_dm_ha,
+        bgb_t_c_ha=bgb_t_c_ha,
     )
 
 """
 
-# TODO: Run in review
 
-annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-
-# ForestTotalBiomass.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
-#     header=0,
-#     sep=";",
-# )
-
-# headers = df.columns.values.tolist()
-# rows = df.to_dict("records")
-
-# for i, row in enumerate(rows):
-#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-#     moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-#     region = Region.objects.get(name__iexact=sanitize(row["region"]))
-
-#     for j, header in enumerate(headers, start=3):
-
-#         if j == len(headers):
-#             break
-
-#         land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-#         value = parse_csv_number(row[headers[j]])
-#         if pd.isna(value):
-#             continue
-
-#         if land_use_type == annualcropland:
-#             for crop in crops:
-#                 print(f"{crop}, {climate}, {moisture}, {region}, {value}")
-
-#                 ForestTotalBiomass.objects.create(
-#                     land_use_type=crop,
-#                     climate=climate,
-#                     moisture=moisture,
-#                     continent=region,
-#                     value=value,
-#                 )
-
-#         print(
-#             land_use_type,
-#             climate,
-#             moisture,
-#             region,
-#             value,
-#         )
-
-#         ForestTotalBiomass.objects.create(
-#             land_use_type=land_use_type,
-#             climate=climate,
-#             moisture=moisture,
-#             continent=region,
-#             value=value,
-#         )
-
-# TotalBiomassAfterDefo.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
-#     header=0,
-#     sep=";",
-# )
-
-# headers = df.columns.values.tolist()
-# rows = df.to_dict("records")
-
-# for i, row in enumerate(rows):
-#     climate = Climate.objects.get(name__iexact=row["climate"])
-#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
-#     region = Region.objects.get(name__iexact=row["region"])
-
-#     for j, header in enumerate(headers, start=3):
-
-#         if j == len(headers):
-#             break
-
-#         print(headers[j])
-#         land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-#         value = parse_csv_number(row[headers[j]])
-#         if not value:
-#             continue
-
-#         if land_use_type == annualcropland:
-#             for crop in crops:
-#                 print(
-#                     crop,
-#                     climate,
-#                     moisture,
-#                     region,
-#                     value,
-#                 )
-
-#                 TotalBiomassAfterDefo.objects.create(
-#                     land_use_type=crop,
-#                     climate=climate,
-#                     moisture=moisture,
-#                     continent=region,
-#                     value=value,
-#                 )
-
-#         print(
-#             land_use_type,
-#             climate,
-#             moisture,
-#             region,
-#             value,
-#         )
-
-#         TotalBiomassAfterDefo.objects.create(
-#             land_use_type=land_use_type,
-#             climate=climate,
-#             moisture=moisture,
-#             continent=region,
-#             value=value,
-#         )
-
-
-# FMGData.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
-#     header=[0],
-#     sep=";",
-# )
-
-# for i, row in df.iterrows():
-#     climate = Climate.objects.get(name__iexact=row["climate"])
-#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
-
-#     grassland_management_type = None
-#     tillage_management_type = None
-
-#     if not pd.isna(row["grassland_management_type"]):
-#         grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
-
-#     if not pd.isna(row["tillage_management_type"]):
-#         tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"])
-
-#     value = parse_csv_number(row["value"])
-
-#     print(
-#         climate,
-#         moisture,
-#         tillage_management_type,
-#         grassland_management_type,
-#         value,
-#     )
-
-#     FMGData.objects.create(
-#         climate=climate,
-#         moisture=moisture,
-#         tillage_management_type=tillage_management_type,
-#         grassland_management_type=grassland_management_type,
-#         value=value,
-#     )
-
-# FIData.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
-#     header=[0],
-#     sep=";",
-# )
-
-# for i, row in df.iterrows():
-#     climate = Climate.objects.get(name__iexact=row["climate"])
-#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
-
-#     grassland_management_type = None
-#     organic_input_type = None
-
-#     if not pd.isna(row["grassland_management_type"]):
-#         grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
-
-#     if not pd.isna(row["organic_input_type"]):
-#         organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"])
-
-#     value = parse_csv_number(row["value"])
-
-#     print(
-#         climate,
-#         moisture,
-#         organic_input_type,
-#         grassland_management_type,
-#         value,
-#     )
-
-#     FIData.objects.create(
-#         climate=climate,
-#         moisture=moisture,
-#         organic_input_type=organic_input_type,
-#         grassland_management_type=grassland_management_type,
-#         value=value,
-#     )
-
-#     if i == len(df) - 1:
-#         break
-
-# FLUData.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
-#     header=[0],
-#     sep=";",
-# )
-
-# annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-# crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-# perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropping").all()
-# perennials = perennials.exclude(name__in=["Agroforestry - Default", "Alley Cropping", "Perennial Fallow", "Hedgerow", "Multistrata", "Parkland", "Shaded Perennial", "Silvoarable", "Silvopasture", "Oil Palm", "Rubber", "Tea", "Olive", "Orchard", "Short Rotation Coppice", "Vine"])
-# for i, row in df.iterrows():
-#     climate = Climate.objects.get(name__iexact=row["climate"])
-#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
-#     land_use_type = None
-#     if not pd.isna(row["land_use_type"]) and row["land_use_type"] != "Perennial Cropland":
-#         land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-#     value = parse_csv_number(row["value"])
-
-#     if land_use_type == annualcropland:
-#         for crop in crops:
-#             print(
-#                 climate,
-#                 moisture,
-#                 crop,
-#                 value,
-#             )
-#             FLUData.objects.create(
-#                 climate=climate,
-#                 moisture=moisture,
-#                 land_use_type=crop,
-#                 value=value,
-#             )
-#     elif row["land_use_type"] == "Perennial Cropland":
-#         for perennial in perennials:
-#             print(
-#                 climate,
-#                 moisture,
-#                 perennial,
-#                 value,
-#             )
-#             FLUData.objects.create(
-#                 climate=climate,
-#                 moisture=moisture,
-#                 land_use_type=perennial,
-#                 value=value,
-#             )
-#     else:
-#         grassland_management_type = None
-#         if not pd.isna(row["grassland_management_type"]):
-#             grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
-
-#         print(
-#             climate,
-#             moisture,
-#             land_use_type,
-#             grassland_management_type,
-#             value,
-#         )
-
-#         FLUData.objects.create(
-#             climate=climate,
-#             moisture=moisture,
-#             land_use_type=land_use_type,
-#             grassland_management_type=grassland_management_type,
-#             value=value,
-#         )
-
-
-# PerennialBGB.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
-#     header=0,
-#     sep=";",
-# )
-
-# headers = df.columns.values.tolist()
-# rows = df.to_dict("records")
-
-# for i, row in enumerate(rows):
-#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-#     moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-#     continent = Region.objects.get(name__iexact=sanitize(row["region"]))
-
-#     for j, header in enumerate(headers, start=3):
-
-#         if j == len(headers):
-#             break
-
-#         land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
-#         value = parse_csv_number(row[headers[j]])
-
-#         if pd.isna(value):
-#             continue
-
-#         print(
-#             land_use_type,
-#             climate,
-#             moisture,
-#             continent,
-#             value,
-#         )
-
-#         PerennialBGB.objects.create(
-#             land_use_type=land_use_type,
-#             climate=climate,
-#             moisture=moisture,
-#             continent=continent,
-#             value=value,
-#         )
-
-# LivestockManureEF.objects.filter(value=None).all().update(value=0)
-
-IrrigationSystemData.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    irrigation_system = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
-    value = parse_csv_number(row["value"], nan_value=None)
-
-    print(irrigation_system, value)
-
-    IrrigationSystemData.objects.create(
-        irrigation_system_type=irrigation_system,
-        value=value,
+def delete_and_import_forest_combustion_factor():
+    log.debug("Deleting all ForestCombustionFactor objects...")
+    ForestCombustionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+        header=[0],
+        sep=";",
     )
+
+    for i, row in df.iterrows():
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+        co2 = parse_csv_number(row["gef_co2"])
+        ch4 = parse_csv_number(row["gef_ch4"])
+        n2o = parse_csv_number(row["gef_n2o"])
+        value = parse_csv_number(row["value"])
+
+        print(
+            land_use_type,
+            climate,
+            forest_type,
+            co2,
+            ch4,
+            n2o,
+            value,
+        )
+
+        ForestCombustionFactor.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            forest_type=forest_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+            value=value,
+        )
+
+
+def delete_and_import_litter_deadwood_carbon_stock():
+    log.debug("Deleting all LitteDeadwoodCarbonStock objects...")
+    LitterDeadwoodCarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "LitterDeadwoodCarbonStock.csv"),
+        header=[0],
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        try:
+            climate = Climate.objects.get(name__iexact=row["climate"])
+            forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+            land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+            litter = parse_csv_number(row["litter"])
+            dw = parse_csv_number(row["deadwood"])
+
+            print(climate, forest_type, land_use_type, litter, dw)
+
+            LitterDeadwoodCarbonStock.objects.create(climate=climate, forest_type=forest_type, land_use_type=land_use_type, litter=litter, dw=dw)
+        except Exception as e:
+            print(row)
+            print(e)
+
+
+def delete_and_import_organic_soil_gef_emission_factor():
+    log.debug("Deleting all OrganicSoilGefEmissionFactor...")
+    OrganicSoilGefEmissionFactor.objects.all().delete()
+
+    df2 = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "OrganicSoilGefEmissionFactor.csv"),
+        header=0,
+        sep=";",
+    )
+
+    df_headers2 = df2.columns.values.tolist()
+    df_dict2 = df2.to_dict("records")
+
+    for i, row in enumerate(df_dict2):
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        co2 = parse_csv_number(row["co2"], nan_value=0)
+        ch4 = parse_csv_number(row["ch4"], nan_value=0)
+        co = parse_csv_number(row["co"], nan_value=0)
+
+        print(
+            climate,
+            moisture,
+            co2,
+            ch4,
+            co,
+        )
+
+        OrganicSoilGefEmissionFactor.objects.create(
+            climate=climate,
+            moisture=moisture,
+            co2=co2,
+            ch4=ch4,
+            co=co,
+        )
+
+
+def delete_and_import_coastal_litter():
+    CoastalLitter.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalLitter.csv"),
+        header=0,
+        sep=",",
+    )
+
+    df_headers = df.columns.values.tolist()
+    df_dict = df.to_dict("records")
+
+    for i, row in enumerate(df_dict):
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+
+        for j, header in enumerate(df_headers, start=2):
+            if j == len(df_headers):
+                break
+
+            land_use_type = LandUseType.objects.get(name__iexact=sanitize(df_headers[j]))
+            value = parse_csv_number(row[df_headers[j]])
+
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                value,
+            )
+
+            CoastalLitter.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
+
+
+def delete_and_import_forest_management_agb():
+    ForestManagementAGB.objects.all().delete()
+    import api.utilities as utils
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        print(row)
+
+        climates = [Climate.objects.get(name__iexact=row["climate"])]
+
+        print(row["land_use_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+
+        from_year = row["from_year"]
+
+        print(f"Region: {row['region']}")
+
+        regions = []
+        if "South" in row["region"] and "America" in row["region"]:
+            print("South America")
+            regions += [region for region in Region.objects.filter(name__in=["South America", "Caribbean", "Central America"])]
+        if "North" in row["region"] and "America" in row["region"]:
+            print("North America")
+            regions += [region for region in Region.objects.filter(name__in=["North America"])]
+        if "Asia" in row["region"]:
+            print("Asia")
+            regions += [region for region in Region.objects.filter(name__in=["Southern Asia", "Eastern Asia", "South-Eastern Asia", "Western Asia", "Central Asia"])]
+        if "Africa" in row["region"]:
+            print("Africa")
+            regions += [region for region in Region.objects.filter(name__in=["Northern Africa", "Western Africa", "Central Africa", "Eastern Africa", "Southern Africa"])]
+        if "Europe" in row["region"]:
+            regions += [Region.objects.get(name__iexact=row["region"])]
+
+        if not regions:
+            print("No regions found for ", row["region"])
+            regions += [Region.objects.get(name__iexact=row["region"])]
+
+        forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
+
+        forest_types = ForestType.objects.filter(name__in=["Natural", "Plantation"]).all()
+
+        agb_range_min = None
+        agb_range_max = None
+        agb_growth_min = None
+        agb_growth_max = None
+        agb_range_min_plantation = None
+        agb_range_max_plantation = None
+        agb_growth_min_plantation = None
+        agb_growth_max_plantation = None
+
+        if not isinstance(row["agb_range"], float) and len(row["agb_range"].split("-")) == 2:
+            agb_range_min = parse_csv_number(row["agb_range"].split("-")[0])
+            agb_range_max = parse_csv_number(row["agb_range"].split("-")[1])
+        elif row["agb_range"] != "n.a." or row["agb_range"] != "":
+            agb_range_min = parse_csv_number(row["agb_range"])
+            agb_range_max = parse_csv_number(row["agb_range"])
+
+        if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
+            agb_growth_min = parse_csv_number(row["agb_growth"].split("-")[0])
+            agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
+        elif row["agb_growth"] != "n.a." or row["agb_growth"] != "":
+            agb_growth_min = parse_csv_number(row["agb_growth"])
+            agb_growth_max = parse_csv_number(row["agb_growth"])
+
+        if not isinstance(row["agb_range_plantation"], float) and len(row["agb_range_plantation"].split("-")) == 2:
+            agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[0])
+            agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[1])
+        elif row["agb_range_plantation"] != "n.a." or row["agb_range_plantation"] != "":
+            agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"])
+            agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"])
+
+        if not isinstance(row["agb_growth_plantation"], float) and len(row["agb_growth_plantation"].split("-")) == 2:
+            agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[0])
+            agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[1])
+        elif row["agb_growth_plantation"] != "n.a." or row["agb_growth_plantation"] != "":
+            agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"])
+            agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"])
+
+        print("Climates: ", climates)
+        print("Regions: ", regions)
+        print("Forest Types: ", forest_types)
+        print(f"From Year: {from_year}")
+
+        for region in regions:
+            for climate in climates:
+                for type in forest_types:
+                    if type.name == "Plantation" and forest_condition_type.name == "Primary":
+                        # Primary forest plantations are not possible
+                        continue
+
+                    print(
+                        land_use_type,
+                        region,
+                        climate,
+                        forest_condition_type,
+                        type,
+                        agb_range_min,
+                        agb_range_max,
+                        agb_growth_min,
+                        agb_growth_max,
+                    )
+
+                    if type.name == "Plantation":
+                        if agb_range_min_plantation is None or agb_range_max_plantation is None or agb_growth_min_plantation is None or agb_growth_max_plantation is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max_plantation * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
+                    else:
+                        if agb_range_min is None or agb_range_max is None or agb_growth_min is None or agb_growth_max is None:
+                            continue
+
+                        ForestManagementAGB.objects.create(
+                            land_use_type=land_use_type,
+                            region=region,
+                            climate=climate,
+                            forest_condition_type=forest_condition_type,
+                            from_year=from_year,
+                            forest_type=type,
+                            agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR,
+                            agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR,
+                            agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR,
+                            agb_unit="tC/ha",
+                        )
+
+
+def import_irrigation_system_types():
+    log.debug("Importing IrrigationSystemType objects...")
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystemType_ModuleType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        irrigation_system_type = IrrigationSystemType.objects.get(name__iexact=row["irrigation_system_type"])
+        module_type = ModuleType.objects.get(class_name__iexact=row["module_type"])
+
+        print(irrigation_system_type, module_type)
+
+        irrigation_system_type.module_types.add(module_type)
+        irrigation_system_type.save()
+
+
+def delete_and_import_input_emission_factors():
+    log.debug("Deleting all InputEmissionFactor models...")
+    EnergyDefaultEmissionFactor.objects.all().delete()
+
+    l = []
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+        header=0,
+        sep=";",
+    )
+
+    df_headers = df.columns.values.tolist()
+    df_dict = df.to_dict("records")
+
+    for i, row in enumerate(df_dict):
+        print(row)
+        fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+        fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"], fuel_use_type=fuel_use_type)
+        co2 = parse_csv_number(row["co2"])
+        ch4 = parse_csv_number(row["ch4"])
+        n2o = parse_csv_number(row["n2o"])
+
+        print(
+            fuel_use_type,
+            fuel_type,
+            co2,
+            ch4,
+            n2o,
+        )
+
+        l.append(
+            EnergyDefaultEmissionFactor(
+                fuel_use_type=fuel_use_type,
+                fuel_type=fuel_type,
+                co2=co2,
+                ch4=ch4,
+                n2o=n2o,
+            )
+        )
+
+    EnergyDefaultEmissionFactor.objects.bulk_create(l)
+
+
+def import_value_chain_packaging_material_types():
+    log.debug("Importing PackagingMaterialType objects...")
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        name = row["name"]
+
+        if PackagingMaterialType.objects.filter(name__iexact=name).exists():
+            print(f"PackagingType {name} already exists. Skipping...")
+            continue
+
+        print(name)
+
+        PackagingMaterialType.objects.create(name=name)
+
+
+def delete_and_import_value_chain_packaging_emission_factors():
+    log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+    ValueChainPackagingEmissionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactors.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        packaging_type = PackagingMaterialType.objects.get(name__iexact=row["packaging_type"])
+        value = parse_csv_number(row["value"])
+
+        print(
+            packaging_type,
+            value,
+        )
+
+        ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
+
+
+def import_value_chain_refrigerant_types():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        name = row["name"]
+
+        if RefrigerantType.objects.filter(name__iexact=name).exists():
+            print(f"RefrigerantType {name} already exists. Skipping...")
+            continue
+
+        print(name)
+
+        RefrigerantType.objects.create(name=name)
+
+
+def delete_and_import_value_chain_refrigerant_emission_factors():
+    log.debug("Deleting all ValueChainRefrigerantEmissionFactor objects...")
+    ValueChainRefrigerantEmissionFactor.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        refrigerant_type = RefrigerantType.objects.get(name__iexact=row["refrigerant_type"])
+        sar = GlobalWarmingPotential.objects.get(name__icontains="SAR")
+        ar4 = GlobalWarmingPotential.objects.get(name__icontains="AR4")
+        ar5 = GlobalWarmingPotential.objects.get(name__icontains="AR5) with C")
+        ar5_wo = GlobalWarmingPotential.objects.get(name__icontains="AR5) without C")
+        ar6 = GlobalWarmingPotential.objects.get(name__icontains="AR6")
+
+        sar_value = parse_csv_number(row["sar"])
+        ar4_value = parse_csv_number(row["ar4"])
+        ar5_value = parse_csv_number(row["ar5"])
+        ar6_value = parse_csv_number(row["ar6"])
+
+        print(
+            refrigerant_type,
+            sar_value,
+            ar4_value,
+            ar5_value,
+            ar6_value,
+        )
+
+        if sar_value:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=sar, value=sar_value)
+        if ar4_value:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar4, value=ar4_value)
+        if ar5_value:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5, value=ar5_value)
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
+        if ar6_value:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
+
+
+def delete_and_import_eletricity_emissions():
+    log.debug("Deleting all ElectricityEmissions objects...")
+    ElectricityEmission.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        print(row)
+        country = row["country"]
+        operating_margin = parse_csv_number(row["operating_margin"])
+        combined_margin = parse_csv_number(row["combined_margin"])
+
+        print(country, operating_margin, combined_margin)
+        try:
+            country = Country.objects.get(name__iexact=country)
+        except Country.DoesNotExist:
+            country = Country.objects.create(name=country, region=Region.objects.get(name=row["region"]))
+
+        ElectricityEmission.objects.create(
+            country=country,
+            operating_margin=operating_margin,
+            combined_margin=combined_margin,
+        )
+
+
+def delete_and_import_crop_yield_stats():
+    CropYieldStat.objects.all().delete()
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+        header=[0],
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        print(row)
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
+        yr_2016 = parse_csv_number(row["2016"])
+        yr_2017 = parse_csv_number(row["2017"])
+        yr_2018 = parse_csv_number(row["2018"])
+        yr_2019 = parse_csv_number(row["2019"])
+        yr_2020 = parse_csv_number(row["2020"])
+
+        actual_years = [yr for yr in [yr_2016, yr_2017, yr_2018, yr_2019, yr_2020] if yr is not None]
+        print(actual_years)
+        average = sum(actual_years) / len(actual_years) / 10000
+
+        print(f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}")
+
+        stat = CropYieldStat.objects.create(
+            land_use_type=land_use_type,
+            continent=continent,
+            year_2016=yr_2016,
+            year_2017=yr_2017,
+            year_2018=yr_2018,
+            year_2019=yr_2019,
+            year_2020=yr_2020,
+            average=average,
+        )
+
+
+def import_fuel_type_fuel_use_type_mapping():
+    log.debug("Importing FuelTypeFuelUseType mapping...")
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_FuelUseType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = row["fuel_type"]
+        fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+
+        if FuelType.objects.filter(name=fuel_type, fuel_use_type=fuel_use_type).exists():
+            print(f"FuelTypeFuelUseType {fuel_type} {fuel_use_type} already exists. Skipping...")
+            continue
+
+        log.debug(fuel_type, fuel_use_type)
+        FuelType.objects.create(name=fuel_type, fuel_use_type=fuel_use_type)
+
+
+def assign_fuel_type_units():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_Unit.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = FuelType.objects.filter(name_en__iexact=row["fuel_type"]).all()
+        unit = Unit.objects.create(name=row["unit"])
+
+        print(f"Assigning unit {unit.name} to {fuel_type}")
+
+        for ft in fuel_type:
+            ft.unit = unit
+            ft.save()
+
+
+def delete_and_import_total_biomass_after_defo():
+    annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+    crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+    TotalBiomassAfterDefo.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
+        header=0,
+        sep=";",
+    )
+
+    headers = df.columns.values.tolist()
+    rows = df.to_dict("records")
+
+    for i, row in enumerate(rows):
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        region = Region.objects.get(name__iexact=row["region"])
+
+        for j, header in enumerate(headers, start=3):
+            if j == len(headers):
+                break
+
+            print(headers[j])
+            land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+            value = parse_csv_number(row[headers[j]])
+            if value is None:
+                print(f"Skipping {land_use_type} {climate} {moisture} {region} {value}")
+                continue
+
+            if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                TotalBiomassAfterDefo.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
+                for crop in crops:
+                    print(f"Processing {crop} {climate} {moisture} {region} {value}")
+                    print(
+                        crop,
+                        climate,
+                        moisture,
+                        region,
+                        value,
+                    )
+
+                    TotalBiomassAfterDefo.objects.create(
+                        land_use_type=crop,
+                        climate=climate,
+                        moisture=moisture,
+                        continent=region,
+                        value=value,
+                    )
+
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                region,
+                value,
+            )
+
+            TotalBiomassAfterDefo.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=region,
+                value=value,
+            )
+
+
+def delete_and_import_forest_total_biomass():
+    annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+    crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+    ForestTotalBiomass.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
+        header=0,
+        sep=";",
+    )
+
+    headers = df.columns.values.tolist()
+    rows = df.to_dict("records")
+
+    for i, row in enumerate(rows):
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        region = Region.objects.get(name__iexact=sanitize(row["region"]))
+
+        for j, header in enumerate(headers, start=3):
+            if j == len(headers):
+                break
+
+            land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+            value = parse_csv_number(row[headers[j]])
+            if pd.isna(value):
+                continue
+
+            if land_use_type == annualcropland:
+                print(f"Processing {land_use_type} {climate} {moisture} {region} {value}")
+                print(f"Processing {len(crops)} crops")
+
+                ForestTotalBiomass.objects.create(
+                    land_use_type=LandUseType.objects.get(name="Default"),
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+
+                for crop in crops:
+                    if crop.name == "Default":
+                        continue
+
+                    print(f"{crop}, {climate}, {moisture}, {region}, {value}")
+
+                    ForestTotalBiomass.objects.create(
+                        land_use_type=crop,
+                        climate=climate,
+                        moisture=moisture,
+                        continent=region,
+                        value=value,
+                    )
+
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                region,
+                value,
+            )
+
+            ForestTotalBiomass.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=region,
+                value=value,
+            )
+
+
+def get_or_create_soil_types_and_update_info():
+    """Import soil types from CSV and update their properties."""
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilTypes.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for _, row in df.iterrows():
+        name = row["name"]
+        active = row["active"]
+        is_coastal = row["is_coastal"]
+
+        print(f"Processing soil type: {name} (active={active}, coastal={is_coastal})")
+
+        soil_type, created = SoilType.objects.get_or_create(name__iexact=name, defaults={"name": name})
+
+        if not created:
+            print(f"Updated existing soil type: {name}")
+        else:
+            print(f"Created new soil type: {name}")
+
+        soil_type.active = active
+        soil_type.is_coastal = is_coastal
+        soil_type.save()
+
+
+def rename_solar_fuel_type_to_renewable():
+    FuelType.objects.filter(name__iexact="Solar").update(name="Renewable")
+
+
+def find_all_stroke_fuel_types_and_put_stroke_lowercase():
+    fuels = FuelType.objects.filter(name__icontains="Stroke")
+    for fuel in fuels:
+        fuel.name = fuel.name.replace("Stroke", "stroke")
+        fuel.save()
+
+
+def add_or_replace_application_parameters():
+    parameters = [
+        {"name": "project_uploads_max_file_size_mb", "value": 50.0, "unit": "MB"},
+        {"name": "c_fraction_ref", "value": 1.0, "unit": None},
+        {"name": "percentage_c_lost_excavation", "value": 0.96, "unit": "%"},
+        {"name": "default_fire_periodicity", "value": 1.0, "unit": "years"},
+        {"name": "default_combustion_factor", "value": 0.77, "unit": None},
+        {"name": "feed_ef_default", "value": 0.0, "unit": None},
+        {"name": "nitrous_ef_default", "value": 0.00169, "unit": None},
+        {"name": "large_fishery_tonnes_ice_default", "value": 2.8, "unit": "tonnes"},
+        {"name": "large_fishery_kw_tonnes", "value": 60.0, "unit": "kW/tonnes"},
+        {"name": "large_fishery_lost_refrigerant_default", "value": 0.48734, "unit": None},
+        {"name": "small_fishery_tonnes_ice_default", "value": 2.8, "unit": "tonnes"},
+        {"name": "small_fishery_kw_tonnes", "value": 60.0, "unit": "kW/tonnes"},
+        {"name": "small_fishery_lost_refrigerant_default", "value": 0.083, "unit": None},
+        {"name": "pumping_efficiency", "value": 0.45, "unit": None},
+        {"name": "transportation_loss", "value": 0.1, "unit": None},
+        {"name": "erh_electricity", "value": 2.725e-06, "unit": "MWh"},
+        {"name": "conversion_bar_meter_head", "value": 10.19, "unit": "bar/meter"},
+        {"name": "leaching_multiplier", "value": 0.011, "unit": None},
+        {"name": "transmission_loss", "value": 0.1, "unit": None},
+    ]
+
+    for parameter in parameters:
+        name = parameter["name"]
+        value = parameter["value"]
+        unit = parameter["unit"]
+
+        try:
+            parameter = ApplicationParameter.objects.get(name__iexact=name)
+            parameter.value = value
+            parameter.unit = unit
+            parameter.save()
+            print(f"Updated {name} with value {value} and unit {unit}")
+        except ApplicationParameter.DoesNotExist:
+            ApplicationParameter.objects.create(name=name, value=value, unit=unit)
+            print(f"Created {name} with value {value} and unit {unit}")
+
+
+def delete_and_import_irrigation_phase_data():
+    log.debug("Deleting all IrrigationPhaseData objects...")
+    IrrigationPhaseData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = FuelType.objects.get(
+            name__iexact=sanitize(row["fuel_type"]),
+            fuel_use_type__name__iexact="stationary",
+        )
+
+        print(
+            fuel_type,
+            row["emission_factor"],
+            row["calorific_value"],
+            row["co2_emissions"],
+            row["ch4_emissions"],
+            row["n2o_emissions"],
+            row["density"],
+        )
+
+        data = IrrigationPhaseData.objects.create(
+            fuel_type=fuel_type,
+            emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
+            calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
+            co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
+            ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
+            n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
+            density=parse_csv_number(row["density"], nan_value=None),
+        )
+
+
+def add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null():
+    livestock_manure_ef = LivestockAWMS.objects.filter(manure_management_type=None)
+    manure_management_type = ManureManagementType.objects.get(name__iexact="Pit>1Month")
+
+    print(f"Adding {manure_management_type} to {livestock_manure_ef.count()} LivestockAWMS objects")
+
+    efs = []
+
+    for ef in livestock_manure_ef:
+        ef.manure_management_type = manure_management_type
+        efs.append(ef)
+
+    print(f"Updating {len(efs)} LivestockAWMS objects")
+
+    LivestockAWMS.objects.bulk_update(efs, ["manure_management_type"])
+
+
+def import_shadow_prices_of_carbon():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ShadowPriceOfCarbon.csv"),
+        header=0,
+        sep=",",
+    )
+
+    shadow_prices = []
+
+    for i, row in df.iterrows():
+        year = row["Year"]
+        min_value = row["Min"]
+        max_value = row["Max"]
+
+        print(year, min_value, max_value)
+
+        shadow_prices.append(
+            ShadowPriceOfCarbon(
+                year=year,
+                min_value=min_value,
+                max_value=max_value,
+            )
+        )
+
+    ShadowPriceOfCarbon.objects.bulk_create(shadow_prices)
+
+
+def add_0_2_to_co2_value_in_input_emission_factor():
+    # NOTE: 11/03/2025 / Was changed from 0.2 to 0.12 but Lorenzo asked to change it back to 0.2
+    """
+    Add 0,2 to co2_value in InputEmissionFactor if input_type__name="Urea"
+    """
+    print("Adding 0.2 to co2_value in InputEmissionFactor where input_type__name='Urea'")
+    urea = InputType.objects.get(name_en="Urea")
+    input_emission_factor = InputEmissionFactor.objects.filter(input_type=urea).update(co2_value=0.2)
+
+
+def clear_cache_of_all_modules():
+    from django.apps import apps
+
+    instances: list[CachedResultMixin] = []
+    for model in apps.get_models():
+        if issubclass(model, (CachedResultMixin)) and not model._meta.abstract:
+            instances.extend(model.objects.all())
+
+    instances = [
+        instance
+        for instance in instances
+        if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])
+    ]
+
+    log.debug(f"Clearing cache for {len(instances)} instances")
+
+    for instance in instances:
+        log.debug(f"Clearing cache for {instance}")
+        instance.invalidate_cached_results()
+
+
+def create_parent_fuel_types():
+    parent_fuel_type_names = ["Fuel", "Electricity"]
+
+    for name in parent_fuel_type_names:
+        if not ParentFuelType.objects.filter(name=name).exists():
+            ParentFuelType.objects.create(name=name)
+            print(f"Created parent fuel type: {name}")
+        else:
+            print(f"Parent fuel type {name} already exists.")
+
+
+def assign_parent_fuel_types_to_fuel_types():
+    fuel_types = FuelType.objects.all()
+    for fuel_type in fuel_types:
+        if fuel_type.name in ["Electricity", "Electricity (Grid)", "Electricity (Non-Grid)"]:
+            parent_fuel_type = ParentFuelType.objects.get(name="Electricity")
+        else:
+            parent_fuel_type = ParentFuelType.objects.get(name="Fuel")
+
+        fuel_type.parent_fuel_type = parent_fuel_type
+        fuel_type.save()
+        print(f"Assigned {parent_fuel_type} to {fuel_type}")
+
+
+def create_energy_entry_module_type():
+    module_type, created = ModuleType.objects.get_or_create(
+        class_name="EnergyEntry",
+        name="Energy Entry",
+        is_submodule=True,
+    )
+    if created:
+        print(f"Created ModuleType: {module_type}")
+    else:
+        print(f"ModuleType already exists: {module_type}")
+
+
+def add_change_public_project_flag_permission_to_admin_group():
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    from api.models import Project
+
+    # Get the admin group
+    admin_group = Group.objects.get(name="Admin")
+
+    # Get the content type for the Project model
+    content_type = ContentType.objects.get_for_model(Project)
+
+    # Get the permission for changing the public project flag
+    permission = Permission.objects.get(codename="change_public_project_flag", content_type=content_type)
+
+    # Add the permission to the admin group
+    admin_group.permissions.add(permission)
+    print(f"Added permission {permission} to group {admin_group}")
+
+
+def add_density_zero_where_density_is_none_in_irrigation_phase_data():
+    """
+    Add density=0.0 to IrrigationPhaseData objects where density is None
+    """
+    print("Adding density=0.0 to IrrigationPhaseData objects where density is None")
+    irrigation_phase_data = IrrigationPhaseData.objects.filter(density=None).update(density=0.0)
+    print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
+
+
+def import_fra_carbon_stock_data():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"])
+        bgb = parse_csv_number(row["bgb"])
+        litter = parse_csv_number(row["litter"])
+        deadwood = parse_csv_number(row["deadwood"])
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+
+        print(f"Creating {country} {2020} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
+
+        FRACarbonStock.objects.create(
+            year=2020,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
+
+
+def add_ipcc_and_fra_as_data_sources():
+    """
+    Add IPCC and FRA as data sources to the database.
+    """
+    from api.models import DataSource
+
+    ipcc_data_source, created = DataSource.objects.get_or_create(short_name="IPCC")
+    if created:
+        print("Created IPCC data source")
+    else:
+        print("IPCC data source already exists")
+
+    fra_data_source, created = DataSource.objects.get_or_create(short_name="FRA")
+    if created:
+        print("Created FRA data source")
+    else:
+        print("FRA data source already exists")
+
+
+def add_emission_factor_source_operating_margin_to_all_irrigation_phase_where_emission_factor_source_is_none():
+    """
+    Add emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None
+    """
+    print("Adding emission_factor_source_operating_margin to all IrrigationPhaseData objects where emission_factor_source is None")
+    obj = EmissionFactorSource.objects.get(name__iexact="Operating Margin")
+    irrigation_phases = IrrigationPhase.objects.filter(ef_source=None).update(ef_source=obj)
+    print(f"Updated {irrigation_phases} IrrigationPhaseData objects")
+
+
+def add_small_fishery_gear_types_fishery_types_relationships():
+    """
+    Add relationships between SmallFisheryGearType and FisheryType.
+    """
+    from api.models import SmallFisheryGearType, FisheryType
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SmallFisheryGearType_FisheryType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        gear_type: SmallFisheryGearType = SmallFisheryGearType.objects.get(name__iexact=row["gear_type"])
+        fishery_types = FisheryType.objects.filter(name__in=row["fishery_types"].split(", ")).all()
+
+        for fishery_type in fishery_types:
+            gear_type.fishery_types.add(fishery_type)
+            print(f"Added {fishery_type} to {gear_type}")
+
+
+def change_other_land_flu_data_to_1():
+    """
+    Change OtherLandFLUData objects to have a value of 1.0 for all land use types.
+    """
+    from ipcc.models import FLUData
+
+    print("Changing OtherLandFLUData objects to have a value of 1.0 for all land use types")
+    flu_datas = FLUData.objects.filter(land_use_type__name__iexact="Other Land").all()
+    entries = []
+    for flu_data in flu_datas:
+        print(f"Changing {flu_data} to have a value of 1.0")
+        flu_data.value = 1.0
+        entries.append(flu_data)
+
+    FLUData.objects.bulk_update(entries, ["value"])
+    print(f"Updated {len(entries)} OtherLandFLUData objects to have a value of 1.0")
+
+
+def update_module_types_of_fuel_types():
+    """
+    Update the module types of FuelType objects to include 'EnergyEntry'.
+    """
+    from api.models import ModuleType, FuelType
+
+    module_types = ModuleType.objects.filter(class_name__in=["EnergyEntry", "TransportEntry", "PackagingEntry", "StorageEntry", "ProcessingEntry", "IrrigationPhase", "IrrigationSystem"])
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_ModuleType.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        sub_module_types = module_types.filter(class_name__icontains=row["module_type"])
+        for module_type in sub_module_types:
+            fuel_type = FuelType.objects.get(name=row["fuel_type"], fuel_use_type__name=row["fuel_use_type"])
+            fuel_type.module_types.clear()  # Clear existing module types
+            if module_type and fuel_type:
+                print(f"Adding {module_type} to {fuel_type}")
+                fuel_type.module_types.add(module_type)
+                fuel_type.save()
+            else:
+                print(f"Could not find module type or fuel type for row {i}")
+
+
+def convert_storage_refrigerant_ef_from_kg_to_tonnes():
+    """
+    Convert the refrigerant emission factors in StorageEmissionFactor from kg to tonnes.
+    """
+    from ipcc.models import ValueChainRefrigerantEmissionFactor
+
+    refrigerant_efs = ValueChainRefrigerantEmissionFactor.objects.all()
+    for ef in refrigerant_efs:
+        if ef.value is not None:
+            ef.value /= 1000  # Convert kg to tonnes
+            ef.save()
+            print(f"Updated {ef} to {ef.value} tonnes")
+
+
+def change_aggregate_from_floodedrice_to_flooded_rice():
+    """
+    Change the aggregate from FloodedRice to Flooded Rice.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Changing aggregate from FloodedRice to Flooded Rice")
+    ChangeAggregate.objects.filter(module_type__iexact="flooded_rice").update(module_type="Flooded Rice")
+    print("Done")
+
+
+def delete_all_floodedrice_module_type_entries_from_aggregates():
+    """
+    Delete all Flooded Rice module type entries from the aggregates.
+    """
+    from minitool.models import ChangeAggregate
+
+    print("Deleting all Flooded Rice module type entries from the aggregates")
+    ChangeAggregate.objects.filter(module_type__exact="floodedrice").delete()
+    print("Done")
+
+
+def add_fi_data_for_all_grassland_management_types():
+    """
+    Add FI data for all grassland management types.
+    """
+    from ipcc.models import FIData
+
+    FIData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"]) if not pd.isna(row["organic_input_type"]) else None
+        value = parse_csv_number(row["value"])
+        FIData.objects.create(climate=climate, moisture=moisture, organic_input_type=organic_input_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {organic_input_type} {grassland_management_type} {value}")
+
+
+def add_flu_data_for_all_grassland_management_types():
+    """
+    Add FLU data for all grassland management types.
+    """
+    from ipcc.models import FLUData
+
+    FLUData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"]) if not pd.isna(row["land_use_type"]) else None
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FLUData.objects.create(climate=climate, moisture=moisture, land_use_type=land_use_type, grassland_management_type=grassland_management_type, value=value)
+        print(f"Created {climate} {moisture} {land_use_type} {grassland_management_type} {value}")
+
+
+def add_fmg_data_for_all_grassland_management_types():
+    """
+    Add FMG data for all grassland management types.
+    """
+    from ipcc.models import FMGData
+
+    FMGData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"]) if not pd.isna(row["grassland_management_type"]) else None
+        tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"]) if not pd.isna(row["tillage_management_type"]) else None
+        value = parse_csv_number(row["value"])
+        FMGData.objects.create(climate=climate, moisture=moisture, grassland_management_type=grassland_management_type, tillage_management_type=tillage_management_type, value=value)
+        print(f"Created {climate} {moisture} {grassland_management_type} {tillage_management_type} {value}")
+
+
+def update_forest_management_agb_and_rshoot_data():
+    """
+    Update the ForestManagementAGB and ForestManagementRootToShoot data.
+    """
+    from ipcc.models import ForestManagementAGB, ForestManagementRootToShoot
+
+    df = pd.read_csv(
+        # os.path.join(os.path.dirname(__file__), "ForestManagement_Revised_AGB_BGB_20251229.csv"),
+        os.path.join(os.path.dirname(__file__), "forman_agb_revisedrevised.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        region = Region.objects.get(name__iexact=row["region"])
+        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+        forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        # threshold = 125
+        from_year = row["from_year"]
+        agb_min = parse_csv_number(row["agb_min"])
+        agb_max = parse_csv_number(row["agb_max"])
+        agb_growth_min = parse_csv_number(row["agb_growth_min"])
+        agb_growth_max = parse_csv_number(row["agb_growth_max"])
+        # rshoot = parse_csv_number(row["r_shoot"])
+
+        agb_entry = ForestManagementAGB.objects.filter(
+            climate=climate,
+            region=region,
+            forest_type=forest_type,
+            forest_condition_type=forest_condition_type,
+            land_use_type=land_use_type,
+            from_year=from_year,
+        ).first()
+
+        if agb_entry:
+            agb_entry.agb_min = agb_min
+            agb_entry.agb_max = agb_max
+            agb_entry.agb_growth_min = agb_growth_min
+            agb_entry.agb_growth_max = agb_growth_max
+            agb_entry.save()
+        else:
+            ForestManagementAGB.objects.create(
+                climate=climate,
+                region=region,
+                forest_type=forest_type,
+                land_use_type=land_use_type,
+                forest_condition_type=forest_condition_type,
+                from_year=from_year,
+                agb_min=agb_min,
+                agb_max=agb_max,
+                agb_growth_min=agb_growth_min,
+                agb_growth_max=agb_growth_max,
+                agb_unit="tC/ha",
+            )
+            print(f"Created {climate} {region} {forest_type} {land_use_type} {from_year} {agb_min} {agb_max} {agb_growth_min} {agb_growth_max}")
+
+        # rshoot_entry = ForestManagementRootToShoot.objects.filter(
+        #     climate=climate,
+        #     region=region,
+        #     forest_type=forest_type,
+        #     land_use_type=land_use_type,
+        #     threshold=threshold,
+        # ).first()
+
+        # if rshoot_entry:
+        #     rshoot_entry.value = rshoot
+        #     rshoot_entry.save()
+        # else:
+        #     ForestManagementRootToShoot.objects.create(
+        #         climate=climate,
+        #         region=region,
+        #         forest_type=forest_type,
+        #         land_use_type=land_use_type,
+        #         threshold=threshold,
+        #         value=rshoot,
+        #     )
+        #     print(f"Created {climate} {region} {forest_type} {land_use_type} {threshold} {rshoot}")
+
+def update_value_chain_refrigerant_emission_factors():
+    """
+    Update the Value Chain Refrigerant Emission Factors.
+    """
+    from ipcc.models import ValueChainRefrigerantEmissionFactor
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
+        header=0,
+        sep=",",
+    )
+    for i, row in df.iterrows():
+        print(row["refrigerant_type"], row["gwp"], row["value"])
+        refrigerant_type = RefrigerantType.objects.get_or_create(name=row["refrigerant_type"])[0]
+        gwp = GlobalWarmingPotential.objects.get(name__iexact=row["gwp"])
+        value = parse_csv_number(row["value"])
+        if value is None:
+            value = 0
+        ef = ValueChainRefrigerantEmissionFactor.objects.filter(refrigerant_type=refrigerant_type, gwp=gwp).first()
+        if ef:
+            ef.value = value
+            ef.save()
+            print(f"Updated {refrigerant_type} {gwp} {value}")
+        else:
+            ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=gwp, value=value)
+            print(f"Created {refrigerant_type} {gwp} {value}")
+
+def run():
+    import os
+
+    app_mode = os.getenv("APP_MODE", None)
+    print(f"Running ippc_dump in {app_mode} mode")
+
+    if app_mode == "production":
+        # TODO: Run in production
+        add_fi_data_for_all_grassland_management_types()
+        add_flu_data_for_all_grassland_management_types()
+        add_fmg_data_for_all_grassland_management_types()
+        update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
+        pass
+
+    if app_mode == "review":
+        # TODO: Run in review
+        update_value_chain_refrigerant_emission_factors()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
+        pass
+
+    if app_mode == "development":
+        # TODO: Run in development
+        # update_forest_management_agb_and_rshoot_data()
+        # delete_and_import_forest_management_agb()
+        # delete_and_import_forest_total_biomass()
+        # delete_and_import_forest_combustion_factor()
+        delete_and_import_total_biomass_after_defo()
+        delete_and_import_forest_total_biomass()
+        pass
+
+    if app_mode == "local":
+        # TODO: Run in local
+        # update_forest_management_agb_and_rshoot_data()
+        # update_value_chain_refrigerant_emission_factors()
+        # delete_and_import_total_biomass_after_defo()
+        # delete_and_import_forest_total_biomass()
+        pass
+
+    if app_mode == "test":
+        # TODO: Run in test
+        pass
+
+    return True

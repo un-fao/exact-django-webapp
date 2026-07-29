@@ -1,0 +1,35 @@
+[
+  {
+    "model": "api.watermanagementtypebeforecultivation",
+    "pk": 4,
+    "fields": {
+      "name": "Flooded Pre-Season > 30 D",
+      "name_en": "Flooded Pre-Season > 30 D",
+      "name_fr": "Inondé avant saison > 30 j\n",
+      "name_es": "Pretemporada inundada > 30 días",
+      "name_ru": "С затоплениями (>30 суток)"
+    }
+  },
+  {
+    "model": "api.watermanagementtypebeforecultivation",
+    "pk": 2,
+    "fields": {
+      "name": "Non Flooded Pre-Season <180 D",
+      "name_en": "Non Flooded Pre-Season <180 D",
+      "name_fr": "Non inondé pré-saison < 180 j\n",
+      "name_es": "Pretemporada no inundada <180 días",
+      "name_ru": "Без затоплений <180 суток"
+    }
+  },
+  {
+    "model": "api.watermanagementtypebeforecultivation",
+    "pk": 3,
+    "fields": {
+      "name": "Non Flooded Pre-Season >180 D",
+      "name_en": "Non Flooded Pre-Season >180 D",
+      "name_fr": "Non inondé pré-saison > 180 j\n",
+      "name_es": "Pretemporada no inundada >180 días",
+      "name_ru": "Без затоплений >180 суток"
+    }
+  }
+]

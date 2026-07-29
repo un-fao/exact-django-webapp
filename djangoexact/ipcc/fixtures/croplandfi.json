@@ -1,0 +1,362 @@
+[
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 1,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 2,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 3,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 4,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 5,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 6,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 7,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 8,
+      "value": 0.95
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 8,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 8,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 9,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 8,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 11,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 12,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 13,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 14,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 15,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 16,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 17,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 18,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 19,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 9,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 21,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 22,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 23,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 24,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 25,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 26,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 27,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 10,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 28,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 10,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 29,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 10,
+      "value": 1.11
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 31,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 32,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 33,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 34,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 35,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 36,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 37,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "organic_input_type": 11,
+      "value": 1.37
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 38,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "organic_input_type": 11,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.croplandfi",
+    "pk": 39,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "organic_input_type": 11,
+      "value": 1.44
+    }
+  }
+]

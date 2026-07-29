@@ -289,20 +289,20 @@ if TEST_LG_FISHERY:
     print(f"Passed Tests: {passed_lg_fisheries}\n\n")
 
 if TEST_ANNUAL_CROPPING:
-    annual_croppings = AnnualCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+    annual_croppings = AnnualCroplandFactory.create_batch(BATCH_SIZE, activity=a)
     total_croplands = annual_croppings.__len__()
     passed_croplands = 0
 
-    a.module_types.add(ModuleType.objects.get(class_name="AnnualCropping"))
+    a.module_types.add(ModuleType.objects.get(class_name="AnnualCropland"))
     a.save()
 
-    print("Testing AnnualCropping...")
+    print("Testing AnnualCropland...")
     for i, annual_cropping in enumerate(annual_croppings):
-        # print(f"\n\nTesting AnnualCropping {i+1}...")
+        # print(f"\n\nTesting AnnualCropland {i+1}...")
         # print("-----------------------------------")
-        # print(get_module_serializer(AnnualCropping)(annual_cropping).data)
+        # print(get_module_serializer(AnnualCropland)(annual_cropping).data)
 
-        annual_cropping: AnnualCropping
+        annual_cropping: AnnualCropland
 
         print(f"Land Use Type START: {annual_cropping.land_use_type_start}")
         print(f"Land Use Type WO: {annual_cropping.land_use_type_wo}")
@@ -320,9 +320,9 @@ if TEST_ANNUAL_CROPPING:
         print(f"Residue Management Type WO: {annual_cropping.residue_management_type_wo}")
         print(f"Residue Management Type W: {annual_cropping.residue_management_type_w}")
 
-        print(f"Crop Yield START: {annual_cropping.crop_yield_start}")
-        print(f"Crop Yield WO: {annual_cropping.crop_yield_wo}")
-        print(f"Crop Yield W: {annual_cropping.crop_yield_w}")
+        print(f"Crop Yield START: {annual_cropping.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {annual_cropping.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {annual_cropping.crop_yield_t2_w}")
 
         try:
             results: Result = CalculatorFactory().calculate_result(annual_cropping)
@@ -391,8 +391,8 @@ if TEST_ANNUAL_CROPPING:
     print(f"Passed Tests: {passed_croplands}\n\n")
 
 if TEST_PERENNIAL_CROPPING:
-    perennials = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(class_name="PerennialCropping"))
+    perennials = PerennialCroplandFactory.create_batch(BATCH_SIZE, activity=a)
+    a.module_types.add(ModuleType.objects.get(class_name="PerennialCropland"))
     a.save()
 
     total_perennials = perennials.__len__()
@@ -405,7 +405,7 @@ if TEST_PERENNIAL_CROPPING:
         print(f"\n\nTesting Perennial {i+1}...")
         print("-----------------------------------")
 
-        perennial: PerennialCropping
+        perennial: PerennialCropland
 
         print("\n")
 
@@ -433,9 +433,9 @@ if TEST_PERENNIAL_CROPPING:
 
         print("\n")
 
-        print(f"Crop Yield START: {perennial.crop_yield_start}")
-        print(f"Crop Yield WO: {perennial.crop_yield_wo}")
-        print(f"Crop Yield W: {perennial.crop_yield_w}")
+        print(f"Crop Yield START: {perennial.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {perennial.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {perennial.crop_yield_t2_w}")
 
         print("\n\n")
 
@@ -572,10 +572,10 @@ if TEST_ENERGY:
 
             log.debug("\n")
 
-            log.debug(f"Country: {electricity_entry.country}")
-            log.debug(f"MWH start: {electricity_entry.mwh_start:,f}")
-            log.debug(f"MWH wo: {electricity_entry.mwh_wo:,f}")
-            log.debug(f"MWH w: {electricity_entry.mwh_w:,f}")
+            log.debug(f"Country: {electricity_entry.country_t2}")
+            log.debug(f"MWH start: {electricity_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"MWH wo: {electricity_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"MWH w: {electricity_entry.quantity_consumed_per_year_w:,f}")
             log.debug(f"MWH Renewables start: {electricity_entry.mwh_renewables_start:,f}")
             log.debug(f"MWH Renewables wo: {electricity_entry.mwh_renewables_wo:,f}")
             log.debug(f"MWH Renewables w: {electricity_entry.mwh_renewables_w:,f}")
@@ -591,9 +591,9 @@ if TEST_ENERGY:
             log.debug("\n")
 
             log.debug(f"Fuel Type: {fuel_entry.fuel_type}")
-            log.debug(f"Fuel consumption start: {fuel_entry.fuel_consumption_start:,f}")
-            log.debug(f"Fuel consumption wo: {fuel_entry.fuel_consumption_wo:,f}")
-            log.debug(f"Fuel consumption w: {fuel_entry.fuel_consumption_w:,f}")
+            log.debug(f"Fuel consumption start: {fuel_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"Fuel consumption wo: {fuel_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"Fuel consumption w: {fuel_entry.quantity_consumed_per_year_w:,f}")
 
             log.debug("\n")
 

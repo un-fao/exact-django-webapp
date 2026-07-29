@@ -1,0 +1,5102 @@
+[
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3572,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3573,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3574,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3575,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3576,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3577,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3578,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.49
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3579,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.29
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3580,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3581,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3582,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3583,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3584,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3585,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3586,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.29
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3587,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3588,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3589,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3590,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3591,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3592,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3593,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3594,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3595,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3596,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.37
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3597,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3598,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3599,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3600,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3601,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3602,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3603,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3604,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3605,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3606,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.6
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3607,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3608,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3609,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3610,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3611,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3612,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3613,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.24
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3614,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3615,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3616,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3617,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3618,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3619,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3620,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3621,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3622,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3623,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3624,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3625,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3626,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3627,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3628,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3629,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.73
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3630,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3631,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3632,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3633,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3634,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3635,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3636,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3637,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.2
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3638,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.23
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3639,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3640,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.5
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3641,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3642,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3643,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3644,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3645,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3646,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3647,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3648,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3649,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3650,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3651,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3652,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3653,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3654,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 0.99
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3655,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3656,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3657,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3658,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3659,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3660,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3661,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3662,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3663,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3664,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3665,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3666,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3667,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3668,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3669,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3670,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3671,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3672,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3673,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3674,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3675,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3676,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3677,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3678,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3679,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3680,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3681,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3682,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3683,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3684,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3685,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3686,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3687,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3688,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3689,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3690,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3691,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3692,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3693,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3694,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3695,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3696,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3697,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3698,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3699,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3700,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3701,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3702,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3703,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3704,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3705,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3706,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3707,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3708,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.5
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3709,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3710,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3711,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3712,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3713,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3714,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.73
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3715,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3716,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3717,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3718,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3719,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3720,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3721,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3722,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.29
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3723,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3724,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3725,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 40,
+      "value": 0.65
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3726,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 41,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3727,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 50,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3728,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 49,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3729,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3730,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3731,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3732,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 54,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3733,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3734,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3735,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3736,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3737,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3738,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3739,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 58,
+      "value": 1.62
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3740,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 59,
+      "value": 1.58
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3741,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 6,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3742,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3743,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3744,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3745,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3746,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3747,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3748,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.54
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3749,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3750,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3751,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3752,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3753,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3754,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3755,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3756,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3757,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.58
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3758,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3759,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3760,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3761,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3762,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3763,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3764,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3765,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3766,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3767,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3768,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3769,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3770,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3771,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3772,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3773,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.62
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3774,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.84
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3775,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3776,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.6
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3777,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3778,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3779,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3780,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3781,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3782,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3783,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.24
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3784,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3785,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3786,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3787,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3788,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3789,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3790,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3791,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3792,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3793,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.28
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3794,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.29
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3795,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3796,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3797,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3798,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3799,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.8
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3800,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3801,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3802,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3803,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3804,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3805,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3806,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3807,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 2.14
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3808,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 2.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3809,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3810,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.5
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3811,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3812,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3813,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3814,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3815,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3816,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3817,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3818,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3819,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3820,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3821,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3822,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3823,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3824,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 0.99
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3825,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3826,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3827,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3828,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3829,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3830,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3831,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3832,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3833,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3834,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3835,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3836,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3837,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3838,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3839,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3840,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3841,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3842,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3843,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3844,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3845,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3846,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3847,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3848,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3849,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3850,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3851,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3852,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3853,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3854,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3855,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3856,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3857,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3858,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3859,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3860,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3861,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3862,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3863,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3864,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3865,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3866,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3867,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3868,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3869,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3870,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3871,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3872,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3873,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3874,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3875,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3876,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3877,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3878,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.51
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3879,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.58
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3880,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3881,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3882,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3883,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3884,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.6
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3885,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.37
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3886,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3887,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3888,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3889,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3890,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3891,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3892,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.79
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3893,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 1.95
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3894,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3895,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 40,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3896,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 41,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3897,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 50,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3898,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 49,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3899,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3900,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3901,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3902,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 54,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3903,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3904,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3905,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3906,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3907,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3908,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3909,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 58,
+      "value": 1.83
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3910,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 59,
+      "value": 2.11
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3911,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 5,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3912,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3913,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3914,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3915,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3916,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3917,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3918,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3919,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.21
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3920,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3921,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3922,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3923,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3924,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3925,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3926,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3927,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3928,
+    "fields": {
+      "ipcc_region": 14,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3929,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.55
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3930,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3931,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3932,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3933,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3934,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3935,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.63
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3936,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3937,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3938,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3939,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3940,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3941,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3942,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3943,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3944,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.31
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3945,
+    "fields": {
+      "ipcc_region": 16,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3946,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.6
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3947,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.4
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3948,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3949,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3950,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3951,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3952,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3953,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.24
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3954,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3955,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3956,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3957,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3958,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3959,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3960,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3961,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3962,
+    "fields": {
+      "ipcc_region": 3,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3963,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.6
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3964,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3965,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3966,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3967,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3968,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3969,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3970,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3971,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3972,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3973,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3974,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3975,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3976,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3977,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.13
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3978,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.21
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3979,
+    "fields": {
+      "ipcc_region": 4,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3980,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.5
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3981,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3982,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3983,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.45
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3984,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3985,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3986,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3987,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3988,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3989,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3990,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3991,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3992,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3993,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3994,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 0.99
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3995,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3996,
+    "fields": {
+      "ipcc_region": 5,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3997,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3998,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 3999,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4000,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4001,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4002,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4003,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4004,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4005,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4006,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4007,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4008,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4009,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4010,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4011,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4012,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4013,
+    "fields": {
+      "ipcc_region": 6,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4014,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4015,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4016,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4017,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.35
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4018,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4019,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4020,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4021,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.36
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4022,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4023,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4024,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4025,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4026,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4027,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4028,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 0.96
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4029,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.12
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4030,
+    "fields": {
+      "ipcc_region": 7,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4031,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4032,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4033,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4034,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4035,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4036,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4037,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4038,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4039,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4040,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4041,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.38
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4042,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4043,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4044,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4045,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4046,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.59
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4047,
+    "fields": {
+      "ipcc_region": 8,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4048,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.49
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4049,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.51
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4050,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4051,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4052,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4053,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4054,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.75
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4055,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4056,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4057,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4058,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4059,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4060,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4061,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4062,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.27
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4063,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.42
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4064,
+    "fields": {
+      "ipcc_region": 13,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4065,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 40,
+      "value": 0.51
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4066,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 41,
+      "value": 0.63
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4067,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 50,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4068,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 49,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4069,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 51,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4070,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 52,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4071,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 53,
+      "value": 0.74
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4072,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 54,
+      "value": 0.37
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4073,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 55,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4074,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 47,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4075,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 46,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4076,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 48,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4077,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 56,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4078,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 57,
+      "value": 0.34
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4079,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 58,
+      "value": 1.48
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4080,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 59,
+      "value": 1.47
+    }
+  },
+  {
+    "model": "ipcc.livestockner",
+    "pk": 4081,
+    "fields": {
+      "ipcc_region": 10,
+      "livestock_production_type": 4,
+      "livestock_category_type": 60,
+      "value": 0.0
+    }
+  }
+]

@@ -1,0 +1,16 @@
+irrigation_system_type,module_type
+Surface without IRRS,IrrigationSystem
+Surface with IRRS,IrrigationSystem
+Solid set sprinkler,IrrigationSystem
+Permanent sprinkler,IrrigationSystem
+Hand moved sprinkler,IrrigationSystem
+Solid roll sprinkler,IrrigationSystem
+Center-pivot sprinkler,IrrigationSystem
+Traveler sprinkler,IrrigationSystem
+Trickle,IrrigationSystem
+Center-pivot sprinkler,IrrigationPhase
+Trickle,IrrigationPhase
+Micro sprinkler,IrrigationPhase
+Sprinkler,IrrigationPhase
+Traveler sprinkler,IrrigationPhase
+Other (set up Tier 2),IrrigationPhase

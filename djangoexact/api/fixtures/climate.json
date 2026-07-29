@@ -1,0 +1,82 @@
+[
+  {
+    "model": "api.climate",
+    "pk": 4,
+    "fields": {
+      "name": "Boreal",
+      "name_en": "Boreal",
+      "name_fr": "Boréal",
+      "name_es": "Boreal",
+      "name_ru": "Бореальный",
+      "is_active": true,
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.climate",
+    "pk": 1,
+    "fields": {
+      "name": "Cool Temperate",
+      "name_en": "Cool Temperate",
+      "name_fr": "Froid tempéré\n",
+      "name_es": "Templado Frío",
+      "name_ru": "Холодный умеренный",
+      "is_active": true,
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.climate",
+    "pk": 3,
+    "fields": {
+      "name": "Tropical",
+      "name_en": "Tropical",
+      "name_fr": "Tropical",
+      "name_es": "Tropical",
+      "name_ru": "Тропический",
+      "is_active": true,
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.climate",
+    "pk": 20,
+    "fields": {
+      "name": "Tropical Montane",
+      "name_en": "Tropical Montane",
+      "name_fr": "Tropical montagnard",
+      "name_es": "Tropical Montano",
+      "name_ru": "Тропическая горная местность",
+      "is_active": true,
+      "moistures": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "api.climate",
+    "pk": 2,
+    "fields": {
+      "name": "Warm Temperate",
+      "name_en": "Warm Temperate",
+      "name_fr": "Chaud tempéré\n",
+      "name_es": "Templado Cálido",
+      "name_ru": "Тёплый умеренный",
+      "is_active": true,
+      "moistures": [
+        1,
+        2
+      ]
+    }
+  }
+]

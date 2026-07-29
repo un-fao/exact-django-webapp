@@ -1,0 +1,402 @@
+[
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 241,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 51,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 242,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 243,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 244,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 53,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 245,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 51,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 246,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 247,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 248,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 53,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 249,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 51,
+      "value": 0.77
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 250,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 251,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 252,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 53,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 253,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 51,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 254,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 255,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 256,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 53,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 257,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 51,
+      "value": 0.76
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 258,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 259,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 260,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 53,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 261,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 51,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 262,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 263,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 52,
+      "value": 0.72
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 264,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 53,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 265,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 51,
+      "value": 0.92
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 266,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 267,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 52,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 268,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 53,
+      "value": 0.93
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 269,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 51,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 270,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 271,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 52,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 272,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 53,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 273,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 51,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 274,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 275,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 52,
+      "value": 1.01
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 276,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 53,
+      "value": 0.82
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 277,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 51,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 278,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 3,
+      "value": 1.35
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 279,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 52,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.croplandflu",
+    "pk": 280,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 53,
+      "value": 0.88
+    }
+  }
+]

@@ -1,0 +1,2402 @@
+[
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 180,
+    "fields": {
+      "land_use_type": 24,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 181,
+    "fields": {
+      "land_use_type": 30,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 182,
+    "fields": {
+      "land_use_type": 31,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 183,
+    "fields": {
+      "land_use_type": 32,
+      "slope": 1.07,
+      "intercept": 1.54,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 184,
+    "fields": {
+      "land_use_type": 33,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.027,
+      "rs_t": 0.4,
+      "n_bg_t": 0.022,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 185,
+    "fields": {
+      "land_use_type": 34,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.015,
+      "rs_t": 0.54,
+      "n_bg_t": 0.012,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 186,
+    "fields": {
+      "land_use_type": 25,
+      "slope": 1.03,
+      "intercept": 0.61,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.007,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 187,
+    "fields": {
+      "land_use_type": 28,
+      "slope": 1.51,
+      "intercept": 0.52,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.255,
+      "n_bg_t": 0.009,
+      "dry_matter": 1.0,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Wheat'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 188,
+    "fields": {
+      "land_use_type": 35,
+      "slope": 1.61,
+      "intercept": 0.4,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.23,
+      "n_bg_t": 0.009,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 189,
+    "fields": {
+      "land_use_type": 36,
+      "slope": 1.29,
+      "intercept": 0.75,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.28,
+      "n_bg_t": 0.009,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 190,
+    "fields": {
+      "land_use_type": 26,
+      "slope": 0.95,
+      "intercept": 2.46,
+      "n_ag_residues": 0.007,
+      "rs_t": 0.0,
+      "n_bg_t": 0.011,
+      "dry_matter": 0.89,
+      "rag": 1.6,
+      "comment": "Approximated using mapping for 'Upland Rice' based on name/commodity match."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 191,
+    "fields": {
+      "land_use_type": 37,
+      "slope": 0.98,
+      "intercept": 0.59,
+      "n_ag_residues": 0.007,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Values already provided in Final_list."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 192,
+    "fields": {
+      "land_use_type": 38,
+      "slope": 0.91,
+      "intercept": 0.89,
+      "n_ag_residues": 0.007,
+      "rs_t": 0.25,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Oats'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 193,
+    "fields": {
+      "land_use_type": 39,
+      "slope": 1.43,
+      "intercept": 0.14,
+      "n_ag_residues": 0.007,
+      "rs_t": 0.0,
+      "n_bg_t": 0.0,
+      "dry_matter": 1.0,
+      "rag": 1.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Millet'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 194,
+    "fields": {
+      "land_use_type": 40,
+      "slope": 0.88,
+      "intercept": 1.33,
+      "n_ag_residues": 0.007,
+      "rs_t": 0.0,
+      "n_bg_t": 0.006,
+      "dry_matter": 0.89,
+      "rag": 1.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sorghum'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 195,
+    "fields": {
+      "land_use_type": 41,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.005,
+      "rs_t": 0.0,
+      "n_bg_t": 0.011,
+      "dry_matter": 1.0,
+      "rag": 1.6,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Rye'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 196,
+    "fields": {
+      "land_use_type": 42,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 197,
+    "fields": {
+      "land_use_type": 43,
+      "slope": 0.36,
+      "intercept": 0.68,
+      "n_ag_residues": 0.01,
+      "rs_t": 0.22,
+      "n_bg_t": 0.01,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 198,
+    "fields": {
+      "land_use_type": 44,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Potatoes'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 199,
+    "fields": {
+      "land_use_type": 45,
+      "slope": 1.07,
+      "intercept": 1.54,
+      "n_ag_residues": 0.016,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 200,
+    "fields": {
+      "land_use_type": 46,
+      "slope": 0.29,
+      "intercept": 0.0,
+      "n_ag_residues": 0.027,
+      "rs_t": 0.4,
+      "n_bg_t": 0.019,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 201,
+    "fields": {
+      "land_use_type": 47,
+      "slope": 0.18,
+      "intercept": 0.0,
+      "n_ag_residues": 0.015,
+      "rs_t": 0.54,
+      "n_bg_t": 0.012,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 202,
+    "fields": {
+      "land_use_type": 48,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.015,
+      "rs_t": 0.8,
+      "n_bg_t": 0.012,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 203,
+    "fields": {
+      "land_use_type": 49,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.025,
+      "rs_t": 0.8,
+      "n_bg_t": 0.016,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 204,
+    "fields": {
+      "land_use_type": 66,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Values already provided in Final_list."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 205,
+    "fields": {
+      "land_use_type": 177,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 206,
+    "fields": {
+      "land_use_type": 178,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 207,
+    "fields": {
+      "land_use_type": 179,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 208,
+    "fields": {
+      "land_use_type": 180,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 209,
+    "fields": {
+      "land_use_type": 181,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 210,
+    "fields": {
+      "land_use_type": 182,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 211,
+    "fields": {
+      "land_use_type": 183,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 212,
+    "fields": {
+      "land_use_type": 184,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 213,
+    "fields": {
+      "land_use_type": 185,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 214,
+    "fields": {
+      "land_use_type": 186,
+      "slope": 1.07,
+      "intercept": 1.54,
+      "n_ag_residues": 0.016,
+      "rs_t": 0.1,
+      "n_bg_t": 0.0,
+      "dry_matter": 0.94,
+      "rag": 1.0,
+      "comment": "Approximated using mapping for 'Peanuts' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 215,
+    "fields": {
+      "land_use_type": 187,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.22,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 1.2,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 216,
+    "fields": {
+      "land_use_type": 188,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Beans, dry'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 217,
+    "fields": {
+      "land_use_type": 189,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 218,
+    "fields": {
+      "land_use_type": 190,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 219,
+    "fields": {
+      "land_use_type": 191,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Buckwheat'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 220,
+    "fields": {
+      "land_use_type": 192,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 221,
+    "fields": {
+      "land_use_type": 193,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 222,
+    "fields": {
+      "land_use_type": 194,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 223,
+    "fields": {
+      "land_use_type": 195,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Carrots and turnips'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 224,
+    "fields": {
+      "land_use_type": 196,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 225,
+    "fields": {
+      "land_use_type": 197,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 226,
+    "fields": {
+      "land_use_type": 198,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 227,
+    "fields": {
+      "land_use_type": 199,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 228,
+    "fields": {
+      "land_use_type": 200,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 229,
+    "fields": {
+      "land_use_type": 201,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 230,
+    "fields": {
+      "land_use_type": 202,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 231,
+    "fields": {
+      "land_use_type": 203,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Beans, Dry' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 232,
+    "fields": {
+      "land_use_type": 204,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Chicory roots'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 233,
+    "fields": {
+      "land_use_type": 205,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 234,
+    "fields": {
+      "land_use_type": 206,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 235,
+    "fields": {
+      "land_use_type": 207,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 236,
+    "fields": {
+      "land_use_type": 208,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 237,
+    "fields": {
+      "land_use_type": 209,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 238,
+    "fields": {
+      "land_use_type": 210,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 239,
+    "fields": {
+      "land_use_type": 211,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 240,
+    "fields": {
+      "land_use_type": 212,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Cow peas, dry'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 241,
+    "fields": {
+      "land_use_type": 213,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 242,
+    "fields": {
+      "land_use_type": 214,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 243,
+    "fields": {
+      "land_use_type": 215,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 244,
+    "fields": {
+      "land_use_type": 216,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 245,
+    "fields": {
+      "land_use_type": 217,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 246,
+    "fields": {
+      "land_use_type": 218,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 247,
+    "fields": {
+      "land_use_type": 219,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.91,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 248,
+    "fields": {
+      "land_use_type": 220,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Fonio'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 249,
+    "fields": {
+      "land_use_type": 221,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 250,
+    "fields": {
+      "land_use_type": 222,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 251,
+    "fields": {
+      "land_use_type": 223,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 252,
+    "fields": {
+      "land_use_type": 224,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 253,
+    "fields": {
+      "land_use_type": 225,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 254,
+    "fields": {
+      "land_use_type": 226,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 255,
+    "fields": {
+      "land_use_type": 227,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 256,
+    "fields": {
+      "land_use_type": 228,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 257,
+    "fields": {
+      "land_use_type": 229,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 258,
+    "fields": {
+      "land_use_type": 230,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 259,
+    "fields": {
+      "land_use_type": 231,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 260,
+    "fields": {
+      "land_use_type": 232,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 261,
+    "fields": {
+      "land_use_type": 233,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 262,
+    "fields": {
+      "land_use_type": 234,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 263,
+    "fields": {
+      "land_use_type": 235,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 264,
+    "fields": {
+      "land_use_type": 236,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Beans, Dry' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 265,
+    "fields": {
+      "land_use_type": 237,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 266,
+    "fields": {
+      "land_use_type": 238,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 267,
+    "fields": {
+      "land_use_type": 239,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 268,
+    "fields": {
+      "land_use_type": 240,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 269,
+    "fields": {
+      "land_use_type": 241,
+      "slope": 1.03,
+      "intercept": 0.61,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.007,
+      "dry_matter": 1.0,
+      "rag": 1.0,
+      "comment": "Approximated using mapping for 'Maize' based on name/commodity match."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 270,
+    "fields": {
+      "land_use_type": 242,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 271,
+    "fields": {
+      "land_use_type": 243,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.0,
+      "n_bg_t": 0.0,
+      "dry_matter": 0.88,
+      "rag": 1.4,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 272,
+    "fields": {
+      "land_use_type": 244,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Grain, Mixed' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 273,
+    "fields": {
+      "land_use_type": 245,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 274,
+    "fields": {
+      "land_use_type": 246,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 275,
+    "fields": {
+      "land_use_type": 247,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.25,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 276,
+    "fields": {
+      "land_use_type": 248,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 277,
+    "fields": {
+      "land_use_type": 249,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 278,
+    "fields": {
+      "land_use_type": 250,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 279,
+    "fields": {
+      "land_use_type": 251,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 280,
+    "fields": {
+      "land_use_type": 252,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 281,
+    "fields": {
+      "land_use_type": 253,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 282,
+    "fields": {
+      "land_use_type": 254,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 283,
+    "fields": {
+      "land_use_type": 255,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 284,
+    "fields": {
+      "land_use_type": 256,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 285,
+    "fields": {
+      "land_use_type": 257,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 286,
+    "fields": {
+      "land_use_type": 258,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 287,
+    "fields": {
+      "land_use_type": 259,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 288,
+    "fields": {
+      "land_use_type": 260,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 289,
+    "fields": {
+      "land_use_type": 261,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 290,
+    "fields": {
+      "land_use_type": 262,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 291,
+    "fields": {
+      "land_use_type": 263,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.8,
+      "n_bg_t": 0.012,
+      "dry_matter": 1.0,
+      "rag": 0.3,
+      "comment": "Approximated using mapping for 'Beans, Dry' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 292,
+    "fields": {
+      "land_use_type": 264,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.015,
+      "rs_t": 0.8,
+      "n_bg_t": 0.012,
+      "dry_matter": 0.9,
+      "rag": 0.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Pineapples'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 293,
+    "fields": {
+      "land_use_type": 265,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 294,
+    "fields": {
+      "land_use_type": 266,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 295,
+    "fields": {
+      "land_use_type": 267,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 296,
+    "fields": {
+      "land_use_type": 268,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 297,
+    "fields": {
+      "land_use_type": 269,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.91,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 298,
+    "fields": {
+      "land_use_type": 270,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 299,
+    "fields": {
+      "land_use_type": 271,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.22,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 300,
+    "fields": {
+      "land_use_type": 272,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Quinoa'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 301,
+    "fields": {
+      "land_use_type": 273,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 302,
+    "fields": {
+      "land_use_type": 274,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 303,
+    "fields": {
+      "land_use_type": 275,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 304,
+    "fields": {
+      "land_use_type": 276,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 305,
+    "fields": {
+      "land_use_type": 277,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 306,
+    "fields": {
+      "land_use_type": 278,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 307,
+    "fields": {
+      "land_use_type": 279,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 1.0,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Beans, Dry' based on name/commodity match."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 308,
+    "fields": {
+      "land_use_type": 280,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 309,
+    "fields": {
+      "land_use_type": 281,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 310,
+    "fields": {
+      "land_use_type": 282,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.22,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 311,
+    "fields": {
+      "land_use_type": 283,
+      "slope": 1.13,
+      "intercept": 0.85,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 1.0,
+      "rag": 0.4,
+      "comment": "Values already provided in Final_list."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 312,
+    "fields": {
+      "land_use_type": 284,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.8,
+      "n_bg_t": 0.012,
+      "dry_matter": 0.22,
+      "rag": 0.3,
+      "comment": "Values already provided in Final_list."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 313,
+    "fields": {
+      "land_use_type": 285,
+      "slope": 0.3,
+      "intercept": 0.0,
+      "n_ag_residues": 0.015,
+      "rs_t": 0.8,
+      "n_bg_t": 0.012,
+      "dry_matter": 0.9,
+      "rag": 0.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sugar cane'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 314,
+    "fields": {
+      "land_use_type": 286,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.19,
+      "n_bg_t": 0.008,
+      "dry_matter": 0.91,
+      "rag": 2.1,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 315,
+    "fields": {
+      "land_use_type": 287,
+      "slope": 0.93,
+      "intercept": 1.35,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.91,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 316,
+    "fields": {
+      "land_use_type": 288,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sweet potatoes'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 317,
+    "fields": {
+      "land_use_type": 289,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 318,
+    "fields": {
+      "land_use_type": 290,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 319,
+    "fields": {
+      "land_use_type": 291,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 320,
+    "fields": {
+      "land_use_type": 292,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 321,
+    "fields": {
+      "land_use_type": 293,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 322,
+    "fields": {
+      "land_use_type": 294,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.22,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 323,
+    "fields": {
+      "land_use_type": 295,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Triticale'."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 324,
+    "fields": {
+      "land_use_type": 296,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 325,
+    "fields": {
+      "land_use_type": 297,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 326,
+    "fields": {
+      "land_use_type": 298,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 327,
+    "fields": {
+      "land_use_type": 299,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 328,
+    "fields": {
+      "land_use_type": 300,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 329,
+    "fields": {
+      "land_use_type": 301,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.255,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.22,
+      "rag": 1.3,
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 330,
+    "fields": {
+      "land_use_type": 302,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 331,
+    "fields": {
+      "land_use_type": 303,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 332,
+    "fields": {
+      "land_use_type": 304,
+      "slope": 0.1,
+      "intercept": 1.06,
+      "n_ag_residues": 0.019,
+      "rs_t": 0.2,
+      "n_bg_t": 0.014,
+      "dry_matter": 0.22,
+      "rag": 0.4,
+      "comment": "Approximated using mapping for 'Potatoes' "
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 333,
+    "fields": {
+      "land_use_type": 305,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 334,
+    "fields": {
+      "land_use_type": 306,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 335,
+    "fields": {
+      "land_use_type": 307,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 336,
+    "fields": {
+      "land_use_type": 308,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 337,
+    "fields": {
+      "land_use_type": 309,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 338,
+    "fields": {
+      "land_use_type": 310,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 339,
+    "fields": {
+      "land_use_type": 311,
+      "slope": 1.09,
+      "intercept": 0.88,
+      "n_ag_residues": 0.006,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": 0.88,
+      "rag": 1.3,
+      "comment": "Remaining missing values filled with Generic value defaults"
+    }
+  }
+]

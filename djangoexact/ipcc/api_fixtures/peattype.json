@@ -1,0 +1,24 @@
+[
+{
+  "model": "api.peattype",
+  "pk": 1,
+  "fields": {
+    "name": "Nutrient Rich",
+    "name_en": "Nutrient Rich",
+    "name_fr": null,
+    "name_es": "Rica en Nutrientes",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.peattype",
+  "pk": 2,
+  "fields": {
+    "name": "Nutrient Poor",
+    "name_en": "Nutrient Poor",
+    "name_fr": null,
+    "name_es": "Pobre en Nutrientes",
+    "name_ru": null
+  }
+}
+]

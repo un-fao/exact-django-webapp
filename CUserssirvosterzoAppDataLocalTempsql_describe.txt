@@ -1,0 +1,139 @@
+availableMaintenanceVersions:
+- POSTGRES_14_22.R20260319.00_11
+backendType: SECOND_GEN
+connectionName: fao-exact:europe-west1:fao-exact-postgres
+createTime: '2024-09-30T10:56:11.405Z'
+databaseInstalledVersion: POSTGRES_14_22
+databaseVersion: POSTGRES_14
+etag: 1714facb78e3be607f964faf16606fb8998cf3df03ed5c76f97d52d01c5e2fa6
+gceZone: europe-west1-d
+geminiConfig:
+  activeQueryEnabled: false
+  entitled: false
+  googleVacuumMgmtEnabled: true
+  indexAdvisorEnabled: false
+  oomSessionCancelEnabled: true
+includeReplicasForMajorVersionUpgrade: false
+instanceType: CLOUD_SQL_INSTANCE
+ipAddresses:
+- ipAddress: 34.77.5.75
+  type: PRIMARY
+- ipAddress: 35.205.190.45
+  type: OUTGOING
+kind: sql#instance
+maintenanceVersion: POSTGRES_14_22.R20260319.00_02
+name: fao-exact-postgres
+project: fao-exact
+region: europe-west1
+satisfiesPzi: false
+selfLink: https://sqladmin.googleapis.com/sql/v1beta4/projects/fao-exact/instances/fao-exact-postgres
+serverCaCert:
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIDfzCCAmegAwIBAgIBADANBgkqhkiG9w0BAQsFADB3MS0wKwYDVQQuEyQ0ZmY4
+    YmYwNS02ZjFhLTQ4YzAtOGYxYS00YmQ4YWEzOWE5NTUxIzAhBgNVBAMTGkdvb2ds
+    ZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUsIEluYzELMAkG
+    A1UEBhMCVVMwHhcNMjQwOTMwMTA1NzE0WhcNMzQwOTI4MTA1ODE0WjB3MS0wKwYD
+    VQQuEyQ0ZmY4YmYwNS02ZjFhLTQ4YzAtOGYxYS00YmQ4YWEzOWE5NTUxIzAhBgNV
+    BAMTGkdvb2dsZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUs
+    IEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+    AQCbhdeTbRbEKHSMOyUrBQmfhypJchJBsY91WEoHht+hiXCpECfuvD5lbzGN/7qe
+    FyVtpwuqhSvRlHuIiFM6aj6fvIe7Y7cQGiADH/kgZT32rZlkyDHqpkXFsvl7v0JC
+    tBv4fRG3oLaiRTGt5b8y2o0TiYjJ05ZLY3XN70ouBo3paeHlbbsoVbDpABwDMN7k
+    ZQNnJldDiq9/ljP452r7vplBqPfHiFkXurgmfQnc9LcbwzvVnwxjCP4nQ4SI/AC5
+    JsZ8sERMZWlp7Qn+1QLVLSk8448PKj8+mdSjFFG7AfxzYlrrXBNOAFedFclvMDqB
+    Vhij3MSPIpheHWCmTrCkASkxAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+    DQYJKoZIhvcNAQELBQADggEBAAR6kRQA5oAgMZN5qyqdHHLkdSXrjyyn4bft2Ehi
+    GZjz2knGIT77p7z8ENp8wRlxzYiMTsxCdshFA2/eCOkyC8bPS2sPw9S2t7EX8sts
+    RaL3cW2hLY1d+mYDJ3u5wzBZH13mrg7fpMmuQgCCaWaJlWgK59R1sFeprO60GB8I
+    9Mra5gnEfig9REUhPayUK1cVBqeQPOayGZ01LmlZgZXjhu8d6K5IouzniatvvpgD
+    d800AF7pdP24bzyreexHiV6ZQNmYa5BLkNQ2jEb/mC/ATfv3XYfY0+Nuf9V9PHWm
+    pcWxY/864mP/ysz18/79lVhhbZNPCNXHEB8Tpw1p+uIWXSQ=
+    -----END CERTIFICATE-----
+  certSerialNumber: '0'
+  commonName: C=US,O=Google\, Inc,CN=Google Cloud SQL Server CA,dnQualifier=4ff8bf05-6f1a-48c0-8f1a-4bd8aa39a955
+  createTime: '2024-09-30T10:57:14.149Z'
+  expirationTime: '2034-09-28T10:58:14.149Z'
+  instance: fao-exact-postgres
+  kind: sql#sslCert
+  sha1Fingerprint: b74e3e5193e4bdd9614bff39c4f3be46cf0fd2cc
+serviceAccountEmailAddress: p913617318560-e9htvu@gcp-sa-cloud-sql.iam.gserviceaccount.com
+settings:
+  activationPolicy: ALWAYS
+  availabilityType: ZONAL
+  backupConfiguration:
+    backupRetentionSettings:
+      retainedBackups: 15
+      retentionUnit: COUNT
+    backupTier: STANDARD
+    enabled: true
+    kind: sql#backupConfiguration
+    location: eu
+    pointInTimeRecoveryEnabled: false
+    replicationLogArchivingEnabled: false
+    startTime: 00:55
+    transactionLogRetentionDays: 14
+    transactionalLogStorageState: TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED
+  connectionPoolConfig:
+    connectionPoolingEnabled: true
+    poolerCount: 1
+  connectorEnforcement: NOT_REQUIRED
+  dataCacheConfig:
+    dataCacheEnabled: true
+  dataDiskSizeGb: '10'
+  dataDiskType: PD_SSD
+  databaseFlags:
+  - name: log_connections
+    value: on
+  - name: max_connections
+    value: '400'
+  deletionProtectionEnabled: false
+  edition: ENTERPRISE_PLUS
+  enableDataplexIntegration: false
+  enableGoogleMlIntegration: false
+  insightsConfig: {}
+  ipConfiguration:
+    enablePrivatePathForGoogleCloudServices: false
+    ipv4Enabled: true
+    message: Configuring authorized network or using CloudSQL auth proxy or language
+      connectors is a prerequisite for connecting to Public IP. Please refer to the
+      documentation for more details https://cloud.google.com/sql/docs/mysql/authorize-networks.
+    requireSsl: false
+    serverCaMode: GOOGLE_MANAGED_INTERNAL_CA
+    serverCertificateRotationMode: SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED
+    sslMode: ALLOW_UNENCRYPTED_AND_ENCRYPTED
+  kind: sql#settings
+  locationPreference:
+    kind: sql#locationPreference
+    zone: europe-west1-d
+  maintenanceWindow:
+    day: 0
+    hour: 0
+    kind: sql#maintenanceWindow
+  pricingPlan: PER_USE
+  recreateReplicasOnPrimaryCrash: true
+  replicationLagMaxSeconds: 31536000
+  replicationType: SYNCHRONOUS
+  retainBackupsOnDelete: false
+  settingsVersion: '1448'
+  storageAutoResize: true
+  storageAutoResizeLimit: '0'
+  tier: db-perf-optimized-N-2
+  userLabels:
+    application: exact
+    environment: review
+sqlNetworkArchitecture: NEW_NETWORK_ARCHITECTURE
+state: RUNNABLE
+upgradableDatabaseVersions:
+- displayName: PostgreSQL 15
+  majorVersion: POSTGRES_15
+  name: POSTGRES_15
+- displayName: PostgreSQL 16
+  majorVersion: POSTGRES_16
+  name: POSTGRES_16
+- displayName: PostgreSQL 17
+  majorVersion: POSTGRES_17
+  name: POSTGRES_17
+- displayName: PostgreSQL 18
+  majorVersion: POSTGRES_18
+  name: POSTGRES_18

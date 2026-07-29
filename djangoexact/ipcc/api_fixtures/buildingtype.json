@@ -1,0 +1,156 @@
+[
+{
+  "model": "api.buildingtype",
+  "pk": 1,
+  "fields": {
+    "name": "Housing (Concrete)",
+    "name_en": "Housing (Concrete)",
+    "name_fr": null,
+    "name_es": "Viviendas (Cemento)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 2,
+  "fields": {
+    "name": "Agricultural Buildings (Concrete)",
+    "name_en": "Agricultural Buildings (Concrete)",
+    "name_fr": null,
+    "name_es": "Construcciones Agrícolas (Cemento)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 3,
+  "fields": {
+    "name": "Agricultural Buildings (Metal)",
+    "name_en": "Agricultural Buildings (Metal)",
+    "name_fr": null,
+    "name_es": "Construcciones Agrícolas (Metal)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 4,
+  "fields": {
+    "name": "Industrial Buildings (Concrete)",
+    "name_en": "Industrial Buildings (Concrete)",
+    "name_fr": null,
+    "name_es": "Construcciones Industriales (Cemento)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 5,
+  "fields": {
+    "name": "Industrial Buildings (Metal)",
+    "name_en": "Industrial Buildings (Metal)",
+    "name_fr": null,
+    "name_es": "Construcciones Industriales (Metal)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 6,
+  "fields": {
+    "name": "Garage (Concrete)",
+    "name_en": "Garage (Concrete)",
+    "name_fr": null,
+    "name_es": "Garaje (Cemento)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 7,
+  "fields": {
+    "name": "Garage (Metal)",
+    "name_en": "Garage (Metal)",
+    "name_fr": null,
+    "name_es": "Garaje (Metal)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 8,
+  "fields": {
+    "name": "Offices (Concrete)",
+    "name_en": "Offices (Concrete)",
+    "name_fr": null,
+    "name_es": "Oficinas (Cemento)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 9,
+  "fields": {
+    "name": "Offices (Metal)",
+    "name_en": "Offices (Metal)",
+    "name_fr": null,
+    "name_es": "Oficinas (Metal)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 14,
+  "fields": {
+    "name": "Food Sales (Retail Or Wholesale)",
+    "name_en": "Food Sales (Retail Or Wholesale)",
+    "name_fr": null,
+    "name_es": "Venta de alimentos (al por menor o al por mayor)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 15,
+  "fields": {
+    "name": "Food Service (Restaurants)",
+    "name_en": "Food Service (Restaurants)",
+    "name_fr": null,
+    "name_es": "Servicio de Comida (Restaurantes)",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 16,
+  "fields": {
+    "name": "Warehouse And Storage",
+    "name_en": "Warehouse And Storage",
+    "name_fr": null,
+    "name_es": "Almacén y Almacenamiento",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 17,
+  "fields": {
+    "name": "Education",
+    "name_en": "Education",
+    "name_fr": null,
+    "name_es": "Educación",
+    "name_ru": null
+  }
+},
+{
+  "model": "api.buildingtype",
+  "pk": 18,
+  "fields": {
+    "name": "Health Care (Metal)",
+    "name_en": "Health Care (Metal)",
+    "name_fr": null,
+    "name_es": "Atención Sanitaria (Metal)",
+    "name_ru": null
+  }
+}
+]

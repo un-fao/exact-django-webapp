@@ -1,0 +1,236 @@
+[
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 1,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 2,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 3,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 4,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 5,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 6,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 2,
+      "weight": 0.45,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.07,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 7,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 2,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 8,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 2,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 9,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 2,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 11,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 12,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 13,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 14,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 15,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 16,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "peat_type": 1,
+      "weight": 0.4,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.24,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 17,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "peat_type": 1,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 18,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "peat_type": 1,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  },
+  {
+    "model": "ipcc.peatextractionconversionfactor",
+    "pk": 19,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "peat_type": 1,
+      "weight": 0.34,
+      "weight_unit": "tC/t air dry peat",
+      "volume": 0.26,
+      "volume_unit": "tC/m3 air dry peat"
+    }
+  }
+]

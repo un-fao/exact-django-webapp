@@ -1,0 +1,49 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-25 11:19+0200\n"
+"PO-Revision-Date: 2025-04-25 12:53+0000\n"
+"Last-Translator: EX-ACT team <exact@fao.org>\n"
+"Language-Team: Unknown\n"
+"Language: zxx\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Loco-Source-Locale: it_IT\n"
+
+#: api/views.py:944
+msgid "increases"
+msgstr "augmente"
+
+#: api/views.py:945
+msgid "decreases"
+msgstr "diminue"
+
+#: api/views.py:993
+msgid "hectares"
+msgstr "hectares"
+
+#: api/views.py:995
+msgid "tonnes of catch"
+msgstr "tonnes de prises"
+
+#: api/views.py:997
+msgid "livestock heads"
+msgstr "têtes de bétail"
+
+#: api/views.py:1000
+msgid "energy consumption"
+msgstr "consommation d'énergie"
+
+#: api/views.py:1002
+msgid "packaging material"
+msgstr "matériel d'emballage"
+
+#: api/views.py:1004
+msgid "agricultural inputs use"
+msgstr "utilisation d'intrants agricoles"

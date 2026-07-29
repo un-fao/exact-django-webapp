@@ -1,15 +1,14 @@
 import json
 
-import firebase_admin
-import firebase_admin.firestore
-import firebase_admin.messaging
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from firebase_admin import auth as firebase_admin_auth
-from rest_framework import authentication, generics, permissions, status
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,7 +20,7 @@ from .serializers import (
     LoginResponseSerializer,
     LoginSerializer,
     RegisterSerializer,
-    UserSerializer,
+    UserSummarySerializer,
     PasswordResetSerializer,
 )
 
@@ -41,7 +40,7 @@ class RegisterView(generics.GenericAPIView):
 
         return Response(
             {
-                "user": UserSerializer(user, context=self.get_serializer_context()).data,
+                "user": UserSummarySerializer(user, context=self.get_serializer_context()).data,
                 "message": "User Created Successfully.  Now perform Login to get your token",
             }
         )
@@ -59,7 +58,6 @@ class CreateNewUserView(APIView):
         data = request.data
 
         try:
-
             email = data.get("email")
             password = data.get("password")
 
@@ -67,6 +65,9 @@ class CreateNewUserView(APIView):
 
             if not serializer.is_valid():
                 return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.validated_data["email"] = email.casefold().strip()
+            email = serializer.validated_data["email"]
 
             db_user: User = serializer.save()
 
@@ -78,7 +79,7 @@ class CreateNewUserView(APIView):
 
             utils.send_email_verification_link(email, db_user.first_name.capitalize() + " " + db_user.last_name.capitalize())
 
-            return Response({"uid": db_user.firebase_uid}, status=status.HTTP_201_CREATED)
+            return Response(UserSummarySerializer(db_user).data, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             try:
@@ -109,16 +110,35 @@ class LoginExistingUserView(APIView):
             if not user.email_verified:
                 return Response({"error": "Email not verified"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            user = auth.sign_in_with_email_and_password(email, password)
+            email = email.casefold().strip()
+
+            try:
+                user = auth.sign_in_with_email_and_password(email, password)
+            except Exception as e:
+                error = json.loads(e.strerror)
+
+                if error.get("error", {}).get("message") == "INVALID_LOGIN_CREDENTIALS":
+                    return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+                return Response({"error": error.get("error", {}).get("message", "Bad Request")}, status=status.HTTP_400_BAD_REQUEST)
 
             existing_user = User.objects.get(firebase_uid=user["localId"])
 
             login(request, existing_user)
 
             if not check_password(password, existing_user.password):
-                # If firebase password is different from Django password, update Django password
-                existing_user.set_password(password)
-                existing_user.save()
+                # If firebase password is different from Django password, update Django password.
+                # The password was already authenticated by Firebase; validate before syncing
+                # so Django-side hashes conform to current password policies.
+                try:
+                    validate_password(password, user=existing_user)
+                except DjangoValidationError:
+                    # Keep the stale Django hash rather than storing a weak password;
+                    # the user can still authenticate via Firebase until they reset.
+                    pass
+                else:
+                    existing_user.set_password(password)
+                    existing_user.save()
 
             extra_data = {
                 "uid": user["localId"],
@@ -126,7 +146,7 @@ class LoginExistingUserView(APIView):
                 "refresh_token": user["refreshToken"],
                 "expires_in": user["expiresIn"],
                 "kind": user["kind"],
-                "user": UserSerializer(existing_user).data,
+                "user": UserSummarySerializer(existing_user).data,
             }
 
             return Response(extra_data, status=status.HTTP_200_OK)
@@ -152,6 +172,8 @@ class PasswordResetView(APIView):
 
         try:
             email = data.get("email", None)
+            if email:
+                email = email.casefold().strip()
 
             firebase_admin_auth.get_user_by_email(email)
 
@@ -174,7 +196,9 @@ class VerifyUserEmail(APIView):
         data = request.data
 
         try:
-            email = data.get("email")
+            email = data.get("email", None)
+            if email:
+                email = email.casefold
 
             user = firebase_admin_auth.get_user_by_email(email)
 

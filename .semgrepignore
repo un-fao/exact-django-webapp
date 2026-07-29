@@ -1,0 +1,29 @@
+# Semgrep ignore list for this repository.
+#
+# IMPORTANT: when a repo-level .semgrepignore exists, Semgrep stops applying
+# its built-in default ignore patterns, so those defaults are replicated
+# below. Keep them in place when editing this file.
+
+# Semgrep built-in defaults (replicated; do not remove)
+.git/
+node_modules/
+build/
+dist/
+vendor/
+.env/
+.venv/
+.tox/
+.npm/
+.yarn/
+*.min.js
+test/
+tests/
+*_test.go
+
+# Repository-specific scope decisions
+#
+# .planning/ holds GSD planning artifacts: one-off diagnostic and migration
+# scripts that were already executed by operators, plus plan documents. They
+# are internal tooling, never deployed or imported by production code, so
+# they are excluded from SAST scanning.
+.planning/

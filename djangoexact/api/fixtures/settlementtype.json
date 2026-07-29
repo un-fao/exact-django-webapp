@@ -1,0 +1,57 @@
+[
+  {
+    "model": "api.settlementtype",
+    "pk": 25,
+    "fields": {
+      "name": "Cultivated soil",
+      "name_en": "Cultivated soil",
+      "name_fr": "Sol cultivé\n",
+      "name_es": "Suelo cultivado",
+      "name_ru": "Культивированная почва"
+    }
+  },
+  {
+    "model": "api.settlementtype",
+    "pk": 21,
+    "fields": {
+      "name": "Infrastructure on existing land (no paving)",
+      "name_en": "Infrastructure on existing land (no paving)",
+      "name_fr": "Infrastructure sur terrain existant (sans pavage)\n",
+      "name_es": "Infraestructura en terreno existente (sin pavimentación)",
+      "name_ru": "Инфраструктура на существующей земле (без асфальтирования)"
+    }
+  },
+  {
+    "model": "api.settlementtype",
+    "pk": 22,
+    "fields": {
+      "name": "Paved settlement",
+      "name_en": "Paved settlement",
+      "name_fr": "Établissement pavée\n",
+      "name_es": "Asentamiento pavimentado",
+      "name_ru": "Асфальтированное поселение"
+    }
+  },
+  {
+    "model": "api.settlementtype",
+    "pk": 23,
+    "fields": {
+      "name": "Turfgrass",
+      "name_en": "Turfgrass",
+      "name_fr": "Gazon",
+      "name_es": "Césped",
+      "name_ru": "Газонные травы"
+    }
+  },
+  {
+    "model": "api.settlementtype",
+    "pk": 24,
+    "fields": {
+      "name": "Wooded area",
+      "name_en": "Wooded area",
+      "name_fr": "Zone boisée\n",
+      "name_es": "Zona boscosa",
+      "name_ru": "Лесистая местность"
+    }
+  }
+]

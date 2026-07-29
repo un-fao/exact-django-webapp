@@ -1,0 +1,36 @@
+# Cloud Function requirements for minitool processing
+# Optimized for Python 3.11 runtime
+
+# Core function framework
+functions-framework==3.*
+
+# Django and database
+Django==4.2.30
+psycopg2-binary==2.9.6
+
+# Google Cloud services
+google-cloud-storage==2.19.0
+google-cloud-logging==3.8.0
+
+# Data processing
+pandas==2.0.1
+numpy==1.24.3
+tqdm==4.67.1
+
+# Configuration
+PyYAML==6.0
+python-dotenv==1.2.2
+
+# Django REST framework (if needed for models)
+djangorestframework==3.15.2
+
+# Additional dependencies from main requirements
+django-filter==23.5
+django-cors-headers==4.0.0
+django-environ==0.10.0
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Minimal additional packages for functionality
+requests==2.33.0
+urllib3==2.7.0

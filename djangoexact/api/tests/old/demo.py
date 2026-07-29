@@ -35,7 +35,7 @@ for i in range(10):
 
     grassland = GrasslandFactory.create(activity=a, land_use_change=luc)
 
-    annual_cropland = AnnualCroppingFactory.create(activity=a, land_use_change=luc)
+    annual_cropland = AnnualCroplandFactory.create(activity=a, land_use_change=luc)
 
     print("##### Test Suite for COP28 Demo #####\n\n")
 
