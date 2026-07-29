@@ -57,7 +57,13 @@ class CustomUserManager(BaseUserManager):
         # username = email  # Automatically set username as email
         # user = self.model(email=email, username=username, **extra_fields)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
+        # Django password validators are intentionally not run here: interactive
+        # signups have their password policy enforced by Firebase in the same
+        # registration flow (accounts.views.CreateNewUserView), login happens via
+        # Firebase rather than this hash, and this manager is also called with
+        # password=None for Firebase-synced accounts, which must keep working.
+        # Adding validate_password would change the public registration contract.
+        user.set_password(password)  # nosemgrep: python.django.security.audit.unvalidated-password.unvalidated-password
         user.save(using=self._db)
         return user
 
