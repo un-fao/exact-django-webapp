@@ -182,6 +182,23 @@ def validate_module_fields(data, mandatory_fields: list):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
 
+def _serializer_registry() -> dict:
+    """Allowlist of DRF serializer classes resolvable by dynamic name.
+
+    Built from this module's namespace at call time rather than once at import
+    time: some lookups run while the module is still being imported (class
+    bodies below call get_model_serializer), so a fixed early snapshot would
+    miss classes defined later and change resolution behavior. Restricting the
+    lookup to serializer classes keeps dynamically-built, model-derived names
+    from indexing arbitrary module globals.
+    """
+    return {
+        name: obj
+        for name, obj in globals().items()
+        if isinstance(obj, type) and issubclass(obj, serializers.BaseSerializer)
+    }
+
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -193,7 +210,7 @@ def get_model_serializer(model_arg):
             super().__init__(*args, **kwargs)
 
     try:
-        return globals()[model_arg.__name__ + "Serializer"]
+        return _serializer_registry()[model_arg.__name__ + "Serializer"]
     except KeyError:
         return GenericSerializer
 
@@ -202,9 +219,9 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
     try:
         match action:
             case ActionTypes.CREATE | ActionTypes.UPDATE:
-                return globals()[model_arg.__name__ + "WriteSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "WriteSerializer"]
             case ActionTypes.RETRIEVE:
-                return globals()[model_arg.__name__ + "ReadSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
         raise ValueError(f"Serializer for {model_arg.__name__} not found")
 
@@ -1520,7 +1537,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         return super().validate(data)
 
     def parent_validation(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        ParentWriteSerializer = _serializer_registry().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
 
