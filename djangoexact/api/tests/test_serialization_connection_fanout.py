@@ -1,50 +1,24 @@
 """Regression tests for the DB-connection fan-out in the request-path endpoints.
 
-Background
-----------
-Django database connections are thread-local and CONN_MAX_AGE is 0, so an ORM
-call made inside a worker thread cannot reuse the request thread's connection:
-it opens a brand-new Postgres connection. Nothing pools them either, because
-settings.DATABASE_CONNECTION_POOLING is never read by any code.
+Django database connections are thread-local and CONN_MAX_AGE is 0, so every
+thread-pool worker that touches the ORM opens its own Postgres connection, and
+a wide per-request pool can burst past the App Engine instance-local Cloud SQL
+socket's per-instance connection ceiling ("Connection refused" for whichever
+request connects next). api/concurrency.py bounds that fan-out; these tests
+guard it:
 
-Four endpoints fanned serialization out into a per-request ThreadPoolExecutor:
-
-    api/views.py     ProjectViewSet.list          max_workers=10
-    api/views.py     ProjectViewSet.results       max_workers=10
-    api/views.py     ActivityViewSet.list         bare, min(32, cpu + 4)
-    public/views.py  PublicProjectViewSet.results max_workers=10
-    public/views.py  PublicActivityViewSet.list   bare, min(32, cpu + 4)
-
-In review that burst made the instance-local /cloudsql socket refuse
-connections, so psycopg2 raised
-
-    OperationalError: connection to server on socket "/cloudsql/..." failed:
-    Connection refused
-
-on whichever request happened to be connecting at that instant, including
-endpoints that never fan out. The database itself stayed idle throughout (peak 7
-backends against max_connections=400), because the refused connections never
-reached it. See .planning/debug/resolved/async-copy-operational-errors.md.
-
-Guards here, in order of sharpness:
-
-- ThreadPoolBoundsStaticTests is the broad one. It fails if any request-path
-  module constructs a ThreadPoolExecutor directly instead of going through
-  api/concurrency.py, so a pool added to an endpoint these tests never exercise
-  is still caught. It covers public/views.py as well as api/views.py, because
-  the same defect shape existed in both and public/ is unauthenticated.
+- ThreadPoolBoundsStaticTests fails if any request-path module constructs a
+  ThreadPoolExecutor directly instead of going through api/concurrency.py, so
+  a pool added to an endpoint these tests never exercise is still caught.
 - BoundedThreadMapTests pins the helper's contract: input ordering, the worker
   ceiling, one connection released per worker, and which exception surfaces.
-- DefaultLanguageTests and the Accept-Language test pin the response bytes.
-  Serialization used to run in worker threads, which never inherit the active
-  language, so these responses have always rendered modeltranslation fields in
-  settings.LANGUAGE_CODE. Moving work back onto the request thread would
-  silently start honouring Accept-Language.
-- The budget test is the coarsest. It pins the configured width against the
-  documented App Engine Standard ceiling of 100 concurrent Cloud SQL connections
-  per instance. That ceiling is an upper bound on what an instance tolerates,
-  not a measurement of what review actually hit, so passing it does not by
-  itself prove an endpoint is safe. It does catch the catastrophic widths.
+- DefaultLanguageTests and the Accept-Language test pin the response bytes:
+  worker threads never inherit the active language, so fanned-out responses
+  have always rendered modeltranslation fields in settings.LANGUAGE_CODE, and
+  moving work onto the request thread must not start honouring Accept-Language.
+- SerializationWorkerBudgetTests pins the configured width against the
+  documented App Engine Standard ceiling of 100 concurrent Cloud SQL
+  connections per instance.
 
 The classes that need no database are plain unittest.TestCase so they can be run
 in a sandbox without Postgres; Django's test runner still collects them.
@@ -83,8 +57,7 @@ REQUEST_PATH_MODULES = [
 # This models App Engine, where a gunicorn worker serves one request at a time.
 # deploy/cloudrun-service.yaml templates containerConcurrency, and on Cloud Run
 # with concurrency greater than 1 a single worker serves several requests at
-# once, so the figure below UNDERSTATES the peak there. The incident being
-# guarded against happened on App Engine.
+# once, so the figure below understates the peak there.
 GUNICORN_WORKERS_PER_INSTANCE = 4
 
 # Documented App Engine Standard ceiling on concurrent Cloud SQL connections
@@ -106,13 +79,11 @@ class SerializationWorkerBudgetTests(unittest.TestCase):
             APP_ENGINE_CONNECTION_CAP,
         )
 
-    def test_budget_formula_rejects_the_previous_bare_executor_default(self):
-        """Boundary neighbour: the width that actually broke review.
-
-        A bare ThreadPoolExecutor() resolves to min(32, os.cpu_count() + 4). At
-        the 32-worker end that is 4 * 33 = 132 connections per instance, past the
-        cap on one endpoint alone. If this ever passes, the budget formula has
-        been weakened and the guard above is meaningless.
+    def test_budget_formula_rejects_a_bare_executor_default(self):
+        """A bare ThreadPoolExecutor() resolves to min(32, os.cpu_count() + 4);
+        at the 32-worker end that is 4 * 33 = 132 connections per instance, past
+        the cap on one endpoint alone. If this ever passes, the budget formula
+        has been weakened and the guard above is meaningless.
         """
         self.assertGreater(worst_case_connections_per_instance(32), APP_ENGINE_CONNECTION_CAP)
 
@@ -126,8 +97,7 @@ class ThreadPoolBoundsStaticTests(unittest.TestCase):
     """No request-path module may build its own ThreadPoolExecutor.
 
     Static rather than behavioural so it also covers endpoints these tests do
-    not exercise, and so it covers public/views.py, where the identical
-    unbounded pool survived the first pass at this fix.
+    not exercise, including all of public/views.py.
     """
 
     @staticmethod
@@ -207,12 +177,7 @@ class BoundedThreadMapTests(unittest.TestCase):
         pool.assert_called_once_with(max_workers=2)
 
     def test_each_worker_releases_its_connection(self):
-        """Without this the connection stays open until the pool joins its threads.
-
-        Measured on the pre-helper code: three workers held three driver
-        connections for the whole life of the pool, and only the pool shutting
-        down released them.
-        """
+        """Without this the connection stays open until the pool joins its threads."""
         with mock.patch.object(concurrency, "connection") as fake_connection:
             concurrency.map_in_bounded_threads(lambda item: item, range(20))
         self.assertEqual(fake_connection.close.call_count, concurrency.SERIALIZATION_MAX_WORKERS)
