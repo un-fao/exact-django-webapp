@@ -1082,7 +1082,8 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
             database_connections = connections.all()
             stats = {"total_connections": len(database_connections), "databases": {}}
 
-            for db_name, db_connection in connections.all().items():
+            for db_name in connections:
+                db_connection = connections[db_name]
                 stats["databases"][db_name] = {
                     "connected": db_connection.connection is not None,
                     "settings": {
