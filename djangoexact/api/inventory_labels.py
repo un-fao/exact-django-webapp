@@ -36,11 +36,9 @@ MODULE_OVERRIDES = {
 def inventory_label(module, category):
     """Resolve the display label for an inventory row's IPCC Category.
 
-    Resolves module-specific overrides first, then the default mapping,
-    then falls back to the category itself unchanged. The override is keyed
-    strictly on the Python class name of `module`, never on
-    `module.module_type.name`, since that field is registered with
-    modeltranslation and its value changes with the active request language.
+    Overrides are keyed on the Python class name of `module`, never on
+    `module.module_type.name`, which is registered with modeltranslation and
+    changes with the active request language.
     """
     overrides = MODULE_OVERRIDES.get(type(module).__name__, {})
     if category in overrides:
