@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: crema-github-runner
+    runs-on: ubuntu-22.04
     environment: review
     permissions:
       id-token: 'write'
