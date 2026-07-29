@@ -44,10 +44,10 @@ jobs:
       # `check --deploy` step below fail on test-env DEBUG/CORS values.
     steps:
       - name: 'Checkout Code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
           cache: pip
@@ -215,18 +215,18 @@ jobs:
       actions: 'read'
     steps:
     - name: 'Checkout Code'
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
         lfs: true
 
     - name: Authenticate to Google Cloud
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed' # v2.1.9
       with:
         workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
         service_account: ${{ vars.SERVICE_ACCOUNT }}
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
       
@@ -471,4 +471,4 @@ jobs:
 
     - name: Create Issue
       if: failure()
-      uses: un-fao/fao-ga-create-issue@v2
+      uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2
