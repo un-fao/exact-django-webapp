@@ -111,14 +111,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         def log_activity_failure(activity_pk, exc):
             log.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-        # Bounded fan-out: every worker opens its own Postgres connection, so the
-        # width of this pool is a per-App-Engine-instance connection cost shared
-        # with api/views.py (see api/concurrency.py). This endpoint is
-        # unauthenticated, so it is the most load-exposed of the four.
-        #
-        # The activities now come back in activity_pks order. The previous
-        # as_completed loop appended in completion order, which was not stable
-        # from one request to the next, so nothing could have depended on it.
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
         response["activities"] = concurrency.map_in_bounded_threads(
             process_activity,
             activity_pks,
@@ -269,11 +263,6 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            # Was a bare ThreadPoolExecutor(), i.e. min(32, os.cpu_count() + 4)
-            # workers. At DefaultPagination.max_page_size (100) that let one
-            # unauthenticated request open up to 32 Postgres connections, which
-            # is 4 x 33 = 132 per App Engine instance on its own: the exact
-            # failure mode diagnosed for api/views.py. See api/concurrency.py.
             response = concurrency.map_in_bounded_threads(process_activity, page)
             return paginator.get_paginated_response(response)
 

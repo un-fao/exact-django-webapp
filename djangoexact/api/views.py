@@ -634,18 +634,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
             self._attach_project_counts(page)
-            # Serialized on the request's own connection instead of a
-            # ThreadPoolExecutor(max_workers=10). This endpoint carried 9 of the
-            # 16 observed 500s; dropping the pool removes the ten extra Postgres
-            # connections it opened per request (see api/concurrency.py).
-            # Ordering is unaffected because executor.map already yielded results
-            # in input order.
-            #
-            # default_language() preserves the response bytes. The pool's workers
-            # never inherited the request language, so these rows have always
-            # rendered modeltranslation fields in settings.LANGUAGE_CODE;
-            # serializing inline would silently start honouring Accept-Language,
-            # which is a separate, deliberate API change.
+            # Serialized on the request's own connection: a thread pool here
+            # costs one Postgres connection per worker per request (see
+            # api/concurrency.py). default_language() preserves the response
+            # bytes, since thread-pool workers never inherited the request
+            # language and always rendered in settings.LANGUAGE_CODE.
             with concurrency.default_language():
                 response = [serialize_project(project) for project in page]
             return paginator.get_paginated_response(response)
@@ -707,14 +700,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         def log_activity_failure(activity_pk, exc):
             logging.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-        # Bounded fan-out: every worker opens its own Postgres connection, so the
-        # width of this pool is a per-App-Engine-instance connection cost, not
-        # just a concurrency knob (see api/concurrency.py). Failed activities are
-        # logged and dropped, as before.
-        #
-        # The activities now come back in activity_pks order. The previous
-        # as_completed loop appended in completion order, which was not stable
-        # from one request to the next, so nothing could have depended on it.
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
         response["activities"] = concurrency.map_in_bounded_threads(
             process_activity,
             activity_pks,
@@ -2102,11 +2089,6 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            # Explicitly bounded. A bare ThreadPoolExecutor() defaults to
-            # min(32, os.cpu_count() + 4) workers, and this page can hold up to
-            # DefaultPagination.max_page_size (100) activities, so the default
-            # let one request open up to 32 Postgres connections. Order and
-            # exception behaviour match the executor.map this replaces.
             response = concurrency.map_in_bounded_threads(process_activity, page)
             logger.debug(f"Time taken to process activities: {time.time() - start}")
             return paginator.get_paginated_response(response)
