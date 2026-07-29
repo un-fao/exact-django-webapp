@@ -35,6 +35,7 @@ import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
+from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
 from django.template.loader import render_to_string
@@ -2642,6 +2643,19 @@ def generic_module_viewset(model: Module):
                         else results_by_activity_gas
                     )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
+
+                # Relabel Inventory rows for display only. module_results may be the raw
+                # in-memory value of a model JSON field on the cached branch, so build new
+                # objects rather than mutating in place; the persisted cache stays raw.
+                inventory_data = module_results.get("inventory") if isinstance(module_results, dict) else None
+                if isinstance(inventory_data, list):
+                    relabeled_inventory = [
+                        {**entry, "activity": inventory_label(module, entry["activity"])}
+                        if isinstance(entry, dict) and "activity" in entry
+                        else entry
+                        for entry in inventory_data
+                    ]
+                    module_results = {**module_results, "inventory": relabeled_inventory}
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data

@@ -15,6 +15,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
+from api.inventory_labels import inventory_label
 from .data_types import InventoryItem
 
 
@@ -123,7 +124,7 @@ def build_inventory_from_cache(
         items.append(InventoryItem(
             activity_name=activity_title,
             module_name=module.module_type.name,
-            ipcc_category=activity,
+            ipcc_category=inventory_label(module, activity),
             gas_type=gas_type,
             value=value,
         ))
