@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-      - review
-      - develop
-      - feature/id-responses
+      # - review
+      # - develop
+      # - feature/id-responses
   pull_request:
     branches:
-      - develop
+      # - develop
       - main
-      - review
+      # - review
 
 jobs:
   test:
