@@ -15,7 +15,7 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ github.ref_name == 'develop' && 'gcp-temporary' || 'ubuntu-22.04' }}
+    runs-on: 'gcp-temporary'
     services:
       postgres:
         image: postgres:15
