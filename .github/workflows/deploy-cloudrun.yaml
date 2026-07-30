@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - develop
       - review
 
 concurrency:
@@ -170,6 +171,11 @@ jobs:
             --location="$CLOUD_RUN_REGION" --project="$PROJECT_ID" >/dev/null 2>&1 \
           || gcloud artifacts repositories create "$IMAGE_REPO" \
             --repository-format=docker --location="$CLOUD_RUN_REGION" --project="$PROJECT_ID"
+
+      - name: Set up Docker Buildx
+        # The temporary runner may not have the Docker CLI plugin installed.
+        # Install it before the BuildKit-backed image build.
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push image
         env:
