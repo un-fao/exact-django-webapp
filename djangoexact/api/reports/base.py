@@ -17,6 +17,7 @@ import numpy as np
 import api.models as api_models
 import api.calculators as calculators
 import ipcc.models as ipcc_models
+from api.inventory_labels import inventory_label
 from .constants import SPC_INCREASE_RATE
 from .data_types import (
     ActivityResult,
@@ -173,7 +174,7 @@ class BaseModuleReport:
             items.append(InventoryItem(
                 activity_name=activity_title,
                 module_name=self.module.module_type.name,
-                ipcc_category=item.activity.value if item.activity else "N/A",
+                ipcc_category=inventory_label(self.module, item.activity.value) if item.activity else "N/A",
                 gas_type=item.gas_type.name if item.gas_type else "N/A",
                 value=item.value,
             ))

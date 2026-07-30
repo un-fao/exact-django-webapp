@@ -15,7 +15,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: 'gcp-temporary'
     services:
       postgres:
         image: postgres:15
@@ -203,11 +203,10 @@ jobs:
 
   deploy:
     needs: test
-    # WR-04: pushes to develop run the test job only; develop has no deploy
-    # target, so the ref guard keeps deploy off while the merged state of
-    # the default branch still gets exercised by the gate.
-    if: github.event_name == 'push' && github.ref_name != 'develop'
-    runs-on: ubuntu-22.04
+    # develop is the non-production deployment target; main remains production
+    # and review remains the review environment.
+    if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main' || github.ref_name == 'review' || github.ref_name == 'feature/id-responses')
+    runs-on: ${{ github.ref_name == 'develop' && 'gcp-temporary' || 'ubuntu-22.04' }}
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
       id-token: 'write'

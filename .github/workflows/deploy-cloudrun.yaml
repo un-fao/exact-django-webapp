@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: 'gcp-temporary'
     environment: review
     permissions:
       id-token: 'write'
