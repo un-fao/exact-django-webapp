@@ -206,7 +206,7 @@ jobs:
     # develop is the non-production deployment target; main remains production
     # and review remains the review environment.
     if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main' || github.ref_name == 'review' || github.ref_name == 'feature/id-responses')
-    runs-on: ${{ github.ref_name == 'develop' && 'gcp-temporary' || 'ubuntu-22.04' }}
+    runs-on: gcp-temporary
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
       id-token: 'write'
@@ -343,6 +343,11 @@ jobs:
         gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+
+    - name: Set up Docker Buildx
+      # The temporary runner may not have the Docker CLI plugin installed.
+      # Install it before the BuildKit-backed image build.
+      uses: docker/setup-buildx-action@v3
 
     - name: Build computation-job image
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
