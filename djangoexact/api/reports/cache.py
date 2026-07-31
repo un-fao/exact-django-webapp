@@ -18,6 +18,27 @@ from typing import Any
 from api.inventory_labels import inventory_label
 from .data_types import InventoryItem
 
+# Bumped whenever a fix changes the inventory a module contributes, so that
+# caches written by the older code are recomputed instead of served.
+INVENTORY_SCHEMA_VERSION = 2
+
+# Modules whose cached inventory was always an empty list before the roll-up fix
+# in BaseCalculator.inventory: their calculators keep no math module under the
+# names the old lookup knew about, so nothing was ever recorded. Cache validity is
+# keyed only on last_modified, so an untouched module would keep serving that
+# empty list forever. Scoping the invalidation to these types keeps the one-time
+# recompute cost off the land modules, whose cached inventory is unaffected.
+INVENTORY_ROLLUP_FIXED_MODULES = frozenset({
+    "Input",
+    "Energy",
+    "Irrigation",
+    "Storage",
+    "Processing",
+    "Packaging",
+    "Transport",
+    "OrganicSoil",
+})
+
 
 class CacheWriteBatch:
     """Collects module cache writes during one project compute and flushes
@@ -91,6 +112,13 @@ def load_emissions_from_cache(module) -> CacheResult | None:
         return None
     cached = module.cached_results_by_activity_by_gas
     if cached is None:
+        return None
+    if (
+        type(module).__name__ in INVENTORY_ROLLUP_FIXED_MODULES
+        and cached.get("inventory_schema", 1) < INVENTORY_SCHEMA_VERSION
+    ):
+        # Written before the inventory roll-up fix, so its "inventory" key is an
+        # empty list. Recalculate rather than serve rows that are known missing.
         return None
     units = module.cached_units_breakdown or {}
     return CacheResult(
@@ -175,6 +203,7 @@ def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_
         "total_w": _serialize(emissions_set_w),
         "total_wo": _serialize(emissions_set_wo),
         "inventory": inventory.to_dict() if inventory is not None else [],
+        "inventory_schema": INVENTORY_SCHEMA_VERSION,
     }
 
     from datetime import timedelta
