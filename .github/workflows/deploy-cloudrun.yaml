@@ -362,6 +362,43 @@ jobs:
           echo "Report download base URL verified: $CLOUDRUN_BACKEND_BASE_URL (HTTP $code)" \
             >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Sync report download base URL into the computation job
+        # exact-computation-job runs api/management/commands/run_async_job.py,
+        # which is the ONLY caller of send_report_ready_email. The host in the
+        # emailed link therefore comes from this job's BACKEND_BASE_URL, not
+        # from the service deployed above.
+        #
+        # deploy.yaml is the job's only deployer and it now triggers on main
+        # only, so a push to review could never correct the job's environment.
+        # That is how the job kept emailing a disabled App Engine hostname for
+        # weeks after review moved to Cloud Run. This step closes that gap:
+        # every review deploy re-asserts the sender's base URL.
+        #
+        # Runs after the verification gate on purpose, so a base URL that is
+        # unreachable or serves no application is never propagated to the
+        # sender. Env only. The job's image stays owned by deploy.yaml.
+        if: env.CLOUDRUN_BACKEND_BASE_URL != ''
+        run: |
+          set -eu
+          job="exact-computation-job"
+          # A missing job is a real misconfiguration of the target project, not
+          # a condition to skip past. This whole bug class came from config
+          # failing silently, so surface it instead of shrugging.
+          if ! gcloud run jobs describe "$job" \
+                 --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+                 --format='value(metadata.name)' >/dev/null 2>&1; then
+            echo "Cloud Run job '$job' not found in $PROJECT_ID/$CLOUD_RUN_REGION." >&2
+            echo "It sends the report-ready email, so its BACKEND_BASE_URL cannot be synced." >&2
+            echo "Deploy it via deploy.yaml, or correct the project and region." >&2
+            exit 1
+          fi
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "BACKEND_BASE_URL=$CLOUDRUN_BACKEND_BASE_URL" \
+            --quiet
+          echo "Computation job BACKEND_BASE_URL synced to $CLOUDRUN_BACKEND_BASE_URL" \
+            >> "$GITHUB_STEP_SUMMARY"
+
       - name: Create Issue
         if: failure()
         uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2
