@@ -1,5 +1,5 @@
 ---
-status: awaiting_human_verify
+status: resolved
 trigger: |
   from the team: "emissions from irrigation, inputs, energy, packaging, transport, storage and processing are not picked up for the inventory in the excel report"
 created: 2026-07-31
@@ -44,22 +44,36 @@ diagnosis.
 
 ## Known code landmarks
 
-- `djangoexact/api/inventory_labels.py` — inventory label mapping
-- `djangoexact/api/reports/excel_manager.py` — Excel workbook generation
-- `djangoexact/api/reports/base.py` — ProjectResult / ActivityResult assembly
-- `djangoexact/api/reports/registry.py` + `modules.py` — per-module-type extract/render registry
-- `djangoexact/math_model/no_time_dependency_final/ghg_inventory_class.py` — inventory data structure
-- `djangoexact/api/calculators.py` — model -> math_model adapter layer
+- `djangoexact/api/inventory_labels.py`: inventory label mapping
+- `djangoexact/api/reports/excel_manager.py`: Excel workbook generation
+- `djangoexact/api/reports/base.py`: ProjectResult / ActivityResult assembly
+- `djangoexact/api/reports/registry.py` + `modules.py`: per-module-type extract/render registry
+- `djangoexact/math_model/no_time_dependency_final/ghg_inventory_class.py`: inventory data structure
+- `djangoexact/api/calculators.py`: model -> math_model adapter layer
 
 ## Current Focus
 
-bug_class: Bohrbug (deterministic, structural — same empty result on every run)
+bug_class: Bohrbug (deterministic, structural, same empty result on every run)
 
-status: fix applied and self-verified, awaiting human verification on a real project
+status: RESOLVED. Q1 value-semantics fix applied, targeted suites run against the
+review database, and the Excel report rendered end-to-end with a clean before/after
+on the same untouched project.
 
-next_action: user renders an Excel report for a project containing the seven module
-families and confirms the Inventory sheet now lists their rows. Then decide on the value
-semantics question recorded under Resolution.open_questions_for_user.
+checkpoint_answers:
+  q1_value_semantics: >
+    "Fix to real emissions." User independently confirmed general_functions.py:358
+    computes emissions_start but returns only (annual_emissions, sum(annual_emissions)),
+    and confirmed these rows have never reached a report (both math objects hang off
+    entry calculators via self.math_w at calculators.py:3923 and 5984, previously
+    throwaway locals), so correcting them regresses no published number.
+  q2_land_use_change: >
+    "Out of scope, file as follow-up." Leave LandUseChange untouched, do not widen
+    the diff. Recorded under Follow-ups.
+  q3_verification: >
+    Database now reachable via cloud-sql-proxy on 127.0.0.1:5432 against the SHARED
+    review instance fao-exact-review. End-to-end verification expected.
+
+next_action: none. Session complete and committed.
 
 reasoning_checkpoint:
   hypothesis: >
@@ -173,7 +187,7 @@ defect in the math layer (suspected swapped args in OperationPhaseIrrigation).
   implication: the fallback returns an EMPTY Inventory, not None. Combined with
   `_inventory_items_from_module`, an empty inventory produces zero rows with no warning.
 
-- checked: the seven container calculators — `InputCalculator:3741`, `EnergyCalculator:3905`,
+- checked: the seven container calculators, `InputCalculator:3741`, `EnergyCalculator:3905`,
   `IrrigationCalculator:5836`, `StorageCalculator:7911`, `ProcessingCalculator:8044`,
   `PackagingCalculator:8110`, `TransportCalculator` (same shape)
   found: every one has the identical body: build two empty `MathResult`s, loop over
@@ -245,6 +259,59 @@ defect in the math layer (suspected swapped args in OperationPhaseIrrigation).
   test still expects the raw wording) BOTH before and after the change.
   implication: pre-existing, unrelated to this fix. Not a regression introduced here.
 
+- checked: Q1 value semantics, `general_functions.input_single_calculation` call sites
+  found: `input_single_calculation_different_ef` has ZERO call sites anywhere outside its
+  own definition (`grep -rn input_single_calculation --include=*.py`, excel_reference_version
+  excluded and separately confirmed empty). The user's condition "if it shares call sites"
+  is therefore false.
+  implication: only `input_single_calculation` was changed. Its 6 call sites are all inside
+  inputs.py as predicted (3 in Inputs, 3 in OperationPhaseIrrigation), so the return-shape
+  change is fully contained. The sibling's divergence is recorded as a follow-up.
+
+- checked: `NewIrrigation` baseline semantics (the 0 versus `ef * units_start / 1000` choice)
+  found: `total_emissions = ef * (units_end - units_start) / 1000`, broken down over
+  `compute_yearly_delta(units_start, units_end, ...)`. The quantity is a one-off embodied
+  emission proportional to the AREA DELTA, i.e. infrastructure the project builds. Every
+  family that records a real number records the start-year ANNUAL rate that seeds its yearly
+  series (`ValueChain.emissions_start`, `ElectricityConsumption.annual_start`,
+  `SolidAndLiquidFuelsConsumption.annual_start_*`), and this module has no such rate.
+  `Roads` has the identical delta shape with an implicit units_start of 0 and already
+  records 0.
+  implication: CHOSE 0. `ef * units_start / 1000` would price irrigation infrastructure that
+  existed BEFORE the project, a historical one-off rather than a baseline annual flux, and
+  would be the only inventory row in the codebase carrying that meaning.
+
+- checked: end-to-end Excel render, review DB via cloud-sql-proxy, project 4281
+  ("test 2805 todelete2"), a project with all 7 families whose module caches had never been
+  touched by this session
+  found: BEFORE (pristine HEAD): "Coverage of the seven reported families: FOUND (0/7) []",
+  MISSING (7/7) all of Input/Energy/Irrigation/Storage/Processing/Packaging/Transport, while
+  Livestock DID contribute 9 rows. AFTER (fixed tree), same project: FOUND (7/7), MISSING
+  (0/7).
+  implication: the defect and the fix are both confirmed on real data, on the same project,
+  with the only variable being the source tree. Livestock appearing in both runs confirms
+  the fix does not disturb the families that already worked.
+
+- checked: cache contamination during verification
+  found: the FIRST end-to-end render (project 702) wrote corrected rows into that project's
+  module caches. A subsequent pristine-HEAD render of 702 then showed 7/7 because HEAD was
+  SERVING the cache the fixed run had just persisted, not recomputing.
+  implication: this invalidated 702 as a before/after subject and is why project 4281 was
+  used instead. It is also live confirmation of contributing cause (3): the cached inventory
+  is what the report reads, so cache invalidation was genuinely required for the fix to be
+  observable. Verified by direct inspection: 32 target-family modules elsewhere in review
+  still hold the pre-fix `"inventory": []` payload.
+
+- checked: Q1 fix against real Input data
+  found: project 4281 InputEntry 548 has `value_start = 225.0`. Pre-fix, BOTH of its
+  inventory rows would read 225.0. Post-fix the persisted cache holds
+  `[{'value': 281.0892857142857, 'activity': 'N2O Field'}, {'value': 1072.500000075,
+  'activity': 'CO2 Equivalent VC'}]`. Project 702 InputEntry 460: `value_start = 123.0`
+  becomes 67.65; InputEntry 461: `value_start = 0.0` stays 0.0.
+  implication: the rows now carry per-gas emissions rather than one repeated input quantity.
+  The per-gas divergence is the tell: a single activity-data figure cannot differ by gas,
+  an emission must.
+
 ## Eliminated
 
 - hypothesis: the Excel writer or the Inventory worksheet layout drops non-land rows
@@ -292,7 +359,16 @@ root_cause: >
   `to_dict()` emits a non-JSON-serialisable enum into the module cache.
   (3) CONTRIBUTING, data: module caches persist the empty inventory and are validated only
   against `last_modified`, so already-computed projects would keep serving empty rows even
-  after the code fix.
+  after the code fix. Confirmed live during verification: a pristine-HEAD render of project
+  702 returned 7/7 correct families purely because it was serving the cache a fixed-code run
+  had just written.
+  (4) SECONDARY, code (the Q1 value-semantics defect, fixed after the user's decision):
+  `Inputs` wrote `self.unit_start` and `NewIrrigation` wrote `self.units_start` into a column
+  headed "Value (tCO2-eq)". Both are activity data (tonnes of input, hectares), not
+  emissions. `input_single_calculation` computed the correct `emissions_start` and then
+  discarded it, returning only `(annual_emissions, sum(annual_emissions))`, so the correct
+  value was genuinely unavailable at the call sites. Latent rather than user-visible: these
+  rows could never reach a report while cause (1) was suppressing them.
 
 fix: >
   (1) Replaced the five-name whitelist with `MATH_COMPONENT_GROUPS`, five component groups
@@ -311,57 +387,170 @@ fix: >
   (4) Added `INVENTORY_SCHEMA_VERSION` to the cached payload and invalidated pre-fix caches
   for the eight affected module types only, so the fix is self-healing on existing projects
   without forcing a project-wide recompute of the land modules.
+  (5) Q1 value semantics, per the user's "fix to real emissions" decision.
+  `input_single_calculation` now returns a third value, `emissions_start`, which it already
+  computed and threw away. The three `Inputs` rows record their own per-gas
+  `emissions_start` instead of the shared `unit_start`. `NewIrrigation` records 0 rather
+  than `units_start`. The schema version was NOT bumped again: version 2 has never been
+  written by any deployed build, so the roll-up fix and this value fix ship as one
+  unreleased change set, and `Input` and `Irrigation` are both already inside
+  `INVENTORY_ROLLUP_FIXED_MODULES`, so the same invalidation covers both corrections.
 
 verification:
   guardrail_verdict: accepted
+  environment: >
+    Review Cloud SQL (fao-exact-review) reached through cloud-sql-proxy on 127.0.0.1:5432.
+    APP_MODE=review, 748 projects. Targeted suites only; the full suite was NOT run, per the
+    shared-instance constraint. Django reported "Skipping setup of unused database(s):
+    default", so no test_* database was created on the shared instance.
   signal_regression_test: >
-    PASS. New suite `api/tests/test_inventory_rollup.py`, 16 tests. Verified RED on the
-    pre-fix tree (5 assertion failures on the defect behaviours, 8 errors on the new API) and
-    GREEN after (16/16). The 3 no-regression guards pass on both trees by design.
+    PASS. `api/tests/test_inventory_rollup.py` grew from 16 to 26 tests (10 added for Q1).
+    Final run: "Ran 26 tests ... OK". The 10 new tests were verified RED against pristine
+    HEAD first: "Ran 10 tests ... FAILED (failures=5, errors=3)", and the failures show the
+    exact defect values rather than incidental errors, e.g.
+    "AssertionError: 100.0 unexpectedly found in [100.0, 100.0, 100.0]" (unit_start repeated
+    across all three gas rows), "AssertionError: Lists differ: [('New Irrigation', 'CO2',
+    40.0)] != [('New Irrigation', 'CO2', 0)]" (units_start), and
+    "ValueError: not enough values to unpack (expected 3, got 2)" on the return contract.
+    The 2 that passed on HEAD are the deliberate no-regression guards (zero baseline stays
+    zero; the yearly emission series is untouched).
   signal_no_collateral_damage: >
-    PASS. `api/tests/reports/test_cache.py` shows the same 2 failures before and after
-    (pre-existing `inventory_label` wording drift). `api/tests/test_inventory_labels.py`
-    passes. No new failures introduced.
+    PASS. Combined targeted run: "Ran 60 tests ... FAILED (failures=2)". Both failures are
+    the pre-existing `inventory_label` wording drift, and both were reproduced identically on
+    pristine HEAD ("Ran 34 tests ... FAILED (failures=2)", same two assertions
+    "'Biomass Carbon stock' != 'Biomass'"). Zero new failures.
+    `api/tests/test_inventory_labels.py` passes.
   signal_root_cause_not_symptom: >
-    PASS. The change is in the discovery mechanism and the container contract, not in the
-    renderer or the sheet layout.
+    PASS. The changes are in the discovery mechanism, the container contract, the cache
+    validity rule and the math layer's return contract. Nothing in the renderer or the sheet
+    layout was touched.
   signal_diff_shape: >
-    PASS. Additive and structural, not deletion-only. 3 source files, +145/-16.
+    PASS. Additive and structural, not deletion-only. 4 source files plus 1 new test file.
   signal_revert_reproduces_bug: >
-    PASS. Stashing the three source files reproduces the empty-inventory failures exactly;
-    restoring them clears the suite.
+    PASS, end-to-end and on real data. Project 4281, all 7 families, caches untouched by this
+    session. Pristine HEAD: "FOUND (0/7): []" / "MISSING (7/7)". Fixed tree, same project:
+    "FOUND (7/7)" / "MISSING (0/7): []". Livestock contributed 9 rows in BOTH runs, so the
+    families that already worked are unaffected.
+  signal_end_to_end_render: >
+    PASS. Excel reports rendered through `api.reports.generate_excel_report` and the produced
+    workbook's Inventory sheet inspected with openpyxl. Three projects rendered with all
+    seven families present: 702 (101 inventory rows), 951 (79), 942 (84), plus 4281 as the
+    before/after subject. Project 702 shows the multi-component roll-up working: Storage
+    contributes Storage/CO2, Electricity/CO2 and Fuel CO2/CH4/N2O rows from one module,
+    which is exactly the case the old single-attribute lookup could not express.
+    Families observed on the sheet: Input, Energy, Irrigation, Storage, Processing,
+    Packaging, Transport, all 7 of 7.
+  observed_values: >
+    Q1 confirmed on real data. Project 4281 InputEntry 548 `value_start = 225.0`, which is
+    what BOTH rows reported pre-fix; post-fix they read 281.0892857142857 (N2O Field) and
+    1072.500000075 (CO2 Equivalent VC). Project 702 InputEntry 460: 123.0 becomes 67.65.
+    InputEntry 461 with `value_start = 0.0` correctly stays 0.0. Irrigation rows are 0
+    throughout, by the deliberate baseline decision.
   oracle_type: >
-    derived (contract). Assertions are on the aggregation contract: one representative per
-    component, summed across components, merged by (gas, activity) across entries. Boundary
-    neighbours covered: zero entries, one entry, two entries, no math module at all.
+    derived (contract) plus one specified oracle. The roll-up assertions are on the
+    aggregation contract: one representative per component, summed across components, merged
+    by (gas, activity) across entries. The Q1 assertions are specified: the expected numbers
+    are computed by hand from the documented formula
+    (unit_start * unit_factor * ipcc_or_tier_2 * emissions_factor) with factors chosen so no
+    correct result coincides with unit_start, so the assertion cannot pass by luck. Boundary
+    neighbours covered: zero entries, one entry, two entries, no math module at all, zero
+    baseline quantity, a gas whose factors are None, and tier-2 override.
+  side_effects_on_review: >
+    DISCLOSED. Rendering a report recomputes and calls `save_results_to_cache`, so this
+    verification WROTE new cached inventory rows onto real review modules: 89 target-family
+    modules across projects 702, 942, 951, 4281, 8205, 8211, 8212 and 8214. That is the
+    intended self-healing behaviour of change (4) and the values written are the corrected
+    ones, but it is a write to projects not created by this session and is recorded here
+    explicitly. No project data, schema, migration or fixture was modified.
   not_verified_here: >
-    No end-to-end Excel render. This sandbox has no Postgres, so a real project has not been
-    rendered to xlsx and the Inventory sheet has not been eyeballed. Requires the user.
+    Projects 8205/8211/8212/8214 ("Testing 31-7") and 444, 505, 520, 538 could not be
+    rendered at all: they fail earlier with pre-existing data gaps unrelated to the inventory
+    (missing RiceSFW tier-2 values, missing AGB growth rates, a missing organic-soil drainage
+    EF, and an openpyxl "Cannot convert [list]" cell-write error). Those are separate defects
+    and were not investigated. The full test suite was not run.
 
 files_changed:
   - djangoexact/api/calculators.py (MATH_COMPONENT_GROUPS, inventory property, entry-calculator tracking, 7 containers wired)
-  - djangoexact/math_model/no_time_dependency_final/inputs.py (OperationPhaseIrrigation argument order)
+  - djangoexact/math_model/no_time_dependency_final/inputs.py (OperationPhaseIrrigation argument order; Inputs and NewIrrigation inventory values)
+  - djangoexact/math_model/no_time_dependency_final/general_functions.py (input_single_calculation returns emissions_start)
   - djangoexact/api/reports/cache.py (INVENTORY_SCHEMA_VERSION and scoped invalidation)
-  - djangoexact/api/tests/test_inventory_rollup.py (new, 16 regression tests)
+  - djangoexact/api/tests/test_inventory_rollup.py (new, 26 regression tests)
 
-open_questions_for_user:
+resolved_questions:
   - >
-    VALUE SEMANTICS, separate latent defect, NOT fixed here. The Inventory column header is
-    "Value (tCO2-eq)", but two of the seven families write a quantity rather than an emission
-    into it: `Inputs` writes `self.unit_start` (tonnes of input) at inputs.py:55/74/93, and
-    `NewIrrigation` writes `self.units_start` (hectares) at inputs.py:353. Energy, Storage,
-    Processing, Packaging and Transport all write real start-year emissions and are correct.
-    So after this fix 5 of the 7 families are fully right, while Inputs and Irrigation will
-    show rows whose numbers are activity data, not tCO2-eq. Fixing that changes reported
-    numbers and is a science decision, so it is deliberately left to the domain owner.
-    `input_single_calculation` already computes the correct `emissions_start` internally but
-    does not return it; all 6 call sites are inside inputs.py, so the change would be
-    contained.
+    VALUE SEMANTICS (Q1): ANSWERED and FIXED. User decided "fix to real emissions".
+    `input_single_calculation` now returns `emissions_start`; the three `Inputs` rows record
+    their own per-gas start-year emission. `NewIrrigation` records 0. All 7 families now
+    report tCO2-eq rather than activity data. Rationale and evidence above.
   - >
-    Zero-valued placeholder rows: Roads (inputs.py:242) and now OperationPhaseIrrigation
-    record 0 for their baseline, on the reading that infrastructure built by the project has
-    no start-year emissions. Worth confirming that is the intended IPCC treatment.
+    LANDUSECHANGE (Q2): ANSWERED. Out of scope by user decision, left untouched. See
+    Follow-ups.
   - >
-    LandUseChange has the same empty-inventory defect but was left untouched, because
-    rolling it up could double count if its child land modules are also reported separately.
-    Needs a database to settle.
+    VERIFICATION (Q3): ANSWERED. Database reachable, end-to-end render performed. See
+    verification.signal_end_to_end_render.
+
+## Follow-ups
+
+Separate issues, deliberately NOT addressed in this change set.
+
+- id: luc-empty-inventory
+  title: LandUseChange has the same empty-inventory defect
+  status: out of scope by explicit user decision (Q2), do not widen this diff
+  detail: >
+    `LandUseChangeCalculator` (calculators.py:755) has the identical container shape:
+    it builds throwaway Deforestation / OtherLandUse calculators and assigns no math module
+    of its own, so `BaseCalculator.inventory` returns empty for it. It was deliberately left
+    out of the roll-up because its child land modules may also be reported separately, and
+    rolling it up could double count. Settling that needs a project whose LandUseChange and
+    child land modules are both present, and a decision on which level owns the row.
+  next_step: file as its own issue and investigate with a purpose-built project.
+
+- id: zero-baseline-ipcc-treatment
+  title: Confirm the zero-baseline treatment for project-built infrastructure
+  status: open question for the domain owner, not a code defect
+  detail: >
+    Three activity rows now record a hard 0 for their start-year inventory: `Roads`
+    (inputs.py, pre-existing), `OperationPhaseIrrigation` (set here) and `NewIrrigation`
+    (set here). The reading is that infrastructure the project builds has no baseline
+    emission, since the emission is a one-off proportional to the built delta rather than an
+    annual rate. This is internally consistent across the three and matches the pre-existing
+    Roads precedent, but it has not been checked against IPCC guidance by a domain expert.
+    Observable effect: the Irrigation family shows a full set of correctly labelled rows
+    whose values are all 0.
+  next_step: confirm with the EX-ACT science owner whether 0 is the intended treatment.
+
+- id: inventory-label-wording-drift
+  title: Two pre-existing test_cache.py failures from inventory_label wording
+  status: pre-existing, unrelated to this session, NOT introduced here
+  detail: >
+    `api/tests/reports/test_cache.py` fails 2 tests,
+    `TestBaseModuleReportDispatcher.test_inventory_items_uses_live_inventory_when_from_cache_false`
+    (line 369) and `TestBuildInventoryFromCache.test_reconstructs_inventory_items_correctly`
+    (line 197), both with "AssertionError: 'Biomass Carbon stock' != 'Biomass'".
+    `inventory_label` renames "Biomass" to "Biomass Carbon stock" and the tests still assert
+    the raw wording. Reproduced identically on pristine HEAD, so it is not a regression from
+    this work. Either the label or the expectation is stale.
+  next_step: decide which side is authoritative and fix the mismatch.
+
+- id: input-single-calculation-different-ef-divergence
+  title: Sibling helper still returns a 2-tuple
+  status: minor, deliberately deferred to keep this diff narrow
+  detail: >
+    `input_single_calculation` now returns 3 values; its sibling
+    `input_single_calculation_different_ef` still returns 2. The sibling has ZERO call sites
+    anywhere in the codebase, which is why the user's "if it shares call sites" condition did
+    not apply and why it was left alone. A future caller switching between the two would hit
+    a loud ValueError on unpacking rather than a silent wrong number, so the risk is low.
+  next_step: either align the signatures or delete the unused helper.
+
+- id: projects-that-cannot-render
+  title: Several review projects fail report generation for unrelated reasons
+  status: observed during verification, not investigated
+  detail: >
+    Projects 444, 505, 520, 538 and the four "Testing 31-7" projects (8205, 8211, 8212, 8214)
+    could not be rendered. Causes seen: NotReadyError for missing RiceSFW tier-2 values,
+    missing AGB growth rates, a missing organic-soil drainage EF, and an openpyxl
+    "ValueError: Cannot convert [1584.0, 1232.0, ...] to Excel" when a list reaches a cell
+    write. The last one looks like a genuine code defect rather than a data gap and may be
+    worth its own session.
+  next_step: triage separately, starting with the openpyxl list-to-cell error.
