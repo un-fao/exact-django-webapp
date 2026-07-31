@@ -396,6 +396,14 @@ jobs:
         EMAIL_PORT: ${{ vars.EMAIL_PORT }}
         SMTP_USER_EMAIL: ${{ vars.SMTP_USER_EMAIL }}
         BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
+        # This Cloud Run job is the process that sends the report-ready email,
+        # so the download link's host comes from HERE, not from the web service.
+        # Where an environment serves its API from Cloud Run rather than App
+        # Engine, vars.BACKEND_BASE_URL still names the App Engine host and the
+        # emailed link 404s at Google's routing layer. Prefer the Cloud Run
+        # value when the environment defines one. Environments still on App
+        # Engine leave it unset and keep vars.BACKEND_BASE_URL unchanged.
+        CLOUDRUN_BACKEND_BASE_URL: ${{ vars.CLOUDRUN_BACKEND_BASE_URL }}
         FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
         FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
         FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
@@ -436,9 +444,15 @@ jobs:
             'EMAIL_PORT': os.environ['EMAIL_PORT'],
             'SMTP_USER_EMAIL': os.environ['SMTP_USER_EMAIL'],
             # Base URL for the emailed report download link (see async-jobs.md).
+            # CLOUDRUN_BACKEND_BASE_URL wins when the environment defines one:
+            # this job is the sender, and an environment served from Cloud Run
+            # must not mint links pointing at its old App Engine hostname.
             # .get with a default so an unset var soft-disables the report email
             # (the sender no-ops on empty) rather than failing the whole job deploy.
-            'BACKEND_BASE_URL': os.environ.get('BACKEND_BASE_URL', ''),
+            'BACKEND_BASE_URL': (
+                os.environ.get('CLOUDRUN_BACKEND_BASE_URL', '')
+                or os.environ.get('BACKEND_BASE_URL', '')
+            ),
             'SMTP_USER_PASSWORD': os.environ['SMTP_USER_PASSWORD'],
             'FIREBASE_API_KEY': os.environ['FIREBASE_API_KEY'],
             'FIREBASE_AUTH_DOMAIN': os.environ['FIREBASE_AUTH_DOMAIN'],

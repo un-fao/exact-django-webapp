@@ -62,11 +62,21 @@ jobs:
           echo "MEMORY_LIMIT=${MEMORY_LIMIT:-4Gi}" >> "$GITHUB_ENV"
           echo "BRANCH_NAME=$REF_NAME" >> "$GITHUB_ENV"
           # Cloud Run gets its own host settings so tightening or widening them
-          # can never reach App Engine. They fall back to the App Engine values,
-          # which do not yet contain the *.run.app hostname; see the deploy guide.
+          # can never reach App Engine. These two fall back to the App Engine
+          # values, which do not yet contain the *.run.app hostname; see the
+          # deploy guide.
           echo "CLOUDRUN_ALLOWED_HOSTS=${CLOUDRUN_ALLOWED_HOSTS:-${ALLOWED_HOSTS:-}}" >> "$GITHUB_ENV"
           echo "CLOUDRUN_CORS_ALLOWED_ORIGINS=${CLOUDRUN_CORS_ALLOWED_ORIGINS:-${CORS_ALLOWED_ORIGINS:-}}" >> "$GITHUB_ENV"
-          echo "CLOUDRUN_BACKEND_BASE_URL=${CLOUDRUN_BACKEND_BASE_URL:-${BACKEND_BASE_URL:-}}" >> "$GITHUB_ENV"
+          # BACKEND_BASE_URL deliberately does NOT fall back to the App Engine
+          # value. It is the host baked into the emailed report download link,
+          # so it must name a host THIS deployment answers on. Inheriting the
+          # App Engine URL shipped links to a hostname whose App Engine app was
+          # disabled, and every one of them 404'd at Google's routing layer
+          # before reaching Django. An empty value soft-disables the report
+          # email (send_report_ready_email no-ops and warns), which is strictly
+          # better than emailing a dead link. The "Verify report download base
+          # URL" step below fails the deploy if a value is set but not live.
+          echo "CLOUDRUN_BACKEND_BASE_URL=${CLOUDRUN_BACKEND_BASE_URL:-}" >> "$GITHUB_ENV"
 
       - name: Resolve image tags
         # github.run_number via env: for the same reason as REF_NAME above.
@@ -310,6 +320,47 @@ jobs:
             --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
             --format='value(status.url)')
           echo "Cloud Run service URL: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify report download base URL
+        # The emailed report download link is minted from BACKEND_BASE_URL by a
+        # background worker that has no request to derive a host from, so a
+        # stale value here is invisible until a user clicks a dead link in their
+        # inbox. This step is the gate that was missing: probe the configured
+        # base URL and fail the deploy if nothing application-level answers on
+        # it. A disabled App Engine host, a decommissioned service or a typo all
+        # surface as an unreachable host or a 404 from Google's routing layer.
+        #
+        # Any status below 500 counts as alive: /api/health/ legitimately
+        # answers 503 while the maintenance flag is on, and that still proves
+        # Django is serving the host.
+        run: |
+          set -eu
+          if [ -z "${CLOUDRUN_BACKEND_BASE_URL:-}" ]; then
+            {
+              echo "WARNING: CLOUDRUN_BACKEND_BASE_URL is not set."
+              echo "The report-ready email is soft-disabled: send_report_ready_email"
+              echo "no-ops on an empty BACKEND_BASE_URL rather than emailing a link"
+              echo "with no host. Set it to the Cloud Run service URL above."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          probe="${CLOUDRUN_BACKEND_BASE_URL%/}/api/health/"
+          # curl already writes 000 to stdout when it never got a response, so
+          # the failure branch must not echo a second 000 on top of it.
+          code=$(curl -sS -m 30 -o /dev/null -w '%{http_code}' "$probe" 2>/dev/null) || code=000
+          case "${code:-000}" in
+            000)
+              echo "CLOUDRUN_BACKEND_BASE_URL is unreachable: $probe" >&2
+              exit 1
+              ;;
+            404)
+              echo "CLOUDRUN_BACKEND_BASE_URL serves no application: $probe returned 404." >&2
+              echo "Emailed report download links built from it would 404 for every user." >&2
+              exit 1
+              ;;
+          esac
+          echo "Report download base URL verified: $CLOUDRUN_BACKEND_BASE_URL (HTTP $code)" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create Issue
         if: failure()
