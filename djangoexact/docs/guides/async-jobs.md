@@ -195,10 +195,22 @@ despite the viewset's class-level `IsAuthenticated`; DRF honors per-action
   set. In deployment it is provisioned as a per-environment **GitHub environment variable**
   and wired in by `.github/workflows/deploy.yaml`: sed-substituted into `app.yaml` for App
   Engine, and written into the Cloud Run job env file (`/tmp/job-env.yaml`) so the worker,
-  which is what actually sends the email, has it. Current values:
-  - develop: `https://exact-dev-dot-fao-exact-review.ew.r.appspot.com`
-  - review: `https://fao-exact-review.ew.r.appspot.com`
-  - production: `https://fao-exact.ew.r.appspot.com`
+  which is what actually sends the email, has it.
+
+  **It must name a host that the environment actually serves.** It is never derived from
+  an incoming request (the sender is a background worker and has none), so a stale value
+  is invisible until a user clicks a dead link. Environments served from Cloud Run set
+  `CLOUDRUN_BACKEND_BASE_URL` instead, which both deploy workflows prefer over
+  `BACKEND_BASE_URL`; see `cloud-run-deploy.md`, "Why the base URL has no fallback".
+  Current values:
+  - develop (Cloud Run `exact-api-dev`): `https://exact-api-dev-mesob2hoya-ew.a.run.app`
+  - review (Cloud Run `exact-api`): `https://exact-api-mesob2hoya-ew.a.run.app`
+  - production (App Engine): `https://fao-exact.ew.r.appspot.com`
+
+  The App Engine app in the `fao-exact-review` project is `servingStatus: USER_DISABLED`,
+  so `https://fao-exact-review.ew.r.appspot.com` and
+  `https://exact-dev-dot-fao-exact-review.ew.r.appspot.com` serve nothing. Neither may be
+  used here.
 
   `build_download_url` strips any trailing slash defensively, so a value set with or without
   one is safe.

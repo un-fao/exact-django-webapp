@@ -66,7 +66,7 @@ Cloud Run specific value never widens or narrows what App Engine sees.
 | `DJANGO_DEBUG` | variable | review environment | existing | Django debug flag |
 | `ALLOWED_HOSTS` | variable | review environment | existing | App Engine review's `ALLOWED_HOSTS`; used only as the fallback if `CLOUDRUN_ALLOWED_HOSTS` is unset |
 | `CORS_ALLOWED_ORIGINS` | variable | review environment | existing | App Engine review's CORS origins; fallback only, see `CLOUDRUN_CORS_ALLOWED_ORIGINS` |
-| `BACKEND_BASE_URL` | variable | review environment | existing | App Engine review's backend URL; fallback only, see `CLOUDRUN_BACKEND_BASE_URL` |
+| `BACKEND_BASE_URL` | variable | review environment | existing | App Engine review's backend URL. **Not** a fallback for the Cloud Run service; see `CLOUDRUN_BACKEND_BASE_URL` |
 | `CLOUD_RUN_COMPUTATION_JOB_NAME` | variable | review environment | existing | Name of the existing computation Job, unrelated to this service but read by `settings.py` |
 | `CLOUD_RUN_REGION` | variable | review environment | existing | Region for both the existing Job and this new service |
 | `EMAIL_HOST` | variable | review environment | existing | SMTP host; App Engine seds this into `settings.py`, this workflow supplies it as a plain env var instead |
@@ -85,7 +85,7 @@ Cloud Run specific value never widens or narrows what App Engine sees.
 | `IMAGE_REPO` | variable | review environment | NEW, optional | Artifact Registry repository name. Defaults to `artifacts` |
 | `CLOUDRUN_ALLOWED_HOSTS` | variable | review environment | NEW, optional | `ALLOWED_HOSTS` for the Cloud Run service only. Falls back to `ALLOWED_HOSTS` if unset, but that App Engine value does not include the `*.run.app` hostname yet. See "Ingress and allowed hosts" below |
 | `CLOUDRUN_CORS_ALLOWED_ORIGINS` | variable | review environment | NEW, optional | `CORS_ALLOWED_ORIGINS` for the Cloud Run service only, same fallback caveat |
-| `CLOUDRUN_BACKEND_BASE_URL` | variable | review environment | NEW, optional | `BACKEND_BASE_URL` for the Cloud Run service only; feeds report-download email links. Leaving it empty soft-disables that email rather than breaking the deploy |
+| `CLOUDRUN_BACKEND_BASE_URL` | variable | review environment | NEW, optional | `BACKEND_BASE_URL` for the Cloud Run service **and** for the computation Job that sends the email. Feeds report-download email links. Unlike the two rows above it does **not** fall back to the App Engine value: see "Why the base URL has no fallback". Leaving it empty soft-disables that email rather than breaking the deploy |
 | `RUNTIME_SERVICE_ACCOUNT` | variable | review environment | NEW, optional | Service account the Cloud Run revision runs as. Defaults to `$PROJECT_ID@appspot.gserviceaccount.com`, the same identity the computation Job already uses |
 | `MIN_SCALE` | variable | review environment | NEW, optional | Knative `minScale`. Defaults to `0` |
 | `MAX_SCALE` | variable | review environment | NEW, optional | Knative `maxScale`. Defaults to `4` |
@@ -115,8 +115,11 @@ is not knowable until the service has deployed once.
    to `review`, so the first, throwaway run is deliberate.
 2. Read the service URL from the job's `$GITHUB_STEP_SUMMARY` output
    (the "Report service URL" step).
-3. Set `CLOUDRUN_ALLOWED_HOSTS` and `CLOUDRUN_CORS_ALLOWED_ORIGINS` (and
-   optionally `CLOUDRUN_BACKEND_BASE_URL`) to that hostname.
+3. Set `CLOUDRUN_ALLOWED_HOSTS`, `CLOUDRUN_CORS_ALLOWED_ORIGINS` and
+   `CLOUDRUN_BACKEND_BASE_URL` to that hostname. The third is not
+   optional in practice: until it is set, the report-ready email is
+   soft-disabled, and the "Verify report download base URL" step will
+   say so in the job summary.
 4. Re-run the workflow.
 5. Verify the admin panel at `/admin/` renders styled. This proves
    WhiteNoise is serving `STATIC_ROOT` correctly.
@@ -142,6 +145,43 @@ the team:
 
 This guide does not choose for the team; the first-run checklist above
 assumes the two-pass path because it widens nothing.
+
+## Why the base URL has no fallback
+
+`CLOUDRUN_ALLOWED_HOSTS` and `CLOUDRUN_CORS_ALLOWED_ORIGINS` fall back to
+their App Engine counterparts. `CLOUDRUN_BACKEND_BASE_URL` deliberately
+does not, and the difference is not cosmetic.
+
+A wrong `ALLOWED_HOSTS` fails loudly and immediately: the very next request
+returns `400 DisallowedHost` and somebody notices within minutes. A wrong
+`BACKEND_BASE_URL` fails silently and much later. It is not read on the
+request path at all. It is read by a background worker with no request to
+derive a host from, baked into a link, and mailed to a user who discovers
+the problem hours later when the link 404s.
+
+That is exactly what happened on review. The environment moved to Cloud
+Run while its App Engine app was left at `servingStatus: USER_DISABLED`,
+so `https://<project>.ew.r.appspot.com` served nothing. Because
+`CLOUDRUN_BACKEND_BASE_URL` was never set, the old fallback substituted
+that dead App Engine hostname into every emailed report link. Google's
+routing layer answered `Error: Page not found` before the request ever
+reached Django, so no application log recorded a thing. Two guards now
+prevent a repeat:
+
+- No fallback. An unset `CLOUDRUN_BACKEND_BASE_URL` yields an empty
+  `BACKEND_BASE_URL`, and `send_report_ready_email` already refuses to
+  send on empty, logging a warning. No email beats a dead link.
+- The "Verify report download base URL" step probes
+  `$CLOUDRUN_BACKEND_BASE_URL/api/health/` after every deploy and fails
+  the run if the host is unreachable or answers `404`. A `5xx` passes:
+  `/api/health/` legitimately returns `503` while the maintenance flag is
+  on, and that still proves Django is serving the host.
+
+The same value also reaches the computation Job through
+`.github/workflows/deploy.yaml`, since that Job, not the web service, is
+what sends the email. It prefers `CLOUDRUN_BACKEND_BASE_URL` and falls
+back to `BACKEND_BASE_URL` only for environments still served by App
+Engine.
 
 ## How this differs from App Engine
 
