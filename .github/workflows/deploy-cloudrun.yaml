@@ -425,6 +425,48 @@ jobs:
           echo "Computation job BACKEND_BASE_URL synced to $CLOUDRUN_BACKEND_BASE_URL" \
             >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Sync SECRET_KEY into the computation job
+        # A correct host is not sufficient for the emailed link to work. The job
+        # signs the download token with SECRET_KEY (api/services/report_links.py
+        # uses django.core.signing) and the service verifies it. When the two
+        # keys differ, loads() raises BadSignature, load_download_token returns
+        # None, and the download view answers "Report not available" with a 404
+        # that looks nothing like a config problem.
+        #
+        # The keys drifted because they have different provenance: this workflow
+        # deploys the service from the SECRET_KEY secret, while deploy.yaml reads
+        # the job's copy back out of the deployed App Engine version as a
+        # documented workaround for an escaping bug. Treat the secret this
+        # workflow already trusts for the service as the single source of truth.
+        #
+        # Values are never echoed, only their digests, so a mismatch is
+        # diagnosable from the log without exposing either key.
+        if: env.SECRET_KEY != ''
+        run: |
+          set -eu
+          job="exact-computation-job"
+          current=$(gcloud run jobs describe "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" --format=json \
+            | jq -r '.spec.template.spec.template.spec.containers[0].env[]?
+                     | select(.name=="SECRET_KEY") | .value // ""')
+          if [ "$current" = "$SECRET_KEY" ]; then
+            echo "Computation job SECRET_KEY already matches the service." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          was=$(printf '%s' "$current" | sha256sum | cut -c1-16)
+          now=$(printf '%s' "$SECRET_KEY" | sha256sum | cut -c1-16)
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "SECRET_KEY=$SECRET_KEY" \
+            --quiet
+          {
+            echo "Computation job SECRET_KEY re-synced to the service's key."
+            echo "sha256 prefix was $was, now $now."
+            echo "Download links minted before this deploy stay invalid: they were"
+            echo "signed with the old key. Newly generated reports will work."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Create Issue
         if: failure()
         uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2
