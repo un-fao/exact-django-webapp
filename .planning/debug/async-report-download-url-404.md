@@ -1,8 +1,9 @@
 ---
-status: awaiting_human_verify
+status: awaiting_ops_then_human_verify
 trigger: "in the async project report generation, the URL sent via email leads to a page not found. The file is correctly created in the gcp bucket."
 created: 2026-07-31
 updated: 2026-07-31
+branch: fix/report-download-base-url
 ---
 
 # Debug: async report download URL returns 404
@@ -60,9 +61,22 @@ test: curl the emailed host and other paths on it; compare response fingerprint 
   the production host which is known-good.
 expecting: if true, EVERY path on the review host returns the same headerless Google
   routing 404, while production returns Django-flavoured responses.
-next_action: apply the fix - remove the App Engine fallback for CLOUDRUN_BACKEND_BASE_URL
-  in deploy-cloudrun.yaml, make deploy.yaml's Cloud Run job env prefer it, add a
-  deploy-time reachability gate, update docs, and hand the ops steps to the user.
+next_action: >
+  WAITING ON THE USER. The repo fix is committed on branch `fix/report-download-base-url`.
+  The user elected to run the three ops commands themselves (see "Ops Steps (user-run)"
+  below), then trigger an async project report on the review environment and click the
+  emailed link. Resume with `/gsd-debug continue async-report-download-url-404` once they
+  report back. If the PDF downloads, mark the session resolved. If it does not, collect the
+  items in "Post-ops Verification Checklist" and reopen the investigation from there.
+checkpoint_answer:
+  type: human-verify
+  asked: 2026-07-31
+  answered: 2026-07-31
+  decision: >
+    Option 2. The USER runs the three ops commands themselves and verifies end to end.
+    The debug agent is explicitly barred from executing any live infrastructure mutation:
+    no `gh variable set`, no `gcloud run jobs update`, no `gcloud run services update`.
+    Read-only `gcloud` / `gh` inspection remains permitted. No PR, no merge.
 reasoning_checkpoint:
   hypothesis: >
     The emailed link 404s because `BACKEND_BASE_URL` for the review environment holds
@@ -368,11 +382,104 @@ verification:
     - name: static checks
       result: PASS
       evidence: "Both workflows parse as YAML; `bash -n` clean on the new step; no em-dashes in the diff."
+  proven: >
+    The two-host token test. A genuine signed token was minted for AsyncJob 32 using the
+    deployed SECRET_KEY, and the identical path and token were requested against both
+    hosts. The dead App Engine host returned HTTP 404 with byte-for-byte the HTML from the
+    user's screenshot; the Cloud Run host returned HTTP 200, `application/pdf`,
+    `Content-Disposition: attachment; filename="fao.pdf"`, 71320 bytes, `%PDF-` magic.
+    This proves the diagnosis completely: route, pk, trailing slash, query-param name,
+    token signing and the stored GCS blob are all correct, and the hostname was the only
+    defective element. Also proven, by direct execution against real hosts: the new
+    deploy-time gate exits 1 on the dead host and 0 on the live one (6/6 cases), the job
+    env precedence logic is 4/4 with production a strict no-op, and reverting the changed
+    line reproduces the dead host under review's real variable state.
+  unproven: >
+    The real end-to-end path has NOT been exercised. Nobody has yet triggered an async
+    report on review and clicked the link as it arrives in an inbox. The two-host test
+    substituted a hand-minted token for the emailed one, so the email-composition and
+    delivery legs are inferred from code reading (`send_report_ready_email` ->
+    `build_download_url`), not observed. Nor have the workflow changes run in a real
+    deploy; they were validated by YAML parse, `bash -n`, and by extracting and executing
+    the step bodies in isolation. Both gaps close only after the ops steps below are run
+    by the user and a fresh report email is clicked.
   outstanding: >
-    Human verification of a freshly generated report email on review, after the ops step.
+    User-run ops steps, then human verification of a freshly generated report email on the
+    review environment.
 
 files_changed:
   - .github/workflows/deploy-cloudrun.yaml
   - .github/workflows/deploy.yaml
   - djangoexact/docs/guides/async-jobs.md
   - djangoexact/docs/guides/cloud-run-deploy.md
+  - .planning/debug/async-report-download-url-404.md
+
+## Ops Steps (user-run)
+
+The repo fix stops the pipeline from ever minting a dead link again. It does NOT revive
+links already sent, and it does not by itself change the running review environment. The
+user elected to run these; the debug agent must not execute them.
+
+Run all three, verbatim:
+
+```bash
+gh variable set CLOUDRUN_BACKEND_BASE_URL \
+  --env review --repo un-fao/exact-django-webapp \
+  --body "https://exact-api-mesob2hoya-ew.a.run.app"
+```
+
+```bash
+gcloud run jobs update exact-computation-job \
+  --region=europe-west1 --project=fao-exact-review \
+  --update-env-vars BACKEND_BASE_URL=https://exact-api-mesob2hoya-ew.a.run.app
+```
+
+```bash
+gcloud run services update exact-api \
+  --region=europe-west1 --project=fao-exact-review \
+  --update-env-vars BACKEND_BASE_URL=https://exact-api-mesob2hoya-ew.a.run.app
+```
+
+The first command is the durable fix: it makes every future deploy correct. The second and
+third patch the live revisions so the fix takes effect immediately, without waiting for a
+deploy. The job (`exact-computation-job`) is the process that actually sends the email, so
+it is the one that matters most for the emailed link; the service is updated too so both
+agree.
+
+WARNING: do NOT use `https://exact.review.fao.org` as `BACKEND_BASE_URL`. That hostname was
+checked during this investigation and it serves the React frontend SPA, returning
+`index.html` with HTTP 200 for any path. Pointing the base URL at it would produce links
+that look alive but return the SPA shell instead of the PDF, which is a strictly worse
+failure than the current honest 404. The only correct value is the Cloud Run service URL
+`https://exact-api-mesob2hoya-ew.a.run.app`.
+
+## Post-ops Verification Checklist
+
+After running the three commands, trigger an async project report on the review environment
+and wait for the completion email.
+
+If the fix worked, expect all of:
+
+1. The link in the email begins with `https://exact-api-mesob2hoya-ew.a.run.app/api/async-jobs/`
+   and NOT with `https://fao-exact-review.ew.r.appspot.com/`. This is visible on hover,
+   before clicking anything, and is the fastest single check.
+2. Clicking it downloads a PDF rather than rendering an error page. The browser should
+   offer a file named `fao.pdf` (the `Content-Disposition` filename), not display HTML.
+3. The PDF opens and contains the expected project report content.
+
+If it did not work, capture the following before reopening the session:
+
+- The full emailed URL, verbatim, including the host and the complete `?token=` value.
+  The host alone distinguishes "the ops steps did not take effect" from "a second, distinct
+  fault exists".
+- The exact rendered error text or HTTP status. Google's routing 404 reads
+  "Error: Page not found / The requested URL was not found on this server." A Django or DRF
+  404 looks different (JSON, or "Not Found / The requested resource was not found on this
+  server."). Distinguishing the two says whether the request reached the app at all.
+- `gcloud run jobs describe exact-computation-job --region=europe-west1 --project=fao-exact-review --format="value(spec.template.spec.template.spec.containers[0].env)"`
+  to confirm `BACKEND_BASE_URL` actually changed on the job.
+- Whether the report file exists in the bucket for the new job id
+  (`gsutil ls gs://fao-exact-review-uploads/reports/<project>/<job>.pdf`). If the blob is
+  missing, the failure moved upstream into generation or upload and is a different bug.
+- Cloud Run logs for `exact-api` around the click timestamp, which will show whether the
+  request arrived and how the view responded.
