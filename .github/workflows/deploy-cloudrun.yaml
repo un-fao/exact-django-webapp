@@ -330,9 +330,12 @@ jobs:
         # it. A disabled App Engine host, a decommissioned service or a typo all
         # surface as an unreachable host or a 404 from Google's routing layer.
         #
-        # Any status below 500 counts as alive: /api/health/ legitimately
-        # answers 503 while the maintenance flag is on, and that still proves
-        # Django is serving the host.
+        # The primary check is a comparison, not a network call: does the
+        # configured base URL name the service this workflow just deployed?
+        # That is exactly the condition that broke, and it is decidable without
+        # reaching the host. It also has to be, because the self-hosted runner
+        # has no public egress to *.run.app: an HTTP probe from here times out
+        # even when the URL is healthy for every real user.
         run: |
           set -eu
           if [ -z "${CLOUDRUN_BACKEND_BASE_URL:-}" ]; then
@@ -344,23 +347,125 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          probe="${CLOUDRUN_BACKEND_BASE_URL%/}/api/health/"
-          # curl already writes 000 to stdout when it never got a response, so
-          # the failure branch must not echo a second 000 on top of it.
+          service_url=$(gcloud run services describe "$CLOUD_RUN_SERVICE_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --format='value(status.url)')
+          configured="${CLOUDRUN_BACKEND_BASE_URL%/}"
+          if [ "$configured" = "${service_url%/}" ]; then
+            echo "REPORT_BASE_URL_VERIFIED=true" >> "$GITHUB_ENV"
+            echo "Report download base URL verified: it is this deployment's service URL." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # A mismatch is either a custom domain mapped to this service, which
+          # is legitimate, or the stale-hostname bug, which is not. Only a probe
+          # can tell them apart, so try one. An unreachable result is treated as
+          # inconclusive rather than fatal: on a runner with no public egress it
+          # says nothing about the host, and failing every deploy on it would
+          # get this gate deleted rather than fixed.
+          probe="$configured/api/health/"
           code=$(curl -sS -m 30 -o /dev/null -w '%{http_code}' "$probe" 2>/dev/null) || code=000
-          case "${code:-000}" in
-            000)
-              echo "CLOUDRUN_BACKEND_BASE_URL is unreachable: $probe" >&2
-              exit 1
-              ;;
-            404)
-              echo "CLOUDRUN_BACKEND_BASE_URL serves no application: $probe returned 404." >&2
-              echo "Emailed report download links built from it would 404 for every user." >&2
-              exit 1
-              ;;
-          esac
-          echo "Report download base URL verified: $CLOUDRUN_BACKEND_BASE_URL (HTTP $code)" \
+          if [ "$code" = "404" ]; then
+            echo "CLOUDRUN_BACKEND_BASE_URL serves no application: $probe returned 404." >&2
+            echo "It is not this service's URL ($service_url) and nothing answers on it." >&2
+            echo "Emailed report download links built from it would 404 for every user." >&2
+            exit 1
+          fi
+          if [ "$code" = "000" ]; then
+            {
+              echo "WARNING: could not verify CLOUDRUN_BACKEND_BASE_URL ($configured)."
+              echo "It is not this deployment's service URL ($service_url) and the runner"
+              echo "could not reach it. Confirm it is a custom domain for this service."
+              echo "The computation job's BACKEND_BASE_URL was left untouched: an"
+              echo "unverified host must not reach the process that emails download links."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "REPORT_BASE_URL_VERIFIED=true" >> "$GITHUB_ENV"
+          {
+            echo "Report download base URL reachable: $configured (HTTP $code)."
+            echo "Not this deployment's service URL ($service_url), assuming custom domain."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sync report download base URL into the computation job
+        # exact-computation-job runs api/management/commands/run_async_job.py,
+        # which is the ONLY caller of send_report_ready_email. The host in the
+        # emailed link therefore comes from this job's BACKEND_BASE_URL, not
+        # from the service deployed above.
+        #
+        # deploy.yaml is the job's only deployer and it now triggers on main
+        # only, so a push to review could never correct the job's environment.
+        # That is how the job kept emailing a disabled App Engine hostname for
+        # weeks after review moved to Cloud Run. This step closes that gap:
+        # every review deploy re-asserts the sender's base URL.
+        #
+        # Requires REPORT_BASE_URL_VERIFIED from the gate above, which is only
+        # set once the base URL is known to name a host this deployment serves.
+        # An unverified value is left out of the sender entirely rather than
+        # propagated on hope. Env only. The job image stays owned by deploy.yaml.
+        if: env.CLOUDRUN_BACKEND_BASE_URL != '' && env.REPORT_BASE_URL_VERIFIED == 'true'
+        run: |
+          set -eu
+          job="exact-computation-job"
+          # A missing job is a real misconfiguration of the target project, not
+          # a condition to skip past. This whole bug class came from config
+          # failing silently, so surface it instead of shrugging.
+          if ! gcloud run jobs describe "$job" \
+                 --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+                 --format='value(metadata.name)' >/dev/null 2>&1; then
+            echo "Cloud Run job '$job' not found in $PROJECT_ID/$CLOUD_RUN_REGION." >&2
+            echo "It sends the report-ready email, so its BACKEND_BASE_URL cannot be synced." >&2
+            echo "Deploy it via deploy.yaml, or correct the project and region." >&2
+            exit 1
+          fi
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "BACKEND_BASE_URL=$CLOUDRUN_BACKEND_BASE_URL" \
+            --quiet
+          echo "Computation job BACKEND_BASE_URL synced to $CLOUDRUN_BACKEND_BASE_URL" \
             >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sync SECRET_KEY into the computation job
+        # A correct host is not sufficient for the emailed link to work. The job
+        # signs the download token with SECRET_KEY (api/services/report_links.py
+        # uses django.core.signing) and the service verifies it. When the two
+        # keys differ, loads() raises BadSignature, load_download_token returns
+        # None, and the download view answers "Report not available" with a 404
+        # that looks nothing like a config problem.
+        #
+        # The keys drifted because they have different provenance: this workflow
+        # deploys the service from the SECRET_KEY secret, while deploy.yaml reads
+        # the job's copy back out of the deployed App Engine version as a
+        # documented workaround for an escaping bug. Treat the secret this
+        # workflow already trusts for the service as the single source of truth.
+        #
+        # Values are never echoed, only their digests, so a mismatch is
+        # diagnosable from the log without exposing either key.
+        if: env.SECRET_KEY != ''
+        run: |
+          set -eu
+          job="exact-computation-job"
+          current=$(gcloud run jobs describe "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" --format=json \
+            | jq -r '.spec.template.spec.template.spec.containers[0].env[]?
+                     | select(.name=="SECRET_KEY") | .value // ""')
+          if [ "$current" = "$SECRET_KEY" ]; then
+            echo "Computation job SECRET_KEY already matches the service." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          was=$(printf '%s' "$current" | sha256sum | cut -c1-16)
+          now=$(printf '%s' "$SECRET_KEY" | sha256sum | cut -c1-16)
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "SECRET_KEY=$SECRET_KEY" \
+            --quiet
+          {
+            echo "Computation job SECRET_KEY re-synced to the service's key."
+            echo "sha256 prefix was $was, now $now."
+            echo "Download links minted before this deploy stay invalid: they were"
+            echo "signed with the old key. Newly generated reports will work."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create Issue
         if: failure()

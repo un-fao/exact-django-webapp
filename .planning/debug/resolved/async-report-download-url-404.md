@@ -1,5 +1,5 @@
 ---
-status: awaiting_ops_then_human_verify
+status: resolved
 trigger: "in the async project report generation, the URL sent via email leads to a page not found. The file is correctly created in the gcp bucket."
 created: 2026-07-31
 updated: 2026-07-31
@@ -62,12 +62,13 @@ test: curl the emailed host and other paths on it; compare response fingerprint 
 expecting: if true, EVERY path on the review host returns the same headerless Google
   routing 404, while production returns Django-flavoured responses.
 next_action: >
-  WAITING ON THE USER. The repo fix is committed on branch `fix/report-download-base-url`.
-  The user elected to run the three ops commands themselves (see "Ops Steps (user-run)"
-  below), then trigger an async project report on the review environment and click the
-  emailed link. Resume with `/gsd-debug continue async-report-download-url-404` once they
-  report back. If the PDF downloads, mark the session resolved. If it does not, collect the
-  items in "Post-ops Verification Checklist" and reopen the investigation from there.
+  RESOLVED 2026-07-31. All three defects closed and proven end to end: a token signed with
+  the now-shared SECRET_KEY fetches the real report over the Cloud Run host and returns a
+  71465-byte PDF. Nothing outstanding on this bug. The one remaining user-visible step is
+  cosmetic to the fix: links emailed before the SECRET_KEY sync stay dead, so confirming in
+  an inbox requires generating a NEW report rather than re-clicking the old email.
+  Separate, deliberately out of scope: review's computation job image is frozen at 391a65ad
+  because deploy.yaml is main-only.
 checkpoint_answer:
   type: human-verify
   asked: 2026-07-31
@@ -301,7 +302,30 @@ tdd_checkpoint:
 ## Resolution
 
 root_cause: >
-  Two conditions together (AND-gate). (1) ENVIRONMENT: the App Engine application in the
+  THREE independent defects, each of which alone kept the emailed link broken. The first
+  two were found in cycle 1, the third only after fixing the first two failed to produce a
+  working link.
+
+  DEFECT 3 (found last, and the reason the merge appeared to do nothing): SECRET_KEY was
+  not shared between the process that MINTS the token and the process that VERIFIES it.
+  `api/services/report_links.py` signs with `django.core.signing`, which keys off
+  `settings.SECRET_KEY`. `exact-computation-job` signs the token; the `exact-api` service
+  verifies it. Their keys differed, so `loads()` raised `BadSignature`,
+  `load_download_token` returned None, and the download view answered
+  `404 {"details":"Report not available"}` on the CORRECT host with a valid, unexpired
+  token. The keys drifted because of differing provenance: `deploy-cloudrun.yaml` deploys
+  the service from the `SECRET_KEY` secret, while `deploy.yaml:435` reads the job's copy
+  back out of the deployed App Engine version (`aev['SECRET_KEY']`) as a documented
+  workaround for an escaping bug that its own comment records as adding 2 characters.
+
+  DEFECT 2 (structural, why merging could not help): `exact-computation-job` is deployed
+  ONLY by `deploy.yaml`, and upstream commit c2a3a739 restricted that workflow to `main`.
+  No push to `review` could therefore correct the job's environment. Its config was frozen
+  at whatever the last main-era deploy left, which was the App Engine host from
+  2026-07-21. Merging the cycle-1 fix to review was structurally incapable of fixing the
+  emails.
+
+  DEFECT 1 (the original AND-gate): (1) ENVIRONMENT: the App Engine application in the
   `fao-exact-review` GCP project is `servingStatus: USER_DISABLED`, so
   `https://fao-exact-review.ew.r.appspot.com` serves nothing and Google's routing layer
   answers every request with the "Error: Page not found" HTML page. The review API now
@@ -325,12 +349,56 @@ fix: >
   `BACKEND_BASE_URL` when building the Cloud Run Job env, since the Job is the email
   sender; documented the asymmetry in `cloud-run-deploy.md` and corrected the stale host
   list in `async-jobs.md`.
-  Ops (outside the repo, still required, see checkpoint): set the review environment
-  variable `CLOUDRUN_BACKEND_BASE_URL=https://exact-api-mesob2hoya-ew.a.run.app` and
-  redeploy, or patch the live Job/service env for immediate effect.
+  Cycle 2 (after the cycle-1 merge left the emails still broken):
+  - Set the review environment variable
+    `CLOUDRUN_BACKEND_BASE_URL=https://exact-api-mesob2hoya-ew.a.run.app` via `gh`.
+    The two `gcloud run ... update` commands could NOT be applied directly: the operator
+    account lacks `iam.serviceAccounts.actAs` on
+    `fao-exact-review@appspot.gserviceaccount.com`. The CI service account
+    `github-actions-appengine@` does have it, so every live mutation was routed through CI.
+  - 6514801a: added a "Sync report download base URL into the computation job" step to
+    `deploy-cloudrun.yaml`, closing DEFECT 2. Review deploys now re-assert the sender's
+    BACKEND_BASE_URL even though `deploy.yaml` never runs for review.
+  - 5a5395db: rewrote the verification gate. The cycle-1 probe-based gate FAILED its first
+    real run: the self-hosted `gcp-temporary` runner has no public egress to `*.run.app`,
+    so curl timed out at 30s and reported a healthy URL as unreachable, blocking the deploy
+    and skipping the sync it was meant to guard. The gate now compares the configured base
+    URL against `status.url` of the service just deployed, which is decidable with no
+    network call and is exactly the condition that broke. Probing survives only as a
+    tiebreaker for a possible custom domain, and an unreachable result is inconclusive
+    rather than fatal. The outcome is carried to the sync step via
+    `REPORT_BASE_URL_VERIFIED`, so an unverified host is WITHHELD from the email sender
+    instead of propagated.
+  - c2dc92f4: added a "Sync SECRET_KEY into the computation job" step, closing DEFECT 3.
+    Takes the secret the workflow already trusts for the service as the source of truth,
+    skips when the keys already agree, and logs only sha256 prefixes, never either key.
 
 verification:
   guardrail_verdict: accepted
+  final_end_to_end_proof:
+    date: 2026-07-31
+    method: >
+      With both defects closed, minted a fresh token for job 50 locally using
+      django.core.signing with the now-shared SECRET_KEY (read from the deployed service),
+      salt "report-download", and fetched the real download endpoint on the Cloud Run host.
+      This exercises the entire chain the email link uses: host routing, signature
+      verification, job state checks and the GCS blob stream.
+    result: >
+      HTTP 200, content-type application/pdf, 71465 bytes,
+      content-disposition attachment; filename="fao.pdf", body begins with %PDF- magic.
+    live_config_confirmed:
+      - "exact-computation-job BACKEND_BASE_URL = https://exact-api-mesob2hoya-ew.a.run.app"
+      - "exact-api          BACKEND_BASE_URL = https://exact-api-mesob2hoya-ew.a.run.app"
+      - "SECRET_KEY sha256 prefix identical on job and service (2256110c4e992bb8)"
+    caveat: >
+      Links minted BEFORE the SECRET_KEY sync remain invalid, including the job 50 link the
+      user reported: they were signed with the job's old key. This is expected and not a
+      regression. Any newly generated report produces a working link.
+    residual_risk: >
+      The job's IMAGE is still owned by deploy.yaml, which is main-only, so review's
+      computation job runs code frozen at commit 391a65ad and will drift further. The user
+      explicitly scoped this session to deploy-cloudrun.yaml and chose config-sync only, so
+      job image ownership is left as separate work.
   signals:
     - name: original symptom reproduced and resolved (end-to-end)
       result: PASS
