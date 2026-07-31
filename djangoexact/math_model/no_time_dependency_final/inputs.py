@@ -39,7 +39,7 @@ class Inputs(BaseModule):
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_co2_emissions, total_co2_eq_emissions = input_single_calculation(
+                yearly_co2_emissions, total_co2_eq_emissions, co2_emissions_start = input_single_calculation(
                     self.unit_start,
                     self.unit_end,
                     self.ipcc_factor_co2,
@@ -52,13 +52,17 @@ class Inputs(BaseModule):
                 )
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_FIELD))
+                # The inventory column is headed "Value (tCO2-eq)". This used to
+                # record self.unit_start, which is activity data (tonnes of input),
+                # not an emission. co2_emissions_start is the start-year emission
+                # that seeds the yearly series above, matching ValueChain.
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, co2_emissions_start, ActivityTypes.CO2_FIELD))
 
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(
+                yearly_n2o_emissions, total_n2o_emissions, n2o_emissions_start = input_single_calculation(
                     self.unit_start,
                     self.unit_end,
                     self.ipcc_factor_n2o,
@@ -71,13 +75,13 @@ class Inputs(BaseModule):
                 )
                 n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_n2o_emissions], ActivityTypes.N20_FIELD, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, self.unit_start, ActivityTypes.N20_FIELD))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, n2o_emissions_start, ActivityTypes.N20_FIELD))
 
             if self.unit_factor_eq is None or self.emissions_factor_eq is None or self.ipcc_factor_eq is None:
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
             else:
-                yearly_co2_eq_emissions, total_co2_emissions = input_single_calculation(
+                yearly_co2_eq_emissions, total_co2_emissions, co2_eq_emissions_start = input_single_calculation(
                     self.unit_start,
                     self.unit_end,
                     self.ipcc_factor_eq,
@@ -90,7 +94,7 @@ class Inputs(BaseModule):
                 )
                 co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
-                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.unit_start, ActivityTypes.CO2_EQUIVALENT_VC))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, co2_eq_emissions_start, ActivityTypes.CO2_EQUIVALENT_VC))
 
         except Exception as e:
             traceback.print_exc()
@@ -188,13 +192,13 @@ class OperationPhaseIrrigation(BaseModule):
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
 
             # TODO: CHECK IF THIS CAN BE CHANGED TO HAVING MULTIPLE INPUTS FOR START AND END LIKE FISHERIES ECC (so backend changes from start to end and not start-0 0-end)
-            yearly_emissions_co2, _ = input_single_calculation(self.units_start, self.units_end, ef_co2, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_co2, _, _ = input_single_calculation(self.units_start, self.units_end, ef_co2, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
             yearly_emissions_co2 = [x * (1 + self.transportation_loss) for x in yearly_emissions_co2] if self.transportation_loss else yearly_emissions_co2
 
-            yearly_emissions_n2o, _ = input_single_calculation(self.units_start, self.units_end, ef_n2o, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_n2o, _, _ = input_single_calculation(self.units_start, self.units_end, ef_n2o, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
             yearly_emissions_n2o = [x * (1 + self.transportation_loss) for x in yearly_emissions_n2o] if self.transportation_loss else yearly_emissions_n2o
 
-            yearly_emissions_ch4, _ = input_single_calculation(self.units_start, self.units_end, ef_ch4, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_ch4, _, _ = input_single_calculation(self.units_start, self.units_end, ef_ch4, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
             yearly_emissions_ch4 = [x * (1 + self.transportation_loss) for x in yearly_emissions_ch4] if self.transportation_loss else yearly_emissions_ch4
 
             irrigation_operational_emission_set = YearlyGasActivityEmissionSet(
@@ -212,9 +216,17 @@ class OperationPhaseIrrigation(BaseModule):
             )
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
-            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.CO2, ActivityTypes.IRRIGATION_OPERATIONAL))
-            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.N2O, ActivityTypes.IRRIGATION_OPERATIONAL))
-            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(0, GasTypes.CH4, ActivityTypes.IRRIGATION_OPERATIONAL))
+            # InventoryPerGasPerActivity takes (gas_type, value, activity). The
+            # gas and the value used to be passed the other way round, which set
+            # gas_type to 0 and value to a GasTypes member. That stayed invisible
+            # while nothing read this inventory; once it is aggregated, summing
+            # two GasTypes members raises TypeError and to_dict() emits a
+            # non-serialisable enum. Value stays 0 here, matching Roads and the
+            # deforestation placeholders: the operational phase has no start-year
+            # baseline, it only exists from the intervention onwards.
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.IRRIGATION_OPERATIONAL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.IRRIGATION_OPERATIONAL))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.IRRIGATION_OPERATIONAL))
 
         except Exception as e:
             traceback.print_exc()
@@ -350,7 +362,20 @@ class NewIrrigation(BaseModule):
                 0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay
             )
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
-            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, self.units_start, ActivityTypes.NEW_IRRIGATION))
+            # This used to record self.units_start, which is hectares (activity
+            # data) in a column headed "Value (tCO2-eq)". 0 is recorded instead of
+            # a derived figure because there is no start-year emission to report:
+            # total_emissions above is ef * (units_end - units_start), a one-off
+            # embodied emission of infrastructure the project BUILDS, proportional
+            # to the area delta. ef * units_start would be the embodied emission of
+            # irrigation that already existed before the project, which is a
+            # historical one-off and not a baseline annual flux. Every family that
+            # reports a real number here (ValueChain, ElectricityConsumption,
+            # SolidAndLiquidFuelsConsumption, and now Inputs) records the start-year
+            # ANNUAL rate that seeds its yearly series, and this module has no such
+            # rate. Matches Roads, which has the same delta shape with an implicit
+            # units_start of 0, and the OperationPhaseIrrigation rows.
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.NEW_IRRIGATION))
 
         except Exception as e:
             traceback.print_exc()

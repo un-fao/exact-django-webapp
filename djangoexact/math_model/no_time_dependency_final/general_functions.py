@@ -363,9 +363,13 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
     except Exception as e:
         traceback.print_exc()
         raise e
-        
 
-    return annual_emissions, sum(annual_emissions)
+    # emissions_start is returned so callers can record the start-year emission in
+    # the GHG inventory. It used to be discarded, which forced Inputs to fall back
+    # to writing unit_start (activity data, e.g. tonnes of fertiliser) into a column
+    # headed "Value (tCO2-eq)". It is the same seed value that ValueChain records,
+    # so the two families now agree on what a baseline inventory row means.
+    return annual_emissions, sum(annual_emissions), emissions_start
 
 
 def input_single_calculation_different_ef(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emission_factor_start, emission_factor_end, time_implementation, time_capitalization, rate_type):
