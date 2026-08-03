@@ -55,7 +55,7 @@ matplotlib==3.8.2
 firebase-admin==6.5.0
 requests==2.33.0
 django-unfold==0.34.0
-django-modeltranslation==0.19.9
+django-modeltranslation==0.20.3
 XlsxWriter==3.2.0
 openpyxl==3.1.2
 django-ckeditor==6.7.1
