@@ -15,7 +15,14 @@ on:
 
 jobs:
   test:
-    runs-on: 'gcp-temporary'
+    # GitHub-hosted. The self-hosted 'gcp-temporary' label this used to target
+    # stopped registering runners on 2026-07-30, and a queued job only starts
+    # when a matching runner appears, so every Deploy run since then sat in the
+    # queue indefinitely (22 of them by 2026-08-03, main included). Nothing in
+    # this job needs to run inside GCP: it talks to a service container, not to
+    # any Google API. Pinned to 22.04 rather than ubuntu-latest because that is
+    # the image this job has actually been proven green on.
+    runs-on: ubuntu-22.04
     services:
       postgres:
         image: postgres:15
@@ -206,7 +213,13 @@ jobs:
     # develop is the non-production deployment target; main remains production
     # and review remains the review environment.
     if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main' || github.ref_name == 'review' || github.ref_name == 'feature/id-responses')
-    runs-on: gcp-temporary
+    # GitHub-hosted, same reason as the test job above. Leaving GCP costs this
+    # job no reachability: it authenticates through Workload Identity Federation
+    # rather than the metadata server, and the cloud-sql-proxy step below is
+    # invoked without --private-ip, so it was already reaching the instance over
+    # its public IP with an ephemeral client cert. Both work from any host with
+    # egress.
+    runs-on: ubuntu-22.04
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
       id-token: 'write'
@@ -345,8 +358,10 @@ jobs:
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
     - name: Set up Docker Buildx
-      # The temporary runner may not have the Docker CLI plugin installed.
-      # Install it before the BuildKit-backed image build.
+      # Originally here because the self-hosted runner might not have the Docker
+      # CLI plugin installed. The GitHub-hosted image ships Buildx, so this is
+      # now about pinning the builder rather than supplying a missing one; keep
+      # it so the build stays BuildKit-backed regardless of image changes.
       uses: docker/setup-buildx-action@v3
 
     - name: Build computation-job image
