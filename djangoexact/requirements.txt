@@ -68,5 +68,5 @@ google-cloud-storage==2.19.0
 google-cloud-run==0.16.0
 factory-boy==3.3.3
 faostat==2.0.1
-tqdm==4.67.1
+tqdm==4.69.1
 whitenoise==6.12.0
