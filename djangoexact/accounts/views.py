@@ -1,4 +1,5 @@
 import json
+import logging
 
 from api.models import CustomUser as User
 from django.contrib.auth import login
@@ -12,6 +13,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+logger = logging.getLogger(__name__)
 
 import accounts.utils as utils
 from djangoexact.settings import auth
@@ -217,8 +220,10 @@ class TokenRefreshView(APIView):
     @swagger_auto_schema(
         responses={200: LoginResponseSerializer, 400: "Bad Request"},
     )
-    @transaction.atomic
     def post(self, request):
+        # No @transaction.atomic: this view performs no DB writes (Firebase only).
+        # The wrapper forced a DB connection open and turned a transient Cloud SQL
+        # restart into a hard 500 on token refresh.
         data = request.data
 
         try:
@@ -234,6 +239,26 @@ class TokenRefreshView(APIView):
 
             return Response(extra_data, status=status.HTTP_200_OK)
 
+        except OperationalError:
+            logger.warning("Token refresh failed: DB unavailable", exc_info=True)
+            response = Response(
+                {"details": "Service temporarily unavailable, please retry."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+            response["Retry-After"] = "5"
+            return response
+
         except Exception as e:
-            foo = json.loads(e.strerror)
-            return Response({"details": foo["error"]["message"]}, status=status.HTTP_400_BAD_REQUEST)
+            # Firebase errors carry a JSON payload in e.strerror; older auth lib
+            # versions or non-Firebase exceptions don't, so parse defensively
+            # instead of letting json.loads(None) raise a secondary TypeError
+            # (which used to surface as a Django debug page in production).
+            message = "Invalid refresh token."
+            raw = getattr(e, "strerror", None)
+            if isinstance(raw, str):
+                try:
+                    message = json.loads(raw)["error"]["message"]
+                except (ValueError, KeyError, TypeError):
+                    pass
+            logger.warning("Token refresh failed: %s", e, exc_info=True)
+            return Response({"details": message}, status=status.HTTP_400_BAD_REQUEST)
