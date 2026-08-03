@@ -1,0 +1,29 @@
+[
+  {
+    "model": "api.largefisheryparameter",
+    "pk": 3,
+    "fields": {
+      "name": "large_fishery_kw_tonnes",
+      "value": 60.0,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.largefisheryparameter",
+    "pk": 1,
+    "fields": {
+      "name": "large_fishery_lost_refrigerant_default",
+      "value": 0.48734,
+      "unit": null
+    }
+  },
+  {
+    "model": "api.largefisheryparameter",
+    "pk": 2,
+    "fields": {
+      "name": "large_fishery_tonnes_ice_default",
+      "value": 2.8,
+      "unit": null
+    }
+  }
+]

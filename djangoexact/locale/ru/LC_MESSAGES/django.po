@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
@@ -12,33 +13,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "\n"
-"X-Loco-Source-Locale: it_IT\n"
-"X-Loco-Parser: loco_parse_po\n"
 "X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Loco-Source-Locale: it_IT\n"
 
 #: api/models.py:2981
 msgid "Field Definition"
-msgstr ""
+msgstr "Определение поля"
 
 #: api/models.py:2982
 msgid "Field Definitions"
-msgstr ""
+msgstr "Определения полей"
 
 #: api/views.py:944
 msgid "increases"
-msgstr ""
+msgstr "увеличивается"
 
 #: api/views.py:945
 msgid "decreases"
-msgstr ""
+msgstr "уменьшается"
 
 #: api/views.py:993
 msgid "hectares"
-msgstr ""
+msgstr "гектары"
 
 #: api/views.py:995
 msgid "tonnes of catch"
-msgstr ""
+msgstr "тонны улова"
 
 #: api/views.py:997
 #, fuzzy
@@ -48,11 +49,11 @@ msgstr "Домашний скот"
 
 #: api/views.py:1000
 msgid "energy consumption"
-msgstr ""
+msgstr "потребление энергии"
 
 #: api/views.py:1002
 msgid "packaging material"
-msgstr ""
+msgstr "упаковочный материал"
 
 #: api/views.py:1004
 #, fuzzy
@@ -61,102 +62,82 @@ msgid "agricultural inputs use"
 msgstr "Сельскохозяйственные постройки (металл)"
 
 #, fuzzy
-#~| msgid "Land Use Change"
 #~ msgid "land_use_change"
 #~ msgstr "Изменение землепользования"
 
 #, fuzzy
-#~| msgid "Organic Soil"
 #~ msgid "organic_soil"
 #~ msgstr "Органическая почва"
 
 #, fuzzy
-#~| msgid "Education"
 #~ msgid "production_w"
 #~ msgstr "Образование"
 
 #, fuzzy
-#~| msgid "Education"
 #~ msgid "production_wo"
 #~ msgstr "Образование"
 
 #, fuzzy
-#~| msgid "Waterbody"
 #~ msgid "waterbody_type"
 #~ msgstr "Водоём"
 
 #, fuzzy
-#~| msgid "Eutrophic"
 #~ msgid "trophic_type_w"
 #~ msgstr "Эвтрофный"
 
 #, fuzzy
-#~| msgid "Electricity"
 #~ msgid "electricity_used_t2_w"
 #~ msgstr "Электричество"
 
 #, fuzzy
-#~| msgid "Electricity"
 #~ msgid "electricity_used_t2_wo"
 #~ msgstr "Электричество"
 
 #, fuzzy
-#~| msgid "Electricity"
 #~ msgid "electricity_ef_t2_w"
 #~ msgstr "Электричество"
 
 #, fuzzy
-#~| msgid "Electricity"
 #~ msgid "electricity_ef_t2_wo"
 #~ msgstr "Электричество"
 
 #, fuzzy
-#~| msgid "Irrigation System"
 #~ msgid "irrigation_system_type"
 #~ msgstr "Система орошения"
 
 #, fuzzy
-#~| msgid "Building"
 #~ msgid "building_type"
 #~ msgstr "Здание"
 
 #, fuzzy
-#~| msgid "Settlement"
 #~ msgid "settlement_type_w"
 #~ msgstr "Поселение"
 
 #, fuzzy
-#~| msgid "Settlement"
 #~ msgid "settlement_type_wo"
 #~ msgstr "Поселение"
 
 #, fuzzy
-#~| msgid "Moist"
 #~ msgid "moisture"
 #~ msgstr "Влажный"
 
 #, fuzzy
-#~| msgid "Aggregated"
 #~ msgid "created_at"
 #~ msgstr "совокупный"
 
 #, fuzzy
-#~| msgid "Project"
 #~ msgid "project"
 #~ msgstr "Проект"
 
 #, fuzzy
-#~| msgid "Education"
 #~ msgid "description"
 #~ msgstr "Образование"
 
 #, fuzzy
-#~| msgid "Education"
 #~ msgid "duration_t2"
 #~ msgstr "Образование"
 
 #, fuzzy
-#~| msgid "Activity"
 #~ msgid "activity"
 #~ msgstr "деятельность"
 
@@ -1172,13 +1153,11 @@ msgstr "Сельскохозяйственные постройки (метал�
 
 #~ msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
 #~ msgstr ""
-#~ "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения "
-#~ "климата"
+#~ "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
 
 #~ msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
 #~ msgstr ""
-#~ "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения "
-#~ "климата"
+#~ "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
 
 #~ msgid "IPCC Sixth Assessment Report (AR6)"
 #~ msgstr "Шестой оценочный отчет МГЭИК (ОД6)"

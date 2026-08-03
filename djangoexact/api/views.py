@@ -1,5 +1,8 @@
+import json
 import os
 import logging
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from django.urls import reverse
 from django.conf import settings
@@ -8,9 +11,11 @@ import numpy as np
 import traceback
 
 from django.contrib.auth.models import Group
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -30,6 +35,7 @@ import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
+from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
 from django.template.loader import render_to_string
@@ -57,6 +63,7 @@ from .models import (
     Note,
     FieldDefinition,
     LandModule,
+    MAX_ACTIVITIES_PER_PROJECT,
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
@@ -70,6 +77,7 @@ from .models import (
     LargeFishery,
     PublicToken,
     HandInHandAssessment,
+    AsyncJob,
 )
 from .serializers import (
     ActionTypes,
@@ -83,6 +91,8 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
+    ProjectExportSerializer,
+    ProjectImportSerializer,
     ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -123,14 +133,15 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ProjectInvitationAcceptSerializer,
+    AsyncJobSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-import api.reports as reports
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
+import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
@@ -140,6 +151,8 @@ import base64
 import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from api.services import async_jobs
+from api.services import report_links
 
 logger = logging.getLogger("console")
 
@@ -154,6 +167,19 @@ project_id = openapi.Parameter(
     openapi.IN_QUERY,
     description="ID of project related to the activity",
     type=openapi.TYPE_INTEGER,
+)
+activity_status = openapi.Parameter(
+    "status",
+    openapi.IN_QUERY,
+    description="Filter activities by computed status. Accepts one or more values as a comma-separated list and/or a repeated parameter (e.g. status=IN PROGRESS,EMPTY).",
+    type=openapi.TYPE_ARRAY,
+    items={"type": openapi.TYPE_STRING, "enum": ["READY", "IN PROGRESS", "EMPTY"]},
+)
+activity_ready = openapi.Parameter(
+    "ready",
+    openapi.IN_QUERY,
+    description="Convenience status filter: true returns only READY activities, false returns the rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.",
+    type=openapi.TYPE_BOOLEAN,
 )
 include_related = openapi.Parameter(
     "include_related",
@@ -333,6 +359,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         new_password = serializer.validated_data["password_new"]
 
+        validate_password(new_password, user=user)
         user.set_password(new_password)
         user.save()
 
@@ -385,6 +412,20 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+
+def get_version_config():
+    """Read version config from file or environment."""
+    config_paths = [
+        Path(__file__).parent.parent.parent / 'version.config.json',
+        Path(os.environ.get('EXACT_USER_DATA_DIR', '')) / 'version.config.json',
+    ]
+    for config_path in config_paths:
+        if config_path.exists():
+            with open(config_path) as f:
+                return json.load(f)
+    # Default for development
+    return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -455,12 +496,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             # Ensures the table is a valid identifier, reducing the risk of SQL injection
                             if not table_name.isidentifier():
                                 raise ValueError("Invalid table name")
-                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosemgrep
+                            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])  # nosec B608
                     table_name = m._meta.db_table
                     # Ensures the table is a valid identifier, reducing the risk of SQL injection
                     if not table_name.isidentifier():
                         raise ValueError("Invalid table name")
-                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosemgrep
+                    # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])  # nosec B608
 
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
@@ -484,6 +527,30 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return error
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
+
+    def _attach_project_counts(self, projects):
+        """Attach _activity_count/_module_count to each Project in one query.
+
+        Batches the counts so the serializer getters never hit the DB per object.
+        module_count mirrors the copy_async threshold formula: the number of
+        activity -> module_types join rows across the project's activities.
+        """
+        ids = [p.pk for p in projects]
+        if not ids:
+            return
+        rows = (
+            Project.objects.filter(pk__in=ids)
+            .annotate(
+                _ac=Count("activities", distinct=True),
+                _mc=Count("activities__module_types"),
+            )
+            .values_list("pk", "_ac", "_mc")
+        )
+        counts = {pk: (ac, mc) for pk, ac, mc in rows}
+        for p in projects:
+            ac, mc = counts.get(p.pk, (0, 0))
+            p._activity_count = ac
+            p._module_count = mc
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -567,13 +634,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
-            # Serial serialization: each ThreadPoolExecutor thread opens its own
-            # Django thread-local DB connection. With 10 workers per request, a
-            # handful of concurrent requests saturated the App Engine ↔ Cloud SQL
-            # Auth Proxy cap of 100 connections, surfacing as "Connection refused".
-            response = [serialize_project(project) for project in page]
+            self._attach_project_counts(page)
+            # Serialized on the request's own connection: a thread pool here
+            # costs one Postgres connection per worker per request (see
+            # api/concurrency.py). default_language() preserves the response
+            # bytes, since thread-pool workers never inherited the request
+            # language and always rendered in settings.LANGUAGE_CODE.
+            with concurrency.default_language():
+                response = [serialize_project(project) for project in page]
             return paginator.get_paginated_response(response)
 
+        self._attach_project_counts(ordered_projects)
         return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     activities = openapi.Parameter(
@@ -614,8 +685,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
         response = serialized_project
@@ -627,16 +698,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Serial processing: parallel threads each opened their own Django
-        # thread-local DB connection and saturated the App Engine ↔ Cloud SQL
-        # Auth Proxy cap of 100 connections per instance.
-        for pk in activity_pks:
-            try:
-                data = process_activity(pk)
-            except Exception as exc:
-                logging.error(f"Activity {pk} generated an exception: {exc}")
-            else:
-                response["activities"].append(data)
+        def log_activity_failure(activity_pk, exc):
+            logging.error(f"Activity {activity_pk} generated an exception: {exc}")
+
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
+        response["activities"] = concurrency.map_in_bounded_threads(
+            process_activity,
+            activity_pks,
+            on_error=log_activity_failure,
+        )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -666,11 +737,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
-            selected_activities = None
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
+            selected_activities = project.activities.all()
         else:
             selected_activities = project.activities.filter(pk__in=selected_activities)
+        selected_activities = list(selected_activities)
 
         if not project.is_ready(selected_activities):
             logging.error("Project is not ready")
@@ -681,9 +753,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return response
 
         try:
-            report = reports.BaseProjectReport(project, activities=selected_activities)
-            _, file_bytes_buffer = report.build_report()
-            report.close_file()
+            from .reports import generate_excel_report
+            file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
         except Exception as e:
             traceback.print_exc()
             logger.error(f"Error generating report: {e}")
@@ -698,6 +769,451 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["post"], url_path="report/async")
+    def report_async(self, request, pk=None):
+        """Enqueue a report for background generation. Returns 202 + job id.
+
+        The existing synchronous `report/` action is unchanged. Poll the job at
+        GET /api/async-jobs/{id}/ then download via that job's /download/ action.
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
+            activity_ids = None
+            selected_activities = project.activities.all()
+        else:
+            activity_ids = [int(pk) for pk in selected_activities]
+            selected_activities = project.activities.filter(pk__in=selected_activities)
+        selected_activities = list(selected_activities)
+
+        if not project.is_ready(selected_activities):
+            logging.error("Project is not ready")
+            return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        template_name = request.query_params.get("template")
+        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
+
+        if fmt == "pdf" and not template_name:
+            return utils.ErrorResponse("Template name is required for PDF", status=http_status.HTTP_400_BAD_REQUEST)
+
+        params = {
+            "project_id": project.pk,
+            "activity_ids": activity_ids,
+            "format": fmt,
+            "template": template_name,
+            "lang": lang,
+        }
+        job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
+        return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Export project as .exactproject file",
+        responses={
+            200: "Project exported successfully",
+            403: "Permission denied",
+            404: "Project not found"
+        }
+    )
+    def export(self, request, pk=None):
+        """Export a project with all its activities and modules."""
+        project: Project = get_object_or_404(Project, pk=pk)
+
+        # Check permission
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        # Generate export_id if not exists
+        if not project.export_id:
+            project.export_id = uuid.uuid4()
+            project.save(update_fields=['export_id'])
+
+        # Get version config
+        version_config = get_version_config()
+
+        # Build export data
+        serializer = ProjectExportSerializer(project)
+        export_data = {
+            "formatVersion": 1,
+            "appVersion": version_config.get("appVersion", "1.0.0"),
+            "compatibilityGroup": version_config.get("compatibilityGroup", 1),
+            "exportedAt": timezone.now().isoformat(),
+            "exportId": str(project.export_id),
+            "project": serializer.data
+        }
+
+        # Return as JSON file
+        response = HttpResponse(
+            json.dumps(export_data, indent=2, default=str),
+            content_type="application/json"
+        )
+        safe_name = project.name.replace('"', '').replace('/', '-')[:50]
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}.exactproject"'
+        return response
+
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(
+        operation_description="Import a .exactproject file",
+        request_body=ProjectImportSerializer,
+        responses={
+            200: "Project already exists",
+            201: "Project imported successfully",
+            400: "Invalid file format or compatibility mismatch"
+        }
+    )
+    def import_project(self, request):
+        """Import a project from .exactproject file data."""
+        serializer = ProjectImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return utils.ErrorResponse(
+                serializer.errors,
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        validated_data = serializer.validated_data
+        export_id = validated_data['exportId']
+        force_copy = request.query_params.get('forceCopy', 'false').lower() == 'true'
+
+        # Check if project with this export_id already exists
+        if not force_copy:
+            existing = Project.objects.filter(export_id=export_id).first()
+            if existing:
+                return Response({
+                    "exists": True,
+                    "projectId": existing.id,
+                    "projectName": existing.name
+                }, status=http_status.HTTP_200_OK)
+
+        # Create new project
+        project_data = validated_data['project'].copy()
+
+        def _create_comment(thread, comment_data, author_cache, parent=None):
+            """
+            Recursively create a comment and its replies.
+            Returns the created Comment instance.
+            """
+            from dateutil import parser as date_parser
+
+            author_email = comment_data.get('author_email')
+            author = None
+            if author_email:
+                if author_email in author_cache:
+                    author = author_cache[author_email]
+                else:
+                    author = CustomUser.objects.filter(email=author_email).first()
+                    author_cache[author_email] = author
+
+            # If author not found, use the importing user
+            if author is None:
+                author = request.user
+
+            # Parse date_created if provided
+            date_created = None
+            if comment_data.get('date_created'):
+                try:
+                    date_created = date_parser.parse(comment_data['date_created'])
+                except (ValueError, TypeError):
+                    pass
+
+            comment = Comment.objects.create(
+                thread=thread,
+                parent=parent,
+                author=author,
+                content=comment_data.get('content', ''),
+            )
+
+            # Update date_created if provided (auto_now_add prevents setting during create)
+            if date_created:
+                Comment.objects.filter(pk=comment.pk).update(date_created=date_created)
+
+            # Create replies recursively
+            for reply_data in comment_data.get('replies', []):
+                _create_comment(thread, reply_data, author_cache, parent=comment)
+
+            return comment
+
+        def _reconstruct_threads(instance, module_data, author_cache):
+            """
+            Reconstruct CommentThread objects for a module from exported thread data.
+            This handles thread fields that contain comment data from the export.
+            """
+            for field in instance._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if not field_name.endswith('_thread'):
+                    continue
+
+                thread_data = module_data.get(field_name)
+                if not thread_data or not isinstance(thread_data, dict):
+                    continue
+
+                comments_data = thread_data.get('comments', [])
+                if not comments_data:
+                    continue
+
+                # Get the thread that was created by the module's save() method
+                thread = getattr(instance, field_name, None)
+                if thread is None:
+                    # Create a new thread if one doesn't exist
+                    thread = CommentThread.objects.create()
+                    setattr(instance, field_name, thread)
+                    instance.save(update_fields=[field_name])
+
+                # Create comments within the thread
+                for comment_data in comments_data:
+                    _create_comment(thread, comment_data, author_cache)
+
+        def prepare_model_data(model_class, data, module_id_map=None):
+            """
+            Filter data to valid model fields and convert FK fields to use _id suffix.
+            Django expects FK fields as either model instances or field_id=integer.
+            Since exports contain integer IDs, we need to use the _id suffix.
+
+            For OneToOneField cross-references between modules in the same
+            activity (e.g. Settlement.land_use_change → LandUseChange),
+            ``module_id_map`` remaps old PKs to newly-created instances.
+            """
+            import re
+            from django.db.models import ForeignKey
+            from django.db.models.fields.related import OneToOneField
+
+            if module_id_map is None:
+                module_id_map = {}
+
+            result = {}
+            for field in model_class._meta.get_fields():
+                if not hasattr(field, 'column'):
+                    continue
+                field_name = field.name
+                if field_name not in data:
+                    continue
+                value = data[field_name]
+
+                # Skip _thread FK fields — these now contain thread/comment data
+                # that will be reconstructed after the module is created.
+                if isinstance(field, ForeignKey) and field_name.endswith('_thread'):
+                    continue
+
+                # OneToOneField cross-module references need ID remapping
+                # because the referenced module was re-created with a new PK.
+                if isinstance(field, OneToOneField):
+                    if isinstance(value, int) and value in module_id_map:
+                        # New export format: integer ID that maps to a
+                        # previously-created module in this activity.
+                        result[f"{field_name}_id"] = module_id_map[value].id
+                    elif isinstance(value, str):
+                        # Old export format: string like "(4) LandUseChange
+                        # in settlements". Parse the PK and remap.
+                        match = re.match(r'\((\d+)\)', value)
+                        if match:
+                            old_pk = int(match.group(1))
+                            if old_pk in module_id_map:
+                                result[f"{field_name}_id"] = module_id_map[old_pk].id
+                        # If not in the map the target module hasn't been
+                        # created yet or doesn't exist — skip gracefully
+                        # (the field is nullable).
+                    elif isinstance(value, int):
+                        # Reference-data FK (e.g. OrganicSoil pointing to
+                        # a shared record) — not in the map, use as-is.
+                        result[f"{field_name}_id"] = value
+                    continue
+
+                # For ForeignKey fields with integer values, use field_id suffix
+                if isinstance(field, ForeignKey) and isinstance(value, int):
+                    result[f"{field_name}_id"] = value
+                else:
+                    result[field_name] = value
+            return result
+
+        try:
+            with transaction.atomic():
+                # Extract activities before creating project
+                activities_data = project_data.pop('activities', [])
+
+                # Prepare project data with proper FK handling
+                filtered_project_data = prepare_model_data(Project, project_data)
+
+                # Generate unique name if needed (unique_together on name + owner)
+                base_name = filtered_project_data.get('name', 'Imported Project')
+                name = base_name
+                counter = 1
+                while Project.objects.filter(name=name, owner=request.user).exists():
+                    counter += 1
+                    name = f"{base_name} (Copy {counter})" if counter > 2 else f"{base_name} (Copy)"
+                filtered_project_data['name'] = name
+
+                # Create project
+                project = Project.objects.create(
+                    owner=request.user,
+                    export_id=export_id if not force_copy else uuid.uuid4(),
+                    **filtered_project_data
+                )
+
+                # Lock project and create membership (same as regular create)
+                project.lock(request.user)
+                ProjectMembership.objects.create(
+                    user=request.user,
+                    project=project,
+                    group=Group.objects.get_or_create(name="Admin")[0]
+                )
+
+                # Create activities and modules
+                for activity_data in activities_data:
+                    activity_data = activity_data.copy()
+                    modules_data = activity_data.pop('modules', {})
+                    module_types_data = activity_data.pop('module_types', [])
+
+                    # Prepare activity data with proper FK handling
+                    filtered_activity_data = prepare_model_data(Activity, activity_data)
+
+                    activity = Activity.objects.create(
+                        project=project,
+                        owner=request.user,
+                        **filtered_activity_data
+                    )
+
+                    # Set module types
+                    if module_types_data:
+                        activity.module_types.set(module_types_data)
+
+                    # Sort so modules referenced via OneToOneField are created
+                    # first: OrganicSoil → LandUseChange → everything else.
+                    def _module_sort_key(item):
+                        priority = {'OrganicSoil': 0, 'LandUseChange': 1}
+                        return priority.get(item[0], 2)
+
+                    modules_data = dict(sorted(modules_data.items(), key=_module_sort_key))
+
+                    # Maps old module PK → newly-created instance so that
+                    # cross-module OneToOneField refs can be resolved.
+                    module_id_map = {}
+
+                    # Cache for author lookups to avoid repeated DB queries
+                    author_cache = {}
+
+                    # Create modules
+                    for module_type, modules_list in modules_data.items():
+                        model_class = self._get_module_class(module_type)
+                        if model_class:
+                            for module_data in modules_list:
+                                module_data = module_data.copy()
+                                original_id = module_data.pop('_original_id', None)
+                                submodules_data = module_data.pop('_submodules', [])
+
+                                filtered_module_data = prepare_model_data(
+                                    model_class, module_data, module_id_map
+                                )
+                                new_instance = model_class.objects.create(
+                                    activity=activity,
+                                    **filtered_module_data
+                                )
+
+                                if original_id is not None:
+                                    module_id_map[original_id] = new_instance
+
+                                # Reconstruct threads with comments for the module
+                                _reconstruct_threads(new_instance, module_data, author_cache)
+
+                                # Create submodules if present in the export
+                                if submodules_data:
+                                    self._create_submodules(
+                                        new_instance, submodules_data, prepare_model_data,
+                                        _reconstruct_threads, author_cache, module_id_map
+                                    )
+
+                return Response({
+                    "exists": False,
+                    "projectId": project.id,
+                    "projectName": project.name
+                }, status=http_status.HTTP_201_CREATED)
+
+        except Exception as e:
+            logger.error(f"Failed to import project: {str(e)}")
+            return utils.ErrorResponse(
+                f"Failed to import project: {str(e)}",
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+    def _get_module_class(self, class_name):
+        """Get module model class by name."""
+        from . import models
+        return getattr(models, class_name, None)
+
+    def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
+                           reconstruct_threads_fn, author_cache, module_id_map):
+        """
+        Create submodules for a parent module from exported submodule data.
+
+        Args:
+            parent_instance: The parent module instance
+            submodules_data: List of submodule data dictionaries from export
+            prepare_model_data: Function to filter model data
+            reconstruct_threads_fn: Function to reconstruct thread comments
+            author_cache: Cache for author lookups
+            module_id_map: Map of original IDs to new instances
+        """
+        for submodule_data in submodules_data:
+            submodule_data = submodule_data.copy()
+            original_id = submodule_data.pop('_original_id', None)
+            nested_submodules = submodule_data.pop('_submodules', [])
+            submodule_type = submodule_data.pop('_submodule_type', None)
+
+            # Get the submodule class
+            submodule_class = None
+
+            # First try to use the stored submodule type from the export
+            if submodule_type:
+                submodule_class = self._get_module_class(submodule_type)
+
+            # Fallback: try to determine from parent's related models
+            if submodule_class is None:
+                for field in parent_instance._meta.get_fields():
+                    if hasattr(field, 'related_model') and hasattr(field, 'related_query_name'):
+                        related_model = field.related_model
+                        # Check if this related model has a 'parent' field pointing to our parent class
+                        for related_field in related_model._meta.get_fields():
+                            if hasattr(related_field, 'column') and related_field.name == 'parent':
+                                if hasattr(related_field, 'related_model'):
+                                    if related_field.related_model == parent_instance.__class__:
+                                        submodule_class = related_model
+                                        break
+                    if submodule_class:
+                        break
+
+            if submodule_class is None:
+                logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
+                continue
+
+            filtered_submodule_data = prepare_model_data(
+                submodule_class, submodule_data, module_id_map
+            )
+
+            # Create the submodule with parent reference
+            new_submodule = submodule_class.objects.create(
+                parent=parent_instance,
+                **filtered_submodule_data
+            )
+
+            if original_id is not None:
+                module_id_map[original_id] = new_submodule
+
+            # Reconstruct threads for the submodule
+            reconstruct_threads_fn(new_submodule, submodule_data, author_cache)
+
+            # Recursively create nested submodules if present
+            if nested_submodules:
+                self._create_submodules(
+                    new_submodule, nested_submodules, prepare_model_data,
+                    reconstruct_threads_fn, author_cache, module_id_map
+                )
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
@@ -752,10 +1268,44 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return error
 
         new_project = utils.copy_project(project, self.request.user)
-        ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
+        # (removed) ProjectMembership.objects.create(...): copy_project already
+        # creates the Admin membership inside its transaction. The old call ran
+        # outside that transaction and could orphan a committed project on failure,
+        # or duplicate the membership.
 
         serializer = ReadProjectSerializer(new_project, context={"request": request})
         return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="copy/async")
+    def copy_async(self, request, pk=None):
+        """Smart copy: inline (201) for small projects, offloaded (202) for large.
+
+        The legacy synchronous `copy/` action is unchanged. New clients should call
+        this endpoint and handle both 201 (body is the new project) and 202
+        (poll GET /api/async-jobs/{job_id}/, then GET /api/projects/{new_project_id}/).
+        """
+        project = self.get_object()
+        error = security.check_permission("view_project", request.user, project)
+        if error:
+            return error
+
+        activity_count = project.activities.count()
+        module_count = sum(a.module_types.count() for a in project.activities.all())
+        threshold = getattr(settings, "PROJECT_COPY_ASYNC_THRESHOLD", 40)
+
+        if activity_count + module_count <= threshold:
+            new_project = utils.copy_project(project, request.user)
+            serializer = ReadProjectSerializer(new_project, context={"request": request})
+            return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
+
+        with transaction.atomic():
+            shell = utils.create_project_shell(project, request.user)
+        params = {"source_project_id": project.pk, "target_project_id": shell.pk}
+        job = async_jobs.enqueue(AsyncJob.Kind.PROJECT_COPY, params, user=request.user, project=shell)
+        return Response(
+            {"job_id": job.pk, "new_project_id": shell.pk, "status": job.status},
+            status=http_status.HTTP_202_ACCEPTED,
+        )
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipReadSerializer})
@@ -878,397 +1428,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
-            activate(lang)
+            from .reports import compute_project_result
+            from .reports.html_context import build_template_context
 
             project: Project = self.get_object()
-            soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
-            # Calculate total area of all activities
-            total_area = sum(activity.area for activity in project.activities.all())
-
-            # Call project results endpoint
-            total_results_response = self.results(request, pk=pk)
-
-            total_data = total_results_response.data
-            activities = total_data["activities"]
-            modules = [module for activity in activities for module in activity["modules"]]
-            results = [module["results"] for module in modules]
-            # TODO: Maybe instead of doing this show the module but with an error message
-            total_w = sum(result["total_w"] for result in results if result.get("total_w", None) is not None)
-            total_wo = sum(result["total_wo"] for result in results if result.get("total_wo", None) is not None)
-            total_balance = total_w - total_wo
-
-            project_emissions_w = total_w
-            project_emissions_wo = total_wo
-            project_emissions_balance = total_balance
-
-            new_request = request._request
-            new_request.query_params = request.query_params.copy()
-            new_request.query_params["aggregate"] = "gas"
-
-            gas_results_response = self.results(new_request, pk=pk)
-            gas_data = gas_results_response.data
-            activities = gas_data["activities"]
-            modules = [module for activity in activities for module in activity["modules"]]
-            results = [module["results"] for module in modules]
-
-            emissions_w = [result["total_w"] for result in results if result.get("total_w", None) is not None]
-            emissions_wo = [result["total_wo"] for result in results if result.get("total_wo", None) is not None]
-
-            co2_w = {"name": "CO2", "value": 0}
-            ch4_w = {"name": "CH4", "value": 0}
-            n2o_w = {"name": "N2O", "value": 0}
-            co_w = {"name": "CO", "value": 0}
-            doc_w = {"name": "DOC", "value": 0}
-            other_w = {"name": "OTHER", "value": 0}
-
-            gases_w = [co2_w, ch4_w, n2o_w, co_w, doc_w, other_w]
-
-            for w in emissions_w:
-                for g in w:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc_w["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other_w["value"] += sum([e["value"] for e in g["emissions"]])
-
-            co2_wo = {"name": "CO2", "value": 0}
-            ch4_wo = {"name": "CH4", "value": 0}
-            n2o_wo = {"name": "N2O", "value": 0}
-            co_wo = {"name": "CO", "value": 0}
-            doc_wo = {"name": "DOC", "value": 0}
-            other_wo = {"name": "OTHER", "value": 0}
-
-            gases_wo = [co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo]
-
-            for wo in emissions_wo:
-                for g in wo:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc_wo["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other_wo["value"] += sum([e["value"] for e in g["emissions"]])
-
-            balances = [result["balance"] for result in results if result.get("balance", None) is not None]
-
-            co2 = {"name": "CO2", "value": 0}
-            ch4 = {"name": "CH4", "value": 0}
-            n2o = {"name": "N2O", "value": 0}
-            co = {"name": "CO", "value": 0}
-            doc = {"name": "DOC", "value": 0}
-            other = {"name": "OTHER", "value": 0}
-
-            for b in balances:
-                for g in b:
-                    if g["gas_type"]["name"] == "CO2":
-                        co2["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CH4":
-                        ch4["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "N2O":
-                        n2o["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "CO":
-                        co["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "DOC":
-                        doc["value"] += sum([e["value"] for e in g["emissions"]])
-                    if g["gas_type"]["name"] == "OTHER":
-                        other["value"] += sum([e["value"] for e in g["emissions"]])
-
-            gases = [co2, ch4, n2o, co, doc, other]
-
-            INCREASES = _("increases")
-            DECREASES = _("decreases")
-
-            sorted_gases = sorted(gases, key=lambda x: (abs(x["value"]) and x["value"] != 0), reverse=True)
-            highest_gas = sorted_gases[0]
-            second_highest_gas = sorted_gases[1]
-            third_highest_gas = sorted_gases[2]
-
-            project_primary_ghg = highest_gas["name"]
-            project_primary_ghg_emissions = highest_gas["value"]
-            project_primary_ghg_direction = INCREASES if project_primary_ghg_emissions >= 0 else DECREASES
-
-            project_secondary_ghg = second_highest_gas["name"]
-            project_secondary_ghg_emissions = second_highest_gas["value"]
-            project_secondary_ghg_direction = INCREASES if project_secondary_ghg_emissions >= 0 else DECREASES
-
-            project_tertiary_ghg = third_highest_gas["name"]
-            project_tertiary_ghg_emissions = third_highest_gas["value"]
-            project_tertiary_ghg_direction = INCREASES if project_tertiary_ghg_emissions >= 0 else DECREASES
-
-            activities = project.activities.all()
-
-            processed_activities = []
-
-            # Hectares: if with to without, with is counted as 0 and without as area
-            livestock_heads = [{"name": lct.name, "value_w": 0, "value_wo": 0} for lct in LivestockCategoryType.objects.all()]
-
-            small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
-            large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
-            aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
-            land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
-
-            for a in total_data["activities"]:
-                db_activity: Activity = activities.get(name=a["name"])
-                mlist = list(filter(lambda x: x.get("results", None) is not None and x["results"].get("balance", None) is not None, a["modules"]))
-                modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
-
-                db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
-
-                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist if m["results"]["total_w"] is not None])
-                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist if m["results"]["total_wo"] is not None])
-                sum_all_balance = sum_all_total_w - sum_all_total_wo
-
-                db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
-
-                main_impact = None
-                secondary_impacts = []
-
-                if db_activity.is_luc:
-                    main_impact = _("hectares")
-                elif db_activity.is_fishery:
-                    main_impact = _("tonnes of catch")
-                elif db_activity.is_livestock:
-                    main_impact = _("livestock heads")
-
-                if any([db_activity.is_energy, db_activity.is_storage, db_activity.is_transport, db_activity.is_processing]):
-                    secondary_impacts.append(_("energy consumption"))
-                if db_activity.is_packaging:
-                    secondary_impacts.append(_("packaging material"))
-                if db_activity.is_input:
-                    secondary_impacts.append(_("agricultural inputs use"))
-
-                secondary_impacts = ", ".join(secondary_impacts)
-
-                db_activity.main_impact = main_impact
-                if secondary_impacts:
-                    db_activity.secondary_impacts = secondary_impacts
-
-                for m in db_activity.modules:
-                    if issubclass(m.__class__, Fishery):
-                        if isinstance(m, SmallFishery):
-                            m: SmallFishery
-                            for ft in small_fishery_types:
-                                if ft["name"] == m.fishery_type.name:
-                                    ft["value_w"] += m.total_catch_yr_w
-                                    ft["value_wo"] += m.total_catch_yr_wo
-                        elif isinstance(m, LargeFishery):
-                            m: LargeFishery
-                            large_fishery_data["value_wo"] += m.total_catch_yr_wo
-                            large_fishery_data["value_w"] += m.total_catch_yr_w
-
-                    elif isinstance(m, Livestock):
-                        m: Livestock
-                        for lh in livestock_heads:
-                            if lh["name"] == m.livestock_category_type.name:
-                                lh["value_w"] += m.heads_number_w
-                                lh["value_wo"] += m.heads_number_wo
-
-                    elif isinstance(m, Aquaculture):
-                        m: Aquaculture
-                        aquaculture_data["value_w"] += m.annual_production_w
-                        aquaculture_data["value_wo"] += m.annual_production_wo
-
-                    elif issubclass(m.__class__, LandModule):
-                        m: LandModule
-                        for lt in land_types:
-                            if lt["name"] == m.module_type.name:
-                                if m.is_with() and not m.is_without():
-                                    lt["value_w"] += m.area
-                                elif m.is_without() and not m.is_with():
-                                    lt["value_wo"] += m.area
-                                elif m.is_with() and m.is_without():
-                                    lt["value_w"] += m.area
-                                    lt["value_wo"] += m.area
-
-                processed_activities.append(db_activity)
-
-            processed_activities = sorted(processed_activities, key=lambda x: x.results["balance"], reverse=total_balance > 0)
-
-            livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
-            small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
-            large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
-            aquaculture_data = {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0 else aquaculture_data
-            land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
-            total_heads = sum([lh["value_w"] for lh in livestock_heads])
-            total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
-
-            activities_total = processed_activities
-
-            def plot_with_without_balance_bar_chart_stacked_by_gas(data_w: list, data_wo: list):
-                co2_w, ch4_w, n2o_w, co_w, doc_w, other_w = data_w
-                co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo = data_wo
-
-                # Prepare bar labels
-                labels = ["With", "Without", "Balance"]
-
-                # Build lists of values for each gas for "With", "Without", and the difference
-                co2_vals = [
-                    co2_w["value"],
-                    co2_wo["value"],
-                    co2_w["value"] - co2_wo["value"],
-                ]
-                ch4_vals = [
-                    ch4_w["value"],
-                    ch4_wo["value"],
-                    ch4_w["value"] - ch4_wo["value"],
-                ]
-                n2o_vals = [
-                    n2o_w["value"],
-                    n2o_wo["value"],
-                    n2o_w["value"] - n2o_wo["value"],
-                ]
-                co_vals = [
-                    co_w["value"],
-                    co_wo["value"],
-                    co_w["value"] - co_wo["value"],
-                ]
-                doc_vals = [
-                    doc_w["value"],
-                    doc_wo["value"],
-                    doc_w["value"] - doc_wo["value"],
-                ]
-                other_vals = [
-                    other_w["value"],
-                    other_wo["value"],
-                    other_w["value"] - other_wo["value"],
-                ]
-
-                # Stack them in an array for plotting
-                data_arrays = np.array([co2_vals, ch4_vals, n2o_vals, co_vals, doc_vals, other_vals])
-                # Each row is a gas, each column is a bar (With, Without, Balance)
-
-                x = np.arange(len(labels))
-                width = 0.6
-
-                fig, ax = plt.subplots(figsize=(6.5, 4))
-
-                # We'll accumulate the bottom of each stack as we go
-                bottom = np.zeros(len(labels))
-
-                colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
-                names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
-
-                for idx, row in enumerate(data_arrays):
-                    ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=names[idx])
-                    bottom += row
-
-                ax.set_xticks(x)
-                ax.set_xticklabels(labels)
-                ax.ticklabel_format(style="plain", axis="y", useOffset=False)
-                ax.set_ylabel("Emissions (tonnes)")
-                ax.set_title("")
-                ax.legend()
-
-                # Save to a BytesIO buffer
-                buf = io.BytesIO()
-                plt.savefig(buf, format="svg")
-                buf.seek(0)
-
-                # Encode as base64 for embedding in HTML
-                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-                plt.close(fig)
-                plt.clf()
-
-                buf.close()
-                return chart_base64
-
-            def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
-                # Create the figure and axis
-                fig, ax = plt.subplots(figsize=(6.5, 4))
-
-                # Data
-                labels = ["With", "Without", "Balance"]
-                emissions = [project_emissions_w, project_emissions_wo, project_emissions_balance]
-                # Create horizontal bar chart
-                ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
-
-                for i, v in enumerate(emissions):
-                    ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
-
-                # Add legend
-                ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
-
-                # Customize the chart
-                ax.ticklabel_format(style="plain", axis="x", useOffset=False)
-                ax.grid(True, axis="x", linestyle="--", alpha=0.7)
-
-                # Save to a BytesIO buffer
-                buf = io.BytesIO()
-                plt.savefig(buf, format="svg")
-                buf.seek(0)
-
-                # Encode as base64 for embedding in HTML
-                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-                plt.close(fig)
-                plt.clf()
-
-                buf.close()
-                return chart_base64
-
-            # Get faologo.eps from static files
-            try:
-                faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
-            except FileNotFoundError:
-                faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
-
-            # Add it as base64 to the context
-            faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
-
-            project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
-            project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
-
-            download_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            context = {
-                "project": project,
-                "start_year_of_activities": project.start_year_of_activities,
-                "implementation_years": project.implementation_years,
-                "last_year_of_accounting": project.last_year_of_accounting,
-                "total_project_years": (project.implementation_years + project.capitalization_years),
-                "total_carbon_balance": project_emissions_balance,
-                "project_emissions_w": project_emissions_w,
-                "project_emissions_wo": project_emissions_wo,
-                "project_emissions_balance": project_emissions_balance,
-                "total_area": total_area,
-                "total_heads": total_heads,
-                "total_tonnes_of_catch": total_tonnes_of_catch,
-                "soc": soc.value,
-                "project_primary_ghg": project_primary_ghg,
-                "project_primary_ghg_emissions": project_primary_ghg_emissions,
-                "project_primary_ghg_direction": project_primary_ghg_direction,
-                "project_secondary_ghg": project_secondary_ghg,
-                "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
-                "project_secondary_ghg_direction": project_secondary_ghg_direction,
-                "project_tertiary_ghg": project_tertiary_ghg,
-                "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
-                "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
-                "activities": activities,
-                "activities_total": activities_total,
-                "project_chart_base64": project_chart_base64,
-                "project_gases_chart_base64": project_gases_chart_base64,
-                "faologo_base64": faologo_base64,
-                "livestock_heads": livestock_heads,
-                "small_fishery_types": small_fishery_types,
-                "large_fishery_data": large_fishery_data,
-                "aquaculture_data": aquaculture_data,
-                "land_types": land_types,
-                "download_date_time": download_date_time,
-            }
-
+            result = compute_project_result(project)
+            context = build_template_context(result, request, lang)
             html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
@@ -1276,16 +1442,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             pdf = HTML(string=html).write_pdf()
 
-            # Create the HTTP response with PDF content
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
-
-            faologo.close()
-
             return response
 
         except Exception as e:
-            return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception(e)
+            return utils.ErrorResponse(
+                f"Error generating PDF ({type(e).__name__}): {e}",
+                status=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=False, methods=["get"])
     @swagger_auto_schema(
@@ -1745,6 +1911,12 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
+# The three statuses Activity.status (api/models.py __get_status) can resolve to.
+# This is intentionally a subset of the StatusType table (which also holds
+# module-level values like SUBMODULES_EMPTY): only these apply at activity level.
+ACTIVITY_STATUS_VALUES = {"READY", "IN PROGRESS", "EMPTY"}
+
+
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows activities to be viewed or edited.
@@ -1829,7 +2001,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id],
+        manual_parameters=[project_id, activity_status, activity_ready],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -1839,12 +2011,18 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
+
+        Optionally filter by computed activity status:
+        - `status`: one or more of `READY`, `IN PROGRESS`, `EMPTY`, given as a comma-separated
+          list and/or a repeated parameter (e.g. `status=IN PROGRESS,EMPTY`).
+        - `ready`: convenience toggle; `true` returns only READY activities, `false` returns the
+          rest (IN PROGRESS and EMPTY). Intersects with `status` when both are given.
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
         is_summary = request.query_params.get("summary", False)
-        is_b_intact = request.query_params.get("is_b_intact", False) == "true"
+        is_b_intact_param = request.query_params.get("is_b_intact", None)
         SerializerClass = ActivitySerializerWithModules
         if is_summary:
             SerializerClass = ActivitySummarySerializer
@@ -1857,8 +2035,54 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity_dict = SerializerClass(activity).data
             return activity_dict
 
-        activities_list = Activity.objects.filter(project__id=project_id)
-        activities_list = activities_list.filter(is_b_intact=is_b_intact)
+        # Prefetch module_types in a single query: both the optional status
+        # filter below and activity serialization walk each activity's modules,
+        # so this trims the per-activity relation fetch. It mitigates but does
+        # not remove the N+1 in Activity.status (the per-subclass module queries
+        # and StatusType lookups remain); a full fix is the persisted-status TODO.
+        activities_list = Activity.objects.filter(project__id=project_id).prefetch_related("module_types")
+        if is_b_intact_param is not None:
+            activities_list = activities_list.filter(is_b_intact=is_b_intact_param == "true")
+
+        # `status` is a computed property derived from module statuses
+        # (Activity.__get_status), not a DB column, so it cannot be filtered in
+        # SQL. Re-derive it in Python from the same property the endpoint already
+        # serializes, so the filter can never diverge from the reported status.
+        # Filtering here materializes the queryset before pagination, which is
+        # fine at per-project activity counts; the unfiltered path stays lazy.
+        #
+        # Two query params narrow the status, both resolved to a set of allowed
+        # StatusType names:
+        #   - `status`: explicit values, as a comma-separated list and/or a
+        #     repeated param (e.g. ?status=IN PROGRESS,EMPTY).
+        #   - `ready`: convenience toggle; true -> {READY}, false -> the
+        #     complement {IN PROGRESS, EMPTY}.
+        # When both are given they intersect (AND); a contradictory pair (e.g.
+        # ?ready=true&status=EMPTY) yields an empty result, which is correct.
+        allowed_statuses = None  # None means "no status constraint"
+
+        requested_statuses = {
+            value.strip().upper().replace("_", " ")
+            for raw in request.query_params.getlist("status")
+            for value in raw.split(",")
+            if value.strip()
+        }
+        if requested_statuses:
+            invalid_statuses = requested_statuses - ACTIVITY_STATUS_VALUES
+            if invalid_statuses:
+                raise ValidationError(f"Invalid status value(s): {', '.join(sorted(invalid_statuses))}. Allowed values: {', '.join(sorted(ACTIVITY_STATUS_VALUES))}")
+            allowed_statuses = requested_statuses
+
+        ready_param = request.query_params.get("ready", None)
+        if ready_param is not None:
+            normalized_ready = ready_param.strip().lower()
+            if normalized_ready not in ("true", "false"):
+                raise ValidationError(f"Invalid ready value '{ready_param}'. Allowed values: true, false")
+            ready_statuses = {"READY"} if normalized_ready == "true" else ACTIVITY_STATUS_VALUES - {"READY"}
+            allowed_statuses = ready_statuses if allowed_statuses is None else allowed_statuses & ready_statuses
+
+        if allowed_statuses is not None:
+            activities_list = [activity for activity in activities_list if activity.status.name_en in allowed_statuses]
 
         # Start measuring time
         start = time.time()
@@ -1866,11 +2090,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            # Serial serialization: a default ThreadPoolExecutor() on Python 3.11
-            # spawns min(32, cpu_count + 4) workers — each acquires its own
-            # Django thread-local DB connection and saturates the App Engine
-            # ↔ Cloud SQL Auth Proxy cap of 100 connections per instance.
-            response = [process_activity(activity) for activity in page]
+            response = concurrency.map_in_bounded_threads(process_activity, page)
             logger.debug(f"Time taken to process activities: {time.time() - start}")
             return paginator.get_paginated_response(response)
 
@@ -1988,6 +2208,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Cannot copy activity from an archived project", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if activity.project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            return utils.ErrorResponse(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities", status=http_status.HTTP_400_BAD_REQUEST)
 
         new_activity = utils.copy_activity(activity, owner=self.request.user)
 
@@ -2420,6 +2643,19 @@ def generic_module_viewset(model: Module):
                         else results_by_activity_gas
                     )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
+
+                # Relabel Inventory rows for display only. module_results may be the raw
+                # in-memory value of a model JSON field on the cached branch, so build new
+                # objects rather than mutating in place; the persisted cache stays raw.
+                inventory_data = module_results.get("inventory") if isinstance(module_results, dict) else None
+                if isinstance(inventory_data, list):
+                    relabeled_inventory = [
+                        {**entry, "activity": inventory_label(module, entry["activity"])}
+                        if isinstance(entry, dict) and "activity" in entry
+                        else entry
+                        for entry in inventory_data
+                    ]
+                    module_results = {**module_results, "inventory": relabeled_inventory}
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
@@ -2901,6 +3137,67 @@ class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
             cache.set(cache_key, response_data, self.CACHE_TIMEOUT_SECONDS)
 
         return Response(response_data)
+
+
+class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
+    """Poll endpoint for background jobs. Users see only their own jobs."""
+
+    serializer_class = AsyncJobSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AsyncJob.objects.filter(created_by=self.request.user)
+
+    @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])
+    def download(self, request, pk=None):
+        """Stream the stored report blob back as an attachment.
+
+        Two access paths:
+        - Signed token (email link): a valid ``token`` query param carries the
+          job pk (see api.services.report_links) and grants access with no
+          session, so the emailed 24-hour link works straight from an inbox.
+        - Authenticated owner: with no token (or an invalid one), the caller
+          must be authenticated and the job is scoped to created_by=request.user,
+          exactly as before. self.get_object() cannot serve the token path
+          because get_queryset() filters on request.user, which is Anonymous
+          there; AllowAny on this action lets that path run despite the
+          class-level IsAuthenticated (DRF honors per-action permission_classes
+          via get_permissions).
+        """
+        job = None
+        token = request.query_params.get("token")
+        if token:
+            token_job_pk = report_links.load_download_token(token)
+            if token_job_pk is not None:
+                # Trust the signed pk from the token, not the URL pk: this path
+                # is unfiltered (no owner scope), so binding to the URL pk would
+                # let a valid token for one job unlock any other job by swapping
+                # the pk in the URL.
+                job = AsyncJob.objects.filter(pk=token_job_pk).first()
+        if job is None:
+            if not request.user.is_authenticated:
+                return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+            job = AsyncJob.objects.filter(pk=pk, created_by=request.user).first()
+
+        if job is None:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+        if job.kind != AsyncJob.Kind.REPORT or job.status != AsyncJob.Status.COMPLETED:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+        gcs_path = (job.result or {}).get("gcs_path")
+        if not gcs_path:
+            return utils.ErrorResponse("Report not available", status=http_status.HTTP_404_NOT_FOUND)
+
+        client = storage.Client()
+        bucket = client.bucket(settings.STORAGE_BUCKET)
+        blob = bucket.blob(gcs_path)
+        stream = blob.open("rb")
+        response = FileResponse(
+            stream,
+            content_type=job.result.get("content_type", "application/octet-stream"),
+        )
+        filename = job.result.get("filename", "report")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
 
 class MinitoolProcessingView(APIView):

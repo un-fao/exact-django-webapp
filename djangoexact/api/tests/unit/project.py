@@ -732,6 +732,29 @@ class ProjectTestCase(APITestCaseMixin):
 
         log.info("END - test_copy_project_does_not_duplicate_admin_membership")
 
+    def test_copy_project_sets_is_public_to_false(self):
+        """
+        Test that copying a project sets is_public to False on the copied project,
+        even if the original project was public.
+        """
+        log.info("START - test_copy_project_sets_is_public_to_false")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        original_project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        self.edit_project(original_project, self.user, {"is_public": True})
+        original_project.refresh_from_db()
+        self.assertTrue(original_project.is_public)
+
+        copy_response = self.copy_project(original_project, self.user)
+        self.assertEqual(copy_response.status_code, status.HTTP_201_CREATED)
+        copied_project = models.Project.objects.get(id=copy_response.data["id"])
+
+        self.assertFalse(copied_project.is_public, "Copied project should have is_public set to False")
+
+        log.info("END - test_copy_project_sets_is_public_to_false")
+
     def test_lock_project_as_user_get_and_post(self):
         """
         Test locking a project:

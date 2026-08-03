@@ -1,0 +1,20 @@
+# Cloud Build config for the computation-job image.
+# Triggered by .github/workflows/deploy.yaml on push to a wired
+# environment (currently `review`). Invoke from repo root with:
+#   gcloud builds submit --config=deploy/cloudbuild-computation-job.yaml \
+#     --substitutions=COMMIT_SHA=$GITHUB_SHA --project=$PROJECT_ID .
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'deploy/Dockerfile.computation_job'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/exact-computation-job:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'
+      - '.'
+timeout: '1200s'
+images:
+  - 'gcr.io/$PROJECT_ID/exact-computation-job:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/exact-computation-job:latest'

@@ -4,7 +4,9 @@ import logging
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
-from django.db import OperationalError, transaction
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from firebase_admin import auth as firebase_admin_auth
 from rest_framework import generics, permissions, status
@@ -128,9 +130,18 @@ class LoginExistingUserView(APIView):
             login(request, existing_user)
 
             if not check_password(password, existing_user.password):
-                # If firebase password is different from Django password, update Django password
-                existing_user.set_password(password)
-                existing_user.save()
+                # If firebase password is different from Django password, update Django password.
+                # The password was already authenticated by Firebase; validate before syncing
+                # so Django-side hashes conform to current password policies.
+                try:
+                    validate_password(password, user=existing_user)
+                except DjangoValidationError:
+                    # Keep the stale Django hash rather than storing a weak password;
+                    # the user can still authenticate via Firebase until they reset.
+                    pass
+                else:
+                    existing_user.set_password(password)
+                    existing_user.save()
 
             extra_data = {
                 "uid": user["localId"],

@@ -1,0 +1,1190 @@
+[
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 579,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 580,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 581,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 582,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 583,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 584,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 585,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 586,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 587,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 588,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 589,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 590,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": 1,
+      "grassland_management_type": null,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 591,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 592,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 0.98
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 593,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 594,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 0.98
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 595,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.05
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 596,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 0.99
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 597,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 598,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 0.99
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 599,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 600,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.09
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 601,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.09
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 602,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": 2,
+      "grassland_management_type": null,
+      "value": 1.09
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 603,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.09
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 604,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.03
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 605,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.09
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 606,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.03
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 607,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 608,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 609,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 610,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.04
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 611,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 612,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 613,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 614,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": 3,
+      "grassland_management_type": null,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 615,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 616,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 617,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 618,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 619,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 620,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 621,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 622,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 623,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 624,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 625,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 626,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 6,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 627,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 628,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 629,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 630,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 631,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 632,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 633,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 634,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 635,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 636,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 637,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 638,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 1,
+      "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 639,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 640,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 641,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 642,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 643,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 644,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 645,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 646,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 647,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 648,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 649,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 650,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 2,
+      "value": 0.9
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 651,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 652,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 653,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 654,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 655,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 656,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 657,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 658,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 659,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 660,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 661,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 662,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 3,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 663,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 664,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 665,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 666,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 667,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 668,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 669,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 670,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 671,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 672,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 673,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 674,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 4,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 675,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 676,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 677,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 678,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 679,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 680,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.14
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 681,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 682,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 683,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.17
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 684,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 685,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.16
+    }
+  },
+  {
+    "model": "ipcc.fmgdata",
+    "pk": 686,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "tillage_management_type": null,
+      "grassland_management_type": 5,
+      "value": 1.16
+    }
+  }
+]

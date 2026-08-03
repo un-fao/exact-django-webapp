@@ -1,0 +1,402 @@
+[
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 143,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 144,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 145,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 146,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 147,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 148,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 149,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 150,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 151,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 152,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 153,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 154,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 155,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 156,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 157,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 158,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 159,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 160,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 161,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 162,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 163,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 164,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 165,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 166,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 167,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 168,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 169,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 170,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 171,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 172,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 173,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 174,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 175,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 176,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 177,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 178,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 179,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "waterbody_type": 1,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 180,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "waterbody_type": 2,
+      "value": 183.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 181,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "waterbody_type": 3,
+      "value": 416.0
+    }
+  },
+  {
+    "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
+    "pk": 182,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "waterbody_type": 4,
+      "value": 30.0
+    }
+  }
+]

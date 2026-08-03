@@ -220,29 +220,50 @@ def get_unique_name(instance, name):
     return f"{name} ({i})"
 
 
+def _ensure_admin_membership(project_copy, owner):
+    """Grant `owner` an Admin membership on `project_copy` if they don't already have one.
+
+    Checks membership against project_copy (the TARGET/new project), not the source
+    project being copied from. Checking the source was the original bug: it let a copy
+    without a membership on the new project pass silently whenever the owner already
+    happened to be an Admin on the source.
+    """
+    if not project_copy.members.filter(user=owner, group__name="Admin").exists():
+        api_models.ProjectMembership.objects.create(
+            user=owner,
+            project=project_copy,
+            group=api_models.Group.objects.get(name="Admin"),
+        )
+
+
+@transaction.atomic
+def create_project_shell(project, owner):
+    """Clone the Project row only (fast). Activities are copied separately via copy_activities_into."""
+    project_copy = copy.deepcopy(project)
+    project_copy.pk = None
+    project_copy.name = get_unique_name(project_copy, project_copy.name)
+    project_copy._state.adding = True
+    project_copy.is_finalized = False
+    project_copy.is_public = False
+    project_copy.owner = owner
+    project_copy.save()
+
+    _ensure_admin_membership(project_copy, owner)
+
+    return project_copy
+
+
+def copy_activities_into(source_project, target_project, owner):
+    """Deep-copy every activity of source_project into target_project."""
+    for activity in source_project.activities.all():
+        copy_activity(activity, target_project, owner)
+
+
 @transaction.atomic
 def copy_project(project, owner):
     try:
-        project_copy = copy.deepcopy(project)
-        project_copy.pk = None
-        project_copy.name = get_unique_name(project_copy, project_copy.name)
-        project_copy._state.adding = True
-        project_copy.is_finalized = False
-        project.owner = owner
-        project_copy.save()
-
-        # Add Membership to the new project
-        # BUG: Membership is assigned to the original project, not the copied one
-        if not project.members.filter(user=owner, group__name="Admin").exists():
-            api_models.ProjectMembership.objects.create(
-                user=owner,
-                project=project_copy,
-                group=api_models.Group.objects.get(name="Admin"),
-            )
-
-        for activity in project.activities.all():
-            copy_activity(activity, project_copy, owner)
-
+        project_copy = create_project_shell(project, owner)
+        copy_activities_into(project, project_copy, owner)
         return project_copy
     except Exception as e:
         log.error(f"Error copying project: {e}")
@@ -328,8 +349,13 @@ def handle_threads(module_from: "api_models.Module", module_to: "api_models.Modu
 
     activity = module_from.activity
 
-    can_view_comments = security.check_permission("can_view_comment", owner, activity.project)
-    if owner is not None and can_view_comments:
+    # check_permission returns None when the user HAS the permission and an
+    # ErrorResponse when they do not, so its result must be compared against
+    # None rather than used as a truthiness test. The codename was also wrong:
+    # "can_view_comment" is declared nowhere in the project, so the lookup always
+    # failed for non-superusers and logged an error for every module copied.
+    permission_error = security.check_permission("view_comment", owner, activity.project)
+    if owner is not None and permission_error is None:
         copy_threads(module_from, module_to)
     else:
         clear_threads(module_to)

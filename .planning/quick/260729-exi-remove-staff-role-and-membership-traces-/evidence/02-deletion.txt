@@ -1,0 +1,30 @@
+[DEBUG 2026-07-29 08:57:22,762] __init__ 	 matplotlib data path: /home/sirvosterzo/Developer/FAO/EXACT/exact-django-webapp/.venv/lib/python3.11/site-packages/matplotlib/mpl-data
+[DEBUG 2026-07-29 08:57:22,764] __init__ 	 CONFIGDIR=/home/sirvosterzo/.config/matplotlib
+[DEBUG 2026-07-29 08:57:22,764] __init__ 	 interactive is False
+[DEBUG 2026-07-29 08:57:22,764] __init__ 	 platform is linux
+[DEBUG 2026-07-29 08:57:22,784] __init__ 	 CACHEDIR=/home/sirvosterzo/.cache/matplotlib
+[DEBUG 2026-07-29 08:57:22,785] font_manager 	 Using fontManager instance from /home/sirvosterzo/.cache/matplotlib/fontlist-v330.json
+[DEBUG 2026-07-29 08:57:22,854] pyplot 	 Loaded backend agg version v2.2.
+[DEBUG 2026-07-29 08:57:23,007] _opentelemetry_tracing 	 This service is instrumented using OpenTelemetry. OpenTelemetry or one of its components could not be imported; please add compatible versions of opentelemetry-api and opentelemetry-instrumentation packages in order to get Storage Tracing data.
+Running in review mode
+279 objects imported automatically (use -v 2 for details).
+
+CONFIRMED_STAFF_GROUP_ID=5
+STAFF_MODE=proceed-full
+TX_M2M_LINK_COUNT=0
+TX_MEMBERSHIP_COUNT=0
+TX_INVITATION_COUNT=0
+REMOVED_M2M_LINKS=0
+REMOVED_MEMBERSHIP_COUNT=0
+REMOVED_MEMBERSHIP_MAPPING={}
+REMOVED_INVITATION_COUNT=0
+REMOVED_INVITATION_MAPPING={}
+REMOVED_GROUP_COUNT=1254
+REMOVED_GROUP_MAPPING={'auth.Group_permissions': 1253, 'auth.Group': 1}
+SAFETY_ALLOWLIST=['api.CustomUser_groups', 'api.Group', 'auth.Group', 'auth.Group_permissions']
+SAFETY_ASSERTION_PASSED
+RESULT: DELETION_COMPLETE
+TALLY_M2M_LINKS_REMOVED=0
+TALLY_MEMBERSHIPS_REMOVED=0
+TALLY_INVITATIONS_REMOVED=0
+TALLY_GROUP_ROWS_REMOVED=1254

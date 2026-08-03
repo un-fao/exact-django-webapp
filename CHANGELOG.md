@@ -1,3 +1,334 @@
+## 1.20 (2026-08-03)
+
+### Feat
+
+- **api**: wire inventory_label into results API and Excel report paths
+- **api**: add inventory_labels mapping module and unit tests
+- **api**: sweep orphaned shell projects from failed async copies
+- **ci**: add review-only Cloud Run deploy workflow
+- **deploy**: add Cloud Run service manifest template
+- **deploy**: add Cloud Run web service Dockerfile
+- **deploy**: add whitenoise for Cloud Run static file serving
+- **api**: expose activity_count and module_count on project serializers
+- **api**: email report failures and log SMTP errors (email-first)
+- **api**: email async report link, 24h token download, cleanup command
+- **api**: add size-threshold async project copy (copy/async + copy_jobs)
+- **api**: stream async report via GET /async-jobs/{id}/download/
+- **api**: add POST /projects/{pk}/report/async/ enqueue endpoint
+- **api**: add async report worker handler (report_jobs.run)
+- **api**: add reconcile_stale_async_jobs safety-net command
+- **api**: add AsyncJob polling endpoint (GET /api/async-jobs/{id}/)
+- **api**: add run_async_job management command
+- **api**: add AsyncJob enqueue/dispatch service (Cloud Run + subprocess)
+- **api**: add generic AsyncJob model for background jobs
+- **api**: cap activities per project at 50 across create, build, and copy paths
+- **api**: add ready toggle to activity list filter
+- **api**: accept multiple statuses in activity list filter
+- **api**: filter activity list by computed status
+- **01-02**: add requirements-dev.txt pinning bandit and pip-audit
+- **01-02**: add test-seed loaddata fixture for base test classes
+- **01-01**: register production config check in ApiConfig.ready()
+- **01-01**: add production config deploy check
+- **api**: compute_module_slice routes LandUseChange to _compute_luc_slice
+- **api**: _compute_luc_slice runs calculator inside rolled-back transaction
+- **api**: build saved Project/Activity/sibling/LUC fixtures for permutations
+- **api**: iterate concrete LUC value combinations across template pair
+- **admin_scripts**: route LandUseChange through plan_luc_pairs
+- **admin_scripts**: plan_luc_pairs emits 144 directed template pairs
+- **admin_scripts**: list templates and identifier helpers for LUC permutations
+- **admin_scripts**: expand LUC preset templates to concrete combos
+- **admin_scripts**: add LUC preset spec for permutations
+- **admin_scripts**: per-module reference-data validator filters bad pairings
+- **admin_scripts**: flesh out Test All Modules templates
+- **admin_scripts**: add Test All Modules views, URLs, dashboard entry
+- **admin_scripts**: runner honors ComputationJob.max_rows
+- **admin_scripts**: add enqueue_for_test_run with run-scoped hash
+- **admin_scripts**: add test_planner with plan_module_tests
+- **admin_scripts**: hash max_rows and force_key when present
+- **admin_scripts**: add ModuleTestRun model and ComputationJob.max_rows
+- **scenario-builder**: restore in-tab stat grid, accordion compare panels, wider layout
+- **scenario-builder**: clear removed scenarios from comparison state
+- **scenario-builder**: render comparison data table on Compare tab
+- **scenario-builder**: render per-change composition stack on Compare tab
+- **scenario-builder**: render distribution box plots on Compare tab
+- **scenario-builder**: render mean +/- CI 95% bar chart on Compare tab
+- **scenario-builder**: render Compare tab status chips with threshold rules
+- **scenario-builder**: ingest run-scenario results into window.scenarioResults with stale tracking
+- **scenario-builder**: add compare.js skeleton and load Chart.js CDN
+- **scenario-builder**: add Compare tab and empty compare panel
+- **scenario-builder**: add result_json and scenario_index to run-scenario response
+- **scenario-builder**: add per_change rollup to stats_for_scenario
+- **scenario-builder**: add outlier counts to stats_for_scenario
+- **scenario-builder**: richer Excel export with per-scenario detail sheets
+- **scenario-builder**: enable Energy, Irrigation, value-chain, settlement & LUC
+- **scenario-builder**: restructure filters and add Tom Select comboboxes
+- **auth**: maintain Staff Group with all permissions for is_staff users
+- **auth**: auto-grant all permissions to staff users
+- **scenario-builder**: scale export stats by unit, add Units column
+- **scenario-builder**: add Units input to change fieldset
+- **scenario-builder**: wire htmx_run_scenario to stats_for_scenario
+- **scenario-builder**: parse per-change unit field from POST data
+- **scenario-builder**: add stats_for_scenario with per-change unit scaling
+- **scenario-builder**: add _coerce_unit helper for per-change multipliers
+- **admin**: add is_opted_out_of_emails to CustomUser CSV export
+- **admin_scripts**: register ComputationJob in Django admin
+- Add is_opted_out_of_emails to RegisterSerializer and user serializers
+- add ef_source_t2 and country_t2 to Small/Large Fisheries
+- **jobs**: add cancellation/progress, fix Grassland processor, auto-populate ChangeRecord
+- **jobs-panel**: add persistent jobs panel UI
+- **notifications**: add job notifications with polling and email
+- **cloud-run**: add Cloud Run Jobs dispatch with subprocess fallback
+- **jobs**: wire gap detection and job enqueueing into scenario views
+- **jobs**: add run_computation_job management command
+- **jobs**: add gap detector and job dispatcher with coalescing
+- **jobs**: add ComputationJob model for async computation tracking
+- **catalog**: replace ChangeRecord dropdown queries with catalog
+- **catalog**: add get_catalog() cached accessor
+- **catalog**: add scenario_catalog.yaml with startup validation
+- **catalog**: add scaffold_scenario_catalog management command
+- **catalog**: add scenario catalog loader and validator
+- **minitool**: remove sqlite DB alias and router
+- **fixtures**: unified reference data pipeline
+- **scripts**: add fix_bom_country_duplicates runscript
+- **i18n**: fill missing es/ru labels and sanitize fr/ru msgstr formatting
+- **scripts**: add runscript to sync cropland module types from IPCC CSV
+- **scripts**: add rename_countries runscript for Q1 renames and Q3 duplicate merges
+- **reports**: revise SPC NPV section per stakeholder feedback
+- **calculators**: add dry matter content reference values to annual cropland model inputs
+- **math_model,annuals**: add dry matter content to residues calculations
+- **reports**: exclude is_b_intact activities from Excel report
+- **api**: add faostat_year_t2 override to AnnualCropland
+- **api**: fall back to CropYieldStat when FAOSTAT data is unavailable
+- **api**: use username/password auth for FAOSTAT token retrieval
+- **api**: use FAOSTAT yield data in AnnualCropCalculator
+- **api**: add FAOSTAT yield data service
+- **scripts**: add import functions for FiresCombustionFactor and CropNitrousEstimationDefaultFactor
+- **models**: add new fields to CropNitrousEstimationDefaultFactor
+- **reports**: auto-populate module cache after fresh calculation
+- **reports**: cache land module units_breakdown to eliminate cached/non-cached data divergence
+- **reports**: use module cached results instead of recalculating when valid
+- implement Cumulative Heads and Catch Impacted rows in Excel report
+- **export/import**: preserve full thread comments data
+- **api**: add project import endpoint
+- **api**: add project export endpoint
+- **config**: add version.config.json and get_version_config helper
+- **serializers**: add ProjectImportSerializer for validation
+- **serializers**: add export serializers for Project, Activity, Module
+- **models**: add export_id UUID field to Project
+- **serializers**: add 'is_b_intact' field to ActivitySummarySerializer for enhanced activity tracking
+- **admin-scripts**: update compile_scenarios_export to include summary sheet and adjust scenario handling
+- **admin-scripts**: update export for multi-scenario workbook
+- **admin-scripts**: restructure compile_scenarios for tab-based multi-scenario UI
+- **admin-scripts**: add htmx_add_scenario view and scenario_panel template
+- **admin-scripts**: add htmx_run_scenario view for per-scenario execution
+- **admin-scripts**: extract scenario_results.html partial
+- **admin-scripts**: update htmx views and templates for scenario-prefix support
+- **admin-scripts**: add _extract_change_key_info helper for prefix detection
+- **admin-scripts**: add _parse_scenarios_from_post helper
+- **admin-scripts**: add prefix param to _parse_changes_from_post
+- **admin-scripts**: add compile-scenarios UI with htmx
+- **admin-scripts**: extend Tailwind content paths and rebuild CSS
+- **admin-scripts**: add base, dashboard, and example script templates with Tailwind
+- **admin-scripts**: add staff_required decorator, dashboard view, and example script view
+- **admin-scripts**: register app and configure URL routing
+- **admin-scripts**: create admin_scripts app skeleton
+- Added tC to tCO2 converter to forest management
+- Added constant to inventory calculation
+- **reports**: reorder SPC tables and use dynamic NPV discounting exponent
+- **.gitignore**: add docs/plans/ to ignored files
+- **reports**: add SPC table with Net Present Value discounting
+- **reports**: add Inventory sheet to Excel report
+- **calculators**: integrate refrigerant emission factors in fisheries
+- **calculators**: use project-level GWP for refrigerant calculations
+
+### Fix
+
+- **reports**: roll non-land module inventories into the Excel Inventory sheet
+- **math_model**: record real emissions in inputs and irrigation inventory rows
+- **ci**: sync SECRET_KEY into the computation job
+- **ci**: verify report base URL by comparison, not by probing it
+- **ci**: sync report download base URL into the computation job
+- **ci**: stop minting report download links at a dead App Engine host
+- **api**: raise KeyError from registry missing hook instead of re-indexing
+- **minitool**: iterate connection aliases instead of calling items on a list
+- **templates**: scope csrf suppressions to the firing Semgrep rule id
+- **minitool**: resolve formatted-sql and len-count Semgrep findings
+- **api**: replace dynamic globals() lookups with serializer registry
+- **api**: bound ORM thread fan-out in request-path endpoints
+- **api**: refresh updated_at when unlinking swept async jobs
+- **settings**: trust X-Forwarded-Proto behind the Cloud Run/App Engine proxy
+- **deploy**: set build-time DB_ENGINE for collectstatic in web image
+- **ci**: bridge DB_USER from DB_USERNAME for runner-side migrate
+- **ci**: address Semgrep SAST findings in Cloud Run deploy workflow
+- **api**: correct inverted comment-thread permission check
+- **api**: populate report user context and reconcile stuck-pending async jobs
+- **api**: dedupe project-copy Admin membership and split copy into shell+populate
+- **api**: give distinct emails to AsyncJob endpoint test users
+- **api**: guard connection.close in run_async_job under atomic tests
+- **api**: guard Cloud Run dispatch failures and env log-dir in async_jobs
+- **api**: enforce activity cap on project reassignment
+- **api**: ignore empty values in activities query param to avoid pk__in ValueError
+- **deps**: bump PyJWT 2.12.1 to 2.13.0 for CVE-2026-48526/48522
+- **api**: exclude lifecycle flags from Project cache invalidation
+- **ci**: authenticate cloud-sql-proxy via ADC, not gcloud-auth
+- **ci**: wait for cloud-sql-proxy readiness before deploy migrate
+- **api**: clear stale scenario fields when swapping LUC module roles (exact-django-webapp-bor)
+- **admin_scripts**: source scenario override options from reference tables
+- **fixtures**: drop orphaned CropNitrous default factor for removed Generic Value LUC
+- **reports**: label and align the Flooded Rice metadata block
+- **reports**: use minor rice season Tier-2 cultivation period override
+- **01**: use unusable password markers and high group pks in seed fixture (WR-03)
+- **01**: gate CI-only TEST.NAME on CI=true to protect local databases (CR-02)
+- **01-02**: add TEST.NAME to non-GAE DATABASES branch
+- **reports**: count LUC hectares once in Cumulative Hectares Impacted (#195)
+- **reports**: correct fishery catch totals and per-activity narrative
+- **calculators**: None-guard dm_content_minor for crops missing IPCC dry_matter
+- **api**: pin LUC fixture country to region with AGB coverage
+- **api**: persist LUC slice results to ChangeRecord
+- **admin_scripts**: resolve LandUseChange.module_type as preset identifiers
+- **scenario_catalog**: remove references to t2 values
+- **scenario_catalog**: add zero-values as options for numerical permuations
+- **admin_scripts**: set land_use_type on ForestManagement preset
+- **api**: set sibling.status=READY in _save_sibling so LUC calculator runs
+- **api**: persist non-sided FK fields and forward max_rows in LUC slice
+- **api**: populate project climate/moisture/soil_type in build_luc_fixture
+- **api**: use factory-boy factories in build_luc_fixture for required fields
+- **admin_scripts**: make Cycle hashable when filter holds list values
+- **admin_scripts**: add Livestock combination validator
+- **admin_scripts**: require field-level non-null on ForestManagementAGB
+- **admin_scripts**: require single LitterDeadwoodCarbonStock row
+- **admin_scripts**: SoilOrganicCarbon value-is-null still trips SOC check
+- **admin_scripts**: extend Livestock + ForestManagement validators
+- **admin_scripts**: tighten Livestock country pick + ForestManagement SOC validator
+- **admin_scripts**: clear remaining Test All Modules failures from #4
+- **admin_scripts**: clear FloodedRice + value-chain math failures
+- **admin_scripts**: gate test-runner querysets on IPCC reference data
+- **admin_scripts**: clear five more Test All Modules failure classes
+- **admin_scripts**: unblock Test All Modules runner across modules
+- **inputs**: model-side logical error causing zero values to be ignored
+- **scenario-builder**: ensure new scenario tabs work correctly
+- **scenario-builder**: use evt.detail.target for HTMX swap target with fallback scan
+- **scenario-builder**: align Compare tab button indent with siblings
+- **scenario-builder**: clarify outlier guard and comments per code review
+- **scenario-builder**: stop double border on TomSelect comboboxes & hide stray template comment
+- **reports**: surface exception details in narrative PDF errors
+- **reports**: match cached GasTypes.OTHER entries in extract_emissions
+- **deps**: patch security vulnerabilities flagged by Dependabot
+- **defaults**: set self.values on @dataclass Defaults subclasses
+- **scenario-builder**: populate scenario-level region filter
+- **reports**: close remaining FloodedRice-audit findings (flx, 5g2, a34, wuz, 80d)
+- **reports**: FloodedRice numbers wrong with minor seasons — aggregate at __post_init__
+- **reports**: stop report PDF 500 and put cover on its own page
+- **calculators**: SettlementCalculator double-counted land + start emissions
+- **reports**: module total must be full balance — stop dropping calculator emissions
+- **perennial_cropping**: honor explicit agb_maximum_c_tier_2 = 0
+- **calculators**: extract salinity_type and soil_type_name into init of CoastalWetlandCalculator
+- **fixtures**: add tropical climate in allowed climates for Agroforestry default LandUseType
+- **fixtures**: deactivate alfalfa LandUseType
+- **scenario-builder**: reject non-finite values in _coerce_unit
+- **ci**: use version.id/version.createTime in gcloud app versions list
+- **ci**: source DB/SECRET env from App Engine version, not GitHub secrets
+- **jobs**: write Cloud Run env-vars via Python YAML; fix Operation API
+- **ci**: hoist secrets to env block to stop bash from mangling $ in values
+- **ci**: substitute CLOUD_RUN_COMPUTATION_JOB_NAME / CLOUD_RUN_REGION in app.yaml
+- **admin_scripts**: propagate CSRF token on HTMX POSTs via base.html
+- **ci**: build computation-job image with docker, not Cloud Build
+- **security**: hoist github.* into env: block (Semgrep CI rule)
+- **jobs**: use CMD not ENTRYPOINT and lift cloudbuild timeout
+- **defaults**: reference of t2 soc for grassland
+- **deaults**: show project-level soc override in grassland defaults
+- **admin_scripts**: harden job dispatcher log dir for read-only deploys
+- **fixtures**: remove Generic Value from landusetype fixture
+- **calculators**: typo in SettlementCalculator existing infrastructure check
+- **deploy**: plumb ALLOWED_HOSTS and CORS_ALLOWED_ORIGINS through deploy pipeline
+- **deploy**: plumb DJANGO_DEBUG and SECRET_KEY through deploy pipeline
+- **security**: resolve Semgrep findings across views, templates, and settings
+- set is_public to False when copying projects
+- **security**: resolve bandit security issues (B113, B307, B602, B608)
+- **migrations**: make 0286 idempotent for historicalprocessingentry.fuel_type_thread
+- **api**: make Swagger/ReDoc views publicly accessible
+- remove gitleaks check
+- **security**: solve npm vulnerabilities
+- **api**: remove duplicate fuel_type_thread field from migration 0246
+- **scripts**: remove db_manager("minitool") from minitool_import
+- **admin_scripts**: remove minitool from test databases attr
+- **minitool**: use default DB connection in import_changes
+- **api**: correct FAOSTAT yield unit — kg/ha not hg/ha, divide by 1000
+- **api**: convert FAOSTAT yield from hg/ha to t/ha
+- **api**: reset faostat __BASE_URL__ before each set_requests_args call
+- **api**: restore None sentinel for minor yield defaults in AnnualCropCalculator
+- **api**: resolve FAOSTAT labels to numeric codes before querying
+- **reports**: harden html_context and view error handling
+- **reports**: remove wrong prefetch_related call to a class property
+- **serializers**: save instance before validating parent LUC in LandModuleSeralizer
+- **calculators**: issue causing LUC status to never be correctly evaluated first try
+- **calculators**: typo in LivestockCalculator causing some complementary manure management variables for with to be set for without
+- **extractors**: handle serialized list-of-dicts cache format in extract_emissions
+- **general_functions**: normalize ef_system length array for gas_head_alculation so it always matches percentage_system_default
+- **forest_management**: allow disturbance or logging calculations if any recurrence is nonzero
+- **calculators**: fill ForestManagementCalculator disturbance_percentage_fire input array with 1 if the disturbance type is fire, 0 otherwise
+- **calculators**: apply SOCInitial to LUC and infrastructure on existing land
+- address 8 critical code quality issues in reports package
+- correct ForestManagement _add chain and always write heads/catch zeros
+- **compile-scenarios**: generate organic soil field changes for wetland scenarios
+- **import**: resolve OneToOneField cross-module references during project import
+- **calculators**: set forest management rshoot before 20 yrs to 0 if it is None
+- **reports**: guard luc None access in OrganicSoilReport.populate_metadata
+- **admin-scripts**: wrap OOB tab button in carrier div for htmx beforeend
+- **admin-scripts**: update tests for multi-scenario naming convention
+- **admin-scripts**: address code review issues for compile-scenarios
+- **calculators**: add with and without calculators when looking for inventory emissions
+- **perennial_cropping**: calculate inventory regardless of biomass emissions dynamics
+- **api**: update error messages for drainage emission factors
+- **deps**: upgrade djangorestframework-simplejwt to 5.5.0
+- **api**: remove deprecated CoreAPI docs endpoint
+- **deps**: upgrade drf-yasg to 1.21.14 to remove pkg_resources dependency
+- **ci**: force reinstall setuptools after requirements installation
+- **deps**: update packaging version to fix pkg_resources import error
+- **deps**: add setuptools to requirements for pkg_resources at runtime
+- **deps**: replace Pyrebase4 with direct Firebase REST API calls
+- **deps**: add setuptools to requirements for pkg_resources compatibility
+- **calculators**: consolidate values of initial BGB with FRA data source selected
+- **calculators**: correct constructor method in LargeFisheryCalculator
+- **reports**: include drainage soil CO2 in coastal wetland reports
+
+### Refactor
+
+- **reports**: defensively merge cache-write registrations for same row
+- **api**: simplify dirty-field checks in Project/Activity save
+- **api**: bulk-invalidate module caches instead of per-module threads
+- **api**: drop Staff group auto-sync signals
+- **admin_scripts**: wrap test-run POST in transaction, hoist imports
+- **admin_scripts**: move _resolve_value_source to test_planner
+- **admin_scripts/tests**: co-locate ComputationJob test, hoist imports
+- **scenario-builder**: slim per-scenario result headline and add data wrapper
+- **admin_scripts**: use statistics.stdev and inclusive quantiles in stats_for
+- **scenario-builder**: extract _build_single_change_q from build_scenario_query
+- extract Operating Margin to EmissionFactorSource constant
+- **compute**: extract compute_module_slice from compute_minitool
+- **api**: normalize yield attribute to .value in AnnualCropCalculator
+- address notable code smells in reports package
+- replace reports.py monolith with clean package architecture
+
+### Perf
+
+- **api**: cache serializer registry with refresh-on-miss
+- **reports**: batch module cache writes with bulk_update (R6)
+- **models**: select_related land_use_change for land modules (N3)
+- **calculators**: drop redundant deepcopies in Result balance (N1)
+- **reports**: share one module fetch per activity across report request
+- **api**: memoize Activity module list per instance, select_related status
+- **calculators**: cache immutable IPCC reference lookups
+- **api**: memoize ModuleType and READY status lookups
+- **reports**: build Result once per module in report base
+- **api**: prefetch module_types in activity list to trim N+1
+
+## 1.19.2a5 (2026-04-29)
+
+### Fix
+
+- **coastal_wetlands**: invert calculation logic of drainage stock biomass
+
 ## 1.19.2a4 (2026-04-20)
 
 ### Fix

@@ -1,0 +1,21 @@
+{% extends "admin_scripts/base.html" %}
+
+{% block title %}Dashboard — Admin Scripts{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">Available Scripts</h1>
+
+{% if scripts %}
+<div class="grid gap-4">
+    {% for script in scripts %}
+    <a href="{% url 'admin_scripts:'|add:script.url %}"
+       class="block bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition">
+        <h2 class="text-lg font-medium text-gray-900">{{ script.name }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ script.description }}</p>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-500">No scripts available.</p>
+{% endif %}
+{% endblock %}

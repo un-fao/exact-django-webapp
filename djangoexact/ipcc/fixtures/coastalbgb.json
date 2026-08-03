@@ -1,0 +1,442 @@
+[
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 81,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 82,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 83,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 84,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 85,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.96,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 86,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.96,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 87,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.29,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 88,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 155,
+      "value": 0.49,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 89,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 155,
+      "value": 0.49,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 90,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 155,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 91,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 92,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 93,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 2.1,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 94,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 2.1,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 95,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 3.65,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 96,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 3.65,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 97,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 3.65,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 98,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 156,
+      "value": 3.65,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 99,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 156,
+      "value": 3.65,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 100,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 156,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 101,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 102,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 103,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 1.3,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 104,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 1.3,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 105,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 2.4,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 106,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 2.4,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 107,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 1.7,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 108,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 157,
+      "value": 1.7,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 109,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 157,
+      "value": 1.7,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 110,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 157,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 111,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 112,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 113,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 114,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 115,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 159,
+      "value": 3.63,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 116,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 159,
+      "value": 3.63,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 117,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 159,
+      "value": 3.63,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 118,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 119,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  },
+  {
+    "model": "ipcc.coastalbgb",
+    "pk": 120,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 159,
+      "value": 0.0,
+      "unit": "t root dm/t shoot dm"
+    }
+  }
+]

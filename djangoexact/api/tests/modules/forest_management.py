@@ -5,7 +5,7 @@ from api.models import *
 from api.serializers import *
 from ipcc.models import *
 import factory.fuzzy as fuzzy
-import api.reports as reports
+from api.reports import generate_excel_report
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -26,8 +26,7 @@ class ForestManagementTest(t.ModuleTest):
     def test(self):
         self.calculate_results()
 
-        rep = reports.BaseProjectReport(self.project)
-        rep.build_report()
+        generate_excel_report(self.project)
 
 
 ForestManagementTest().test()

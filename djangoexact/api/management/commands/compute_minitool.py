@@ -168,28 +168,27 @@ class Command(BaseCommand):
 
     def _process_modules(self, modules_to_process, config, options):
         """Process the specified modules"""
+        from api.services.minitool_compute import compute_module_slice
+
         self.stdout.write(f"Processing {len(modules_to_process)} modules...")
 
-        # Extract configuration
         CONFIG = {**config["modules"], **config["performance"]}
 
         total_processed = 0
         total_errors = 0
 
         for module_name in modules_to_process:
-            # Find the module configuration
-            module_config = None
-            for config_name, module_config_data in MODULE_CONFIGS.items():
-                if module_config_data.get("config_name") == module_name:
-                    module_config = module_config_data
+            # Find the MODULE_CONFIGS key by config_name
+            module_type = None
+            for key, cfg in MODULE_CONFIGS.items():
+                if cfg.get("config_name") == module_name:
+                    module_type = key
                     break
 
-            if not module_config:
+            if not module_type:
                 self.stdout.write(self.style.WARNING(f"Module configuration not found for: {module_name}"))
                 continue
 
-            # If modules were explicitly requested via command line, process them regardless of config
-            # Otherwise, only process modules that are enabled in configuration file
             module_explicitly_requested = len(modules_to_process) > 0
             if not module_explicitly_requested and not CONFIG.get(module_name, False):
                 self.stdout.write(self.style.WARNING(f"Module {module_name} is disabled in configuration"))
@@ -198,28 +197,24 @@ class Command(BaseCommand):
             self.stdout.write(f"Processing {module_name}...")
 
             try:
-                # Get the model class
-                model_class = getattr(models, config_name)
-
-                # Compute permutations
-                data, errors = self.permutation_computer.compute_permutations(
-                    module_config["fields"], model_class, chunk_size=CONFIG["chunk_size"], stop_at=CONFIG["max_rows"], max_workers=CONFIG["max_workers"]
+                data, errors = compute_module_slice(
+                    module_type=module_type,
+                    chunk_size=CONFIG["chunk_size"],
+                    max_rows=CONFIG["max_rows"],
+                    max_workers=CONFIG["max_workers"],
                 )
 
-                # Save results
-                if data or errors:
-                    self.data_manager.save_data(data, errors, config_name)
+                self.stdout.write(self.style.SUCCESS(
+                    f"Completed {module_name}: {len(data)} successful, {len(errors)} errors"
+                ))
 
-                    self.stdout.write(self.style.SUCCESS(f"Completed {config_name}: {len(data)} successful, {len(errors)} errors"))
-
-                    total_processed += len(data)
-                    total_errors += len(errors)
-                else:
-                    self.stdout.write(self.style.WARNING(f"No data generated for {config_name}"))
+                total_processed += len(data)
+                total_errors += len(errors)
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Error processing {module_name}: {str(e)}"))
                 continue
 
-        # Summary
-        self.stdout.write(self.style.SUCCESS(f"\nProcessing complete! Total: {total_processed} successful, {total_errors} errors"))
+        self.stdout.write(self.style.SUCCESS(
+            f"\nProcessing complete! Total: {total_processed} successful, {total_errors} errors"
+        ))

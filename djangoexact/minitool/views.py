@@ -59,7 +59,10 @@ class PercentileCont(OrderableAggMixin, Aggregate):
 
     def as_sql(self, compiler, connection, **extra_context):  # noqa: F811
         if connection.vendor == "postgresql":
-            # Use PostgreSQL's native PERCENTILE_CONT
+            # Use PostgreSQL's native PERCENTILE_CONT. The SQL is produced entirely
+            # by Django's ORM compiler from the static Aggregate template above:
+            # no user input reaches this expression's SQL.
+            # nosemgrep: python.django.security.audit.custom-expression-as-sql.custom-expression-as-sql, python.django.security.injection.tainted-sql-string.tainted-sql-string
             return super().as_sql(compiler, connection, **extra_context)
         else:
             # For non-PostgreSQL databases, raise NotSupportedError to trigger optimized fallback
@@ -1073,9 +1076,14 @@ class EmissionsModulesViewSet(viewsets.GenericViewSet):
         try:
             from django.db import connections
 
-            stats = {"total_connections": len(connections.all()), "databases": {}}
+            # connections.all() returns a plain list of DatabaseWrapper instances,
+            # not a queryset, so len() over the materialized list is correct and
+            # no .count() method exists here.
+            database_connections = connections.all()
+            stats = {"total_connections": len(database_connections), "databases": {}}
 
-            for db_name, db_connection in connections.all().items():
+            for db_name in connections:
+                db_connection = connections[db_name]
                 stats["databases"][db_name] = {
                     "connected": db_connection.connection is not None,
                     "settings": {

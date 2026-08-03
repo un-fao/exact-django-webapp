@@ -1,0 +1,24 @@
+[
+  {
+    "model": "api.disturbancetype",
+    "pk": 1,
+    "fields": {
+      "name": "Fire",
+      "name_en": "Fire",
+      "name_fr": "Incendie",
+      "name_es": "Fuego",
+      "name_ru": "Пожар"
+    }
+  },
+  {
+    "model": "api.disturbancetype",
+    "pk": 2,
+    "fields": {
+      "name": "Insects",
+      "name_en": "Insects",
+      "name_fr": "Insectes",
+      "name_es": "Insectos",
+      "name_ru": "Насекомые"
+    }
+  }
+]

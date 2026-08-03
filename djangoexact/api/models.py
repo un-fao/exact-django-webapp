@@ -1,6 +1,8 @@
 import uuid
 from abc import abstractmethod
+from functools import lru_cache
 
+from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import exceptions, validators
 from django.db import models as models
@@ -27,12 +29,15 @@ pc_as_float = validators.RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly fo
 
 RICE_CULTIVATION_DAYS = 113
 
+# Hard cap on activities per project; enforced on every creation path (create, build, copy).
+MAX_ACTIVITIES_PER_PROJECT = 50
+
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import RegexValidator
-import threading
+from django.apps import apps
 
 alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 
@@ -52,7 +57,13 @@ class CustomUserManager(BaseUserManager):
         # username = email  # Automatically set username as email
         # user = self.model(email=email, username=username, **extra_fields)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
+        # Django password validators are intentionally not run here: interactive
+        # signups have their password policy enforced by Firebase in the same
+        # registration flow (accounts.views.CreateNewUserView), login happens via
+        # Firebase rather than this hash, and this manager is also called with
+        # password=None for Firebase-synced accounts, which must keep working.
+        # Adding validate_password would change the public registration contract.
+        user.set_password(password)  # nosemgrep: python.django.security.audit.unvalidated-password.unvalidated-password
         user.save(using=self._db)
         return user
 
@@ -444,6 +455,30 @@ class ModuleType(models.Model):
         verbose_name_plural = "Module types"
 
 
+@lru_cache(maxsize=None)
+def module_type_for_class(class_name: str):
+    """Return the ModuleType row for a given model class name.
+
+    Reference data is immutable at runtime (loaded via load_reference_data);
+    this memo is per-process. Reloading reference data requires a process
+    restart or calling module_type_for_class.cache_clear(). The returned
+    instance is shared and must be treated as read-only.
+    """
+    return ModuleType.objects.get(class_name=class_name)
+
+
+@lru_cache(maxsize=1)
+def get_ready_status():
+    """Return the READY StatusType row.
+
+    Reference data is immutable at runtime (loaded via load_reference_data);
+    this memo is per-process. Reloading reference data requires a process
+    restart or calling get_ready_status.cache_clear(). The returned instance
+    is shared and must be treated as read-only.
+    """
+    return StatusType.objects.get(name_en="READY")
+
+
 class DataSource(models.Model):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=255, unique=True)
@@ -586,6 +621,45 @@ class BaseModel(models.Model):
         abstract = True
 
 
+# Cache columns nulled to invalidate a module's cached results. Matches the set nulled by
+# CachedResultMixin.invalidate_cached_results() so the persisted state is identical; nulling
+# last_cached_at is what makes is_cached_results_valid() return False.
+_MODULE_CACHE_INVALIDATION = {
+    "last_cached_at": None,
+    "cached_results_total": None,
+    "cached_results_by_activity": None,
+    "cached_results_by_gas": None,
+    "cached_results_by_activity_by_gas": None,
+    "cached_units_breakdown": None,
+}
+
+
+def invalidate_module_caches(*, project=None, activity=None):
+    """Bulk-invalidate cached module results for a whole project or a single activity.
+
+    Replaces the old fan-out: Project.save() used to spawn one thread (and therefore one DB
+    connection) per module, which on large projects (hundreds of modules) exhausted the
+    Postgres connection limit and timed the request out, so finalizing/editing such a project
+    failed. Both call sites now issue a small number of synchronous bulk UPDATEs (one per
+    concrete module model) on the request's own connection, producing the same persisted state
+    without the thread/connection storm. This mirrors the existing bulk pattern in
+    scripts/invalidate_results_cache.py.
+
+    Only concrete Module subclasses are touched, matching the previous behaviour (the members of
+    Activity.modules are Modules, never Submodules).
+    """
+    if project is not None:
+        filter_kwargs = {"activity__project": project}
+    elif activity is not None:
+        filter_kwargs = {"activity": activity}
+    else:
+        return
+
+    for model in apps.get_app_config("api").get_models():
+        if issubclass(model, Module) and not model._meta.abstract:
+            model.objects.filter(**filter_kwargs).update(**_MODULE_CACHE_INVALIDATION)
+
+
 class Project(Historical, DirtyFieldsMixin):
     class Meta:
         verbose_name_plural = "Projects"
@@ -634,6 +708,13 @@ class Project(Historical, DirtyFieldsMixin):
 
     map_data = models.JSONField(null=True, blank=True, verbose_name="map_data")
 
+    export_id = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True,
+        help_text="UUID for identifying this project across exports/imports"
+    )
+
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
@@ -672,19 +753,17 @@ class Project(Historical, DirtyFieldsMixin):
         if self.pk:
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
-                exclude_fields = ["is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at"]
+                # Lifecycle/metadata flags that never affect emission calculations, so they must
+                # NOT invalidate every module's cached results. Toggling one of these on a large
+                # project would otherwise spawn one thread + DB connection per module (hundreds to
+                # thousands), exhausting connections and timing the request out (finalize failure).
+                exclude_fields = [
+                    "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
+                    "is_finalized", "is_public", "is_archived", "archived_at",
+                ]
 
-                threads: list[threading.Thread] = []
-
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
-                    for activity in self.activities.all():
-                        activity: Activity
-                        for module in activity.modules:
-                            module: Module
-                            threads.append(threading.Thread(target=module.invalidate_cached_results))
-
-                for thread in threads:
-                    thread.start()
+                if any(field not in exclude_fields for field in dirty_fields):
+                    invalidate_module_caches(project=self)
 
         super().save(*args, **kwargs)
 
@@ -704,7 +783,7 @@ class Project(Historical, DirtyFieldsMixin):
             activities = self.activities.all()
 
         for activity in activities:
-            for module in activity.modules:
+            for module in activity.cache_modules():
                 if not module.is_ready():
                     return False
         return True
@@ -961,7 +1040,30 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     @property
     def modules(self) -> list["Module"]:
+        memo = getattr(self, "_modules_memo", None)
+        if memo is not None:
+            return memo
         return self.__get_all_modules()
+
+    def cache_modules(self) -> list["Module"]:
+        """Prime the per-instance module list memo consulted by ``modules``.
+
+        Read-only report paths call this once per Activity instance so later
+        ``modules`` reads and the derived properties (is_luc, is_fishery,
+        area, and friends) reuse one fetched list instead of re-running the
+        per-type queries on every access. Idempotent: calling it more than
+        once on the same instance is a no-op after the first call, since an
+        empty activity memoizes ``[]``, which is not None and will not
+        re-fetch (this is intended).
+
+        Never call this around code that adds or removes modules on the
+        activity: the memo lives only for this Python instance's lifetime
+        and is never persisted, so it will not observe mutations made after
+        it is primed.
+        """
+        if getattr(self, "_modules_memo", None) is None:
+            self._modules_memo = self.__get_all_modules()
+        return self._modules_memo
 
     @property
     def status(self):
@@ -985,6 +1087,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     def heads(self):
         return self.get_livestock_modules_heads()
+
+    @property
+    def catch(self):
+        return self.get_fishery_modules_catch()
 
     @property
     def start_year(self):
@@ -1050,6 +1156,13 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 heads += module.heads_number_w
         return heads
 
+    def get_fishery_modules_catch(self) -> float:
+        catch = 0
+        for module in self.modules:
+            if isinstance(module, Fishery):
+                catch += module.total_catch_yr_w or 0
+        return catch
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
@@ -1063,9 +1176,8 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
                 exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
 
-                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
-                    for module in self.modules:
-                        module.invalidate_cached_results()
+                if any(field not in exclude_fields for field in dirty_fields):
+                    invalidate_module_caches(activity=self)
         super().save(*args, **kwargs)
 
     def __get_delay(self) -> int:
@@ -1106,7 +1218,21 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(list(getattr(self, module_type.class_name.lower()).all()))
+            manager = getattr(self, module_type.class_name.lower())
+            # Land modules carry a forward land_use_change relation (used by
+            # is_with/is_without); select it along with status here to avoid
+            # a per-module query. This covers all concrete top-level land
+            # types (AnnualCropland, PerennialCropland, ForestManagement via
+            # LandModule; FloodedRice, Grassland via LandModuleFixed, which
+            # subclasses LandModule). The abstract LandModuleNoScenarios /
+            # LandSubmodule also carry land_use_change but have no concrete
+            # top-level subclasses today. Only a forward relation on the
+            # module itself is added here, never activity, to keep the
+            # shared parent Activity instance intact for cache_modules.
+            related = ["status"]
+            if issubclass(manager.model, LandModule):
+                related.append("land_use_change")
+            modules.extend(list(manager.all().select_related(*related)))
 
         return modules
 
@@ -1156,6 +1282,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
     cached_results_by_activity = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
     cached_results_by_gas = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
     cached_results_by_activity_by_gas = models.JSONField(null=True, blank=True, verbose_name="cached_results_total")
+    cached_units_breakdown = models.JSONField(null=True, blank=True, verbose_name="cached_units_breakdown")
     last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name="last_modified")
 
     def save(self, *args, **kwargs):
@@ -1164,7 +1291,13 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
         if self.pk and self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
-            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
+            cache_fields = [
+                "last_cached_at",
+                "cached_results_total", "cached_results_by_activity",
+                "cached_results_by_gas", "cached_results_by_activity_by_gas",
+                "cached_units_breakdown",
+                "last_modified",
+            ]
 
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
@@ -1187,12 +1320,20 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
         self.save()
 
+    def cache_units_breakdown(self, units_breakdown_w: list, units_breakdown_wo: list) -> None:
+        """Store land-module units breakdown for use by the report pipeline."""
+        self.cached_units_breakdown = {"w": units_breakdown_w, "wo": units_breakdown_wo}
+        if hasattr(self, "skip_history_when_saving"):
+            self.skip_history_when_saving = True
+        self.save(update_fields=["cached_units_breakdown"])
+
     def invalidate_cached_results(self):
         self.last_cached_at = None
         self.cached_results_total = None
         self.cached_results_by_activity = None
         self.cached_results_by_gas = None
         self.cached_results_by_activity_by_gas = None
+        self.cached_units_breakdown = None
         if isinstance(self, Submodule):
             parent: Module = self.parent
             parent.invalidate_cached_results()
@@ -1242,7 +1383,7 @@ class Submodule(Historical, CachedResultMixin):
 
     @property
     def module_type(self):
-        return ModuleType.objects.get(class_name=self.__class__.__name__)
+        return module_type_for_class(self.__class__.__name__)
 
     @property
     def project(self):
@@ -1332,7 +1473,7 @@ class Module(Historical, CachedResultMixin):
 
     @property
     def module_type(self):
-        return ModuleType.objects.get(class_name=self.__class__.__name__)
+        return module_type_for_class(self.__class__.__name__)
 
     @property
     def project(self):
@@ -1819,6 +1960,7 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     crop_yield_t2_w = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_w")
     crop_yield_t2_wo = models.FloatField(null=True, blank=True, verbose_name="crop_yield_t2_wo")
     crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
+    faostat_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="faostat_year_t2")
 
     area = models.FloatField(null=True, blank=True, verbose_name="area")
 
@@ -2490,9 +2632,16 @@ class Fishery(Module):
     fui_t2_w = models.FloatField(null=True, blank=True, verbose_name="fui_t2_w")
     fui_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fui_t2_wo")
 
-    inshore_ice_production_country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="inshore_ice_production_country_t2")
+    country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="country_t2")
+    ef_source = models.ForeignKey("EmissionFactorSource", on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_year_t2 = models.IntegerField(null=True, blank=True, verbose_name="implementation_year_t2")
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and not self.ef_source:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
+
+        return super().save(*args, **kwargs)
 
 
 class SmallFishery(Fishery):
@@ -2580,6 +2729,9 @@ class InputEntry(Submodule):
 
 
 class EmissionFactorSource(models.Model):
+    OPERATING_MARGIN = "Operating Margin"
+    COMBINED_MARGIN = "Combined Margin"
+
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -2609,7 +2761,7 @@ class ElectricityTier2Mixin(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None and not self.ef_source:
-            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name=EmissionFactorSource.OPERATING_MARGIN)[0]
 
         return super().save(*args, **kwargs)
 
@@ -3350,3 +3502,53 @@ class HandInHandAssessment(models.Model):
 
     def __str__(self):
         return f"{self.country.name} - {self.name} ({self.year})"
+
+
+class AsyncJob(models.Model):
+    """Generic background job tracked in the DB and executed by the
+    exact-computation-job Cloud Run Job (or a local subprocess). Used for
+    async report generation and large project copies. Not Historical: these
+    rows are ephemeral operational state, matching admin_scripts.ComputationJob.
+    """
+
+    class Kind(models.TextChoices):
+        REPORT = "report", "Report generation"
+        PROJECT_COPY = "project_copy", "Project copy"
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        RUNNING = "running", "Running"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    kind = models.CharField(max_length=32, choices=Kind.choices)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
+    progress = models.PositiveSmallIntegerField(default=0)
+    params = models.JSONField(default=dict)
+    result = models.JSONField(default=dict, blank=True)
+    error_message = models.TextField(default="", blank=True)
+    pid = models.IntegerField(null=True, blank=True)
+    cloud_run_execution_name = models.CharField(max_length=255, default="", blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="async_jobs",
+    )
+    project = models.ForeignKey(
+        "api.Project", null=True, blank=True,
+        on_delete=models.CASCADE, related_name="async_jobs",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["kind", "status"]),
+        ]
+
+    def __str__(self):
+        return f"AsyncJob<{self.pk} {self.kind} {self.status}>"

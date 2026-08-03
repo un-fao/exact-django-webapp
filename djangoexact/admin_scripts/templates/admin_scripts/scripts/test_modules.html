@@ -1,0 +1,57 @@
+{% extends "admin_scripts/base.html" %}
+{% block title %}Test All Modules{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex items-center justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Test All Modules</h1>
+        <a href="{% url 'admin_scripts:dashboard' %}"
+           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition">
+            &larr; Back to Dashboard
+        </a>
+    </div>
+
+    <p class="text-sm text-gray-600">
+        Enqueues one capped (max 100 rows) computation per
+        (module, field) pair in the scenario catalog and reports per-pair
+        outcomes. Fields with fewer than two distinct values are skipped.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit"
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+            Run new test
+        </button>
+    </form>
+
+    <section>
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Recent runs</h2>
+        {% if recent_runs %}
+        <div class="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+            {% for run in recent_runs %}
+            <a href="{% url 'admin_scripts:test-modules-detail' run.pk %}"
+               class="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-50">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Run #{{ run.pk }}</p>
+                    <p class="text-xs text-gray-500">
+                        Started {{ run.created_at|date:'M d, Y H:i' }}
+                        {% if run.completed_at %}
+                            &middot; finished {{ run.completed_at|timesince:run.created_at }} later
+                        {% else %}
+                            &middot; in progress
+                        {% endif %}
+                    </p>
+                </div>
+                <span class="text-xs text-gray-400">View &rarr;</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-500">No runs yet.</p>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

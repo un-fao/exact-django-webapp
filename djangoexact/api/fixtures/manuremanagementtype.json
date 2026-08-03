@@ -1,0 +1,178 @@
+[
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 41,
+    "fields": {
+      "name": "Aerobic Treatment",
+      "name_en": "Aerobic Treatment",
+      "name_fr": "Traitement aérobie\n",
+      "name_es": "Tratamiento Aeróbico",
+      "name_ru": "Аэробная обработка"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 35,
+    "fields": {
+      "name": "Burned For Fuel",
+      "name_en": "Burned For Fuel",
+      "name_fr": "Brûlage à des fins de combustible\n",
+      "name_es": "Quemado para combustible",
+      "name_ru": "Сожжённый в качестве топлива"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 40,
+    "fields": {
+      "name": "Composting",
+      "name_en": "Composting",
+      "name_fr": "Compostage",
+      "name_es": "Compostaje",
+      "name_ru": "Компостирование"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 33,
+    "fields": {
+      "name": "Daily Spread",
+      "name_en": "Daily Spread",
+      "name_fr": "Épandage quotidien\n",
+      "name_es": "Distribución diaria",
+      "name_ru": "Ежедневное распределение"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 39,
+    "fields": {
+      "name": "Deep Bedding",
+      "name_en": "Deep Bedding",
+      "name_fr": "Litière profonde\n",
+      "name_es": "Camas profundas",
+      "name_ru": "Глубокая подстилка"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 34,
+    "fields": {
+      "name": "Digester",
+      "name_en": "Digester",
+      "name_fr": "Digesteur anaérobie",
+      "name_es": "Digestor",
+      "name_ru": "Дигестер"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 46,
+    "fields": {
+      "name": "Dry Lot",
+      "name_en": "Dry Lot",
+      "name_fr": "Parc d’élevage",
+      "name_es": "Corral de engorde",
+      "name_ru": "Сухой загон"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 43,
+    "fields": {
+      "name": "Lagoon",
+      "name_en": "Lagoon",
+      "name_fr": "Bassin anaérobie ouvert",
+      "name_es": "Laguna",
+      "name_ru": "Лагуна"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 44,
+    "fields": {
+      "name": "Liquid/Slurry",
+      "name_en": "Liquid/Slurry",
+      "name_fr": "Liquide/Lisier\n",
+      "name_es": "Líquido/fango",
+      "name_ru": "Жидкость/Жижа"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 53,
+    "fields": {
+      "name": "Other (pls. Go Tier 2)",
+      "name_en": "Other (pls. Go Tier 2)",
+      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_es": "Otros (Por favor, inserte Nivel 2)",
+      "name_ru": "Прочее (пожалуйста, перейдите ко второму уровню)"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 52,
+    "fields": {
+      "name": "Other (Pls. Go Tier 2)",
+      "name_en": "Other (Pls. Go Tier 2)",
+      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_es": "Otros (Por favor, inserte Nivel 2)",
+      "name_ru": "Прочее (перейдите к уровень 2/Tier 2)"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 32,
+    "fields": {
+      "name": "Pasture/Range/Paddock",
+      "name_en": "Pasture/Range/Paddock",
+      "name_fr": "Pâturages/parcours/parcelles\n",
+      "name_es": "Pastura/Prado/Pradera",
+      "name_ru": "Пастбище/Выпас/Паддок"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 36,
+    "fields": {
+      "name": "Pit<1Month",
+      "name_en": "Pit<1Month",
+      "name_fr": "Fosse <1 mois\n",
+      "name_es": "Pozo<1Mes",
+      "name_ru": "Яма <1 месяц"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 37,
+    "fields": {
+      "name": "Pit>1Month",
+      "name_en": "Pit>1Month",
+      "name_fr": "Fosse >1 mois\n",
+      "name_es": "Pozo>1Mes",
+      "name_ru": "Яма >1 месяц"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 38,
+    "fields": {
+      "name": "Poultry Manure",
+      "name_en": "Poultry Manure",
+      "name_fr": "Fumier de volaille\n",
+      "name_es": "Estiercol de aves de corral",
+      "name_ru": "Птичий навоз"
+    }
+  },
+  {
+    "model": "api.manuremanagementtype",
+    "pk": 45,
+    "fields": {
+      "name": "Solid Storage",
+      "name_en": "Solid Storage",
+      "name_fr": "Stockage solide\n",
+      "name_es": "Almacenaje de sólidos",
+      "name_ru": "Твёрдое хранение"
+    }
+  }
+]

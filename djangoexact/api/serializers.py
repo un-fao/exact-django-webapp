@@ -5,7 +5,7 @@ import uuid
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
-from django.db.models import Model
+from django.db.models import Count, Model
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.utils import timezone
@@ -58,6 +58,7 @@ from .models import (
     LandUseType,
     LargeFishery,
     Livestock,
+    MAX_ACTIVITIES_PER_PROJECT,
     MacroFuelType,
     MacroInputType,
     MinorSeasonAnnualCropland,
@@ -104,6 +105,7 @@ from .models import (
     HandInHandRegion,
     HandInHandCountry,
     HandInHandAssessment,
+    AsyncJob,
 )
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
@@ -180,6 +182,56 @@ def validate_module_fields(data, mandatory_fields: list):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
 
+class _SerializerRegistry(dict):
+    """Lazily-populated allowlist of DRF serializer classes resolvable by
+    dynamic name.
+
+    Populated from this module's namespace on first miss and refreshed on
+    later misses rather than snapshotted at import time: some lookups run
+    while the module is still being imported (class bodies below call
+    get_model_serializer), so an early snapshot would miss classes defined
+    later and change resolution behavior. Hits cost O(1); a miss rescans the
+    namespace before failing, which is what every lookup cost before caching.
+    Restricting entries to serializer classes keeps dynamically-built,
+    model-derived names from indexing arbitrary module globals.
+    """
+
+    def _refresh(self):
+        self.update(
+            (name, obj)
+            for name, obj in globals().items()
+            if isinstance(obj, type) and issubclass(obj, serializers.BaseSerializer)
+        )
+
+    def __missing__(self, key):
+        self._refresh()
+        # dict.__getitem__ on a subclass re-enters __missing__ for an absent
+        # key, so raise directly instead of re-indexing after the refresh.
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        raise KeyError(key)
+
+    def __contains__(self, key):
+        if dict.__contains__(self, key):
+            return True
+        self._refresh()
+        return dict.__contains__(self, key)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+_SERIALIZER_REGISTRY = _SerializerRegistry()
+
+
+def _serializer_registry() -> dict:
+    """Return the lazily-populated serializer allowlist registry."""
+    return _SERIALIZER_REGISTRY
+
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -191,7 +243,7 @@ def get_model_serializer(model_arg):
             super().__init__(*args, **kwargs)
 
     try:
-        return globals()[model_arg.__name__ + "Serializer"]
+        return _serializer_registry()[model_arg.__name__ + "Serializer"]
     except KeyError:
         return GenericSerializer
 
@@ -200,9 +252,9 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
     try:
         match action:
             case ActionTypes.CREATE | ActionTypes.UPDATE:
-                return globals()[model_arg.__name__ + "WriteSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "WriteSerializer"]
             case ActionTypes.RETRIEVE:
-                return globals()[model_arg.__name__ + "ReadSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
         raise ValueError(f"Serializer for {model_arg.__name__} not found")
 
@@ -275,13 +327,13 @@ class UserReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "email", "first_name", "last_name", "country", "organization"]
+        fields = ["id", "email", "first_name", "last_name", "country", "organization", "is_opted_out_of_emails"]
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "email", "first_name", "last_name", "country", "organization"]
+        fields = ["id", "email", "first_name", "last_name", "country", "organization", "is_opted_out_of_emails"]
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -318,10 +370,12 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
     tags = ProjectTagSerializer(many=True, read_only=True)
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -333,6 +387,18 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
         user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
         return [group.group.name for group in user_project_group] if user_project_group else []
+
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
 
 
 class ProjectResultSerializer(serializers.Serializer):
@@ -353,11 +419,25 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     total_catch = serializers.SerializerMethodField()
     total_livestock = serializers.SerializerMethodField()
     note = serializers.SerializerMethodField()
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    module_count = serializers.SerializerMethodField(read_only=True)
 
     capitalization_years = serializers.FloatField(read_only=True)
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
+
+    def get_activity_count(self, obj):
+        cached = getattr(obj, "_activity_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.count()
+
+    def get_module_count(self, obj):
+        cached = getattr(obj, "_module_count", None)
+        if cached is not None:
+            return cached
+        return obj.activities.aggregate(c=Count("module_types"))["c"] or 0
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -537,10 +617,160 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
 
+class ModuleExportSerializer(serializers.Serializer):
+    """Generic serializer for exporting any module type."""
+
+    def _serialize_comment(self, comment):
+        """Serialize a single comment with its replies."""
+        comment_data = {
+            'content': comment.content,
+            'author_email': comment.author.email if comment.author else None,
+            'date_created': comment.date_created.isoformat() if comment.date_created else None,
+        }
+        # Include replies recursively
+        if comment.replies.exists():
+            comment_data['replies'] = [
+                self._serialize_comment(reply) for reply in comment.replies.all()
+            ]
+        return comment_data
+
+    def _serialize_thread(self, thread):
+        """Serialize a CommentThread with all its comments."""
+        if thread is None:
+            return None
+
+        # Get top-level comments only (those without a parent)
+        top_level_comments = thread.comments.filter(parent__isnull=True).order_by('date_created')
+
+        return {
+            'comments': [self._serialize_comment(comment) for comment in top_level_comments]
+        }
+
+    def to_representation(self, instance):
+        """Export all model fields except relations that will be recreated."""
+        data = {}
+        # Include original ID so the importer can remap cross-module
+        # OneToOneField references (e.g. Settlement.land_use_change →
+        # LandUseChange) whose PKs change in the target database.
+        data['_original_id'] = instance.id
+        excluded_fields = (
+            'id', 'activity', 'status', 'data_source', 'note',
+            'history', 'last_modified', 'parent'
+        )
+        for field in instance._meta.get_fields():
+            if field.name in excluded_fields:
+                continue
+            # Skip reverse relations (they have no DB column)
+            if not hasattr(field, 'column'):
+                continue
+            if hasattr(field, 'get_internal_type'):
+                field_type = field.get_internal_type()
+                if field_type in ('ForeignKey', 'OneToOneField'):
+                    # For thread fields, serialize the full thread data with comments
+                    if field.name.endswith('_thread'):
+                        thread_instance = getattr(instance, field.name, None)
+                        thread_data = self._serialize_thread(thread_instance)
+                        if thread_data and thread_data.get('comments'):
+                            data[field.name] = thread_data
+                    else:
+                        # Store FK / OneToOne as ID
+                        value = getattr(instance, f'{field.name}_id', None)
+                        if value is not None:
+                            data[field.name] = value
+                elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
+                    continue
+                else:
+                    value = getattr(instance, field.name, None)
+                    if value is not None:
+                        data[field.name] = value
+
+        # Export submodules if the module has them
+        if hasattr(instance, 'submodules'):
+            submodules = instance.submodules
+            if submodules:
+                submodules_list = []
+                for submodule in submodules:
+                    submodule_data = self.to_representation(submodule)
+                    # Include the submodule class name for proper reconstruction
+                    submodule_data['_submodule_type'] = submodule.__class__.__name__
+                    submodules_list.append(submodule_data)
+                data['_submodules'] = submodules_list
+
+        return data
+
+
+class ActivityExportSerializer(serializers.ModelSerializer):
+    """Serializer for exporting activities with their modules."""
+    modules = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        exclude = ['id', 'project', 'owner', 'created_at', 'updated_at']
+
+    def get_modules(self, obj):
+        """Group modules by their type."""
+        result = {}
+        module_serializer = ModuleExportSerializer()
+        for module in obj.modules:
+            module_type = module.__class__.__name__
+            if module_type not in result:
+                result[module_type] = []
+            result[module_type].append(module_serializer.to_representation(module))
+        return result
+
+
+class ProjectExportSerializer(serializers.ModelSerializer):
+    """Serializer for full project export."""
+    activities = ActivityExportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        for field in ['country', 'climate', 'moisture', 'soil_type', 'gw_potential', 'status']:
+            if field in data and data[field] is not None:
+                if isinstance(data[field], dict) and 'id' in data[field]:
+                    data[field] = data[field]['id']
+        return data
+
+
+class ProjectImportSerializer(serializers.Serializer):
+    """Serializer for validating and processing project imports."""
+    formatVersion = serializers.IntegerField()
+    appVersion = serializers.CharField()
+    compatibilityGroup = serializers.IntegerField()
+    exportedAt = serializers.DateTimeField()
+    exportId = serializers.UUIDField()
+    project = serializers.DictField()
+
+    def validate_compatibilityGroup(self, value):
+        """Ensure compatibility group matches current app."""
+        from .views import get_version_config
+        current_config = get_version_config()
+        current_group = current_config.get("compatibilityGroup", 1)
+        if value != current_group:
+            raise serializers.ValidationError(
+                f"This project was created with EX-ACT v{value} and cannot be "
+                f"imported into this version (v{current_group})."
+            )
+        return value
+
+    def validate_formatVersion(self, value):
+        """Ensure format version is supported."""
+        if value != 1:
+            raise serializers.ValidationError(
+                f"Unsupported file format version: {value}"
+            )
+        return value
+
+
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage"]
+        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
         ref_name = "Activity"
 
 
@@ -591,6 +821,15 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
         if project.is_finalized:
             return serializers.ValidationError("Finalized projects cannot have activities added")
+
+        # Enforce the activity cap on creation and when an existing activity is
+        # reassigned to a different project (the destination would gain an activity).
+        # Note: on update, `project` above is pinned to the instance's current
+        # project, so the destination must be read from the incoming data.
+        target_project: Project = data.get("project") or project
+        is_reassignment = self.instance is not None and target_project != self.instance.project
+        if (not self.instance or is_reassignment) and target_project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
 
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
@@ -701,6 +940,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_finalized:
             raise serializers.ValidationError("Finalized projects cannot have activities added")
+
+        if not self.instance and project.activities.count() >= MAX_ACTIVITIES_PER_PROJECT:
+            raise serializers.ValidationError(f"A project cannot have more than {MAX_ACTIVITIES_PER_PROJECT} activities")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -1018,11 +1260,16 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 organic_soil.save()
                 module_types_to_append.append(ModuleType.objects.get(class_name="OrganicSoil").id)
 
-            self.sanitize_input_entries()
-
             self.instance.module_types.add(*module_types_to_append)
             if (luc or was_luc_added) and not was_luc_removed:
                 self.instance.module_types.add(ModuleType.objects.get(class_name="LandUseChange").id)
+
+            # Sanitize AFTER module_types are re-populated: Activity.modules is derived
+            # from module_types.all(), so running this while the M2M is cleared (see the
+            # module_types.clear() above) would iterate zero modules and clear nothing.
+            # This is what leaves stale _start/_w/_wo values behind when a LUC's module
+            # roles are swapped.
+            self.sanitize_input_entries()
 
             self.instance.save()
 
@@ -1053,7 +1300,7 @@ class RecursiveField(serializers.Serializer):
 class UserSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email"]
+        fields = ["id", "email", "is_opted_out_of_emails"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -1323,7 +1570,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         return super().validate(data)
 
     def parent_validation(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        ParentWriteSerializer = _serializer_registry().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
 
@@ -1462,6 +1709,8 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
             for field, value in data.items():
                 setattr(self.instance, field, value)
+
+            self.instance.save()
 
             # Validate the parent Land Use Change on related LandModule change
             parent_luc = getattr(self.instance, "land_use_change", None)
@@ -3937,3 +4186,13 @@ class HandInHandAssessmentGroupedSerializer(serializers.Serializer):
         result.sort(key=lambda x: x["name"])
 
         return result
+
+
+class AsyncJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AsyncJob
+        fields = [
+            "id", "kind", "status", "progress", "result", "error_message",
+            "created_at", "started_at", "completed_at", "project",
+        ]
+        read_only_fields = fields

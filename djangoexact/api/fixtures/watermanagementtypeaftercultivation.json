@@ -1,0 +1,68 @@
+[
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 2,
+    "fields": {
+      "name": "Irrigated, Continuously Flooded",
+      "name_en": "Irrigated, Continuously Flooded",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 4,
+    "fields": {
+      "name": "Irrigated, Multiple Drainage Periods",
+      "name_en": "Irrigated, Multiple Drainage Periods",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 3,
+    "fields": {
+      "name": "Irrigated, Single Drainage Period",
+      "name_en": "Irrigated, Single Drainage Period",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 7,
+    "fields": {
+      "name": "Rainfed, Deep Water",
+      "name_en": "Rainfed, Deep Water",
+      "name_fr": "Pluvial, eau profonde\n",
+      "name_es": "Alimentadas a lluvia, Aguas profundas ",
+      "name_ru": "Дождевое орошение, с высоким уровнем воды"
+    }
+  },
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 6,
+    "fields": {
+      "name": "Rainfed, Dry Season (Drought Prone)",
+      "name_en": "Rainfed, Dry Season (Drought Prone)",
+      "name_fr": "Pluvial, saison sèche (susceptible à sècheresses)\n",
+      "name_es": "Alimentadas a lluvia, Con tendencia a la sequía",
+      "name_ru": "Дождевое орошение, сухой сезон (подвержено засухе)"
+    }
+  },
+  {
+    "model": "api.watermanagementtypeaftercultivation",
+    "pk": 5,
+    "fields": {
+      "name": "Rainfed, Wet Season (Regular Rainfed)",
+      "name_en": "Rainfed, Wet Season (Regular Rainfed)",
+      "name_fr": "Pluvial, saison humide (pluies régulières)\n",
+      "name_es": "Alimentadas a lluvia, Alimentación regular por lluvia",
+      "name_ru": "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
+    }
+  }
+]

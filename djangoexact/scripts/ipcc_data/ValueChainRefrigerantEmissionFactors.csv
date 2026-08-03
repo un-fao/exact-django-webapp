@@ -1,18 +1,91 @@
-refrigerant_type,sar,ar4,ar5,ar6
-HFC-23,11700,14800,12400,14600
-HFC-32,650,675,677,771
-HFC-125,2800,3500,3170,3740
-HFC-134a,1300,1430,1300,1530
-HFC-143a,3800,4470,4800,5810
-HFC-152a,140,124,138,164
-HFC-227ea,2900,3220,3350,3600
-HFC-236fa,6300,9810,8060,8690
-HFC-245fa,,1030,858,962
-HFC-365mfc,,794,804,914
-HFC-43-10mee,1300,1640,1650,1600
-HFO-1234yf,,4,0.501,0.501
-HFO-1234ze(E),,7,1.37,1.37
-HFO-1336mzz(Z),,9,2,2.08
-HFO-1336mzz(E),,,7,17.9
-HCFO-1233zd(E),,4.5,1,3.88
-HCFO-1224yd(Z),,,1,
+refrigerant_type,gwp,value
+HCFC-22 (R22),IPCC Second Assessment Report (SAR),1500.0
+HFC-23,IPCC Second Assessment Report (SAR),11700.0
+HFC-32,IPCC Second Assessment Report (SAR),650.0
+HFC-125,IPCC Second Assessment Report (SAR),2800.0
+HFC-134a,IPCC Second Assessment Report (SAR),1300.0
+HFC-143a,IPCC Second Assessment Report (SAR),3800.0
+HFC-152a,IPCC Second Assessment Report (SAR),140.0
+HFC-227ea,IPCC Second Assessment Report (SAR),2900.0
+HFC-236fa,IPCC Second Assessment Report (SAR),6300.0
+HFC-245fa,IPCC Second Assessment Report (SAR),
+HFC-365mfc,IPCC Second Assessment Report (SAR),
+HFC-43-10mee,IPCC Second Assessment Report (SAR),1300.0
+HFO-1234yf,IPCC Second Assessment Report (SAR),
+HFO-1234ze(E),IPCC Second Assessment Report (SAR),
+HFO-1336mzz(Z),IPCC Second Assessment Report (SAR),
+HFO-1336mzz(E),IPCC Second Assessment Report (SAR),
+HCFO-1233zd(E),IPCC Second Assessment Report (SAR),
+HCFO-1224yd(Z),IPCC Second Assessment Report (SAR),
+HCFC-22 (R22),IPCC Fourth Assessment Report (AR4),1810.0
+HFC-23,IPCC Fourth Assessment Report (AR4),14800.0
+HFC-32,IPCC Fourth Assessment Report (AR4),675.0
+HFC-125,IPCC Fourth Assessment Report (AR4),3500.0
+HFC-134a,IPCC Fourth Assessment Report (AR4),1430.0
+HFC-143a,IPCC Fourth Assessment Report (AR4),4470.0
+HFC-152a,IPCC Fourth Assessment Report (AR4),124.0
+HFC-227ea,IPCC Fourth Assessment Report (AR4),3220.0
+HFC-236fa,IPCC Fourth Assessment Report (AR4),9810.0
+HFC-245fa,IPCC Fourth Assessment Report (AR4),1030.0
+HFC-365mfc,IPCC Fourth Assessment Report (AR4),794.0
+HFC-43-10mee,IPCC Fourth Assessment Report (AR4),1640.0
+HFO-1234yf,IPCC Fourth Assessment Report (AR4),4.0
+HFO-1234ze(E),IPCC Fourth Assessment Report (AR4),7.0
+HFO-1336mzz(Z),IPCC Fourth Assessment Report (AR4),9.0
+HFO-1336mzz(E),IPCC Fourth Assessment Report (AR4),
+HCFO-1233zd(E),IPCC Fourth Assessment Report (AR4),4.5
+HCFO-1224yd(Z),IPCC Fourth Assessment Report (AR4),
+HCFC-22 (R22),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1760.0
+HFC-23,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,12400.0
+HFC-32,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,677.0
+HFC-125,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,3170.0
+HFC-134a,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1300.0
+HFC-143a,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,4800.0
+HFC-152a,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,138.0
+HFC-227ea,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,3350.0
+HFC-236fa,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,8060.0
+HFC-245fa,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,858.0
+HFC-365mfc,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,804.0
+HFC-43-10mee,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1650.0
+HFO-1234yf,IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,0.5
+HFO-1234ze(E),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1.37
+HFO-1336mzz(Z),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,2.0
+HFO-1336mzz(E),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,7.0
+HCFO-1233zd(E),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1.0
+HCFO-1224yd(Z),IPCC Fifth Assessment Report (AR5) without Climate Change Feedback,1.0
+HCFC-22 (R22),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1760.0
+HFC-23,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,12400.0
+HFC-32,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,677.0
+HFC-125,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,3170.0
+HFC-134a,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1550.0
+HFC-143a,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,4800.0
+HFC-152a,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,138.0
+HFC-227ea,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,3350.0
+HFC-236fa,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,8060.0
+HFC-245fa,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,858.0
+HFC-365mfc,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,804.0
+HFC-43-10mee,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1650.0
+HFO-1234yf,IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,0.5
+HFO-1234ze(E),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1.37
+HFO-1336mzz(Z),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,2.0
+HFO-1336mzz(E),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,7.0
+HCFO-1233zd(E),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1.0
+HCFO-1224yd(Z),IPCC Fifth Assessment Report (AR5) with Climate Change Feedback,1.0
+HCFC-22 (R22),IPCC Sixth Assessment Report (AR6),1960.0
+HFC-23,IPCC Sixth Assessment Report (AR6),14600.0
+HFC-32,IPCC Sixth Assessment Report (AR6),771.0
+HFC-125,IPCC Sixth Assessment Report (AR6),3740.0
+HFC-134a,IPCC Sixth Assessment Report (AR6),1530.0
+HFC-143a,IPCC Sixth Assessment Report (AR6),5810.0
+HFC-152a,IPCC Sixth Assessment Report (AR6),164.0
+HFC-227ea,IPCC Sixth Assessment Report (AR6),3600.0
+HFC-236fa,IPCC Sixth Assessment Report (AR6),8690.0
+HFC-245fa,IPCC Sixth Assessment Report (AR6),962.0
+HFC-365mfc,IPCC Sixth Assessment Report (AR6),914.0
+HFC-43-10mee,IPCC Sixth Assessment Report (AR6),1600.0
+HFO-1234yf,IPCC Sixth Assessment Report (AR6),0.5
+HFO-1234ze(E),IPCC Sixth Assessment Report (AR6),1.37
+HFO-1336mzz(Z),IPCC Sixth Assessment Report (AR6),2.08
+HFO-1336mzz(E),IPCC Sixth Assessment Report (AR6),17.9
+HCFO-1233zd(E),IPCC Sixth Assessment Report (AR6),3.88
+HCFO-1224yd(Z),IPCC Sixth Assessment Report (AR6),

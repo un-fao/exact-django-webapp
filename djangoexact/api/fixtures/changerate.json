@@ -1,0 +1,26 @@
+[
+  {
+    "model": "api.changerate",
+    "pk": 3,
+    "fields": {
+      "name": "exponential",
+      "value": 0.78
+    }
+  },
+  {
+    "model": "api.changerate",
+    "pk": 1,
+    "fields": {
+      "name": "immediate",
+      "value": 1.0
+    }
+  },
+  {
+    "model": "api.changerate",
+    "pk": 2,
+    "fields": {
+      "name": "linear",
+      "value": 0.5
+    }
+  }
+]
