@@ -14,7 +14,7 @@ django-environ==0.11.2
 django-extensions==3.2.3
 djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
-drf-spectacular==0.26.2
+drf-spectacular==0.30.0
 drf-yasg==1.21.14
 gunicorn==22.0.0
 idna==3.16
