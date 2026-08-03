@@ -51,7 +51,7 @@ uritemplate==4.1.1
 urllib3==2.7.0
 django-simple-history==3.8.0
 django-archive==0.2.0
-matplotlib==3.8.2
+matplotlib==3.11.1
 firebase-admin==6.5.0
 requests==2.33.0
 django-unfold==0.34.0
