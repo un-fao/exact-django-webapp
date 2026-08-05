@@ -192,7 +192,7 @@ jobs:
         # Docker CLI plugin installed. The GitHub-hosted image ships Buildx, so
         # this is now about pinning the builder rather than supplying a missing
         # one; the build below needs BuildKit for its --secret mount.
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Build and push image
         env:
