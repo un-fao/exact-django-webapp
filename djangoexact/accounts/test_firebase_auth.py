@@ -13,6 +13,7 @@ them they cover every branch the views take on the error paths.
 """
 
 import json
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
@@ -30,8 +31,10 @@ from accounts.firebase_auth import (
 from accounts.views import (
     FIREBASE_INVALID_RESPONSE_MESSAGE,
     FIREBASE_UNAVAILABLE_MESSAGE,
+    LoginExistingUserView,
     firebase_error_response,
 )
+from api.models import CustomUser as User
 
 TOKEN_EXPIRED_BODY = json.dumps({"error": {"code": 400, "message": "TOKEN_EXPIRED", "errors": []}})
 INVALID_CREDENTIALS_BODY = json.dumps({"error": {"code": 400, "message": "INVALID_LOGIN_CREDENTIALS"}})
@@ -243,3 +246,50 @@ class FirebaseErrorResponseTestCase(SimpleTestCase):
             response = self._map(exc, "error")
 
         self.assertNotIn("do not leak", str(response.data))
+
+
+class OrphanedAccountCleanupTestCase(SimpleTestCase):
+    """Login must delete an orphaned Firebase account with a credential it accepts.
+
+    ``LoginExistingUserView.post`` is wrapped in ``@transaction.atomic``, which
+    opens a connection before the body runs. ``post.__wrapped__`` is the
+    undecorated function that ``functools.wraps`` keeps on the wrapper, so
+    calling it drives the real branch with no database involved.
+    """
+
+    SIGN_IN_RESULT = {
+        "localId": "firebase-uid-123",
+        "idToken": "id-token-abc",
+        "refreshToken": "refresh-token-xyz",
+        "expiresIn": "3600",
+        "kind": "identitytoolkit#VerifyPasswordResponse",
+    }
+
+    def _post_with_no_django_user(self, delete_side_effect=None):
+        request = SimpleNamespace(data={"email": "Orphan@Example.com ", "password": "pw"})
+        verified_record = SimpleNamespace(email_verified=True)
+
+        with (
+            patch("accounts.views.firebase_admin_auth.get_user_by_email", return_value=verified_record),
+            patch("accounts.views.auth.sign_in_with_email_and_password", return_value=self.SIGN_IN_RESULT),
+            patch("accounts.views.User.objects.get", side_effect=User.DoesNotExist),
+            patch("accounts.views.auth.delete_user_account", side_effect=delete_side_effect) as delete,
+        ):
+            response = LoginExistingUserView.post.__wrapped__(LoginExistingUserView(), request)
+
+        return response, delete
+
+    def test_cleanup_sends_the_id_token_not_the_uid(self):
+        response, delete = self._post_with_no_django_user()
+
+        delete.assert_called_once_with(self.SIGN_IN_RESULT["idToken"])
+        self.assertNotIn(self.SIGN_IN_RESULT["localId"], delete.call_args.args)
+        self.assertEqual(response.status_code, 404)
+
+    def test_cleanup_failure_still_returns_not_found(self):
+        with self.assertLogs("console", level="ERROR"):
+            response, delete = self._post_with_no_django_user(delete_side_effect=FirebaseUnavailableError())
+
+        delete.assert_called_once_with(self.SIGN_IN_RESULT["idToken"])
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, {"error": "User not found"})

@@ -182,9 +182,8 @@ class LoginExistingUserView(APIView):
 
         except User.DoesNotExist:
             try:
-                auth.delete_user_account(user["localId"])
+                auth.delete_user_account(user["idToken"])
             except FirebaseError:
-                # Best effort cleanup; the client still gets the 404 it expects.
                 logger.exception("Failed to delete orphaned Firebase account during login")
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
