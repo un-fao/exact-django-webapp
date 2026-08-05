@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-05 - Completed quick task 260805-l5b: applied the Dependabot + Semgrep security findings CSV (npm lockfile, Python pins, GitHub Action SHA pinning, WeasyPrint not-affected guard)
+Last activity: 2026-08-05 - Completed quick task 260805-mmh: replaced the json.loads(e.strerror) idiom in accounts auth error handling with typed FirebaseError exceptions, closing several unhandled-500 paths on token refresh and login
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -100,6 +100,7 @@ None yet.
 | 260729-exi | Removed the residual Staff auth Group (id=5) and its traces from the review environment DB via cloud-sql-proxy. Inspection found zero linked users, memberships, or invitations; deleted the group row plus its 1253 auth_group_permissions links inside one transaction. All 7 verification checks passed; users and is_staff flags untouched | 2026-07-29 | (docs) | [260729-exi-remove-staff-role-and-membership-traces-](./quick/260729-exi-remove-staff-role-and-membership-traces-/) |
 | 260729-k8y | Relabel Inventory IPCC Category names per 1-results-report.xlsx via presentation-layer mapping (api/inventory_labels.py, keyed on module class with Aquaculture overrides for N2O Field/Electricity); wired into module results API and Excel report live+cached paths; ActivityTypes untouched | 2026-07-29 | 63d8b004 | [260729-k8y-relabel-inventory-result-categories-via-](./quick/260729-k8y-relabel-inventory-result-categories-via-/) |
 | 260805-l5b | Applied the Dependabot + Semgrep findings CSV: npm audit fix for fast-uri/brace-expansion/postcss (lockfile only, npm audit now clean), bumped httplib2 0.32.0 + pyparsing 3.3.2 + Django 5.2.17, SHA-pinned both docker/setup-buildx-action refs. WeasyPrint held at 68.0 as not-affected (presentational_hints never enabled) with a guard test; the accounts/views.py logger finding was stale on develop | 2026-08-05 | b97b53c6 | [260805-l5b-read-exact-django-webapp-csv-security-fi](./quick/260805-l5b-read-exact-django-webapp-csv-security-fi/) |
+| 260805-mmh | Replaced the `json.loads(e.strerror)` idiom in accounts auth error handling with typed FirebaseError exceptions parsed inside FirebaseAuth. Transport failures, non-JSON bodies and unexpected response shapes were turning handled 400s into unhandled 500s on TokenRefreshView. Frontend-visible responses unchanged; 27 DB-free tests added. Flags VerifyUserEmail as a dead AllowAny endpoint that needs auth before its typo is fixed | 2026-08-05 | 1d5c6405 | [260805-mmh-fix-the-foo-json-loads-e-strerror-error-](./quick/260805-mmh-fix-the-foo-json-loads-e-strerror-error-/) |
 
 ## Deferred Items
 
