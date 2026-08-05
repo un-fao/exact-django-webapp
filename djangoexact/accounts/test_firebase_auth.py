@@ -2,14 +2,20 @@
 
 These run without a database, so they all use ``SimpleTestCase``.
 
-``LoginExistingUserView.post`` and ``TokenRefreshView.post`` are both decorated
-with ``@transaction.atomic``, which opens a connection to the default database
-before any of the body runs, and ``SimpleTestCase`` blocks database access. The
-views therefore cannot be exercised through the HTTP layer here. Instead the two
-pieces the views delegate to are covered directly: ``FirebaseAuth``, which turns
-every transport and body failure into a typed exception, and
-``firebase_error_response``, which maps those exceptions onto responses. Between
-them they cover every branch the views take on the error paths.
+``LoginExistingUserView.post`` is decorated with ``@transaction.atomic``, which
+opens a connection to the default database before any of the body runs, while
+``SimpleTestCase`` blocks database access. That view therefore cannot be
+exercised through the HTTP layer here. Two approaches cover it instead:
+
+- the pieces it delegates to are tested directly, namely ``FirebaseAuth``, which
+  turns every transport and body failure into a typed exception, and
+  ``firebase_error_response``, which maps those exceptions onto responses;
+- for a branch that has to run in the view itself, ``post.__wrapped__`` is the
+  undecorated function that ``functools.wraps`` keeps on the wrapper, so calling
+  it skips the atomic block and needs no connection.
+
+``TokenRefreshView.post`` dropped its ``@transaction.atomic`` (it performs no DB
+writes), so it can be driven directly if a test ever needs to.
 """
 
 import json
