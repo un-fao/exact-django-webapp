@@ -13,6 +13,8 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+logger = logging.getLogger(__name__)
+
 import accounts.utils as utils
 from djangoexact.settings import auth
 
@@ -248,8 +250,10 @@ class TokenRefreshView(APIView):
     @swagger_auto_schema(
         responses={200: LoginResponseSerializer, 400: "Bad Request"},
     )
-    @transaction.atomic
     def post(self, request):
+        # No @transaction.atomic: this view performs no DB writes (Firebase only).
+        # The wrapper forced a DB connection open and turned a transient Cloud SQL
+        # restart into a hard 500 on token refresh.
         data = request.data
 
         refresh_token = data.get("refresh") if isinstance(data, dict) else None

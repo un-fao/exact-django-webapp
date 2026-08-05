@@ -103,6 +103,10 @@ load_starting_fixtures.py
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json
+djangoexact/djangoexact/fao-exact-dev-service-account-key.json
+# Generic guard for any future GCP/Firebase service-account or private-key JSON
+**/*-service-account-key*.json
+**/*-private-key*.json
 
 csv
 djangoexact/ipcc_dump_csv.zip
@@ -189,3 +193,12 @@ test may 2026 (Copy).exactp
 .superpowers/
 README.pdf
 .venv-main
+.beads
+.claude/settings.json
+.venv
+.env.*
+docs
+CLAUDE.md
+CUserssirvosterzoAppDataLocalTempsql_describe.txt
+EXACT_guide.pdf
+README.pdf
