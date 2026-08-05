@@ -5,8 +5,8 @@ charset-normalizer==3.1.0
 colorama==0.4.6
 coreapi==2.3.3
 coreschema==0.0.4
-httplib2==0.22.0
-Django==5.2.14
+httplib2==0.32.0
+Django==5.2.17
 django-filter==24.3
 django-auditlog==3.0.0
 django-cors-headers==4.4.0
@@ -33,7 +33,7 @@ pluggy==1.5.0
 psycopg2-binary==2.9.6
 pydotplus==2.0.2
 PyJWT==2.13.0
-pyparsing==3.0.9
+pyparsing==3.3.2
 pyrsistent==0.19.3
 pytest==9.0.3
 python-dateutil==2.8.2
@@ -63,6 +63,10 @@ django-picklefield==3.2
 django-dirtyfields==1.9.3
 python-slugify==8.0.4
 drf-nested-routers==0.94.1
+# CVE-2026-49452 only affects WeasyPrint when the presentational_hints option is enabled.
+# This codebase never enables it; all call sites use HTML(string=html).write_pdf() in
+# api/views.py, api/services/report_jobs.py and public/views.py. The exemption is enforced by
+# api/tests/test_weasyprint_presentational_hints_guard.py, so held at 68.0 rather than 69.0.
 weasyprint==68.0
 google-cloud-storage==2.19.0
 google-cloud-run==0.16.0
