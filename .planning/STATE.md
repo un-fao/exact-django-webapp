@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-05 - Completed quick task 260805-mmh: replaced the json.loads(e.strerror) idiom in accounts auth error handling with typed FirebaseError exceptions, closing several unhandled-500 paths on token refresh and login
+Last activity: 2026-08-05 - Completed quick task 260805-n82: audited the 7 remaining open Dependabot alerts and confirmed all are already patched on develop; they persist only because scanning targets main, which is 14 commits behind
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -101,6 +101,7 @@ None yet.
 | 260729-k8y | Relabel Inventory IPCC Category names per 1-results-report.xlsx via presentation-layer mapping (api/inventory_labels.py, keyed on module class with Aquaculture overrides for N2O Field/Electricity); wired into module results API and Excel report live+cached paths; ActivityTypes untouched | 2026-07-29 | 63d8b004 | [260729-k8y-relabel-inventory-result-categories-via-](./quick/260729-k8y-relabel-inventory-result-categories-via-/) |
 | 260805-l5b | Applied the Dependabot + Semgrep findings CSV: npm audit fix for fast-uri/brace-expansion/postcss (lockfile only, npm audit now clean), bumped httplib2 0.32.0 + pyparsing 3.3.2 + Django 5.2.17, SHA-pinned both docker/setup-buildx-action refs. WeasyPrint held at 68.0 as not-affected (presentational_hints never enabled) with a guard test; the accounts/views.py logger finding was stale on develop | 2026-08-05 | b97b53c6 | [260805-l5b-read-exact-django-webapp-csv-security-fi](./quick/260805-l5b-read-exact-django-webapp-csv-security-fi/) |
 | 260805-mmh | Replaced the `json.loads(e.strerror)` idiom in accounts auth error handling with typed FirebaseError exceptions parsed inside FirebaseAuth. Transport failures, non-JSON bodies and unexpected response shapes were turning handled 400s into unhandled 500s on TokenRefreshView. Frontend-visible responses unchanged; 27 DB-free tests added. Flags VerifyUserEmail as a dead AllowAny endpoint that needs auth before its typo is fixed | 2026-08-05 | 1d5c6405 | [260805-mmh-fix-the-foo-json-loads-e-strerror-error-](./quick/260805-mmh-fix-the-foo-json-loads-e-strerror-error-/) |
+| 260805-n82 | Audited the 7 remaining open Dependabot alerts (fast-uri x2, brace-expansion x2, postcss on npm; httplib2, django on pip) against the Dependabot API patched versions. All 7 are already patched on develop by 260805-l5b; they stay open only because scanning runs against main, which is 14 commits behind and still pins the vulnerable versions. No code change: every installed version already exceeds first_patched_version. Alerts close when develop reaches main | 2026-08-05 | (docs) | [260805-n82-fix-remaining-dependabot-alerts-fast-uri](./quick/260805-n82-fix-remaining-dependabot-alerts-fast-uri/) |
 
 ## Deferred Items
 
