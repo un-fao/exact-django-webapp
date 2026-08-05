@@ -1,3 +1,10 @@
+## 1.20.2 (2026-08-05)
+
+### Fix
+
+- **accounts**: send the Firebase ID token when deleting an orphaned account
+- **prod**: stop App Engine Cloud SQL connection-cap exhaustion + harden settings
+
 ## 1.20.1 (2026-08-05)
 
 ### Fix
