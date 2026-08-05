@@ -1,3 +1,12 @@
+## 1.20.1 (2026-08-05)
+
+### Fix
+
+- **accounts**: stop Firebase auth errors turning into unhandled 500s
+- **ci**: pin docker/setup-buildx-action to a commit SHA
+- **deps**: bump httplib2, pyparsing and Django to patched versions
+- **deps**: resolve npm advisories for fast-uri, brace-expansion and postcss
+
 ## 1.20 (2026-08-03)
 
 ### Feat

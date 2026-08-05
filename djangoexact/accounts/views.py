@@ -1,4 +1,3 @@
-import json
 import logging
 
 from api.models import CustomUser as User
@@ -19,6 +18,7 @@ logger = logging.getLogger(__name__)
 import accounts.utils as utils
 from djangoexact.settings import auth
 
+from .firebase_auth import FirebaseError, FirebaseResponseError, FirebaseUnavailableError
 from .serializers import (
     LoginResponseSerializer,
     LoginSerializer,
@@ -26,6 +26,34 @@ from .serializers import (
     UserSummarySerializer,
     PasswordResetSerializer,
 )
+
+logger = logging.getLogger("console")
+
+FIREBASE_UNAVAILABLE_MESSAGE = "Authentication service unavailable"
+FIREBASE_INVALID_RESPONSE_MESSAGE = "Invalid response from authentication service"
+
+
+def firebase_error_response(exc, key, context, fallback="Bad Request"):
+    """Turn a :class:`FirebaseError` into a safe DRF response.
+
+    ``key`` is the payload key the endpoint already uses ("error" or "details"),
+    so existing clients keep seeing the same response shape. Only the Firebase
+    error code is ever echoed back to the client; anything the client cannot act
+    on is logged server side and answered with a generic message.
+    """
+    if isinstance(exc, FirebaseUnavailableError):
+        logger.exception("Firebase unreachable during %s", context)
+        return Response({key: FIREBASE_UNAVAILABLE_MESSAGE}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    if isinstance(exc, FirebaseResponseError):
+        logger.exception("Unusable Firebase response during %s", context)
+        return Response({key: FIREBASE_INVALID_RESPONSE_MESSAGE}, status=status.HTTP_502_BAD_GATEWAY)
+
+    if exc.code:
+        return Response({key: exc.code}, status=status.HTTP_400_BAD_REQUEST)
+
+    logger.exception("Unrecognised Firebase error body during %s (status=%s)", context, exc.status_code)
+    return Response({key: fallback}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @authentication_classes([])
@@ -117,13 +145,11 @@ class LoginExistingUserView(APIView):
 
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
-            except Exception as e:
-                error = json.loads(e.strerror)
-
-                if error.get("error", {}).get("message") == "INVALID_LOGIN_CREDENTIALS":
+            except FirebaseError as e:
+                if e.code == "INVALID_LOGIN_CREDENTIALS":
                     return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-                return Response({"error": error.get("error", {}).get("message", "Bad Request")}, status=status.HTTP_400_BAD_REQUEST)
+                return firebase_error_response(e, "error", "login")
 
             existing_user = User.objects.get(firebase_uid=user["localId"])
 
@@ -155,7 +181,10 @@ class LoginExistingUserView(APIView):
             return Response(extra_data, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
-            auth.delete_user_account(user["localId"])
+            try:
+                auth.delete_user_account(user["idToken"])
+            except FirebaseError:
+                logger.exception("Failed to delete orphaned Firebase account during login")
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
@@ -226,39 +255,21 @@ class TokenRefreshView(APIView):
         # restart into a hard 500 on token refresh.
         data = request.data
 
+        refresh_token = data.get("refresh") if isinstance(data, dict) else None
+
+        if not isinstance(refresh_token, str) or not refresh_token.strip():
+            # Firebase answers MISSING_REFRESH_TOKEN for this anyway; save the round trip.
+            return Response({"details": "MISSING_REFRESH_TOKEN"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            refresh_token = data.get("refresh")
-
             user = auth.refresh(refresh_token)
+        except FirebaseError as e:
+            return firebase_error_response(e, "details", "token refresh", fallback="Token refresh failed")
 
-            extra_data = {
-                "uid": user["userId"],
-                "access_token": user["idToken"],
-                "refresh_token": user["refreshToken"],
-            }
+        extra_data = {
+            "uid": user["userId"],
+            "access_token": user["idToken"],
+            "refresh_token": user["refreshToken"],
+        }
 
-            return Response(extra_data, status=status.HTTP_200_OK)
-
-        except OperationalError:
-            logger.warning("Token refresh failed: DB unavailable", exc_info=True)
-            response = Response(
-                {"details": "Service temporarily unavailable, please retry."},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-            response["Retry-After"] = "5"
-            return response
-
-        except Exception as e:
-            # Firebase errors carry a JSON payload in e.strerror; older auth lib
-            # versions or non-Firebase exceptions don't, so parse defensively
-            # instead of letting json.loads(None) raise a secondary TypeError
-            # (which used to surface as a Django debug page in production).
-            message = "Invalid refresh token."
-            raw = getattr(e, "strerror", None)
-            if isinstance(raw, str):
-                try:
-                    message = json.loads(raw)["error"]["message"]
-                except (ValueError, KeyError, TypeError):
-                    pass
-            logger.warning("Token refresh failed: %s", e, exc_info=True)
-            return Response({"details": message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(extra_data, status=status.HTTP_200_OK)
