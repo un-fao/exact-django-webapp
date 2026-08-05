@@ -7,7 +7,7 @@ updates:
       day: "monday"
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "python"
@@ -22,7 +22,7 @@ updates:
       day: "monday"
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "javascript"
