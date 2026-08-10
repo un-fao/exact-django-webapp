@@ -34,6 +34,7 @@ from google.cloud import storage
 import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
+from api import results_cache
 from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
@@ -683,11 +684,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        serialized_project = ProjectResultSerializer(project, context={"request": request}).data
-
         selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
+
+        activity_pks = list(project.activities.filter(pk__in=selected_activities).values_list("id", flat=True))
+
+        # Read the stamp fresh, before computing. A concurrent edit during compute
+        # advances the stamp, so the row this request writes below is keyed to the old
+        # value and will never be read back. That is the intended outcome: a project
+        # edited mid-request never serves a payload that ignores the edit.
+        results_stamp = Project.objects.filter(pk=project.pk).values_list("results_stamp", flat=True).first() or 0
+        cache_key = results_cache.build_cache_key(activity_pks)
+
+        # Matches GenericModuleViewSet.results (api/views.py) and adds no new
+        # parameter to the public contract: "cached" is already declared above.
+        use_cached = request.query_params.get("cached", "true") == "true"
+        if use_cached:
+            cached_payload = results_cache.read(project.pk, cache_key, results_stamp)
+            if cached_payload is not None:
+                return Response(data=cached_payload, status=http_status.HTTP_200_OK)
+
+        serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
         response = serialized_project
         response["activities"] = []
@@ -695,8 +713,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # Function to process an activity
         def process_activity(activity_pk):
             return ActivityViewSet.results(self, request, pk=activity_pk).data
-
-        activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
         def log_activity_failure(activity_pk, exc):
             logging.error(f"Activity {activity_pk} generated an exception: {exc}")
@@ -708,6 +724,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
             activity_pks,
             on_error=log_activity_failure,
         )
+
+        try:
+            results_cache.write(project.pk, cache_key, results_stamp, results_cache.normalize_payload(response))
+        except Exception as e:
+            # A cache write failure must never change the response the user gets.
+            logging.exception(e)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
