@@ -1,0 +1,124 @@
+# Knative Service template for the EX-ACT web API on Cloud Run.
+#
+# Rendered by .github/workflows/deploy-cloudrun.yaml with envsubst, into a file
+# outside the checkout. The rendered manifest carries DB_PASSWORD, SECRET_KEY,
+# SMTP_USER_PASSWORD and FIREBASE_SERVICE_ACCOUNT, so it is never written into
+# the working tree and never appears in a log line.
+#
+# Env value scalars are SINGLE quoted on purpose. Double-quoted YAML interprets
+# backslash escapes, and these secrets are known to contain dollar signs and
+# backslashes (.github/workflows/deploy.yaml:370-381). Single quotes keep both
+# literal. The workflow refuses to render if a required value contains an
+# apostrophe.
+#
+# Trap: settings.py:172 reads DB_USER, while the repository variable is named
+# DB_USERNAME. The entry below is NAMED DB_USER and VALUED $DB_USERNAME. Renaming
+# either half makes psycopg2 authenticate as the literal placeholder string.
+#
+# PORT is reserved by Cloud Run and must not be listed. APP_MODE is deliberately
+# unset; BRANCH_NAME is set instead, matching the computation Job.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: $CLOUD_RUN_SERVICE_NAME
+  labels:
+    cloud.googleapis.com/location: $CLOUD_RUN_REGION
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: '$MIN_SCALE'
+        autoscaling.knative.dev/maxScale: '$MAX_SCALE'
+        # Unix socket to the same Cloud SQL instance App Engine uses. Must agree
+        # with the DB_HOST value below.
+        run.googleapis.com/cloudsql-instances: $DB_INSTANCE_CONNECTION
+        # gen2 for full native library compatibility (Pango, Cairo, GDK-PixBuf).
+        # Cloud Run Jobs already run under gen2 with this same dependency stack.
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/startup-cpu-boost: 'true'
+    # runAsNonRoot suppression: this is a Cloud Run (Knative) manifest, not a
+    # Kubernetes pod spec. Cloud Run's admission layer honors only a small
+    # subset of securityContext, and the deployed image
+    # (deploy/Dockerfile.web_service) runs as root by base-image design, so
+    # declaring runAsNonRoot: true would be rejected or would break startup.
+    # Changing the runtime user is tracked separately from this scan fix.
+    spec: # nosemgrep: yaml.kubernetes.security.run-as-non-root.run-as-non-root
+      # App Engine Standard caps concurrency near 10 per instance against 4
+      # gunicorn workers. CONN_MAX_AGE is 0, so every request opens a new
+      # Postgres connection; Cloud Run's default of 80 would multiply connection
+      # churn eightfold.
+      containerConcurrency: $CONTAINER_CONCURRENCY
+      # Headroom above gunicorn's own 120s timeout, which stays the real ceiling.
+      timeoutSeconds: $REQUEST_TIMEOUT_SECONDS
+      serviceAccountName: $RUNTIME_SERVICE_ACCOUNT
+      containers:
+        - image: $IMAGE
+          ports:
+            - name: http1
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: '$CPU_LIMIT'
+              memory: '$MEMORY_LIMIT'
+          env:
+            - name: PROJECT_ID
+              value: '$PROJECT_ID'
+            - name: STORAGE_BUCKET
+              value: '$STORAGE_BUCKET'
+            - name: DB_ENGINE
+              value: '$DB_ENGINE'
+            - name: DB_HOST
+              value: '/cloudsql/$DB_INSTANCE_CONNECTION'
+            - name: DB_USER
+              value: '$DB_USERNAME'
+            - name: DB_PASSWORD
+              value: '$DB_PASSWORD'
+            - name: DB_NAME
+              value: '$DB_NAME'
+            - name: DB_PORT
+              value: '$DB_PORT'
+            - name: SECRET_KEY
+              value: '$SECRET_KEY'
+            - name: DJANGO_DEBUG
+              value: '$DJANGO_DEBUG'
+            - name: ALLOWED_HOSTS
+              value: '$CLOUDRUN_ALLOWED_HOSTS'
+            - name: CORS_ALLOWED_ORIGINS
+              value: '$CLOUDRUN_CORS_ALLOWED_ORIGINS'
+            - name: BACKEND_BASE_URL
+              value: '$CLOUDRUN_BACKEND_BASE_URL'
+            - name: CLOUD_RUN_COMPUTATION_JOB_NAME
+              value: '$CLOUD_RUN_COMPUTATION_JOB_NAME'
+            - name: CLOUD_RUN_REGION
+              value: '$CLOUD_RUN_REGION'
+            - name: BRANCH_NAME
+              value: '$BRANCH_NAME'
+            - name: EMAIL_HOST
+              value: '$EMAIL_HOST'
+            - name: EMAIL_PORT
+              value: '$EMAIL_PORT'
+            - name: SMTP_USER_EMAIL
+              value: '$SMTP_USER_EMAIL'
+            - name: SMTP_USER_PASSWORD
+              value: '$SMTP_USER_PASSWORD'
+            - name: FIREBASE_API_KEY
+              value: '$FIREBASE_API_KEY'
+            - name: FIREBASE_AUTH_DOMAIN
+              value: '$FIREBASE_AUTH_DOMAIN'
+            - name: FIREBASE_PROJECT_ID
+              value: '$FIREBASE_PROJECT_ID'
+            - name: FIREBASE_STORAGE_BUCKET
+              value: '$FIREBASE_STORAGE_BUCKET'
+            - name: FIREBASE_MESSAGING_SENDER_ID
+              value: '$FIREBASE_MESSAGING_SENDER_ID'
+            - name: FIREBASE_APP_ID
+              value: '$FIREBASE_APP_ID'
+            - name: FIREBASE_MEASUREMENT_ID
+              value: '$FIREBASE_MEASUREMENT_ID'
+            - name: FIREBASE_SERVICE_ACCOUNT
+              value: '$FIREBASE_SERVICE_ACCOUNT'
+  traffic:
+    - percent: 100
+      latestRevision: true

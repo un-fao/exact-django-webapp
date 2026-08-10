@@ -10,7 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework import status as http_status
 from rest_framework.response import Response
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import api.concurrency as concurrency
 from api import security
 import api.utilities as utils
 from rest_framework.decorators import action
@@ -95,8 +95,8 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
         response = serialized_project
@@ -108,19 +108,16 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit all tasks to the executor
-            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+        def log_activity_failure(activity_pk, exc):
+            log.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-            for future in as_completed(future_to_pk):
-                pk = future_to_pk[future]
-                try:
-                    data = future.result()
-                    response["activities"].append(data)
-                except Exception as exc:
-                    log.error(f"Activity {pk} generated an exception: {exc}")
-                    # You can choose to handle exceptions differently if needed
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
+        response["activities"] = concurrency.map_in_bounded_threads(
+            process_activity,
+            activity_pks,
+            on_error=log_activity_failure,
+        )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -151,8 +148,12 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             log.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
+        if request.query_params.get("template", None):
+            response = self.template(request, pk=pk)
+            return response
+
+        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        if not selected_activities:
             selected_activities = None
         else:
             selected_activities = project.activities.filter(pk__in=selected_activities)
@@ -266,8 +267,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
+            response = concurrency.map_in_bounded_threads(process_activity, page)
             return paginator.get_paginated_response(response)
 
         return Response(data=self.serializer_class(activities_list, many=True).data, status=http_status.HTTP_200_OK)

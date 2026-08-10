@@ -1,0 +1,482 @@
+name: Deploy Cloud Run (review)
+
+# Additive pipeline. .github/workflows/deploy.yaml still owns App Engine and is
+# untouched. Review only, never main: production must not have two pipelines
+# deploying and migrating against it.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/id-responses
+      - review
+
+concurrency:
+  group: cloudrun-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # GitHub-hosted, same move as deploy.yaml: the self-hosted 'gcp-temporary'
+    # label stopped registering runners on 2026-07-30 and every queued job on it
+    # stalled. Authentication is Workload Identity Federation and the
+    # cloud-sql-proxy step below omits --private-ip, so neither depended on
+    # running inside GCP.
+    runs-on: ubuntu-22.04
+    environment: review
+    permissions:
+      id-token: 'write'
+      contents: 'read'
+      actions: 'read'
+      issues: 'write'
+    steps:
+      # Repository vars and secrets go into $GITHUB_ENV with heredoc delimiters
+      # so the values stay byte-for-byte literal. Interpolating them through a
+      # YAML env: block instead is what adds two characters to any value
+      # containing a dollar sign or a backslash, which breaks psycopg2 auth.
+      # See .github/workflows/deploy.yaml:370-381 for the full history.
+      - name: Export repository variables
+        run: echo '${{ toJson(vars) }}' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
+
+      - name: Export repository secrets
+        run: echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
+
+      - name: Resolve deployment identifiers
+        # github context reaches the script through env: rather than being
+        # interpolated into the run body. A branch name is attacker-influenced
+        # input, so interpolating it directly would let it inject shell code
+        # (SAST: github context in a run step). Mirrors deploy.yaml.
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -eu
+          if [ -z "${PROJECT_ID:-}" ]; then
+            p="${SERVICE_ACCOUNT#*@}"
+            PROJECT_ID="${p%%.*}"
+            echo "PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+          fi
+          # SERVICE_NAME is already taken: the variables dump above sets it to
+          # the App Engine service name. The Cloud Run service gets its own.
+          echo "CLOUD_RUN_SERVICE_NAME=${CLOUD_RUN_SERVICE_NAME:-exact-api}" >> "$GITHUB_ENV"
+          echo "IMAGE_REPO=${IMAGE_REPO:-artifacts}" >> "$GITHUB_ENV"
+          echo "RUNTIME_SERVICE_ACCOUNT=${RUNTIME_SERVICE_ACCOUNT:-${PROJECT_ID}@appspot.gserviceaccount.com}" >> "$GITHUB_ENV"
+          echo "MIN_SCALE=${MIN_SCALE:-0}" >> "$GITHUB_ENV"
+          echo "MAX_SCALE=${MAX_SCALE:-4}" >> "$GITHUB_ENV"
+          echo "CONTAINER_CONCURRENCY=${CONTAINER_CONCURRENCY:-10}" >> "$GITHUB_ENV"
+          echo "REQUEST_TIMEOUT_SECONDS=${REQUEST_TIMEOUT_SECONDS:-300}" >> "$GITHUB_ENV"
+          echo "CPU_LIMIT=${CPU_LIMIT:-2}" >> "$GITHUB_ENV"
+          echo "MEMORY_LIMIT=${MEMORY_LIMIT:-4Gi}" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=$REF_NAME" >> "$GITHUB_ENV"
+          # Cloud Run gets its own host settings so tightening or widening them
+          # can never reach App Engine. These two fall back to the App Engine
+          # values, which do not yet contain the *.run.app hostname; see the
+          # deploy guide.
+          echo "CLOUDRUN_ALLOWED_HOSTS=${CLOUDRUN_ALLOWED_HOSTS:-${ALLOWED_HOSTS:-}}" >> "$GITHUB_ENV"
+          echo "CLOUDRUN_CORS_ALLOWED_ORIGINS=${CLOUDRUN_CORS_ALLOWED_ORIGINS:-${CORS_ALLOWED_ORIGINS:-}}" >> "$GITHUB_ENV"
+          # BACKEND_BASE_URL deliberately does NOT fall back to the App Engine
+          # value. It is the host baked into the emailed report download link,
+          # so it must name a host THIS deployment answers on. Inheriting the
+          # App Engine URL shipped links to a hostname whose App Engine app was
+          # disabled, and every one of them 404'd at Google's routing layer
+          # before reaching Django. An empty value soft-disables the report
+          # email (send_report_ready_email no-ops and warns), which is strictly
+          # better than emailing a dead link. The "Verify report download base
+          # URL" step below fails the deploy if a value is set but not live.
+          echo "CLOUDRUN_BACKEND_BASE_URL=${CLOUDRUN_BACKEND_BASE_URL:-}" >> "$GITHUB_ENV"
+
+      - name: Resolve image tags
+        # github.run_number via env: for the same reason as REF_NAME above.
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -eu
+          base="$CLOUD_RUN_REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_REPO/$CLOUD_RUN_SERVICE_NAME"
+          echo "TAG=$base:$RUN_NUMBER" >> "$GITHUB_ENV"
+          echo "TAG_LATEST=$base:latest" >> "$GITHUB_ENV"
+
+      - name: 'Checkout Code'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          lfs: true
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.9
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: djangoexact/requirements*.txt
+
+      - name: Install dependencies
+        run: |
+          cd djangoexact
+          pip install --upgrade pip 'setuptools>=78.1.1' wheel
+          pip install -r requirements.txt --no-cache-dir
+          pip install --force-reinstall 'setuptools>=78.1.1'
+
+      - name: Setup cloud-sql-proxy
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          # Redirect the proxy's output to a file. When this step ends its log
+          # pipe closes; without the redirect the backgrounded Go proxy is killed
+          # by SIGPIPE on its next write (the "Listening on 127.0.0.1" line) and
+          # never ends up serving 127.0.0.1:5432 for the later steps. The next
+          # step waits for readiness and cats this log if it never comes up.
+          #
+          # Authenticate via Application Default Credentials, i.e. the WIF
+          # credential file that google-github-actions/auth exports as
+          # GOOGLE_APPLICATION_CREDENTIALS. Do NOT pass --gcloud-auth (-g): it
+          # shells out to "gcloud config config-helper", which fails with "You do
+          # not currently have an active account selected" because the auth step
+          # writes an ADC file without activating a gcloud account.
+          ./cloud-sql-proxy -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} > /tmp/cloud-sql-proxy.log 2>&1 &
+
+      - name: Validate config, migrate and invalidate cache
+        env:
+          APP_MODE: review
+          # The proxy listens on localhost; the container will use the /cloudsql
+          # socket instead. DB_HOST from the variables dump is the App Engine
+          # value and must not leak into these runner-side commands.
+          DB_HOST: 127.0.0.1
+        run: |
+          set -eu
+
+          # settings.py reads DB_USER, but the repo variable is DB_USERNAME. The
+          # App Engine path seds the real name into the settings default; this
+          # env-only path runs unsubstituted source, so bridge the name for the
+          # runner-side commands here, the same mapping the service manifest
+          # applies for the container. Sourced from the dumped $GITHUB_ENV value
+          # so it stays byte-for-byte literal.
+          export DB_USER="$DB_USERNAME"
+
+          echo "Waiting for cloud-sql-proxy on 127.0.0.1:${{ vars.DB_PORT }}..."
+          for i in $(seq 1 30); do
+            if (echo > /dev/tcp/127.0.0.1/${{ vars.DB_PORT }}) 2>/dev/null; then
+              echo "cloud-sql-proxy is accepting connections."
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "cloud-sql-proxy never started listening on 127.0.0.1:${{ vars.DB_PORT }}." >&2
+              echo "----- cloud-sql-proxy log -----" >&2
+              cat /tmp/cloud-sql-proxy.log >&2 || true
+              exit 1
+            fi
+            sleep 1
+          done
+
+          cd djangoexact
+          # WR-02: validate config BEFORE migrate so a rejected config aborts the
+          # deploy without mutating the schema.
+          python manage.py check --deploy
+          python manage.py migrate
+          python manage.py runscript invalidate_results_cache
+
+      - name: Ensure Artifact Registry repository
+        run: |
+          set -eu
+          gcloud artifacts repositories describe "$IMAGE_REPO" \
+            --location="$CLOUD_RUN_REGION" --project="$PROJECT_ID" >/dev/null 2>&1 \
+          || gcloud artifacts repositories create "$IMAGE_REPO" \
+            --repository-format=docker --location="$CLOUD_RUN_REGION" --project="$PROJECT_ID"
+
+      - name: Set up Docker Buildx
+        # Originally here because the self-hosted runner might not have the
+        # Docker CLI plugin installed. The GitHub-hosted image ships Buildx, so
+        # this is now about pinning the builder rather than supplying a missing
+        # one; the build below needs BuildKit for its --secret mount.
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Build and push image
+        env:
+          DOCKER_BUILDKIT: '1'
+        # Cloud Build stays bypassed: an org policy blocks the deploy service
+        # account from the Cloud Build staging bucket, so the image is built with
+        # docker on the runner. Same rationale as deploy.yaml:353-357.
+        run: |
+          set -eu
+          # collectstatic inside the image has to import settings.py, which
+          # refuses to load without a parseable service account. This generates a
+          # throwaway RSA credential for this build alone, exactly as the test job
+          # in deploy.yaml:61-89 does. It is written straight to a file and never
+          # printed, and it reaches the build over a BuildKit secret mount so it
+          # is absent from every layer and from image history.
+          python - <<'PYEOF' > /tmp/build_firebase_cred.txt
+          from cryptography.hazmat.primitives import serialization
+          from cryptography.hazmat.primitives.asymmetric import rsa
+          import base64, json
+          key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+          pem = key.private_bytes(
+              encoding=serialization.Encoding.PEM,
+              format=serialization.PrivateFormat.TraditionalOpenSSL,
+              encryption_algorithm=serialization.NoEncryption(),
+          ).decode()
+          throwaway = {
+              "type": "service_account", "project_id": "build-only",
+              "private_key_id": "build-only", "private_key": pem,
+              "client_email": "build-only@build-only.iam.gserviceaccount.com",
+              "client_id": "123456789",
+              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+              "token_uri": "https://oauth2.googleapis.com/token",
+              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+              "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/build-only",
+          }
+          print(base64.b64encode(json.dumps(throwaway).encode()).decode())
+          PYEOF
+
+          gcloud auth configure-docker "$CLOUD_RUN_REGION-docker.pkg.dev" --quiet
+          docker build \
+            -f deploy/Dockerfile.web_service \
+            --secret id=build_firebase_cred,src=/tmp/build_firebase_cred.txt \
+            -t "$TAG" -t "$TAG_LATEST" \
+            .
+          rm -f /tmp/build_firebase_cred.txt
+          docker push "$TAG"
+          docker push "$TAG_LATEST"
+
+      - name: Render Cloud Run service manifest
+        run: |
+          set -eu
+          command -v envsubst >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y gettext-base; }
+
+          export IMAGE="$TAG"
+
+          # Guard rails that report NAMES only. The rendered manifest carries four
+          # secrets and is never printed, so these two checks replace the
+          # inspection that printing it would have given us.
+          #
+          # Emptiness matters because envsubst silently substitutes an unset
+          # variable with an empty string rather than leaving the placeholder,
+          # which would ship a blank setting instead of failing.
+          #
+          # Apostrophes matter because every env value is a single-quoted YAML
+          # scalar (single quotes are what keep dollar signs and backslashes in
+          # secrets literal).
+          missing=
+          for v in PROJECT_ID CLOUD_RUN_REGION CLOUD_RUN_SERVICE_NAME IMAGE_REPO IMAGE \
+                   DB_INSTANCE_CONNECTION DB_ENGINE DB_USERNAME DB_PASSWORD DB_NAME DB_PORT \
+                   SECRET_KEY STORAGE_BUCKET DJANGO_DEBUG BRANCH_NAME \
+                   CLOUDRUN_ALLOWED_HOSTS CLOUDRUN_CORS_ALLOWED_ORIGINS \
+                   EMAIL_HOST EMAIL_PORT SMTP_USER_EMAIL SMTP_USER_PASSWORD \
+                   FIREBASE_API_KEY FIREBASE_AUTH_DOMAIN FIREBASE_PROJECT_ID \
+                   FIREBASE_STORAGE_BUCKET FIREBASE_MESSAGING_SENDER_ID FIREBASE_APP_ID \
+                   FIREBASE_SERVICE_ACCOUNT RUNTIME_SERVICE_ACCOUNT \
+                   MIN_SCALE MAX_SCALE CONTAINER_CONCURRENCY REQUEST_TIMEOUT_SECONDS \
+                   CPU_LIMIT MEMORY_LIMIT; do
+            eval "val=\${$v-}"
+            if [ -z "$val" ]; then
+              echo "required variable is empty: $v" >&2
+              missing=1
+            fi
+            case "$val" in
+              *"'"*)
+                echo "value contains an apostrophe and cannot be templated: $v" >&2
+                missing=1
+                ;;
+            esac
+          done
+          [ -z "$missing" ] || exit 1
+
+          # Rendered outside the checkout so no later step or artifact upload can
+          # pick it up. A plain envsubst redirect, deliberately without the
+          # backslash-unescape pass the org template's subst() helper ends with:
+          # that pass would rewrite literal backslash sequences inside a secret.
+          envsubst < deploy/cloudrun-service.yaml > /tmp/service.yaml
+
+          python3 -c "import yaml; yaml.safe_load(open('/tmp/service.yaml'))"
+          echo "Manifest rendered and parsed."
+
+      - name: Deploy to Cloud Run
+        # Debug-level gcloud logging is deliberately not enabled on this step.
+        # Unlike the App Engine deploy, it would emit the request body here, and
+        # the request body is every env value.
+        run: |
+          set -eu
+          gcloud run services replace /tmp/service.yaml \
+            --platform=managed \
+            --region="$CLOUD_RUN_REGION" \
+            --project="$PROJECT_ID" \
+            --quiet
+          rm -f /tmp/service.yaml
+
+      - name: Allow unauthenticated invocations
+        # Matches the current App Engine exposure. Django auth is unchanged.
+        # Revisit together with the FAO IT ingress decision.
+        run: |
+          set -eu
+          gcloud run services add-iam-policy-binding "$CLOUD_RUN_SERVICE_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --member="allUsers" --role="roles/run.invoker" --quiet
+          gcloud run services update "$CLOUD_RUN_SERVICE_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --ingress=all --quiet
+
+      - name: Report service URL
+        # value(status.url) prints the URL and nothing else. A bare describe would
+        # print the whole spec, env values included.
+        run: |
+          set -eu
+          url=$(gcloud run services describe "$CLOUD_RUN_SERVICE_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --format='value(status.url)')
+          echo "Cloud Run service URL: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify report download base URL
+        # The emailed report download link is minted from BACKEND_BASE_URL by a
+        # background worker that has no request to derive a host from, so a
+        # stale value here is invisible until a user clicks a dead link in their
+        # inbox. This step is the gate that was missing: probe the configured
+        # base URL and fail the deploy if nothing application-level answers on
+        # it. A disabled App Engine host, a decommissioned service or a typo all
+        # surface as an unreachable host or a 404 from Google's routing layer.
+        #
+        # The primary check is a comparison, not a network call: does the
+        # configured base URL name the service this workflow just deployed?
+        # That is exactly the condition that broke, and it is decidable without
+        # reaching the host. It stays the primary check now that the job runs on
+        # a GitHub-hosted runner: it needs no egress, no service to be warm and
+        # no allUsers binding to have propagated yet.
+        run: |
+          set -eu
+          if [ -z "${CLOUDRUN_BACKEND_BASE_URL:-}" ]; then
+            {
+              echo "WARNING: CLOUDRUN_BACKEND_BASE_URL is not set."
+              echo "The report-ready email is soft-disabled: send_report_ready_email"
+              echo "no-ops on an empty BACKEND_BASE_URL rather than emailing a link"
+              echo "with no host. Set it to the Cloud Run service URL above."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          service_url=$(gcloud run services describe "$CLOUD_RUN_SERVICE_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --format='value(status.url)')
+          configured="${CLOUDRUN_BACKEND_BASE_URL%/}"
+          if [ "$configured" = "${service_url%/}" ]; then
+            echo "REPORT_BASE_URL_VERIFIED=true" >> "$GITHUB_ENV"
+            echo "Report download base URL verified: it is this deployment's service URL." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # A mismatch is either a custom domain mapped to this service, which
+          # is legitimate, or the stale-hostname bug, which is not. Only a probe
+          # can tell them apart, so try one. On the GitHub-hosted runner this
+          # probe genuinely reaches the internet, so a 000 is now a real signal
+          # of an unreachable host rather than the expected outcome it was on
+          # the egress-less self-hosted runner. It is still treated as
+          # inconclusive rather than fatal: a transient network failure must not
+          # fail a deploy that is otherwise correct, or this gate gets deleted
+          # rather than fixed. The 404 branch below is what catches the bug.
+          probe="$configured/api/health/"
+          code=$(curl -sS -m 30 -o /dev/null -w '%{http_code}' "$probe" 2>/dev/null) || code=000
+          if [ "$code" = "404" ]; then
+            echo "CLOUDRUN_BACKEND_BASE_URL serves no application: $probe returned 404." >&2
+            echo "It is not this service's URL ($service_url) and nothing answers on it." >&2
+            echo "Emailed report download links built from it would 404 for every user." >&2
+            exit 1
+          fi
+          if [ "$code" = "000" ]; then
+            {
+              echo "WARNING: could not verify CLOUDRUN_BACKEND_BASE_URL ($configured)."
+              echo "It is not this deployment's service URL ($service_url) and the runner"
+              echo "could not reach it. Confirm it is a custom domain for this service."
+              echo "The computation job's BACKEND_BASE_URL was left untouched: an"
+              echo "unverified host must not reach the process that emails download links."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "REPORT_BASE_URL_VERIFIED=true" >> "$GITHUB_ENV"
+          {
+            echo "Report download base URL reachable: $configured (HTTP $code)."
+            echo "Not this deployment's service URL ($service_url), assuming custom domain."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sync report download base URL into the computation job
+        # exact-computation-job runs api/management/commands/run_async_job.py,
+        # which is the ONLY caller of send_report_ready_email. The host in the
+        # emailed link therefore comes from this job's BACKEND_BASE_URL, not
+        # from the service deployed above.
+        #
+        # deploy.yaml is the job's only deployer and it now triggers on main
+        # only, so a push to review could never correct the job's environment.
+        # That is how the job kept emailing a disabled App Engine hostname for
+        # weeks after review moved to Cloud Run. This step closes that gap:
+        # every review deploy re-asserts the sender's base URL.
+        #
+        # Requires REPORT_BASE_URL_VERIFIED from the gate above, which is only
+        # set once the base URL is known to name a host this deployment serves.
+        # An unverified value is left out of the sender entirely rather than
+        # propagated on hope. Env only. The job image stays owned by deploy.yaml.
+        if: env.CLOUDRUN_BACKEND_BASE_URL != '' && env.REPORT_BASE_URL_VERIFIED == 'true'
+        run: |
+          set -eu
+          job="exact-computation-job"
+          # A missing job is a real misconfiguration of the target project, not
+          # a condition to skip past. This whole bug class came from config
+          # failing silently, so surface it instead of shrugging.
+          if ! gcloud run jobs describe "$job" \
+                 --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+                 --format='value(metadata.name)' >/dev/null 2>&1; then
+            echo "Cloud Run job '$job' not found in $PROJECT_ID/$CLOUD_RUN_REGION." >&2
+            echo "It sends the report-ready email, so its BACKEND_BASE_URL cannot be synced." >&2
+            echo "Deploy it via deploy.yaml, or correct the project and region." >&2
+            exit 1
+          fi
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "BACKEND_BASE_URL=$CLOUDRUN_BACKEND_BASE_URL" \
+            --quiet
+          echo "Computation job BACKEND_BASE_URL synced to $CLOUDRUN_BACKEND_BASE_URL" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sync SECRET_KEY into the computation job
+        # A correct host is not sufficient for the emailed link to work. The job
+        # signs the download token with SECRET_KEY (api/services/report_links.py
+        # uses django.core.signing) and the service verifies it. When the two
+        # keys differ, loads() raises BadSignature, load_download_token returns
+        # None, and the download view answers "Report not available" with a 404
+        # that looks nothing like a config problem.
+        #
+        # The keys drifted because they have different provenance: this workflow
+        # deploys the service from the SECRET_KEY secret, while deploy.yaml reads
+        # the job's copy back out of the deployed App Engine version as a
+        # documented workaround for an escaping bug. Treat the secret this
+        # workflow already trusts for the service as the single source of truth.
+        #
+        # Values are never echoed, only their digests, so a mismatch is
+        # diagnosable from the log without exposing either key.
+        if: env.SECRET_KEY != ''
+        run: |
+          set -eu
+          job="exact-computation-job"
+          current=$(gcloud run jobs describe "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" --format=json \
+            | jq -r '.spec.template.spec.template.spec.containers[0].env[]?
+                     | select(.name=="SECRET_KEY") | .value // ""')
+          if [ "$current" = "$SECRET_KEY" ]; then
+            echo "Computation job SECRET_KEY already matches the service." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          was=$(printf '%s' "$current" | sha256sum | cut -c1-16)
+          now=$(printf '%s' "$SECRET_KEY" | sha256sum | cut -c1-16)
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --update-env-vars "SECRET_KEY=$SECRET_KEY" \
+            --quiet
+          {
+            echo "Computation job SECRET_KEY re-synced to the service's key."
+            echo "sha256 prefix was $was, now $now."
+            echo "Download links minted before this deploy stay invalid: they were"
+            echo "signed with the old key. Newly generated reports will work."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create Issue
+        if: failure()
+        uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2

@@ -31,6 +31,14 @@ if app_mode:
 else:
     FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
 
+# Absolute URL to this API host. Used to build self-contained, emailable report
+# download links (see api/services/report_links.py). Empty locally unless set.
+BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "")
+
+# Send the "your report is ready" email when an async report job completes.
+# Default True; distinct from JOB_NOTIFICATIONS_ENABLED (ComputationJob emails).
+REPORT_READY_EMAIL_ENABLED = os.environ.get("REPORT_READY_EMAIL_ENABLED", "true").lower() in ("true", "1", "yes")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -57,6 +65,16 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).s
 # CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
+# Behind the App Engine / Cloud Run TLS-terminating proxy the container is
+# reached over plain http with the original scheme in X-Forwarded-Proto. Trust
+# that header so request.is_secure() reflects the external https request.
+# Without it Django computes the same-origin as http://<host> and rejects a
+# browser https POST with "Origin checking failed ... does not match any trusted
+# origins" (the admin and DRF session views). Google recommends this exact
+# setting for Django on App Engine, so it is correct on both platforms; the
+# container is never reachable except through the proxy, which sets the header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -97,6 +115,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves STATIC_ROOT for the Cloud Run web service. Stays inert on App
+    # Engine, where the app.yaml `- url: /static` handler intercepts those
+    # requests before Django sees them.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -323,7 +345,7 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "$STORAGE_BUCKET")
 DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 
-# Computation Jobs — Cloud Run
+# Computation Jobs - Cloud Run
 # Set to a Cloud Run Job resource name to enable GCP dispatch.
 # Empty string = subprocess fallback (local dev).
 CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
@@ -332,3 +354,7 @@ CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
 # Job Notifications
 # Set to True to enable email notifications for completed jobs.
 JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
+
+# Projects whose (activities + module-type) count exceeds this are copied via a
+# background job instead of synchronously in the request. Small copies stay sync.
+PROJECT_COPY_ASYNC_THRESHOLD = int(os.environ.get("PROJECT_COPY_ASYNC_THRESHOLD", "40"))
