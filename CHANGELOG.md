@@ -1,3 +1,9 @@
+## 1.20.3 (2026-08-10)
+
+### Fix
+
+- **deps**: move cloud function manifest to Django 5.2.17
+
 ## 1.20.2 (2026-08-05)
 
 ### Fix
