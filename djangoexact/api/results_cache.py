@@ -11,8 +11,14 @@ import hashlib
 import json
 
 # Bumped whenever the assembly or the computation semantics of the project results
-# payload changes. Forgetting to bump this means every existing project serves stale
-# numbers forever, because a matching cache_key would keep short-circuiting the compute.
+# payload changes. Forgetting to bump this means every existing project keeps serving a
+# payload built by the old code, because a matching cache_key short-circuits the compute.
+#
+# This is the ONE deliberate exception to "an untouched project is preserved as it is":
+# bumping it force-recomputes every project without any user action, so reserve it for
+# fixing a defect in our own code (the precedent is INVENTORY_SCHEMA_VERSION in
+# api/reports/cache.py, added exactly that way). Never bump it to propagate a reference
+# data change: new IPCC factors must not rewrite an appraisal a user already ran.
 RESULTS_SCHEMA_VERSION = 1
 
 
@@ -26,9 +32,15 @@ def build_cache_key(activity_pks) -> str:
 
     Deliberately excludes user identity and language: ProjectResultSerializer is an
     empty serializer (api/serializers.py), so the payload carries no per-user field, and
-    the thread fan-out already forces settings.LANGUAGE_CODE for every caller. Also
-    excludes a reference-data epoch: there is no such epoch to fold in (see the deferred
-    load_reference_data invalidation gap filed in .planning/BACKLOG.md).
+    the thread fan-out already forces settings.LANGUAGE_CODE for every caller.
+
+    Deliberately excludes any reference-data epoch, and that is a product rule rather
+    than an oversight. Reloading IPCC factors or GWP coefficients must NOT retroactively
+    change a project a user already computed: an appraisal is a record of what the
+    numbers were when it was run. An untouched project keeps its payload until the user
+    edits something, so the only inputs that can move a project off its cached result
+    are the user's own edits (via results_stamp) and a deliberate operator sweep
+    (scripts/invalidate_results_cache.py).
     """
     from api.reports.cache import INVENTORY_SCHEMA_VERSION
 

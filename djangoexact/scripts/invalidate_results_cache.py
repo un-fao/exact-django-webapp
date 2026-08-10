@@ -44,9 +44,11 @@ def invalidate_project_result_caches():
     for every non-finalized project, mirroring the finalized carve-out already used by
     cycle_all_modules_and_invalidate_cached_results above.
 
-    This is the D3a manual invalidation lever: it does not know why a project's numbers
-    might be stale (a reference-data reload, a bug fix, an ops decision), only that the
-    project-level cache and the module-level cache should be treated the same way here.
+    This is the deliberate operator escape hatch, and it is the ONLY way a project that
+    nobody edited gets recomputed. Results are otherwise preserved exactly as the user
+    last computed them: no reference-data reload, no factor update, and no background
+    process may invalidate them on its own. Running this is an explicit ops decision to
+    discard that record, which is why the finalized carve-out is honoured here too.
     """
     dirty_projects = models.Project.objects.filter(is_finalized=False)
     count = dirty_projects.count()
