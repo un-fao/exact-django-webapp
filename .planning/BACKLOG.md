@@ -97,7 +97,7 @@ The original beads ids are kept per item so older commit messages, code comments
 
 ---
 
-## Open (24)
+## Open (23)
 
 ### CI test gate: full suite ~394/545 red; group permissions not seeded (327x 403) + pre-existing failures
 
@@ -270,23 +270,21 @@ The original beads ids are kept per item so older commit messages, code comments
 
 > api/services/luc_compute.py uses function-local imports of admin_scripts.luc_permutations (iterate_concrete_combos at line 26, _compute_luc_slice at line 145). admin_scripts is the higher layer (it consumes api/), so importing from it inverts the usual direction. Lazy imports avoid load-time circularity, but the conceptual cycle would become real if admin_scripts ever imports api/services/luc_compute at module load. Long-term fix: move the LUC preset spec and expansion helpers into api/ (or a neutral package) so api/services/luc_compute owns its dependencies. Not a blocker for the initial LUC permutations work — flagged in the final code review of feat/luc-permutations.
 
-### load_reference_data does not invalidate any cached results
-
-**P2** · `bug` · created 2026-08-10
-
-> api/management/commands/load_reference_data.py contains no call to invalidate_module_caches, no .update() on a cache column, and no call to clear_reference_caches(). A grep for "cache_clear|invalidate" across api/management/commands/*.py returns zero hits. Meanwhile api/reference_cache.py:70-86 defines clear_reference_caches() explicitly for this purpose, and its docstring at api/reference_cache.py:7-8 states the reload requires a process restart or calling clear_reference_caches(); nothing calls it from the loader. Consequence: changing an IPCC emission factor or a GWP coefficient leaves every module cache valid, and the API keeps serving numbers derived from the old factors indefinitely. The new project-level cache (ProjectResultCache) adds one more stale layer above it, since results_stamp has no reference-data epoch to advance. Mitigated for now, not fixed: scripts/invalidate_results_cache.py now also clears the project-level rows and bumps every non-finalized project's results_stamp, so an operator can force a full recompute after a reference-data reload.
-
 ### copy_activity copies a valid module-level cache into the target
 
 **P2** · `bug` · created 2026-08-10
 
-> api/utilities.py:365-427 uses copy.deepcopy(module) then sets pk = None. The deepcopy carries last_cached_at, last_modified, and all cached_results_* blobs. CachedResultMixin.save only stamps last_modified when it is None (api/models.py:1289-1290), and on a copy it is not None, so the copy is born with a valid cache. Inside copy_project the target is a clone of the source, so the numbers happen to agree, but copy_activities_into(source_project, target_project, owner) is generic in its signature and ActivityViewSet.copy also copies. A copy into a project with a different country, climate, moisture, soil type, or GWP would serve the source project's numbers, and it copies multi-megabyte JSON per module for nothing. Mitigated for now, not fixed: scripts/invalidate_results_cache.py now also clears the project-level rows and bumps every non-finalized project's results_stamp, so an operator can force a full recompute after noticing a bad copy.
+> api/utilities.py:365-427 uses copy.deepcopy(module) then sets pk = None. The deepcopy carries last_cached_at, last_modified, and all cached_results_* blobs. CachedResultMixin.save only stamps last_modified when it is None (api/models.py:1289-1290), and on a copy it is not None, so the copy is born with a valid cache. Inside copy_project the target is a clone of the source, so the numbers happen to agree, but copy_activities_into(source_project, target_project, owner) is generic in its signature and ActivityViewSet.copy also copies. A copy into a project with a different country, climate, moisture, soil type, or GWP would serve the source project's numbers, and it copies multi-megabyte JSON per module for nothing. Note this is a genuine defect rather than an instance of the preserve-untouched-results rule (see Engineering notes): a copy is a newly created project, so it has no prior computation of its own to preserve, and it is born displaying numbers that were never computed for its own parameters. Workaround until fixed: an operator can run scripts/invalidate_results_cache.py, which clears the project-level rows and bumps every non-finalized project's results_stamp.
 
 ---
 
-## Engineering notes (4)
+## Engineering notes (5)
 
 Durable findings that were stored as beads memories. These are observations about this codebase and its deployment that were expensive to work out and are not obvious from the source.
+
+### reference-data-reloads-must-not-invalidate-results
+
+> Product rule, confirmed by the product owner on 2026-08-10. load_reference_data invalidating nothing is INTENDED behaviour, not a defect. Do not "fix" it, and do not file it as a bug again. A user's project results must never be recalculated unless the user explicitly does something to trigger it, so an old untouched project is preserved exactly as it was last computed: an EX-ACT appraisal is a record of what the numbers were when it was run, and reloading IPCC emission factors or GWP coefficients must not retroactively rewrite it. Consequences to preserve in any future cache work: (1) the ProjectResultCache key in api/results_cache.py deliberately folds in NO reference-data epoch, (2) api/reference_cache.py clear_reference_caches() is correctly left uncalled by the loader (its docstring at api/reference_cache.py:7-8 predates this rule and describes the mechanism, not a requirement to invoke it), (3) the only sanctioned ways an already-computed project moves off its cached numbers are the user's own edits, which bump Project.results_stamp, and a deliberate operator run of scripts/invalidate_results_cache.py. The single exception is RESULTS_SCHEMA_VERSION / INVENTORY_SCHEMA_VERSION, which force a global recompute without user action and are therefore reserved for fixing defects in our own computation code, never for propagating reference-data changes.
 
 ### cloud-sql-proxy-must-use-adc-not-gcloud-auth
 

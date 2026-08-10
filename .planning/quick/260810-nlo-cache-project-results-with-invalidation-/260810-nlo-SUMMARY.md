@@ -71,11 +71,11 @@ coverage:
     human_judgment: true
     rationale: "The dedupe query and the post-commit transaction.on_commit wiring are implemented per the plan and pass a static read-through, but exercising the dedupe under real concurrent AsyncJob rows needs Postgres/transactions, which are CI/DB-machine only here."
   - id: D3
-    description: "Two pre-existing bugs (load_reference_data invalidates nothing; copy_activity copies a valid cache) are filed in .planning/BACKLOG.md, not fixed, with the D3a mitigation named"
+    description: "Neither of the two candidate cache defects is fixed here. Superseded after execution: the product owner confirmed load_reference_data invalidating nothing is INTENDED (an untouched project must be preserved as the user last computed it), so it is recorded as an engineering note rather than a bug. Only copy_activity remains filed as a genuine P2."
     requirement: D3
     verification:
       - kind: other
-        ref: "Two new entries added to .planning/BACKLOG.md Open section (count 22 to 24), each naming scripts/invalidate_results_cache.py as the shipped mitigation"
+        ref: ".planning/BACKLOG.md carries one Open bug entry (copy_activity, count 22 to 23) plus a new engineering note reference-data-reloads-must-not-invalidate-results (count 4 to 5)"
         status: pass
     human_judgment: false
   - id: D3a
@@ -118,7 +118,7 @@ status: complete
 - `ProjectViewSet.results` now reads the cache strictly below `security.check_permission`, keyed on a stamp read fresh before compute; never returns 202; wraps the cache write in try/except so a write failure can never change the response.
 - `scripts/invalidate_results_cache.py` gained `invalidate_project_result_caches()`, called from `run()`, clearing `ProjectResultCache` rows and bumping stamps for non-finalized projects only, with lines 6-38 of the original file byte-for-byte unchanged.
 - `AsyncJob.Kind.RESULTS_RECOMPUTE` and `api/services/results_jobs.py` added: `schedule_recompute` (post-commit, feature-gated by `RESULTS_RECOMPUTE_ENABLED`), `_enqueue_if_idle` (PENDING/RUNNING dedupe, records the stamp in `params`), `is_superseded` (pure predicate), `run` (reproduces `ProjectViewSet.results` off-request via `APIRequestFactory` + `force_authenticate` as `project.owner`, deliberately never activates a locale, raises on non-200 so the job is recorded FAILED). `run_async_job.py` dispatches the new kind; the REPORT-only notification block and the connection-close guard are unchanged.
-- Two pre-existing bugs (load_reference_data invalidates nothing; copy_activity copies a valid cache) filed in `.planning/BACKLOG.md` per D3, naming the D3a mitigation.
+- `.planning/BACKLOG.md` per D3, as corrected after execution: `copy_activity` copying a valid cache stays filed as a P2 bug, but `load_reference_data` invalidating nothing was confirmed by the product owner as INTENDED behaviour and is now recorded as the engineering note `reference-data-reloads-must-not-invalidate-results`. A user's results are never recalculated without an explicit trigger, so an old untouched project is preserved exactly as it was last computed. Follow-up commit `dcb04804` realigned the code comments in `api/results_cache.py` and `scripts/invalidate_results_cache.py`, which had described the behaviour as a gap to work around.
 
 ## Task Commits
 
