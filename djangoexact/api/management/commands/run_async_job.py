@@ -1,0 +1,74 @@
+import logging
+
+from django.core.management.base import BaseCommand
+from django.db import connection
+from django.utils import timezone
+
+from api.models import AsyncJob
+
+log = logging.getLogger("console")
+
+
+class Command(BaseCommand):
+    help = "Execute a queued AsyncJob by id (report generation or project copy)."
+
+    def add_arguments(self, parser):
+        parser.add_argument("--job-id", type=int, required=True)
+
+    def handle(self, *args, **options):
+        job_id = options["job_id"]
+        job = AsyncJob.objects.get(pk=job_id)
+
+        if job.status != AsyncJob.Status.PENDING:
+            # Cancelled or already handled: do nothing (idempotent re-dispatch guard).
+            self.stdout.write(f"Job {job_id} is {job.status}; skipping.")
+            return
+
+        job.status = AsyncJob.Status.RUNNING
+        job.started_at = timezone.now()
+        job.save(update_fields=["status", "started_at", "updated_at"])
+
+        try:
+            if job.kind == AsyncJob.Kind.REPORT:
+                from api.services import report_jobs
+                result = report_jobs.run(job)
+            elif job.kind == AsyncJob.Kind.PROJECT_COPY:
+                from api.services import copy_jobs
+                result = copy_jobs.run(job)
+            else:
+                raise ValueError(f"Unknown AsyncJob kind: {job.kind}")
+
+            job.result = result or {}
+            job.status = AsyncJob.Status.COMPLETED
+            job.progress = 100
+        except Exception as e:
+            # The container may have forked from the web app; the inherited DB
+            # connection can be unusable. Drop it so the status write reconnects.
+            # Skip inside an atomic block (e.g. TestCase) where closing would
+            # poison the connection the finally-block save still needs.
+            if not connection.in_atomic_block:
+                connection.close()
+            log.exception(e)
+            job.status = AsyncJob.Status.FAILED
+            job.error_message = str(e)[:2000]
+        finally:
+            job.completed_at = timezone.now()
+            job.save(update_fields=[
+                "status", "progress", "result", "error_message",
+                "completed_at", "updated_at",
+            ])
+            # Email the requester the outcome of a report job: a signed download
+            # link when it completed, or a "could not be generated" notice when
+            # it failed. Isolated in its own try/except so it can never change
+            # the job outcome the finally-block just committed. The save above
+            # already reconnected the DB (the except-block may have closed it),
+            # so reading job.created_by/job.project here is safe.
+            if job.kind == AsyncJob.Kind.REPORT:
+                try:
+                    from api.services import report_notifications
+                    if job.status == AsyncJob.Status.COMPLETED:
+                        report_notifications.send_report_ready_email(job)
+                    elif job.status == AsyncJob.Status.FAILED:
+                        report_notifications.send_report_failed_email(job)
+                except Exception as e:
+                    log.exception(e)

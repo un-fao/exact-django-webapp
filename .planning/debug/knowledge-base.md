@@ -1,0 +1,24 @@
+# GSD Debug Knowledge Base
+
+Resolved debug sessions. Used by `gsd-debugger` to surface known-pattern hypotheses at the start of new investigations.
+
+---
+
+## excel-inventory-missing-mods: Excel report Inventory sheet omitted all seven non-land module families
+- **Date:** 2026-07-31
+- **Error patterns:** no inventory data available for this project, inventory sheet empty, missing inventory rows, irrigation inputs energy packaging transport storage processing not picked up, silent omission no error, empty Inventory(), activity data in tCO2-eq column
+- **Root cause(s):** `BaseCalculator.inventory` discovered its math module through a hardcoded five-name attribute whitelist (`math_start`, `math_start_w`, `math_start_wo`, `math_w`, `math_wo`) and returned an empty `Inventory()` on a miss, so the seven container families contributed zero rows; their container calculators built per-entry sub-calculators as throwaway locals and kept no math module of their own, and Transport/Storage/Packaging entry calculators store theirs under `energy_math_*` / `electricity_math_*`; `OperationPhaseIrrigation` passed `InventoryPerGasPerActivity(0, GasTypes.X, activity)` into a `(gas_type, value, activity)` signature, which would raise TypeError the moment the inventory was actually aggregated; module caches persisted the empty inventory and were validated only against `last_modified`, so existing projects would keep serving empty rows after the code fix; separately, `Inputs` and `NewIrrigation` wrote activity data (`unit_start` tonnes, `units_start` hectares) into a column headed "Value (tCO2-eq)" because `input_single_calculation` computed `emissions_start` and then discarded it
+- **Fix:** replaced the whitelist with `MATH_COMPONENT_GROUPS` (one representative per component, summed across components); added `_track_entry_calculator` / `_reset_entry_calculators` / `entry_calculators` to BaseCalculator and wired all seven containers so entry inventories roll up; corrected the three swapped `InventoryPerGasPerActivity` calls; added `INVENTORY_SCHEMA_VERSION` with invalidation scoped to the eight affected module types so the fix self-heals existing projects; made `input_single_calculation` return `emissions_start` and recorded it in the three `Inputs` rows, with 0 for `NewIrrigation` to match the `Roads` precedent
+- **Files changed:** djangoexact/api/calculators.py, djangoexact/api/reports/cache.py, djangoexact/math_model/no_time_dependency_final/inputs.py, djangoexact/math_model/no_time_dependency_final/general_functions.py, djangoexact/api/tests/test_inventory_rollup.py
+- **Why not caught:** no gate existed for this class. The failure was a silent empty-list fallback rather than an exception, and the Inventory sheet's "No inventory data available" placeholder is indistinguishable from a legitimately empty project. No test asserted that a given module family contributes inventory rows, and `pytest` does not run in CI (tests are a local pre-PR gate only), so nothing would have flagged it even if such a test had existed. The value-semantics half was doubly hidden: those rows could never reach a report while the roll-up defect suppressed them.
+- **Recurrence guard:** regression test `djangoexact/api/tests/test_inventory_rollup.py` (26 tests), notably `MathComponentGroupTests::test_every_group_name_is_a_real_attribute_somewhere`, which greps the calculators source and fails if any name in `MATH_COMPONENT_GROUPS` stops being assigned anywhere, catching the exact drift the old whitelist suffered; plus `InputsInventoryValueTests::test_no_row_reports_the_raw_input_quantity`, which fails if an inventory row ever again carries the raw input quantity. Structural guard: `INVENTORY_SCHEMA_VERSION` in the cached payload, so any future fix that changes a module's inventory can invalidate stale caches instead of being masked by them.
+
+### Reusable lessons
+
+- A lookup that returns an empty collection on a miss is a silent failure. Prefer raising, or at minimum log, when a discovery mechanism finds nothing. The empty `Inventory()` fallback is what turned a plumbing gap into an invisible one for the whole life of the codebase.
+- When a report reads a value off object A while the real work happens on throwaway object B, the numbers can be right on one sheet and absent on another. If the Results sheet is correct but a summary sheet is empty, suspect two different objects rather than a rendering bug.
+- Verifying a cache-backed fix contaminates the evidence. The first fixed-code render writes corrected rows, after which a reverted build reads them back and appears to pass. Pick a subject whose cache the session has not touched, or the before/after proves nothing.
+- Before trusting a "this is how it has always been" value, check whether the producing function even returns the right quantity. Here the correct value was computed and thrown away one stack frame below the call site.
+
+---
+

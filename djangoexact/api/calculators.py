@@ -97,6 +97,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
+from api import reference_cache
 
 from . import utilities as utils
 from .models import (
@@ -142,7 +143,6 @@ from .models import (
     SetAside,
     SmallFishery,
     SoilType,
-    StatusType,
     Waterbody,
     ModuleType,
     MinorSeasonFloodedRice,
@@ -165,6 +165,7 @@ from .models import (
     ValueChainSubmodule,
     EnergyEntry,
     RefrigerantType,
+    get_ready_status,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -404,7 +405,7 @@ class Result:
     def __init__(self, w: MathResult, wo: MathResult, balance: MathResult = None) -> None:
         self.total_w = w
         self.total_wo = wo
-        self.balance = copy.deepcopy(w) - copy.deepcopy(wo) if balance is None else copy.deepcopy(balance)
+        self.balance = w - wo if balance is None else copy.deepcopy(balance)
 
     def __str__(self):
         return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
@@ -516,6 +517,25 @@ class CalculatorFactory:
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
 
 
+# Attribute names under which calculators keep their math modules, grouped by
+# COMPONENT. Within a component the start / with / without variants are all built
+# from the same start-year figures and therefore carry identical inventory rows,
+# so BaseCalculator.inventory takes exactly one representative per component.
+# Separate components contribute genuinely different rows (a value chain's own
+# emissions versus the energy it consumes) and are summed.
+#
+# The list is explicit rather than a scan of __dict__ so that adding a new
+# component to a calculator is a deliberate act: a silently missed component is
+# exactly the defect this grouping was introduced to fix.
+MATH_COMPONENT_GROUPS = (
+    ("math_start", "math_start_w", "math_start_wo", "math_w", "math_wo"),
+    ("energy_math_start_w", "energy_math_start_wo", "energy_math_w", "energy_math_wo"),
+    ("electricity_math_w", "electricity_math_wo"),
+    ("organic_soil_math_w", "organic_soil_math_wo"),
+    ("peat_extraction_math_w", "peat_extraction_math_wo"),
+)
+
+
 class BaseCalculator(ABC):
     """
     Abstract base class for all calculators.
@@ -547,6 +567,10 @@ class BaseCalculator(ABC):
         self.results_start = None
         self.results_w = None
         self.results_wo = None
+
+        # Entry calculators tracked by container calculators for inventory
+        # roll-up. See BaseCalculator.inventory.
+        self._entry_calculators: list["BaseCalculator"] = []
 
         self.project: Project = getattr(self.data, "parent", self.data).activity.project
         self.activity: Activity = getattr(self.data, "parent", self.data).activity
@@ -584,11 +608,68 @@ class BaseCalculator(ABC):
 
     @property
     def inventory(self) -> Inventory:
-        """Get inventory from the first non-None start module."""
-        for math_module in [self.math_start, self.math_start_w, self.math_start_wo, self.math_w, self.math_wo]:
-            if math_module and hasattr(math_module, "inventory"):
-                return math_module.inventory
-        return Inventory()
+        """Baseline (start-year) GHG inventory contributed by this module.
+
+        Two sources are combined:
+
+        1. This calculator's own math modules, looked up through
+           ``MATH_COMPONENT_GROUPS``. Within one component the start / with /
+           without variants are all built from the same start-year figures and
+           therefore carry identical inventory rows, so exactly one
+           representative is taken. Across components (a value chain's own
+           emissions versus the energy it consumes) the rows are distinct and
+           are summed.
+        2. The inventories of any entry calculators this calculator delegated
+           to. Container calculators (Input, Energy, Irrigation, Storage,
+           Processing, Packaging, Transport) own no math module at all, so
+           without this roll-up their inventory is silently empty and the Excel
+           Inventory sheet omits them entirely.
+
+        Returns a freshly aggregated ``Inventory`` rather than a reference to a
+        math module's own inventory, so callers cannot mutate calculator state.
+        """
+        inventory = Inventory()
+
+        for group in MATH_COMPONENT_GROUPS:
+            for attribute in group:
+                math_module = getattr(self, attribute, None)
+                if math_module is None:
+                    continue
+                component_inventory = getattr(math_module, "inventory", None)
+                if component_inventory is None:
+                    continue
+                inventory = inventory + component_inventory
+                break
+
+        for entry_calculator in self.entry_calculators:
+            inventory = inventory + entry_calculator.inventory
+
+        return inventory
+
+    @property
+    def entry_calculators(self) -> list["BaseCalculator"]:
+        """Sub-calculators whose inventories roll up into this one.
+
+        Populated by container calculators through ``_track_entry_calculator``
+        while they iterate their entries in ``calculate()``.
+        """
+        return self._entry_calculators
+
+    def _track_entry_calculator(self, calculator_class, entry) -> "BaseCalculator":
+        """Build an entry calculator and register it for inventory roll-up.
+
+        Container calculators must call ``_reset_entry_calculators()`` at the
+        top of ``calculate()``; ``calculate()`` can be invoked more than once on
+        the same instance (for example via ``get_defaults(calculate=True)``) and
+        without the reset the entries would accumulate and double count.
+        """
+        calculator = calculator_class(entry)
+        self._entry_calculators.append(calculator)
+        return calculator
+
+    def _reset_entry_calculators(self) -> None:
+        """Drop entry calculators tracked by a previous ``calculate()`` run."""
+        self._entry_calculators = []
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -603,7 +684,8 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
+            ready_status = get_ready_status()
+            if any(module.status != ready_status for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -820,7 +902,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name_en="READY"):
+        if module.status != get_ready_status():
             raise Exception("Forest module is not complete")
 
         dry_matter_w = luc.dry_matter_w if luc else None
@@ -828,13 +910,13 @@ class DeforestationCalculator(BaseCalculator):
 
         # BUG: Aren't these handled in the parent class?
         try:
-            soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc_ref = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
             else:
                 soc_ref = ipcc.SoilOrganicCarbon(value=project.soc_ref_t2)
-        som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+        som = reference_cache.get_nitrous_emission_factor(moisture.pk)
 
         total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
         total_biomass_wo = SimpleNamespace(value=0)
@@ -853,7 +935,7 @@ class DeforestationCalculator(BaseCalculator):
 
         mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
 
-        bgb_start = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+        bgb_start = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
         if not bgb_start:
             raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
 
@@ -863,7 +945,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_w = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
+                litter_dw_w = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
 
@@ -880,7 +962,7 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
 
-            bgb_w = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_w = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_start_id, mean)
             if not bgb_w:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
@@ -890,7 +972,7 @@ class DeforestationCalculator(BaseCalculator):
             bgb_wo = SimpleNamespace(value=0)
         else:
             try:
-                litter_dw_wo = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+                litter_dw_wo = reference_cache.get_litter_deadwood_carbon_stock(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
 
@@ -907,12 +989,12 @@ class DeforestationCalculator(BaseCalculator):
 
             mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
 
-            bgb_wo = ipcc.ForestManagementRootToShoot.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
+            bgb_wo = reference_cache.get_root_to_shoot_above(climate.pk, forest.forest_type_id, region.pk, module.land_use_type_w_id, mean)
             if not bgb_wo:
                 raise Exception(f"ForestManagementRootToShoot for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
 
-        combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
-        combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+        combustion_factor_w = reference_cache.get_forest_combustion_factor(module.land_use_type_w_id, climate.pk, forest.forest_type_id)
+        combustion_factor_wo = reference_cache.get_forest_combustion_factor(module.land_use_type_wo_id, climate.pk, forest.forest_type_id)
 
         module_start = module_w = module_wo = module
         if luc:
@@ -1087,7 +1169,7 @@ class OtherLandUseCalculator(BaseCalculator):
 
         # BUG: Isn't this handled in the parent class?
         try:
-            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            soc = reference_cache.get_soil_organic_carbon(climate.pk, moisture.pk, soil_type.pk)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             if project.soc_ref_t2 is None:
                 raise Exception(f"SoilOrganicCarbon for {climate} climate, {moisture} moisture, and {soil_type} soil type does not exist. Please insert T2 values for the start module")
@@ -1114,7 +1196,8 @@ class OtherLandUseCalculator(BaseCalculator):
         soc_t2_w: float | None = getattr(module_w, "soc_t2_w") if getattr(module_w, "soc_t2_w") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
         soc_t2_wo: float | None = getattr(module_wo, "soc_t2_wo") if getattr(module_wo, "soc_t2_wo") is not None else getattr(self.activity, "soc_t2") if getattr(self.activity, "soc_t2") is not None else getattr(self.project, "soc_ref_t2")
 
-        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
+        ready_status = get_ready_status()
+        ready = all(module.status == ready_status for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
@@ -1213,7 +1296,7 @@ class OtherLandUseCalculator(BaseCalculator):
         c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
         try:
-            som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
+            som = reference_cache.get_nitrous_emission_factor(moisture.pk)
         except ipcc.NitrousEmissionFactor.DoesNotExist:
             raise Exception(f"LandUseNitrousEmissionFactor for {moisture.name} moisture does not exist")
 
@@ -3721,10 +3804,11 @@ class InputCalculator(BaseCalculator):
 
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
 
         entries = module.input_entries.all()
         for entry in entries:
-            r_w, r_wo = InputEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(InputEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -3888,9 +3972,10 @@ class EnergyCalculator(BaseCalculator):
         module: Energy = self.data
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
 
         for entry in module.entries.all():
-            r_w, r_wo = EnergyEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(EnergyEntryCalculator, entry).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
@@ -5815,13 +5900,15 @@ class IrrigationCalculator(BaseCalculator):
         module: Irrigation = self.data
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
+
         for system in module.irrigation_systems.all():
-            r_w, r_wo = IrrigationSystemCalculator(system).calculate()
+            r_w, r_wo = self._track_entry_calculator(IrrigationSystemCalculator, system).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
         for phase in module.irrigation_phases.all():
-            r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
+            r_w, r_wo = self._track_entry_calculator(IrrigationPhaseCalculator, phase).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
@@ -7890,8 +7977,10 @@ class StorageCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = StorageEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(StorageEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8023,8 +8112,10 @@ class ProcessingCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = ProcessingEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(ProcessingEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8089,8 +8180,10 @@ class PackagingCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = PackagingEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(PackagingEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8213,8 +8306,10 @@ class TransportCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = TransportEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(TransportEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo

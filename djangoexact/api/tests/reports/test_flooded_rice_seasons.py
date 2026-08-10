@@ -1,6 +1,6 @@
 """Unit tests for FloodedRiceReport minor-season aggregation and metadata layout.
 
-Guards beads issues:
+Guards the following regressions (ids are from the retired beads tracker):
 - exact-django-webapp-h8z: report uses FloodedRiceSeasonCalculator (main only) while
   production uses FloodedRiceCalculator (main + minor seasons)
 - exact-django-webapp-ttm: minor-season loop adds MAIN module start, not minor's own
@@ -105,6 +105,13 @@ class TestMinorSeasonMetadataStride(unittest.TestCase):
         season.organic_amendment_type_w.name = f"oa_w_{n}"
         season.organic_amendment_type_wo = Mock()
         season.organic_amendment_type_wo.name = f"oa_wo_{n}"
+        # Tier-2 cultivation-period overrides default to None so the
+        # coordinate tests deterministically exercise the efc_default
+        # fallback path (a bare Mock would auto-create a truthy child
+        # attribute here, silently masking the fallback branch).
+        season.cultivation_period_t2_start = None
+        season.cultivation_period_t2_w = None
+        season.cultivation_period_t2_wo = None
         season_calc = Mock()
         season_calc.efc_default = Mock(cultivation_period=120 + n)
         season_calc.yield_default = Mock(value=10.0 + n)
@@ -121,6 +128,7 @@ class TestMinorSeasonMetadataStride(unittest.TestCase):
                     season,
                     season_calc,
                     base_row=8 + 6 * i,
+                    season_index=i,
                     is_start=is_start,
                     is_with=is_with,
                     is_without=is_without,
@@ -153,11 +161,11 @@ class TestMinorSeasonMetadataStride(unittest.TestCase):
         s0, sc0 = self._build_season(0)
         s1, sc1 = self._build_season(1)
         w0 = _flooded_rice_minor_season_metadata_writes(
-            s0, sc0, base_row=8 + 6 * 0,
+            s0, sc0, base_row=8 + 6 * 0, season_index=0,
             is_start=False, is_with=True, is_without=False,
         )
         w1 = _flooded_rice_minor_season_metadata_writes(
-            s1, sc1, base_row=8 + 6 * 1,
+            s1, sc1, base_row=8 + 6 * 1, season_index=1,
             is_start=False, is_with=True, is_without=False,
         )
         rows0 = sorted({w.row_offset for w in w0})
@@ -171,11 +179,38 @@ class TestMinorSeasonMetadataStride(unittest.TestCase):
         from api.reports.land import _flooded_rice_minor_season_metadata_writes
         season, sc = self._build_season(0)
         writes = _flooded_rice_minor_season_metadata_writes(
-            season, sc, base_row=8,
+            season, sc, base_row=8, season_index=0,
             is_start=False, is_with=True, is_without=False,
         )
         cols = {w.col for w in writes}
-        self.assertEqual(cols, {3})
+        self.assertEqual(cols, {1, 3})
+
+    def test_minor_season_cultivation_period_falls_back_to_default_when_none(self):
+        """Bug exact-django-webapp-second-cr (BUG 1): with no Tier-2 override,
+        the minor season's cultivation-period cell falls back to
+        season_calc.efc_default.cultivation_period (120 for season index 0)."""
+        from api.reports.land import _flooded_rice_minor_season_metadata_writes
+        season, sc = self._build_season(0)
+        writes = _flooded_rice_minor_season_metadata_writes(
+            season, sc, base_row=8, season_index=0,
+            is_start=False, is_with=True, is_without=False,
+        )
+        by_row_col = {(w.row_offset, w.col): w.value for w in writes}
+        self.assertEqual(by_row_col[(9, 3)], 120)
+
+    def test_minor_season_cultivation_period_uses_tier2_override_when_set(self):
+        """Bug exact-django-webapp-second-cr (BUG 1): when the season's own
+        cultivation_period_t2_w is set, it is used instead of the IPCC
+        default (120)."""
+        from api.reports.land import _flooded_rice_minor_season_metadata_writes
+        season, sc = self._build_season(0)
+        season.cultivation_period_t2_w = 99
+        writes = _flooded_rice_minor_season_metadata_writes(
+            season, sc, base_row=8, season_index=0,
+            is_start=False, is_with=True, is_without=False,
+        )
+        by_row_col = {(w.row_offset, w.col): w.value for w in writes}
+        self.assertEqual(by_row_col[(9, 3)], 99)
 
 
 # ===========================================================================

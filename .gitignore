@@ -1,6 +1,9 @@
 # Git worktrees
 .worktrees/
 
+# GSD research tool cache (hash-named response blobs)
+.planning/research/.cache/
+
 # These are some examples of commonly ignored file patterns.
 # You should customize this list as applicable to your project.
 # Learn more about .gitignore:
@@ -100,6 +103,10 @@ load_starting_fixtures.py
 
 
 djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.json
+djangoexact/djangoexact/fao-exact-dev-service-account-key.json
+# Generic guard for any future GCP/Firebase service-account or private-key JSON
+**/*-service-account-key*.json
+**/*-private-key*.json
 
 csv
 djangoexact/ipcc_dump_csv.zip
@@ -180,12 +187,22 @@ STD 1019 open-source agreement_EX-ACT.docx
 .venv
 .env*
 
-# Beads / Dolt files (added by bd init)
-.dolt/
+# Stray local database files (minitool.db and test_db.sqlite3 are already
+# tracked and stay tracked; this only stops new ones being committed).
 *.db
-.beads-credential-key
 EXACT_guide.pdf
 2-results-report-2.xlsx
 test may 2026 (Copy).exactp
 *.sqlite3
 .superpowers/
+README.pdf
+.venv-main
+.beads
+.claude/settings.json
+.venv
+.env.*
+docs
+CLAUDE.md
+CUserssirvosterzoAppDataLocalTempsql_describe.txt
+EXACT_guide.pdf
+README.pdf

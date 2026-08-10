@@ -24,7 +24,9 @@
     </ul>
 </div>
 
-{# nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-token #}
+{# False positive: csrf_token is present on the line after the form tag, but the rule's #}
+{# generic-mode ellipsis cannot span this form's full body, so it fires anyway. #}
+{# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token #}
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="module aligned">

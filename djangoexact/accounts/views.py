@@ -1,3 +1,5 @@
+import logging
+
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
@@ -10,8 +12,11 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+logger = logging.getLogger(__name__)
+
 import accounts.utils as utils
 
+from .firebase_auth import FirebaseError, FirebaseResponseError, FirebaseUnavailableError
 from .serializers import (
     LoginResponseSerializer,
     LoginSerializer,
@@ -19,6 +24,34 @@ from .serializers import (
     UserSummarySerializer,
     PasswordResetSerializer,
 )
+
+logger = logging.getLogger("console")
+
+FIREBASE_UNAVAILABLE_MESSAGE = "Authentication service unavailable"
+FIREBASE_INVALID_RESPONSE_MESSAGE = "Invalid response from authentication service"
+
+
+def firebase_error_response(exc, key, context, fallback="Bad Request"):
+    """Turn a :class:`FirebaseError` into a safe DRF response.
+
+    ``key`` is the payload key the endpoint already uses ("error" or "details"),
+    so existing clients keep seeing the same response shape. Only the Firebase
+    error code is ever echoed back to the client; anything the client cannot act
+    on is logged server side and answered with a generic message.
+    """
+    if isinstance(exc, FirebaseUnavailableError):
+        logger.exception("Firebase unreachable during %s", context)
+        return Response({key: FIREBASE_UNAVAILABLE_MESSAGE}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    if isinstance(exc, FirebaseResponseError):
+        logger.exception("Unusable Firebase response during %s", context)
+        return Response({key: FIREBASE_INVALID_RESPONSE_MESSAGE}, status=status.HTTP_502_BAD_GATEWAY)
+
+    if exc.code:
+        return Response({key: exc.code}, status=status.HTTP_400_BAD_REQUEST)
+
+    logger.exception("Unrecognised Firebase error body during %s (status=%s)", context, exc.status_code)
+    return Response({key: fallback}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @authentication_classes([])
@@ -215,7 +248,6 @@ class TokenRefreshView(APIView):
     @swagger_auto_schema(
         responses={200: LoginResponseSerializer, 400: "Bad Request"},
     )
-    @transaction.atomic
     def post(self, request):
         try:
             # Since we're not using Firebase tokens anymore, this endpoint

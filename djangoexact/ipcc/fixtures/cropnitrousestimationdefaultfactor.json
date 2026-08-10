@@ -1,21 +1,6 @@
 [
   {
     "model": "ipcc.cropnitrousestimationdefaultfactor",
-    "pk": 179,
-    "fields": {
-      "land_use_type": 29,
-      "slope": null,
-      "intercept": null,
-      "n_ag_residues": 0.008,
-      "rs_t": 0.22,
-      "n_bg_t": 0.009,
-      "dry_matter": null,
-      "rag": null,
-      "comment": null
-    }
-  },
-  {
-    "model": "ipcc.cropnitrousestimationdefaultfactor",
     "pk": 180,
     "fields": {
       "land_use_type": 24,
