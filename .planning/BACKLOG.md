@@ -97,7 +97,7 @@ The original beads ids are kept per item so older commit messages, code comments
 
 ---
 
-## Open (22)
+## Open (24)
 
 ### CI test gate: full suite ~394/545 red; group permissions not seeded (327x 403) + pre-existing failures
 
@@ -269,6 +269,18 @@ The original beads ids are kept per item so older commit messages, code comments
 **P4** · `task` · was `exact-django-webapp-urt` · owner: claudio.lavacca@fao.org · created 2026-05-28
 
 > api/services/luc_compute.py uses function-local imports of admin_scripts.luc_permutations (iterate_concrete_combos at line 26, _compute_luc_slice at line 145). admin_scripts is the higher layer (it consumes api/), so importing from it inverts the usual direction. Lazy imports avoid load-time circularity, but the conceptual cycle would become real if admin_scripts ever imports api/services/luc_compute at module load. Long-term fix: move the LUC preset spec and expansion helpers into api/ (or a neutral package) so api/services/luc_compute owns its dependencies. Not a blocker for the initial LUC permutations work — flagged in the final code review of feat/luc-permutations.
+
+### load_reference_data does not invalidate any cached results
+
+**P2** · `bug` · created 2026-08-10
+
+> api/management/commands/load_reference_data.py contains no call to invalidate_module_caches, no .update() on a cache column, and no call to clear_reference_caches(). A grep for "cache_clear|invalidate" across api/management/commands/*.py returns zero hits. Meanwhile api/reference_cache.py:70-86 defines clear_reference_caches() explicitly for this purpose, and its docstring at api/reference_cache.py:7-8 states the reload requires a process restart or calling clear_reference_caches(); nothing calls it from the loader. Consequence: changing an IPCC emission factor or a GWP coefficient leaves every module cache valid, and the API keeps serving numbers derived from the old factors indefinitely. The new project-level cache (ProjectResultCache) adds one more stale layer above it, since results_stamp has no reference-data epoch to advance. Mitigated for now, not fixed: scripts/invalidate_results_cache.py now also clears the project-level rows and bumps every non-finalized project's results_stamp, so an operator can force a full recompute after a reference-data reload.
+
+### copy_activity copies a valid module-level cache into the target
+
+**P2** · `bug` · created 2026-08-10
+
+> api/utilities.py:365-427 uses copy.deepcopy(module) then sets pk = None. The deepcopy carries last_cached_at, last_modified, and all cached_results_* blobs. CachedResultMixin.save only stamps last_modified when it is None (api/models.py:1289-1290), and on a copy it is not None, so the copy is born with a valid cache. Inside copy_project the target is a clone of the source, so the numbers happen to agree, but copy_activities_into(source_project, target_project, owner) is generic in its signature and ActivityViewSet.copy also copies. A copy into a project with a different country, climate, moisture, soil type, or GWP would serve the source project's numbers, and it copies multi-megabyte JSON per module for nothing. Mitigated for now, not fixed: scripts/invalidate_results_cache.py now also clears the project-level rows and bumps every non-finalized project's results_stamp, so an operator can force a full recompute after noticing a bad copy.
 
 ---
 
