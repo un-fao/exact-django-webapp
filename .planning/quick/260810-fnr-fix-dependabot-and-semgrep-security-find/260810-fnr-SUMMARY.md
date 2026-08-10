@@ -41,7 +41,7 @@ coverage:
     requirement: "DEPENDABOT-175"
     verification:
       - kind: other
-        ref: "python3 pip-requirements parse gate (Task 1 automated verify) — asserts all six pins exact"
+        ref: "python3 pip-requirements parse gate (Task 1 automated verify) asserts all six pins exact"
         status: pass
     human_judgment: true
     rationale: "Alerts auto-close only once develop reaches main (GitHub scans the default branch); the parse gate proves the pin is correct but cannot itself confirm GitHub closed the alert. The plan's Task 1 human-check also flags that the cloud function's main.py is absent from this checkout and untestable here, so a human must confirm one permutation job in the review environment before production."
@@ -49,7 +49,7 @@ coverage:
     description: "Zero residual drift across all 16 packages shared between the cloud-function manifest and djangoexact/requirements.txt, proving the six-package matrix was complete."
     verification:
       - kind: other
-        ref: "python3 drift-comparison gate (Task 2 automated verify) — printed shared=16 drifted=0"
+        ref: "python3 drift-comparison gate (Task 2 automated verify) printed shared=16 drifted=0"
         status: pass
     human_judgment: false
 
