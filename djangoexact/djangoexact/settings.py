@@ -281,6 +281,9 @@ REST_FRAMEWORK = {
 # Auditlog Settings
 AUDITLOG_INCLUDE_ALL_MODELS = True
 AUDITLOG_EXCLUDE_TRACKING_FIELDS = ("created", "modified")
+# ProjectResultCache is ephemeral derived state (like AsyncJob): an audited save would
+# deep-copy the whole stored payload on every write, see .planning/BACKLOG.md entry 4ng.
+AUDITLOG_EXCLUDE_TRACKING_MODELS = ("api.ProjectResultCache",)
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),

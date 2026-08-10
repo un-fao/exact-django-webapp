@@ -659,6 +659,21 @@ def invalidate_module_caches(*, project=None, activity=None):
         if issubclass(model, Module) and not model._meta.abstract:
             model.objects.filter(**filter_kwargs).update(**_MODULE_CACHE_INVALIDATION)
 
+    bump_project_results_stamp(project.pk if project is not None else activity.project_id)
+
+
+def bump_project_results_stamp(project_id):
+    """Advance Project.results_stamp so any previously stored ProjectResultCache row for
+    this project can never be read again (the read path filters on an exact stamp match).
+
+    Two properties on purpose: the bump is atomic (an F() expression, never a
+    read-modify-write), and it goes through QuerySet.update(), which bypasses Project.save()
+    entirely, so this call cannot recurse back into invalidate_module_caches.
+    """
+    if not project_id:
+        return
+    Project.objects.filter(pk=project_id).update(results_stamp=models.F("results_stamp") + 1)
+
 
 class Project(Historical, DirtyFieldsMixin):
     class Meta:
@@ -718,6 +733,8 @@ class Project(Historical, DirtyFieldsMixin):
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
+    results_stamp = models.BigIntegerField(default=0, verbose_name="results_stamp")
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
@@ -760,6 +777,7 @@ class Project(Historical, DirtyFieldsMixin):
                 exclude_fields = [
                     "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
                     "is_finalized", "is_public", "is_archived", "archived_at",
+                    "results_stamp",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):
@@ -1180,6 +1198,16 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                     invalidate_module_caches(activity=self)
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # No project-level notification existed for Activity deletion before this: the
+        # project's own module cascade only fires from Project.save/Activity.save, never
+        # from a delete. Capture the project id first, since self.project_id is gone after
+        # the row is deleted. Bump after the delete so a failed delete does not bump.
+        project_id = self.project_id
+        result = super().delete(*args, **kwargs)
+        bump_project_results_stamp(project_id)
+        return result
+
     def __get_delay(self) -> int:
         if self.start_year_t2 is None:
             return 0
@@ -1367,7 +1395,19 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         if isinstance(self, Submodule):
             parent: Module = self.parent
             parent.invalidate_cached_results()
+
+        # Resolve the owning project BEFORE the delete: get_activity() (defined on both
+        # Module and Submodule) walks a relation that no longer exists once this row is
+        # gone. A narrow catch keeps a module whose activity link is already broken from
+        # turning a delete into a 500; it simply skips the stamp bump in that case.
+        try:
+            project_id = self.get_activity().project_id
+        except (AttributeError, exceptions.ObjectDoesNotExist):
+            project_id = None
+
         super().delete(*args, **kwargs)
+
+        bump_project_results_stamp(project_id)
 
 
 class Submodule(Historical, CachedResultMixin):
@@ -3552,3 +3592,27 @@ class AsyncJob(models.Model):
 
     def __str__(self):
         return f"AsyncJob<{self.pk} {self.kind} {self.status}>"
+
+
+class ProjectResultCache(models.Model):
+    """Stored payload for GET /api/projects/{id}/results/, keyed by project and a cache
+    key folding in the selected activities and the schema versions. Ephemeral derived
+    state, exactly like AsyncJob: not Historical, not DirtyFieldsMixin, and excluded from
+    auditlog (see AUDITLOG_EXCLUDE_TRACKING_MODELS in settings.py).
+
+    Uniqueness on (project, cache_key) rather than on the stamp is what bounds row growth:
+    a write replaces the row for that key instead of appending one row per edit.
+    """
+
+    project = models.ForeignKey("api.Project", on_delete=models.CASCADE, related_name="result_caches")
+    cache_key = models.CharField(max_length=64)
+    results_stamp = models.BigIntegerField()
+    schema_version = models.PositiveIntegerField()
+    payload = models.JSONField()
+    computed_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("project", "cache_key")
+
+    def __str__(self):
+        return f"ProjectResultCache<project={self.project_id} key={self.cache_key}>"
