@@ -35,6 +35,9 @@ class Command(BaseCommand):
             elif job.kind == AsyncJob.Kind.PROJECT_COPY:
                 from api.services import copy_jobs
                 result = copy_jobs.run(job)
+            elif job.kind == AsyncJob.Kind.RESULTS_RECOMPUTE:
+                from api.services import results_jobs
+                result = results_jobs.run(job)
             else:
                 raise ValueError(f"Unknown AsyncJob kind: {job.kind}")
 

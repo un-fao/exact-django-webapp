@@ -15,6 +15,7 @@ from django.test import SimpleTestCase
 from django.utils import timezone
 
 from api import results_cache
+from api.services import results_jobs
 
 
 class BuildCacheKeyTests(SimpleTestCase):
@@ -65,3 +66,14 @@ class NormalizePayloadTests(SimpleTestCase):
         twice = results_cache.normalize_payload(once)
 
         self.assertEqual(once, twice)
+
+
+class IsSupersededTests(SimpleTestCase):
+    def test_none_job_stamp_is_never_superseded(self):
+        self.assertFalse(results_jobs.is_superseded(None, 5))
+
+    def test_equal_stamps_are_not_superseded(self):
+        self.assertFalse(results_jobs.is_superseded(5, 5))
+
+    def test_lower_job_stamp_is_superseded(self):
+        self.assertTrue(results_jobs.is_superseded(3, 5))

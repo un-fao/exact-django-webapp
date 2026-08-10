@@ -674,6 +674,16 @@ def bump_project_results_stamp(project_id):
         return
     Project.objects.filter(pk=project_id).update(results_stamp=models.F("results_stamp") + 1)
 
+    # Warm the cache asynchronously after every bump. Two loop-breakers make this safe:
+    # the recompute worker writes only ProjectResultCache rows, which never bump the
+    # stamp, and the stamp write above and the cache payload write are separate code
+    # paths by construction (results_cache.write is never called from here).
+    try:
+        from api.services import results_jobs
+        results_jobs.schedule_recompute(project_id)
+    except Exception as e:
+        log.exception(e)
+
 
 class Project(Historical, DirtyFieldsMixin):
     class Meta:
@@ -3554,6 +3564,7 @@ class AsyncJob(models.Model):
     class Kind(models.TextChoices):
         REPORT = "report", "Report generation"
         PROJECT_COPY = "project_copy", "Project copy"
+        RESULTS_RECOMPUTE = "results_recompute", "Results recompute"
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"

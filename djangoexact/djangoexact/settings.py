@@ -370,6 +370,15 @@ DEFAULT_FROM_EMAIL = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
 CLOUD_RUN_COMPUTATION_JOB_NAME = os.environ.get("CLOUD_RUN_COMPUTATION_JOB_NAME", "")
 CLOUD_RUN_REGION = os.environ.get("CLOUD_RUN_REGION", "europe-west1")
 
+# Enables per-edit asynchronous recompute of the project results cache (AsyncJob kind
+# RESULTS_RECOMPUTE) after every results_stamp bump. Defaults to on wherever a real
+# Cloud Run target exists, off otherwise: api/services/async_jobs.py dispatch() falls
+# back to a local subprocess when CLOUD_RUN_COMPUTATION_JOB_NAME is empty, which is
+# exactly the local and CI condition, and per-edit enqueue would then spawn a
+# subprocess for every module save the test suite makes. An explicit env override lets
+# anyone exercise the path locally without a real Cloud Run job configured.
+RESULTS_RECOMPUTE_ENABLED = os.environ.get("RESULTS_RECOMPUTE_ENABLED", "").lower() in ("true", "1") or bool(CLOUD_RUN_COMPUTATION_JOB_NAME)
+
 # Job Notifications
 # Set to True to enable email notifications for completed jobs.
 JOB_NOTIFICATIONS_ENABLED = os.environ.get("JOB_NOTIFICATIONS_ENABLED", "").lower() in ("true", "1", "yes")
