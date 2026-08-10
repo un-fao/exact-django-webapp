@@ -1,5 +1,11 @@
 # Cloud Function requirements for minitool processing
 # Optimized for Python 3.11 runtime
+#
+# Alignment invariant: every package this manifest shares with
+# djangoexact/requirements.txt must be pinned to the identical version,
+# with djangoexact/requirements.txt as the reference. This manifest is not
+# covered by .github/dependabot.yml, which watches /djangoexact only, so
+# drift here is caught by review rather than by tooling.
 
 # Core function framework
 functions-framework==3.*
