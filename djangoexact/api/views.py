@@ -38,6 +38,7 @@ from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
+from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
@@ -155,6 +156,73 @@ from api.services import async_jobs
 from api.services import report_links
 
 logger = logging.getLogger("console")
+
+# Columns that carry a module's computed state across an export/import round
+# trip. They are deliberately NOT written during objects.create(): saving a
+# submodule runs CachedResultMixin.save(), which calls
+# parent.invalidate_cached_results() and would wipe a cache restored a moment
+# earlier. Instead they are replayed once the whole module tree exists, via a
+# queryset update() that bypasses save() and so cannot invalidate anything or
+# re-stamp last_modified.
+CACHE_RESTORE_FIELDS = (
+    "last_cached_at",
+    "cached_results_total",
+    "cached_results_by_activity",
+    "cached_results_by_gas",
+    "cached_results_by_activity_by_gas",
+    "cached_units_breakdown",
+    "last_modified",
+)
+
+
+def _parse_export_datetime(value):
+    """Coerce a timestamp from an export file back into an aware datetime.
+
+    Export writes timestamps through json.dumps(default=str), so they arrive as
+    strings such as "2026-08-11 10:31:02.412+00:00". Returns None when the
+    value is missing or unparseable, in which case the caller leaves the field
+    to its normal default.
+    """
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        parsed = parse_datetime(str(value))
+    if parsed is None:
+        return None
+    if timezone.is_naive(parsed):
+        parsed = timezone.make_aware(parsed, timezone.get_default_timezone())
+    return parsed
+
+
+def _extract_cache_restore(module_data, resolve_status_id):
+    """Pop the cache and status columns out of an exported module payload.
+
+    Removing them from ``module_data`` keeps them out of objects.create(), so
+    the values are written exactly once, by the deferred restore pass. Returns
+    the column/value mapping to replay, empty for payloads produced by an older
+    build that did not export these fields.
+    """
+    restore = {}
+
+    for field_name in CACHE_RESTORE_FIELDS:
+        if field_name not in module_data:
+            continue
+        value = module_data.pop(field_name)
+        if field_name in ("last_cached_at", "last_modified"):
+            value = _parse_export_datetime(value)
+            if value is None:
+                continue
+        restore[field_name] = value
+
+    if "status" in module_data:
+        status_id = resolve_status_id(module_data.pop("status"))
+        if status_id is not None:
+            restore["status_id"] = status_id
+
+    return restore
+
 
 activity_id = openapi.Parameter(
     "activity_id",
@@ -1033,6 +1101,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     result[field_name] = value
             return result
 
+        # Queued (model, pk, values) triples replayed after every module and
+        # submodule exists. See CACHE_RESTORE_FIELDS for why this is deferred.
+        cache_restores = []
+        status_id_cache = {}
+
+        def resolve_status_id(value):
+            """Map an exported StatusType PK onto one that exists here.
+
+            Reference-data PKs are stable across EX-ACT installations, so this
+            is normally the identity. An unknown id means the file came from a
+            database with different reference data: drop it rather than abort
+            the whole import with a foreign key violation, and let the module
+            fall back to EMPTY as it did before.
+            """
+            if not isinstance(value, int):
+                return None
+            if value not in status_id_cache:
+                status_id_cache[value] = (
+                    value if StatusType.objects.filter(pk=value).exists() else None
+                )
+            return status_id_cache[value]
+
         try:
             with transaction.atomic():
                 # Extract activities before creating project
@@ -1108,6 +1198,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 original_id = module_data.pop('_original_id', None)
                                 submodules_data = module_data.pop('_submodules', [])
 
+                                restore_values = _extract_cache_restore(
+                                    module_data, resolve_status_id
+                                )
+
                                 filtered_module_data = prepare_model_data(
                                     model_class, module_data, module_id_map
                                 )
@@ -1115,6 +1209,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     activity=activity,
                                     **filtered_module_data
                                 )
+
+                                if restore_values:
+                                    cache_restores.append(
+                                        (model_class, new_instance.pk, restore_values)
+                                    )
 
                                 if original_id is not None:
                                     module_id_map[original_id] = new_instance
@@ -1126,8 +1225,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 if submodules_data:
                                     self._create_submodules(
                                         new_instance, submodules_data, prepare_model_data,
-                                        _reconstruct_threads, author_cache, module_id_map
+                                        _reconstruct_threads, author_cache, module_id_map,
+                                        cache_restores, resolve_status_id
                                     )
+
+                # Replay the exported results now that every module and
+                # submodule exists. update() bypasses save(), so this cannot
+                # retrigger cache invalidation or re-stamp last_modified.
+                for restore_model, restore_pk, restore_values in cache_restores:
+                    restore_model.objects.filter(pk=restore_pk).update(**restore_values)
 
                 return Response({
                     "exists": False,
@@ -1148,7 +1254,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return getattr(models, class_name, None)
 
     def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
-                           reconstruct_threads_fn, author_cache, module_id_map):
+                           reconstruct_threads_fn, author_cache, module_id_map,
+                           cache_restores, resolve_status_id):
         """
         Create submodules for a parent module from exported submodule data.
 
@@ -1159,6 +1266,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
             reconstruct_threads_fn: Function to reconstruct thread comments
             author_cache: Cache for author lookups
             module_id_map: Map of original IDs to new instances
+            cache_restores: Sink collecting (model, pk, values) triples to
+                replay once the whole module tree exists
+            resolve_status_id: Callable mapping an exported StatusType PK onto
+                one valid in this database
         """
         for submodule_data in submodules_data:
             submodule_data = submodule_data.copy()
@@ -1192,6 +1303,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
                 continue
 
+            restore_values = _extract_cache_restore(submodule_data, resolve_status_id)
+
             filtered_submodule_data = prepare_model_data(
                 submodule_class, submodule_data, module_id_map
             )
@@ -1201,6 +1314,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 parent=parent_instance,
                 **filtered_submodule_data
             )
+
+            if restore_values:
+                cache_restores.append(
+                    (submodule_class, new_submodule.pk, restore_values)
+                )
 
             if original_id is not None:
                 module_id_map[original_id] = new_submodule
@@ -1212,7 +1330,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             if nested_submodules:
                 self._create_submodules(
                     new_submodule, nested_submodules, prepare_model_data,
-                    reconstruct_threads_fn, author_cache, module_id_map
+                    reconstruct_threads_fn, author_cache, module_id_map,
+                    cache_restores, resolve_status_id
                 )
 
     @transaction.atomic

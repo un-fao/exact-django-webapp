@@ -760,6 +760,12 @@ class Project(Historical, DirtyFieldsMixin):
                 exclude_fields = [
                     "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
                     "is_finalized", "is_public", "is_archived", "archived_at",
+                    # export_id is assigned lazily by the export endpoint on the
+                    # first download. It identifies the file, never the science,
+                    # so invalidating on it would wipe the cached results of the
+                    # project being exported and guarantee the exported file
+                    # carries no results at all.
+                    "export_id",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):

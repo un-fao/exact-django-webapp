@@ -653,9 +653,17 @@ class ModuleExportSerializer(serializers.Serializer):
         # OneToOneField references (e.g. Settlement.land_use_change →
         # LandUseChange) whose PKs change in the target database.
         data['_original_id'] = instance.id
+        # NOTE: 'status' and 'last_modified' are exported on purpose.
+        # An appraisal is a record of the numbers as they were computed, so the
+        # round trip has to carry the module's computed state, not just its
+        # inputs. 'status' is what makes the results endpoint serve a module at
+        # all (it refuses anything that is not READY), and 'last_modified' is
+        # what validates the cache: is_cached_results_valid() compares
+        # last_cached_at against it, so re-stamping it at import time would
+        # silently invalidate every restored result.
         excluded_fields = (
-            'id', 'activity', 'status', 'data_source', 'note',
-            'history', 'last_modified', 'parent'
+            'id', 'activity', 'data_source', 'note',
+            'history', 'parent'
         )
         for field in instance._meta.get_fields():
             if field.name in excluded_fields:
