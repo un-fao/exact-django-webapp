@@ -5158,6 +5158,56 @@ def update_value_chain_refrigerant_emission_factors():
             ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=gwp, value=value)
             print(f"Created {refrigerant_type} {gwp} {value}")
 
+def update_crop_types_annuals_perennials():
+    """
+    Update the annual/perennial module types of the existing LandUseType rows.
+
+    Reads the "Annualsperennials" sheet of FAOSTAT_Crop_Types_20260813.xlsx and,
+    for every item that matches an existing LandUseType by name, adds the
+    AnnualCropland / PerennialCropland module type when the column is marked YES
+    and removes it when the column is marked NO. Items with no matching
+    LandUseType are skipped, no new LandUseType is created.
+    """
+    from api.models import LandUseType, ModuleType
+
+    annual_module_type = ModuleType.objects.get(class_name__iexact="AnnualCropland")
+    perennial_module_type = ModuleType.objects.get(class_name__iexact="PerennialCropland")
+
+    df = pd.read_excel(
+        os.path.join(
+            os.path.dirname(__file__), "ipcc_data", "FAOSTAT_Crop_Types_20260813.xlsx"
+        ),
+        sheet_name="Annualsperennials",
+        header=0,
+    )
+
+    for i, row in df.iterrows():
+        if pd.isna(row["ITEM"]):
+            continue
+
+        name = str(row["ITEM"]).replace("ï»¿", "").strip()
+        if not name:
+            continue
+
+        land_use_type = LandUseType.objects.filter(name__iexact=name).first()
+        if land_use_type is None:
+            print(f"Skipping row {i}: no LandUseType named '{name}'")
+            continue
+
+        for column, module_type in (
+            ("ANNUALS", annual_module_type),
+            ("PERENNIALS", perennial_module_type),
+        ):
+            value = row[column]
+            keep = not pd.isna(value) and str(value).strip().upper() == "YES"
+
+            if keep:
+                land_use_type.module_types.add(module_type)
+                print(f"Kept {module_type} on {land_use_type}")
+            else:
+                land_use_type.module_types.remove(module_type)
+                print(f"Removed {module_type} from {land_use_type}")
+
 def run():
     import os
 
@@ -5166,12 +5216,12 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        add_fi_data_for_all_grassland_management_types()
-        add_flu_data_for_all_grassland_management_types()
-        add_fmg_data_for_all_grassland_management_types()
-        update_value_chain_refrigerant_emission_factors()
-        delete_and_import_total_biomass_after_defo()
-        delete_and_import_forest_total_biomass()
+        # update_value_chain_refrigerant_emission_factors()
+        # add_fi_data_for_all_grassland_management_types() to run? also below
+        # add_flu_data_for_all_grassland_management_types()
+        # add_fmg_data_for_all_grassland_management_types()
+        # delete_and_import_total_biomass_after_defo()
+        # delete_and_import_forest_total_biomass()
         pass
 
     if app_mode == "review":
