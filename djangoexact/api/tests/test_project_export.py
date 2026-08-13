@@ -1,7 +1,9 @@
 """Tests for project export/import functionality."""
 import json
 import uuid
-from django.test import TestCase
+from django.conf import settings
+from django.contrib.auth.models import Group, Permission
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 from rest_framework import status as http_status
 
@@ -18,17 +20,34 @@ from .factories import (
 )
 from ..models import (
     Activity,
-    ModuleType,
-    Project,
+    Climate,
+    Country,
     Input,
     InputEntry,
+    Irrigation,
+    IrrigationPhase,
+    IrrigationSystem,
+    Moisture,
+    ModuleType,
+    Project,
+    ProjectMembership,
+    ProjectStatus,
+    SoilType,
+    StatusType,
     Storage,
     StorageEntry,
-    Irrigation,
-    IrrigationSystem,
-    IrrigationPhase,
-    StatusType,
 )
+from ipcc.models import GlobalWarmingPotential
+
+# minitool.middleware.DatabaseConnectionMiddleware calls connections.close_all()
+# after every response. Django's TestCase wraps each test in a transaction on a
+# single connection, so closing it mid-test makes every subsequent query raise
+# "Cannot operate on a closed database". Tests that drive the API client through
+# TestCase must therefore run without that middleware.
+MIDDLEWARE_WITHOUT_CONNECTION_CLOSER = [
+    middleware for middleware in settings.MIDDLEWARE
+    if not middleware.startswith("minitool.")
+]
 
 
 class ProjectExportIdFieldTests(TestCase):
@@ -84,7 +103,11 @@ class ProjectExportTests(TestCase):
         self.assertIn('exportedAt', data)
         self.assertIn('exportId', data)
         self.assertIn('project', data)
-        self.assertEqual(data['formatVersion'], 1)
+        # 2 since reference relations carry a `<field>__nk` natural key.
+        self.assertEqual(data['formatVersion'], 2)
+        # compatibilityGroup must NOT move: it hard-rejects on mismatch and
+        # would invalidate every .exactproject already issued.
+        self.assertEqual(data['compatibilityGroup'], 1)
 
     def test_export_generates_export_id(self):
         """Export generates export_id if not present."""
@@ -544,3 +567,494 @@ class IrrigationSubmoduleExportImportTests(TestCase):
         self.assertEqual(
             IrrigationPhase.objects.filter(parent__in=new_irrigations).count(), 1
         )
+
+
+
+class ProjectImportCachedResultsTests(TestCase):
+    """Regression: the export/import round trip must carry module cached
+    results and module status, so an imported project shows its numbers
+    without the user recomputing every module.
+
+    Covers three independent failure modes that all had to be fixed:
+      A. ``status`` was excluded from the export payload.
+      B. ``last_modified`` was excluded, so the import-time value of ``now()``
+         made the restored ``last_cached_at`` look stale.
+      C. creating a submodule invalidated the freshly restored parent cache.
+    """
+
+    TOTAL = {"balance": 42.5}
+    BY_ACTIVITY = {"cropland": 10.0}
+    BY_GAS = {"co2": 30.0, "ch4": 12.5}
+    BY_ACTIVITY_BY_GAS = {"cropland": {"co2": 30.0, "ch4": 12.5}}
+
+    def setUp(self):
+        from .factories import ActivityFactory, InputFactory, InputEntryFactory, GrasslandFactory
+        from ..models import (
+            Climate, Moisture, SoilType, Country, Group, ProjectMembership, ModuleType
+        )
+
+        # Superuser so the test exercises the round trip itself rather than
+        # project permission wiring, which is covered elsewhere.
+        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        self.project = ProjectFactory(
+            owner=self.user,
+            name="Cache Round Trip",
+            climate=Climate.objects.first(),
+            moisture=Moisture.objects.first(),
+            soil_type=SoilType.objects.first(),
+            country=Country.objects.first(),
+        )
+        ProjectMembership.objects.create(
+            project=self.project,
+            user=self.user,
+            group=Group.objects.get_or_create(name="Admin")[0],
+        )
+        self.activity = ActivityFactory(project=self.project, owner=self.user)
+        # Activity.modules walks module_types, so the export sees nothing
+        # unless the types are registered on the activity.
+        self.activity.module_types.set(
+            ModuleType.objects.filter(class_name__in=["Input", "Grassland"])
+        )
+
+        # Module WITH submodules: exercises failure mode C.
+        self.parent_module = InputFactory(activity=self.activity)
+        self.entry = InputEntryFactory(parent=self.parent_module)
+
+        # Module WITHOUT submodules: exercises A and B in isolation, so a
+        # regression in the submodule path cannot mask a regression here.
+        self.plain_module = GrasslandFactory(activity=self.activity)
+
+        # Cache AFTER submodules exist, mirroring production ordering.
+        for module in (self.parent_module, self.plain_module):
+            module.cache_results(
+                self.TOTAL, self.BY_ACTIVITY, self.BY_GAS, self.BY_ACTIVITY_BY_GAS
+            )
+            module.refresh_from_db()
+            self.assertTrue(
+                module.is_cached_results_valid(),
+                f"precondition failed: {module.__class__.__name__} cache invalid before export",
+            )
+
+    def _round_trip(self):
+        """Export the project and re-import it as a forced copy."""
+        from ..models import Project
+
+        export = self.client.get(f'/api/projects/{self.project.id}/export/')
+        self.assertEqual(export.status_code, http_status.HTTP_200_OK)
+        payload = json.loads(export.content)
+
+        response = self.client.post(
+            '/api/projects/import_project/?forceCopy=true',
+            data=payload,
+            format='json'
+        )
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        return Project.objects.get(id=response.data['projectId'])
+
+    def _imported(self, model, project):
+        return model.objects.get(activity__project=project)
+
+    def test_import_preserves_module_status(self):
+        """Imported modules keep READY instead of being reset to EMPTY."""
+        from ..models import Input, Grassland
+
+        imported = self._round_trip()
+        for model in (Input, Grassland):
+            module = self._imported(model, imported)
+            self.assertIsNotNone(module.status, f"{model.__name__} status is null")
+            self.assertEqual(
+                module.status.name_en, "READY",
+                f"{model.__name__} status was reset to {module.status.name_en}",
+            )
+            self.assertTrue(module.is_ready())
+
+    def test_import_preserves_submodule_status(self):
+        """Submodule status survives the round trip too."""
+        from ..models import InputEntry
+
+        imported = self._round_trip()
+        entry = InputEntry.objects.get(parent__activity__project=imported)
+        self.assertIsNotNone(entry.status)
+        self.assertEqual(entry.status.name_en, "READY")
+
+    def test_import_preserves_cached_result_payloads(self):
+        """The four cached_results_* JSON columns arrive byte-identical."""
+        from ..models import Input, Grassland
+
+        imported = self._round_trip()
+        for model in (Input, Grassland):
+            module = self._imported(model, imported)
+            self.assertEqual(module.cached_results_total, self.TOTAL)
+            self.assertEqual(module.cached_results_by_activity, self.BY_ACTIVITY)
+            self.assertEqual(module.cached_results_by_gas, self.BY_GAS)
+            self.assertEqual(
+                module.cached_results_by_activity_by_gas, self.BY_ACTIVITY_BY_GAS
+            )
+
+    def test_import_keeps_cached_results_valid(self):
+        """The restored cache must actually be readable, not just present.
+
+        This is the assertion that fails when ``last_modified`` is dropped:
+        the JSON columns are populated but ``is_cached_results_valid()`` is
+        False, so ``get_cached_results()`` returns None and the module reads
+        as uncomputed.
+        """
+        from ..models import Input, Grassland
+
+        imported = self._round_trip()
+        for model in (Input, Grassland):
+            module = self._imported(model, imported)
+            self.assertTrue(
+                module.is_cached_results_valid(),
+                f"{model.__name__}: last_cached_at={module.last_cached_at} "
+                f"last_modified={module.last_modified}",
+            )
+            self.assertEqual(module.get_cached_results(), self.TOTAL)
+
+    def test_import_cache_survives_submodule_creation(self):
+        """Creating submodules during import must not wipe the parent cache."""
+        from ..models import Input
+
+        imported = self._round_trip()
+        module = self._imported(Input, imported)
+        self.assertIsNotNone(
+            module.cached_results_total,
+            "parent cache was invalidated while its submodule was created",
+        )
+        self.assertTrue(module.is_cached_results_valid())
+
+    def test_export_does_not_invalidate_the_source_project(self):
+        """Downloading a project must not destroy its own cached results.
+
+        The first export assigns export_id and saves the project. Project.save
+        bulk-invalidates every module cache for any dirty field outside its
+        allowlist, so an unlisted export_id silently wiped the results of the
+        project being exported, and guaranteed the file carried none either.
+        """
+        from ..models import Input, Grassland
+
+        self.assertIsNone(self.project.export_id)
+
+        response = self.client.get(f'/api/projects/{self.project.id}/export/')
+        self.assertEqual(response.status_code, http_status.HTTP_200_OK)
+
+        self.project.refresh_from_db()
+        self.assertIsNotNone(self.project.export_id, "precondition: export_id was assigned")
+
+        for model in (Input, Grassland):
+            module = model.objects.get(activity=self.activity)
+            self.assertIsNotNone(
+                module.cached_results_total,
+                f"{model.__name__} cache was wiped by its own export",
+            )
+            self.assertTrue(module.is_cached_results_valid())
+
+    def test_export_payload_includes_status_and_last_modified(self):
+        """Guards the exporter directly, independent of import behaviour."""
+        export = self.client.get(f'/api/projects/{self.project.id}/export/')
+        payload = json.loads(export.content)
+        modules = payload['project']['activities'][0]['modules']
+
+        self.assertIn('Input', modules)
+        exported_module = modules['Input'][0]
+        for field in ('status', 'last_modified', 'last_cached_at', 'cached_results_total'):
+            self.assertIn(
+                field, exported_module,
+                f"exporter dropped '{field}' from the module payload",
+            )
+
+        submodule = exported_module['_submodules'][0]
+        self.assertIn('status', submodule)
+        self.assertIn('last_modified', submodule)
+
+    def test_import_of_legacy_payload_without_cache_fields(self):
+        """A file produced by an older build still imports cleanly.
+
+        Backward compatibility boundary: the restore must be opt-in on the
+        presence of each key, never assume it.
+        """
+        from ..models import Input, Project
+
+        export = self.client.get(f'/api/projects/{self.project.id}/export/')
+        payload = json.loads(export.content)
+
+        stripped = (
+            'status', 'last_modified', 'last_cached_at', 'cached_results_total',
+            'cached_results_by_activity', 'cached_results_by_gas',
+            'cached_results_by_activity_by_gas', 'cached_units_breakdown',
+        )
+
+        def strip(module_data):
+            for key in stripped:
+                module_data.pop(key, None)
+            for sub in module_data.get('_submodules', []):
+                strip(sub)
+
+        for activity in payload['project']['activities']:
+            for module_list in activity['modules'].values():
+                for module_data in module_list:
+                    strip(module_data)
+
+        payload['exportId'] = str(uuid.uuid4())
+        response = self.client.post(
+            '/api/projects/import_project/',
+            data=payload,
+            format='json'
+        )
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+
+        imported = Project.objects.get(id=response.data['projectId'])
+        module = Input.objects.get(activity__project=imported)
+        # No cache to restore, so it reads as uncomputed. That is correct.
+        self.assertIsNone(module.cached_results_total)
+        self.assertFalse(module.is_cached_results_valid())
+        self.assertEqual(module.status.name_en, "EMPTY")
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_CONNECTION_CLOSER)
+class ProjectImportNaturalKeyTests(TestCase):
+    """formatVersion 2: reference relations resolve by natural key.
+
+    The bug these cover: `.exactproject` v1 encoded every reference relation as
+    a raw integer primary key and the importer resolved nothing, so a file moved
+    between installations whose reference data was seeded differently either
+    failed at the first row or, worse, silently resolved to a different climate,
+    soil type or GWP report.
+
+    Two databases cannot be booted in one test run, so skew is simulated: create
+    the reference rows, capture their real pks, then hand-build an import body
+    whose integer is deliberately wrong while the natural key is right.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        # get_or_create throughout: this suite runs against a database that may
+        # already hold the committed reference fixtures.
+        self.gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="NK Test AR6",
+            defaults={"name": "NK Test AR6", "co2": 1.0, "ch4": 27.2, "n2o": 273.0},
+        )
+        self.other_gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="NK Test AR5",
+            defaults={"name": "NK Test AR5", "co2": 1.0, "ch4": 28.0, "n2o": 265.0},
+        )
+        self.country, _ = Country.objects.get_or_create(name="NK Test Country")
+        self.climate, _ = Climate.objects.get_or_create(
+            name_en="NK Test Climate", defaults={"name": "NK Test Climate"}
+        )
+        self.moisture, _ = Moisture.objects.get_or_create(
+            name_en="NK Test Moisture", defaults={"name": "NK Test Moisture"}
+        )
+        self.soil_type, _ = SoilType.objects.get_or_create(
+            name_en="NK Test Soil", defaults={"name": "NK Test Soil"}
+        )
+        self.project_status, _ = ProjectStatus.objects.get_or_create(
+            name="NK Test Status", defaults={"value": 9901}
+        )
+
+    # --- helpers ---------------------------------------------------------
+    def _body(self, project_overrides, format_version=2):
+        project = {
+            "name": "NK Imported Project",
+            "implementation_years": 20,
+            "start_year_of_activities": 2024,
+            "last_year_of_accounting": 2050,
+            "country": self.country.id,
+            "country__nk": ["NK Test Country"],
+            "gw_potential": self.gwp.id,
+            "gw_potential__nk": ["NK Test AR6"],
+            "activities": [],
+        }
+        project.update(project_overrides)
+        return {
+            "formatVersion": format_version,
+            "appVersion": "1.0.0",
+            "compatibilityGroup": 1,
+            "exportedAt": "2026-02-02T12:00:00Z",
+            "exportId": str(uuid.uuid4()),
+            "project": project,
+        }
+
+    def _post(self, body):
+        return self.client.post(
+            '/api/projects/import_project/', data=body, format='json'
+        )
+
+    def _project(self, name):
+        """A project the export endpoint will actually serve.
+
+        `security.check_permission("view_project", ...)` goes through
+        ProjectMembership, so ownership alone is not enough. The import path
+        creates the same membership at views.py:1152.
+        """
+        project = ProjectFactory(
+            owner=self.user,
+            name=name,
+            country=self.country,
+            climate=self.climate,
+            moisture=self.moisture,
+            soil_type=self.soil_type,
+            gw_potential=self.gwp,
+            status=self.project_status,
+        )
+        group, _ = Group.objects.get_or_create(name="Admin")
+        # A fresh test database has the auth groups but no permissions attached,
+        # and has_project_permission() checks membership.group.permissions.
+        group.permissions.add(
+            *Permission.objects.filter(codename="view_project")
+        )
+        ProjectMembership.objects.create(
+            user=self.user, project=project, group=group
+        )
+        return project
+
+    # --- import ----------------------------------------------------------
+    def test_natural_key_wins_over_a_nonexistent_integer(self):
+        """The actual bug: the encoded pk does not exist here, the key does."""
+        body = self._body({"gw_potential": self.gwp.id + 1000})
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+
+    def test_natural_key_wins_over_a_different_existing_row(self):
+        """The dangerous case: the integer resolves, but to the wrong row."""
+        body = self._body({
+            "gw_potential": self.other_gwp.id,
+            "gw_potential__nk": ["NK Test AR6"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+        self.assertNotEqual(imported.gw_potential_id, self.other_gwp.id)
+
+    def test_unresolvable_natural_key_aborts_with_a_named_error(self):
+        before = Project.objects.count()
+        body = self._body({"gw_potential__nk": ["No Such Report"]})
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        message = json.dumps(response.data)
+        self.assertIn("does not exist in this installation", message)
+        self.assertIn("No Such Report", message)
+        self.assertEqual(Project.objects.count(), before)
+
+    def test_unresolvable_key_never_falls_back_to_the_integer(self):
+        """A present-but-unresolvable key must not silently use the integer."""
+        body = self._body({
+            "gw_potential": self.gwp.id,
+            "gw_potential__nk": ["No Such Report"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Project.objects.filter(name="NK Imported Project").exists())
+
+    def test_missing_key_for_one_field_falls_back_to_its_integer_only(self):
+        body = self._body({
+            "climate": self.climate.id,   # no climate__nk
+            "gw_potential": self.gwp.id + 1000,
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.climate_id, self.climate.id)
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+
+    def test_format_version_1_still_imports_by_integer(self):
+        body = self._body({}, format_version=1)
+        body['project'].pop('gw_potential__nk')
+        body['project'].pop('country__nk')
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+        self.assertEqual(imported.country_id, self.country.id)
+
+    def test_country_rename_resolves_through_the_alias_table(self):
+        turkiye, _ = Country.objects.get_or_create(name="Türkiye")
+        body = self._body({
+            "country": turkiye.id + 1000,
+            "country__nk": ["Turkey"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.country_id, turkiye.id)
+
+    # --- export ----------------------------------------------------------
+    def test_export_emits_both_encodings_for_project_reference_fields(self):
+        project = self._project("NK Export Project")
+
+        response = self.client.get(f'/api/projects/{project.id}/export/')
+        self.assertEqual(
+            response.status_code, http_status.HTTP_200_OK, response.content[:400]
+        )
+        exported = json.loads(response.content)
+        payload = exported['project']
+
+        self.assertEqual(exported['formatVersion'], 2)
+        self.assertEqual(exported['compatibilityGroup'], 1)
+        self.assertEqual(payload['gw_potential'], self.gwp.id)
+        self.assertEqual(payload['gw_potential__nk'], ["NK Test AR6"])
+        self.assertEqual(payload['climate__nk'], ["NK Test Climate"])
+        self.assertEqual(payload['moisture__nk'], ["NK Test Moisture"])
+        self.assertEqual(payload['soil_type__nk'], ["NK Test Soil"])
+        self.assertEqual(payload['country__nk'], ["NK Test Country"])
+        # Project.status is api.ProjectStatus, not the api.StatusType that a
+        # module's `status` points at. The model must come from the field.
+        self.assertEqual(payload['status__nk'], ["NK Test Status"])
+
+    def test_reference_fields_round_trip_through_export_and_import(self):
+        project = self._project("NK Round Trip")
+
+        exported = json.loads(
+            self.client.get(f'/api/projects/{project.id}/export/').content
+        )
+        response = self.client.post(
+            '/api/projects/import_project/?forceCopy=true',
+            data=exported,
+            format='json',
+        )
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        for field in ('country_id', 'climate_id', 'moisture_id',
+                      'soil_type_id', 'gw_potential_id', 'status_id'):
+            with self.subTest(field=field):
+                self.assertEqual(getattr(imported, field), getattr(project, field))

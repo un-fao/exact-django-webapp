@@ -155,6 +155,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "djangoexact.wsgi.application"
 
+# Offline build: the database is always a local sqlite file, never Cloud SQL, so
+# this branch deliberately keeps its own DATABASES block rather than develop's
+# GAE / non-GAE branching with the `$DB_*` sed placeholders. Keep this side when
+# resolving a merge from develop. Develop's engine-conditional OPTIONS guard is
+# a no-op here: the engine below is hardcoded to sqlite and carries no OPTIONS.
+#
+# Note for scripts/build_offline_db.sh: this block ignores DB_ENGINE and DB_NAME.
+# Steer the output location with EXACT_USER_DATA_DIR instead.
+
 # For packaged Electron apps, use writable user data directory
 # In development, use BASE_DIR (current directory)
 USER_DATA_DIR = os.getenv("EXACT_USER_DATA_DIR", None)

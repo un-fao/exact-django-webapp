@@ -10,88 +10,88 @@
 #     exist, so fresh databases still get a valid schema while existing
 #     databases are left untouched.
 #
-# Vendor-aware: production PostgreSQL uses a DO $$ anonymous block;
-# the offline-tool SQLite build uses PRAGMA-based introspection since
-# SQLite supports neither DO blocks, information_schema, nor pg_indexes.
+# Vendor-aware: production PostgreSQL uses a DO $$ anonymous block; every other
+# backend, including the offline-tool SQLite build, uses Django introspection
+# plus plain guarded SQL, since SQLite supports neither DO blocks,
+# information_schema, nor pg_indexes.
 
 import django.db.models.deletion
 from django.db import migrations, models
 
+TABLE = "api_historicalprocessingentry"
+COLUMN = "fuel_type_thread_id"
+INDEX = "api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"
 
-INDEX_NAME = "api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"
-TABLE_NAME = "api_historicalprocessingentry"
-COLUMN_NAME = "fuel_type_thread_id"
+# PostgreSQL: PL/pgSQL guard, unchanged. This is what production applied.
+POSTGRES_FORWARD = f"""
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = '{TABLE}'
+          AND column_name = '{COLUMN}'
+    ) THEN
+        ALTER TABLE {TABLE}
+            ADD COLUMN {COLUMN} bigint NULL;
+    END IF;
 
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_indexes
+        WHERE schemaname = current_schema()
+          AND tablename = '{TABLE}'
+          AND indexname = '{INDEX}'
+    ) THEN
+        CREATE INDEX {INDEX}
+            ON {TABLE} ({COLUMN});
+    END IF;
+END
+$$;
+"""
 
-def _forward(apps, schema_editor):
-    vendor = schema_editor.connection.vendor
-    with schema_editor.connection.cursor() as cursor:
-        if vendor == "postgresql":
-            cursor.execute(
-                """
-                DO $$
-                BEGIN
-                    IF NOT EXISTS (
-                        SELECT 1
-                        FROM information_schema.columns
-                        WHERE table_name = 'api_historicalprocessingentry'
-                          AND column_name = 'fuel_type_thread_id'
-                    ) THEN
-                        ALTER TABLE api_historicalprocessingentry
-                            ADD COLUMN fuel_type_thread_id bigint NULL;
-                    END IF;
-
-                    IF NOT EXISTS (
-                        SELECT 1
-                        FROM pg_indexes
-                        WHERE schemaname = current_schema()
-                          AND tablename = 'api_historicalprocessingentry'
-                          AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
-                    ) THEN
-                        CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
-                            ON api_historicalprocessingentry (fuel_type_thread_id);
-                    END IF;
-                END
-                $$;
-                """
-            )
-            return
-
-        cursor.execute(f"PRAGMA table_info({TABLE_NAME})")
-        columns = {row[1] for row in cursor.fetchall()}
-        if COLUMN_NAME not in columns:
-            cursor.execute(
-                f"ALTER TABLE {TABLE_NAME} ADD COLUMN {COLUMN_NAME} bigint NULL"
-            )
-
-        cursor.execute(f"PRAGMA index_list({TABLE_NAME})")
-        indexes = {row[1] for row in cursor.fetchall()}
-        if INDEX_NAME not in indexes:
-            cursor.execute(
-                f"CREATE INDEX IF NOT EXISTS {INDEX_NAME} "
-                f"ON {TABLE_NAME} ({COLUMN_NAME})"
-            )
+POSTGRES_REVERSE = f"""
+DROP INDEX IF EXISTS {INDEX};
+ALTER TABLE {TABLE} DROP COLUMN IF EXISTS {COLUMN};
+"""
 
 
-def _reverse(apps, schema_editor):
-    vendor = schema_editor.connection.vendor
-    with schema_editor.connection.cursor() as cursor:
-        if vendor == "postgresql":
-            cursor.execute(
-                f"DROP INDEX IF EXISTS {INDEX_NAME};"
-            )
-            cursor.execute(
-                f"ALTER TABLE {TABLE_NAME} DROP COLUMN IF EXISTS {COLUMN_NAME};"
-            )
-            return
+def _column_exists(connection):
+    with connection.cursor() as cursor:
+        description = connection.introspection.get_table_description(cursor, TABLE)
+    return any(column.name == COLUMN for column in description)
 
-        cursor.execute(f"DROP INDEX IF EXISTS {INDEX_NAME}")
-        cursor.execute(f"PRAGMA table_info({TABLE_NAME})")
-        columns = {row[1] for row in cursor.fetchall()}
-        if COLUMN_NAME in columns:
-            cursor.execute(
-                f"ALTER TABLE {TABLE_NAME} DROP COLUMN {COLUMN_NAME}"
-            )
+
+def add_column_if_missing(apps, schema_editor):
+    """Add the column, on any backend.
+
+    The original migration was PostgreSQL-only (`DO $$ ... $$`), which made a
+    fresh sqlite database impossible to migrate and so blocked the fixture-based
+    offline bootstrap (scripts/build_offline_db.sh). The PostgreSQL path below is
+    the original statement verbatim; other backends get the same effect through
+    plain SQL guarded by introspection.
+    """
+    connection = schema_editor.connection
+    if connection.vendor == "postgresql":
+        schema_editor.execute(POSTGRES_FORWARD)
+        return
+
+    if _column_exists(connection):
+        return
+    schema_editor.execute(f"ALTER TABLE {TABLE} ADD COLUMN {COLUMN} bigint NULL")
+    schema_editor.execute(f'CREATE INDEX IF NOT EXISTS "{INDEX}" ON {TABLE} ({COLUMN})')
+
+
+def drop_column_if_present(apps, schema_editor):
+    connection = schema_editor.connection
+    if connection.vendor == "postgresql":
+        schema_editor.execute(POSTGRES_REVERSE)
+        return
+
+    schema_editor.execute(f'DROP INDEX IF EXISTS "{INDEX}"')
+    if _column_exists(connection):
+        # sqlite supports DROP COLUMN from 3.35 onwards.
+        schema_editor.execute(f"ALTER TABLE {TABLE} DROP COLUMN {COLUMN}")
 
 
 class Migration(migrations.Migration):
@@ -117,7 +117,10 @@ class Migration(migrations.Migration):
                 ),
             ],
             database_operations=[
-                migrations.RunPython(_forward, reverse_code=_reverse),
+                migrations.RunPython(
+                    add_column_if_missing,
+                    drop_column_if_present,
+                ),
             ],
         ),
     ]
