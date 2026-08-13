@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-07-24T09:21:09.083Z"
-last_activity: 2026-07-24
-last_activity_desc: "Completed quick task 260724-eut: additive Cloud Run deployment path for review (WhiteNoise, Dockerfile.web_service, cloudrun-service.yaml, deploy-cloudrun.yaml, operator guide)"
+last_updated: "2026-08-13T09:18:22.564Z"
+last_activity: 2026-08-13
+last_activity_desc: "Completed quick task 260813-fvj: fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-05 - Completed quick task 260805-nsn: merged main into a review sync branch, resolved the three conflicts, and opened PR #266 to unblock PR #265
+Last activity: 2026-08-13 - Completed quick task 260813-fvj: fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -106,6 +106,8 @@ None yet.
 | 260805-ncv | Fixed the Gemini PR finding in LoginExistingUserView: the orphaned-account cleanup passed user["localId"] to auth.delete_user_account, which posts {"idToken": ...} to the Identity Toolkit accounts:delete endpoint, so Firebase rejected every call and the orphan was never deleted (masked by the best-effort guard, client still saw 404). One-key fix plus 2 DB-free regression tests that drive the branch via post.__wrapped__ to bypass @transaction.atomic. Gemini's suggested diff was mis-anchored and would not have parsed | 2026-08-05 | 8f426740 | [260805-ncv-fix-loginexistinguserview-orphan-cleanup](./quick/260805-ncv-fix-loginexistinguserview-orphan-cleanup/) |
 | 260805-nsn | Unblocked PR #265 (review -> main), which was CONFLICTING because review lacked main's 4 CI-runner commits. The org ruleset "FAO Security Checks (review)" forbids direct pushes to review with no bypass, so GitHub's web conflict editor cannot be used; the resolution was made on chore/sync-review-with-main and offered to review as PR #266. Three conflicts: both deploy workflows kept main's corrected Buildx comment plus review's SHA-pinned setup-buildx-action ref (taking main's floating @v3 would have reverted the 260805-l5b security fix), and STATE.md was a keep-both merge. A verify gate asserting gcp-temporary appears nowhere was wrong and was narrowed to runs-on lines, since the label legitimately survives in main's explanatory comments | 2026-08-05 | bce38c33 | [260805-nsn-merge-main-into-review-on-a-sync-branch-](./quick/260805-nsn-merge-main-into-review-on-a-sync-branch-/) |
 | 260810-fnr | Cleared the 6 open Dependabot alerts (175-180, all Django) by moving gcp-deployment/cloud-function/requirements.txt off the EOL Django 4.2.30 to 5.2.17. No 4.2.x patch exists, so the 5.2 series was the only escape; DRF 3.16.1, django-filter 24.3, django-cors-headers 4.4.0, django-environ 0.11.2 and PyYAML 6.0.2 came along because their old pins predate Django 5.2 support. Manifest now has zero drift across all 16 packages shared with djangoexact/requirements.txt. The linked dashboard CSV was entirely stale: all 7 of its Dependabot rows are fixed or dismissed on GitHub and all 3 Semgrep rows are already resolved on develop, so no Semgrep work existed | 2026-08-10 | bf788724 | [260810-fnr-fix-dependabot-and-semgrep-security-find](./quick/260810-fnr-fix-dependabot-and-semgrep-security-find/) |
+| 19 | update ipcc_dump.py to sync annual/perennial module types from FAOSTAT_Crop_Types_20260813.xlsx | 2026-08-13 | c73c3021 | — |
+| 260813-fvj | Fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools. Root cause was not PK instability in the fixture pipeline but that release/offline-tool ships a committed 53 MB db.sqlite3 instead of bootstrapping from fixtures, so 83 of 162 manifest reference models drifted (ipcc.GlobalWarmingPotential PK ranges fully disjoint against a NOT NULL Project.gw_potential, so every online-to-offline import failed at row one). Three sequenced commits: a fixture-based offline bootstrap plus verify_reference_parity and a release-branch handoff checklist; natural keys on 32 reference models with 18 new UniqueConstraints; formatVersion 2 dual encoding that resolves reference FKs by natural key on import and hard-fails by name instead of silently mis-resolving. api.Unit tripped the duplicate gate on the shipped snapshot and was deliberately left unconstrained. Migration 0290 is still unvalidated against production Postgres | 2026-08-13 | 87c8fec8 | [260813-fvj-when-import-exporting-from-online-tool-t](./quick/260813-fvj-when-import-exporting-from-online-tool-t/) |
 
 ## Deferred Items
 
