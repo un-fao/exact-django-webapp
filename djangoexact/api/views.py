@@ -37,6 +37,11 @@ import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
+from api.natural_keys import (
+    UnresolvableNaturalKeyError,
+    resolve_natural_key,
+    spec_for,
+)
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string
@@ -203,6 +208,10 @@ def _extract_cache_restore(module_data, resolve_status_id):
     the values are written exactly once, by the deferred restore pass. Returns
     the column/value mapping to replay, empty for payloads produced by an older
     build that did not export these fields.
+
+    ``status`` is popped here, before ``prepare_model_data`` ever sees it, so the
+    StatusType relation bypasses the natural-key resolution there. Its natural
+    key is therefore popped alongside it and handed to ``resolve_status_id``.
     """
     restore = {}
 
@@ -216,8 +225,9 @@ def _extract_cache_restore(module_data, resolve_status_id):
                 continue
         restore[field_name] = value
 
+    status_nk = module_data.pop("status__nk", None)
     if "status" in module_data:
-        status_id = resolve_status_id(module_data.pop("status"))
+        status_id = resolve_status_id(module_data.pop("status"), status_nk)
         if status_id is not None:
             restore["status_id"] = status_id
 
@@ -909,7 +919,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # Build export data
         serializer = ProjectExportSerializer(project)
         export_data = {
-            "formatVersion": 1,
+            # 2: reference relations carry a `<field>__nk` natural key beside
+            # the legacy integer pk. compatibilityGroup is deliberately NOT
+            # bumped: it hard-rejects on mismatch and would invalidate every
+            # .exactproject already issued.
+            "formatVersion": 2,
             "appVersion": version_config.get("appVersion", "1.0.0"),
             "compatibilityGroup": version_config.get("compatibilityGroup", 1),
             "exportedAt": timezone.now().isoformat(),
@@ -1048,6 +1062,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             For OneToOneField cross-references between modules in the same
             activity (e.g. Settlement.land_use_change → LandUseChange),
             ``module_id_map`` remaps old PKs to newly-created instances.
+
+            For reference-data relations, a formatVersion 2 payload carries a
+            ``<field>__nk`` natural key beside the integer. The key wins: the
+            integer is only meaningful in the database that produced the file.
+            An unresolvable key raises rather than falling back to the integer,
+            because that fallback is the silent mis-resolution this exists to
+            remove.
             """
             import re
             from django.db.models import ForeignKey
@@ -1055,6 +1076,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             if module_id_map is None:
                 module_id_map = {}
+
+            def reference_pk(field, field_name):
+                """Resolve `<field>__nk` to a local pk, or None if not present."""
+                natural_key = data.get(f"{field_name}__nk")
+                if not natural_key or spec_for(field.related_model) is None:
+                    return None
+                return resolve_natural_key(
+                    field.related_model, tuple(natural_key), nk_cache
+                )
 
             result = {}
             for field in model_class._meta.get_fields():
@@ -1090,13 +1120,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         # (the field is nullable).
                     elif isinstance(value, int):
                         # Reference-data FK (e.g. OrganicSoil pointing to
-                        # a shared record) — not in the map, use as-is.
-                        result[f"{field_name}_id"] = value
+                        # a shared record), not in the map. Resolve by natural
+                        # key when the file carries one, else use as-is.
+                        resolved = reference_pk(field, field_name)
+                        result[f"{field_name}_id"] = value if resolved is None else resolved
                     continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
                 if isinstance(field, ForeignKey) and isinstance(value, int):
-                    result[f"{field_name}_id"] = value
+                    resolved = reference_pk(field, field_name)
+                    result[f"{field_name}_id"] = value if resolved is None else resolved
                 else:
                     result[field_name] = value
             return result
@@ -1105,16 +1138,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # submodule exists. See CACHE_RESTORE_FIELDS for why this is deferred.
         cache_restores = []
         status_id_cache = {}
+        # `(label, pk) -> key` and `(label, key) -> pk` memo for one import
+        # request. Request-scoped on purpose: never process-cached, so an import
+        # cannot be served reference data resolved before the last fixture load.
+        nk_cache = {}
 
-        def resolve_status_id(value):
-            """Map an exported StatusType PK onto one that exists here.
+        def resolve_status_id(value, natural_key=None):
+            """Map an exported StatusType reference onto one that exists here.
 
-            Reference-data PKs are stable across EX-ACT installations, so this
-            is normally the identity. An unknown id means the file came from a
-            database with different reference data: drop it rather than abort
-            the whole import with a foreign key violation, and let the module
-            fall back to EMPTY as it did before.
+            formatVersion 2 carries `status__nk`. When present it is
+            authoritative and an unresolvable key raises: reference PKs are NOT
+            stable across EX-ACT installations, which is exactly why the key
+            exists.
+
+            Without a key (formatVersion 1) the old behaviour stands: return the
+            integer if such a row exists, else None, so the module falls back to
+            EMPTY rather than aborting the whole import on a foreign key
+            violation.
             """
+            if natural_key:
+                return resolve_natural_key(StatusType, tuple(natural_key), nk_cache)
             if not isinstance(value, int):
                 return None
             if value not in status_id_cache:
@@ -1160,6 +1203,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     activity_data = activity_data.copy()
                     modules_data = activity_data.pop('modules', {})
                     module_types_data = activity_data.pop('module_types', [])
+                    module_types_nk = activity_data.pop('module_types__nk', None)
 
                     # Prepare activity data with proper FK handling
                     filtered_activity_data = prepare_model_data(Activity, activity_data)
@@ -1170,8 +1214,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         **filtered_activity_data
                     )
 
-                    # Set module types
-                    if module_types_data:
+                    # Set module types. Resolve the natural keys BEFORE set(),
+                    # so an unknown module type fails by name rather than as an
+                    # opaque integrity error on the M2M through table.
+                    if module_types_nk:
+                        module_type_model = Activity._meta.get_field('module_types').related_model
+                        activity.module_types.set([
+                            resolve_natural_key(module_type_model, tuple(key), nk_cache)
+                            for key in module_types_nk
+                            if key
+                        ])
+                    elif module_types_data:
                         activity.module_types.set(module_types_data)
 
                     # Sort so modules referenced via OneToOneField are created
@@ -1241,6 +1294,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     "projectName": project.name
                 }, status=http_status.HTTP_201_CREATED)
 
+        except UnresolvableNaturalKeyError as e:
+            # The message already names the model and the key and says what to
+            # do about it, so it is returned unwrapped. Every resolution happens
+            # before any objects.create(), which is what lets it name the module
+            # rather than a deferred foreign key constraint on a sqlite table.
+            logger.error(str(e))
+            return utils.ErrorResponse(
+                str(e),
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             logger.error(f"Failed to import project: {str(e)}")
             return utils.ErrorResponse(

@@ -1,12 +1,27 @@
 """Tests for project export/import functionality."""
 import json
 import uuid
-from django.test import TestCase
+from django.conf import settings
+from django.contrib.auth.models import Group, Permission
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 from rest_framework import status as http_status
 
 from .factories import UserFactory, ProjectFactory
-from ..models import Project
+from ..models import (
+    Climate, Country, Moisture, Project, ProjectMembership, ProjectStatus, SoilType,
+)
+from ipcc.models import GlobalWarmingPotential
+
+# minitool.middleware.DatabaseConnectionMiddleware calls connections.close_all()
+# after every response. Django's TestCase wraps each test in a transaction on a
+# single connection, so closing it mid-test makes every subsequent query raise
+# "Cannot operate on a closed database". Tests that drive the API client through
+# TestCase must therefore run without that middleware.
+MIDDLEWARE_WITHOUT_CONNECTION_CLOSER = [
+    middleware for middleware in settings.MIDDLEWARE
+    if not middleware.startswith("minitool.")
+]
 
 
 class ProjectExportIdFieldTests(TestCase):
@@ -61,7 +76,11 @@ class ProjectExportTests(TestCase):
         self.assertIn('exportedAt', data)
         self.assertIn('exportId', data)
         self.assertIn('project', data)
-        self.assertEqual(data['formatVersion'], 1)
+        # 2 since reference relations carry a `<field>__nk` natural key.
+        self.assertEqual(data['formatVersion'], 2)
+        # compatibilityGroup must NOT move: it hard-rejects on mismatch and
+        # would invalidate every .exactproject already issued.
+        self.assertEqual(data['compatibilityGroup'], 1)
 
     def test_export_generates_export_id(self):
         """Export generates export_id if not present."""
@@ -542,3 +561,245 @@ class ProjectImportCachedResultsTests(TestCase):
         self.assertIsNone(module.cached_results_total)
         self.assertFalse(module.is_cached_results_valid())
         self.assertEqual(module.status.name_en, "EMPTY")
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_CONNECTION_CLOSER)
+class ProjectImportNaturalKeyTests(TestCase):
+    """formatVersion 2: reference relations resolve by natural key.
+
+    The bug these cover: `.exactproject` v1 encoded every reference relation as
+    a raw integer primary key and the importer resolved nothing, so a file moved
+    between installations whose reference data was seeded differently either
+    failed at the first row or, worse, silently resolved to a different climate,
+    soil type or GWP report.
+
+    Two databases cannot be booted in one test run, so skew is simulated: create
+    the reference rows, capture their real pks, then hand-build an import body
+    whose integer is deliberately wrong while the natural key is right.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        # get_or_create throughout: this suite runs against a database that may
+        # already hold the committed reference fixtures.
+        self.gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="NK Test AR6",
+            defaults={"name": "NK Test AR6", "co2": 1.0, "ch4": 27.2, "n2o": 273.0},
+        )
+        self.other_gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="NK Test AR5",
+            defaults={"name": "NK Test AR5", "co2": 1.0, "ch4": 28.0, "n2o": 265.0},
+        )
+        self.country, _ = Country.objects.get_or_create(name="NK Test Country")
+        self.climate, _ = Climate.objects.get_or_create(
+            name_en="NK Test Climate", defaults={"name": "NK Test Climate"}
+        )
+        self.moisture, _ = Moisture.objects.get_or_create(
+            name_en="NK Test Moisture", defaults={"name": "NK Test Moisture"}
+        )
+        self.soil_type, _ = SoilType.objects.get_or_create(
+            name_en="NK Test Soil", defaults={"name": "NK Test Soil"}
+        )
+        self.project_status, _ = ProjectStatus.objects.get_or_create(
+            name="NK Test Status", defaults={"value": 9901}
+        )
+
+    # --- helpers ---------------------------------------------------------
+    def _body(self, project_overrides, format_version=2):
+        project = {
+            "name": "NK Imported Project",
+            "implementation_years": 20,
+            "start_year_of_activities": 2024,
+            "last_year_of_accounting": 2050,
+            "country": self.country.id,
+            "country__nk": ["NK Test Country"],
+            "gw_potential": self.gwp.id,
+            "gw_potential__nk": ["NK Test AR6"],
+            "activities": [],
+        }
+        project.update(project_overrides)
+        return {
+            "formatVersion": format_version,
+            "appVersion": "1.0.0",
+            "compatibilityGroup": 1,
+            "exportedAt": "2026-02-02T12:00:00Z",
+            "exportId": str(uuid.uuid4()),
+            "project": project,
+        }
+
+    def _post(self, body):
+        return self.client.post(
+            '/api/projects/import_project/', data=body, format='json'
+        )
+
+    def _project(self, name):
+        """A project the export endpoint will actually serve.
+
+        `security.check_permission("view_project", ...)` goes through
+        ProjectMembership, so ownership alone is not enough. The import path
+        creates the same membership at views.py:1152.
+        """
+        project = ProjectFactory(
+            owner=self.user,
+            name=name,
+            country=self.country,
+            climate=self.climate,
+            moisture=self.moisture,
+            soil_type=self.soil_type,
+            gw_potential=self.gwp,
+            status=self.project_status,
+        )
+        group, _ = Group.objects.get_or_create(name="Admin")
+        # A fresh test database has the auth groups but no permissions attached,
+        # and has_project_permission() checks membership.group.permissions.
+        group.permissions.add(
+            *Permission.objects.filter(codename="view_project")
+        )
+        ProjectMembership.objects.create(
+            user=self.user, project=project, group=group
+        )
+        return project
+
+    # --- import ----------------------------------------------------------
+    def test_natural_key_wins_over_a_nonexistent_integer(self):
+        """The actual bug: the encoded pk does not exist here, the key does."""
+        body = self._body({"gw_potential": self.gwp.id + 1000})
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+
+    def test_natural_key_wins_over_a_different_existing_row(self):
+        """The dangerous case: the integer resolves, but to the wrong row."""
+        body = self._body({
+            "gw_potential": self.other_gwp.id,
+            "gw_potential__nk": ["NK Test AR6"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+        self.assertNotEqual(imported.gw_potential_id, self.other_gwp.id)
+
+    def test_unresolvable_natural_key_aborts_with_a_named_error(self):
+        before = Project.objects.count()
+        body = self._body({"gw_potential__nk": ["No Such Report"]})
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        message = json.dumps(response.data)
+        self.assertIn("does not exist in this installation", message)
+        self.assertIn("No Such Report", message)
+        self.assertEqual(Project.objects.count(), before)
+
+    def test_unresolvable_key_never_falls_back_to_the_integer(self):
+        """A present-but-unresolvable key must not silently use the integer."""
+        body = self._body({
+            "gw_potential": self.gwp.id,
+            "gw_potential__nk": ["No Such Report"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Project.objects.filter(name="NK Imported Project").exists())
+
+    def test_missing_key_for_one_field_falls_back_to_its_integer_only(self):
+        body = self._body({
+            "climate": self.climate.id,   # no climate__nk
+            "gw_potential": self.gwp.id + 1000,
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.climate_id, self.climate.id)
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+
+    def test_format_version_1_still_imports_by_integer(self):
+        body = self._body({}, format_version=1)
+        body['project'].pop('gw_potential__nk')
+        body['project'].pop('country__nk')
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+        self.assertEqual(imported.country_id, self.country.id)
+
+    def test_country_rename_resolves_through_the_alias_table(self):
+        turkiye, _ = Country.objects.get_or_create(name="Türkiye")
+        body = self._body({
+            "country": turkiye.id + 1000,
+            "country__nk": ["Turkey"],
+        })
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.country_id, turkiye.id)
+
+    # --- export ----------------------------------------------------------
+    def test_export_emits_both_encodings_for_project_reference_fields(self):
+        project = self._project("NK Export Project")
+
+        response = self.client.get(f'/api/projects/{project.id}/export/')
+        self.assertEqual(
+            response.status_code, http_status.HTTP_200_OK, response.content[:400]
+        )
+        exported = json.loads(response.content)
+        payload = exported['project']
+
+        self.assertEqual(exported['formatVersion'], 2)
+        self.assertEqual(exported['compatibilityGroup'], 1)
+        self.assertEqual(payload['gw_potential'], self.gwp.id)
+        self.assertEqual(payload['gw_potential__nk'], ["NK Test AR6"])
+        self.assertEqual(payload['climate__nk'], ["NK Test Climate"])
+        self.assertEqual(payload['moisture__nk'], ["NK Test Moisture"])
+        self.assertEqual(payload['soil_type__nk'], ["NK Test Soil"])
+        self.assertEqual(payload['country__nk'], ["NK Test Country"])
+        # Project.status is api.ProjectStatus, not the api.StatusType that a
+        # module's `status` points at. The model must come from the field.
+        self.assertEqual(payload['status__nk'], ["NK Test Status"])
+
+    def test_reference_fields_round_trip_through_export_and_import(self):
+        project = self._project("NK Round Trip")
+
+        exported = json.loads(
+            self.client.get(f'/api/projects/{project.id}/export/').content
+        )
+        response = self.client.post(
+            '/api/projects/import_project/?forceCopy=true',
+            data=exported,
+            format='json',
+        )
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None)
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        for field in ('country_id', 'climate_id', 'moisture_id',
+                      'soil_type_id', 'gw_potential_id', 'status_id'):
+            with self.subTest(field=field):
+                self.assertEqual(getattr(imported, field), getattr(project, field))
