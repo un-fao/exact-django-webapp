@@ -170,6 +170,9 @@ if os.getenv("GAE_APPLICATION", None):
             "TEST": {
                 "NAME": "$DB_NAME",
             },
+            # The GAE branch keeps its OPTIONS dict unconditional: its ENGINE is
+            # the hard `$DB_ENGINE` sed placeholder, always substituted with a
+            # postgresql engine at deploy time, so it can never be sqlite.
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
                 "application_name": "djangoexact",  # Help identify connections
@@ -179,18 +182,29 @@ if os.getenv("GAE_APPLICATION", None):
         },
     }
 else:
+    _DB_ENGINE = os.getenv("DB_ENGINE", default="$DB_ENGINE")
+    # `connect_timeout` and `application_name` are psycopg-only. sqlite3.connect()
+    # rejects `connect_timeout` with a TypeError before a single query runs, which
+    # blocks the fixture-based offline bootstrap (scripts/build_offline_db.sh).
+    # Keep the Postgres options verbatim when the resolved engine is postgresql,
+    # and pass no options otherwise.
+    _DB_OPTIONS = (
+        {
+            "connect_timeout": 30,  # Optional: set timeout
+            "application_name": "djangoexact",  # Help identify connections
+        }
+        if "postgresql" in _DB_ENGINE
+        else {}
+    )
     DATABASES = {
         "default": {
-            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
+            "ENGINE": _DB_ENGINE,
             "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
             "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
-            "OPTIONS": {
-                "connect_timeout": 30,  # Optional: set timeout
-                "application_name": "djangoexact",  # Help identify connections
-            },
+            "OPTIONS": _DB_OPTIONS,
             "CONN_MAX_AGE": 0,  # Close connections immediately after use
             "ATOMIC_REQUESTS": False,  # Disable automatic transactions
         },

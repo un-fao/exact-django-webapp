@@ -5222,13 +5222,15 @@ def run():
         # add_fmg_data_for_all_grassland_management_types()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
+        update_crop_types_annuals_perennials()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        update_value_chain_refrigerant_emission_factors()
-        delete_and_import_total_biomass_after_defo()
-        delete_and_import_forest_total_biomass()
+        # update_value_chain_refrigerant_emission_factors()
+        # delete_and_import_total_biomass_after_defo()
+        # delete_and_import_forest_total_biomass()
+        update_crop_types_annuals_perennials()
         pass
 
     if app_mode == "development":
@@ -5239,6 +5241,7 @@ def run():
         # delete_and_import_forest_combustion_factor()
         delete_and_import_total_biomass_after_defo()
         delete_and_import_forest_total_biomass()
+        update_crop_types_annuals_perennials()
         pass
 
     if app_mode == "local":
