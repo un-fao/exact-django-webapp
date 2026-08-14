@@ -803,3 +803,182 @@ class ProjectImportNaturalKeyTests(TestCase):
                       'soil_type_id', 'gw_potential_id', 'status_id'):
             with self.subTest(field=field):
                 self.assertEqual(getattr(imported, field), getattr(project, field))
+
+
+@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_CONNECTION_CLOSER)
+class ProjectImportLegacyReferenceIdTests(TestCase):
+    """formatVersion 1 payloads naming reference data that does not exist here.
+
+    The reported bug: a `.exactp` exported from the ONLINE tool failed to import
+    into the OFFLINE tool with nothing but `FOREIGN KEY constraint failed`.
+
+    Three conditions had to hold at once, which is why the natural-key work in
+    PR #274 did not close it:
+
+    1. the file is formatVersion 1, because the online deployment predates that
+       PR and still hardcodes `"formatVersion": 1` at the export endpoint, so no
+       `<field>__nk` is emitted and there is nothing to resolve;
+    2. the reference pk it names does not exist locally. `Project.gw_potential`
+       is NOT NULL and the observed online payloads carry pk 1, while a
+       fixture-built offline database holds pks 8-12;
+    3. the importer wrote that foreign pk straight into the FK column, so the
+       first `Project.objects.create()` was rejected by sqlite, which reports
+       neither the table nor the column.
+
+    Nothing here can make such a file importable: a primary key is private to
+    the database that issued it and v1 carries no other identity. What these
+    pin is that condition 3 no longer produces an anonymous integrity error.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        # co2/ch4/n2o are all non-null FloatFields with no default.
+        self.gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="Legacy Import AR6",
+            defaults={
+                "name": "Legacy Import AR6",
+                "co2": 1.0,
+                "ch4": 27.2,
+                "n2o": 273.0,
+            },
+        )
+        self.country, _ = Country.objects.get_or_create(
+            name="Legacy Import Country"
+        )
+        self.climate, _ = Climate.objects.get_or_create(
+            name_en="Legacy Import Climate",
+            defaults={"name": "Legacy Import Climate"},
+        )
+
+    def _absent_gwp_pk(self):
+        return (
+            GlobalWarmingPotential.objects.order_by("-pk")
+            .values_list("pk", flat=True)
+            .first()
+        ) + 1000
+
+    def _v1_body(self, overrides=None):
+        """A formatVersion 1 payload: integers only, no `__nk` anywhere."""
+        project = {
+            "name": "Legacy Imported Project",
+            "implementation_years": 20,
+            "start_year_of_activities": 2024,
+            "last_year_of_accounting": 2050,
+            "country": self.country.id,
+            "gw_potential": self.gwp.id,
+            "activities": [],
+        }
+        project.update(overrides or {})
+        return {
+            "formatVersion": 1,
+            "appVersion": "1.0.0",
+            "compatibilityGroup": 1,
+            "exportedAt": "2026-08-14T12:51:28Z",
+            "exportId": str(uuid.uuid4()),
+            "project": project,
+        }
+
+    def _post(self, body):
+        return self.client.post(
+            '/api/projects/import_project/', data=body, format='json'
+        )
+
+    def test_the_reported_bug_no_longer_returns_a_bare_fk_constraint_error(self):
+        """The regression seed. This is the exact shape of the user's file."""
+        body = self._v1_body({"gw_potential": self._absent_gwp_pk()})
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        message = json.dumps(response.data)
+        # The symptom, pinned negatively: this string is what the user saw and
+        # it names neither the table nor the column, so it cannot be acted on.
+        self.assertNotIn("FOREIGN KEY constraint failed", message)
+
+    def test_the_error_names_the_model_the_field_and_the_id(self):
+        absent = self._absent_gwp_pk()
+        body = self._v1_body({"gw_potential": absent})
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        message = json.dumps(response.data)
+        self.assertIn("ipcc.GlobalWarmingPotential", message)
+        self.assertIn("gw_potential", message)
+        self.assertIn(str(absent), message)
+        self.assertIn("file format 1", message)
+
+    def test_no_project_survives_the_failed_import(self):
+        before = Project.objects.count()
+        body = self._v1_body({"gw_potential": self._absent_gwp_pk()})
+
+        self._post(body)
+
+        self.assertEqual(Project.objects.count(), before)
+        self.assertFalse(
+            Project.objects.filter(name="Legacy Imported Project").exists()
+        )
+
+    def test_a_v1_payload_whose_ids_all_exist_still_imports(self):
+        """The control. v1 is not rejected for being v1, only for naming a
+        reference row this installation does not have.
+
+        `GUINEA PDACG (1).exactp` on the reporter's machine is exactly this case
+        and imports cleanly, which is what proves the failure is an AND of the
+        three conditions rather than "v1 is broken".
+        """
+        body = self._v1_body({"climate": self.climate.id})
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED,
+            getattr(response, "data", None),
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
+        self.assertEqual(imported.country_id, self.country.id)
+        self.assertEqual(imported.climate_id, self.climate.id)
+
+    def test_a_nullable_reference_id_is_refused_rather_than_silently_dropped(self):
+        """`climate` is nullable, so nulling it would let the import "succeed".
+
+        It must not: a project imported with no climate computes different
+        numbers, and the file gives no evidence that the user meant none. The
+        same reasoning as the hard failure on an unresolvable natural key.
+        """
+        absent_climate = (
+            Climate.objects.order_by("-pk").values_list("pk", flat=True).first()
+        ) + 1000
+        body = self._v1_body({"climate": absent_climate})
+
+        response = self._post(body)
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+        message = json.dumps(response.data)
+        self.assertIn("api.Climate", message)
+        self.assertIn("climate", message)
+
+    def test_a_v2_payload_is_unaffected_by_the_verification(self):
+        """The key still wins, and a deliberately wrong integer is still ignored.
+
+        Without this, the natural fix for the v1 path (verify the integer) would
+        break the v2 path, whose whole point is that the integer is meaningless.
+        """
+        body = self._v1_body({
+            "gw_potential": self._absent_gwp_pk(),
+            "gw_potential__nk": ["Legacy Import AR6"],
+        })
+        body["formatVersion"] = 2
+
+        response = self._post(body)
+
+        self.assertEqual(
+            response.status_code, http_status.HTTP_201_CREATED,
+            getattr(response, "data", None),
+        )
+        imported = Project.objects.get(id=response.data['projectId'])
+        self.assertEqual(imported.gw_potential_id, self.gwp.id)
