@@ -408,19 +408,20 @@ on:
 Without this, merging to `review` and pushing is a silent no-op: no build, no migrate, no
 deploy, and the re-exported file would still be formatVersion 1.
 
-**Gate 1, confirm the review database is NOT production's.** The repo cannot answer this.
-`.env.review` and `.env.production` declare an identical `DB_NAME=exact` / `DB_USER=exact_user`,
-and the value that actually deploys comes from the GitHub Actions environment-scoped variable
-`vars.DB_INSTANCE_CONNECTION` (plus `vars.DB_NAME`), which is not in the repo. Check in GitHub:
-Settings -> Environments -> `review` -> `DB_INSTANCE_CONNECTION`, and compare it against the
-same variable under `production`.
+**Gate 1, confirm the review database is NOT production's. CLEARED 2026-08-14.** The repo
+cannot answer this: `.env.review` and `.env.production` declare an identical `DB_NAME=exact` /
+`DB_USER=exact_user`, and the value that actually deploys comes from the GitHub Actions
+environment-scoped variable `vars.DB_INSTANCE_CONNECTION`. Resolved by querying the GitHub API
+directly (`gh api repos/un-fao/exact-django-webapp/environments/{env}/variables/DB_INSTANCE_CONNECTION`):
 
-- Different instance connection names -> separate databases, proceed.
-- **Same instance connection name AND same `DB_NAME` -> review shares production's database.**
-  In that case migrations `api/0290` and `ipcc/0065` add UNIQUE constraints to PRODUCTION data
-  the moment the review deploy runs. That is a production schema change wearing a review label.
-  Do not proceed on the review path; treat it as a production deploy with the corresponding
-  care (backup, maintenance window, rollback plan).
+- review:     `fao-exact-review:europe-west1:fao-exact-review-postgres`
+- production: `fao-exact:europe-west1:fao-exact-postgres`
+
+Different Cloud SQL instances in different GCP projects (`fao-exact-review` vs `fao-exact`).
+`DB_NAME` is `exact` in both, but that is the database name WITHIN each separate instance, so it
+does not indicate sharing. **Review does NOT share production's database.** Migrations
+`api/0290` and `ipcc/0065` therefore touch review data only, and the review path is a genuine
+rehearsal for production rather than a production schema change wearing a review label.
 
 **Gate 2, run the natural-key check against the REVIEW database before migrating.** This is not
 in CI - `check_reference_natural_keys` appears nowhere in `.github/`, `bitbucket-pipelines.yml`
@@ -449,6 +450,37 @@ Read the result by EXIT CODE, not by eyeballing the text (`handle()` calls `sys.
   null/blank). Both would be rejected by the UNIQUE constraints in `api/0290` and
   `ipcc/0065`, so the migration fails partway through the deploy. Resolve the named rows
   first. Add `--json` for a machine-readable list of exactly which model, fields and pks.
+
+**GATE 2 RESULT: PASSED against the live review database, 2026-08-14 14:28 UTC.**
+
+Executed by the orchestrator, not simulated. A `cloud-sql-proxy` was already running on
+127.0.0.1:5432 bound to `fao-exact-review:europe-west1:fao-exact-review-postgres` (pid 213886).
+Connection confirmed before running: `ENGINE=django.db.backends.postgresql`, `NAME=exact`,
+`USER=exact_user`, `current_database()=exact`, server `PostgreSQL 14.22`. Note the repo-root
+`.env` sets only `APP_MODE=review` and declares no `DB_*`, so `.env.review` supplies the
+connection unshadowed (relevant because `load_dotenv()` does not override, so a `DB_*` in the
+root `.env` WOULD have silently won over `.env.review`).
+
+```
+No duplicate or empty natural keys across 32 registered model(s).
+EXIT_CODE=0
+```
+
+So migrations `api/0290` and `ipcc/0065` will NOT fail on review data. The command is strictly
+read-only (`values_list` reads only, no writes), so this cleared the gate without touching data.
+
+**Incidental confirmation of the root cause, from server data.** The review database holds
+`ipcc.GlobalWarmingPotential` at pks **1-5**, exactly the range the online v1 exports carry
+(`gw_potential = 1`) and exactly the range recorded for the old shipped `db.sqlite3` snapshot in
+`api/natural_keys.py:139-141`. The committed fixtures hold 8-12. This is independent, live-server
+evidence for the phase-3 conclusion that **the fixtures are the outlier, not the servers**, and
+that commit 6190429f (build the offline DB from fixtures) is what moved the offline side off the
+range both servers use and so exposed the latent defect.
+
+**Gate still OUTSTANDING for production.** This run cleared REVIEW only. Before `main` ever
+receives these migrations, run the identical command against
+`fao-exact:europe-west1:fao-exact-postgres`. Review passing does not imply production passes:
+they are separate databases with independently edited reference data.
 
 **Then:**
 
