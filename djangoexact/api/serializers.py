@@ -19,6 +19,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from api.natural_keys import natural_key_for_pk
 from django.utils.text import slugify
 
 from . import labels
@@ -620,6 +621,22 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 class ModuleExportSerializer(serializers.Serializer):
     """Generic serializer for exporting any module type."""
 
+    @property
+    def natural_key_cache(self):
+        """Per-instance `(label, pk) -> key` memo, shared across one activity.
+
+        `ActivityExportSerializer.get_modules` reuses a single
+        `ModuleExportSerializer` for every module in an activity, so an export
+        pays one query per distinct reference row rather than one per module.
+        Deliberately per-instance rather than process-wide: a request must never
+        be served reference data cached by an earlier request.
+        """
+        cache = self.__dict__.get("_natural_key_cache")
+        if cache is None:
+            cache = {}
+            self.__dict__["_natural_key_cache"] = cache
+        return cache
+
     def _serialize_comment(self, comment):
         """Serialize a single comment with its replies."""
         comment_data = {
@@ -685,6 +702,21 @@ class ModuleExportSerializer(serializers.Serializer):
                         value = getattr(instance, f'{field.name}_id', None)
                         if value is not None:
                             data[field.name] = value
+                            # formatVersion 2: emit a natural key beside the
+                            # integer for every relation whose target model is
+                            # in the registry, so the importer can resolve it in
+                            # an installation whose reference PKs have drifted.
+                            # Unregistered targets (Activity, cross-module
+                            # OneToOne refs) get nothing and keep their existing
+                            # path. This lives inside the get_fields() loop on
+                            # purpose: that is what makes it cover every
+                            # multi-table-inheritance subclass with no per-model
+                            # registration.
+                            natural_key = natural_key_for_pk(
+                                field.related_model, value, self.natural_key_cache
+                            )
+                            if natural_key is not None:
+                                data[f'{field.name}__nk'] = list(natural_key)
                 elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
                     continue
                 else:
@@ -726,6 +758,24 @@ class ActivityExportSerializer(serializers.ModelSerializer):
             result[module_type].append(module_serializer.to_representation(module))
         return result
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        # formatVersion 2: `module_types` is serialized as a bare pk list by the
+        # inherited Meta.exclude. Emit the natural keys alongside it, leaving the
+        # existing key's name and shape untouched.
+        module_types = data.get('module_types')
+        if module_types:
+            related_model = Activity._meta.get_field('module_types').related_model
+            cache = {}
+            keys = []
+            for pk in module_types:
+                natural_key = natural_key_for_pk(related_model, pk, cache)
+                keys.append(list(natural_key) if natural_key is not None else None)
+            data['module_types__nk'] = keys
+
+        return data
+
 
 class ProjectExportSerializer(serializers.ModelSerializer):
     """Serializer for full project export."""
@@ -738,10 +788,20 @@ class ProjectExportSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        cache = {}
         for field in ['country', 'climate', 'moisture', 'soil_type', 'gw_potential', 'status']:
             if field in data and data[field] is not None:
                 if isinstance(data[field], dict) and 'id' in data[field]:
                     data[field] = data[field]['id']
+                # formatVersion 2: emit the natural key from the same resolved
+                # pk. The target model always comes from the model field, never
+                # from the field name: `status` here is api.ProjectStatus, while
+                # `status` on a module is api.StatusType.
+                if isinstance(data[field], int):
+                    related_model = Project._meta.get_field(field).related_model
+                    natural_key = natural_key_for_pk(related_model, data[field], cache)
+                    if natural_key is not None:
+                        data[f'{field}__nk'] = list(natural_key)
         return data
 
 
@@ -767,8 +827,14 @@ class ProjectImportSerializer(serializers.Serializer):
         return value
 
     def validate_formatVersion(self, value):
-        """Ensure format version is supported."""
-        if value != 1:
+        """Ensure format version is supported.
+
+        Version 1 encodes reference relations as raw integer primary keys only.
+        Version 2 carries a `<field>__nk` natural key beside each of them and is
+        what makes an import survive reference-data drift between installations.
+        Both are accepted: v1 files already in the wild must keep importing.
+        """
+        if value not in (1, 2):
             raise serializers.ValidationError(
                 f"Unsupported file format version: {value}"
             )
