@@ -59,7 +59,7 @@ jobs:
           echo "CLOUD_RUN_SERVICE_NAME=${CLOUD_RUN_SERVICE_NAME:-exact-api}" >> "$GITHUB_ENV"
           echo "IMAGE_REPO=${IMAGE_REPO:-artifacts}" >> "$GITHUB_ENV"
           echo "RUNTIME_SERVICE_ACCOUNT=${RUNTIME_SERVICE_ACCOUNT:-${PROJECT_ID}@appspot.gserviceaccount.com}" >> "$GITHUB_ENV"
-          echo "MIN_SCALE=${MIN_SCALE:-0}" >> "$GITHUB_ENV"
+          echo "MIN_SCALE=${MIN_SCALE:-1}" >> "$GITHUB_ENV"
           echo "MAX_SCALE=${MAX_SCALE:-4}" >> "$GITHUB_ENV"
           echo "CONTAINER_CONCURRENCY=${CONTAINER_CONCURRENCY:-10}" >> "$GITHUB_ENV"
           echo "REQUEST_TIMEOUT_SECONDS=${REQUEST_TIMEOUT_SECONDS:-300}" >> "$GITHUB_ENV"
