@@ -38,9 +38,10 @@ from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from api.natural_keys import (
-    UnresolvableNaturalKeyError,
+    ReferenceResolutionError,
     resolve_natural_key,
     spec_for,
+    verify_legacy_reference_pk,
 )
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
@@ -1069,6 +1070,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
             An unresolvable key raises rather than falling back to the integer,
             because that fallback is the silent mis-resolution this exists to
             remove.
+
+            A formatVersion 1 payload carries no key at all, so its integers are
+            the exporting installation's private identifiers. They are verified
+            to name a local row before use rather than written through: a
+            write-through is what surfaced, several frames later, as a bare
+            ``FOREIGN KEY constraint failed`` naming neither table nor column.
             """
             import re
             from django.db.models import ForeignKey
@@ -1077,13 +1084,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
             if module_id_map is None:
                 module_id_map = {}
 
-            def reference_pk(field, field_name):
-                """Resolve `<field>__nk` to a local pk, or None if not present."""
-                natural_key = data.get(f"{field_name}__nk")
-                if not natural_key or spec_for(field.related_model) is None:
+            def reference_pk(field, field_name, value):
+                """Return the local pk for a reference relation, or None.
+
+                None means "not reference data": the target model is absent from
+                the natural-key registry, so the caller keeps the integer and its
+                existing behaviour. Registry membership is the only gate here,
+                which is what leaves ``Activity``, the cross-module OneToOne refs
+                and every other user-data relation untouched.
+                """
+                if spec_for(field.related_model) is None:
                     return None
-                return resolve_natural_key(
-                    field.related_model, tuple(natural_key), nk_cache
+                natural_key = data.get(f"{field_name}__nk")
+                if natural_key:
+                    return resolve_natural_key(
+                        field.related_model, tuple(natural_key), nk_cache
+                    )
+                return verify_legacy_reference_pk(
+                    field.related_model, field_name, value, nk_cache
                 )
 
             result = {}
@@ -1121,14 +1139,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     elif isinstance(value, int):
                         # Reference-data FK (e.g. OrganicSoil pointing to
                         # a shared record), not in the map. Resolve by natural
-                        # key when the file carries one, else use as-is.
-                        resolved = reference_pk(field, field_name)
+                        # key when the file carries one, else verify the integer.
+                        resolved = reference_pk(field, field_name, value)
                         result[f"{field_name}_id"] = value if resolved is None else resolved
                     continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
                 if isinstance(field, ForeignKey) and isinstance(value, int):
-                    resolved = reference_pk(field, field_name)
+                    resolved = reference_pk(field, field_name, value)
                     result[f"{field_name}_id"] = value if resolved is None else resolved
                 else:
                     result[field_name] = value
@@ -1294,11 +1312,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     "projectName": project.name
                 }, status=http_status.HTTP_201_CREATED)
 
-        except UnresolvableNaturalKeyError as e:
-            # The message already names the model and the key and says what to
-            # do about it, so it is returned unwrapped. Every resolution happens
-            # before any objects.create(), which is what lets it name the module
-            # rather than a deferred foreign key constraint on a sqlite table.
+        except ReferenceResolutionError as e:
+            # Both subclasses already name the model, the relation and what to do
+            # about it, so the message is returned unwrapped. Every resolution and
+            # every existence check happens before the matching objects.create(),
+            # which is what lets this name the relation rather than surface as a
+            # bare "FOREIGN KEY constraint failed" from the sqlite driver.
             logger.error(str(e))
             return utils.ErrorResponse(
                 str(e),

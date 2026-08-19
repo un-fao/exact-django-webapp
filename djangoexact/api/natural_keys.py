@@ -18,6 +18,14 @@ absent from `NATURAL_KEY_SPECS` gets no natural key on export and no resolution
 on import, which is what keeps user-data relations (`Activity.owner`,
 `Module.activity`, the cross-module OneToOne refs) on their existing paths.
 
+**The v1 half.** A file produced before formatVersion 2 existed, or by an
+installation that has not been upgraded yet, carries no key at all. Nothing can
+resolve those integers, so `verify_legacy_reference_pk` checks them instead: a
+registered target whose pk names no local row raises `LegacyReferenceIdError`
+rather than being written through. The write-through is what produced a bare
+`FOREIGN KEY constraint failed` from the sqlite driver, naming neither table nor
+column, and it is why an online-to-offline import failure was undiagnosable.
+
 Two rules that are easy to get wrong here:
 
 1. **Key on `name_en`, never on `name`, for any translated model.**
@@ -59,7 +67,16 @@ class NaturalKeySpec:
     label: str
 
 
-class UnresolvableNaturalKeyError(Exception):
+class ReferenceResolutionError(Exception):
+    """Base for every failure to point an imported relation at a local row.
+
+    Two subclasses, one per encoding the payload can use. Callers that do not
+    distinguish the cause catch this base: `import_project` does, because both
+    render as the same 400 with their own already-actionable message.
+    """
+
+
+class UnresolvableNaturalKeyError(ReferenceResolutionError):
     """A natural key in an import payload names no row in this installation.
 
     Raised instead of falling back to the encoded integer primary key. The
@@ -79,6 +96,32 @@ class UnresolvableNaturalKeyError(Exception):
         if detail:
             message = f"{message} {detail}"
         super().__init__(message)
+
+
+class LegacyReferenceIdError(ReferenceResolutionError):
+    """A formatVersion 1 payload names reference data by primary key alone, and
+    no row with that primary key exists here.
+
+    A primary key is private to the database that issued it. v1 carries no
+    natural key beside it, so there is nothing left to resolve the row by: the
+    integer cannot be repaired, only re-exported. Raised rather than written
+    through, because writing it through is what produces the bare
+    ``FOREIGN KEY constraint failed`` that names neither the table nor the row.
+    """
+
+    def __init__(self, label, field_name, pk):
+        self.label = label
+        self.field_name = field_name
+        self.pk = pk
+        super().__init__(
+            f"Cannot import: this file was produced by an older version of EX-ACT "
+            f"(file format 1), which identifies reference data by database id "
+            f"instead of by name. It sets '{field_name}' to '{label}' id {pk}, "
+            f"which does not exist in this installation. Ids are not shared "
+            f"between EX-ACT installations, so this file cannot be repaired on "
+            f"import. Export the project again from the online tool once it has "
+            f"been updated, then import the new file."
+        )
 
 
 # Historical country names mapped to their current name. Seeded with the renames
@@ -245,6 +288,41 @@ def resolve_natural_key(model, key, cache=None) -> int:
 
     if cache is not None:
         cache[cache_key] = pk
+    return pk
+
+
+def verify_legacy_reference_pk(model, field_name, pk, cache=None) -> int:
+    """Return `pk` if it names a row of `model` here, else raise.
+
+    The formatVersion 1 counterpart of `resolve_natural_key`. A v1 payload has
+    no key to resolve, so the only honest thing left is to check the integer
+    before it reaches the database and fail by name if it means nothing here.
+    Unregistered targets never reach this function: registry membership is the
+    gate on the way in exactly as it is on the way out, which is what keeps
+    user-data relations on their existing paths.
+
+    `cache` shares the dict used by `resolve_natural_key`, under its own
+    namespace, so a payload naming the same bad reference on 400 modules costs
+    one query rather than 400. A miss is memoised as None and re-raised, because
+    the failure is a property of this installation and cannot change mid-import.
+    """
+    spec = spec_for(model)
+    label = spec.label if spec is not None else getattr(
+        getattr(model, "_meta", None), "label", str(model)
+    )
+
+    cache_key = ("verify", label, pk)
+    if cache is not None and cache_key in cache:
+        if cache[cache_key] is None:
+            raise LegacyReferenceIdError(label, field_name, pk)
+        return cache[cache_key]
+
+    exists = model.objects.filter(pk=pk).exists()
+
+    if cache is not None:
+        cache[cache_key] = pk if exists else None
+    if not exists:
+        raise LegacyReferenceIdError(label, field_name, pk)
     return pk
 
 

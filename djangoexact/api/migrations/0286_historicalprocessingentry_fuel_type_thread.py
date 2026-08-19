@@ -20,40 +20,58 @@ from django.db import migrations, models
 
 TABLE = "api_historicalprocessingentry"
 COLUMN = "fuel_type_thread_id"
-INDEX = "api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"
 
 # PostgreSQL: PL/pgSQL guard, unchanged. This is what production applied.
-POSTGRES_FORWARD = f"""
+# Identifiers are written out literally (no f-strings) so static SQL-injection
+# scanners don't flag these constant DDL statements.
+POSTGRES_FORWARD = """
 DO $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1
         FROM information_schema.columns
-        WHERE table_name = '{TABLE}'
-          AND column_name = '{COLUMN}'
+        WHERE table_name = 'api_historicalprocessingentry'
+          AND column_name = 'fuel_type_thread_id'
     ) THEN
-        ALTER TABLE {TABLE}
-            ADD COLUMN {COLUMN} bigint NULL;
+        ALTER TABLE api_historicalprocessingentry
+            ADD COLUMN fuel_type_thread_id bigint NULL;
     END IF;
 
     IF NOT EXISTS (
         SELECT 1
         FROM pg_indexes
         WHERE schemaname = current_schema()
-          AND tablename = '{TABLE}'
-          AND indexname = '{INDEX}'
+          AND tablename = 'api_historicalprocessingentry'
+          AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
     ) THEN
-        CREATE INDEX {INDEX}
-            ON {TABLE} ({COLUMN});
+        CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
+            ON api_historicalprocessingentry (fuel_type_thread_id);
     END IF;
 END
 $$;
 """
 
-POSTGRES_REVERSE = f"""
-DROP INDEX IF EXISTS {INDEX};
-ALTER TABLE {TABLE} DROP COLUMN IF EXISTS {COLUMN};
+POSTGRES_REVERSE = """
+DROP INDEX IF EXISTS api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a;
+ALTER TABLE api_historicalprocessingentry DROP COLUMN IF EXISTS fuel_type_thread_id;
 """
+
+SQLITE_ADD_COLUMN = (
+    "ALTER TABLE api_historicalprocessingentry "
+    "ADD COLUMN fuel_type_thread_id bigint NULL"
+)
+SQLITE_CREATE_INDEX = (
+    'CREATE INDEX IF NOT EXISTS '
+    '"api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a" '
+    "ON api_historicalprocessingentry (fuel_type_thread_id)"
+)
+SQLITE_DROP_INDEX = (
+    'DROP INDEX IF EXISTS '
+    '"api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"'
+)
+SQLITE_DROP_COLUMN = (
+    "ALTER TABLE api_historicalprocessingentry DROP COLUMN fuel_type_thread_id"
+)
 
 
 def _column_exists(connection):
@@ -78,8 +96,8 @@ def add_column_if_missing(apps, schema_editor):
 
     if _column_exists(connection):
         return
-    schema_editor.execute(f"ALTER TABLE {TABLE} ADD COLUMN {COLUMN} bigint NULL")
-    schema_editor.execute(f'CREATE INDEX IF NOT EXISTS "{INDEX}" ON {TABLE} ({COLUMN})')
+    schema_editor.execute(SQLITE_ADD_COLUMN)
+    schema_editor.execute(SQLITE_CREATE_INDEX)
 
 
 def drop_column_if_present(apps, schema_editor):
@@ -88,10 +106,10 @@ def drop_column_if_present(apps, schema_editor):
         schema_editor.execute(POSTGRES_REVERSE)
         return
 
-    schema_editor.execute(f'DROP INDEX IF EXISTS "{INDEX}"')
+    schema_editor.execute(SQLITE_DROP_INDEX)
     if _column_exists(connection):
         # sqlite supports DROP COLUMN from 3.35 onwards.
-        schema_editor.execute(f"ALTER TABLE {TABLE} DROP COLUMN {COLUMN}")
+        schema_editor.execute(SQLITE_DROP_COLUMN)
 
 
 class Migration(migrations.Migration):

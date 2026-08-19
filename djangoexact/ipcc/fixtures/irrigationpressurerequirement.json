@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 20,
+    "pk": 15,
     "fields": {
       "irrigation_system_type": 7,
       "initial_denomination": null,
@@ -13,7 +13,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 21,
+    "pk": 16,
     "fields": {
       "irrigation_system_type": 9,
       "initial_denomination": null,
@@ -25,7 +25,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 22,
+    "pk": 17,
     "fields": {
       "irrigation_system_type": 10,
       "initial_denomination": null,
@@ -37,7 +37,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 23,
+    "pk": 18,
     "fields": {
       "irrigation_system_type": 11,
       "initial_denomination": null,
@@ -49,7 +49,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 24,
+    "pk": 19,
     "fields": {
       "irrigation_system_type": 8,
       "initial_denomination": null,
@@ -61,7 +61,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 25,
+    "pk": 20,
     "fields": {
       "irrigation_system_type": 1,
       "initial_denomination": null,
@@ -73,7 +73,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 26,
+    "pk": 21,
     "fields": {
       "irrigation_system_type": 2,
       "initial_denomination": null,
@@ -85,7 +85,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 27,
+    "pk": 22,
     "fields": {
       "irrigation_system_type": 3,
       "initial_denomination": null,
@@ -97,7 +97,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 28,
+    "pk": 23,
     "fields": {
       "irrigation_system_type": 4,
       "initial_denomination": null,
@@ -109,7 +109,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 29,
+    "pk": 24,
     "fields": {
       "irrigation_system_type": 5,
       "initial_denomination": null,
@@ -121,7 +121,7 @@
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 30,
+    "pk": 25,
     "fields": {
       "irrigation_system_type": 6,
       "initial_denomination": null,

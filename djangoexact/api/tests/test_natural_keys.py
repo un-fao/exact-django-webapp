@@ -18,14 +18,18 @@ from django.test import TestCase
 from django.utils.translation import override
 
 from api import models
+from ipcc.models import GlobalWarmingPotential
 from api.natural_keys import (
     COUNTRY_NAME_ALIASES,
     NATURAL_KEY_SPECS,
+    LegacyReferenceIdError,
+    ReferenceResolutionError,
     UnresolvableNaturalKeyError,
     natural_key_for,
     natural_key_for_pk,
     resolve_natural_key,
     spec_for,
+    verify_legacy_reference_pk,
 )
 
 
@@ -229,6 +233,132 @@ class NaturalKeyResolveTests(TestCase):
             again = resolve_natural_key(models.Climate, ("Tropical",), cache=cache)
 
         self.assertEqual(again, self.climate.pk)
+
+
+class LegacyReferenceIdVerifyTests(TestCase):
+    """`verify_legacy_reference_pk`: the formatVersion 1 path.
+
+    A v1 payload carries no natural key, so its integers are the exporting
+    installation's private identifiers. Before this existed they were written
+    straight into the FK column and the database rejected them several frames
+    later as a bare "FOREIGN KEY constraint failed" naming neither table nor
+    column. The verifier's whole job is to turn that into a named refusal at the
+    point the bad value is read.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        # co2/ch4/n2o are all non-null FloatFields with no default.
+        cls.gwp, _ = GlobalWarmingPotential.objects.get_or_create(
+            name_en="Legacy Verify AR6",
+            defaults={
+                "name": "Legacy Verify AR6",
+                "co2": 1.0,
+                "ch4": 27.2,
+                "n2o": 273.0,
+            },
+        )
+
+    def _absent_pk(self):
+        """A pk one past the highest that exists, so it cannot collide."""
+        return (
+            GlobalWarmingPotential.objects.order_by("-pk")
+            .values_list("pk", flat=True)
+            .first()
+        ) + 1
+
+    def test_existing_pk_passes_through_unchanged(self):
+        self.assertEqual(
+            verify_legacy_reference_pk(
+                GlobalWarmingPotential, "gw_potential", self.gwp.pk
+            ),
+            self.gwp.pk,
+        )
+
+    def test_absent_pk_raises_naming_model_field_and_id(self):
+        absent = self._absent_pk()
+
+        with self.assertRaises(LegacyReferenceIdError) as ctx:
+            verify_legacy_reference_pk(
+                GlobalWarmingPotential, "gw_potential", absent
+            )
+
+        message = str(ctx.exception)
+        self.assertIn("ipcc.GlobalWarmingPotential", message)
+        self.assertIn("gw_potential", message)
+        self.assertIn(str(absent), message)
+
+    def test_message_tells_the_user_what_to_do(self):
+        with self.assertRaises(LegacyReferenceIdError) as ctx:
+            verify_legacy_reference_pk(
+                GlobalWarmingPotential, "gw_potential", self._absent_pk()
+            )
+
+        message = str(ctx.exception)
+        # The remedy is the only part of this the user can act on, and it is the
+        # reason the error exists at all rather than a bare integrity error.
+        self.assertIn("file format 1", message)
+        self.assertIn("Export the project again", message)
+
+    def test_error_is_a_reference_resolution_error(self):
+        """import_project catches the base, so both encodings must share it."""
+        self.assertTrue(
+            issubclass(LegacyReferenceIdError, ReferenceResolutionError)
+        )
+        self.assertTrue(
+            issubclass(UnresolvableNaturalKeyError, ReferenceResolutionError)
+        )
+
+    def test_boundary_pks_are_rejected_not_treated_as_absent_sentinels(self):
+        # 0 and negatives are not "no value": they are ids that do not exist.
+        # A guard keyed on truthiness would let 0 through to the database.
+        for pk in (0, -1):
+            with self.subTest(pk=pk):
+                with self.assertRaises(LegacyReferenceIdError):
+                    verify_legacy_reference_pk(
+                        GlobalWarmingPotential, "gw_potential", pk
+                    )
+
+    def test_hit_is_cached_and_not_requeried(self):
+        cache = {}
+
+        verify_legacy_reference_pk(
+            GlobalWarmingPotential, "gw_potential", self.gwp.pk, cache=cache
+        )
+        with self.assertNumQueries(0):
+            again = verify_legacy_reference_pk(
+                GlobalWarmingPotential, "gw_potential", self.gwp.pk, cache=cache
+            )
+
+        self.assertEqual(again, self.gwp.pk)
+
+    def test_miss_is_cached_and_still_raises(self):
+        """A payload naming the same bad id on 400 modules costs one query."""
+        cache = {}
+        absent = self._absent_pk()
+
+        with self.assertRaises(LegacyReferenceIdError):
+            verify_legacy_reference_pk(
+                GlobalWarmingPotential, "gw_potential", absent, cache=cache
+            )
+        with self.assertNumQueries(0):
+            with self.assertRaises(LegacyReferenceIdError):
+                verify_legacy_reference_pk(
+                    GlobalWarmingPotential, "gw_potential", absent, cache=cache
+                )
+
+    def test_verify_cache_does_not_collide_with_the_resolve_cache(self):
+        """Both share one dict per import request, under separate namespaces."""
+        cache = {}
+
+        verify_legacy_reference_pk(
+            GlobalWarmingPotential, "gw_potential", self.gwp.pk, cache=cache
+        )
+        resolved = resolve_natural_key(
+            GlobalWarmingPotential, ("Legacy Verify AR6",), cache=cache
+        )
+
+        self.assertEqual(resolved, self.gwp.pk)
 
 
 class CheckReferenceNaturalKeysCommandTests(TestCase):
