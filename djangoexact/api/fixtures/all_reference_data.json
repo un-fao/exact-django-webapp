@@ -2774,25 +2774,6 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 29,
-    "fields": {
-      "name": "Generic Value",
-      "name_en": "Generic Value",
-      "name_fr": "Valeur générique\n",
-      "name_es": "Valor genérico",
-      "name_ru": "Общая ценность",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        4,
-        5
-      ],
-      "climates": [],
-      "moistures": []
-    }
-  },
-  {
-    "model": "api.landusetype",
     "pk": 221,
     "fields": {
       "name": "Ginger, raw",
@@ -109368,21 +109349,6 @@
     "fields": {
       "land_use_type": 311,
       "value": 0.85
-    }
-  },
-  {
-    "model": "ipcc.cropnitrousestimationdefaultfactor",
-    "pk": 179,
-    "fields": {
-      "land_use_type": 29,
-      "slope": null,
-      "intercept": null,
-      "n_ag_residues": 0.008,
-      "rs_t": 0.22,
-      "n_bg_t": 0.009,
-      "dry_matter": null,
-      "rag": null,
-      "comment": null
     }
   },
   {
