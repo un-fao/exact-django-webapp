@@ -7,14 +7,6 @@ class GlobalWarmingPotential(Model):
     class Meta:
         verbose_name = "Global Warming Potential"
         verbose_name_plural = "Global Warming Potentials"
-        # Natural key for .exactproject import (api/natural_keys.py). Highest
-        # priority of the lot: primary key ranges are fully disjoint between
-        # installations (fixtures 8-12, shipped offline database 1-5) and
-        # Project.gw_potential is NOT NULL, so this is what makes every
-        # online-to-offline import fail at the first row. Constrain `name_en`
-        # explicitly, never unique=True on the translated `name`, which would
-        # propagate the constraint to name_es/name_fr/name_ru.
-        constraints = [UniqueConstraint(fields=["name_en"], name="uniq_gwp_name_en")]
 
     name = CharField(max_length=100)
     co2 = FloatField()
