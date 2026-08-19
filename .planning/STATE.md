@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-13 - Completed quick task 260813-fvj: fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools
+Last activity: 2026-08-19 - Completed quick task 260819-prd: replaced all reference-data fixtures with production data
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -116,6 +116,7 @@ Items acknowledged and carried forward from previous milestone close:
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | *(none)* | | | |
+| 260819-prd | Replaced all reference-data fixtures with a dump of the production database (162 manifest models + combined); net 86,641 -> 63,869 rows, 0 dangling FKs, parity verified | 2026-08-19 | 64c7ef02 | [260819-prd-replace-all-fixtures-with-production-dat](./quick/260819-prd-replace-all-fixtures-with-production-dat/) |
 
 ## Session Continuity
 
