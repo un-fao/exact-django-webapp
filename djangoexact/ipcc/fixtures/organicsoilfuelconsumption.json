@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 91,
+    "pk": 31,
     "fields": {
       "climate": 4,
       "moisture": 1,
@@ -12,7 +12,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 92,
+    "pk": 32,
     "fields": {
       "climate": 4,
       "moisture": 1,
@@ -23,7 +23,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 93,
+    "pk": 33,
     "fields": {
       "climate": 4,
       "moisture": 1,
@@ -34,7 +34,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 94,
+    "pk": 34,
     "fields": {
       "climate": 4,
       "moisture": 2,
@@ -45,7 +45,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 95,
+    "pk": 35,
     "fields": {
       "climate": 4,
       "moisture": 2,
@@ -56,7 +56,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 96,
+    "pk": 36,
     "fields": {
       "climate": 4,
       "moisture": 2,
@@ -67,7 +67,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 97,
+    "pk": 37,
     "fields": {
       "climate": 1,
       "moisture": 1,
@@ -78,7 +78,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 98,
+    "pk": 38,
     "fields": {
       "climate": 1,
       "moisture": 1,
@@ -89,7 +89,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 99,
+    "pk": 39,
     "fields": {
       "climate": 1,
       "moisture": 1,
@@ -100,7 +100,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 100,
+    "pk": 40,
     "fields": {
       "climate": 1,
       "moisture": 2,
@@ -111,7 +111,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 101,
+    "pk": 41,
     "fields": {
       "climate": 1,
       "moisture": 2,
@@ -122,7 +122,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 102,
+    "pk": 42,
     "fields": {
       "climate": 1,
       "moisture": 2,
@@ -133,7 +133,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 103,
+    "pk": 43,
     "fields": {
       "climate": 2,
       "moisture": 1,
@@ -144,7 +144,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 104,
+    "pk": 44,
     "fields": {
       "climate": 2,
       "moisture": 1,
@@ -155,7 +155,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 105,
+    "pk": 45,
     "fields": {
       "climate": 2,
       "moisture": 1,
@@ -166,7 +166,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 106,
+    "pk": 46,
     "fields": {
       "climate": 2,
       "moisture": 2,
@@ -177,7 +177,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 107,
+    "pk": 47,
     "fields": {
       "climate": 2,
       "moisture": 2,
@@ -188,7 +188,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 108,
+    "pk": 48,
     "fields": {
       "climate": 2,
       "moisture": 2,
@@ -199,7 +199,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 109,
+    "pk": 49,
     "fields": {
       "climate": 3,
       "moisture": 1,
@@ -210,7 +210,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 110,
+    "pk": 50,
     "fields": {
       "climate": 3,
       "moisture": 1,
@@ -221,7 +221,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 111,
+    "pk": 51,
     "fields": {
       "climate": 3,
       "moisture": 1,
@@ -232,7 +232,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 112,
+    "pk": 52,
     "fields": {
       "climate": 3,
       "moisture": 2,
@@ -243,7 +243,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 113,
+    "pk": 53,
     "fields": {
       "climate": 3,
       "moisture": 2,
@@ -254,7 +254,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 114,
+    "pk": 54,
     "fields": {
       "climate": 3,
       "moisture": 2,
@@ -265,7 +265,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 115,
+    "pk": 55,
     "fields": {
       "climate": 3,
       "moisture": 4,
@@ -276,7 +276,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 116,
+    "pk": 56,
     "fields": {
       "climate": 3,
       "moisture": 4,
@@ -287,7 +287,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 117,
+    "pk": 57,
     "fields": {
       "climate": 3,
       "moisture": 4,
@@ -298,7 +298,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 118,
+    "pk": 58,
     "fields": {
       "climate": 20,
       "moisture": 1,
@@ -309,7 +309,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 119,
+    "pk": 59,
     "fields": {
       "climate": 20,
       "moisture": 1,
@@ -320,7 +320,7 @@
   },
   {
     "model": "ipcc.organicsoilfuelconsumption",
-    "pk": 120,
+    "pk": 60,
     "fields": {
       "climate": 20,
       "moisture": 1,

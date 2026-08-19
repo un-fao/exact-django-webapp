@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.livestockvser",
-    "pk": 4292,
+    "pk": 1742,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -11,7 +11,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4293,
+    "pk": 1743,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -21,7 +21,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4294,
+    "pk": 1744,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -31,7 +31,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4295,
+    "pk": 1745,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -41,7 +41,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4296,
+    "pk": 1746,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -51,7 +51,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4297,
+    "pk": 1747,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -61,7 +61,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4298,
+    "pk": 1748,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -71,7 +71,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4299,
+    "pk": 1749,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -81,7 +81,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4300,
+    "pk": 1750,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -91,7 +91,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4301,
+    "pk": 1751,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -101,7 +101,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4302,
+    "pk": 1752,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -111,7 +111,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4303,
+    "pk": 1753,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -121,7 +121,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4304,
+    "pk": 1754,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -131,7 +131,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4305,
+    "pk": 1755,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -141,7 +141,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4306,
+    "pk": 1756,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -151,7 +151,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4307,
+    "pk": 1757,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -161,7 +161,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4308,
+    "pk": 1758,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -171,7 +171,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4309,
+    "pk": 1759,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -181,7 +181,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4310,
+    "pk": 1760,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -191,7 +191,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4311,
+    "pk": 1761,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -201,7 +201,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4312,
+    "pk": 1762,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -211,7 +211,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4313,
+    "pk": 1763,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -221,7 +221,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4314,
+    "pk": 1764,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -231,7 +231,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4315,
+    "pk": 1765,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -241,7 +241,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4316,
+    "pk": 1766,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -251,7 +251,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4317,
+    "pk": 1767,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -261,7 +261,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4318,
+    "pk": 1768,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -271,7 +271,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4319,
+    "pk": 1769,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -281,7 +281,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4320,
+    "pk": 1770,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -291,7 +291,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4321,
+    "pk": 1771,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -301,7 +301,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4322,
+    "pk": 1772,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -311,7 +311,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4323,
+    "pk": 1773,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -321,7 +321,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4324,
+    "pk": 1774,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -331,7 +331,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4325,
+    "pk": 1775,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -341,7 +341,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4326,
+    "pk": 1776,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -351,7 +351,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4327,
+    "pk": 1777,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -361,7 +361,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4328,
+    "pk": 1778,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -371,7 +371,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4329,
+    "pk": 1779,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -381,7 +381,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4330,
+    "pk": 1780,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -391,7 +391,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4331,
+    "pk": 1781,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -401,7 +401,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4332,
+    "pk": 1782,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -411,7 +411,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4333,
+    "pk": 1783,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -421,7 +421,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4334,
+    "pk": 1784,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -431,7 +431,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4335,
+    "pk": 1785,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -441,7 +441,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4336,
+    "pk": 1786,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -451,7 +451,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4337,
+    "pk": 1787,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -461,7 +461,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4338,
+    "pk": 1788,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -471,7 +471,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4339,
+    "pk": 1789,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -481,7 +481,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4340,
+    "pk": 1790,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -491,7 +491,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4341,
+    "pk": 1791,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -501,7 +501,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4342,
+    "pk": 1792,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -511,7 +511,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4343,
+    "pk": 1793,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -521,7 +521,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4344,
+    "pk": 1794,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -531,7 +531,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4345,
+    "pk": 1795,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -541,7 +541,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4346,
+    "pk": 1796,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -551,7 +551,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4347,
+    "pk": 1797,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -561,7 +561,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4348,
+    "pk": 1798,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -571,7 +571,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4349,
+    "pk": 1799,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -581,7 +581,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4350,
+    "pk": 1800,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -591,7 +591,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4351,
+    "pk": 1801,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -601,7 +601,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4352,
+    "pk": 1802,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -611,7 +611,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4353,
+    "pk": 1803,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -621,7 +621,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4354,
+    "pk": 1804,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -631,7 +631,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4355,
+    "pk": 1805,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -641,7 +641,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4356,
+    "pk": 1806,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -651,7 +651,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4357,
+    "pk": 1807,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -661,7 +661,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4358,
+    "pk": 1808,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -671,7 +671,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4359,
+    "pk": 1809,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -681,7 +681,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4360,
+    "pk": 1810,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -691,7 +691,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4361,
+    "pk": 1811,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -701,7 +701,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4362,
+    "pk": 1812,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -711,7 +711,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4363,
+    "pk": 1813,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -721,7 +721,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4364,
+    "pk": 1814,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -731,7 +731,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4365,
+    "pk": 1815,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -741,7 +741,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4366,
+    "pk": 1816,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -751,7 +751,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4367,
+    "pk": 1817,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -761,7 +761,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4368,
+    "pk": 1818,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -771,7 +771,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4369,
+    "pk": 1819,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -781,7 +781,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4370,
+    "pk": 1820,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -791,7 +791,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4371,
+    "pk": 1821,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -801,7 +801,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4372,
+    "pk": 1822,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -811,7 +811,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4373,
+    "pk": 1823,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -821,7 +821,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4374,
+    "pk": 1824,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -831,7 +831,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4375,
+    "pk": 1825,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -841,7 +841,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4376,
+    "pk": 1826,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -851,7 +851,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4377,
+    "pk": 1827,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -861,7 +861,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4378,
+    "pk": 1828,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -871,7 +871,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4379,
+    "pk": 1829,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -881,7 +881,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4380,
+    "pk": 1830,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -891,7 +891,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4381,
+    "pk": 1831,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -901,7 +901,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4382,
+    "pk": 1832,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -911,7 +911,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4383,
+    "pk": 1833,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -921,7 +921,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4384,
+    "pk": 1834,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -931,7 +931,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4385,
+    "pk": 1835,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -941,7 +941,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4386,
+    "pk": 1836,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -951,7 +951,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4387,
+    "pk": 1837,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -961,7 +961,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4388,
+    "pk": 1838,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -971,7 +971,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4389,
+    "pk": 1839,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -981,7 +981,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4390,
+    "pk": 1840,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -991,7 +991,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4391,
+    "pk": 1841,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -1001,7 +1001,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4392,
+    "pk": 1842,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -1011,7 +1011,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4393,
+    "pk": 1843,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -1021,7 +1021,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4394,
+    "pk": 1844,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -1031,7 +1031,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4395,
+    "pk": 1845,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -1041,7 +1041,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4396,
+    "pk": 1846,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -1051,7 +1051,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4397,
+    "pk": 1847,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -1061,7 +1061,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4398,
+    "pk": 1848,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -1071,7 +1071,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4399,
+    "pk": 1849,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -1081,7 +1081,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4400,
+    "pk": 1850,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -1091,7 +1091,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4401,
+    "pk": 1851,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -1101,7 +1101,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4402,
+    "pk": 1852,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -1111,7 +1111,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4403,
+    "pk": 1853,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -1121,7 +1121,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4404,
+    "pk": 1854,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -1131,7 +1131,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4405,
+    "pk": 1855,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -1141,7 +1141,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4406,
+    "pk": 1856,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -1151,7 +1151,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4407,
+    "pk": 1857,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -1161,7 +1161,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4408,
+    "pk": 1858,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -1171,7 +1171,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4409,
+    "pk": 1859,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -1181,7 +1181,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4410,
+    "pk": 1860,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -1191,7 +1191,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4411,
+    "pk": 1861,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -1201,7 +1201,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4412,
+    "pk": 1862,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -1211,7 +1211,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4413,
+    "pk": 1863,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -1221,7 +1221,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4414,
+    "pk": 1864,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -1231,7 +1231,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4415,
+    "pk": 1865,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -1241,7 +1241,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4416,
+    "pk": 1866,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -1251,7 +1251,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4417,
+    "pk": 1867,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -1261,7 +1261,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4418,
+    "pk": 1868,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -1271,7 +1271,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4419,
+    "pk": 1869,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -1281,7 +1281,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4420,
+    "pk": 1870,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -1291,7 +1291,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4421,
+    "pk": 1871,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -1301,7 +1301,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4422,
+    "pk": 1872,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -1311,7 +1311,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4423,
+    "pk": 1873,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -1321,7 +1321,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4424,
+    "pk": 1874,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -1331,7 +1331,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4425,
+    "pk": 1875,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -1341,7 +1341,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4426,
+    "pk": 1876,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -1351,7 +1351,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4427,
+    "pk": 1877,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -1361,7 +1361,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4428,
+    "pk": 1878,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -1371,7 +1371,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4429,
+    "pk": 1879,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -1381,7 +1381,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4430,
+    "pk": 1880,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -1391,7 +1391,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4431,
+    "pk": 1881,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -1401,7 +1401,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4432,
+    "pk": 1882,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -1411,7 +1411,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4433,
+    "pk": 1883,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -1421,7 +1421,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4434,
+    "pk": 1884,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -1431,7 +1431,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4435,
+    "pk": 1885,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -1441,7 +1441,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4436,
+    "pk": 1886,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -1451,7 +1451,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4437,
+    "pk": 1887,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -1461,7 +1461,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4438,
+    "pk": 1888,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -1471,7 +1471,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4439,
+    "pk": 1889,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -1481,7 +1481,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4440,
+    "pk": 1890,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -1491,7 +1491,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4441,
+    "pk": 1891,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -1501,7 +1501,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4442,
+    "pk": 1892,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -1511,7 +1511,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4443,
+    "pk": 1893,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -1521,7 +1521,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4444,
+    "pk": 1894,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -1531,7 +1531,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4445,
+    "pk": 1895,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 40,
@@ -1541,7 +1541,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4446,
+    "pk": 1896,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 41,
@@ -1551,7 +1551,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4447,
+    "pk": 1897,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 50,
@@ -1561,7 +1561,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4448,
+    "pk": 1898,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 49,
@@ -1571,7 +1571,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4449,
+    "pk": 1899,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 51,
@@ -1581,7 +1581,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4450,
+    "pk": 1900,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 52,
@@ -1591,7 +1591,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4451,
+    "pk": 1901,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 53,
@@ -1601,7 +1601,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4452,
+    "pk": 1902,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 54,
@@ -1611,7 +1611,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4453,
+    "pk": 1903,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 55,
@@ -1621,7 +1621,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4454,
+    "pk": 1904,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 47,
@@ -1631,7 +1631,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4455,
+    "pk": 1905,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 46,
@@ -1641,7 +1641,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4456,
+    "pk": 1906,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 48,
@@ -1651,7 +1651,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4457,
+    "pk": 1907,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 56,
@@ -1661,7 +1661,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4458,
+    "pk": 1908,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 57,
@@ -1671,7 +1671,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4459,
+    "pk": 1909,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 58,
@@ -1681,7 +1681,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4460,
+    "pk": 1910,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 59,
@@ -1691,7 +1691,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4461,
+    "pk": 1911,
     "fields": {
       "livestock_production_type": 4,
       "livestock_category_type": 60,
@@ -1701,7 +1701,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4462,
+    "pk": 1912,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -1711,7 +1711,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4463,
+    "pk": 1913,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -1721,7 +1721,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4464,
+    "pk": 1914,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -1731,7 +1731,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4465,
+    "pk": 1915,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -1741,7 +1741,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4466,
+    "pk": 1916,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -1751,7 +1751,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4467,
+    "pk": 1917,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -1761,7 +1761,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4468,
+    "pk": 1918,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -1771,7 +1771,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4469,
+    "pk": 1919,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -1781,7 +1781,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4470,
+    "pk": 1920,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -1791,7 +1791,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4471,
+    "pk": 1921,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -1801,7 +1801,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4472,
+    "pk": 1922,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -1811,7 +1811,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4473,
+    "pk": 1923,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -1821,7 +1821,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4474,
+    "pk": 1924,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -1831,7 +1831,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4475,
+    "pk": 1925,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -1841,7 +1841,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4476,
+    "pk": 1926,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -1851,7 +1851,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4477,
+    "pk": 1927,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -1861,7 +1861,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4478,
+    "pk": 1928,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -1871,7 +1871,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4479,
+    "pk": 1929,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -1881,7 +1881,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4480,
+    "pk": 1930,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -1891,7 +1891,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4481,
+    "pk": 1931,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -1901,7 +1901,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4482,
+    "pk": 1932,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -1911,7 +1911,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4483,
+    "pk": 1933,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -1921,7 +1921,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4484,
+    "pk": 1934,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -1931,7 +1931,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4485,
+    "pk": 1935,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -1941,7 +1941,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4486,
+    "pk": 1936,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -1951,7 +1951,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4487,
+    "pk": 1937,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -1961,7 +1961,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4488,
+    "pk": 1938,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -1971,7 +1971,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4489,
+    "pk": 1939,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -1981,7 +1981,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4490,
+    "pk": 1940,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -1991,7 +1991,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4491,
+    "pk": 1941,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2001,7 +2001,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4492,
+    "pk": 1942,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2011,7 +2011,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4493,
+    "pk": 1943,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2021,7 +2021,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4494,
+    "pk": 1944,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2031,7 +2031,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4495,
+    "pk": 1945,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2041,7 +2041,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4496,
+    "pk": 1946,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2051,7 +2051,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4497,
+    "pk": 1947,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2061,7 +2061,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4498,
+    "pk": 1948,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2071,7 +2071,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4499,
+    "pk": 1949,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2081,7 +2081,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4500,
+    "pk": 1950,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2091,7 +2091,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4501,
+    "pk": 1951,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2101,7 +2101,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4502,
+    "pk": 1952,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2111,7 +2111,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4503,
+    "pk": 1953,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2121,7 +2121,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4504,
+    "pk": 1954,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2131,7 +2131,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4505,
+    "pk": 1955,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2141,7 +2141,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4506,
+    "pk": 1956,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -2151,7 +2151,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4507,
+    "pk": 1957,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -2161,7 +2161,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4508,
+    "pk": 1958,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2171,7 +2171,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4509,
+    "pk": 1959,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2181,7 +2181,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4510,
+    "pk": 1960,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2191,7 +2191,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4511,
+    "pk": 1961,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2201,7 +2201,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4512,
+    "pk": 1962,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2211,7 +2211,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4513,
+    "pk": 1963,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2221,7 +2221,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4514,
+    "pk": 1964,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2231,7 +2231,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4515,
+    "pk": 1965,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2241,7 +2241,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4516,
+    "pk": 1966,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2251,7 +2251,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4517,
+    "pk": 1967,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2261,7 +2261,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4518,
+    "pk": 1968,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2271,7 +2271,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4519,
+    "pk": 1969,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2281,7 +2281,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4520,
+    "pk": 1970,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2291,7 +2291,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4521,
+    "pk": 1971,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2301,7 +2301,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4522,
+    "pk": 1972,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2311,7 +2311,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4523,
+    "pk": 1973,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -2321,7 +2321,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4524,
+    "pk": 1974,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -2331,7 +2331,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4525,
+    "pk": 1975,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2341,7 +2341,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4526,
+    "pk": 1976,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2351,7 +2351,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4527,
+    "pk": 1977,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2361,7 +2361,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4528,
+    "pk": 1978,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2371,7 +2371,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4529,
+    "pk": 1979,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2381,7 +2381,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4530,
+    "pk": 1980,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2391,7 +2391,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4531,
+    "pk": 1981,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2401,7 +2401,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4532,
+    "pk": 1982,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2411,7 +2411,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4533,
+    "pk": 1983,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2421,7 +2421,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4534,
+    "pk": 1984,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2431,7 +2431,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4535,
+    "pk": 1985,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2441,7 +2441,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4536,
+    "pk": 1986,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2451,7 +2451,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4537,
+    "pk": 1987,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2461,7 +2461,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4538,
+    "pk": 1988,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2471,7 +2471,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4539,
+    "pk": 1989,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2481,7 +2481,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4540,
+    "pk": 1990,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -2491,7 +2491,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4541,
+    "pk": 1991,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -2501,7 +2501,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4542,
+    "pk": 1992,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2511,7 +2511,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4543,
+    "pk": 1993,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2521,7 +2521,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4544,
+    "pk": 1994,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2531,7 +2531,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4545,
+    "pk": 1995,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2541,7 +2541,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4546,
+    "pk": 1996,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2551,7 +2551,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4547,
+    "pk": 1997,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2561,7 +2561,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4548,
+    "pk": 1998,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2571,7 +2571,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4549,
+    "pk": 1999,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2581,7 +2581,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4550,
+    "pk": 2000,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2591,7 +2591,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4551,
+    "pk": 2001,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2601,7 +2601,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4552,
+    "pk": 2002,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2611,7 +2611,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4553,
+    "pk": 2003,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2621,7 +2621,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4554,
+    "pk": 2004,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2631,7 +2631,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4555,
+    "pk": 2005,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2641,7 +2641,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4556,
+    "pk": 2006,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2651,7 +2651,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4557,
+    "pk": 2007,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -2661,7 +2661,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4558,
+    "pk": 2008,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -2671,7 +2671,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4559,
+    "pk": 2009,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2681,7 +2681,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4560,
+    "pk": 2010,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2691,7 +2691,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4561,
+    "pk": 2011,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2701,7 +2701,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4562,
+    "pk": 2012,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2711,7 +2711,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4563,
+    "pk": 2013,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2721,7 +2721,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4564,
+    "pk": 2014,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2731,7 +2731,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4565,
+    "pk": 2015,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2741,7 +2741,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4566,
+    "pk": 2016,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2751,7 +2751,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4567,
+    "pk": 2017,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2761,7 +2761,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4568,
+    "pk": 2018,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2771,7 +2771,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4569,
+    "pk": 2019,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2781,7 +2781,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4570,
+    "pk": 2020,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2791,7 +2791,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4571,
+    "pk": 2021,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2801,7 +2801,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4572,
+    "pk": 2022,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2811,7 +2811,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4573,
+    "pk": 2023,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2821,7 +2821,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4574,
+    "pk": 2024,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -2831,7 +2831,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4575,
+    "pk": 2025,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -2841,7 +2841,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4576,
+    "pk": 2026,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -2851,7 +2851,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4577,
+    "pk": 2027,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -2861,7 +2861,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4578,
+    "pk": 2028,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -2871,7 +2871,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4579,
+    "pk": 2029,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -2881,7 +2881,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4580,
+    "pk": 2030,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -2891,7 +2891,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4581,
+    "pk": 2031,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -2901,7 +2901,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4582,
+    "pk": 2032,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -2911,7 +2911,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4583,
+    "pk": 2033,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -2921,7 +2921,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4584,
+    "pk": 2034,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -2931,7 +2931,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4585,
+    "pk": 2035,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -2941,7 +2941,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4586,
+    "pk": 2036,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -2951,7 +2951,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4587,
+    "pk": 2037,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -2961,7 +2961,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4588,
+    "pk": 2038,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -2971,7 +2971,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4589,
+    "pk": 2039,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -2981,7 +2981,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4590,
+    "pk": 2040,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -2991,7 +2991,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4591,
+    "pk": 2041,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -3001,7 +3001,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4592,
+    "pk": 2042,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -3011,7 +3011,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4593,
+    "pk": 2043,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -3021,7 +3021,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4594,
+    "pk": 2044,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -3031,7 +3031,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4595,
+    "pk": 2045,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -3041,7 +3041,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4596,
+    "pk": 2046,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -3051,7 +3051,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4597,
+    "pk": 2047,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -3061,7 +3061,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4598,
+    "pk": 2048,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -3071,7 +3071,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4599,
+    "pk": 2049,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -3081,7 +3081,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4600,
+    "pk": 2050,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -3091,7 +3091,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4601,
+    "pk": 2051,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -3101,7 +3101,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4602,
+    "pk": 2052,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -3111,7 +3111,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4603,
+    "pk": 2053,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -3121,7 +3121,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4604,
+    "pk": 2054,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -3131,7 +3131,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4605,
+    "pk": 2055,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -3141,7 +3141,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4606,
+    "pk": 2056,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -3151,7 +3151,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4607,
+    "pk": 2057,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -3161,7 +3161,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4608,
+    "pk": 2058,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -3171,7 +3171,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4609,
+    "pk": 2059,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -3181,7 +3181,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4610,
+    "pk": 2060,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -3191,7 +3191,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4611,
+    "pk": 2061,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -3201,7 +3201,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4612,
+    "pk": 2062,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -3211,7 +3211,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4613,
+    "pk": 2063,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -3221,7 +3221,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4614,
+    "pk": 2064,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -3231,7 +3231,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4615,
+    "pk": 2065,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 40,
@@ -3241,7 +3241,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4616,
+    "pk": 2066,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 41,
@@ -3251,7 +3251,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4617,
+    "pk": 2067,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 50,
@@ -3261,7 +3261,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4618,
+    "pk": 2068,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 49,
@@ -3271,7 +3271,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4619,
+    "pk": 2069,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 51,
@@ -3281,7 +3281,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4620,
+    "pk": 2070,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 52,
@@ -3291,7 +3291,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4621,
+    "pk": 2071,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 53,
@@ -3301,7 +3301,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4622,
+    "pk": 2072,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 54,
@@ -3311,7 +3311,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4623,
+    "pk": 2073,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 55,
@@ -3321,7 +3321,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4624,
+    "pk": 2074,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 47,
@@ -3331,7 +3331,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4625,
+    "pk": 2075,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 46,
@@ -3341,7 +3341,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4626,
+    "pk": 2076,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 48,
@@ -3351,7 +3351,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4627,
+    "pk": 2077,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 56,
@@ -3361,7 +3361,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4628,
+    "pk": 2078,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 57,
@@ -3371,7 +3371,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4629,
+    "pk": 2079,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 58,
@@ -3381,7 +3381,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4630,
+    "pk": 2080,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 59,
@@ -3391,7 +3391,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4631,
+    "pk": 2081,
     "fields": {
       "livestock_production_type": 5,
       "livestock_category_type": 60,
@@ -3401,7 +3401,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4632,
+    "pk": 2082,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -3411,7 +3411,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4633,
+    "pk": 2083,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -3421,7 +3421,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4634,
+    "pk": 2084,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -3431,7 +3431,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4635,
+    "pk": 2085,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -3441,7 +3441,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4636,
+    "pk": 2086,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -3451,7 +3451,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4637,
+    "pk": 2087,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -3461,7 +3461,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4638,
+    "pk": 2088,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -3471,7 +3471,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4639,
+    "pk": 2089,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -3481,7 +3481,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4640,
+    "pk": 2090,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -3491,7 +3491,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4641,
+    "pk": 2091,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -3501,7 +3501,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4642,
+    "pk": 2092,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -3511,7 +3511,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4643,
+    "pk": 2093,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -3521,7 +3521,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4644,
+    "pk": 2094,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -3531,7 +3531,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4645,
+    "pk": 2095,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -3541,7 +3541,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4646,
+    "pk": 2096,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -3551,7 +3551,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4647,
+    "pk": 2097,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -3561,7 +3561,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4648,
+    "pk": 2098,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -3571,7 +3571,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4649,
+    "pk": 2099,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -3581,7 +3581,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4650,
+    "pk": 2100,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -3591,7 +3591,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4651,
+    "pk": 2101,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -3601,7 +3601,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4652,
+    "pk": 2102,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -3611,7 +3611,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4653,
+    "pk": 2103,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -3621,7 +3621,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4654,
+    "pk": 2104,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -3631,7 +3631,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4655,
+    "pk": 2105,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -3641,7 +3641,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4656,
+    "pk": 2106,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -3651,7 +3651,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4657,
+    "pk": 2107,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -3661,7 +3661,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4658,
+    "pk": 2108,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -3671,7 +3671,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4659,
+    "pk": 2109,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -3681,7 +3681,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4660,
+    "pk": 2110,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -3691,7 +3691,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4661,
+    "pk": 2111,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -3701,7 +3701,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4662,
+    "pk": 2112,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -3711,7 +3711,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4663,
+    "pk": 2113,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -3721,7 +3721,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4664,
+    "pk": 2114,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -3731,7 +3731,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4665,
+    "pk": 2115,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -3741,7 +3741,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4666,
+    "pk": 2116,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -3751,7 +3751,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4667,
+    "pk": 2117,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -3761,7 +3761,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4668,
+    "pk": 2118,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -3771,7 +3771,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4669,
+    "pk": 2119,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -3781,7 +3781,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4670,
+    "pk": 2120,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -3791,7 +3791,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4671,
+    "pk": 2121,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -3801,7 +3801,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4672,
+    "pk": 2122,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -3811,7 +3811,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4673,
+    "pk": 2123,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -3821,7 +3821,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4674,
+    "pk": 2124,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -3831,7 +3831,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4675,
+    "pk": 2125,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -3841,7 +3841,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4676,
+    "pk": 2126,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -3851,7 +3851,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4677,
+    "pk": 2127,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -3861,7 +3861,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4678,
+    "pk": 2128,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -3871,7 +3871,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4679,
+    "pk": 2129,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -3881,7 +3881,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4680,
+    "pk": 2130,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -3891,7 +3891,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4681,
+    "pk": 2131,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -3901,7 +3901,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4682,
+    "pk": 2132,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -3911,7 +3911,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4683,
+    "pk": 2133,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -3921,7 +3921,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4684,
+    "pk": 2134,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -3931,7 +3931,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4685,
+    "pk": 2135,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -3941,7 +3941,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4686,
+    "pk": 2136,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -3951,7 +3951,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4687,
+    "pk": 2137,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -3961,7 +3961,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4688,
+    "pk": 2138,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -3971,7 +3971,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4689,
+    "pk": 2139,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -3981,7 +3981,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4690,
+    "pk": 2140,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -3991,7 +3991,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4691,
+    "pk": 2141,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4001,7 +4001,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4692,
+    "pk": 2142,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4011,7 +4011,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4693,
+    "pk": 2143,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4021,7 +4021,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4694,
+    "pk": 2144,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4031,7 +4031,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4695,
+    "pk": 2145,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4041,7 +4041,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4696,
+    "pk": 2146,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4051,7 +4051,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4697,
+    "pk": 2147,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4061,7 +4061,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4698,
+    "pk": 2148,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4071,7 +4071,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4699,
+    "pk": 2149,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4081,7 +4081,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4700,
+    "pk": 2150,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4091,7 +4091,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4701,
+    "pk": 2151,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4101,7 +4101,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4702,
+    "pk": 2152,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4111,7 +4111,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4703,
+    "pk": 2153,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4121,7 +4121,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4704,
+    "pk": 2154,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4131,7 +4131,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4705,
+    "pk": 2155,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4141,7 +4141,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4706,
+    "pk": 2156,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -4151,7 +4151,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4707,
+    "pk": 2157,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -4161,7 +4161,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4708,
+    "pk": 2158,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4171,7 +4171,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4709,
+    "pk": 2159,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4181,7 +4181,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4710,
+    "pk": 2160,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4191,7 +4191,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4711,
+    "pk": 2161,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4201,7 +4201,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4712,
+    "pk": 2162,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4211,7 +4211,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4713,
+    "pk": 2163,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4221,7 +4221,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4714,
+    "pk": 2164,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4231,7 +4231,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4715,
+    "pk": 2165,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4241,7 +4241,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4716,
+    "pk": 2166,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4251,7 +4251,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4717,
+    "pk": 2167,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4261,7 +4261,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4718,
+    "pk": 2168,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4271,7 +4271,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4719,
+    "pk": 2169,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4281,7 +4281,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4720,
+    "pk": 2170,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4291,7 +4291,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4721,
+    "pk": 2171,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4301,7 +4301,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4722,
+    "pk": 2172,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4311,7 +4311,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4723,
+    "pk": 2173,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -4321,7 +4321,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4724,
+    "pk": 2174,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -4331,7 +4331,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4725,
+    "pk": 2175,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4341,7 +4341,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4726,
+    "pk": 2176,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4351,7 +4351,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4727,
+    "pk": 2177,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4361,7 +4361,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4728,
+    "pk": 2178,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4371,7 +4371,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4729,
+    "pk": 2179,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4381,7 +4381,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4730,
+    "pk": 2180,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4391,7 +4391,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4731,
+    "pk": 2181,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4401,7 +4401,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4732,
+    "pk": 2182,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4411,7 +4411,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4733,
+    "pk": 2183,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4421,7 +4421,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4734,
+    "pk": 2184,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4431,7 +4431,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4735,
+    "pk": 2185,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4441,7 +4441,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4736,
+    "pk": 2186,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4451,7 +4451,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4737,
+    "pk": 2187,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4461,7 +4461,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4738,
+    "pk": 2188,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4471,7 +4471,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4739,
+    "pk": 2189,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4481,7 +4481,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4740,
+    "pk": 2190,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -4491,7 +4491,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4741,
+    "pk": 2191,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -4501,7 +4501,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4742,
+    "pk": 2192,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4511,7 +4511,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4743,
+    "pk": 2193,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4521,7 +4521,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4744,
+    "pk": 2194,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4531,7 +4531,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4745,
+    "pk": 2195,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4541,7 +4541,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4746,
+    "pk": 2196,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4551,7 +4551,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4747,
+    "pk": 2197,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4561,7 +4561,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4748,
+    "pk": 2198,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4571,7 +4571,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4749,
+    "pk": 2199,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4581,7 +4581,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4750,
+    "pk": 2200,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4591,7 +4591,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4751,
+    "pk": 2201,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4601,7 +4601,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4752,
+    "pk": 2202,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4611,7 +4611,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4753,
+    "pk": 2203,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4621,7 +4621,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4754,
+    "pk": 2204,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4631,7 +4631,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4755,
+    "pk": 2205,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4641,7 +4641,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4756,
+    "pk": 2206,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4651,7 +4651,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4757,
+    "pk": 2207,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -4661,7 +4661,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4758,
+    "pk": 2208,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -4671,7 +4671,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4759,
+    "pk": 2209,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4681,7 +4681,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4760,
+    "pk": 2210,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4691,7 +4691,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4761,
+    "pk": 2211,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4701,7 +4701,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4762,
+    "pk": 2212,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4711,7 +4711,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4763,
+    "pk": 2213,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4721,7 +4721,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4764,
+    "pk": 2214,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4731,7 +4731,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4765,
+    "pk": 2215,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4741,7 +4741,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4766,
+    "pk": 2216,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4751,7 +4751,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4767,
+    "pk": 2217,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4761,7 +4761,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4768,
+    "pk": 2218,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4771,7 +4771,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4769,
+    "pk": 2219,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4781,7 +4781,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4770,
+    "pk": 2220,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4791,7 +4791,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4771,
+    "pk": 2221,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4801,7 +4801,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4772,
+    "pk": 2222,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4811,7 +4811,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4773,
+    "pk": 2223,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4821,7 +4821,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4774,
+    "pk": 2224,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -4831,7 +4831,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4775,
+    "pk": 2225,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -4841,7 +4841,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4776,
+    "pk": 2226,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -4851,7 +4851,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4777,
+    "pk": 2227,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -4861,7 +4861,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4778,
+    "pk": 2228,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -4871,7 +4871,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4779,
+    "pk": 2229,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -4881,7 +4881,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4780,
+    "pk": 2230,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -4891,7 +4891,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4781,
+    "pk": 2231,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -4901,7 +4901,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4782,
+    "pk": 2232,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -4911,7 +4911,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4783,
+    "pk": 2233,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -4921,7 +4921,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4784,
+    "pk": 2234,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,
@@ -4931,7 +4931,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4785,
+    "pk": 2235,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 40,
@@ -4941,7 +4941,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4786,
+    "pk": 2236,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 41,
@@ -4951,7 +4951,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4787,
+    "pk": 2237,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 50,
@@ -4961,7 +4961,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4788,
+    "pk": 2238,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 49,
@@ -4971,7 +4971,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4789,
+    "pk": 2239,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 51,
@@ -4981,7 +4981,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4790,
+    "pk": 2240,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 52,
@@ -4991,7 +4991,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4791,
+    "pk": 2241,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 53,
@@ -5001,7 +5001,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4792,
+    "pk": 2242,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 54,
@@ -5011,7 +5011,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4793,
+    "pk": 2243,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 55,
@@ -5021,7 +5021,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4794,
+    "pk": 2244,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 47,
@@ -5031,7 +5031,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4795,
+    "pk": 2245,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 46,
@@ -5041,7 +5041,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4796,
+    "pk": 2246,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 48,
@@ -5051,7 +5051,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4797,
+    "pk": 2247,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 56,
@@ -5061,7 +5061,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4798,
+    "pk": 2248,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 57,
@@ -5071,7 +5071,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4799,
+    "pk": 2249,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 58,
@@ -5081,7 +5081,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4800,
+    "pk": 2250,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 59,
@@ -5091,7 +5091,7 @@
   },
   {
     "model": "ipcc.livestockvser",
-    "pk": 4801,
+    "pk": 2251,
     "fields": {
       "livestock_production_type": 6,
       "livestock_category_type": 60,

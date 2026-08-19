@@ -1,37 +1,7 @@
 [
   {
     "model": "api.handinhandassessment",
-    "pk": 1,
-    "fields": {
-      "country": 1,
-      "name": "test assessment",
-      "link": "https://example.com/assessment",
-      "year": 2020,
-      "files_list": [
-        {
-          "url": "https://storage.googleapis.com/fao-exact-review-uploads/hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
-          "name": "2735-results-report.xlsx",
-          "size": 27548,
-          "blob_path": "hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
-          "uploaded_at": "2025-10-13T11:41:21.976071"
-        }
-      ]
-    }
-  },
-  {
-    "model": "api.handinhandassessment",
-    "pk": 6,
-    "fields": {
-      "country": 2,
-      "name": "Burundi HiH 2025",
-      "link": "https://exact.apps.fao.org/public/project/18dpo/activities",
-      "year": 2025,
-      "files_list": []
-    }
-  },
-  {
-    "model": "api.handinhandassessment",
-    "pk": 11,
+    "pk": 10,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - lapin",
@@ -42,7 +12,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 13,
+    "pk": 12,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - manioc",
@@ -53,7 +23,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 12,
+    "pk": 11,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - soja",
@@ -64,7 +34,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 10,
+    "pk": 9,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - tomate",
@@ -75,18 +45,51 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 7,
+    "pk": 6,
     "fields": {
       "country": 5,
       "name": "Djibouti HiH 2025",
-      "link": "https://exact.apps.fao.org/public/project/1nnr3/activities",
+      "link": "https://exact.apps.fao.org/public/project/30wkz/activities",
       "year": 2025,
       "files_list": []
     }
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 8,
+    "pk": 15,
+    "fields": {
+      "country": 6,
+      "name": "Eritrea HiH 2025 - anchovy vc",
+      "link": "https://exact.apps.fao.org/public/project/1yxfa/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 16,
+    "fields": {
+      "country": 6,
+      "name": "Eritrea HiH 2025 - banana vc",
+      "link": "https://exact.apps.fao.org/public/project/1wvsp/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 14,
+    "fields": {
+      "country": 6,
+      "name": "Eritrea HiH 2025 - potato vc",
+      "link": "https://exact.apps.fao.org/public/project/1yt3d/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 7,
     "fields": {
       "country": 7,
       "name": "Ethiopia HiH 2025",
@@ -97,55 +100,231 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 3,
+    "pk": 25,
     "fields": {
-      "country": 16,
-      "name": "Nepal HiH 2025 - Honey",
-      "link": "https://exact.apps.fao.org/public/project/1fvoh/activities",
+      "country": 8,
+      "name": "Gambia - HIH 2025",
+      "link": "https://exact.apps.fao.org/public/project/35e9v/activities",
       "year": 2025,
       "files_list": []
     }
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 4,
+    "pk": 23,
     "fields": {
-      "country": 16,
-      "name": "Nepal HiH 2025- Mandarin Orange",
-      "link": "https://exact.apps.fao.org/public/project/17z9y/activities",
+      "country": 9,
+      "name": "Somalia HiH - dairy and fodder production vc - 2025",
+      "link": "https://exact.apps.fao.org/public/project/1i4ix/activities",
       "year": 2025,
       "files_list": []
     }
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 5,
+    "pk": 24,
     "fields": {
-      "country": 16,
-      "name": "Nepal HiH 2025- Timur",
-      "link": "https://exact.apps.fao.org/public/project/1i7ev/activities",
+      "country": 9,
+      "name": "Somalia HiH - maize vc - 2025",
+      "link": "https://exact.apps.fao.org/public/project/1hon8/activities",
       "year": 2025,
       "files_list": []
     }
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 2,
+    "pk": 22,
     "fields": {
-      "country": 16,
-      "name": "Nepal HiH 2025- Yak Cheese",
-      "link": "https://exact.apps.fao.org/public/project/1bdzl/activities",
+      "country": 9,
+      "name": "Somalia HIH - sesame - 2025",
+      "link": "https://exact.apps.fao.org/public/project/1hsz5/activities",
       "year": 2025,
       "files_list": []
     }
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 9,
+    "pk": 26,
+    "fields": {
+      "country": 21,
+      "name": "Bolivia - HIH 2025",
+      "link": "https://exact.apps.fao.org/public/project/34vi8/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 34,
+    "fields": {
+      "country": 24,
+      "name": "El Salvador - HIH - 2025",
+      "link": "https://exact.apps.fao.org/public/project/36k52/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 35,
+    "fields": {
+      "country": 25,
+      "name": "Guatemala - HIH - 2025",
+      "link": "https://exact.apps.fao.org/public/project/3ag6d/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 13,
+    "fields": {
+      "country": 26,
+      "name": "HIH Mexico",
+      "link": "https://exact.apps.fao.org/public/project/30v50/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 8,
     "fields": {
       "country": 27,
       "name": "Paraguay HiH 2025",
       "link": "https://exact.apps.fao.org/public/project/1n23i/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 27,
+    "fields": {
+      "country": 28,
+      "name": "Per - HIH - Andean grains - 2025",
+      "link": "https://exact.apps.fao.org/public/project/3aqa6/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 28,
+    "fields": {
+      "country": 28,
+      "name": "Per - HIH - sustainable livestock farming - 2025",
+      "link": "https://exact.apps.fao.org/public/project/3a7ij/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 29,
+    "fields": {
+      "country": 28,
+      "name": "Peru - HIH - Amazonian bioeconomy",
+      "link": "https://exact.apps.fao.org/public/project/3a36m/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 21,
+    "fields": {
+      "country": 29,
+      "name": "HiH Iraq assessment",
+      "link": "https://exact.apps.fao.org/public/project/1zdaz/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 20,
+    "fields": {
+      "country": 31,
+      "name": "Madagascar HiH 2025 - maize",
+      "link": "https://exact.apps.fao.org/public/project/2vdct/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 18,
+    "fields": {
+      "country": 31,
+      "name": "Madagascar HiH 2025 - onion",
+      "link": "https://exact.apps.fao.org/public/project/2rn3e/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 17,
+    "fields": {
+      "country": 31,
+      "name": "Madagascar HiH 2025 - red meat",
+      "link": "https://exact.apps.fao.org/public/project/2t4id/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 19,
+    "fields": {
+      "country": 31,
+      "name": "Madagascar HiH 2025 - soybean",
+      "link": "https://exact.apps.fao.org/public/project/2w0gd/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 32,
+    "fields": {
+      "country": 32,
+      "name": "Bhutan - HIH - buckwheat - 2025",
+      "link": "https://exact.apps.fao.org/public/project/34oad/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 33,
+    "fields": {
+      "country": 32,
+      "name": "Bhutan - HIH - Ecohub - 2025",
+      "link": "https://exact.apps.fao.org/public/project/348eo/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 30,
+    "fields": {
+      "country": 32,
+      "name": "Bhutan - HIH - Eggs - 2025",
+      "link": "https://exact.apps.fao.org/public/project/34sma/activities",
+      "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 31,
+    "fields": {
+      "country": 32,
+      "name": "Bhutan - HIH - Honey - 2025",
+      "link": "https://exact.apps.fao.org/public/project/34r6b/activities",
       "year": 2025,
       "files_list": []
     }

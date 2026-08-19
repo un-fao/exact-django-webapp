@@ -10,7 +10,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -36,33 +38,6 @@
       "name_ru": "Агролесомелиорация - по умолчанию",
       "forest_type": null,
       "is_active": true,
-      "module_types": [
-        5
-      ],
-      "climates": [
-        1,
-        2,
-        3,
-        4,
-        20
-      ],
-      "moistures": [
-        1,
-        2
-      ]
-    }
-  },
-  {
-    "model": "api.landusetype",
-    "pk": 46,
-    "fields": {
-      "name": "Alfalfa",
-      "name_en": "Alfalfa",
-      "name_fr": "Luzerne",
-      "name_es": "Alfalfa",
-      "name_ru": "Люцерна",
-      "forest_type": null,
-      "is_active": false,
       "module_types": [
         5
       ],
@@ -116,7 +91,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -224,7 +201,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -250,7 +229,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -276,7 +257,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -358,7 +341,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -412,7 +397,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -436,34 +423,6 @@
       "name_fr": "Orge",
       "name_es": "Cebada",
       "name_ru": "Ячмень",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        4
-      ],
-      "climates": [
-        1,
-        2,
-        3,
-        4,
-        20
-      ],
-      "moistures": [
-        1,
-        2,
-        4
-      ]
-    }
-  },
-  {
-    "model": "api.landusetype",
-    "pk": 30,
-    "fields": {
-      "name": "Beans & Pulses",
-      "name_en": "Beans & Pulses",
-      "name_fr": "Haricots et légumineuses\n",
-      "name_es": "Frijoles y legumbres",
-      "name_ru": "Бобовые, зернобобовые культуры",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -513,6 +472,34 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 30,
+    "fields": {
+      "name": "Beans & Pulses",
+      "name_en": "Beans & Pulses",
+      "name_fr": "Haricots et légumineuses\n",
+      "name_es": "Frijoles y legumbres",
+      "name_ru": "Бобовые, зернобобовые культуры",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 189,
     "fields": {
       "name": "Blueberries",
@@ -522,7 +509,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -548,7 +537,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -714,7 +705,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -880,7 +873,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -906,7 +901,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1017,7 +1014,7 @@
       "forest_type": null,
       "is_active": true,
       "module_types": [
-        4
+        5
       ],
       "climates": [
         1,
@@ -1044,7 +1041,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1070,7 +1069,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1096,7 +1097,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1122,7 +1125,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1280,7 +1285,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1334,7 +1341,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1360,7 +1369,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1519,7 +1530,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1630,7 +1643,7 @@
       "forest_type": null,
       "is_active": true,
       "module_types": [
-        4
+        5
       ],
       "climates": [
         1,
@@ -1644,6 +1657,25 @@
         2,
         4
       ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 29,
+    "fields": {
+      "name": "Generic Value",
+      "name_en": "Generic Value",
+      "name_fr": "Valeur générique\n",
+      "name_es": "Valor genérico",
+      "name_ru": "Общая ценность",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4,
+        5
+      ],
+      "climates": [],
+      "moistures": []
     }
   },
   {
@@ -1685,7 +1717,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1739,7 +1773,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1892,7 +1928,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -1998,7 +2036,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2052,7 +2092,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2078,7 +2120,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2104,7 +2148,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2130,7 +2176,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2184,7 +2232,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2294,7 +2344,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2311,10 +2363,10 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 51,
+    "pk": 73,
     "fields": {
-      "name": "Long-Term Cultivated",
-      "name_en": "Long-Term Cultivated",
+      "name": "﻿Long-Term Cultivated",
+      "name_en": "﻿Long-Term Cultivated",
       "name_fr": "Cultivé à long terme\n",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
@@ -2327,10 +2379,10 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 73,
+    "pk": 51,
     "fields": {
-      "name": "﻿Long-Term Cultivated",
-      "name_en": "﻿Long-Term Cultivated",
+      "name": "Long-Term Cultivated",
+      "name_en": "Long-Term Cultivated",
       "name_fr": "Cultivé à long terme\n",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
@@ -2436,7 +2488,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2769,7 +2823,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2872,7 +2928,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -2980,7 +3038,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3034,7 +3094,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3141,7 +3203,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3221,7 +3285,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3247,7 +3313,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3298,7 +3366,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3352,7 +3422,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3397,16 +3469,18 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 260,
+    "pk": 261,
     "fields": {
-      "name": "Pepper (Piper spp.), raw",
-      "name_en": "Pepper (Piper spp.), raw",
+      "name": "Peppermint, spearmint",
+      "name_en": "Peppermint, spearmint",
       "name_fr": null,
       "name_es": null,
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3423,16 +3497,18 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 261,
+    "pk": 260,
     "fields": {
-      "name": "Peppermint, spearmint",
-      "name_en": "Peppermint, spearmint",
+      "name": "Pepper (Piper spp.), raw",
+      "name_en": "Pepper (Piper spp.), raw",
       "name_fr": null,
       "name_es": null,
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3542,7 +3618,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3596,7 +3674,10 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        4,
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3622,7 +3703,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3648,7 +3731,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3674,7 +3759,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3700,7 +3787,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3838,7 +3927,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3944,9 +4035,7 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [
-        4
-      ],
+      "module_types": [],
       "climates": [
         1,
         2,
@@ -3972,7 +4061,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -3999,7 +4090,8 @@
       "forest_type": null,
       "is_active": true,
       "module_types": [
-        4
+        4,
+        6
       ],
       "climates": [
         1,
@@ -4268,7 +4360,8 @@
         1,
         2,
         3,
-        4
+        4,
+        20
       ],
       "moistures": [
         1,
@@ -4447,7 +4540,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -4473,9 +4568,7 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [
-        4
-      ],
+      "module_types": [],
       "climates": [
         1,
         2,
@@ -4701,6 +4794,34 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 27,
+    "fields": {
+      "name": "Sugarcane",
+      "name_en": "Sugarcane",
+      "name_fr": "Canne à sucre\n",
+      "name_es": "Caña de azúcar",
+      "name_ru": "Сахарный тростник",
+      "forest_type": null,
+      "is_active": false,
+      "module_types": [
+        4
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4,
+        20
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 285,
     "fields": {
       "name": "Sugar cane",
@@ -4757,34 +4878,6 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 27,
-    "fields": {
-      "name": "Sugarcane",
-      "name_en": "Sugarcane",
-      "name_fr": "Canne à sucre\n",
-      "name_es": "Caña de azúcar",
-      "name_ru": "Сахарный тростник",
-      "forest_type": null,
-      "is_active": false,
-      "module_types": [
-        4
-      ],
-      "climates": [
-        1,
-        2,
-        3,
-        4,
-        20
-      ],
-      "moistures": [
-        1,
-        2,
-        4
-      ]
-    }
-  },
-  {
-    "model": "api.landusetype",
     "pk": 286,
     "fields": {
       "name": "Sunflower seed",
@@ -4822,9 +4915,7 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [
-        4
-      ],
+      "module_types": [],
       "climates": [
         1,
         2,
@@ -4904,7 +4995,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -4930,7 +5023,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -5012,7 +5107,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -5065,9 +5162,20 @@
       "name_ru": "Прибрежные болота Средиземноморья",
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
-      "climates": [],
-      "moistures": []
+      "module_types": [
+        39
+      ],
+      "climates": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "moistures": [
+        1,
+        2,
+        4
+      ]
     }
   },
   {
@@ -5189,7 +5297,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -5243,7 +5353,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -5379,7 +5491,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,
@@ -5461,7 +5575,9 @@
       "name_ru": null,
       "forest_type": null,
       "is_active": true,
-      "module_types": [],
+      "module_types": [
+        5
+      ],
       "climates": [
         1,
         2,

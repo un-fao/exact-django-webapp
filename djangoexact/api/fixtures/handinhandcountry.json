@@ -73,6 +73,15 @@
   },
   {
     "model": "api.handinhandcountry",
+    "pk": 31,
+    "fields": {
+      "region": 1,
+      "name": "Madagascar",
+      "iso_code": "MG"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
     "pk": 9,
     "fields": {
       "region": 1,
@@ -118,6 +127,15 @@
   },
   {
     "model": "api.handinhandcountry",
+    "pk": 32,
+    "fields": {
+      "region": 2,
+      "name": "Bhutan",
+      "iso_code": "BT"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
     "pk": 14,
     "fields": {
       "region": 2,
@@ -132,15 +150,6 @@
       "region": 2,
       "name": "Mongolia",
       "iso_code": "MN"
-    }
-  },
-  {
-    "model": "api.handinhandcountry",
-    "pk": 16,
-    "fields": {
-      "region": 2,
-      "name": "Nepal",
-      "iso_code": "NP"
     }
   },
   {
