@@ -94,3 +94,26 @@ database-truth and existing projects point at these rows."* Left as-is.
 3. **`all_api_dependencies.json` is stale** — missing fr/es/ru translations and
    older country names. It is a fallback branch in `ipcc/import_ipcc_fixtures.sh:84`
    and is not manifest-managed, so the refresh does not reach it.
+
+## Post-dump correction — "Generic Value" removed
+
+`api.LandUseType` pk=29 was named literally "Generic Value", a placeholder
+rather than a real land use type. Removed from the fixtures, along with the one
+row depending on it — `ipcc.CropNitrousEstimationDefaultFactor` pk=179, whose
+`slope`, `intercept`, `dry_matter` and `rag` were all null.
+
+**Not removed:** the 38 `CropNitrousEstimationDefaultFactor` rows whose
+`comment` reads *"Remaining missing values filled with Generic value defaults"*.
+Those are real factors for real crops (`land_use_type` 177–311); only the
+comment mentions the phrase. Deleting them would have dropped valid data.
+
+Production confirms the removal is safe: `LandUseType` 29 is referenced by that
+single factor row and by no project or activity data. Re-verified 0 dangling
+FK/M2M references across 305,499 checked.
+
+⚠ **Both rows still exist in the production database.** These three fixtures
+(`landusetype.json`, `cropnitrousestimationdefaultfactor.json`,
+`all_reference_data.json`) therefore intentionally diverge from a raw dump. A
+fresh `dump_reference_data` run will reintroduce them until production is
+cleaned. `verify_reference_parity` will now report these 2 rows as a mismatch;
+it is not part of CI, so nothing breaks.
