@@ -1661,25 +1661,6 @@
   },
   {
     "model": "api.landusetype",
-    "pk": 29,
-    "fields": {
-      "name": "Generic Value",
-      "name_en": "Generic Value",
-      "name_fr": "Valeur générique\n",
-      "name_es": "Valor genérico",
-      "name_ru": "Общая ценность",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        4,
-        5
-      ],
-      "climates": [],
-      "moistures": []
-    }
-  },
-  {
-    "model": "api.landusetype",
     "pk": 221,
     "fields": {
       "name": "Ginger, raw",
