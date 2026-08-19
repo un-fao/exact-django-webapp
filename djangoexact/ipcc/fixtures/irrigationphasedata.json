@@ -74,7 +74,7 @@
       "co2_emissions": 0.0,
       "ch4_emissions": 0.0,
       "n2o_emissions": 0.0,
-      "density": 0.0
+      "density": 0.1
     }
   },
   {
@@ -87,7 +87,7 @@
       "co2_emissions": 0.0,
       "ch4_emissions": 0.0,
       "n2o_emissions": 0.0,
-      "density": 0.0
+      "density": 0.1
     }
   }
 ]

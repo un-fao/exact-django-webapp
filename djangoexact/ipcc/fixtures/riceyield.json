@@ -118,13 +118,5 @@
       "continent": 10,
       "value": 6.3167
     }
-  },
-  {
-    "model": "ipcc.riceyield",
-    "pk": 16,
-    "fields": {
-      "continent": 13,
-      "value": 8.5398
-    }
   }
 ]

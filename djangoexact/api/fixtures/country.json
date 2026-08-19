@@ -1,7 +1,7 @@
 [
   {
     "model": "api.country",
-    "pk": 145,
+    "pk": 262,
     "fields": {
       "name": "Afghanistan",
       "region": 9,
@@ -11,12 +11,12 @@
   },
   {
     "model": "api.country",
-    "pk": 285,
+    "pk": 254,
     "fields": {
       "name": "Åland Islands",
-      "region": 11,
-      "ipcc_region": 5,
-      "gleam_region": 10
+      "region": null,
+      "ipcc_region": null,
+      "gleam_region": null
     }
   },
   {
@@ -147,6 +147,16 @@
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
+    }
+  },
+  {
+    "model": "api.country",
+    "pk": 287,
+    "fields": {
+      "name": "Azores (Portugal)",
+      "region": 11,
+      "ipcc_region": null,
+      "gleam_region": null
     }
   },
   {
@@ -411,6 +421,16 @@
   },
   {
     "model": "api.country",
+    "pk": 288,
+    "fields": {
+      "name": "Canary Islands",
+      "region": 11,
+      "ipcc_region": null,
+      "gleam_region": null
+    }
+  },
+  {
+    "model": "api.country",
     "pk": 66,
     "fields": {
       "name": "Cayman Islands",
@@ -437,6 +457,16 @@
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
+    }
+  },
+  {
+    "model": "api.country",
+    "pk": 289,
+    "fields": {
+      "name": "Channel Islands",
+      "region": 11,
+      "ipcc_region": null,
+      "gleam_region": null
     }
   },
   {
@@ -551,9 +581,9 @@
   },
   {
     "model": "api.country",
-    "pk": 258,
+    "pk": 265,
     "fields": {
-      "name": "Côte D’Ivoire",
+      "name": "Côte d’Ivoire",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -601,7 +631,7 @@
   },
   {
     "model": "api.country",
-    "pk": 282,
+    "pk": 47,
     "fields": {
       "name": "Czechia",
       "region": 11,
@@ -1201,6 +1231,16 @@
   },
   {
     "model": "api.country",
+    "pk": 290,
+    "fields": {
+      "name": "Kosovo",
+      "region": 11,
+      "ipcc_region": null,
+      "gleam_region": null
+    }
+  },
+  {
+    "model": "api.country",
     "pk": 117,
     "fields": {
       "name": "Kuwait",
@@ -1321,7 +1361,7 @@
   },
   {
     "model": "api.country",
-    "pk": 290,
+    "pk": 291,
     "fields": {
       "name": "Madeira Islands",
       "region": 5,
@@ -1631,22 +1671,22 @@
   },
   {
     "model": "api.country",
-    "pk": 237,
-    "fields": {
-      "name": "North Macedonia",
-      "region": 11,
-      "ipcc_region": 5,
-      "gleam_region": 10
-    }
-  },
-  {
-    "model": "api.country",
     "pk": 28,
     "fields": {
       "name": "Northern Mariana Islands",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
+    }
+  },
+  {
+    "model": "api.country",
+    "pk": 237,
+    "fields": {
+      "name": "North Macedonia",
+      "region": 11,
+      "ipcc_region": 5,
+      "gleam_region": 10
     }
   },
   {
@@ -1901,9 +1941,9 @@
   },
   {
     "model": "api.country",
-    "pk": 283,
+    "pk": 278,
     "fields": {
-      "name": "Saint Martin (French Part)",
+      "name": "Saint Martin (french Part)",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2091,6 +2131,16 @@
   },
   {
     "model": "api.country",
+    "pk": 283,
+    "fields": {
+      "name": "Southern Africa",
+      "region": 4,
+      "ipcc_region": 14,
+      "gleam_region": 9
+    }
+  },
+  {
+    "model": "api.country",
     "pk": 99,
     "fields": {
       "name": "South Georgia And The South Sandwich Islands",
@@ -2191,7 +2241,17 @@
   },
   {
     "model": "api.country",
-    "pk": 291,
+    "pk": 272,
+    "fields": {
+      "name": "Taiwan ",
+      "region": null,
+      "ipcc_region": null,
+      "gleam_region": null
+    }
+  },
+  {
+    "model": "api.country",
+    "pk": 292,
     "fields": {
       "name": "Taiwan (Chinese Taipei)",
       "region": 7,

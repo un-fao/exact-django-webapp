@@ -3,7 +3,7 @@
     "model": "api.ipccregion",
     "pk": 16,
     "fields": {
-      "name": "East Asia And South-East Asia"
+      "name": "East Asia and South-East Asia"
     }
   },
   {
@@ -17,7 +17,7 @@
     "model": "api.ipccregion",
     "pk": 4,
     "fields": {
-      "name": "Latin America And The Caribbean"
+      "name": "Latin America and The Caribbean"
     }
   },
   {
