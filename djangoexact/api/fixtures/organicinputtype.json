@@ -1,18 +1,6 @@
 [
   {
     "model": "api.organicinputtype",
-    "pk": 14,
-    "fields": {
-      "name": "Default",
-      "name_en": "Default",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null,
-      "is_active": false
-    }
-  },
-  {
-    "model": "api.organicinputtype",
     "pk": 10,
     "fields": {
       "name": "High C input, no manure",

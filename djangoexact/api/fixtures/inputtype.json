@@ -273,9 +273,9 @@
   },
   {
     "model": "api.inputtype",
-    "pk": 27,
+    "pk": 33,
     "fields": {
-      "macro_input_type": 11,
+      "macro_input_type": 10,
       "name": "User Defined Input (tier 2)",
       "name_en": "User Defined Input (tier 2)",
       "name_fr": "Intrant défini par l'utilisateur (tier 2)\n",

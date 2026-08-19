@@ -1,6 +1,21 @@
 [
   {
     "model": "ipcc.cropnitrousestimationdefaultfactor",
+    "pk": 179,
+    "fields": {
+      "land_use_type": 29,
+      "slope": null,
+      "intercept": null,
+      "n_ag_residues": 0.008,
+      "rs_t": 0.22,
+      "n_bg_t": 0.009,
+      "dry_matter": null,
+      "rag": null,
+      "comment": null
+    }
+  },
+  {
+    "model": "ipcc.cropnitrousestimationdefaultfactor",
     "pk": 180,
     "fields": {
       "land_use_type": 24,
@@ -294,21 +309,6 @@
       "n_ag_residues": 0.016,
       "rs_t": 0.22,
       "n_bg_t": 0.009,
-      "dry_matter": null,
-      "rag": null,
-      "comment": null
-    }
-  },
-  {
-    "model": "ipcc.cropnitrousestimationdefaultfactor",
-    "pk": 200,
-    "fields": {
-      "land_use_type": 46,
-      "slope": 0.29,
-      "intercept": 0.0,
-      "n_ag_residues": 0.027,
-      "rs_t": 0.4,
-      "n_bg_t": 0.019,
       "dry_matter": null,
       "rag": null,
       "comment": null

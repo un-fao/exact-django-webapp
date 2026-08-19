@@ -14,5 +14,21 @@
       "name": "Implementation",
       "value": 1
     }
+  },
+  {
+    "model": "api.projectstatus",
+    "pk": 4,
+    "fields": {
+      "name": "Mid-term implementation",
+      "value": 2
+    }
+  },
+  {
+    "model": "api.projectstatus",
+    "pk": 3,
+    "fields": {
+      "name": "Terminal Evaluation",
+      "value": 3
+    }
   }
 ]
