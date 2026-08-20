@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-08-13T09:18:22.564Z"
-last_activity: 2026-08-13
-last_activity_desc: "Completed quick task 260813-fvj: fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools"
+last_updated: "2026-08-20T07:46:14.267Z"
+last_activity: 2026-08-20
+last_activity_desc: "Completed quick task 260820-dkj: project admins can manage members of finalized projects again"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-19 - Completed quick task 260819-jfs: reverted natural-key matching in project export/import to raw primary-key matching
+Last activity: 2026-08-20 - Completed quick task 260820-he5: admin script to import FRA carbon stock for a chosen assessment year
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -109,6 +109,7 @@ None yet.
 | 19 | update ipcc_dump.py to sync annual/perennial module types from FAOSTAT_Crop_Types_20260813.xlsx | 2026-08-13 | c73c3021 | — |
 | 260813-fvj | Fixed the reference-data ID mismatch breaking .exactproject import between the online and offline tools. Root cause was not PK instability in the fixture pipeline but that release/offline-tool ships a committed 53 MB db.sqlite3 instead of bootstrapping from fixtures, so 83 of 162 manifest reference models drifted (ipcc.GlobalWarmingPotential PK ranges fully disjoint against a NOT NULL Project.gw_potential, so every online-to-offline import failed at row one). Three sequenced commits: a fixture-based offline bootstrap plus verify_reference_parity and a release-branch handoff checklist; natural keys on 32 reference models with 18 new UniqueConstraints; formatVersion 2 dual encoding that resolves reference FKs by natural key on import and hard-fails by name instead of silently mis-resolving. api.Unit tripped the duplicate gate on the shipped snapshot and was deliberately left unconstrained. Migration 0290 is still unvalidated against production Postgres | 2026-08-13 | 87c8fec8 | [260813-fvj-when-import-exporting-from-online-tool-t](./quick/260813-fvj-when-import-exporting-from-online-tool-t/) |
 | 260819-jfs | Reverted the natural-key matching introduced across bf7f906d, 87c8fec8 and e57b9673, returning project export/import to raw primary-key matching. Export declares formatVersion 1 again; prepare_model_data writes the integer straight into <field>_id and resolve_status_id is back to its identity/None behaviour. Deleted api/natural_keys.py, the check_reference_natural_keys command, test_natural_keys.py, the 18 UniqueConstraints on api/ipcc models and migrations api/0290 + ipcc/0065. Migration 0291 was kept for its four unrelated verbose_name AlterFields, with its dependency rewired to 0289_asyncjob and a deliberate numbering gap at 0290; the filename is unchanged so databases that already recorded it by name still see it applied. Restored files are byte-identical to bf7f906d~1 | 2026-08-19 | 23385e86 | [260819-jfs-remove-natural-key-matching-from-project](./quick/260819-jfs-remove-natural-key-matching-from-project/) |
+| 260820-dkj | Allow project admins to add new admins to finalized projects | 2026-08-20 | ee4a98a6 | [260820-dkj-allow-project-admins-to-add-new-admins-t](./quick/260820-dkj-allow-project-admins-to-add-new-admins-t/) |
 
 ## Deferred Items
 
@@ -118,6 +119,7 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | *(none)* | | | |
 | 260819-prd | Replaced all reference-data fixtures with a dump of the production database (162 manifest models + combined); net 86,641 -> 63,869 rows, 0 dangling FKs, parity verified | 2026-08-19 | 64c7ef02 | [260819-prd-replace-all-fixtures-with-production-dat](./quick/260819-prd-replace-all-fixtures-with-production-dat/) |
+| 260820-he5 | Admin script: import FRA carbon stock data for a selected assessment year | 2026-08-20 | 9faeed81 | [260820-he5-admin-script-import-fra-carbon-stock-dat](./quick/260820-he5-admin-script-import-fra-carbon-stock-dat/) |
 
 ## Session Continuity
 

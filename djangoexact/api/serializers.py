@@ -3209,6 +3209,24 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
+def check_member_management_allowed(project: Project, request):
+    """Guard for adding/updating project memberships and invitations.
+
+    Archived projects are closed for good. Finalized projects are read-only for
+    everyone except the people who administer them: project Admins (and
+    superusers, who bypass every other project permission check) must still be
+    able to hand over or share administration after finalization.
+    """
+    user = getattr(request, "user", None)
+    is_project_admin = user is not None and user.is_authenticated and (user.is_superuser or project.members.filter(user=user, group__name="Admin").exists())
+
+    if project.is_archived:
+        raise serializers.ValidationError("Cannot add members to an archived project")
+
+    if project.is_finalized and not is_project_admin:
+        raise serializers.ValidationError("Cannot add members to a finalized project")
+
+
 class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
@@ -3224,11 +3242,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         return data
 
@@ -3559,11 +3573,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()

@@ -137,6 +137,7 @@ jobs:
             api.tests.test_luc_compute_iterator \
             api.tests.test_project_export \
             api.tests.test_production_config_check \
+            api.tests.test_finalized_member_management \
             api.tests.unit.test_soc_t2_w_unit_simple \
             api.tests.unit.test_sync_firebase_emails \
             api.tests.unit.activity \

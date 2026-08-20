@@ -304,6 +304,7 @@ class Region(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    iso3 = models.CharField(max_length=3, null=True, blank=True, unique=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     ipcc_region = models.ForeignKey(IPCCRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     gleam_region = models.ForeignKey(GLEAMRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")

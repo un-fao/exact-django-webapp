@@ -9,6 +9,7 @@ urlpatterns = [
     path("jobs/", views.jobs_list, name="jobs-list"),
     path("jobs/partial/", views.jobs_list_partial, name="jobs-list-partial"),
     path("example-script/", views.example_script, name="example-script"),
+    path("fra-carbon-stock/", views.fra_carbon_stock, name="fra-carbon-stock"),
     path("compile-scenarios/", views.compile_scenarios, name="compile-scenarios"),
     path("compile-scenarios/export/", views.compile_scenarios_export, name="compile-scenarios-export"),
     path("compile-scenarios/htmx/module-types/", views.htmx_module_types, name="htmx-module-types"),

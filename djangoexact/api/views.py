@@ -1686,7 +1686,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1701,7 +1701,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
