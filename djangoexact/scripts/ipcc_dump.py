@@ -4801,7 +4801,7 @@ def add_density_zero_where_density_is_none_in_irrigation_phase_data():
     print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
 
 
-def import_fra_carbon_stock_data():
+def import_fra_carbon_stock_data_2020():
     """
     Import FRA carbon stock data from CSV file.
     """
@@ -4811,7 +4811,7 @@ def import_fra_carbon_stock_data():
     FRACarbonStock.objects.all().delete()
 
     df = pd.read_csv(
-        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock2020.csv"),
         header=0,
         sep=",",
     )
@@ -4825,12 +4825,12 @@ def import_fra_carbon_stock_data():
             print(f"Country {row['country']} not found. Skipping...")
             missing_countries.append(row["country"])
             continue
-        agb = parse_csv_number(row["agb"])
-        bgb = parse_csv_number(row["bgb"])
-        litter = parse_csv_number(row["litter"])
-        deadwood = parse_csv_number(row["deadwood"])
-        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
-        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+        agb = parse_csv_number(row["agb"]) if row["agb"] else None
+        bgb = parse_csv_number(row["bgb"]) if row["bgb"] else None
+        litter = parse_csv_number(row["litter"]) if row["litter"] else None
+        deadwood = parse_csv_number(row["deadwood"]) if row["deadwood"] else None
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row["carbon_stock_biomass_total"] else None
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row["carbon_stock_total"] else None
 
         print(f"Creating {country} {2020} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
 
@@ -4847,6 +4847,53 @@ def import_fra_carbon_stock_data():
 
     print(f"Missing countries: {missing_countries}")
 
+
+def import_fra_carbon_stock_data_2025():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock2025.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"]) if row["agb"] else None
+        bgb = parse_csv_number(row["bgb"]) if row["bgb"] else None
+        litter = parse_csv_number(row["litter"]) if row["litter"] else None
+        deadwood = parse_csv_number(row["deadwood"]) if row["deadwood"] else None
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row["carbon_stock_biomass_total"] else None
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row["carbon_stock_total"] else None
+        year = 2025
+
+        print(f"Creating {country} {year} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
+
+        FRACarbonStock.objects.create(
+            year=year,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
 
 def add_ipcc_and_fra_as_data_sources():
     """
@@ -5332,6 +5379,7 @@ def run():
         update_crop_types_annuals_perennials()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "review":
@@ -5342,6 +5390,7 @@ def run():
         update_crop_types_annuals_perennials()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "development":
@@ -5355,6 +5404,7 @@ def run():
         update_crop_types_annuals_perennials()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "local":
