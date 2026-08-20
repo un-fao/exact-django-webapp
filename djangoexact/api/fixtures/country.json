@@ -4,6 +4,7 @@
     "pk": 262,
     "fields": {
       "name": "Afghanistan",
+      "iso3": "AFG",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -14,6 +15,7 @@
     "pk": 254,
     "fields": {
       "name": "Åland Islands",
+      "iso3": "ALA",
       "region": null,
       "ipcc_region": null,
       "gleam_region": null
@@ -24,6 +26,7 @@
     "pk": 208,
     "fields": {
       "name": "Albania",
+      "iso3": "ALB",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -34,6 +37,7 @@
     "pk": 106,
     "fields": {
       "name": "Algeria",
+      "iso3": "DZA",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -44,6 +48,7 @@
     "pk": 1,
     "fields": {
       "name": "American Samoa",
+      "iso3": "ASM",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -54,6 +59,7 @@
     "pk": 209,
     "fields": {
       "name": "Andorra",
+      "iso3": "AND",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -64,6 +70,7 @@
     "pk": 156,
     "fields": {
       "name": "Angola",
+      "iso3": "AGO",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -74,6 +81,7 @@
     "pk": 54,
     "fields": {
       "name": "Anguilla",
+      "iso3": "AIA",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -84,6 +92,7 @@
     "pk": 55,
     "fields": {
       "name": "Antigua And Barbuda",
+      "iso3": "ATG",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -94,6 +103,7 @@
     "pk": 56,
     "fields": {
       "name": "Argentina",
+      "iso3": "ARG",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -104,6 +114,7 @@
     "pk": 107,
     "fields": {
       "name": "Armenia",
+      "iso3": "ARM",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -114,6 +125,7 @@
     "pk": 57,
     "fields": {
       "name": "Aruba",
+      "iso3": "ABW",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -124,6 +136,7 @@
     "pk": 142,
     "fields": {
       "name": "Australia",
+      "iso3": "AUS",
       "region": 12,
       "ipcc_region": 8,
       "gleam_region": 6
@@ -134,6 +147,7 @@
     "pk": 210,
     "fields": {
       "name": "Austria",
+      "iso3": "AUT",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -144,6 +158,7 @@
     "pk": 108,
     "fields": {
       "name": "Azerbaijan",
+      "iso3": "AZE",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -154,6 +169,7 @@
     "pk": 287,
     "fields": {
       "name": "Azores (Portugal)",
+      "iso3": null,
       "region": 11,
       "ipcc_region": null,
       "gleam_region": null
@@ -164,6 +180,7 @@
     "pk": 58,
     "fields": {
       "name": "Bahamas",
+      "iso3": "BHS",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -174,6 +191,7 @@
     "pk": 109,
     "fields": {
       "name": "Bahrain",
+      "iso3": "BHR",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -184,6 +202,7 @@
     "pk": 146,
     "fields": {
       "name": "Bangladesh",
+      "iso3": "BGD",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -194,6 +213,7 @@
     "pk": 59,
     "fields": {
       "name": "Barbados",
+      "iso3": "BRB",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -204,6 +224,7 @@
     "pk": 45,
     "fields": {
       "name": "Belarus",
+      "iso3": "BLR",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -214,6 +235,7 @@
     "pk": 211,
     "fields": {
       "name": "Belgium",
+      "iso3": "BEL",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -224,6 +246,7 @@
     "pk": 60,
     "fields": {
       "name": "Belize",
+      "iso3": "BLZ",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -234,6 +257,7 @@
     "pk": 157,
     "fields": {
       "name": "Benin",
+      "iso3": "BEN",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -244,6 +268,7 @@
     "pk": 137,
     "fields": {
       "name": "Bermuda",
+      "iso3": "BMU",
       "region": 13,
       "ipcc_region": 3,
       "gleam_region": 5
@@ -254,6 +279,7 @@
     "pk": 147,
     "fields": {
       "name": "Bhutan",
+      "iso3": "BTN",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -264,6 +290,7 @@
     "pk": 61,
     "fields": {
       "name": "Bolivia (Plurinational State of)",
+      "iso3": "BOL",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -274,6 +301,7 @@
     "pk": 62,
     "fields": {
       "name": "Bonaire, Sint Eustatius And Saba",
+      "iso3": "BES",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -284,6 +312,7 @@
     "pk": 212,
     "fields": {
       "name": "Bosnia And Herzegovina",
+      "iso3": "BIH",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -294,6 +323,7 @@
     "pk": 158,
     "fields": {
       "name": "Botswana",
+      "iso3": "BWA",
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -304,6 +334,7 @@
     "pk": 63,
     "fields": {
       "name": "Bouvet Island",
+      "iso3": "BVT",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -314,6 +345,7 @@
     "pk": 64,
     "fields": {
       "name": "Brazil",
+      "iso3": "BRA",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -324,6 +356,7 @@
     "pk": 148,
     "fields": {
       "name": "British Indian Ocean Territory",
+      "iso3": "IOT",
       "region": 1,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -334,6 +367,7 @@
     "pk": 65,
     "fields": {
       "name": "British Virgin Islands",
+      "iso3": "VGB",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -344,6 +378,7 @@
     "pk": 263,
     "fields": {
       "name": "Brunei Darussalam",
+      "iso3": "BRN",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -354,6 +389,7 @@
     "pk": 46,
     "fields": {
       "name": "Bulgaria",
+      "iso3": "BGR",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -364,6 +400,7 @@
     "pk": 159,
     "fields": {
       "name": "Burkina Faso",
+      "iso3": "BFA",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -374,6 +411,7 @@
     "pk": 160,
     "fields": {
       "name": "Burundi",
+      "iso3": "BDI",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -384,6 +422,7 @@
     "pk": 161,
     "fields": {
       "name": "Cabo Verde",
+      "iso3": "CPV",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -394,6 +433,7 @@
     "pk": 264,
     "fields": {
       "name": "Cambodia",
+      "iso3": "KHM",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -404,6 +444,7 @@
     "pk": 162,
     "fields": {
       "name": "Cameroon",
+      "iso3": "CMR",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -414,6 +455,7 @@
     "pk": 138,
     "fields": {
       "name": "Canada",
+      "iso3": "CAN",
       "region": 13,
       "ipcc_region": 3,
       "gleam_region": 5
@@ -424,6 +466,7 @@
     "pk": 288,
     "fields": {
       "name": "Canary Islands",
+      "iso3": null,
       "region": 11,
       "ipcc_region": null,
       "gleam_region": null
@@ -434,6 +477,7 @@
     "pk": 66,
     "fields": {
       "name": "Cayman Islands",
+      "iso3": "CYM",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -444,6 +488,7 @@
     "pk": 163,
     "fields": {
       "name": "Central African Republic",
+      "iso3": "CAF",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -454,6 +499,7 @@
     "pk": 164,
     "fields": {
       "name": "Chad",
+      "iso3": "TCD",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -464,6 +510,7 @@
     "pk": 289,
     "fields": {
       "name": "Channel Islands",
+      "iso3": null,
       "region": 11,
       "ipcc_region": null,
       "gleam_region": null
@@ -474,6 +521,7 @@
     "pk": 67,
     "fields": {
       "name": "Chile",
+      "iso3": "CHL",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -484,6 +532,7 @@
     "pk": 4,
     "fields": {
       "name": "China",
+      "iso3": "CHN",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -494,6 +543,7 @@
     "pk": 5,
     "fields": {
       "name": "China, Hong Kong SAR",
+      "iso3": "HKG",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -504,6 +554,7 @@
     "pk": 6,
     "fields": {
       "name": "China, Macao SAR",
+      "iso3": "MAC",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -514,6 +565,7 @@
     "pk": 7,
     "fields": {
       "name": "Christmas Island",
+      "iso3": "CXR",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -524,6 +576,7 @@
     "pk": 274,
     "fields": {
       "name": "Cocos (keeling) Islands",
+      "iso3": "CCK",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -534,6 +587,7 @@
     "pk": 68,
     "fields": {
       "name": "Colombia",
+      "iso3": "COL",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -544,6 +598,7 @@
     "pk": 165,
     "fields": {
       "name": "Comoros",
+      "iso3": "COM",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -554,6 +609,7 @@
     "pk": 166,
     "fields": {
       "name": "Congo",
+      "iso3": "COG",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -564,6 +620,7 @@
     "pk": 9,
     "fields": {
       "name": "Cook Islands",
+      "iso3": "COK",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -574,6 +631,7 @@
     "pk": 69,
     "fields": {
       "name": "Costa Rica",
+      "iso3": "CRI",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -584,6 +642,7 @@
     "pk": 265,
     "fields": {
       "name": "Côte d’Ivoire",
+      "iso3": "CIV",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -594,6 +653,7 @@
     "pk": 213,
     "fields": {
       "name": "Croatia",
+      "iso3": "HRV",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -604,6 +664,7 @@
     "pk": 70,
     "fields": {
       "name": "Cuba",
+      "iso3": "CUB",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -614,6 +675,7 @@
     "pk": 256,
     "fields": {
       "name": "Curaçao",
+      "iso3": "CUW",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -624,6 +686,7 @@
     "pk": 110,
     "fields": {
       "name": "Cyprus",
+      "iso3": "CYP",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -634,6 +697,7 @@
     "pk": 47,
     "fields": {
       "name": "Czechia",
+      "iso3": "CZE",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -644,6 +708,7 @@
     "pk": 275,
     "fields": {
       "name": "Democratic People's Republic Of Korea",
+      "iso3": "PRK",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -654,6 +719,7 @@
     "pk": 168,
     "fields": {
       "name": "Democratic Republic Of The Congo",
+      "iso3": "COD",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -664,6 +730,7 @@
     "pk": 214,
     "fields": {
       "name": "Denmark",
+      "iso3": "DNK",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -674,6 +741,7 @@
     "pk": 169,
     "fields": {
       "name": "Djibouti",
+      "iso3": "DJI",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -684,6 +752,7 @@
     "pk": 72,
     "fields": {
       "name": "Dominica",
+      "iso3": "DMA",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -694,6 +763,7 @@
     "pk": 73,
     "fields": {
       "name": "Dominican Republic",
+      "iso3": "DOM",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -704,6 +774,7 @@
     "pk": 74,
     "fields": {
       "name": "Ecuador",
+      "iso3": "ECU",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -714,6 +785,7 @@
     "pk": 111,
     "fields": {
       "name": "Egypt",
+      "iso3": "EGY",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -724,6 +796,7 @@
     "pk": 75,
     "fields": {
       "name": "El Salvador",
+      "iso3": "SLV",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -734,6 +807,7 @@
     "pk": 170,
     "fields": {
       "name": "Equatorial Guinea",
+      "iso3": "GNQ",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -744,6 +818,7 @@
     "pk": 171,
     "fields": {
       "name": "Eritrea",
+      "iso3": "ERI",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -754,6 +829,7 @@
     "pk": 215,
     "fields": {
       "name": "Estonia",
+      "iso3": "EST",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -764,6 +840,7 @@
     "pk": 172,
     "fields": {
       "name": "Eswatini",
+      "iso3": "SWZ",
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -774,6 +851,7 @@
     "pk": 173,
     "fields": {
       "name": "Ethiopia",
+      "iso3": "ETH",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -784,6 +862,7 @@
     "pk": 276,
     "fields": {
       "name": "Falkland Islands (malvinas)",
+      "iso3": "FLK",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -794,6 +873,7 @@
     "pk": 216,
     "fields": {
       "name": "Faroe Islands",
+      "iso3": "FRO",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -804,6 +884,7 @@
     "pk": 11,
     "fields": {
       "name": "Fiji",
+      "iso3": "FJI",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -814,6 +895,7 @@
     "pk": 217,
     "fields": {
       "name": "Finland",
+      "iso3": "FIN",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -824,6 +906,7 @@
     "pk": 218,
     "fields": {
       "name": "France",
+      "iso3": "FRA",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -834,6 +917,7 @@
     "pk": 77,
     "fields": {
       "name": "French Guiana",
+      "iso3": "GUF",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -844,6 +928,7 @@
     "pk": 12,
     "fields": {
       "name": "French Polynesia",
+      "iso3": "PYF",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -854,6 +939,7 @@
     "pk": 174,
     "fields": {
       "name": "French Southern Territories",
+      "iso3": "ATF",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -864,6 +950,7 @@
     "pk": 175,
     "fields": {
       "name": "Gabon",
+      "iso3": "GAB",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -874,6 +961,7 @@
     "pk": 176,
     "fields": {
       "name": "Gambia",
+      "iso3": "GMB",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -884,6 +972,7 @@
     "pk": 112,
     "fields": {
       "name": "Georgia",
+      "iso3": "GEO",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -894,6 +983,7 @@
     "pk": 219,
     "fields": {
       "name": "Germany",
+      "iso3": "DEU",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -904,6 +994,7 @@
     "pk": 177,
     "fields": {
       "name": "Ghana",
+      "iso3": "GHA",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -914,6 +1005,7 @@
     "pk": 220,
     "fields": {
       "name": "Gibraltar",
+      "iso3": "GIB",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -924,6 +1016,7 @@
     "pk": 221,
     "fields": {
       "name": "Greece",
+      "iso3": "GRC",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -934,6 +1027,7 @@
     "pk": 139,
     "fields": {
       "name": "Greenland",
+      "iso3": "GRL",
       "region": 13,
       "ipcc_region": 3,
       "gleam_region": 5
@@ -944,6 +1038,7 @@
     "pk": 78,
     "fields": {
       "name": "Grenada",
+      "iso3": "GRD",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -954,6 +1049,7 @@
     "pk": 79,
     "fields": {
       "name": "Guadeloupe",
+      "iso3": "GLP",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -964,6 +1060,7 @@
     "pk": 13,
     "fields": {
       "name": "Guam",
+      "iso3": "GUM",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -974,6 +1071,7 @@
     "pk": 80,
     "fields": {
       "name": "Guatemala",
+      "iso3": "GTM",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -984,6 +1082,7 @@
     "pk": 222,
     "fields": {
       "name": "Guernsey",
+      "iso3": "GGY",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -994,6 +1093,7 @@
     "pk": 178,
     "fields": {
       "name": "Guinea",
+      "iso3": "GIN",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1004,6 +1104,7 @@
     "pk": 179,
     "fields": {
       "name": "Guinea-Bissau",
+      "iso3": "GNB",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1014,6 +1115,7 @@
     "pk": 81,
     "fields": {
       "name": "Guyana",
+      "iso3": "GUY",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1024,6 +1126,7 @@
     "pk": 82,
     "fields": {
       "name": "Haiti",
+      "iso3": "HTI",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1034,6 +1137,7 @@
     "pk": 14,
     "fields": {
       "name": "Heard Island And Mcdonald Islands",
+      "iso3": "HMD",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1044,6 +1148,7 @@
     "pk": 223,
     "fields": {
       "name": "Holy See",
+      "iso3": "VAT",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1054,6 +1159,7 @@
     "pk": 83,
     "fields": {
       "name": "Honduras",
+      "iso3": "HND",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1064,6 +1170,7 @@
     "pk": 48,
     "fields": {
       "name": "Hungary",
+      "iso3": "HUN",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -1074,6 +1181,7 @@
     "pk": 224,
     "fields": {
       "name": "Iceland",
+      "iso3": "ISL",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1084,6 +1192,7 @@
     "pk": 149,
     "fields": {
       "name": "India",
+      "iso3": "IND",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1094,6 +1203,7 @@
     "pk": 266,
     "fields": {
       "name": "Indonesia",
+      "iso3": "IDN",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1104,6 +1214,7 @@
     "pk": 150,
     "fields": {
       "name": "Iran (Islamic Republic of)",
+      "iso3": "IRN",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1114,6 +1225,7 @@
     "pk": 113,
     "fields": {
       "name": "Iraq",
+      "iso3": "IRQ",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1124,6 +1236,7 @@
     "pk": 225,
     "fields": {
       "name": "Ireland",
+      "iso3": "IRL",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1134,6 +1247,7 @@
     "pk": 226,
     "fields": {
       "name": "Isle Of Man",
+      "iso3": "IMN",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1144,6 +1258,7 @@
     "pk": 114,
     "fields": {
       "name": "Israel",
+      "iso3": "ISR",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1154,6 +1269,7 @@
     "pk": 227,
     "fields": {
       "name": "Italy",
+      "iso3": "ITA",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1164,6 +1280,7 @@
     "pk": 84,
     "fields": {
       "name": "Jamaica",
+      "iso3": "JAM",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1174,6 +1291,7 @@
     "pk": 16,
     "fields": {
       "name": "Japan",
+      "iso3": "JPN",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1184,6 +1302,7 @@
     "pk": 228,
     "fields": {
       "name": "Jersey",
+      "iso3": "JEY",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1194,6 +1313,7 @@
     "pk": 115,
     "fields": {
       "name": "Jordan",
+      "iso3": "JOR",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1204,6 +1324,7 @@
     "pk": 116,
     "fields": {
       "name": "Kazakhstan",
+      "iso3": "KAZ",
       "region": 6,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1214,6 +1335,7 @@
     "pk": 180,
     "fields": {
       "name": "Kenya",
+      "iso3": "KEN",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1224,6 +1346,7 @@
     "pk": 17,
     "fields": {
       "name": "Kiribati",
+      "iso3": "KIR",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1234,6 +1357,7 @@
     "pk": 290,
     "fields": {
       "name": "Kosovo",
+      "iso3": null,
       "region": 11,
       "ipcc_region": null,
       "gleam_region": null
@@ -1244,6 +1368,7 @@
     "pk": 117,
     "fields": {
       "name": "Kuwait",
+      "iso3": "KWT",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1254,6 +1379,7 @@
     "pk": 118,
     "fields": {
       "name": "Kyrgyzstan",
+      "iso3": "KGZ",
       "region": 6,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1264,6 +1390,7 @@
     "pk": 277,
     "fields": {
       "name": "Lao People's Democratic Republic",
+      "iso3": "LAO",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1274,6 +1401,7 @@
     "pk": 229,
     "fields": {
       "name": "Latvia",
+      "iso3": "LVA",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1284,6 +1412,7 @@
     "pk": 119,
     "fields": {
       "name": "Lebanon",
+      "iso3": "LBN",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1294,6 +1423,7 @@
     "pk": 181,
     "fields": {
       "name": "Lesotho",
+      "iso3": "LSO",
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1304,6 +1434,7 @@
     "pk": 182,
     "fields": {
       "name": "Liberia",
+      "iso3": "LBR",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1314,6 +1445,7 @@
     "pk": 120,
     "fields": {
       "name": "Libya",
+      "iso3": "LBY",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1324,6 +1456,7 @@
     "pk": 230,
     "fields": {
       "name": "Liechtenstein",
+      "iso3": "LIE",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1334,6 +1467,7 @@
     "pk": 231,
     "fields": {
       "name": "Lithuania",
+      "iso3": "LTU",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1344,6 +1478,7 @@
     "pk": 232,
     "fields": {
       "name": "Luxembourg",
+      "iso3": "LUX",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1354,6 +1489,7 @@
     "pk": 183,
     "fields": {
       "name": "Madagascar",
+      "iso3": "MDG",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1364,6 +1500,7 @@
     "pk": 291,
     "fields": {
       "name": "Madeira Islands",
+      "iso3": null,
       "region": 5,
       "ipcc_region": null,
       "gleam_region": null
@@ -1374,6 +1511,7 @@
     "pk": 184,
     "fields": {
       "name": "Malawi",
+      "iso3": "MWI",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1384,6 +1522,7 @@
     "pk": 267,
     "fields": {
       "name": "Malaysia",
+      "iso3": "MYS",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1394,6 +1533,7 @@
     "pk": 151,
     "fields": {
       "name": "Maldives",
+      "iso3": "MDV",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1404,6 +1544,7 @@
     "pk": 185,
     "fields": {
       "name": "Mali",
+      "iso3": "MLI",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1414,6 +1555,7 @@
     "pk": 233,
     "fields": {
       "name": "Malta",
+      "iso3": "MLT",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1424,6 +1566,7 @@
     "pk": 20,
     "fields": {
       "name": "Marshall Islands",
+      "iso3": "MHL",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1434,6 +1577,7 @@
     "pk": 85,
     "fields": {
       "name": "Martinique",
+      "iso3": "MTQ",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1444,6 +1588,7 @@
     "pk": 186,
     "fields": {
       "name": "Mauritania",
+      "iso3": "MRT",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1454,6 +1599,7 @@
     "pk": 187,
     "fields": {
       "name": "Mauritius",
+      "iso3": "MUS",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1464,6 +1610,7 @@
     "pk": 188,
     "fields": {
       "name": "Mayotte",
+      "iso3": "MYT",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1474,6 +1621,7 @@
     "pk": 86,
     "fields": {
       "name": "Mexico",
+      "iso3": "MEX",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1484,6 +1632,7 @@
     "pk": 268,
     "fields": {
       "name": "Micronesia (federated States Of)",
+      "iso3": "FSM",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1494,6 +1643,7 @@
     "pk": 234,
     "fields": {
       "name": "Monaco",
+      "iso3": "MCO",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1504,6 +1654,7 @@
     "pk": 22,
     "fields": {
       "name": "Mongolia",
+      "iso3": "MNG",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1514,6 +1665,7 @@
     "pk": 235,
     "fields": {
       "name": "Montenegro",
+      "iso3": "MNE",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1524,6 +1676,7 @@
     "pk": 87,
     "fields": {
       "name": "Montserrat",
+      "iso3": "MSR",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1534,6 +1687,7 @@
     "pk": 121,
     "fields": {
       "name": "Morocco",
+      "iso3": "MAR",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1544,6 +1698,7 @@
     "pk": 189,
     "fields": {
       "name": "Mozambique",
+      "iso3": "MOZ",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1554,6 +1709,7 @@
     "pk": 269,
     "fields": {
       "name": "Myanmar",
+      "iso3": "MMR",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1564,6 +1720,7 @@
     "pk": 190,
     "fields": {
       "name": "Namibia",
+      "iso3": "NAM",
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1574,6 +1731,7 @@
     "pk": 24,
     "fields": {
       "name": "Nauru",
+      "iso3": "NRU",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1584,6 +1742,7 @@
     "pk": 152,
     "fields": {
       "name": "Nepal",
+      "iso3": "NPL",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1594,6 +1753,7 @@
     "pk": 236,
     "fields": {
       "name": "Netherlands (Kingdom of the)",
+      "iso3": "NLD",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1604,6 +1764,7 @@
     "pk": 25,
     "fields": {
       "name": "New Caledonia",
+      "iso3": "NCL",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1614,6 +1775,7 @@
     "pk": 143,
     "fields": {
       "name": "New Zealand",
+      "iso3": "NZL",
       "region": 12,
       "ipcc_region": 8,
       "gleam_region": 6
@@ -1624,6 +1786,7 @@
     "pk": 88,
     "fields": {
       "name": "Nicaragua",
+      "iso3": "NIC",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1634,6 +1797,7 @@
     "pk": 191,
     "fields": {
       "name": "Niger",
+      "iso3": "NER",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1644,6 +1808,7 @@
     "pk": 192,
     "fields": {
       "name": "Nigeria",
+      "iso3": "NGA",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1654,6 +1819,7 @@
     "pk": 26,
     "fields": {
       "name": "Niue",
+      "iso3": "NIU",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1664,6 +1830,7 @@
     "pk": 27,
     "fields": {
       "name": "Norfolk Island",
+      "iso3": "NFK",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1674,6 +1841,7 @@
     "pk": 28,
     "fields": {
       "name": "Northern Mariana Islands",
+      "iso3": "MNP",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1684,6 +1852,7 @@
     "pk": 237,
     "fields": {
       "name": "North Macedonia",
+      "iso3": "MKD",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1694,6 +1863,7 @@
     "pk": 238,
     "fields": {
       "name": "Norway",
+      "iso3": "NOR",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1704,6 +1874,7 @@
     "pk": 122,
     "fields": {
       "name": "Oman",
+      "iso3": "OMN",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1714,6 +1885,7 @@
     "pk": 153,
     "fields": {
       "name": "Pakistan",
+      "iso3": "PAK",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1724,6 +1896,7 @@
     "pk": 29,
     "fields": {
       "name": "Palau",
+      "iso3": "PLW",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1734,6 +1907,7 @@
     "pk": 126,
     "fields": {
       "name": "Palestine",
+      "iso3": "PSE",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1744,6 +1918,7 @@
     "pk": 89,
     "fields": {
       "name": "Panama",
+      "iso3": "PAN",
       "region": 15,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1754,6 +1929,7 @@
     "pk": 30,
     "fields": {
       "name": "Papua New Guinea",
+      "iso3": "PNG",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1764,6 +1940,7 @@
     "pk": 90,
     "fields": {
       "name": "Paraguay",
+      "iso3": "PRY",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1774,6 +1951,7 @@
     "pk": 91,
     "fields": {
       "name": "Peru",
+      "iso3": "PER",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1784,6 +1962,7 @@
     "pk": 270,
     "fields": {
       "name": "Philippines",
+      "iso3": "PHL",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1794,6 +1973,7 @@
     "pk": 154,
     "fields": {
       "name": "Pitcairn",
+      "iso3": "PCN",
       "region": 12,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -1804,6 +1984,7 @@
     "pk": 49,
     "fields": {
       "name": "Poland",
+      "iso3": "POL",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -1814,6 +1995,7 @@
     "pk": 239,
     "fields": {
       "name": "Portugal",
+      "iso3": "PRT",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1824,6 +2006,7 @@
     "pk": 92,
     "fields": {
       "name": "Puerto Rico",
+      "iso3": "PRI",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1834,6 +2017,7 @@
     "pk": 123,
     "fields": {
       "name": "Qatar",
+      "iso3": "QAT",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -1844,6 +2028,7 @@
     "pk": 32,
     "fields": {
       "name": "Republic Of Korea",
+      "iso3": "KOR",
       "region": 7,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1854,6 +2039,7 @@
     "pk": 50,
     "fields": {
       "name": "Republic Of Moldova",
+      "iso3": "MDA",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -1864,6 +2050,7 @@
     "pk": 259,
     "fields": {
       "name": "Réunion",
+      "iso3": "REU",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1874,6 +2061,7 @@
     "pk": 51,
     "fields": {
       "name": "Romania",
+      "iso3": "ROU",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -1884,6 +2072,7 @@
     "pk": 144,
     "fields": {
       "name": "Russian Federation",
+      "iso3": "RUS",
       "region": 11,
       "ipcc_region": 7,
       "gleam_region": 7
@@ -1894,6 +2083,7 @@
     "pk": 194,
     "fields": {
       "name": "Rwanda",
+      "iso3": "RWA",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1904,6 +2094,7 @@
     "pk": 257,
     "fields": {
       "name": "Saint Barthélemy",
+      "iso3": "BLM",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1914,6 +2105,7 @@
     "pk": 195,
     "fields": {
       "name": "Saint Helena",
+      "iso3": "SHN",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -1924,6 +2116,7 @@
     "pk": 94,
     "fields": {
       "name": "Saint Kitts And Nevis",
+      "iso3": "KNA",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1934,6 +2127,7 @@
     "pk": 95,
     "fields": {
       "name": "Saint Lucia",
+      "iso3": "LCA",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1944,6 +2138,7 @@
     "pk": 278,
     "fields": {
       "name": "Saint Martin (french Part)",
+      "iso3": "MAF",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1954,6 +2149,7 @@
     "pk": 140,
     "fields": {
       "name": "Saint Pierre And Miquelon",
+      "iso3": "SPM",
       "region": 13,
       "ipcc_region": 3,
       "gleam_region": 5
@@ -1964,6 +2160,7 @@
     "pk": 97,
     "fields": {
       "name": "Saint Vincent And The Grenadines",
+      "iso3": "VCT",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -1974,6 +2171,7 @@
     "pk": 33,
     "fields": {
       "name": "Samoa",
+      "iso3": "WSM",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -1984,6 +2182,7 @@
     "pk": 240,
     "fields": {
       "name": "San Marino",
+      "iso3": "SMR",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -1994,6 +2193,7 @@
     "pk": 196,
     "fields": {
       "name": "Sao Tome And Principe",
+      "iso3": "STP",
       "region": 2,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2004,6 +2204,7 @@
     "pk": 241,
     "fields": {
       "name": "Sark",
+      "iso3": null,
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2014,6 +2215,7 @@
     "pk": 124,
     "fields": {
       "name": "Saudi Arabia",
+      "iso3": "SAU",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2024,6 +2226,7 @@
     "pk": 197,
     "fields": {
       "name": "Senegal",
+      "iso3": "SEN",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2034,6 +2237,7 @@
     "pk": 242,
     "fields": {
       "name": "Serbia",
+      "iso3": "SRB",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2044,6 +2248,7 @@
     "pk": 198,
     "fields": {
       "name": "Seychelles",
+      "iso3": "SYC",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2054,6 +2259,7 @@
     "pk": 199,
     "fields": {
       "name": "Sierra Leone",
+      "iso3": "SLE",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2064,6 +2270,7 @@
     "pk": 271,
     "fields": {
       "name": "Singapore",
+      "iso3": "SGP",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2074,6 +2281,7 @@
     "pk": 279,
     "fields": {
       "name": "Sint Maarten (dutch Part)",
+      "iso3": "SXM",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2084,6 +2292,7 @@
     "pk": 52,
     "fields": {
       "name": "Slovakia",
+      "iso3": "SVK",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -2094,6 +2303,7 @@
     "pk": 243,
     "fields": {
       "name": "Slovenia",
+      "iso3": "SVN",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2104,6 +2314,7 @@
     "pk": 35,
     "fields": {
       "name": "Solomon Islands",
+      "iso3": "SLB",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2114,6 +2325,7 @@
     "pk": 200,
     "fields": {
       "name": "Somalia",
+      "iso3": "SOM",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2124,6 +2336,7 @@
     "pk": 201,
     "fields": {
       "name": "South Africa",
+      "iso3": "ZAF",
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2134,6 +2347,7 @@
     "pk": 283,
     "fields": {
       "name": "Southern Africa",
+      "iso3": null,
       "region": 4,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2144,6 +2358,7 @@
     "pk": 99,
     "fields": {
       "name": "South Georgia And The South Sandwich Islands",
+      "iso3": "SGS",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2154,6 +2369,7 @@
     "pk": 125,
     "fields": {
       "name": "South Sudan",
+      "iso3": "SSD",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2164,6 +2380,7 @@
     "pk": 244,
     "fields": {
       "name": "Spain",
+      "iso3": "ESP",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2174,6 +2391,7 @@
     "pk": 155,
     "fields": {
       "name": "Sri Lanka",
+      "iso3": "LKA",
       "region": 9,
       "ipcc_region": 10,
       "gleam_region": 8
@@ -2184,6 +2402,7 @@
     "pk": 127,
     "fields": {
       "name": "Sudan",
+      "iso3": "SDN",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2194,6 +2413,7 @@
     "pk": 100,
     "fields": {
       "name": "Suriname",
+      "iso3": "SUR",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2204,6 +2424,7 @@
     "pk": 245,
     "fields": {
       "name": "Svalbard And Jan Mayen Islands",
+      "iso3": "SJM",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2214,6 +2435,7 @@
     "pk": 246,
     "fields": {
       "name": "Sweden",
+      "iso3": "SWE",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2224,6 +2446,7 @@
     "pk": 247,
     "fields": {
       "name": "Switzerland",
+      "iso3": "CHE",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2234,6 +2457,7 @@
     "pk": 128,
     "fields": {
       "name": "Syrian Arab Republic",
+      "iso3": "SYR",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2244,6 +2468,7 @@
     "pk": 272,
     "fields": {
       "name": "Taiwan ",
+      "iso3": null,
       "region": null,
       "ipcc_region": null,
       "gleam_region": null
@@ -2254,6 +2479,7 @@
     "pk": 292,
     "fields": {
       "name": "Taiwan (Chinese Taipei)",
+      "iso3": "TWN",
       "region": 7,
       "ipcc_region": null,
       "gleam_region": null
@@ -2264,6 +2490,7 @@
     "pk": 129,
     "fields": {
       "name": "Tajikistan",
+      "iso3": "TJK",
       "region": 6,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2274,6 +2501,7 @@
     "pk": 273,
     "fields": {
       "name": "Thailand",
+      "iso3": "THA",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2284,6 +2512,7 @@
     "pk": 280,
     "fields": {
       "name": "Timor-Leste",
+      "iso3": "TLS",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2294,6 +2523,7 @@
     "pk": 202,
     "fields": {
       "name": "Togo",
+      "iso3": "TGO",
       "region": 5,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2304,6 +2534,7 @@
     "pk": 38,
     "fields": {
       "name": "Tokelau",
+      "iso3": "TKL",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2314,6 +2545,7 @@
     "pk": 39,
     "fields": {
       "name": "Tonga",
+      "iso3": "TON",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2324,6 +2556,7 @@
     "pk": 101,
     "fields": {
       "name": "Trinidad And Tobago",
+      "iso3": "TTO",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2334,6 +2567,7 @@
     "pk": 130,
     "fields": {
       "name": "Tunisia",
+      "iso3": "TUN",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2344,6 +2578,7 @@
     "pk": 131,
     "fields": {
       "name": "Türkiye",
+      "iso3": "TUR",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2354,6 +2589,7 @@
     "pk": 132,
     "fields": {
       "name": "Turkmenistan",
+      "iso3": "TKM",
       "region": 6,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2364,6 +2600,7 @@
     "pk": 102,
     "fields": {
       "name": "Turks And Caicos Islands",
+      "iso3": "TCA",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2374,6 +2611,7 @@
     "pk": 40,
     "fields": {
       "name": "Tuvalu",
+      "iso3": "TUV",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2384,6 +2622,7 @@
     "pk": 203,
     "fields": {
       "name": "Uganda",
+      "iso3": "UGA",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2394,6 +2633,7 @@
     "pk": 53,
     "fields": {
       "name": "Ukraine",
+      "iso3": "UKR",
       "region": 11,
       "ipcc_region": 6,
       "gleam_region": 2
@@ -2404,6 +2644,7 @@
     "pk": 133,
     "fields": {
       "name": "United Arab Emirates",
+      "iso3": "ARE",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2414,6 +2655,7 @@
     "pk": 248,
     "fields": {
       "name": "United Kingdom Of Great Britain And Northern Ireland",
+      "iso3": "GBR",
       "region": 11,
       "ipcc_region": 5,
       "gleam_region": 10
@@ -2424,6 +2666,7 @@
     "pk": 204,
     "fields": {
       "name": "United Republic Of Tanzania",
+      "iso3": "TZA",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2434,6 +2677,7 @@
     "pk": 41,
     "fields": {
       "name": "United States Minor Outlying Islands",
+      "iso3": "UMI",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2444,6 +2688,7 @@
     "pk": 141,
     "fields": {
       "name": "United States Of America",
+      "iso3": "USA",
       "region": 13,
       "ipcc_region": 3,
       "gleam_region": 5
@@ -2454,6 +2699,7 @@
     "pk": 103,
     "fields": {
       "name": "United States Virgin Islands",
+      "iso3": "VIR",
       "region": 16,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2464,6 +2710,7 @@
     "pk": 104,
     "fields": {
       "name": "Uruguay",
+      "iso3": "URY",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2474,6 +2721,7 @@
     "pk": 134,
     "fields": {
       "name": "Uzbekistan",
+      "iso3": "UZB",
       "region": 6,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2484,6 +2732,7 @@
     "pk": 42,
     "fields": {
       "name": "Vanuatu",
+      "iso3": "VUT",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2494,6 +2743,7 @@
     "pk": 105,
     "fields": {
       "name": "Venezuela (Bolivarian Republic of)",
+      "iso3": "VEN",
       "region": 14,
       "ipcc_region": 4,
       "gleam_region": 12
@@ -2504,6 +2754,7 @@
     "pk": 281,
     "fields": {
       "name": "Viet Nam",
+      "iso3": "VNM",
       "region": 8,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2514,6 +2765,7 @@
     "pk": 44,
     "fields": {
       "name": "Wallis And Futuna Islands",
+      "iso3": "WLF",
       "region": 12,
       "ipcc_region": 16,
       "gleam_region": 11
@@ -2524,6 +2776,7 @@
     "pk": 135,
     "fields": {
       "name": "Western Sahara",
+      "iso3": "ESH",
       "region": 3,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2534,6 +2787,7 @@
     "pk": 136,
     "fields": {
       "name": "Yemen",
+      "iso3": "YEM",
       "region": 10,
       "ipcc_region": 13,
       "gleam_region": 13
@@ -2544,6 +2798,7 @@
     "pk": 205,
     "fields": {
       "name": "Zambia",
+      "iso3": "ZMB",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
@@ -2554,6 +2809,7 @@
     "pk": 206,
     "fields": {
       "name": "Zimbabwe",
+      "iso3": "ZWE",
       "region": 1,
       "ipcc_region": 14,
       "gleam_region": 9
