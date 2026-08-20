@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-20 - Completed quick task 260820-dkj: project admins can manage members of finalized projects again
+Last activity: 2026-08-20 - Completed quick task 260820-he5: admin script to import FRA carbon stock for a chosen assessment year
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -119,6 +119,7 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | *(none)* | | | |
 | 260819-prd | Replaced all reference-data fixtures with a dump of the production database (162 manifest models + combined); net 86,641 -> 63,869 rows, 0 dangling FKs, parity verified | 2026-08-19 | 64c7ef02 | [260819-prd-replace-all-fixtures-with-production-dat](./quick/260819-prd-replace-all-fixtures-with-production-dat/) |
+| 260820-he5 | Admin script: import FRA carbon stock data for a selected assessment year | 2026-08-20 | 9faeed81 | [260820-he5-admin-script-import-fra-carbon-stock-dat](./quick/260820-he5-admin-script-import-fra-carbon-stock-dat/) |
 
 ## Session Continuity
 
