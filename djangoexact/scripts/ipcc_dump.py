@@ -5208,6 +5208,113 @@ def update_crop_types_annuals_perennials():
                 land_use_type.module_types.remove(module_type)
                 print(f"Removed {module_type} from {land_use_type}")
 
+def delete_and_import_set_aside_organic_soil_rewetting_emission_factors():
+    """
+    Replace the Set Aside OrganicSoilRewettingEmissionFactor rows.
+
+    Reads ipcc.organicsoilrewettingemissionfactor.xlsx and re-imports every row
+    whose module_type is Set Aside. Rows for other module types are left alone.
+    The min/max columns in the sheet have no counterpart on the model and are
+    ignored.
+    """
+    module_type = ModuleType.objects.get(class_name__iexact="SetAside")
+
+    df = pd.read_excel(
+        os.path.join(
+            os.path.dirname(__file__),
+            "ipcc_data",
+            "ipcc.organicsoilrewettingemissionfactor.xlsx",
+        ),
+        header=0,
+    )
+
+    OrganicSoilRewettingEmissionFactor.objects.filter(module_type=module_type).delete()
+
+    for i, row in df.iterrows():
+        if sanitize(row["module_type"]) != "Set Aside":
+            print(f"Skipping row {i}: module_type is '{row['module_type']}'")
+            continue
+
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        peat_type = PeatType.objects.get(name__iexact=sanitize(row["peat_type"]))
+
+        factor = OrganicSoilRewettingEmissionFactor.objects.create(
+            climate=climate,
+            moisture=moisture,
+            peat_type=peat_type,
+            module_type=module_type,
+            co2=parse_csv_number(row["co2"], nan_value=0),
+            co2_unit=row["co2_unit"],
+            doc=parse_csv_number(row["doc"], nan_value=0),
+            doc_unit=row["doc_unit"],
+            ch4=parse_csv_number(row["ch4"], nan_value=0),
+            ch4_unit=row["ch4_unit"],
+            n2o=parse_csv_number(row["n2o"], nan_value=0),
+            n2o_unit=row["n2o_unit"],
+        )
+
+        print(
+            f"Created {climate}, {moisture}, {peat_type}: "
+            f"co2={factor.co2}, doc={factor.doc}, ch4={factor.ch4}, n2o={factor.n2o}"
+        )
+
+def delete_and_import_set_aside_organic_soil_drainage_emission_factors():
+    """
+    Replace the Set Aside OrganicSoilDrainageEmissionFactor rows.
+
+    Reads ipcc.organicsoildrainageemissionfactor.xlsx and re-imports every row
+    whose module_type is Set Aside. Rows for other module types are left alone.
+    The sheet numbers its site location types ("(1) On-Site"), the database does
+    not, so the prefix is dropped before the lookup. The min/max columns have no
+    counterpart on the model and are ignored.
+    """
+    module_type = ModuleType.objects.get(class_name__iexact="SetAside")
+
+    df = pd.read_excel(
+        os.path.join(
+            os.path.dirname(__file__),
+            "ipcc_data",
+            "ipcc.organicsoildrainageemissionfactor.xlsx",
+        ),
+        header=0,
+    )
+
+    OrganicSoilDrainageEmissionFactor.objects.filter(module_type=module_type).delete()
+
+    for i, row in df.iterrows():
+        if sanitize(row["module_type"]) != "Set Aside":
+            print(f"Skipping row {i}: module_type is '{row['module_type']}'")
+            continue
+
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        peat_type = PeatType.objects.get(name__iexact=sanitize(row["peat_type"]))
+        site_location_type = SiteLocationType.objects.get(
+            name__iexact=str(row["site_location_type"]).split(")")[-1].strip()
+        )
+
+        factor = OrganicSoilDrainageEmissionFactor.objects.create(
+            climate=climate,
+            moisture=moisture,
+            peat_type=peat_type,
+            site_location_type=site_location_type,
+            module_type=module_type,
+            co2=parse_csv_number(row["co2"], nan_value=0),
+            co2_unit=row["co2_unit"],
+            doc=parse_csv_number(row["doc"], nan_value=0),
+            doc_unit=row["doc_unit"],
+            ch4=parse_csv_number(row["ch4"], nan_value=0),
+            ch4_unit=row["ch4_unit"],
+            n2o=parse_csv_number(row["n2o"], nan_value=0),
+            n2o_unit=row["n2o_unit"],
+        )
+
+        print(
+            f"Created {climate}, {moisture}, {peat_type}, {site_location_type}: "
+            f"co2={factor.co2}, doc={factor.doc}, ch4={factor.ch4}, n2o={factor.n2o}"
+        )
+
 def run():
     import os
 
@@ -5223,6 +5330,8 @@ def run():
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
         update_crop_types_annuals_perennials()
+        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
         pass
 
     if app_mode == "review":
@@ -5231,6 +5340,8 @@ def run():
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
         update_crop_types_annuals_perennials()
+        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
         pass
 
     if app_mode == "development":
@@ -5242,6 +5353,8 @@ def run():
         delete_and_import_total_biomass_after_defo()
         delete_and_import_forest_total_biomass()
         update_crop_types_annuals_perennials()
+        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
         pass
 
     if app_mode == "local":
