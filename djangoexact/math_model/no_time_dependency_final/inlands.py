@@ -214,7 +214,26 @@ class AnnexedModule(BaseModule):
                     total_doc = compute_yearly_or_half_year_cumulative(doc_start, doc_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                     total_co2 = compute_yearly_or_half_year_cumulative(co2_start, co2_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
-                    return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
+                    # Baseline (start-year) inventory. The total_* values above are per-year
+                    # series with interim averaging, so total_x[0] is the mean of year 0 and
+                    # year 1, not the baseline -- the *_start scalars are the only correct
+                    # source. Onsite and offsite CH4 share one row, as DRAINAGE_PEAT does.
+                    inventory_start = {
+                        GasTypes.CO2: co2_start,
+                        GasTypes.DOC: doc_start,
+                        GasTypes.CH4: ch4_start + ch4_start_ditches,
+                        GasTypes.N2O: n2ostart,
+                    }
+
+                    return (
+                        total_n2o,
+                        total_ch4_onsite,
+                        total_ch4_off_site,
+                        total_doc,
+                        total_co2,
+                        sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2),
+                        inventory_start,
+                    )
 
                 except Exception as e:
                     traceback.print_exc()
@@ -291,7 +310,7 @@ class AnnexedModule(BaseModule):
                     raise e
 
             try:
-                n2o_initial, ch4_onsite_initial, ch4_offsite_initial, doc_initial, co2_initial, total_initial = calculate_drainage_initial()
+                n2o_initial, ch4_onsite_initial, ch4_offsite_initial, doc_initial, co2_initial, total_initial, inventory_start = calculate_drainage_initial()
                 n2o_final, ch4_onsite_final, ch4_offsite_final, doc_final, co2_final, total_final = calculate_drainage_final()
 
                 n2o_total = [i + j for i, j in zip(n2o_initial, n2o_final)]
@@ -312,11 +331,8 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
 
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2, co2_initial, ActivityTypes.DRAINAGE))
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.DOC, doc_initial, ActivityTypes.DRAINAGE))
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, ch4_onsite_initial, ActivityTypes.DRAINAGE))
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, ch4_offsite_total, ActivityTypes.DRAINAGE))
-                self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.N2O, n2o_initial, ActivityTypes.DRAINAGE))
+                for gas_type, value in inventory_start.items():
+                    self.inventory.add_emission(gas_type, value, ActivityTypes.DRAINAGE)
 
             except Exception as e:
                 traceback.print_exc()
