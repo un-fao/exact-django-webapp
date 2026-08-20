@@ -4872,12 +4872,12 @@ def import_fra_carbon_stock_data_2025():
             print(f"Country {row['country']} not found. Skipping...")
             missing_countries.append(row["country"])
             continue
-        agb = parse_csv_number(row["agb"]) if row["agb"] else None
-        bgb = parse_csv_number(row["bgb"]) if row["bgb"] else None
-        litter = parse_csv_number(row["litter"]) if row["litter"] else None
-        deadwood = parse_csv_number(row["deadwood"]) if row["deadwood"] else None
-        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row["carbon_stock_biomass_total"] else None
-        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row["carbon_stock_total"] else None
+        agb = parse_csv_number(row["agb"]) if row.get("agb") is not None else None
+        bgb = parse_csv_number(row["bgb"]) if row.get("bgb") is not None else None
+        litter = parse_csv_number(row["litter"]) if row.get("litter") is not None else None
+        deadwood = parse_csv_number(row["deadwood"]) if row.get("deadwood") is not None else None
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row.get("carbon_stock_biomass_total") is not None else None
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row.get("carbon_stock_total") is not None else None
         year = 2025
 
         print(f"Creating {country} {year} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
@@ -5387,10 +5387,10 @@ def run():
         # update_value_chain_refrigerant_emission_factors()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
-        update_crop_types_annuals_perennials()
-        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
-        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
-        import_fra_carbon_stock_data_2025()
+        # update_crop_types_annuals_perennials()
+        # delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        # delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        # import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "development":
