@@ -26,17 +26,17 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
         # NOTE: the function is y = b + a * e^(kx) where k = -0.519349 this was calculated as the integral between 0 and 1 of a*e^(bx) = 0.78
         # where 0.78 was selected from the exact team, as it shows natural decay
 
-        if start_value < end_value:
-            k = -0.519349
-            a = end_value / (math.exp(k * years_implementation) - 1)
-            b = start_value - a
-            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
-        else:
-            # NOTE: We switch end and start values as we want the same decay as above but in the opposite direction
-            k = -0.519349
-            a = start_value / (math.exp(k * years_implementation) - 1)
-            b = end_value - a
-            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
+        # The amplitude must be scaled by (end - start), not by the end value alone,
+        # so that the curve lands exactly on the end value when the start is nonzero.
+        # The decreasing case mirrors the increasing curve, like the linear branch does.
+        k = -0.519349
+        low_value = min(start_value, end_value)
+        high_value = max(start_value, end_value)
+        denominator = math.exp(k * years_implementation) - 1
+        yearly_breakdown = [low_value + (high_value - low_value) * (math.exp(k * i) - 1) / denominator for i in range(years_implementation + 1)]
+
+        if start_value > end_value:
+            yearly_breakdown.reverse()
 
         yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
@@ -132,8 +132,8 @@ def compute_luc_hectare_delta(start_value, end_value, years_implementation, year
         delta_yearly = [abs(i) for i in delta_yearly]
     
     else:
-        # In case of immediate change, the delta is the difference between the start and end value divided by the number of years of implementation
-        delta_yearly = [start_value] + [end_value] * (years_implementation + years_capitalization - 1)
+        # In case of immediate change, all hectares change in the first year and none afterwards
+        delta_yearly = [abs(start_value - end_value)] + [0] * (years_implementation + years_capitalization - 1)
 
     return delta_yearly
 
@@ -374,7 +374,7 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
 
 def input_single_calculation_different_ef(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emission_factor_start, emission_factor_end, time_implementation, time_capitalization, rate_type):
     try:
-        ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
+        ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor is not None else ipcc_factor
 
         unit_start = unit_start * unit_factor
         unit_end = unit_end * unit_factor
