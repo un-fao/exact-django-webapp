@@ -1015,22 +1015,24 @@ class DeforestationCalculator(BaseCalculator):
         soc_w = soc_ref
         soc_wo = soc_ref
 
+        # For a grassland end use only the stock-exchange FLU/FI/FMG factors change;
+        # soc_w/soc_wo must stay the reference SOC stock, because the math model
+        # multiplies soc_end_default by the end factors again (passing the factor
+        # product here dropped the reference stock and applied the factors twice)
         if luc.module_type_w.name_en == "Grassland":
-            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_w, climate=project.climate)
-            flu_w = SimpleNamespace(value=soc_w.flu)
-            fi_w = SimpleNamespace(value=soc_w.fi)
-            fmg_w = SimpleNamespace(value=soc_w.fmg)
-            soc_w = SimpleNamespace(value=soc_w.flu * soc_w.fi * soc_w.fmg)
+            grassland_sef_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_w, climate=project.climate)
+            flu_w = SimpleNamespace(value=grassland_sef_w.flu)
+            fi_w = SimpleNamespace(value=grassland_sef_w.fi)
+            fmg_w = SimpleNamespace(value=grassland_sef_w.fmg)
 
         if luc.module_type_wo.name_en == "Grassland":
-            soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
+            grassland_sef_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
                 grassland_management_type=module_wo.grassland_management_type_wo,
                 climate=project.climate,
             )
-            flu_wo = SimpleNamespace(value=soc_wo.flu)
-            fi_wo = SimpleNamespace(value=soc_wo.fi)
-            fmg_wo = SimpleNamespace(value=soc_wo.fmg)
-            soc_wo = SimpleNamespace(value=soc_wo.flu * soc_wo.fi * soc_wo.fmg)
+            flu_wo = SimpleNamespace(value=grassland_sef_wo.flu)
+            fi_wo = SimpleNamespace(value=grassland_sef_wo.fi)
+            fmg_wo = SimpleNamespace(value=grassland_sef_wo.fmg)
 
         math_w = None
         math_wo = None
@@ -1372,15 +1374,17 @@ class OtherLandUseCalculator(BaseCalculator):
                 "soc_end_default": soc.value,
                 "soc_start_tier_2": soc_t2_start,
                 "soc_end_tier_2": soc_t2_wo,
-                "fmg_start_default": fmg_start.value,
+                # The start state is the same in both scenarios, so the grassland-start
+                # factors must be applied here exactly as in the with-scenario call
+                "fmg_start_default": soc_start.fmg if soc_start else fmg_start.value,
                 "fmg_end_default": fmg_final_wo.value,
                 "fmg_start_tier_2": module_start.fmg_t2_start,
                 "fmg_end_tier_2": module_wo.fmg_t2_wo,
-                "flu_start_default": flu_start.value,
+                "flu_start_default": soc_start.flu if soc_start else flu_start.value,
                 "flu_end_default": flu_final_wo.value,
                 "flu_start_tier_2": module_start.flu_t2_start,
                 "flu_end_tier_2": module_wo.flu_t2_wo,
-                "fi_start_default": fi_start.value,
+                "fi_start_default": soc_start.fi if soc_start else fi_start.value,
                 "fi_end_default": fi_final_wo.value,
                 "fi_start_tier_2": module_start.fi_t2_start,
                 "fi_end_tier_2": module_wo.fi_t2_wo,
@@ -3074,7 +3078,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -3122,7 +3126,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -3173,7 +3177,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_w,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
@@ -3224,7 +3228,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_wo,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
@@ -4426,11 +4430,11 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_with() and self.is_fuel_w:
             inputs_w = {
                 "emissions_factor_co2": self.energy_ef_default_w.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_w,
                 "emissions_factor_ch4": self.energy_ef_default_w.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_w,
                 "emissions_factor_n2o": self.energy_ef_default_w.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_w,
                 "rate_type": self.change_rate.name,
@@ -4448,11 +4452,11 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_without() and self.is_fuel_wo:
             inputs_wo = {
                 "emissions_factor_co2": self.energy_ef_default_wo.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_wo,
                 "emissions_factor_ch4": self.energy_ef_default_wo.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_wo,
                 "emissions_factor_n2o": self.energy_ef_default_wo.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "rate_type": self.change_rate.name,
@@ -5768,8 +5772,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_w.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_w.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_w,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5845,8 +5849,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_wo.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_wo.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_wo,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5972,7 +5976,7 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         self.inputs_w = {
             "ef_ref": self.ef.value,
-            "ef_tier_2": self.module.ef_t2_start,
+            "ef_tier_2": self.module.ef_t2_w,
             "units_start": self.module.ha_start,
             "units_end": self.module.ha_w,
             "implementation_time": self.activity.implementation_years,
