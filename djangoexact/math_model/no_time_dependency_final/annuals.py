@@ -105,7 +105,8 @@ class AnnualCropland(LandModule):
             yield_value_main = self.yield_main * 1000
 
             # Calculate agricultural residue for main season
-            ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.dm_content_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+            # The IPCC intercept (Table 11.2) is in tonnes/ha, so it must be scaled to kg like the slope term
+            ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 is not None else yield_value_main * self.dm_content_main * self.n_estimation_slope_main + self.n_estimation_intercept_main * 1000
             ag_residue_tonnes_main = ag_residue_main / 1000
 
             # Calculate methane emissions for main season
@@ -131,11 +132,15 @@ class AnnualCropland(LandModule):
 
         def calculate_minor_season_emissions():
             """Calculate methane and nitrous emissions for minor season"""
-            yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
+            # Use the tier-2-resolved minor yield, mirroring the main season which uses self.yield_main
+            yield_value_minor = self.yield_minor * 1000 if self.yield_minor is not None else None
 
             # Calculate agricultural residue for minor season
+            # The IPCC intercept (Table 11.2) is in tonnes/ha, so it must be scaled to kg like the slope term
             ag_residue_minor = (
-                self.residue_minor_tier_2 * 1000 if self.residue_minor_tier_2 else yield_value_minor * self.dm_content_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor if yield_value_minor else 0
+                self.residue_minor_tier_2 * 1000
+                if self.residue_minor_tier_2 is not None
+                else yield_value_minor * self.dm_content_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor * 1000 if yield_value_minor else 0
             )
             ag_residue_tonnes_minor = ag_residue_minor / 1000
 

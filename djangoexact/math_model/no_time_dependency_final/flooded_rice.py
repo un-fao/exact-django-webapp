@@ -85,7 +85,9 @@ class FloodedRice(LandModule):
 
                 ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_emitted_yearly], ActivityTypes.CH4_EMITTED_RICE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
-                inventory = InventoryPerGasPerActivity(GasTypes.CH4,ch4_emitted_total*self.hectares_start,ActivityTypes.CH4_EMITTED_RICE)
+                # Start-year annual inventory: per-ha emission on the starting area, not the
+                # project total (which already sums over all hectare-years) times area again
+                inventory = InventoryPerGasPerActivity(GasTypes.CH4, kg_methane_cultivation_period * self.hectares_start * self.methane_constant / 1000, ActivityTypes.CH4_EMITTED_RICE)
                 self.inventory.emissions_by_sector_by_gas(inventory)
             except Exception as e:
                 traceback.print_exc()
@@ -137,7 +139,9 @@ class FloodedRice(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-                inventory =  InventoryPerGasPerActivity(GasTypes.N2O,self.soc_start*self.hectares_start,ActivityTypes.SOM)
+                # SOM N2O has no start-year flow, matching the convention in the other land modules;
+                # the previous value was a soil-carbon stock in tC recorded under an N2O row
+                inventory =  InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.SOM)
                 self.inventory.emissions_by_sector_by_gas(inventory)
 
             except Exception as e:

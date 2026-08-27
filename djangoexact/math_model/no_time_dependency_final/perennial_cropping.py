@@ -197,7 +197,9 @@ class PerennialCropland(LandModule):
                         # BREAKDOWN THE HECTARES FOR MAX YEARS GROWTH
                         hectares_before_n, hectares_after_n = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
 
-                        calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
+                        # Growth-only term: biomass_start is a per-hectare tC stock and must not be
+                        # added to this project-total tCO2 flow (the tabular cap converts it explicitly)
+                        calculated = biomass_accumulation_rate * sum(self.hectares_total)
                         tabular = ((max_agb - self.agb_start * (44/12)) + bgb_rate * max_years_growth) * self.hectares_end
 
                         total = -min(calculated, tabular) if (capped and self.hectares_end != 0) else -calculated
