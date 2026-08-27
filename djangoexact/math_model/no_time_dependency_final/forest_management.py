@@ -186,7 +186,7 @@ class ForestManagement(BaseModule):
             agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(
                 self.implementation_time, self.capitalization_time, self.agb_yearly_growth_under_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool
             )
-            if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+            if self.bgb_yearly_growth_over_20_tier_2 is not None and self.bgb_yearly_growth_under_20_tier_2 is not None:
                 bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
                     self.implementation_time,
                     self.capitalization_time,
@@ -208,7 +208,7 @@ class ForestManagement(BaseModule):
                 agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(
                     self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool
                 )
-                if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+                if self.bgb_yearly_growth_over_20_tier_2 is not None and self.bgb_yearly_growth_under_20_tier_2 is not None:
                     bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
                         self.implementation_time,
                         self.capitalization_time,
@@ -243,7 +243,7 @@ class ForestManagement(BaseModule):
                     self.is_same_forest_type,
                     self.forest_start,
                 )
-                if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+                if self.bgb_yearly_growth_over_20_tier_2 is not None and self.bgb_yearly_growth_under_20_tier_2 is not None:
                     bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(
                         self.implementation_time,
                         self.capitalization_time,
@@ -317,47 +317,6 @@ class ForestManagement(BaseModule):
                         self.mangrove_factor,
                         self.ef_nitrous,
                         self.ef_methane,
-                    )
-
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
                     )
 
                     self.result.yearly_emissions_by_sector_by_gas.append(

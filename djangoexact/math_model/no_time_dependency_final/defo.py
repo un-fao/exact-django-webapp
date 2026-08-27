@@ -7,7 +7,7 @@ from .general_functions import (
     compute_half_year_cumulative_n_year_maturity,
     compute_yearly_or_half_year_cumulative,
     som_emissions,
-    compute_yearly_delta,
+    compute_luc_hectare_delta,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -93,7 +93,9 @@ class Defo(BaseModule):
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
         self.total_hectares = compute_yearly_or_half_year_cumulative(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.delta_hectares = compute_yearly_delta(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        # compute_luc_hectare_delta handles the "immediate" rate (all hectares in year 1);
+        # compute_yearly_delta returned all zeros for it, silently dropping every emission
+        self.delta_hectares = compute_luc_hectare_delta(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
 
     def calculate_emissions(self):
         def calculate_biomass():
@@ -106,7 +108,7 @@ class Defo(BaseModule):
 
                 hwp_before_t_c = self.agb_t_c_per_ha_default if self.hwp_before_t_dm_per_ha * self.mangrove_factor > self.agb_t_c_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
 
-                if self.biomass_final_1_year_t_per_ha_tier_2:
+                if self.biomass_final_1_year_t_per_ha_tier_2 is not None:
                     biomass_final_1_year_t_per_ha = self.biomass_final_1_year_t_per_ha_tier_2
                 else:
                     biomass_final_1_year_t_per_ha = self.biomass_final_1_year_t_per_ha_default
