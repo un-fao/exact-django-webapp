@@ -691,6 +691,7 @@ class Project(Historical, DirtyFieldsMixin):
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
     lock_updated_at = models.DateTimeField(null=True, blank=True, verbose_name="lock_updated_at")
     locked_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name="locked_projects", verbose_name="locked_by")
+    last_recap_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="last_recap_sent_at")
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE, verbose_name="gw_potential")
 

@@ -734,7 +734,8 @@ class ProjectExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
-                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
+                   'last_recap_sent_at']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
