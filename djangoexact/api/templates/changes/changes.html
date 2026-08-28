@@ -11,9 +11,13 @@
     </head>
     <body>
         <p>Dear {{ recipient.first_name }} {{ recipient.last_name }},</p>
-        <p>The {{ lock_holder_group_name }} has added comments for your attention.</p>
+        {% if lock_holder_name %}
+            <p>The {{ lock_holder_group_name }} has added comments for your attention.</p>
+        {% else %}
+            <p>This is a recap of recent changes and comments for your attention.</p>
+        {% endif %}
         <hr />
-        <p>Reviewer: {{ lock_holder_name }}</p>
+        {% if lock_holder_name %}<p>Reviewer: {{ lock_holder_name }}</p>{% endif %}
         <p>Date: {{ lock_unlock_date | date:"d/m/Y" }}</p>
         <p>Project Name: {{ project.name }}</p>
         <p>

@@ -13,6 +13,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.core.mail import send_mail
 import os
 from django.conf import settings
+from django.utils import timezone
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import api.models as api_models
@@ -605,10 +606,8 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
     changes = []
     for record in records:
         if record.prev_record is None:
-            changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
-            continue
-
-        if record.next_record is None:
+            history_user_email = record.history_user.email if record.history_user else None
+            changes.append(ChangeLog(record.history_date, history_user_email, ChangeReasons.CREATE.value, []))
             continue
 
         delta = record.diff_against(record.prev_record)
@@ -749,26 +748,43 @@ def validate_uuid(uuid_string):
     return True
 
 
-def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> None:
+def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> int:
     """
-    Send an email to all Admin members with the changes made to the project.
+    Send a recap email to all Admin members with the changes made to the project
+    since the last successfully sent recap. If no recap has ever been sent for
+    this project, the recap covers its entire history since creation.
 
     Args:
         project (Project): The project object.
-        lock_holder (CustomUser): The user who holds the lock.
-        last_lock_update_date (datetime): The date when the lock was last updated.
-        recipients (list[CustomUser], optional): List of users to send the email to. If None, defaults to all Admin members of the project.
+        recipients (list[CustomUser], optional): List of members to send the email to.
+            If None, defaults to all Admin members of the project who have not opted out.
 
     Returns:
-        None
+        int: The number of recipients successfully mailed. Zero when there is
+        nothing to report, and zero when every send raised. `project.last_recap_sent_at`
+        is advanced to the window boundary captured at the start of this call only
+        when this is greater than 0, so a crash, an empty diff, or a total send
+        failure leaves every change still in scope for the next recap.
     """
+    # Captured before the diff is computed: a change landing mid-run falls into
+    # the next window instead of being lost.
+    sent_at = timezone.now()
 
-    def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
+    history_filter = {} if project.last_recap_sent_at is None else {"history_date__gte": project.last_recap_sent_at}
+    comment_filter = {} if project.last_recap_sent_at is None else {"date_created__gte": project.last_recap_sent_at}
+
+    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at", "last_recap_sent_at"]
+
+    def diff(history_manager) -> list:
+        changelogs = get_changes(history_manager.filter(**history_filter), exclude_fields=fields_to_exclude)
+        return [c for c in changelogs if c.changes]
+
+    def get_new_comments(threads: list["api_models.CommentThread"]) -> list:
         new_comments = []
         for thread in threads:
             if thread is None:
                 continue
-            comments = thread.comments.filter(date_created__gte=locked_at)
+            comments = thread.comments.filter(**comment_filter)
             if comments.exists():
                 for comment in comments:
                     comment: "api_models.Comment"
@@ -787,9 +803,6 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
                     new_comments.append(changelog)
         return new_comments
 
-    if project.locked_at is None or project.locked_by is None:
-        raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
-
     if recipients is None:
         from api.models import ProjectNotificationPreference
 
@@ -806,39 +819,35 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
             if project_preference is None or not project_preference.is_opted_out:
                 recipients.append(member)
 
-    locked_at = project.locked_at
-
-    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at"]
-
     changes = {
         "project": {
             "name": project.name,
-            "changes": get_changes(project.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude),
+            "changes": diff(project.history),
         },
         "activities": [],
     }
 
     for a in project.activities.all():
-        a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
+        a_data = {"name": a.name, "changes": diff(a.history), "modules": []}
 
         for m in find_modules(a):
             m: "api_models.Module" | "api_models.Submodule"
-            m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+            m_changes = diff(m.history)
 
             if hasattr(m, "submodules"):
                 submodules = m.submodules
                 for submodule in submodules:
-                    submodule_changes = get_changes(submodule.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+                    submodule_changes = diff(submodule.history)
                     if submodule_changes:
                         m_changes.extend(submodule_changes)
 
                     threads = submodule.threads
-                    new_comments = get_new_comments(threads, locked_at)
+                    new_comments = get_new_comments(threads)
                     if new_comments:
                         m_changes.extend(new_comments)
 
             threads = m.threads
-            new_comments = get_new_comments(threads, locked_at)
+            new_comments = get_new_comments(threads)
             if new_comments:
                 m_changes.extend(new_comments)
 
@@ -850,25 +859,40 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
             changes["activities"].append(a_data)
 
-    lock_holder = project.members.filter(user=project.locked_by).first()
-    if lock_holder is None:
-        log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
+        return 0
+
+    # Lock context degrades gracefully: the recap button works on an unlocked
+    # project too, so there is not always a lock holder to report.
+    lock_holder = None
+    lock_holder_name = None
+    lock_holder_group_name = None
+    display_date = sent_at
+
+    if project.locked_by is not None:
+        lock_holder = project.members.filter(user=project.locked_by).first()
+        if lock_holder is None:
+            log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+        lock_holder_name = project.locked_by.get_full_name()
+        lock_holder_group_name = lock_holder.group.name if lock_holder else "Superuser"
+        display_date = project.locked_at
 
     # Send email to recipients
     context = {
         "project": changes["project"],
         "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
         "activities": changes["activities"],
-        "lock_holder_group_name": lock_holder.group.name if lock_holder else "Superuser",
-        "lock_holder_name": project.locked_by.get_full_name(),
-        "lock_unlock_date": locked_at,
+        "lock_holder_group_name": lock_holder_group_name,
+        "lock_holder_name": lock_holder_name,
+        "lock_unlock_date": display_date,
     }
 
-    subject = f"{context['lock_holder_group_name']} Feedback - {context['project']['name']}"
+    if lock_holder_name is not None:
+        subject = f"{lock_holder_group_name} Feedback - {context['project']['name']}"
+    else:
+        subject = f"Project Recap - {context['project']['name']}"
 
-    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
-        return
-
+    sent_count = 0
     for recipient in recipients:
         user: api_models.CustomUser = recipient.user
         context.update({"recipient": user})
@@ -879,5 +903,12 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
             to = user.email
             try:
                 send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+                sent_count += 1
             except Exception as e:
                 log.error(f"Failed to send email to {user.email}: {e}")
+
+    if sent_count > 0:
+        project.last_recap_sent_at = sent_at
+        project.save(update_fields=["last_recap_sent_at"])
+
+    return sent_count
