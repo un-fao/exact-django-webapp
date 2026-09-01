@@ -256,7 +256,7 @@ def create_project_shell(project, owner):
 
 def copy_activities_into(source_project, target_project, owner):
     """Deep-copy every activity of source_project into target_project."""
-    for activity in source_project.activities.all():
+    for activity in source_project.activities.filter(is_b_intact=True).all():
         copy_activity(activity, target_project, owner)
 
 
