@@ -804,20 +804,17 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         return new_comments
 
     if recipients is None:
-        from api.models import ProjectNotificationPreference
-
-        # Get all admin members who haven't opted out globally
-        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
-
-        # Filter out users who have opted out of notifications for this specific project
-        recipients = []
-        for member in potential_recipients:
-            user = member.user
-            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
-
-            # If no project-specific preference exists, or if they haven't opted out for this project, include them
-            if project_preference is None or not project_preference.is_opted_out:
-                recipients.append(member)
+        # Admin members who haven't opted out globally AND have an explicit subscribed
+        # preference row for THIS project. The two preference conditions below must stay
+        # in this single filter() call: Django only applies conditions on a multi-valued
+        # relation to the same related row within one call, so splitting them into two
+        # chained filter() calls would match a subscribed row for a different project.
+        recipients = project.members.filter(
+            group__name="Admin",
+            user__is_opted_out_of_emails=False,
+            user__project_notification_preferences__project=project,
+            user__project_notification_preferences__is_subscribed=True,
+        )
 
     changes = {
         "project": {

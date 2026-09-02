@@ -1816,11 +1816,11 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         project = serializer.validated_data["project"]
 
         # Get or create the preference
-        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_subscribed": serializer.validated_data.get("is_subscribed", False)})
 
         if not created:
             # Update existing preference
-            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.is_subscribed = serializer.validated_data.get("is_subscribed", False)
             preference.save()
 
         response_serializer = ProjectNotificationPreferenceReadSerializer(preference)

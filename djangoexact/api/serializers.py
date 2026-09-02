@@ -3266,14 +3266,14 @@ class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
         ref_name = "ProjectNotificationPreference"
 
 
 class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["project", "is_opted_out"]
+        fields = ["project", "is_subscribed"]
         ref_name = "ProjectNotificationPreference"
 
     def validate(self, data):
