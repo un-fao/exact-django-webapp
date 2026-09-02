@@ -13,6 +13,7 @@ from django.test import SimpleTestCase
 
 import api.security as security
 from api.utilities import ChangeLog, Change, ChangeReasons, send_changes_email
+from api.views import ProjectNotificationPreferenceViewSet
 
 
 class _FakeHistoryManager:
@@ -176,3 +177,114 @@ class CheckProjectAdminTestCase(SimpleTestCase):
         result = security.check_project_admin(_user(), _project_for_permission_check())
         self.assertIsNotNone(result)
         self.assertEqual(result.status_code, 403)
+
+
+class _FakeProjectMembersRecorder:
+    """Stands in for `project.members` inside send_changes_email; records the exact
+    kwargs `.filter()` was called with. Distinct from `_FakeMembers` above, which
+    backs the `check_project_admin` tests and has a different, narrower signature."""
+
+    def __init__(self):
+        self.filter_calls = []
+
+    def filter(self, **kwargs):
+        self.filter_calls.append(kwargs)
+        return []
+
+
+class SendChangesEmailRecipientDerivationTestCase(SimpleTestCase):
+    """D-01: recipient derivation is one queryset covering cases (a) no row, (b)
+    subscribed, (c) subscribed but globally opted out — all three regress together
+    if any condition is dropped from the single filter() call."""
+
+    @patch("api.utilities.send_mail")
+    @patch("api.utilities.render_to_string")
+    @patch("api.utilities.get_changes")
+    def test_recipient_queryset_shape(self, mock_get_changes, mock_render, mock_send_mail):
+        mock_get_changes.return_value = _non_empty_changelog()
+        mock_render.return_value = "<html></html>"
+
+        project = _FakeProject()
+        project.members = _FakeProjectMembersRecorder()
+
+        send_changes_email(project)
+
+        self.assertEqual(
+            project.members.filter_calls,
+            [
+                {
+                    "group__name": "Admin",
+                    "user__is_opted_out_of_emails": False,
+                    "user__project_notification_preferences__project": project,
+                    "user__project_notification_preferences__is_subscribed": True,
+                }
+            ],
+        )
+
+    @patch("api.utilities.send_mail")
+    @patch("api.utilities.render_to_string")
+    @patch("api.utilities.get_changes")
+    def test_explicit_recipients_bypasses_derivation(self, mock_get_changes, mock_render, mock_send_mail):
+        mock_get_changes.return_value = _non_empty_changelog()
+        mock_render.return_value = "<html></html>"
+
+        project = _FakeProject()
+        project.members = _FakeProjectMembersRecorder()
+
+        send_changes_email(project, recipients=[_recipient()])
+
+        self.assertEqual(project.members.filter_calls, [])
+
+
+class _RecordingPreferenceManager:
+    """Stands in for `ProjectNotificationPreference.objects` inside
+    `ProjectNotificationPreferenceViewSet.create`; records `get_or_create` kwargs."""
+
+    def __init__(self, return_value):
+        self.get_or_create_calls = []
+        self._return_value = return_value
+
+    def get_or_create(self, **kwargs):
+        self.get_or_create_calls.append(kwargs)
+        return self._return_value
+
+
+def _fake_write_serializer(project, is_subscribed=True):
+    return SimpleNamespace(is_valid=lambda: True, validated_data={"project": project, "is_subscribed": is_subscribed})
+
+
+class ProjectNotificationPreferenceCreateGateTestCase(SimpleTestCase):
+    """D-02: create() gates on project admin before any write (case d), and an admin
+    reaches get_or_create with the renamed field (pins the Task 1 rename)."""
+
+    @patch("api.views.ProjectNotificationPreferenceReadSerializer")
+    @patch("api.views.ProjectNotificationPreference")
+    @patch("api.views.ProjectNotificationPreferenceWriteSerializer")
+    def test_non_admin_create_is_rejected_and_writes_nothing(self, mock_write_serializer_class, mock_model, mock_read_serializer_class):
+        user = _user()
+        project = _project_for_permission_check(admins=[])  # empty admin list -> non-admin
+        mock_write_serializer_class.return_value = _fake_write_serializer(project)
+        mock_model.objects = _RecordingPreferenceManager(return_value=(SimpleNamespace(), True))
+
+        request = SimpleNamespace(user=user, data={"project": 1, "is_subscribed": True})
+        response = ProjectNotificationPreferenceViewSet().create(request)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(mock_model.objects.get_or_create_calls, [])
+
+    @patch("api.views.ProjectNotificationPreferenceReadSerializer")
+    @patch("api.views.ProjectNotificationPreference")
+    @patch("api.views.ProjectNotificationPreferenceWriteSerializer")
+    def test_admin_create_reaches_get_or_create_with_new_field_name(self, mock_write_serializer_class, mock_model, mock_read_serializer_class):
+        user = _user()
+        project = _project_for_permission_check(admins=[user])
+        mock_write_serializer_class.return_value = _fake_write_serializer(project, is_subscribed=True)
+        mock_model.objects = _RecordingPreferenceManager(return_value=(SimpleNamespace(is_subscribed=True), True))
+
+        request = SimpleNamespace(user=user, data={"project": 1, "is_subscribed": True})
+        response = ProjectNotificationPreferenceViewSet().create(request)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(mock_model.objects.get_or_create_calls), 1)
+        call_kwargs = mock_model.objects.get_or_create_calls[0]
+        self.assertEqual(call_kwargs["defaults"], {"is_subscribed": True})
