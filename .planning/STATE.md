@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-08-20 - Completed quick task 260820-he5: admin script to import FRA carbon stock for a chosen assessment year
+Last activity: 2026-09-02 - Completed quick task 260902-f1z: recap notifications are now per-project opt-in, off by default
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -120,6 +120,8 @@ Items acknowledged and carried forward from previous milestone close:
 | *(none)* | | | |
 | 260819-prd | Replaced all reference-data fixtures with a dump of the production database (162 manifest models + combined); net 86,641 -> 63,869 rows, 0 dangling FKs, parity verified | 2026-08-19 | 64c7ef02 | [260819-prd-replace-all-fixtures-with-production-dat](./quick/260819-prd-replace-all-fixtures-with-production-dat/) |
 | 260820-he5 | Admin script: import FRA carbon stock data for a selected assessment year | 2026-08-20 | 9faeed81 | [260820-he5-admin-script-import-fra-carbon-stock-dat](./quick/260820-he5-admin-script-import-fra-carbon-stock-dat/) |
+| 260828-gjy | Recap emails: trigger from frontend button, window changes since previous recap email, keep auto trigger disabled | 2026-08-28 | 233090ef | [260828-gjy-recap-emails-trigger-from-frontend-butto](./quick/260828-gjy-recap-emails-trigger-from-frontend-butto/) |
+| 260902-f1z | Per-project notification opt-in: ProjectNotificationPreference.is_opted_out inverted to is_subscribed (default off), recipient derivation collapsed to one queryset, all preference writes gated on project admin | 2026-09-02 | a1d20733 | [260902-f1z-add-per-project-opt-in-for-automated-rec](./quick/260902-f1z-add-per-project-opt-in-for-automated-rec/) |
 
 ## Session Continuity
 

@@ -734,7 +734,8 @@ class ProjectExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
-                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
+                   'last_recap_sent_at']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -3265,14 +3266,14 @@ class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
         ref_name = "ProjectNotificationPreference"
 
 
 class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["project", "is_opted_out"]
+        fields = ["project", "is_subscribed"]
         ref_name = "ProjectNotificationPreference"
 
     def validate(self, data):

@@ -691,6 +691,7 @@ class Project(Historical, DirtyFieldsMixin):
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
     lock_updated_at = models.DateTimeField(null=True, blank=True, verbose_name="lock_updated_at")
     locked_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name="locked_projects", verbose_name="locked_by")
+    last_recap_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="last_recap_sent_at")
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE, verbose_name="gw_potential")
 
@@ -945,7 +946,7 @@ class ProjectNotificationPreference(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="project_notification_preferences")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notification_preferences")
-    is_opted_out = models.BooleanField(default=False, verbose_name="is_opted_out_of_project_notifications")
+    is_subscribed = models.BooleanField(default=False, verbose_name="is_subscribed_to_project_notifications")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -956,7 +957,7 @@ class ProjectNotificationPreference(models.Model):
         verbose_name_plural = "Project Notification Preferences"
 
     def __str__(self):
-        status = "opted out" if self.is_opted_out else "receiving notifications"
+        status = "subscribed to notifications" if self.is_subscribed else "not subscribed"
         return f"({self.pk}) {self.user.email} - {self.project.name} - {status}"
 
 
