@@ -1588,7 +1588,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         operation_description="Send a recap email of changes and comments since the last recap to project Admins. Admin-only; works on locked and unlocked projects alike.",
         responses={
             200: "Recap processed (see 'sent' in the response body for whether mail actually went out)",
-            403: "Selected user does not have permission to trigger a recap email for this project",
+            403: "Selected user does not have project-admin permission for this project",
             500: "Internal server error",
         },
     )
@@ -1804,6 +1804,7 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
             200: ProjectNotificationPreferenceReadSerializer,
             201: ProjectNotificationPreferenceReadSerializer,
             400: "Bad request",
+            403: "Forbidden",
         },
     )
     def create(self, request, *args, **kwargs):
@@ -1814,6 +1815,10 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
 
         user = request.user
         project = serializer.validated_data["project"]
+
+        error = security.check_project_admin(user, project)
+        if error:
+            return error
 
         # Get or create the preference
         preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_subscribed": serializer.validated_data.get("is_subscribed", False)})
@@ -1843,6 +1848,10 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         if instance.user != request.user:
             return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
 
+        error = security.check_project_admin(request.user, instance.project)
+        if error:
+            return error
+
         serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
 
         if not serializer.is_valid():
@@ -1852,6 +1861,12 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
 
         return Response(response_serializer.data, status=http_status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        # Inherited ModelViewSet.update would write through the read serializer and
+        # bypass the ownership + admin gates above; force every PUT through the
+        # gated partial_update path instead.
+        return self.partial_update(request, *args, **kwargs)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

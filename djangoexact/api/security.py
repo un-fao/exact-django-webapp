@@ -12,13 +12,13 @@ def check_permission(permission, user, project):
 
 
 def check_project_admin(user, project):
-    """Guard for project-admin-only actions (e.g. triggering a recap email).
+    """Guard for project-admin-only actions.
 
     Superusers bypass every other project permission check. Everyone else must
     be a member of the project in the Admin group.
     """
     is_project_admin = user.is_superuser or project.members.filter(user=user, group__name="Admin").exists()
     if not is_project_admin:
-        logging.error("Selected user does not have permission to trigger a recap email for this project")
-        return utils.ErrorResponse("Selected user does not have permission to trigger a recap email for this project", status=http_status.HTTP_403_FORBIDDEN)
+        logging.error("Selected user does not have project-admin permission for this project")
+        return utils.ErrorResponse("Selected user does not have project-admin permission for this project", status=http_status.HTTP_403_FORBIDDEN)
     return None
