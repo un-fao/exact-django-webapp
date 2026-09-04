@@ -78,6 +78,10 @@ REPORT_COUNT_KEYS = (
     "unmatched", "unresolved_fk", "ambiguous", "conflict", "base_mismatch",
 )
 
+# Per bucket, per table. Skipped rows total ~1200 today; the cap only bounds a
+# future drop that goes badly wrong, so --detail can never blow up in memory.
+DETAIL_CAP = 200
+
 
 def _is_null(raw):
     return raw.strip().upper() in NULL_TOKENS
@@ -252,6 +256,36 @@ def build_key(row, key_cols, name_to_index, fk_lookups):
     return tuple(parts)
 
 
+def explain_unresolved(row, key_cols, name_to_index, fk_lookups):
+    """Which key columns build_key could not resolve, as [(csv column, raw value)]."""
+    bad = []
+    for name, model_field, field in key_cols:
+        raw = get_cell(row, name, name_to_index).strip()
+        if _is_null(raw):
+            continue
+        if field.is_relation:
+            by_name, pk_set = fk_lookups[model_field]
+            m = OBJ_PK_RE.match(raw) or PAREN_PK_RE.match(raw)
+            if m:
+                if int(m.group(1)) not in pk_set:
+                    bad.append((name, raw))
+            elif by_name.get(raw.lower()) is None:
+                bad.append((name, raw))
+            continue
+        itype = field.get_internal_type()
+        if itype in INT_FIELD_TYPES or itype in FLOAT_FIELD_TYPES:
+            try:
+                float(raw)
+            except ValueError:
+                bad.append((name, raw))
+    return bad
+
+
+def key_display(row, key_cols, name_to_index):
+    """The row's natural key as the CSV spells it -- names, not resolved pks."""
+    return {name: get_cell(row, name, name_to_index).strip() for name, _, _ in key_cols}
+
+
 def build_fixture_index(fixture_rows, key_cols):
     index = {}
     for row in fixture_rows:
@@ -260,7 +294,7 @@ def build_fixture_index(fixture_rows, key_cols):
     return index
 
 
-def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
+def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache, detail=None):
     field_map = {f.name: f for f in model._meta.concrete_fields}
     name_to_index, data_rows = read_csv_rows(csv_path)
     ranged_groups, ranged_names_used = compute_ranged_groups(csv_path, name_to_index, field_map)
@@ -286,18 +320,28 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
     base_values = {}
     conflicts_detail = []
 
+    def note(bucket, **extra):
+        if detail is None:
+            return
+        bucket_rows = detail.setdefault(bucket, [])
+        if len(bucket_rows) < DETAIL_CAP:
+            bucket_rows.append({"k": key_display(row, key_cols, name_to_index), **extra})
+
     for row in data_rows:
         key = build_key(row, key_cols, name_to_index, fk_lookups)
         if key is None:
             counts["unresolved_fk"] += 1
+            note("unresolved_fk", bad=explain_unresolved(row, key_cols, name_to_index, fk_lookups))
             continue
 
         pks = fixture_index.get(key)
         if not pks:
             counts["unmatched"] += 1
+            note("unmatched")
             continue
         if len(pks) > 1:
             counts["ambiguous"] += 1
+            note("ambiguous", pks=pks)
             continue
 
         counts["matched_unique"] += 1
@@ -307,6 +351,7 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
         row_values = {}
         row_base_values = {}
         mismatch = False
+        mismatched_fields = []
         for model_field, (base_ref, min_ref, max_ref) in ranged_groups.items():
             base_raw = get_cell(row, base_ref, name_to_index).strip()
             if not _is_null(base_raw):
@@ -317,6 +362,7 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
                 if base_val is not None and isinstance(fixture_val, (int, float)) and not isinstance(fixture_val, bool):
                     if not math.isclose(base_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9):
                         mismatch = True
+                        mismatched_fields.append([model_field, base_val, fixture_val])
 
             if min_ref is not None:
                 min_raw = get_cell(row, min_ref, name_to_index).strip()
@@ -327,6 +373,7 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
 
         if mismatch:
             counts["base_mismatch"] += 1
+            note("base_mismatch", pk=pk, f=mismatched_fields)
             continue
 
         existing = patches.get(pk)
@@ -394,7 +441,7 @@ def iter_mapped_columns():
                 yield spec, model, f"{model_field}_max"
 
 
-def compute_all(csv_paths, fixture_cache=None):
+def compute_all(csv_paths, fixture_cache=None, details=None):
     """Runs the full join across the given CSVs. Returns (tables, results) where
     results is fixture_file -> (spec, patches, groups, base_values). Writes nothing --
     the whole point is to let the writer fail loudly before touching a single file
@@ -412,7 +459,13 @@ def compute_all(csv_paths, fixture_cache=None):
         if spec is None:
             raise CommandError(f"{csv_path.name}: resolves to {name}.json, which is not in MANIFEST")
         model = django_apps.get_model(spec.model)
-        table, patches, groups, base_values = process_csv(csv_path, spec, model, manifest_by_model, fixture_cache)
+        detail = {} if details is not None else None
+        table, patches, groups, base_values = process_csv(
+            csv_path, spec, model, manifest_by_model, fixture_cache, detail
+        )
+        if details is not None:
+            detail["groups"] = sorted(groups)
+            details[csv_path.name] = detail
         tables.append(table)
         results[spec.fixture_file] = (spec, patches, groups, base_values)
     return tables, results
@@ -478,6 +531,7 @@ class Command(BaseCommand):
         parser.add_argument("--json", dest="json_path", default=None, help="Write the full report as JSON to this path.")
         parser.add_argument("--check", dest="check_path", default=None, help="Compare the computed report against a committed one; exit nonzero on any difference.")
         parser.add_argument("--only", dest="only", default=None, help="Restrict to a single CSV filename.")
+        parser.add_argument("--detail", dest="detail_path", default=None, help="Write per-row detail for every skipped row as JSON to this path.")
 
     def handle(self, *args, **options):
         uncertainties_dir = data_dir()
@@ -488,7 +542,8 @@ class Command(BaseCommand):
                 raise CommandError(f"no CSV named {options['only']!r} in {uncertainties_dir}")
 
         fixture_cache = {}
-        tables, results = compute_all(csv_paths, fixture_cache)
+        details = {} if options["detail_path"] else None
+        tables, results = compute_all(csv_paths, fixture_cache, details)
 
         # Compute every patched payload in memory before writing anything -- a
         # failure here must never leave a partial write on disk (CONTEXT).
@@ -503,6 +558,9 @@ class Command(BaseCommand):
 
         if options["json_path"]:
             write_json(Path(options["json_path"]), report)
+
+        if options["detail_path"]:
+            write_json(Path(options["detail_path"]), {"tables": details, "cap": DETAIL_CAP})
 
         if options["check_path"]:
             with open(options["check_path"], encoding="utf-8") as fh:
