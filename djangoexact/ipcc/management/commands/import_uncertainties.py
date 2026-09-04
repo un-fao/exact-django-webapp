@@ -281,8 +281,9 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
     counts["csv_rows"] = len(data_rows)
     counts["fixture_rows"] = len(fixture_rows)
     patches = {}
-    base_values = {}  # pk -> {model_field: csv base value}, written rows only -- lets
-    # tests re-prove the join independently of this function's own bookkeeping.
+    # pk -> {model_field: csv base value} for written rows only, so tests can re-prove
+    # the join independently of this function's own bookkeeping.
+    base_values = {}
     conflicts_detail = []
 
     for row in data_rows:
