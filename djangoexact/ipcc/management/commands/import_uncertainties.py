@@ -365,6 +365,28 @@ def aggregate_totals(tables):
     return totals
 
 
+def data_dir():
+    return Path(settings.BASE_DIR) / "ipcc" / "data" / "uncertainties"
+
+
+def iter_mapped_columns():
+    """Yields (spec, model, column_name) for every _min/_max column the mapping table
+    derives across all 64 CSVs -- the single source of truth models.py must match."""
+    manifest_by_fixture = {spec.fixture_file: spec for spec in MANIFEST}
+    for csv_path in sorted(data_dir().glob("*.csv")):
+        name = resolve_fixture_name(csv_path)
+        spec = manifest_by_fixture[f"{name}.json"]
+        model = django_apps.get_model(spec.model)
+        field_map = {f.name: f for f in model._meta.concrete_fields}
+        name_to_index, _data_rows = read_csv_rows(csv_path)
+        groups, _names_used = compute_ranged_groups(csv_path, name_to_index, field_map)
+        for model_field, (_base_ref, min_ref, max_ref) in groups.items():
+            if min_ref is not None:
+                yield spec, model, f"{model_field}_min"
+            if max_ref is not None:
+                yield spec, model, f"{model_field}_max"
+
+
 class Command(BaseCommand):
     help = "Join the committed IPCC uncertainty CSVs onto the reference fixtures by natural key (D-01/D-02/D-03)."
 
@@ -375,15 +397,15 @@ class Command(BaseCommand):
         parser.add_argument("--only", dest="only", default=None, help="Restrict to a single CSV filename.")
 
     def handle(self, *args, **options):
-        data_dir = Path(settings.BASE_DIR) / "ipcc" / "data" / "uncertainties"
+        uncertainties_dir = data_dir()
         manifest_by_fixture = {spec.fixture_file: spec for spec in MANIFEST}
         manifest_by_model = {spec.model.lower(): spec for spec in MANIFEST}
 
-        csv_paths = sorted(data_dir.glob("*.csv"))
+        csv_paths = sorted(uncertainties_dir.glob("*.csv"))
         if options["only"]:
             csv_paths = [p for p in csv_paths if p.name == options["only"]]
             if not csv_paths:
-                raise CommandError(f"no CSV named {options['only']!r} in {data_dir}")
+                raise CommandError(f"no CSV named {options['only']!r} in {uncertainties_dir}")
 
         fixture_cache = {}
         tables = []
