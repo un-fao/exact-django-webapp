@@ -6,9 +6,9 @@ current_phase: 1
 current_phase_name: CI Test Gate & Production Config Guard
 status: verifying
 stopped_at: Phase 1 executed and verified (human_needed); awaiting first CI run observation
-last_updated: "2026-08-20T07:46:14.267Z"
-last_activity: 2026-08-20
-last_activity_desc: "Completed quick task 260820-dkj: project admins can manage members of finalized projects again"
+last_updated: "2026-09-04T13:35:00.000Z"
+last_activity: 2026-09-04
+last_activity_desc: "Completed quick task 260904-k80: IPCC uncertainty ranges stored across 64 reference models"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 Phase: 1 (CI Test Gate & Production Config Guard) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-09-02 - Completed quick task 260902-f1z: recap notifications are now per-project opt-in, off by default
+Last activity: 2026-09-04 - Completed quick task 260904-k80: IPCC uncertainty ranges stored across 64 reference models
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -122,6 +122,7 @@ Items acknowledged and carried forward from previous milestone close:
 | 260820-he5 | Admin script: import FRA carbon stock data for a selected assessment year | 2026-08-20 | 9faeed81 | [260820-he5-admin-script-import-fra-carbon-stock-dat](./quick/260820-he5-admin-script-import-fra-carbon-stock-dat/) |
 | 260828-gjy | Recap emails: trigger from frontend button, window changes since previous recap email, keep auto trigger disabled | 2026-08-28 | 233090ef | [260828-gjy-recap-emails-trigger-from-frontend-butto](./quick/260828-gjy-recap-emails-trigger-from-frontend-butto/) |
 | 260902-f1z | Per-project notification opt-in: ProjectNotificationPreference.is_opted_out inverted to is_subscribed (default off), recipient derivation collapsed to one queryset, all preference writes gated on project admin | 2026-09-02 | a1d20733 | [260902-f1z-add-per-project-opt-in-for-automated-rec](./quick/260902-f1z-add-per-project-opt-in-for-automated-rec/) |
+| 260904-k80 | IPCC uncertainty ranges: 238 nullable _min/_max columns across 64 ipcc models (migration 0065), populated from the 2026-09-04 CSV drop by an idempotent natural-key import command. 44,184 rows carry a bound; no base value, unit, pk or row changed. 314 rows skipped by the base-value gate — EnergyDefaultEmissionFactor (0 written) needs a kg/TJ unit conversion before its bounds can be stored | 2026-09-04 | a29b16fd | [260904-k80-add-uncertainty-ranges-min-max-to-ipcc-r](./quick/260904-k80-add-uncertainty-ranges-min-max-to-ipcc-r/) |
 
 ## Session Continuity
 
