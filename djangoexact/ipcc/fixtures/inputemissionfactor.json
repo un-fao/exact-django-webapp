@@ -9,7 +9,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -22,7 +28,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -35,7 +47,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -48,7 +66,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -61,7 +85,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -74,7 +104,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -87,7 +123,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -100,7 +142,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -113,7 +161,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -126,7 +180,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -139,7 +199,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -152,7 +218,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -165,7 +237,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -178,7 +256,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -191,7 +275,13 @@
       "water_regime_type": null,
       "co2_value": 0.12,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.06,
+      "co2_value_max": 0.12,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -204,7 +294,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -217,7 +313,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -230,7 +332,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -243,7 +351,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -256,7 +370,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -269,7 +389,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -282,7 +408,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -295,7 +427,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -308,7 +446,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -321,7 +465,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -334,7 +484,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -347,7 +503,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -360,7 +522,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -373,7 +541,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -386,7 +560,13 @@
       "water_regime_type": null,
       "co2_value": 0.13,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.065,
+      "co2_value_max": 0.13,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -399,7 +579,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -412,7 +598,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -425,7 +617,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -438,7 +636,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -451,7 +655,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -464,7 +674,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -477,7 +693,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -490,7 +712,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -503,7 +731,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -516,7 +750,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -529,7 +769,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -542,7 +788,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -555,7 +807,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -568,7 +826,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -581,7 +845,13 @@
       "water_regime_type": null,
       "co2_value": 0.125,
       "n2o_value": null,
-      "co2_eq_value": 0.586666667
+      "co2_eq_value": 0.586666667,
+      "co2_value_min": 0.0625,
+      "co2_value_max": 0.125,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.99,
+      "co2_eq_value_max": 0.183333333
     }
   },
   {
@@ -594,7 +864,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -607,7 +883,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -620,7 +902,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -633,7 +921,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -646,7 +940,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -659,7 +959,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -672,7 +978,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -685,7 +997,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -698,7 +1016,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -711,7 +1035,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -724,7 +1054,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -737,7 +1073,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -750,7 +1092,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -763,7 +1111,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -776,7 +1130,13 @@
       "water_regime_type": null,
       "co2_value": 0.2,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -789,7 +1149,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -802,7 +1168,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -815,7 +1187,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -828,7 +1206,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -841,7 +1225,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -854,7 +1244,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -867,7 +1263,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -880,7 +1282,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -893,7 +1301,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -906,7 +1320,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -919,7 +1339,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -932,7 +1358,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -945,7 +1377,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -958,7 +1396,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.016,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.013,
+      "n2o_value_max": 0.019,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -971,7 +1415,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0105,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0065,
+      "n2o_value_max": 0.015,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -984,7 +1434,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -997,7 +1453,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1010,7 +1472,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1023,7 +1491,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1036,7 +1510,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1049,7 +1529,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1062,7 +1548,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1075,7 +1567,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1088,7 +1586,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1101,7 +1605,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1114,7 +1624,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1127,7 +1643,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1140,7 +1662,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1153,7 +1681,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1166,7 +1700,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.003,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.01,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1179,7 +1719,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1192,7 +1738,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1205,7 +1757,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1218,7 +1776,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1231,7 +1795,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1244,7 +1814,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1257,7 +1833,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1270,7 +1852,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1283,7 +1871,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1296,7 +1890,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1309,7 +1909,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1322,7 +1928,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1335,7 +1947,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1348,7 +1966,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1361,7 +1985,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": 4.766666667
+      "co2_eq_value": 4.766666667,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.016,
+      "co2_eq_value_min": 3.666666667,
+      "co2_eq_value_max": 5.866666667
     }
   },
   {
@@ -1374,7 +2004,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1387,7 +2023,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1400,7 +2042,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1413,7 +2061,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1426,7 +2080,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1439,7 +2099,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1452,7 +2118,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1465,7 +2137,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1478,7 +2156,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1491,7 +2175,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1504,7 +2194,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1517,7 +2213,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1530,7 +2232,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1543,7 +2251,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1556,7 +2270,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1569,7 +2289,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1582,7 +2308,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1595,7 +2327,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1608,7 +2346,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1621,7 +2365,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1634,7 +2384,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1647,7 +2403,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1660,7 +2422,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1673,7 +2441,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1686,7 +2460,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1699,7 +2479,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1712,7 +2498,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1725,7 +2517,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1738,7 +2536,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1751,7 +2555,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1764,7 +2574,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1777,7 +2593,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1790,7 +2612,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1803,7 +2631,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1816,7 +2650,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1829,7 +2669,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1842,7 +2688,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1855,7 +2707,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1868,7 +2726,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1881,7 +2745,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1894,7 +2764,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1907,7 +2783,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1920,7 +2802,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.005,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1933,7 +2821,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.006,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.001,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1946,7 +2840,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": 0.0055,
-      "co2_eq_value": null
+      "co2_eq_value": null,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": 0.0005,
+      "n2o_value_max": 0.011,
+      "co2_eq_value_min": null,
+      "co2_eq_value_max": null
     }
   },
   {
@@ -1959,7 +2859,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -1972,7 +2878,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -1985,7 +2897,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -1998,7 +2916,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2011,7 +2935,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2024,7 +2954,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2037,7 +2973,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2050,7 +2992,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2063,7 +3011,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2076,7 +3030,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2089,7 +3049,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2102,7 +3068,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2115,7 +3087,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2128,7 +3106,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2141,7 +3125,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.733333333
+      "co2_eq_value": 0.733333333,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.513333333,
+      "co2_eq_value_max": 0.953333333
     }
   },
   {
@@ -2154,7 +3144,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2167,7 +3163,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2180,7 +3182,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2193,7 +3201,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2206,7 +3220,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2219,7 +3239,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2232,7 +3258,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2245,7 +3277,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2258,7 +3296,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2271,7 +3315,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2284,7 +3334,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2297,7 +3353,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2310,7 +3372,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2323,7 +3391,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2336,7 +3410,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 0.55
+      "co2_eq_value": 0.55,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 0.33,
+      "co2_eq_value_max": 0.77
     }
   },
   {
@@ -2349,7 +3429,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2362,7 +3448,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2375,7 +3467,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2388,7 +3486,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2401,7 +3505,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2414,7 +3524,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2427,7 +3543,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2440,7 +3562,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2453,7 +3581,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2466,7 +3600,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2479,7 +3619,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2492,7 +3638,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2505,7 +3657,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2518,7 +3676,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2531,7 +3695,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 14.3
+      "co2_eq_value": 14.3,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 6.233333333,
+      "co2_eq_value_max": 22.36666667
     }
   },
   {
@@ -2544,7 +3714,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2557,7 +3733,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2570,7 +3752,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2583,7 +3771,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2596,7 +3790,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2609,7 +3809,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2622,7 +3828,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2635,7 +3847,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2648,7 +3866,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2661,7 +3885,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2674,7 +3904,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2687,7 +3923,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2700,7 +3942,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2713,7 +3961,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2726,7 +3980,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 23.1
+      "co2_eq_value": 23.1,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 13.2,
+      "co2_eq_value_max": 33.0
     }
   },
   {
@@ -2739,7 +3999,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2752,7 +4018,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2765,7 +4037,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2778,7 +4056,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2791,7 +4075,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2804,7 +4094,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2817,7 +4113,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2830,7 +4132,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2843,7 +4151,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2856,7 +4170,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2869,7 +4189,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2882,7 +4208,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2895,7 +4227,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2908,7 +4246,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   },
   {
@@ -2921,7 +4265,13 @@
       "water_regime_type": null,
       "co2_value": null,
       "n2o_value": null,
-      "co2_eq_value": 18.7
+      "co2_eq_value": 18.7,
+      "co2_value_min": null,
+      "co2_value_max": null,
+      "n2o_value_min": null,
+      "n2o_value_max": null,
+      "co2_eq_value_min": 7.7,
+      "co2_eq_value_max": 29.7
     }
   }
 ]

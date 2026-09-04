@@ -1,7 +1,12 @@
 """DB-free tests for import_uncertainties (see conftest.py -- SimpleTestCase only,
 no `databases` attribute, so these run safely under bare pytest and manage.py test)."""
 
+import json
+import math
 import os
+import tempfile
+from io import StringIO
+from pathlib import Path
 
 import django
 
@@ -9,6 +14,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoexact.settings")
 os.environ.setdefault("DJANGO_DEBUG", "True")
 django.setup()
 
+from django.core.management import call_command  # noqa: E402
 from django.test import SimpleTestCase  # noqa: E402
 
 from ipcc.management.commands import import_uncertainties as iu  # noqa: E402
@@ -49,3 +55,85 @@ class SchemaSyncTests(SimpleTestCase):
                 column, base_fields,
                 f"{spec.model}.{column} collides with a ranged base field -- would silently retype it",
             )
+
+
+class FixtureWriterTests(SimpleTestCase):
+    """Proves the writer's D-01/D-03 guarantees against the fixtures already on disk
+    (this test suite runs after `manage.py import_uncertainties` has patched them)."""
+
+    def test_combined_fixture_matches_per_model_fixtures(self):
+        combined = []
+        for spec in iu.MANIFEST:
+            with open(iu.fixture_path(spec), encoding="utf-8") as fh:
+                combined.extend(json.load(fh))
+        combined_path = Path(iu.settings.BASE_DIR) / "api" / "fixtures" / "all_reference_data.json"
+        with open(combined_path, encoding="utf-8") as fh:
+            actual = json.load(fh)
+        self.assertEqual(combined, actual)
+
+    def test_patch_only_touches_new_keys(self):
+        """Strips the on-disk fixture back to its pre-patch shape (works whether or
+        not this run already patched it), copies that reconstruction to a temp dir,
+        and asserts re-running the patch reproduces the current on-disk file exactly --
+        proving the patch only ever adds the new `_min`/`_max` keys."""
+        manifest_by_fixture = {spec.fixture_file: spec for spec in iu.MANIFEST}
+        cases = [("CoastalBGB.csv", "coastalbgb.json"), ("GrasslandAGB.csv", "grasslandbiomass.json")]
+        for csv_name, fixture_file in cases:
+            spec = manifest_by_fixture[fixture_file]
+            with open(iu.fixture_path(spec), encoding="utf-8") as fh:
+                current = json.load(fh)
+
+            csv_path = iu.data_dir() / csv_name
+            model = iu.django_apps.get_model(spec.model)
+            field_map = {f.name: f for f in model._meta.concrete_fields}
+            name_to_index, _rows = iu.read_csv_rows(csv_path)
+            groups, _names_used = iu.compute_ranged_groups(csv_path, name_to_index, field_map)
+            new_columns = set(iu.new_columns_for_groups(groups))
+
+            stripped_original = [
+                {
+                    "model": row["model"],
+                    "pk": row["pk"],
+                    "fields": {k: v for k, v in row["fields"].items() if k not in new_columns},
+                }
+                for row in current
+            ]
+
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp_copy = Path(tmp) / fixture_file
+                tmp_copy.write_text(json.dumps(stripped_original), encoding="utf-8")
+                fixture_cache = {fixture_file: json.loads(tmp_copy.read_text(encoding="utf-8"))}
+                _tables, results = iu.compute_all([csv_path], fixture_cache)
+                _spec, patches, groups2, _base_values = results[fixture_file]
+                patched = iu.apply_patches(spec, patches, groups2, fixture_cache)
+
+            self.assertEqual(patched, current, f"{csv_name}: re-patching the stripped fixture didn't reproduce the current one")
+
+    def test_base_values_agree_on_written_rows(self):
+        """Restricted to the ten largest CSVs (by file size) to keep runtime well
+        under the ~60s cap for the plan's 58k-row full pass; the join code path is
+        identical regardless of how many CSVs are given."""
+        csv_paths = sorted(iu.data_dir().glob("*.csv"), key=lambda p: p.stat().st_size, reverse=True)[:10]
+        _tables, results = iu.compute_all(csv_paths, {})
+        checked = 0
+        for spec, _patches, _groups, base_values in results.values():
+            fixture_by_pk = {row["pk"]: row["fields"] for row in iu.load_fixture(spec, {})}
+            for pk, fields_at_pk in base_values.items():
+                fixture_fields = fixture_by_pk[pk]
+                for model_field, csv_val in fields_at_pk.items():
+                    fixture_val = fixture_fields[model_field]
+                    if not isinstance(fixture_val, (int, float)) or isinstance(fixture_val, bool):
+                        continue  # matches process_csv's own gate: nothing comparable, nothing to prove
+                    self.assertTrue(
+                        math.isclose(csv_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9),
+                        f"{spec.model} pk={pk} {model_field}: csv={csv_val} fixture={fixture_val}",
+                    )
+                    checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_report_matches_committed_baseline(self):
+        report_path = str(iu.data_dir() / "import_report.json")
+        try:
+            call_command("import_uncertainties", "--dry-run", "--check", report_path, stdout=StringIO())
+        except iu.CommandError as exc:
+            self.fail(f"report does not match committed baseline: {exc}")

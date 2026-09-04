@@ -11,7 +11,17 @@
       "n_bg_t": 0.009,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 1.0682,
+      "slope_max": 1.0682,
+      "intercept_min": 0.8272,
+      "intercept_max": 0.9328,
+      "n_ag_residues_min": 0.0015,
+      "n_ag_residues_max": 0.0105,
+      "rs_t_min": 0.1848,
+      "rs_t_max": 0.2552,
+      "n_bg_t_min": 0.00225,
+      "n_bg_t_max": 0.01575
     }
   },
   {
@@ -26,7 +36,17 @@
       "n_bg_t": 0.008,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.9153,
+      "slope_max": 0.9153,
+      "intercept_min": 0.374,
+      "intercept_max": 1.326,
+      "n_ag_residues_min": 0.002,
+      "n_ag_residues_max": 0.014,
+      "rs_t_min": 0.1045,
+      "rs_t_max": 0.2755,
+      "n_bg_t_min": 0.002,
+      "n_bg_t_max": 0.014
     }
   },
   {
@@ -41,7 +61,17 @@
       "n_bg_t": 0.014,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.031,
+      "slope_max": 0.031,
+      "intercept_min": 0.318,
+      "intercept_max": 1.802,
+      "n_ag_residues_min": 0.00475,
+      "n_ag_residues_max": 0.03325,
+      "rs_t_min": 0.1,
+      "rs_t_max": 0.3,
+      "n_bg_t_min": 0.0035,
+      "n_bg_t_max": 0.0245
     }
   },
   {
@@ -56,7 +86,17 @@
       "n_bg_t": 0.014,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.8667,
+      "slope_max": 0.8667,
+      "intercept_min": 0.9086,
+      "intercept_max": 2.1714,
+      "n_ag_residues_min": 0.00475,
+      "n_ag_residues_max": 0.03325,
+      "rs_t_min": 0.1,
+      "rs_t_max": 0.3,
+      "n_bg_t_min": 0.0035,
+      "n_bg_t_max": 0.0245
     }
   },
   {
@@ -71,7 +111,17 @@
       "n_bg_t": 0.022,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.15,
+      "slope_max": 0.15,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": 0.00675,
+      "n_ag_residues_max": 0.04725,
+      "rs_t_min": 0.2,
+      "rs_t_max": 0.6,
+      "n_bg_t_min": 0.0055,
+      "n_bg_t_max": 0.0385
     }
   },
   {
@@ -86,7 +136,17 @@
       "n_bg_t": 0.012,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.15,
+      "slope_max": 0.15,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": 0.00375,
+      "n_ag_residues_max": 0.02625,
+      "rs_t_min": 0.27,
+      "rs_t_max": 0.81,
+      "n_bg_t_min": 0.003,
+      "n_bg_t_max": 0.021
     }
   },
   {
@@ -101,7 +161,17 @@
       "n_bg_t": 0.007,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.9991,
+      "slope_max": 0.9991,
+      "intercept_min": 0.4941,
+      "intercept_max": 0.7259,
+      "n_ag_residues_min": 0.0015,
+      "n_ag_residues_max": 0.0105,
+      "rs_t_min": 0.1628,
+      "rs_t_max": 0.2772,
+      "n_bg_t_min": 0.00175,
+      "n_bg_t_max": 0.01225
     }
   },
   {
@@ -116,7 +186,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 1.0,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Wheat'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Wheat'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -131,7 +211,17 @@
       "n_bg_t": 0.009,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 1.5778,
+      "slope_max": 1.5778,
+      "intercept_min": 0.3,
+      "intercept_max": 0.5,
+      "n_ag_residues_min": 0.0015,
+      "n_ag_residues_max": 0.0105,
+      "rs_t_min": 0.1357,
+      "rs_t_max": 0.3243,
+      "n_bg_t_min": 0.00225,
+      "n_bg_t_max": 0.01575
     }
   },
   {
@@ -146,7 +236,17 @@
       "n_bg_t": 0.009,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 1.2255,
+      "slope_max": 1.2255,
+      "intercept_min": 0.555,
+      "intercept_max": 0.945,
+      "n_ag_residues_min": 0.0015,
+      "n_ag_residues_max": 0.0105,
+      "rs_t_min": 0.2072,
+      "rs_t_max": 0.3528,
+      "n_bg_t_min": 0.00225,
+      "n_bg_t_max": 0.01575
     }
   },
   {
@@ -161,7 +261,17 @@
       "n_bg_t": 0.011,
       "dry_matter": 0.89,
       "rag": 1.6,
-      "comment": "Approximated using mapping for 'Upland Rice' based on name/commodity match."
+      "comment": "Approximated using mapping for 'Upland Rice' based on name/commodity match.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -176,7 +286,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Values already provided in Final_list."
+      "comment": "Values already provided in Final_list.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -191,7 +311,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Oats'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Oats'.",
+      "slope_min": 0.8645,
+      "slope_max": 0.8645,
+      "intercept_min": 0.8188,
+      "intercept_max": 0.9612,
+      "n_ag_residues_min": 0.00175,
+      "n_ag_residues_max": 0.01225,
+      "rs_t_min": -0.05,
+      "rs_t_max": 0.55,
+      "n_bg_t_min": 0.002,
+      "n_bg_t_max": 0.014
     }
   },
   {
@@ -206,7 +336,17 @@
       "n_bg_t": 0.0,
       "dry_matter": 1.0,
       "rag": 1.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Millet'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Millet'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -221,7 +361,17 @@
       "n_bg_t": 0.006,
       "dry_matter": 0.89,
       "rag": 1.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sorghum'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sorghum'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -236,7 +386,17 @@
       "n_bg_t": 0.011,
       "dry_matter": 1.0,
       "rag": 1.6,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Rye'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Rye'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -251,7 +411,17 @@
       "n_bg_t": 0.008,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.6417,
+      "slope_max": 0.6417,
+      "intercept_min": 0.6885,
+      "intercept_max": 2.0115,
+      "n_ag_residues_min": 0.002,
+      "n_ag_residues_max": 0.014,
+      "rs_t_min": 0.1045,
+      "rs_t_max": 0.2755,
+      "n_bg_t_min": 0.002,
+      "n_bg_t_max": 0.014
     }
   },
   {
@@ -266,7 +436,17 @@
       "n_bg_t": 0.01,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.0,
+      "slope_max": 0.0,
+      "intercept_min": 0.3604,
+      "intercept_max": 0.9996,
+      "n_ag_residues_min": 0.0025,
+      "n_ag_residues_max": 0.0175,
+      "rs_t_min": 0.121,
+      "rs_t_max": 0.319,
+      "n_bg_t_min": 0.0025,
+      "n_bg_t_max": 0.0175
     }
   },
   {
@@ -281,7 +461,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Potatoes'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Potatoes'.",
+      "slope_min": 0.031,
+      "slope_max": 0.031,
+      "intercept_min": 0.318,
+      "intercept_max": 1.802,
+      "n_ag_residues_min": 0.00475,
+      "n_ag_residues_max": 0.03325,
+      "rs_t_min": 0.1,
+      "rs_t_max": 0.3,
+      "n_bg_t_min": 0.0035,
+      "n_bg_t_max": 0.0245
     }
   },
   {
@@ -296,7 +486,17 @@
       "n_bg_t": 0.009,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.8667,
+      "slope_max": 0.8667,
+      "intercept_min": 0.9086,
+      "intercept_max": 2.1714,
+      "n_ag_residues_min": 0.004,
+      "n_ag_residues_max": 0.028,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -311,7 +511,17 @@
       "n_bg_t": 0.012,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.09,
+      "slope_max": 0.09,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": 0.00375,
+      "n_ag_residues_max": 0.02625,
+      "rs_t_min": 0.27,
+      "rs_t_max": 0.81,
+      "n_bg_t_min": 0.003,
+      "n_bg_t_max": 0.021
     }
   },
   {
@@ -326,7 +536,17 @@
       "n_bg_t": 0.012,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.15,
+      "slope_max": 0.15,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": 0.00375,
+      "n_ag_residues_max": 0.02625,
+      "rs_t_min": 0.4,
+      "rs_t_max": 1.2,
+      "n_bg_t_min": 0.003,
+      "n_bg_t_max": 0.021
     }
   },
   {
@@ -341,7 +561,17 @@
       "n_bg_t": 0.016,
       "dry_matter": null,
       "rag": null,
-      "comment": null
+      "comment": null,
+      "slope_min": 0.15,
+      "slope_max": 0.15,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": 0.00625,
+      "n_ag_residues_max": 0.04375,
+      "rs_t_min": 0.4,
+      "rs_t_max": 1.2,
+      "n_bg_t_min": 0.004,
+      "n_bg_t_max": 0.028
     }
   },
   {
@@ -356,7 +586,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Values already provided in Final_list."
+      "comment": "Values already provided in Final_list.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -371,7 +611,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -386,7 +636,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -401,7 +661,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -416,7 +686,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -431,7 +711,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -446,7 +736,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -461,7 +761,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -476,7 +786,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -491,7 +811,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -506,7 +836,17 @@
       "n_bg_t": 0.0,
       "dry_matter": 0.94,
       "rag": 1.0,
-      "comment": "Approximated using mapping for 'Peanuts' "
+      "comment": "Approximated using mapping for 'Peanuts' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -521,7 +861,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 1.2,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -536,7 +886,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Beans, dry'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Beans, dry'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -551,7 +911,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -566,7 +936,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -581,7 +961,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Buckwheat'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Buckwheat'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -596,7 +986,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -611,7 +1011,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -626,7 +1036,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -641,7 +1061,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Carrots and turnips'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Carrots and turnips'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -656,7 +1086,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -671,7 +1111,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -686,7 +1136,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -701,7 +1161,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -716,7 +1186,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' "
+      "comment": "Approximated using mapping for 'Cereals' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -731,7 +1211,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -746,7 +1236,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -761,7 +1261,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Beans, Dry' "
+      "comment": "Approximated using mapping for 'Beans, Dry' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -776,7 +1286,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Chicory roots'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Chicory roots'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -791,7 +1311,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -806,7 +1336,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -821,7 +1361,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -836,7 +1386,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -851,7 +1411,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -866,7 +1436,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -881,7 +1461,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -896,7 +1486,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Cow peas, dry'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Cow peas, dry'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -911,7 +1511,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -926,7 +1536,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -941,7 +1561,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -956,7 +1586,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -971,7 +1611,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -986,7 +1636,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1001,7 +1661,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.91,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1016,7 +1686,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Fonio'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Fonio'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1031,7 +1711,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1046,7 +1736,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1061,7 +1761,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1076,7 +1786,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1091,7 +1811,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1106,7 +1836,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1121,7 +1861,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1136,7 +1886,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1151,7 +1911,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1166,7 +1936,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1181,7 +1961,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1196,7 +1986,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1211,7 +2011,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1226,7 +2036,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1241,7 +2061,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1256,7 +2086,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Beans, Dry' "
+      "comment": "Approximated using mapping for 'Beans, Dry' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1271,7 +2111,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1286,7 +2136,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1301,7 +2161,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1316,7 +2186,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1331,7 +2211,17 @@
       "n_bg_t": 0.007,
       "dry_matter": 1.0,
       "rag": 1.0,
-      "comment": "Approximated using mapping for 'Maize' based on name/commodity match."
+      "comment": "Approximated using mapping for 'Maize' based on name/commodity match.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1346,7 +2236,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1361,7 +2261,17 @@
       "n_bg_t": 0.0,
       "dry_matter": 0.88,
       "rag": 1.4,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1376,7 +2286,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Grain, Mixed' "
+      "comment": "Approximated using mapping for 'Grain, Mixed' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1391,7 +2311,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1406,7 +2336,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1421,7 +2361,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1436,7 +2386,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1451,7 +2411,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1466,7 +2436,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1481,7 +2461,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1496,7 +2486,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1511,7 +2511,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1526,7 +2536,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1541,7 +2561,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1556,7 +2586,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1571,7 +2611,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1586,7 +2636,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1601,7 +2661,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1616,7 +2686,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1631,7 +2711,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1646,7 +2736,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1661,7 +2761,17 @@
       "n_bg_t": 0.012,
       "dry_matter": 1.0,
       "rag": 0.3,
-      "comment": "Approximated using mapping for 'Beans, Dry' "
+      "comment": "Approximated using mapping for 'Beans, Dry' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1676,7 +2786,17 @@
       "n_bg_t": 0.012,
       "dry_matter": 0.9,
       "rag": 0.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Pineapples'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Pineapples'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1691,7 +2811,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1706,7 +2836,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1721,7 +2861,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1736,7 +2886,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1751,7 +2911,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.91,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1766,7 +2936,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1781,7 +2961,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.22,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1796,7 +2986,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Quinoa'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Quinoa'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1811,7 +3011,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1826,7 +3036,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1841,7 +3061,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1856,7 +3086,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1871,7 +3111,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1886,7 +3136,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1901,7 +3161,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 1.0,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Beans, Dry' based on name/commodity match."
+      "comment": "Approximated using mapping for 'Beans, Dry' based on name/commodity match.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1916,7 +3186,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1931,7 +3211,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1946,7 +3236,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.22,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1961,7 +3261,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 1.0,
       "rag": 0.4,
-      "comment": "Values already provided in Final_list."
+      "comment": "Values already provided in Final_list.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1976,7 +3286,17 @@
       "n_bg_t": 0.012,
       "dry_matter": 0.22,
       "rag": 0.3,
-      "comment": "Values already provided in Final_list."
+      "comment": "Values already provided in Final_list.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -1991,7 +3311,17 @@
       "n_bg_t": 0.012,
       "dry_matter": 0.9,
       "rag": 0.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sugar cane'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sugar cane'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2006,7 +3336,17 @@
       "n_bg_t": 0.008,
       "dry_matter": 0.91,
       "rag": 2.1,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2021,7 +3361,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.91,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables)."
+      "comment": "Approximated using mapping for 'Soybeans' based on name/commodity match. Oilseed: proxied to Soybeans parameters (seed crop present in FAO crop mapping tables).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2036,7 +3386,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sweet potatoes'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Sweet potatoes'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2051,7 +3411,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2066,7 +3436,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2081,7 +3461,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2096,7 +3486,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' "
+      "comment": "Approximated using mapping for 'Potatoes' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2111,7 +3511,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2126,7 +3536,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.22,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Vegetable crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2141,7 +3561,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Triticale'."
+      "comment": "Filled missing values from IPCC and FAO crops mapping). Exact match to FAO crop 'Triticale'.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2156,7 +3586,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2171,7 +3611,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2186,7 +3636,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2201,7 +3661,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2216,7 +3686,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation."
+      "comment": "Approximated using mapping for 'Cereals' based on name/commodity match. Tree nuts harvested as dry seeds: proxied to Cereals as conservative seed-crop approximation.",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2231,7 +3711,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.22,
       "rag": 1.3,
-      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture)."
+      "comment": "Approximated using mapping for 'Potatoes' based on name/commodity match. Fruit crop: used Potatoes proxy as conservative fresh-produce approximation (high moisture).",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2246,7 +3736,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2261,7 +3761,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2276,7 +3786,17 @@
       "n_bg_t": 0.014,
       "dry_matter": 0.22,
       "rag": 0.4,
-      "comment": "Approximated using mapping for 'Potatoes' "
+      "comment": "Approximated using mapping for 'Potatoes' ",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2291,7 +3811,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2306,7 +3836,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2321,7 +3861,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2336,7 +3886,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2351,7 +3911,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2366,7 +3936,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   },
   {
@@ -2381,7 +3961,17 @@
       "n_bg_t": 0.009,
       "dry_matter": 0.88,
       "rag": 1.3,
-      "comment": "Remaining missing values filled with Generic value defaults"
+      "comment": "Remaining missing values filled with Generic value defaults",
+      "slope_min": null,
+      "slope_max": null,
+      "intercept_min": null,
+      "intercept_max": null,
+      "n_ag_residues_min": null,
+      "n_ag_residues_max": null,
+      "rs_t_min": null,
+      "rs_t_max": null,
+      "n_bg_t_min": null,
+      "n_bg_t_max": null
     }
   }
 ]

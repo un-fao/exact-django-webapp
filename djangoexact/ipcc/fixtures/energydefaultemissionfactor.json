@@ -7,7 +7,13 @@
       "fuel_type": 21,
       "co2": 2.27486259,
       "ch4": 0.000328263,
-      "n2o": 1.96958e-05
+      "n2o": 1.96958e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -18,7 +24,13 @@
       "fuel_type": 22,
       "co2": 2.6669331,
       "ch4": 0.00035991,
-      "n2o": 2.15946e-05
+      "n2o": 2.15946e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -29,7 +41,13 @@
       "fuel_type": 18,
       "co2": 2.799327,
       "ch4": 0.0003819,
-      "n2o": 2.2914e-05
+      "n2o": 2.2914e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -40,7 +58,13 @@
       "fuel_type": 24,
       "co2": 1.59080779,
       "ch4": 0.000126055,
-      "n2o": 2.52109e-06
+      "n2o": 2.52109e-06,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -51,7 +75,13 @@
       "fuel_type": 23,
       "co2": 0.00206807,
       "ch4": 1.84e-07,
-      "n2o": 3.69e-09
+      "n2o": 3.69e-09,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -62,7 +92,13 @@
       "fuel_type": 40,
       "co2": 2.27486259,
       "ch4": 0.001083268,
-      "n2o": 0.000105044
+      "n2o": 0.000105044,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -73,7 +109,13 @@
       "fuel_type": 41,
       "co2": 2.6669331,
       "ch4": 0.000140365,
-      "n2o": 0.000140365
+      "n2o": 0.000140365,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -84,7 +126,13 @@
       "fuel_type": 44,
       "co2": 0.00206807,
       "ch4": 3.39e-06,
-      "n2o": 1.11e-07
+      "n2o": 1.11e-07,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -95,7 +143,13 @@
       "fuel_type": 43,
       "co2": 1.59080779,
       "ch4": 0.001563076,
-      "n2o": 5.04218e-06
+      "n2o": 5.04218e-06,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -106,7 +160,13 @@
       "fuel_type": 45,
       "co2": 0.032084208,
       "ch4": 0.000382968,
-      "n2o": 0.0
+      "n2o": 0.0,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -117,7 +177,13 @@
       "fuel_type": 46,
       "co2": 0.032084208,
       "ch4": 0.00553176,
-      "n2o": 0.000872316
+      "n2o": 0.000872316,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -128,7 +194,13 @@
       "fuel_type": 47,
       "co2": 2.6669331,
       "ch4": 0.000149363,
-      "n2o": 0.001029343
+      "n2o": 0.001029343,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -139,7 +211,13 @@
       "fuel_type": 48,
       "co2": 2.27486259,
       "ch4": 0.004595682,
-      "n2o": 1.31305e-05
+      "n2o": 1.31305e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -150,7 +228,13 @@
       "fuel_type": 49,
       "co2": 2.27486259,
       "ch4": 0.002626104,
-      "n2o": 6.56526e-05
+      "n2o": 6.56526e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -161,7 +245,13 @@
       "fuel_type": 30,
       "co2": 1.7472,
       "ch4": 0.00468,
-      "n2o": 6.24e-05
+      "n2o": 6.24e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -172,7 +262,13 @@
       "fuel_type": 31,
       "co2": 1.03456,
       "ch4": 0.002928,
-      "n2o": 1.3664e-05
+      "n2o": 1.3664e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   },
   {
@@ -183,7 +279,13 @@
       "fuel_type": 32,
       "co2": 3.304,
       "ch4": 0.0059,
-      "n2o": 2.95e-05
+      "n2o": 2.95e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
     }
   }
 ]

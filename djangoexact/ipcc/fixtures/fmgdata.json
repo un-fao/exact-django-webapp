@@ -7,7 +7,9 @@
       "moisture": 2,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -18,7 +20,9 @@
       "moisture": 1,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -29,7 +33,9 @@
       "moisture": 2,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -40,7 +46,9 @@
       "moisture": 1,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -51,7 +59,9 @@
       "moisture": 2,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -62,7 +72,9 @@
       "moisture": 1,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -73,7 +85,9 @@
       "moisture": 2,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -84,7 +98,9 @@
       "moisture": 1,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -95,7 +111,9 @@
       "moisture": 4,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -106,7 +124,9 @@
       "moisture": 2,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -117,7 +137,9 @@
       "moisture": 1,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -128,7 +150,9 @@
       "moisture": 4,
       "tillage_management_type": 1,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -139,7 +163,9 @@
       "moisture": 2,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9984,
+      "value_max": 1.0816
     }
   },
   {
@@ -150,7 +176,9 @@
       "moisture": 1,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 0.98
+      "value": 0.98,
+      "value_min": 0.931,
+      "value_max": 1.029
     }
   },
   {
@@ -161,7 +189,9 @@
       "moisture": 2,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9984,
+      "value_max": 1.0816
     }
   },
   {
@@ -172,7 +202,9 @@
       "moisture": 1,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 0.98
+      "value": 0.98,
+      "value_min": 0.931,
+      "value_max": 1.029
     }
   },
   {
@@ -183,7 +215,9 @@
       "moisture": 2,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.05
+      "value": 1.05,
+      "value_min": 1.008,
+      "value_max": 1.092
     }
   },
   {
@@ -194,7 +228,9 @@
       "moisture": 1,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 0.99
+      "value": 0.99,
+      "value_min": 0.9603,
+      "value_max": 1.0197
     }
   },
   {
@@ -205,7 +241,9 @@
       "moisture": 2,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -216,7 +254,9 @@
       "moisture": 1,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 0.99
+      "value": 0.99,
+      "value_min": 0.9207,
+      "value_max": 1.0593
     }
   },
   {
@@ -227,7 +267,9 @@
       "moisture": 4,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -238,7 +280,9 @@
       "moisture": 2,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 0.545,
+      "value_max": 1.635
     }
   },
   {
@@ -249,7 +293,9 @@
       "moisture": 1,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 0.545,
+      "value_max": 1.635
     }
   },
   {
@@ -260,7 +306,9 @@
       "moisture": 4,
       "tillage_management_type": 2,
       "grassland_management_type": null,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 0.545,
+      "value_max": 1.635
     }
   },
   {
@@ -271,7 +319,9 @@
       "moisture": 2,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 1.0464,
+      "value_max": 1.1336
     }
   },
   {
@@ -282,7 +332,9 @@
       "moisture": 1,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.03
+      "value": 1.03,
+      "value_min": 0.9888,
+      "value_max": 1.0712
     }
   },
   {
@@ -293,7 +345,9 @@
       "moisture": 2,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 1.0464,
+      "value_max": 1.1336
     }
   },
   {
@@ -304,7 +358,9 @@
       "moisture": 1,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.03
+      "value": 1.03,
+      "value_min": 0.9888,
+      "value_max": 1.0712
     }
   },
   {
@@ -315,7 +371,9 @@
       "moisture": 2,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.056,
+      "value_max": 1.144
     }
   },
   {
@@ -326,7 +384,9 @@
       "moisture": 1,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.0088,
+      "value_max": 1.0712
     }
   },
   {
@@ -337,7 +397,9 @@
       "moisture": 2,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.045,
+      "value_max": 1.155
     }
   },
   {
@@ -348,7 +410,9 @@
       "moisture": 1,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -359,7 +423,9 @@
       "moisture": 4,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.045,
+      "value_max": 1.155
     }
   },
   {
@@ -370,7 +436,9 @@
       "moisture": 2,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": 0.58,
+      "value_max": 1.74
     }
   },
   {
@@ -381,7 +449,9 @@
       "moisture": 1,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": 0.58,
+      "value_max": 1.74
     }
   },
   {
@@ -392,7 +462,9 @@
       "moisture": 4,
       "tillage_management_type": 3,
       "grassland_management_type": null,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": 0.58,
+      "value_max": 1.74
     }
   },
   {
@@ -403,7 +475,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -414,7 +488,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -425,7 +501,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -436,7 +514,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -447,7 +527,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -458,7 +540,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -469,7 +553,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -480,7 +566,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -491,7 +579,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -502,7 +592,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -513,7 +605,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -524,7 +618,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 6,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -535,7 +631,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -546,7 +644,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -557,7 +657,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -568,7 +670,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -579,7 +683,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -590,7 +696,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -601,7 +709,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -612,7 +722,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -623,7 +735,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -634,7 +748,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -645,7 +761,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -656,7 +774,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -667,7 +787,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -678,7 +800,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -689,7 +813,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -700,7 +826,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -711,7 +839,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -722,7 +852,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -733,7 +865,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -744,7 +878,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -755,7 +891,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -766,7 +904,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -777,7 +917,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -788,7 +930,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 2,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -799,7 +943,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -810,7 +956,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -821,7 +969,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -832,7 +982,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -843,7 +995,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -854,7 +1008,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -865,7 +1021,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -876,7 +1034,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -887,7 +1047,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -898,7 +1060,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -909,7 +1073,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -920,7 +1086,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 3,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -931,7 +1099,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -942,7 +1112,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -953,7 +1125,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -964,7 +1138,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -975,7 +1151,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -986,7 +1164,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -997,7 +1177,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1008,7 +1190,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1019,7 +1203,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1030,7 +1216,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1041,7 +1229,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1052,7 +1242,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 4,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1063,7 +1255,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1074,7 +1268,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1085,7 +1281,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1096,7 +1294,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1107,7 +1307,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1118,7 +1320,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.14
+      "value": 1.14,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1129,7 +1333,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1140,7 +1346,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1151,7 +1359,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.17
+      "value": 1.17,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1162,7 +1372,9 @@
       "moisture": 2,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1173,7 +1385,9 @@
       "moisture": 1,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1184,7 +1398,9 @@
       "moisture": 4,
       "tillage_management_type": null,
       "grassland_management_type": 5,
-      "value": 1.16
+      "value": 1.16,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

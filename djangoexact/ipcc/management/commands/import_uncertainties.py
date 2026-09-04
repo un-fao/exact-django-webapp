@@ -281,6 +281,8 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
     counts["csv_rows"] = len(data_rows)
     counts["fixture_rows"] = len(fixture_rows)
     patches = {}
+    base_values = {}  # pk -> {model_field: csv base value}, written rows only -- lets
+    # tests re-prove the join independently of this function's own bookkeeping.
     conflicts_detail = []
 
     for row in data_rows:
@@ -302,11 +304,14 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
         fixture_fields = fixture_by_pk[pk]
 
         row_values = {}
+        row_base_values = {}
         mismatch = False
         for model_field, (base_ref, min_ref, max_ref) in ranged_groups.items():
             base_raw = get_cell(row, base_ref, name_to_index).strip()
             if not _is_null(base_raw):
                 base_val = _to_float_or_none(base_raw)
+                if base_val is not None:
+                    row_base_values[model_field] = base_val
                 fixture_val = fixture_fields.get(model_field)
                 if base_val is not None and isinstance(fixture_val, (int, float)) and not isinstance(fixture_val, bool):
                     if not math.isclose(base_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9):
@@ -340,6 +345,7 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
         else:
             patches[pk] = row_values
 
+        base_values.setdefault(pk, {}).update(row_base_values)
         counts["written"] += 1
         if any(v is not None for v in row_values.values()):
             counts["carrying_bound"] += 1
@@ -354,7 +360,7 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache):
         **counts,
         "conflicts_detail": conflicts_detail,
     }
-    return table, patches, ranged_groups
+    return table, patches, ranged_groups, base_values
 
 
 def aggregate_totals(tables):
@@ -387,6 +393,82 @@ def iter_mapped_columns():
                 yield spec, model, f"{model_field}_max"
 
 
+def compute_all(csv_paths, fixture_cache=None):
+    """Runs the full join across the given CSVs. Returns (tables, results) where
+    results is fixture_file -> (spec, patches, groups, base_values). Writes nothing --
+    the whole point is to let the writer fail loudly before touching a single file
+    (CONTEXT)."""
+    manifest_by_fixture = {spec.fixture_file: spec for spec in MANIFEST}
+    manifest_by_model = {spec.model.lower(): spec for spec in MANIFEST}
+    if fixture_cache is None:
+        fixture_cache = {}
+
+    tables = []
+    results = {}
+    for csv_path in csv_paths:
+        name = resolve_fixture_name(csv_path)
+        spec = manifest_by_fixture.get(f"{name}.json")
+        if spec is None:
+            raise CommandError(f"{csv_path.name}: resolves to {name}.json, which is not in MANIFEST")
+        model = django_apps.get_model(spec.model)
+        table, patches, groups, base_values = process_csv(csv_path, spec, model, manifest_by_model, fixture_cache)
+        tables.append(table)
+        results[spec.fixture_file] = (spec, patches, groups, base_values)
+    return tables, results
+
+
+def new_columns_for_groups(groups):
+    return [
+        col
+        for model_field, (_base_ref, min_ref, max_ref) in groups.items()
+        for col in ((f"{model_field}_min",) if min_ref is not None else ())
+        + ((f"{model_field}_max",) if max_ref is not None else ())
+    ]
+
+
+def apply_patches(spec, patches, groups, fixture_cache):
+    """Returns the patched fixture payload: every mapped column set on every row (to
+    its bound where matched, null otherwise), key order following `_meta.concrete_fields`
+    so new keys land after the existing ones exactly as `dump_reference_data` would emit
+    them. Reads the pre-run payload from `fixture_cache` -- populated by `compute_all`
+    before anything was written -- never from disk post-write."""
+    model = django_apps.get_model(spec.model)
+    field_order = [f.name for f in model._meta.concrete_fields if not f.primary_key]
+    new_columns = new_columns_for_groups(groups)
+
+    new_rows = []
+    for row in load_fixture(spec, fixture_cache):
+        row_patch = patches.get(row["pk"], {})
+        fields = dict(row["fields"])
+        for col in new_columns:
+            fields[col] = row_patch.get(col)
+        ordered_fields = {name: fields[name] for name in field_order if name in fields}
+        new_rows.append({"model": row["model"], "pk": row["pk"], "fields": ordered_fields})
+    return new_rows
+
+
+def write_json(path, payload):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+
+
+def fixture_path(spec):
+    return Path(settings.BASE_DIR) / spec.app / "fixtures" / spec.fixture_file
+
+
+def rebuild_combined():
+    """Mirrors `dump_reference_data._write_combined`: the concatenation of every
+    MANIFEST fixture's current on-disk payload, in MANIFEST order. Reads fresh from
+    disk (not the pre-run `fixture_cache`) so it picks up what this run just wrote."""
+    combined = []
+    for spec in MANIFEST:
+        with open(fixture_path(spec), encoding="utf-8") as fh:
+            combined.extend(json.load(fh))
+    write_json(Path(settings.BASE_DIR) / "api" / "fixtures" / "all_reference_data.json", combined)
+
+
 class Command(BaseCommand):
     help = "Join the committed IPCC uncertainty CSVs onto the reference fixtures by natural key (D-01/D-02/D-03)."
 
@@ -398,9 +480,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         uncertainties_dir = data_dir()
-        manifest_by_fixture = {spec.fixture_file: spec for spec in MANIFEST}
-        manifest_by_model = {spec.model.lower(): spec for spec in MANIFEST}
-
         csv_paths = sorted(uncertainties_dir.glob("*.csv"))
         if options["only"]:
             csv_paths = [p for p in csv_paths if p.name == options["only"]]
@@ -408,32 +487,33 @@ class Command(BaseCommand):
                 raise CommandError(f"no CSV named {options['only']!r} in {uncertainties_dir}")
 
         fixture_cache = {}
-        tables = []
-        for csv_path in csv_paths:
-            name = resolve_fixture_name(csv_path)
-            spec = manifest_by_fixture.get(f"{name}.json")
-            if spec is None:
-                raise CommandError(f"{csv_path.name}: resolves to {name}.json, which is not in MANIFEST")
-            model = django_apps.get_model(spec.model)
-            table, _patches, _groups = process_csv(csv_path, spec, model, manifest_by_model, fixture_cache)
-            tables.append(table)
+        tables, results = compute_all(csv_paths, fixture_cache)
+
+        # Compute every patched payload in memory before writing anything -- a
+        # failure here must never leave a partial write on disk (CONTEXT).
+        new_payloads = {
+            fixture_file: (spec, apply_patches(spec, patches, groups, fixture_cache))
+            for fixture_file, (spec, patches, groups, _base_values) in results.items()
+        }
 
         totals = aggregate_totals(tables)
         report = {"tables": tables, "totals": totals}
         self._print_report(tables, totals)
 
         if options["json_path"]:
-            out_path = Path(options["json_path"])
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(out_path, "w", encoding="utf-8") as fh:
-                json.dump(report, fh, indent=2, ensure_ascii=False)
-                fh.write("\n")
+            write_json(Path(options["json_path"]), report)
 
         if options["check_path"]:
             with open(options["check_path"], encoding="utf-8") as fh:
                 committed = json.load(fh)
             if report != committed:
                 raise CommandError(f"report differs from committed baseline at {options['check_path']}")
+
+        if not options["dry_run"]:
+            for spec, rows in new_payloads.values():
+                write_json(fixture_path(spec), rows)
+            rebuild_combined()
+            self.stdout.write(self.style.SUCCESS(f"wrote {len(new_payloads)} fixtures + combined."))
 
     def _print_report(self, tables, totals):
         header = f"{'model':<45}{'groups':>7}{'cols':>6}{'rows':>8}{'written':>9}{'unmatch':>9}{'unres_fk':>9}{'ambig':>7}{'conflict':>9}{'basemis':>9}"

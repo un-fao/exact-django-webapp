@@ -9,7 +9,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.32,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.2,
+      "value_max": 0.44
     }
   },
   {
@@ -22,7 +30,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -35,7 +51,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -48,7 +72,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.72
+      "value": 0.72,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.47,
+      "value_max": 0.97
     }
   },
   {
@@ -61,7 +93,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.32,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.2,
+      "value_max": 0.44
     }
   },
   {
@@ -74,7 +114,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.32,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.2,
+      "value_max": 0.44
     }
   },
   {
@@ -87,7 +135,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -100,7 +156,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -113,7 +177,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.72
+      "value": 0.72,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.47,
+      "value_max": 0.97
     }
   },
   {
@@ -126,7 +198,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -139,7 +219,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -152,7 +240,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.74
+      "value": 0.74,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -165,7 +261,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -178,7 +282,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -191,7 +303,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -204,7 +324,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.74
+      "value": 0.74,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -217,7 +345,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.23,
+      "value_max": 0.49
     }
   },
   {
@@ -230,7 +366,15 @@
       "co2": null,
       "ch4": 6.8,
       "n2o": null,
-      "value": 0.32
+      "value": 0.32,
+      "co2_min": 1490.0,
+      "co2_max": 1670.0,
+      "ch4_min": 4.8,
+      "ch4_max": 8.8,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": 0.2,
+      "value_max": 0.44
     }
   },
   {
@@ -243,7 +387,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -256,7 +408,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -269,7 +429,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -282,7 +450,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -295,7 +471,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -308,7 +492,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -321,7 +513,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -334,7 +534,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -347,7 +555,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -360,7 +576,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.29,
+      "value_max": 0.61
     }
   },
   {
@@ -373,7 +597,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -386,7 +618,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -399,7 +639,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -412,7 +660,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -425,7 +681,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -438,7 +702,15 @@
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": 1438.0,
+      "co2_max": 1700.0,
+      "ch4_min": 2.8,
+      "ch4_max": 6.6,
+      "n2o_min": 0.19,
+      "n2o_max": 0.33,
+      "value_min": 0.17,
+      "value_max": 0.51
     }
   },
   {
@@ -451,7 +723,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -464,7 +744,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

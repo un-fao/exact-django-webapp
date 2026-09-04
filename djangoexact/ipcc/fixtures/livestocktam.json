@@ -6,7 +6,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 14,
-      "value": 250.0
+      "value": 250.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -16,7 +18,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 14,
-      "value": 302.0
+      "value": 302.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -26,7 +30,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -36,7 +42,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -46,7 +54,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -56,7 +66,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -66,7 +78,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 14,
-      "value": 54.0
+      "value": 54.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -76,7 +90,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 14,
-      "value": 200.0
+      "value": 200.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -86,7 +102,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 14,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -96,7 +114,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 14,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -106,7 +126,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 14,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -116,7 +138,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 14,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -126,7 +150,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -136,7 +162,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -146,7 +174,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 14,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -156,7 +186,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 14,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -166,7 +198,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 14,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -176,7 +210,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 16,
-      "value": 485.0
+      "value": 485.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -186,7 +222,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 16,
-      "value": 310.0
+      "value": 310.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -196,7 +234,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -206,7 +246,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -216,7 +258,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -226,7 +270,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -236,7 +282,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 16,
-      "value": 56.0
+      "value": 56.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -246,7 +294,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 16,
-      "value": 160.0
+      "value": 160.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -256,7 +306,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 16,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -266,7 +318,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 16,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -276,7 +330,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 16,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -286,7 +342,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 16,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -296,7 +354,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -306,7 +366,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -316,7 +378,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 16,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -326,7 +390,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 16,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -336,7 +402,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 16,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -346,7 +414,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 3,
-      "value": 650.0
+      "value": 650.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -356,7 +426,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 3,
-      "value": 407.0
+      "value": 407.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -366,7 +438,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -376,7 +450,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -386,7 +462,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -396,7 +474,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -406,7 +486,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 3,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -416,7 +498,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 3,
-      "value": 184.0
+      "value": 184.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -426,7 +510,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 3,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -436,7 +522,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 3,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -446,7 +534,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 3,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -456,7 +546,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 3,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -466,7 +558,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -476,7 +570,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -486,7 +582,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -496,7 +594,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -506,7 +606,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 3,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -516,7 +618,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 4,
-      "value": 520.0
+      "value": 520.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -526,7 +630,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 4,
-      "value": 329.0
+      "value": 329.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -536,7 +642,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -546,7 +654,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -556,7 +666,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -566,7 +678,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -576,7 +690,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 4,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -586,7 +702,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 4,
-      "value": 205.0
+      "value": 205.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -596,7 +714,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 4,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -606,7 +726,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 4,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -616,7 +738,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 4,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -626,7 +750,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 4,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -636,7 +762,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -646,7 +774,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -656,7 +786,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 4,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -666,7 +798,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 4,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -676,7 +810,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 4,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -686,7 +822,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 5,
-      "value": 600.0
+      "value": 600.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -696,7 +834,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 5,
-      "value": 405.0
+      "value": 405.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -706,7 +846,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -716,7 +858,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -726,7 +870,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -736,7 +882,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -746,7 +894,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 5,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -756,7 +906,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 5,
-      "value": 190.0
+      "value": 190.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -766,7 +918,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -776,7 +930,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 5,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -786,7 +942,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 5,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -796,7 +954,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 5,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -806,7 +966,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -816,7 +978,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -826,7 +990,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 5,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -836,7 +1002,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 5,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -846,7 +1014,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 5,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -856,7 +1026,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 6,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -866,7 +1038,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 6,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -876,7 +1050,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -886,7 +1062,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -896,7 +1074,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -906,7 +1086,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -916,7 +1098,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 6,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -926,7 +1110,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 6,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -936,7 +1122,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 6,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -946,7 +1134,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 6,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -956,7 +1146,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 6,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -966,7 +1158,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 6,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -976,7 +1170,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -986,7 +1182,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -996,7 +1194,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 6,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1006,7 +1206,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 6,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1016,7 +1218,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 6,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1026,7 +1230,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 7,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1036,7 +1242,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 7,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1046,7 +1254,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1056,7 +1266,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1066,7 +1278,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1076,7 +1290,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1086,7 +1302,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 7,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1096,7 +1314,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 7,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1106,7 +1326,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 7,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1116,7 +1338,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 7,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -1126,7 +1350,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 7,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1136,7 +1362,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 7,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1146,7 +1374,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -1156,7 +1386,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1166,7 +1398,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 7,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1176,7 +1410,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 7,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1186,7 +1422,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 7,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1196,7 +1434,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 8,
-      "value": 488.0
+      "value": 488.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1206,7 +1446,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 8,
-      "value": 359.0
+      "value": 359.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1216,7 +1458,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1226,7 +1470,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1236,7 +1482,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1246,7 +1494,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1256,7 +1506,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 8,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1266,7 +1518,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 8,
-      "value": 163.0
+      "value": 163.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1276,7 +1530,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 8,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1286,7 +1542,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 8,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -1296,7 +1554,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 8,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1306,7 +1566,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 8,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1316,7 +1578,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -1326,7 +1590,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1336,7 +1602,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 8,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1346,7 +1614,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 8,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1356,7 +1626,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 8,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1366,7 +1638,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 13,
-      "value": 510.0
+      "value": 510.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1376,7 +1650,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 13,
-      "value": 362.0
+      "value": 362.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1386,7 +1662,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1396,7 +1674,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1406,7 +1686,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1416,7 +1698,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1426,7 +1710,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 13,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1436,7 +1722,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 13,
-      "value": 157.0
+      "value": 157.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1446,7 +1734,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 13,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1456,7 +1746,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 13,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -1466,7 +1758,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 13,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1476,7 +1770,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 13,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1486,7 +1782,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -1496,7 +1794,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1506,7 +1806,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 13,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1516,7 +1818,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 13,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1526,7 +1830,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 13,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1536,7 +1842,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 40,
       "ipcc_region": 10,
-      "value": 350.0
+      "value": 350.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1546,7 +1854,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 41,
       "ipcc_region": 10,
-      "value": 167.0
+      "value": 167.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1556,7 +1866,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 50,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1566,7 +1878,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 49,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1576,7 +1890,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 51,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1586,7 +1902,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 52,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1596,7 +1914,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 53,
       "ipcc_region": 10,
-      "value": 55.0
+      "value": 55.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1606,7 +1926,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 54,
       "ipcc_region": 10,
-      "value": 162.0
+      "value": 162.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1616,7 +1938,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 55,
       "ipcc_region": 10,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1626,7 +1950,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 47,
       "ipcc_region": 10,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -1636,7 +1962,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 46,
       "ipcc_region": 10,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1646,7 +1974,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 48,
       "ipcc_region": 10,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1656,7 +1986,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 56,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -1666,7 +1998,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 57,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1676,7 +2010,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 58,
       "ipcc_region": 10,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1686,7 +2022,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 59,
       "ipcc_region": 10,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1696,7 +2034,9 @@
       "livestock_production_type": 4,
       "livestock_category_type": 60,
       "ipcc_region": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1706,7 +2046,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 14,
-      "value": 270.0
+      "value": 270.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1716,7 +2058,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 14,
-      "value": 208.0
+      "value": 208.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1726,7 +2070,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1736,7 +2082,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1746,7 +2094,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1756,7 +2106,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1766,7 +2118,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 14,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1776,7 +2130,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 14,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1786,7 +2142,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 14,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1796,7 +2154,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 14,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -1806,7 +2166,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 14,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1816,7 +2178,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 14,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1826,7 +2190,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -1836,7 +2202,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1846,7 +2214,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 14,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1856,7 +2226,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 14,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1866,7 +2238,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 14,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -1876,7 +2250,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 16,
-      "value": 355.0
+      "value": 355.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1886,7 +2262,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 16,
-      "value": 296.0
+      "value": 296.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1896,7 +2274,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1906,7 +2286,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1916,7 +2298,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1926,7 +2310,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1936,7 +2322,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 16,
-      "value": 44.0
+      "value": 44.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1946,7 +2334,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 16,
-      "value": 102.0
+      "value": 102.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1956,7 +2346,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 16,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1966,7 +2358,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 16,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -1976,7 +2370,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 16,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -1986,7 +2382,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 16,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -1996,7 +2394,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2006,7 +2406,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2016,7 +2418,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 16,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2026,7 +2430,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 16,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2036,7 +2442,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 16,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2046,7 +2454,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 3,
-      "value": 650.0
+      "value": 650.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2056,7 +2466,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 3,
-      "value": 407.0
+      "value": 407.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2066,7 +2478,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2076,7 +2490,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2086,7 +2502,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2096,7 +2514,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2106,7 +2526,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 3,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2116,7 +2538,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 3,
-      "value": 184.0
+      "value": 184.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2126,7 +2550,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 3,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2136,7 +2562,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 3,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -2146,7 +2574,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 3,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -2156,7 +2586,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 3,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -2166,7 +2598,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2176,7 +2610,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2186,7 +2622,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2196,7 +2634,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2206,7 +2646,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 3,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2216,7 +2658,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 4,
-      "value": 500.0
+      "value": 500.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2226,7 +2670,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 4,
-      "value": 295.0
+      "value": 295.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2236,7 +2682,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2246,7 +2694,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2256,7 +2706,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2266,7 +2718,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2276,7 +2730,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 4,
-      "value": 47.0
+      "value": 47.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2286,7 +2742,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 4,
-      "value": 121.0
+      "value": 121.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2296,7 +2754,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 4,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2306,7 +2766,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 4,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -2316,7 +2778,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 4,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -2326,7 +2790,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 4,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -2336,7 +2802,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2346,7 +2814,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2356,7 +2826,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 4,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2366,7 +2838,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 4,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2376,7 +2850,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 4,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2386,7 +2862,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 5,
-      "value": 600.0
+      "value": 600.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2396,7 +2874,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 5,
-      "value": 405.0
+      "value": 405.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2406,7 +2886,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2416,7 +2898,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2426,7 +2910,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2436,7 +2922,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2446,7 +2934,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 5,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2456,7 +2946,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 5,
-      "value": 190.0
+      "value": 190.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2466,7 +2958,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2476,7 +2970,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 5,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -2486,7 +2982,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 5,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -2496,7 +2994,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 5,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -2506,7 +3006,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2516,7 +3018,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2526,7 +3030,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 5,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2536,7 +3042,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 5,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2546,7 +3054,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 5,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2556,7 +3066,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 6,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2566,7 +3078,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 6,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2576,7 +3090,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2586,7 +3102,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2596,7 +3114,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2606,7 +3126,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2616,7 +3138,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 6,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2626,7 +3150,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 6,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2636,7 +3162,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 6,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2646,7 +3174,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 6,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -2656,7 +3186,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 6,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -2666,7 +3198,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 6,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -2676,7 +3210,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2686,7 +3222,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2696,7 +3234,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 6,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2706,7 +3246,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 6,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2716,7 +3258,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 6,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2726,7 +3270,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 7,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2736,7 +3282,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 7,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2746,7 +3294,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2756,7 +3306,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2766,7 +3318,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2776,7 +3330,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2786,7 +3342,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 7,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2796,7 +3354,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 7,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2806,7 +3366,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 7,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2816,7 +3378,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 7,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -2826,7 +3390,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 7,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -2836,7 +3402,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 7,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -2846,7 +3414,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -2856,7 +3426,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2866,7 +3438,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 7,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2876,7 +3450,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 7,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2886,7 +3462,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 7,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -2896,7 +3474,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 8,
-      "value": 488.0
+      "value": 488.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2906,7 +3486,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 8,
-      "value": 359.0
+      "value": 359.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2916,7 +3498,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2926,7 +3510,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2936,7 +3522,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2946,7 +3534,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2956,7 +3546,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 8,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2966,7 +3558,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 8,
-      "value": 163.0
+      "value": 163.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2976,7 +3570,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 8,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2986,7 +3582,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 8,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -2996,7 +3594,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 8,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3006,7 +3606,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 8,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3016,7 +3618,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3026,7 +3630,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3036,7 +3642,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 8,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3046,7 +3654,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 8,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3056,7 +3666,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 8,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3066,7 +3678,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 13,
-      "value": 270.0
+      "value": 270.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3076,7 +3690,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 13,
-      "value": 232.0
+      "value": 232.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3086,7 +3702,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3096,7 +3714,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3106,7 +3726,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3116,7 +3738,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3126,7 +3750,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 13,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3136,7 +3762,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 13,
-      "value": 99.0
+      "value": 99.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3146,7 +3774,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 13,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3156,7 +3786,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 13,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -3166,7 +3798,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 13,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3176,7 +3810,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 13,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3186,7 +3822,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3196,7 +3834,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3206,7 +3846,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 13,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3216,7 +3858,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 13,
-      "value": 0.5
+      "value": 0.5,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3226,7 +3870,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 13,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3236,7 +3882,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 40,
       "ipcc_region": 10,
-      "value": 265.0
+      "value": 265.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3246,7 +3894,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 41,
       "ipcc_region": 10,
-      "value": 236.0
+      "value": 236.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3256,7 +3906,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 50,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3266,7 +3918,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 49,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3276,7 +3930,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 51,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3286,7 +3942,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 52,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3296,7 +3954,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 53,
       "ipcc_region": 10,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3306,7 +3966,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 54,
       "ipcc_region": 10,
-      "value": 99.0
+      "value": 99.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3316,7 +3978,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 55,
       "ipcc_region": 10,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3326,7 +3990,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 47,
       "ipcc_region": 10,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -3336,7 +4002,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 46,
       "ipcc_region": 10,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3346,7 +4014,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 48,
       "ipcc_region": 10,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3356,7 +4026,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 56,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3366,7 +4038,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 57,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3376,7 +4050,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 58,
       "ipcc_region": 10,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3386,7 +4062,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 59,
       "ipcc_region": 10,
-      "value": 0.6
+      "value": 0.6,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3396,7 +4074,9 @@
       "livestock_production_type": 5,
       "livestock_category_type": 60,
       "ipcc_region": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3406,7 +4086,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 14,
-      "value": 260.0
+      "value": 260.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3416,7 +4098,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 14,
-      "value": 236.0
+      "value": 236.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3426,7 +4110,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3436,7 +4122,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 14,
-      "value": 339.0
+      "value": 339.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3446,7 +4134,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3456,7 +4146,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 14,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3466,7 +4158,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 14,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3476,7 +4170,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 14,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3486,7 +4182,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 14,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3496,7 +4194,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 14,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -3506,7 +4206,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 14,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3516,7 +4218,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 14,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3526,7 +4230,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3536,7 +4242,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 14,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3546,7 +4254,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 14,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3556,7 +4266,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 14,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3566,7 +4278,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 14,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3576,7 +4290,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 16,
-      "value": 386.0
+      "value": 386.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3586,7 +4302,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 16,
-      "value": 299.0
+      "value": 299.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3596,7 +4314,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3606,7 +4326,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 16,
-      "value": 336.0
+      "value": 336.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3616,7 +4338,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3626,7 +4350,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 16,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3636,7 +4362,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 16,
-      "value": 44.0
+      "value": 44.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3646,7 +4374,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 16,
-      "value": 102.0
+      "value": 102.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3656,7 +4386,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 16,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3666,7 +4398,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 16,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -3676,7 +4410,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 16,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3686,7 +4422,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 16,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3696,7 +4434,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3706,7 +4446,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 16,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3716,7 +4458,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 16,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3726,7 +4470,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 16,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3736,7 +4482,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 16,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3746,7 +4494,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 3,
-      "value": 650.0
+      "value": 650.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3756,7 +4506,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 3,
-      "value": 407.0
+      "value": 407.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3766,7 +4518,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3776,7 +4530,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 3,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3786,7 +4542,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3796,7 +4554,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 3,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3806,7 +4566,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 3,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3816,7 +4578,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 3,
-      "value": 184.0
+      "value": 184.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3826,7 +4590,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 3,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3836,7 +4602,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 3,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -3846,7 +4614,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 3,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -3856,7 +4626,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 3,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -3866,7 +4638,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -3876,7 +4650,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 3,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3886,7 +4662,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3896,7 +4674,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 3,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3906,7 +4686,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 3,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -3916,7 +4698,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 4,
-      "value": 508.0
+      "value": 508.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3926,7 +4710,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 4,
-      "value": 303.0
+      "value": 303.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3936,7 +4722,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3946,7 +4734,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 4,
-      "value": 315.0
+      "value": 315.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3956,7 +4746,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3966,7 +4758,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 4,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3976,7 +4770,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 4,
-      "value": 47.0
+      "value": 47.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3986,7 +4782,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 4,
-      "value": 121.0
+      "value": 121.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3996,7 +4794,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 4,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4006,7 +4806,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 4,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -4016,7 +4818,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 4,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4026,7 +4830,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 4,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4036,7 +4842,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4046,7 +4854,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 4,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4056,7 +4866,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 4,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4066,7 +4878,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 4,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4076,7 +4890,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 4,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4086,7 +4902,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 5,
-      "value": 600.0
+      "value": 600.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4096,7 +4914,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 5,
-      "value": 405.0
+      "value": 405.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4106,7 +4926,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4116,7 +4938,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 5,
-      "value": 509.0
+      "value": 509.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4126,7 +4950,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4136,7 +4962,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4146,7 +4974,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 5,
-      "value": 61.0
+      "value": 61.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4156,7 +4986,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 5,
-      "value": 190.0
+      "value": 190.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4166,7 +4998,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 5,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4176,7 +5010,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 5,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -4186,7 +5022,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 5,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4196,7 +5034,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 5,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4206,7 +5046,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4216,7 +5058,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 5,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4226,7 +5070,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 5,
-      "value": 1.4
+      "value": 1.4,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4236,7 +5082,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 5,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4246,7 +5094,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 5,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4256,7 +5106,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 6,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4266,7 +5118,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 6,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4276,7 +5130,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4286,7 +5142,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 6,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4296,7 +5154,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4306,7 +5166,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 6,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4316,7 +5178,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 6,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4326,7 +5190,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 6,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4336,7 +5202,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 6,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4346,7 +5214,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 6,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -4356,7 +5226,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 6,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4366,7 +5238,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 6,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4376,7 +5250,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4386,7 +5262,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 6,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4396,7 +5274,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 6,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4406,7 +5286,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 6,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4416,7 +5298,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 6,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4426,7 +5310,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 7,
-      "value": 550.0
+      "value": 550.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4436,7 +5322,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 7,
-      "value": 389.0
+      "value": 389.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4446,7 +5334,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4456,7 +5346,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 7,
-      "value": 467.0
+      "value": 467.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4466,7 +5358,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4476,7 +5370,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 7,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4486,7 +5382,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 7,
-      "value": 59.0
+      "value": 59.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4496,7 +5394,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 7,
-      "value": 204.0
+      "value": 204.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4506,7 +5406,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 7,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4516,7 +5418,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 7,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -4526,7 +5430,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 7,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4536,7 +5442,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 7,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4546,7 +5454,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4556,7 +5466,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 7,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4566,7 +5478,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 7,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4576,7 +5490,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 7,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4586,7 +5502,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 7,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4596,7 +5514,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 8,
-      "value": 488.0
+      "value": 488.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4606,7 +5526,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 8,
-      "value": 359.0
+      "value": 359.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4616,7 +5538,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4626,7 +5550,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 8,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4636,7 +5562,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4646,7 +5574,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 8,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4656,7 +5586,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 8,
-      "value": 41.0
+      "value": 41.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4666,7 +5598,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 8,
-      "value": 163.0
+      "value": 163.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4676,7 +5610,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 8,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4686,7 +5622,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 8,
-      "value": 377.0
+      "value": 377.0,
+      "value_min": 263.9,
+      "value_max": 490.1
     }
   },
   {
@@ -4696,7 +5634,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 8,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4706,7 +5646,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 8,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4716,7 +5658,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4726,7 +5670,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 8,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4736,7 +5682,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 8,
-      "value": 1.3
+      "value": 1.3,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4746,7 +5694,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 8,
-      "value": 1.2
+      "value": 1.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4756,7 +5706,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 8,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4766,7 +5718,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 13,
-      "value": 349.0
+      "value": 349.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4776,7 +5730,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 13,
-      "value": 275.0
+      "value": 275.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4786,7 +5742,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4796,7 +5754,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 13,
-      "value": 381.0
+      "value": 381.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4806,7 +5766,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4816,7 +5778,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 13,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4826,7 +5790,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 13,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4836,7 +5802,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 13,
-      "value": 99.0
+      "value": 99.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4846,7 +5814,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 13,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4856,7 +5826,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 13,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -4866,7 +5838,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 13,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -4876,7 +5850,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 13,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -4886,7 +5862,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -4896,7 +5874,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 13,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4906,7 +5886,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 13,
-      "value": 0.9
+      "value": 0.9,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4916,7 +5898,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 13,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4926,7 +5910,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 13,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   },
   {
@@ -4936,7 +5922,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 40,
       "ipcc_region": 10,
-      "value": 285.0
+      "value": 285.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4946,7 +5934,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 41,
       "ipcc_region": 10,
-      "value": 226.0
+      "value": 226.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4956,7 +5946,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 50,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4966,7 +5958,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 49,
       "ipcc_region": 10,
-      "value": 321.0
+      "value": 321.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4976,7 +5970,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 51,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4986,7 +5982,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 52,
       "ipcc_region": 10,
-      "value": 31.0
+      "value": 31.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -4996,7 +5994,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 53,
       "ipcc_region": 10,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5006,7 +6006,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 54,
       "ipcc_region": 10,
-      "value": 99.0
+      "value": 99.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5016,7 +6018,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 55,
       "ipcc_region": 10,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5026,7 +6030,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 47,
       "ipcc_region": 10,
-      "value": 238.0
+      "value": 238.0,
+      "value_min": 166.6,
+      "value_max": 309.4
     }
   },
   {
@@ -5036,7 +6042,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 46,
       "ipcc_region": 10,
-      "value": 217.0
+      "value": 217.0,
+      "value_min": 151.9,
+      "value_max": 282.1
     }
   },
   {
@@ -5046,7 +6054,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 48,
       "ipcc_region": 10,
-      "value": 130.0
+      "value": 130.0,
+      "value_min": 91.0,
+      "value_max": 169.0
     }
   },
   {
@@ -5056,7 +6066,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 56,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": 60.0,
+      "value_max": 180.0
     }
   },
   {
@@ -5066,7 +6078,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 57,
       "ipcc_region": 10,
-      "value": 120.0
+      "value": 120.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5076,7 +6090,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 58,
       "ipcc_region": 10,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5086,7 +6102,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 59,
       "ipcc_region": 10,
-      "value": 0.8
+      "value": 0.8,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -5096,7 +6114,9 @@
       "livestock_production_type": 6,
       "livestock_category_type": 60,
       "ipcc_region": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 32.5,
+      "value_max": 97.5
     }
   }
 ]

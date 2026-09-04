@@ -14,7 +14,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -32,7 +40,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -50,7 +66,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -68,7 +92,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -86,7 +118,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -104,7 +144,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -122,7 +170,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -140,7 +196,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -158,7 +222,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -176,7 +248,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -194,7 +274,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -212,7 +300,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -230,7 +326,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -248,7 +352,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -266,7 +378,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -284,7 +404,15 @@
       "ch4": 6.1,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.3,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 1.1,
+      "co2_max": 4.2,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": 1.6,
+      "ch4_max": 11.0,
+      "n2o_min": -0.03,
+      "n2o_max": 0.64
     }
   },
   {
@@ -302,7 +430,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -320,7 +456,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -338,7 +482,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -356,7 +508,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 3.6,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": null,
+      "doc_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -374,7 +534,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.07,
+      "doc_max": 0.19,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -392,7 +560,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.07,
+      "doc_max": 0.19,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -410,7 +586,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -428,7 +612,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -446,7 +638,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -464,7 +664,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -482,7 +690,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -500,7 +716,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -518,7 +742,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -536,7 +768,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -554,7 +794,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.07,
+      "doc_max": 0.19,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -572,7 +820,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.07,
+      "doc_max": 0.19,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -590,7 +846,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -608,7 +872,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -626,7 +898,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -644,7 +924,15 @@
       "ch4": 542.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.19,
+      "doc_max": 0.46,
+      "ch4_min": 102.0,
+      "ch4_max": 981.0,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -662,7 +950,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -680,7 +976,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -698,7 +1002,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   },
   {
@@ -716,7 +1028,15 @@
       "ch4": 0.0,
       "ch4_unit": "kg CH4/ha/yr",
       "n2o": 0.0,
-      "n2o_unit": "kg N2O/ha/yr"
+      "n2o_unit": "kg N2O/ha/yr",
+      "co2_min": 0.06,
+      "co2_max": 7.0,
+      "doc_min": 0.56,
+      "doc_max": 1.14,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": 0.2,
+      "n2o_max": 5.0
     }
   }
 ]

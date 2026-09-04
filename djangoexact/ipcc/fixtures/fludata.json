@@ -7,7 +7,9 @@
       "moisture": 2,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -18,7 +20,9 @@
       "moisture": 1,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.77
+      "value": 0.77,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -29,7 +33,9 @@
       "moisture": 2,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.7
+      "value": 0.7,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -40,7 +46,9 @@
       "moisture": 1,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.77
+      "value": 0.77,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -51,7 +59,9 @@
       "moisture": 2,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.69
+      "value": 0.69,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -62,7 +72,9 @@
       "moisture": 1,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.76
+      "value": 0.76,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -73,7 +85,9 @@
       "moisture": 2,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.83
+      "value": 0.83,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -84,7 +98,9 @@
       "moisture": 1,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -95,7 +111,9 @@
       "moisture": 4,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.83
+      "value": 0.83,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -106,7 +124,9 @@
       "moisture": 2,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.64
+      "value": 0.64,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -117,7 +137,9 @@
       "moisture": 1,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.64
+      "value": 0.64,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -128,7 +150,9 @@
       "moisture": 4,
       "land_use_type": 1,
       "grassland_management_type": null,
-      "value": 0.64
+      "value": 0.64,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -139,7 +163,9 @@
       "moisture": 2,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.82
+      "value": 0.82,
+      "value_min": 0.6806,
+      "value_max": 0.9594
     }
   },
   {
@@ -150,7 +176,9 @@
       "moisture": 1,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.93
+      "value": 0.93,
+      "value_min": 0.8277,
+      "value_max": 1.0323
     }
   },
   {
@@ -161,7 +189,9 @@
       "moisture": 2,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.82
+      "value": 0.82,
+      "value_min": 0.6806,
+      "value_max": 0.9594
     }
   },
   {
@@ -172,7 +202,9 @@
       "moisture": 1,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.93
+      "value": 0.93,
+      "value_min": 0.8277,
+      "value_max": 1.0323
     }
   },
   {
@@ -183,7 +215,9 @@
       "moisture": 2,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.82
+      "value": 0.82,
+      "value_min": 0.6806,
+      "value_max": 0.9594
     }
   },
   {
@@ -194,7 +228,9 @@
       "moisture": 1,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.93
+      "value": 0.93,
+      "value_min": 0.8277,
+      "value_max": 1.0323
     }
   },
   {
@@ -205,7 +241,9 @@
       "moisture": 2,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.82
+      "value": 0.82,
+      "value_min": 0.6806,
+      "value_max": 0.9594
     }
   },
   {
@@ -216,7 +254,9 @@
       "moisture": 1,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.93
+      "value": 0.93,
+      "value_min": 0.8277,
+      "value_max": 1.0323
     }
   },
   {
@@ -227,7 +267,9 @@
       "moisture": 4,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.82
+      "value": 0.82,
+      "value_min": 0.6806,
+      "value_max": 0.9594
     }
   },
   {
@@ -238,7 +280,9 @@
       "moisture": 2,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.88
+      "value": 0.88,
+      "value_min": 0.44,
+      "value_max": 1.32
     }
   },
   {
@@ -249,7 +293,9 @@
       "moisture": 1,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.88
+      "value": 0.88,
+      "value_min": 0.44,
+      "value_max": 1.32
     }
   },
   {
@@ -260,7 +306,9 @@
       "moisture": 4,
       "land_use_type": 161,
       "grassland_management_type": null,
-      "value": 0.88
+      "value": 0.88,
+      "value_min": 0.44,
+      "value_max": 1.32
     }
   },
   {
@@ -271,7 +319,9 @@
       "moisture": 2,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -282,7 +332,9 @@
       "moisture": 1,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -293,7 +345,9 @@
       "moisture": 2,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -304,7 +358,9 @@
       "moisture": 1,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -315,7 +371,9 @@
       "moisture": 2,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -326,7 +384,9 @@
       "moisture": 1,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -337,7 +397,9 @@
       "moisture": 2,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -348,7 +410,9 @@
       "moisture": 1,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -359,7 +423,9 @@
       "moisture": 4,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -370,7 +436,9 @@
       "moisture": 2,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -381,7 +449,9 @@
       "moisture": 1,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -392,7 +462,9 @@
       "moisture": 4,
       "land_use_type": 3,
       "grassland_management_type": null,
-      "value": 1.35
+      "value": 1.35,
+      "value_min": 1.296,
+      "value_max": 1.404
     }
   },
   {
@@ -403,7 +475,9 @@
       "moisture": 2,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -414,7 +488,9 @@
       "moisture": 1,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -425,7 +501,9 @@
       "moisture": 2,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -436,7 +514,9 @@
       "moisture": 1,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -447,7 +527,9 @@
       "moisture": 2,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -458,7 +540,9 @@
       "moisture": 1,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -469,7 +553,9 @@
       "moisture": 2,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -480,7 +566,9 @@
       "moisture": 1,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -491,7 +579,9 @@
       "moisture": 4,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -502,7 +592,9 @@
       "moisture": 2,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -513,7 +605,9 @@
       "moisture": 1,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -524,7 +618,9 @@
       "moisture": 4,
       "land_use_type": 4,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -535,7 +631,9 @@
       "moisture": 2,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -546,7 +644,9 @@
       "moisture": 1,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -557,7 +657,9 @@
       "moisture": 2,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -568,7 +670,9 @@
       "moisture": 1,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -579,7 +683,9 @@
       "moisture": 2,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -590,7 +696,9 @@
       "moisture": 1,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -601,7 +709,9 @@
       "moisture": 2,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -612,7 +722,9 @@
       "moisture": 1,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -623,7 +735,9 @@
       "moisture": 4,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -634,7 +748,9 @@
       "moisture": 2,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -645,7 +761,9 @@
       "moisture": 1,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -656,7 +774,9 @@
       "moisture": 4,
       "land_use_type": 162,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -667,7 +787,9 @@
       "moisture": 2,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -678,7 +800,9 @@
       "moisture": 1,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -689,7 +813,9 @@
       "moisture": 2,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -700,7 +826,9 @@
       "moisture": 1,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -711,7 +839,9 @@
       "moisture": 2,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -722,7 +852,9 @@
       "moisture": 1,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -733,7 +865,9 @@
       "moisture": 2,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -744,7 +878,9 @@
       "moisture": 1,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -755,7 +891,9 @@
       "moisture": 4,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -766,7 +904,9 @@
       "moisture": 2,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -777,7 +917,9 @@
       "moisture": 1,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -788,7 +930,9 @@
       "moisture": 4,
       "land_use_type": 71,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -799,7 +943,9 @@
       "moisture": 2,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -810,7 +956,9 @@
       "moisture": 1,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -821,7 +969,9 @@
       "moisture": 2,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -832,7 +982,9 @@
       "moisture": 1,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -843,7 +995,9 @@
       "moisture": 2,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -854,7 +1008,9 @@
       "moisture": 1,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -865,7 +1021,9 @@
       "moisture": 2,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -876,7 +1034,9 @@
       "moisture": 1,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -887,7 +1047,9 @@
       "moisture": 4,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -898,7 +1060,9 @@
       "moisture": 2,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -909,7 +1073,9 @@
       "moisture": 1,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -920,7 +1086,9 @@
       "moisture": 4,
       "land_use_type": 7,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -931,7 +1099,9 @@
       "moisture": 2,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -942,7 +1112,9 @@
       "moisture": 1,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -953,7 +1125,9 @@
       "moisture": 2,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -964,7 +1138,9 @@
       "moisture": 1,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -975,7 +1151,9 @@
       "moisture": 2,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -986,7 +1164,9 @@
       "moisture": 1,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -997,7 +1177,9 @@
       "moisture": 2,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1008,7 +1190,9 @@
       "moisture": 1,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1019,7 +1203,9 @@
       "moisture": 4,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1030,7 +1216,9 @@
       "moisture": 2,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1041,7 +1229,9 @@
       "moisture": 1,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1052,7 +1242,9 @@
       "moisture": 4,
       "land_use_type": 8,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1063,7 +1255,9 @@
       "moisture": 2,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1074,7 +1268,9 @@
       "moisture": 1,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1085,7 +1281,9 @@
       "moisture": 2,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1096,7 +1294,9 @@
       "moisture": 1,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1107,7 +1307,9 @@
       "moisture": 2,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1118,7 +1320,9 @@
       "moisture": 1,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1129,7 +1333,9 @@
       "moisture": 2,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1140,7 +1346,9 @@
       "moisture": 1,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1151,7 +1359,9 @@
       "moisture": 4,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1162,7 +1372,9 @@
       "moisture": 2,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1173,7 +1385,9 @@
       "moisture": 1,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1184,7 +1398,9 @@
       "moisture": 4,
       "land_use_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1195,7 +1411,9 @@
       "moisture": 2,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1206,7 +1424,9 @@
       "moisture": 1,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1217,7 +1437,9 @@
       "moisture": 2,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1228,7 +1450,9 @@
       "moisture": 1,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1239,7 +1463,9 @@
       "moisture": 2,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1250,7 +1476,9 @@
       "moisture": 1,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1261,7 +1489,9 @@
       "moisture": 2,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1272,7 +1502,9 @@
       "moisture": 1,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1283,7 +1515,9 @@
       "moisture": 4,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1294,7 +1528,9 @@
       "moisture": 2,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1305,7 +1541,9 @@
       "moisture": 1,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1316,7 +1554,9 @@
       "moisture": 4,
       "land_use_type": 10,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1327,7 +1567,9 @@
       "moisture": 2,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1338,7 +1580,9 @@
       "moisture": 1,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1349,7 +1593,9 @@
       "moisture": 2,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1360,7 +1606,9 @@
       "moisture": 1,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1371,7 +1619,9 @@
       "moisture": 2,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1382,7 +1632,9 @@
       "moisture": 1,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1393,7 +1645,9 @@
       "moisture": 2,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1404,7 +1658,9 @@
       "moisture": 1,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1415,7 +1671,9 @@
       "moisture": 4,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1426,7 +1684,9 @@
       "moisture": 2,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1437,7 +1697,9 @@
       "moisture": 1,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1448,7 +1710,9 @@
       "moisture": 4,
       "land_use_type": 11,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1459,7 +1723,9 @@
       "moisture": 2,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1470,7 +1736,9 @@
       "moisture": 1,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1481,7 +1749,9 @@
       "moisture": 2,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1492,7 +1762,9 @@
       "moisture": 1,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1503,7 +1775,9 @@
       "moisture": 2,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1514,7 +1788,9 @@
       "moisture": 1,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1525,7 +1801,9 @@
       "moisture": 2,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1536,7 +1814,9 @@
       "moisture": 1,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1547,7 +1827,9 @@
       "moisture": 4,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1558,7 +1840,9 @@
       "moisture": 2,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1569,7 +1853,9 @@
       "moisture": 1,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1580,7 +1866,9 @@
       "moisture": 4,
       "land_use_type": 12,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1591,7 +1879,9 @@
       "moisture": 2,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1602,7 +1892,9 @@
       "moisture": 1,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1613,7 +1905,9 @@
       "moisture": 2,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1624,7 +1918,9 @@
       "moisture": 1,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1635,7 +1931,9 @@
       "moisture": 2,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1646,7 +1944,9 @@
       "moisture": 1,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1657,7 +1957,9 @@
       "moisture": 2,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1668,7 +1970,9 @@
       "moisture": 1,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1679,7 +1983,9 @@
       "moisture": 4,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1690,7 +1996,9 @@
       "moisture": 2,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1701,7 +2009,9 @@
       "moisture": 1,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1712,7 +2022,9 @@
       "moisture": 4,
       "land_use_type": 13,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1723,7 +2035,9 @@
       "moisture": 2,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1734,7 +2048,9 @@
       "moisture": 1,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1745,7 +2061,9 @@
       "moisture": 2,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1756,7 +2074,9 @@
       "moisture": 1,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1767,7 +2087,9 @@
       "moisture": 2,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1778,7 +2100,9 @@
       "moisture": 1,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1789,7 +2113,9 @@
       "moisture": 2,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1800,7 +2126,9 @@
       "moisture": 1,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1811,7 +2139,9 @@
       "moisture": 4,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1822,7 +2152,9 @@
       "moisture": 2,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1833,7 +2165,9 @@
       "moisture": 1,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1844,7 +2178,9 @@
       "moisture": 4,
       "land_use_type": 14,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1855,7 +2191,9 @@
       "moisture": 2,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1866,7 +2204,9 @@
       "moisture": 1,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1877,7 +2217,9 @@
       "moisture": 2,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1888,7 +2230,9 @@
       "moisture": 1,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1899,7 +2243,9 @@
       "moisture": 2,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1910,7 +2256,9 @@
       "moisture": 1,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1921,7 +2269,9 @@
       "moisture": 2,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1932,7 +2282,9 @@
       "moisture": 1,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1943,7 +2295,9 @@
       "moisture": 4,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -1954,7 +2308,9 @@
       "moisture": 2,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1965,7 +2321,9 @@
       "moisture": 1,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1976,7 +2334,9 @@
       "moisture": 4,
       "land_use_type": 21,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -1987,7 +2347,9 @@
       "moisture": 2,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -1998,7 +2360,9 @@
       "moisture": 1,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2009,7 +2373,9 @@
       "moisture": 2,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2020,7 +2386,9 @@
       "moisture": 1,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2031,7 +2399,9 @@
       "moisture": 2,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2042,7 +2412,9 @@
       "moisture": 1,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2053,7 +2425,9 @@
       "moisture": 2,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2064,7 +2438,9 @@
       "moisture": 1,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2075,7 +2451,9 @@
       "moisture": 4,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2086,7 +2464,9 @@
       "moisture": 2,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2097,7 +2477,9 @@
       "moisture": 1,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2108,7 +2490,9 @@
       "moisture": 4,
       "land_use_type": 22,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2119,7 +2503,9 @@
       "moisture": 2,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2130,7 +2516,9 @@
       "moisture": 1,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2141,7 +2529,9 @@
       "moisture": 2,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2152,7 +2542,9 @@
       "moisture": 1,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2163,7 +2555,9 @@
       "moisture": 2,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2174,7 +2568,9 @@
       "moisture": 1,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2185,7 +2581,9 @@
       "moisture": 2,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2196,7 +2594,9 @@
       "moisture": 1,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2207,7 +2607,9 @@
       "moisture": 4,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2218,7 +2620,9 @@
       "moisture": 2,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2229,7 +2633,9 @@
       "moisture": 1,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2240,7 +2646,9 @@
       "moisture": 4,
       "land_use_type": 19,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2251,7 +2659,9 @@
       "moisture": 2,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2262,7 +2672,9 @@
       "moisture": 1,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2273,7 +2685,9 @@
       "moisture": 2,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2284,7 +2698,9 @@
       "moisture": 1,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2295,7 +2711,9 @@
       "moisture": 2,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2306,7 +2724,9 @@
       "moisture": 1,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2317,7 +2737,9 @@
       "moisture": 2,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2328,7 +2750,9 @@
       "moisture": 1,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2339,7 +2763,9 @@
       "moisture": 4,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2350,7 +2776,9 @@
       "moisture": 2,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2361,7 +2789,9 @@
       "moisture": 1,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2372,7 +2802,9 @@
       "moisture": 4,
       "land_use_type": 16,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2383,7 +2815,9 @@
       "moisture": 2,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2394,7 +2828,9 @@
       "moisture": 1,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2405,7 +2841,9 @@
       "moisture": 2,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2416,7 +2854,9 @@
       "moisture": 1,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2427,7 +2867,9 @@
       "moisture": 2,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2438,7 +2880,9 @@
       "moisture": 1,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2449,7 +2893,9 @@
       "moisture": 2,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2460,7 +2906,9 @@
       "moisture": 1,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2471,7 +2919,9 @@
       "moisture": 4,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2482,7 +2932,9 @@
       "moisture": 2,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2493,7 +2945,9 @@
       "moisture": 1,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2504,7 +2958,9 @@
       "moisture": 4,
       "land_use_type": 17,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2515,7 +2971,9 @@
       "moisture": 2,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2526,7 +2984,9 @@
       "moisture": 1,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2537,7 +2997,9 @@
       "moisture": 2,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2548,7 +3010,9 @@
       "moisture": 1,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2559,7 +3023,9 @@
       "moisture": 2,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2570,7 +3036,9 @@
       "moisture": 1,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2581,7 +3049,9 @@
       "moisture": 2,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2592,7 +3062,9 @@
       "moisture": 1,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2603,7 +3075,9 @@
       "moisture": 4,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2614,7 +3088,9 @@
       "moisture": 2,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2625,7 +3101,9 @@
       "moisture": 1,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2636,7 +3114,9 @@
       "moisture": 4,
       "land_use_type": 18,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2647,7 +3127,9 @@
       "moisture": 2,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2658,7 +3140,9 @@
       "moisture": 1,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2669,7 +3153,9 @@
       "moisture": 2,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2680,7 +3166,9 @@
       "moisture": 1,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2691,7 +3179,9 @@
       "moisture": 2,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2702,7 +3192,9 @@
       "moisture": 1,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 0.72
+      "value": 0.72,
+      "value_min": 0.5616,
+      "value_max": 0.8784
     }
   },
   {
@@ -2713,7 +3205,9 @@
       "moisture": 2,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2724,7 +3218,9 @@
       "moisture": 1,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2735,7 +3231,9 @@
       "moisture": 4,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.01
+      "value": 1.01,
+      "value_min": 0.7575,
+      "value_max": 1.2625
     }
   },
   {
@@ -2746,7 +3244,9 @@
       "moisture": 2,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2757,7 +3257,9 @@
       "moisture": 1,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2768,7 +3270,9 @@
       "moisture": 4,
       "land_use_type": 20,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.5,
+      "value_max": 1.5
     }
   },
   {
@@ -2779,7 +3283,9 @@
       "moisture": 2,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2790,7 +3296,9 @@
       "moisture": 1,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2801,7 +3309,9 @@
       "moisture": 2,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2812,7 +3322,9 @@
       "moisture": 1,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2823,7 +3335,9 @@
       "moisture": 2,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2834,7 +3348,9 @@
       "moisture": 1,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2845,7 +3361,9 @@
       "moisture": 2,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2856,7 +3374,9 @@
       "moisture": 1,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2867,7 +3387,9 @@
       "moisture": 4,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2878,7 +3400,9 @@
       "moisture": 2,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2889,7 +3413,9 @@
       "moisture": 1,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2900,7 +3426,9 @@
       "moisture": 4,
       "land_use_type": 15,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2911,7 +3439,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2922,7 +3452,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2933,7 +3465,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2944,7 +3478,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2955,7 +3491,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2966,7 +3504,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2977,7 +3517,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2988,7 +3530,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -2999,7 +3543,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3010,7 +3556,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3021,7 +3569,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3032,7 +3582,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 6,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3043,7 +3595,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3054,7 +3608,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3065,7 +3621,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3076,7 +3634,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3087,7 +3647,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3098,7 +3660,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3109,7 +3673,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3120,7 +3686,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3131,7 +3699,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3142,7 +3712,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3153,7 +3725,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3164,7 +3738,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3175,7 +3751,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3186,7 +3764,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3197,7 +3777,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3208,7 +3790,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3219,7 +3803,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3230,7 +3816,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3241,7 +3829,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3252,7 +3842,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3263,7 +3855,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3274,7 +3868,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3285,7 +3881,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3296,7 +3894,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3307,7 +3907,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3318,7 +3920,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3329,7 +3933,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3340,7 +3946,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3351,7 +3959,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3362,7 +3972,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3373,7 +3985,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3384,7 +3998,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3395,7 +4011,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3406,7 +4024,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3417,7 +4037,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3428,7 +4050,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3439,7 +4063,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3450,7 +4076,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3461,7 +4089,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3472,7 +4102,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3483,7 +4115,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3494,7 +4128,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3505,7 +4141,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3516,7 +4154,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3527,7 +4167,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3538,7 +4180,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3549,7 +4193,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3560,7 +4206,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3571,7 +4219,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3582,7 +4232,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3593,7 +4245,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3604,7 +4258,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3615,7 +4271,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3626,7 +4284,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3637,7 +4297,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3648,7 +4310,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3659,7 +4323,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3670,7 +4336,9 @@
       "moisture": 2,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3681,7 +4349,9 @@
       "moisture": 1,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -3692,7 +4362,9 @@
       "moisture": 4,
       "land_use_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

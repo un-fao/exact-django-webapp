@@ -6,7 +6,9 @@
       "climate": 4,
       "moisture": 2,
       "soil_type": 1,
-      "value": 63.0
+      "value": 63.0,
+      "value_min": 51.66,
+      "value_max": 74.34
     }
   },
   {
@@ -16,7 +18,9 @@
       "climate": 4,
       "moisture": 2,
       "soil_type": 3,
-      "value": 10.0
+      "value": 10.0,
+      "value_min": 1.0,
+      "value_max": 19.0
     }
   },
   {
@@ -26,7 +30,9 @@
       "climate": 4,
       "moisture": 2,
       "soil_type": 4,
-      "value": 117.0
+      "value": 117.0,
+      "value_min": 11.7,
+      "value_max": 222.3
     }
   },
   {
@@ -36,7 +42,9 @@
       "climate": 4,
       "moisture": 2,
       "soil_type": 5,
-      "value": 20.0
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
     }
   },
   {
@@ -46,7 +54,9 @@
       "climate": 4,
       "moisture": 2,
       "soil_type": 6,
-      "value": 116.0
+      "value": 116.0,
+      "value_min": 40.6,
+      "value_max": 191.4
     }
   },
   {
@@ -56,7 +66,9 @@
       "climate": 4,
       "moisture": 1,
       "soil_type": 1,
-      "value": 63.0
+      "value": 63.0,
+      "value_min": 51.66,
+      "value_max": 74.34
     }
   },
   {
@@ -66,7 +78,9 @@
       "climate": 4,
       "moisture": 1,
       "soil_type": 3,
-      "value": 10.0
+      "value": 10.0,
+      "value_min": 1.0,
+      "value_max": 19.0
     }
   },
   {
@@ -76,7 +90,9 @@
       "climate": 4,
       "moisture": 1,
       "soil_type": 4,
-      "value": 117.0
+      "value": 117.0,
+      "value_min": 11.7,
+      "value_max": 222.3
     }
   },
   {
@@ -86,7 +102,9 @@
       "climate": 4,
       "moisture": 1,
       "soil_type": 5,
-      "value": 20.0
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
     }
   },
   {
@@ -96,7 +114,9 @@
       "climate": 4,
       "moisture": 1,
       "soil_type": 6,
-      "value": 116.0
+      "value": 116.0,
+      "value_min": 40.6,
+      "value_max": 191.4
     }
   },
   {
@@ -106,7 +126,9 @@
       "climate": 1,
       "moisture": 1,
       "soil_type": 1,
-      "value": 43.0
+      "value": 43.0,
+      "value_min": 39.56,
+      "value_max": 46.44
     }
   },
   {
@@ -116,7 +138,9 @@
       "climate": 1,
       "moisture": 1,
       "soil_type": 2,
-      "value": 33.0
+      "value": 33.0,
+      "value_min": 3.3,
+      "value_max": 62.7
     }
   },
   {
@@ -126,7 +150,9 @@
       "climate": 1,
       "moisture": 1,
       "soil_type": 3,
-      "value": 13.0
+      "value": 13.0,
+      "value_min": 8.71,
+      "value_max": 17.29
     }
   },
   {
@@ -136,7 +162,9 @@
       "climate": 1,
       "moisture": 1,
       "soil_type": 5,
-      "value": 20.0
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
     }
   },
   {
@@ -146,7 +174,9 @@
       "climate": 1,
       "moisture": 1,
       "soil_type": 6,
-      "value": 87.0
+      "value": 87.0,
+      "value_min": 8.7,
+      "value_max": 165.3
     }
   },
   {
@@ -156,7 +186,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 1,
-      "value": 81.0
+      "value": 81.0,
+      "value_min": 76.95,
+      "value_max": 85.05
     }
   },
   {
@@ -166,7 +198,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 2,
-      "value": 76.0
+      "value": 76.0,
+      "value_min": 37.24,
+      "value_max": 114.76
     }
   },
   {
@@ -176,7 +210,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 3,
-      "value": 51.0
+      "value": 51.0,
+      "value_min": 44.37,
+      "value_max": 57.63
     }
   },
   {
@@ -186,7 +222,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 4,
-      "value": 128.0
+      "value": 128.0,
+      "value_min": 110.08,
+      "value_max": 145.92
     }
   },
   {
@@ -196,7 +234,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 5,
-      "value": 136.0
+      "value": 136.0,
+      "value_min": 116.96,
+      "value_max": 155.04
     }
   },
   {
@@ -206,7 +246,9 @@
       "climate": 1,
       "moisture": 2,
       "soil_type": 6,
-      "value": 128.0
+      "value": 128.0,
+      "value_min": 111.36,
+      "value_max": 144.64
     }
   },
   {
@@ -216,7 +258,9 @@
       "climate": 2,
       "moisture": 1,
       "soil_type": 1,
-      "value": 24.0
+      "value": 24.0,
+      "value_min": 22.8,
+      "value_max": 25.2
     }
   },
   {
@@ -226,7 +270,9 @@
       "climate": 2,
       "moisture": 1,
       "soil_type": 2,
-      "value": 19.0
+      "value": 19.0,
+      "value_min": 15.96,
+      "value_max": 22.04
     }
   },
   {
@@ -236,7 +282,9 @@
       "climate": 2,
       "moisture": 1,
       "soil_type": 3,
-      "value": 10.0
+      "value": 10.0,
+      "value_min": 9.5,
+      "value_max": 10.5
     }
   },
   {
@@ -246,7 +294,9 @@
       "climate": 2,
       "moisture": 1,
       "soil_type": 5,
-      "value": 84.0
+      "value": 84.0,
+      "value_min": 29.4,
+      "value_max": 138.6
     }
   },
   {
@@ -256,7 +306,9 @@
       "climate": 2,
       "moisture": 1,
       "soil_type": 6,
-      "value": 74.0
+      "value": 74.0,
+      "value_min": 61.42,
+      "value_max": 86.58
     }
   },
   {
@@ -266,7 +318,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 1,
-      "value": 64.0
+      "value": 64.0,
+      "value_min": 60.8,
+      "value_max": 67.2
     }
   },
   {
@@ -276,7 +330,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 2,
-      "value": 55.0
+      "value": 55.0,
+      "value_min": 50.6,
+      "value_max": 59.4
     }
   },
   {
@@ -286,7 +342,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 3,
-      "value": 36.0
+      "value": 36.0,
+      "value_min": 27.72,
+      "value_max": 44.28
     }
   },
   {
@@ -296,7 +354,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 4,
-      "value": 143.0
+      "value": 143.0,
+      "value_min": 100.1,
+      "value_max": 185.9
     }
   },
   {
@@ -306,7 +366,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 5,
-      "value": 138.0
+      "value": 138.0,
+      "value_min": 121.44,
+      "value_max": 154.56
     }
   },
   {
@@ -316,7 +378,9 @@
       "climate": 2,
       "moisture": 2,
       "soil_type": 6,
-      "value": 135.0
+      "value": 135.0,
+      "value_min": 97.2,
+      "value_max": 172.8
     }
   },
   {
@@ -326,7 +390,9 @@
       "climate": 3,
       "moisture": 1,
       "soil_type": 1,
-      "value": 21.0
+      "value": 21.0,
+      "value_min": 19.95,
+      "value_max": 22.05
     }
   },
   {
@@ -336,7 +402,9 @@
       "climate": 3,
       "moisture": 1,
       "soil_type": 2,
-      "value": 19.0
+      "value": 19.0,
+      "value_min": 17.1,
+      "value_max": 20.9
     }
   },
   {
@@ -346,7 +414,9 @@
       "climate": 3,
       "moisture": 1,
       "soil_type": 3,
-      "value": 9.0
+      "value": 9.0,
+      "value_min": 8.19,
+      "value_max": 9.81
     }
   },
   {
@@ -356,7 +426,9 @@
       "climate": 3,
       "moisture": 1,
       "soil_type": 5,
-      "value": 50.0
+      "value": 50.0,
+      "value_min": 5.0,
+      "value_max": 95.0
     }
   },
   {
@@ -366,7 +438,9 @@
       "climate": 3,
       "moisture": 1,
       "soil_type": 6,
-      "value": 22.0
+      "value": 22.0,
+      "value_min": 18.26,
+      "value_max": 25.74
     }
   },
   {
@@ -376,7 +450,9 @@
       "climate": 3,
       "moisture": 2,
       "soil_type": 1,
-      "value": 40.0
+      "value": 40.0,
+      "value_min": 37.2,
+      "value_max": 42.8
     }
   },
   {
@@ -386,7 +462,9 @@
       "climate": 3,
       "moisture": 2,
       "soil_type": 2,
-      "value": 38.0
+      "value": 38.0,
+      "value_min": 36.1,
+      "value_max": 39.9
     }
   },
   {
@@ -396,7 +474,9 @@
       "climate": 3,
       "moisture": 2,
       "soil_type": 3,
-      "value": 27.0
+      "value": 27.0,
+      "value_min": 23.76,
+      "value_max": 30.24
     }
   },
   {
@@ -406,7 +486,9 @@
       "climate": 3,
       "moisture": 2,
       "soil_type": 5,
-      "value": 70.0
+      "value": 70.0,
+      "value_min": 7.0,
+      "value_max": 133.0
     }
   },
   {
@@ -416,7 +498,9 @@
       "climate": 3,
       "moisture": 2,
       "soil_type": 6,
-      "value": 68.0
+      "value": 68.0,
+      "value_min": 56.44,
+      "value_max": 79.56
     }
   },
   {
@@ -426,7 +510,9 @@
       "climate": 3,
       "moisture": 4,
       "soil_type": 1,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 55.2,
+      "value_max": 64.8
     }
   },
   {
@@ -436,7 +522,9 @@
       "climate": 3,
       "moisture": 4,
       "soil_type": 2,
-      "value": 52.0
+      "value": 52.0,
+      "value_min": 48.88,
+      "value_max": 55.12
     }
   },
   {
@@ -446,7 +534,9 @@
       "climate": 3,
       "moisture": 4,
       "soil_type": 3,
-      "value": 46.0
+      "value": 46.0,
+      "value_min": 36.8,
+      "value_max": 55.2
     }
   },
   {
@@ -456,7 +546,9 @@
       "climate": 3,
       "moisture": 4,
       "soil_type": 5,
-      "value": 77.0
+      "value": 77.0,
+      "value_min": 56.21,
+      "value_max": 97.79
     }
   },
   {
@@ -466,7 +558,9 @@
       "climate": 3,
       "moisture": 4,
       "soil_type": 6,
-      "value": 49.0
+      "value": 49.0,
+      "value_min": 39.69,
+      "value_max": 58.31
     }
   },
   {
@@ -476,7 +570,9 @@
       "climate": 20,
       "moisture": 1,
       "soil_type": 1,
-      "value": 51.0
+      "value": 51.0,
+      "value_min": 45.9,
+      "value_max": 56.1
     }
   },
   {
@@ -486,7 +582,9 @@
       "climate": 20,
       "moisture": 1,
       "soil_type": 2,
-      "value": 44.0
+      "value": 44.0,
+      "value_min": 39.16,
+      "value_max": 48.84
     }
   },
   {
@@ -496,7 +594,9 @@
       "climate": 20,
       "moisture": 1,
       "soil_type": 3,
-      "value": 52.0
+      "value": 52.0,
+      "value_min": 34.32,
+      "value_max": 69.68
     }
   },
   {
@@ -506,7 +606,9 @@
       "climate": 20,
       "moisture": 1,
       "soil_type": 5,
-      "value": 96.0
+      "value": 96.0,
+      "value_min": 66.24,
+      "value_max": 125.76
     }
   },
   {
@@ -516,7 +618,9 @@
       "climate": 20,
       "moisture": 1,
       "soil_type": 6,
-      "value": 82.0
+      "value": 82.0,
+      "value_min": 41.0,
+      "value_max": 123.0
     }
   }
 ]
