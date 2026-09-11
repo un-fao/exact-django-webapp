@@ -141,7 +141,12 @@ from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseForbidden, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from google.auth.exceptions import GoogleAuthError
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
@@ -328,6 +333,31 @@ class DefaultPagination(PageNumberPagination):
 
 def warmup(request):
     return HttpResponse("Warmup successful.")
+
+
+# One scheduler service account per GCP project, so its address follows from
+# PROJECT_ID and needs no setting of its own.
+RECAP_SCHEDULER_SERVICE_ACCOUNT = "recap-email-scheduler@{}.iam.gserviceaccount.com"
+
+
+@csrf_exempt
+@require_POST
+def recap_sweep(request):
+    # The Cloud Run service accepts unauthenticated calls because it is the public
+    # API, so Cloud Run never checks Cloud Scheduler's OIDC token: it is checked here.
+    token = request.headers.get("Authorization", "").removeprefix("Bearer ")
+    try:
+        claims = id_token.verify_oauth2_token(token, google_requests.Request(), audience=request.build_absolute_uri())
+    except (ValueError, GoogleAuthError):
+        return HttpResponseForbidden()
+
+    expected = RECAP_SCHEDULER_SERVICE_ACCOUNT.format(os.getenv("PROJECT_ID", ""))
+    if not claims.get("email_verified") or claims.get("email") != expected:
+        return HttpResponseForbidden()
+
+    # ponytail: the sweep runs inside one gunicorn request (GUNICORN_TIMEOUT, 120s); move it to
+    # exact-computation-job via an args override once the review workflow rebuilds that image.
+    return JsonResponse({"sent": utils.send_due_recaps()})
 
 
 class BaseWiewSet(viewsets.GenericViewSet):
