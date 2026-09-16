@@ -5044,7 +5044,7 @@ class LivestockCalculator(BaseCalculator):
             )
             
             if (
-                module.prp_percentage_t2_start
+                module.prp_percentage_t2_start is not None
                 and self.animal_waste_prp_start.value == 100
                 and (module.emission_factor_ch4_t2_start is None or module.emission_factor_n2o_t2_start is None)
             ):
@@ -5310,7 +5310,7 @@ class LivestockCalculator(BaseCalculator):
             )
             
             if (
-                module.prp_percentage_t2_w
+                module.prp_percentage_t2_w is not None
                 and self.animal_waste_prp_w.value == 100
                 and (module.emission_factor_ch4_t2_w is None or module.emission_factor_n2o_t2_w is None)
             ):
@@ -5576,7 +5576,7 @@ class LivestockCalculator(BaseCalculator):
             )
                 
             if (
-                module.prp_percentage_t2_wo
+                module.prp_percentage_t2_wo is not None
                 and self.animal_waste_prp_wo.value == 100
                 and (module.emission_factor_ch4_t2_wo is None or module.emission_factor_n2o_t2_wo is None)
             ):
@@ -5799,8 +5799,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_w.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_w.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_w,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5876,8 +5876,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_wo.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_wo.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_wo,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
