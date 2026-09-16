@@ -4958,7 +4958,13 @@ class LivestockCalculator(BaseCalculator):
         self.LEACHING_MULTI = ApplicationParameter.objects.get(name="leaching_multiplier").value
         self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
-        PRP_T2_ERROR_MESSAGE = "No other system apart from PRP is available to compute manure emissions from. Please select a complementary manure management type."
+        # gas_head_calculation rescales the other systems by (1 - t2 PRP) / (1 - default PRP), which divides by
+        # zero when the default PRP is 100%, whatever the tier 2 PRP or complementary type. Only a system tier 2 EF
+        # skips that rescaling, and CH4 and N2O each need their own.
+        PRP_T2_ERROR_MESSAGE = (
+            "The default Pasture/Range/Paddock share for this livestock is 100%, so there is no other manure management system to assign the rest to. "
+            "Leave the tier 2 PRP percentage empty, or enter both tier 2 CH4 and N2O emission factors."
+        )
 
         if module.is_start():
             production_category_region_flt = {
@@ -5038,8 +5044,9 @@ class LivestockCalculator(BaseCalculator):
             )
             
             if (
-                module.prp_percentage_t2_start == 1.0
-                and self.animal_waste_prp_start.value == 1.0
+                module.prp_percentage_t2_start
+                and self.animal_waste_prp_start.value == 100
+                and (module.emission_factor_ch4_t2_start is None or module.emission_factor_n2o_t2_start is None)
             ):
                 raise ValueError(PRP_T2_ERROR_MESSAGE)
 
@@ -5303,8 +5310,9 @@ class LivestockCalculator(BaseCalculator):
             )
             
             if (
-                module.prp_percentage_t2_w == 1.0
-                and self.animal_waste_prp_w.value == 1.0
+                module.prp_percentage_t2_w
+                and self.animal_waste_prp_w.value == 100
+                and (module.emission_factor_ch4_t2_w is None or module.emission_factor_n2o_t2_w is None)
             ):
                 raise ValueError(PRP_T2_ERROR_MESSAGE)
 
@@ -5568,8 +5576,9 @@ class LivestockCalculator(BaseCalculator):
             )
                 
             if (
-                module.prp_percentage_t2_wo == 1.0
-                and self.animal_waste_prp_wo.value == 1.0
+                module.prp_percentage_t2_wo
+                and self.animal_waste_prp_wo.value == 100
+                and (module.emission_factor_ch4_t2_wo is None or module.emission_factor_n2o_t2_wo is None)
             ):
                 raise ValueError(PRP_T2_ERROR_MESSAGE)
 
