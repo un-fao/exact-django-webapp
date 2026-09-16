@@ -20,25 +20,6 @@
   },
   {
     "model": "ipcc.afforestationcombustionfactor",
-    "pk": 3,
-    "fields": {
-      "land_use_type": 2,
-      "co2": 1515.0,
-      "ch4": 2.7,
-      "n2o": 0.07,
-      "value": 0.4,
-      "co2_min": null,
-      "co2_max": null,
-      "ch4_min": null,
-      "ch4_max": null,
-      "n2o_min": null,
-      "n2o_max": null,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationcombustionfactor",
     "pk": 4,
     "fields": {
       "land_use_type": 15,

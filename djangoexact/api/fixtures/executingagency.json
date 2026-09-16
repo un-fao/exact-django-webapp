@@ -9,14 +9,6 @@
   },
   {
     "model": "api.executingagency",
-    "pk": 7,
-    "fields": {
-      "name": "Ministère de l'environnement et des ressources forestières",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.executingagency",
     "pk": 3,
     "fields": {
       "name": "NEPAL MINISTRY OF AGRIC",

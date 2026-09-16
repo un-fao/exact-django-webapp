@@ -13,18 +13,6 @@
   },
   {
     "model": "ipcc.afforestationflu",
-    "pk": 474,
-    "fields": {
-      "climate": 4,
-      "moisture": 1,
-      "land_use_type": 2,
-      "value": 0.93,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
     "pk": 475,
     "fields": {
       "climate": 4,
@@ -273,18 +261,6 @@
       "value": 0.7,
       "value_min": 0.6688,
       "value_max": 0.8512
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
-    "pk": 496,
-    "fields": {
-      "climate": 4,
-      "moisture": 2,
-      "land_use_type": 2,
-      "value": 0.82,
-      "value_min": null,
-      "value_max": null
     }
   },
   {
@@ -541,18 +517,6 @@
   },
   {
     "model": "ipcc.afforestationflu",
-    "pk": 518,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
-      "land_use_type": 2,
-      "value": 0.93,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
     "pk": 519,
     "fields": {
       "climate": 1,
@@ -801,18 +765,6 @@
       "value": 0.7,
       "value_min": 0.6688,
       "value_max": 0.8512
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
-    "pk": 540,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "land_use_type": 2,
-      "value": 0.82,
-      "value_min": null,
-      "value_max": null
     }
   },
   {
@@ -1069,18 +1021,6 @@
   },
   {
     "model": "ipcc.afforestationflu",
-    "pk": 562,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "land_use_type": 2,
-      "value": 0.93,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
     "pk": 563,
     "fields": {
       "climate": 3,
@@ -1329,18 +1269,6 @@
       "value": 0.83,
       "value_min": 0.6688,
       "value_max": 0.8512
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
-    "pk": 584,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "land_use_type": 2,
-      "value": 0.82,
-      "value_min": null,
-      "value_max": null
     }
   },
   {
@@ -1597,18 +1525,6 @@
   },
   {
     "model": "ipcc.afforestationflu",
-    "pk": 606,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "land_use_type": 2,
-      "value": 0.82,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
     "pk": 607,
     "fields": {
       "climate": 3,
@@ -1857,18 +1773,6 @@
       "value": 0.64,
       "value_min": 0.6688,
       "value_max": 0.8512
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
-    "pk": 628,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "land_use_type": 2,
-      "value": 0.88,
-      "value_min": null,
-      "value_max": null
     }
   },
   {
@@ -2125,18 +2029,6 @@
   },
   {
     "model": "ipcc.afforestationflu",
-    "pk": 650,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "land_use_type": 2,
-      "value": 0.93,
-      "value_min": null,
-      "value_max": null
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
     "pk": 651,
     "fields": {
       "climate": 2,
@@ -2385,18 +2277,6 @@
       "value": 0.69,
       "value_min": 0.5796,
       "value_max": 0.8004
-    }
-  },
-  {
-    "model": "ipcc.afforestationflu",
-    "pk": 672,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "land_use_type": 2,
-      "value": 0.82,
-      "value_min": null,
-      "value_max": null
     }
   },
   {

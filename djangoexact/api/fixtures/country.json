@@ -12,11 +12,11 @@
   },
   {
     "model": "api.country",
-    "pk": 254,
+    "pk": 285,
     "fields": {
       "name": "Åland Islands",
       "iso3": "ALA",
-      "region": null,
+      "region": 11,
       "ipcc_region": null,
       "gleam_region": null
     }
@@ -166,7 +166,7 @@
   },
   {
     "model": "api.country",
-    "pk": 287,
+    "pk": 286,
     "fields": {
       "name": "Azores (Portugal)",
       "iso3": null,
@@ -463,7 +463,7 @@
   },
   {
     "model": "api.country",
-    "pk": 288,
+    "pk": 287,
     "fields": {
       "name": "Canary Islands",
       "iso3": null,
@@ -507,7 +507,7 @@
   },
   {
     "model": "api.country",
-    "pk": 289,
+    "pk": 288,
     "fields": {
       "name": "Channel Islands",
       "iso3": null,
@@ -639,13 +639,13 @@
   },
   {
     "model": "api.country",
-    "pk": 265,
+    "pk": 289,
     "fields": {
-      "name": "Côte d’Ivoire",
-      "iso3": "CIV",
+      "name": "Côte d'Ivoire",
+      "iso3": null,
       "region": 5,
-      "ipcc_region": 14,
-      "gleam_region": 9
+      "ipcc_region": null,
+      "gleam_region": null
     }
   },
   {
@@ -2344,17 +2344,6 @@
   },
   {
     "model": "api.country",
-    "pk": 283,
-    "fields": {
-      "name": "Southern Africa",
-      "iso3": null,
-      "region": 4,
-      "ipcc_region": 14,
-      "gleam_region": 9
-    }
-  },
-  {
-    "model": "api.country",
     "pk": 99,
     "fields": {
       "name": "South Georgia And The South Sandwich Islands",
@@ -2467,22 +2456,11 @@
     "model": "api.country",
     "pk": 272,
     "fields": {
-      "name": "Taiwan ",
+      "name": "Taiwan",
       "iso3": null,
-      "region": null,
-      "ipcc_region": null,
-      "gleam_region": null
-    }
-  },
-  {
-    "model": "api.country",
-    "pk": 292,
-    "fields": {
-      "name": "Taiwan (Chinese Taipei)",
-      "iso3": "TWN",
       "region": 7,
-      "ipcc_region": null,
-      "gleam_region": null
+      "ipcc_region": 16,
+      "gleam_region": 11
     }
   },
   {

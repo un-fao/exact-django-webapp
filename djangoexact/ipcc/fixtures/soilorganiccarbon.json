@@ -622,5 +622,17 @@
       "value_min": 41.0,
       "value_max": 123.0
     }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 493,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 2,
+      "value": null,
+      "value_min": null,
+      "value_max": null
+    }
   }
 ]

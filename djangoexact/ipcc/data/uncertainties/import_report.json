@@ -16,7 +16,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.BurningEmissionFactor",
@@ -34,7 +35,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CoastalAGB",
@@ -52,7 +54,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CoastalBGB",
@@ -70,7 +73,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 2,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.CoastalDeadwood",
@@ -88,7 +92,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CoastalLitter",
@@ -106,7 +111,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CroplandFI",
@@ -124,7 +130,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CroplandFLU",
@@ -142,7 +149,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CroplandFMG",
@@ -160,7 +168,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.CropNitrousEstimationDefaultFactor",
@@ -169,16 +178,17 @@
       "ranged_groups": 5,
       "new_columns": 10,
       "csv_rows": 25,
-      "fixture_rows": 159,
-      "matched_unique": 23,
-      "written": 17,
-      "carrying_bound": 17,
+      "fixture_rows": 160,
+      "matched_unique": 24,
+      "written": 18,
+      "carrying_bound": 18,
       "unmatched": 0,
-      "unresolved_fk": 2,
+      "unresolved_fk": 1,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 6,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.DataOnMangrove",
@@ -196,7 +206,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.DefaultSoilCarbonStock",
@@ -214,7 +225,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.DrainageEmissionFactor",
@@ -232,7 +244,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.EnergyDefaultEmissionFactor",
@@ -242,15 +255,16 @@
       "new_columns": 6,
       "csv_rows": 14,
       "fixture_rows": 17,
-      "matched_unique": 11,
+      "matched_unique": 8,
       "written": 0,
       "carrying_bound": 0,
       "unmatched": 0,
-      "unresolved_fk": 3,
+      "unresolved_fk": 6,
       "ambiguous": 0,
       "conflict": 0,
-      "base_mismatch": 11,
-      "conflicts_detail": []
+      "base_mismatch": 8,
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.FIData",
@@ -268,7 +282,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.FiresCombustionFactor",
@@ -286,7 +301,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 2,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.FLUData",
@@ -304,7 +320,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.FMGData",
@@ -322,7 +339,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.ForestCombustionFactor",
@@ -333,14 +351,15 @@
       "csv_rows": 36,
       "fixture_rows": 36,
       "matched_unique": 34,
-      "written": 34,
-      "carrying_bound": 34,
+      "written": 33,
+      "carrying_bound": 33,
       "unmatched": 2,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
-      "base_mismatch": 0,
-      "conflicts_detail": []
+      "base_mismatch": 1,
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.GrasslandBiomass",
@@ -358,7 +377,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.GrasslandStockExchangeFactor",
@@ -376,7 +396,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.InputEmissionFactor",
@@ -394,7 +415,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.AfforestationCombustionFactor",
@@ -403,7 +425,7 @@
       "ranged_groups": 4,
       "new_columns": 8,
       "csv_rows": 21,
-      "fixture_rows": 22,
+      "fixture_rows": 21,
       "matched_unique": 21,
       "written": 21,
       "carrying_bound": 20,
@@ -412,7 +434,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.AfforestationFLU",
@@ -421,7 +444,7 @@
       "ranged_groups": 1,
       "new_columns": 2,
       "csv_rows": 210,
-      "fixture_rows": 220,
+      "fixture_rows": 210,
       "matched_unique": 210,
       "written": 210,
       "carrying_bound": 190,
@@ -430,7 +453,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.Atwood",
@@ -448,7 +472,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.ForestManagementAGB",
@@ -457,7 +482,7 @@
       "ranged_groups": 4,
       "new_columns": 4,
       "csv_rows": 1336,
-      "fixture_rows": 1350,
+      "fixture_rows": 1351,
       "matched_unique": 1336,
       "written": 1336,
       "carrying_bound": 757,
@@ -466,7 +491,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.ForestManagementRootToShoot",
@@ -477,14 +503,15 @@
       "csv_rows": 1086,
       "fixture_rows": 1086,
       "matched_unique": 1086,
-      "written": 1086,
-      "carrying_bound": 905,
+      "written": 1083,
+      "carrying_bound": 902,
       "unmatched": 0,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
-      "base_mismatch": 0,
-      "conflicts_detail": []
+      "base_mismatch": 3,
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.ForestTotalBiomass",
@@ -493,16 +520,17 @@
       "ranged_groups": 1,
       "new_columns": 2,
       "csv_rows": 5792,
-      "fixture_rows": 5792,
-      "matched_unique": 5632,
-      "written": 5616,
+      "fixture_rows": 5952,
+      "matched_unique": 5792,
+      "written": 5776,
       "carrying_bound": 5280,
-      "unmatched": 160,
+      "unmatched": 0,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 16,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LargeFisheryFUI",
@@ -520,7 +548,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LitterDeadwoodCarbonStock",
@@ -538,7 +567,8 @@
       "ambiguous": 2,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LivestockAWMS",
@@ -549,14 +579,15 @@
       "csv_rows": 7140,
       "fixture_rows": 7140,
       "matched_unique": 7140,
-      "written": 7140,
+      "written": 7139,
       "carrying_bound": 0,
       "unmatched": 0,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
-      "base_mismatch": 0,
-      "conflicts_detail": []
+      "base_mismatch": 1,
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LivestockManureEF",
@@ -567,14 +598,15 @@
       "csv_rows": 27720,
       "fixture_rows": 29974,
       "matched_unique": 27706,
-      "written": 27554,
-      "carrying_bound": 27554,
+      "written": 27044,
+      "carrying_bound": 27044,
       "unmatched": 14,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
-      "base_mismatch": 152,
-      "conflicts_detail": []
+      "base_mismatch": 662,
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LivestockNER",
@@ -592,7 +624,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LivestockTAM",
@@ -610,7 +643,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.LivestockVSER",
@@ -628,7 +662,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.ManureManagementVolatilizationMultiplier",
@@ -646,7 +681,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.MethaneEntericFermentationFactor",
@@ -664,7 +700,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 60,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.NitrousEmissionFactor",
@@ -682,7 +719,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.OrganicSoilDrainageEmissionFactor",
@@ -691,7 +729,7 @@
       "ranged_groups": 4,
       "new_columns": 8,
       "csv_rows": 360,
-      "fixture_rows": 360,
+      "fixture_rows": 400,
       "matched_unique": 280,
       "written": 280,
       "carrying_bound": 188,
@@ -700,7 +738,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.OrganicSoilFuelConsumption",
@@ -718,7 +757,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.OrganicSoilRewettingEmissionFactor",
@@ -727,7 +767,7 @@
       "ranged_groups": 4,
       "new_columns": 8,
       "csv_rows": 180,
-      "fixture_rows": 180,
+      "fixture_rows": 200,
       "matched_unique": 140,
       "written": 140,
       "carrying_bound": 100,
@@ -736,7 +776,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.OtherConstructedWaterbodiesEmissionFactor",
@@ -754,7 +795,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.PeatExtractionConversionFactor",
@@ -772,7 +814,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.PeatExtractionEmissionFactor",
@@ -790,7 +833,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.PerennialAGB",
@@ -808,7 +852,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.PerennialBGB",
@@ -826,7 +871,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.PerennialMaxAGB",
@@ -844,7 +890,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RewettingCarbonFactor",
@@ -862,7 +909,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RewettingMethaneFactor",
@@ -880,7 +928,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RiceDefaultEmissionFactor",
@@ -898,7 +947,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RiceSFO",
@@ -916,7 +966,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RiceSFP",
@@ -934,7 +985,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RiceSFW",
@@ -952,7 +1004,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.RiceYield",
@@ -970,7 +1023,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.RoadEmissionFactor",
@@ -988,7 +1042,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.SettlementEF",
@@ -1006,7 +1061,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.SmallFisheryFUI",
@@ -1024,7 +1080,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.SoilOrganicCarbon",
@@ -1033,16 +1090,17 @@
       "ranged_groups": 1,
       "new_columns": 2,
       "csv_rows": 53,
-      "fixture_rows": 52,
-      "matched_unique": 52,
-      "written": 52,
+      "fixture_rows": 53,
+      "matched_unique": 53,
+      "written": 53,
       "carrying_bound": 52,
-      "unmatched": 1,
+      "unmatched": 0,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.TotalBiomassAfterDefo",
@@ -1051,16 +1109,17 @@
       "ranged_groups": 1,
       "new_columns": 2,
       "csv_rows": 6240,
-      "fixture_rows": 6080,
-      "matched_unique": 5920,
-      "written": 5855,
+      "fixture_rows": 6400,
+      "matched_unique": 6240,
+      "written": 6175,
       "carrying_bound": 5247,
-      "unmatched": 320,
+      "unmatched": 0,
       "unresolved_fk": 0,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 65,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.TrophicStateFactor",
@@ -1078,7 +1137,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": true
     },
     {
       "model": "ipcc.IrrigationPhaseData",
@@ -1088,15 +1148,16 @@
       "new_columns": 12,
       "csv_rows": 7,
       "fixture_rows": 7,
-      "matched_unique": 3,
-      "written": 3,
-      "carrying_bound": 2,
-      "unmatched": 1,
-      "unresolved_fk": 3,
+      "matched_unique": 1,
+      "written": 1,
+      "carrying_bound": 0,
+      "unmatched": 0,
+      "unresolved_fk": 6,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.IrrigationPressureRequirement",
@@ -1114,7 +1175,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.IrrigationSystemData",
@@ -1132,7 +1194,8 @@
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     },
     {
       "model": "ipcc.LandUseCarbonStockExchangeFactor",
@@ -1141,30 +1204,31 @@
       "ranged_groups": 1,
       "new_columns": 2,
       "csv_rows": 264,
-      "fixture_rows": 264,
-      "matched_unique": 252,
-      "written": 252,
-      "carrying_bound": 252,
+      "fixture_rows": 252,
+      "matched_unique": 240,
+      "written": 240,
+      "carrying_bound": 240,
       "unmatched": 0,
-      "unresolved_fk": 12,
+      "unresolved_fk": 24,
       "ambiguous": 0,
       "conflict": 0,
       "base_mismatch": 0,
-      "conflicts_detail": []
+      "conflicts_detail": [],
+      "published": false
     }
   ],
   "totals": {
     "ranged_groups": 121,
     "new_columns": 238,
     "csv_rows": 58452,
-    "fixture_rows": 60821,
-    "matched_unique": 57555,
-    "written": 57241,
-    "carrying_bound": 44184,
-    "unmatched": 848,
-    "unresolved_fk": 47,
+    "fixture_rows": 61341,
+    "matched_unique": 58020,
+    "written": 57194,
+    "carrying_bound": 43657,
+    "unmatched": 366,
+    "unresolved_fk": 64,
     "ambiguous": 2,
     "conflict": 0,
-    "base_mismatch": 314
+    "base_mismatch": 826
   }
 }

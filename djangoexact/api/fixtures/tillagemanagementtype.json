@@ -7,7 +7,7 @@
       "name_en": "Full Tillage",
       "name_fr": null,
       "name_es": "Laboreo Total",
-      "name_ru": null
+      "name_ru": "Полная обработка почвы"
     }
   },
   {
@@ -18,7 +18,7 @@
       "name_en": "No Tillage",
       "name_fr": null,
       "name_es": "Sin Laboreo",
-      "name_ru": null
+      "name_ru": "Без обработки почвы"
     }
   },
   {
@@ -29,7 +29,7 @@
       "name_en": "Reduced Tillage",
       "name_fr": null,
       "name_es": "Laboreo Reducido",
-      "name_ru": null
+      "name_ru": "Сниженная обработка почвы"
     }
   }
 ]

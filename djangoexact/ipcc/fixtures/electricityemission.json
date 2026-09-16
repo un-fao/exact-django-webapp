@@ -12,7 +12,7 @@
     "model": "ipcc.electricityemission",
     "pk": 763,
     "fields": {
-      "country": 254,
+      "country": 285,
       "operating_margin": 0.48626,
       "combined_margin": 0.27362
     }
@@ -138,7 +138,7 @@
     "model": "ipcc.electricityemission",
     "pk": 777,
     "fields": {
-      "country": 287,
+      "country": 286,
       "operating_margin": 0.753,
       "combined_margin": 0.384
     }
@@ -381,7 +381,7 @@
     "model": "ipcc.electricityemission",
     "pk": 804,
     "fields": {
-      "country": 288,
+      "country": 287,
       "operating_margin": 0.753,
       "combined_margin": 0.435
     }
@@ -417,7 +417,7 @@
     "model": "ipcc.electricityemission",
     "pk": 808,
     "fields": {
-      "country": 289,
+      "country": 288,
       "operating_margin": 0.753,
       "combined_margin": 0.389
     }
@@ -525,7 +525,7 @@
     "model": "ipcc.electricityemission",
     "pk": 820,
     "fields": {
-      "country": 265,
+      "country": 289,
       "operating_margin": 0.466,
       "combined_margin": 0.314
     }
@@ -2010,7 +2010,7 @@
     "model": "ipcc.electricityemission",
     "pk": 985,
     "fields": {
-      "country": 292,
+      "country": 272,
       "operating_margin": 0.484,
       "combined_margin": 0.331
     }

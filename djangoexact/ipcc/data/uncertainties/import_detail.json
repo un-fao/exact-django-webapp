@@ -82,30 +82,6 @@
       ]
     },
     "CropNitrousEstimationDefaultFactor.csv": {
-      "unresolved_fk": [
-        {
-          "k": {
-            "land_use_type": "Generic Value"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Generic Value"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        }
-      ],
       "base_mismatch": [
         {
           "k": {
@@ -201,6 +177,19 @@
           ]
         }
       ],
+      "unresolved_fk": [
+        {
+          "k": {
+            "land_use_type": "Alfalfa"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Alfalfa"
+            ]
+          ]
+        }
+      ],
       "groups": [
         "intercept",
         "n_ag_residues",
@@ -233,257 +222,18 @@
       ]
     },
     "EnergyDefaultEmissionFactor.csv": {
-      "base_mismatch": [
+      "unresolved_fk": [
         {
           "k": {
             "fuel_type": "Motor Gasoline"
           },
-          "pk": 97,
-          "f": [
+          "bad": [
             [
-              "co2",
-              69300.0,
-              2.27486259
-            ],
-            [
-              "ch4",
-              10.0,
-              0.001083268
-            ],
-            [
-              "n2o",
-              0.6,
-              0.000105044
+              "fuel_type",
+              "Motor Gasoline"
             ]
           ]
         },
-        {
-          "k": {
-            "fuel_type": "Lpg"
-          },
-          "pk": 95,
-          "f": [
-            [
-              "co2",
-              63100.0,
-              1.59080779
-            ],
-            [
-              "ch4",
-              5.0,
-              0.000126055
-            ],
-            [
-              "n2o",
-              0.1,
-              2.52109e-06
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Natural Gas"
-          },
-          "pk": 96,
-          "f": [
-            [
-              "co2",
-              56100.0,
-              0.00206807
-            ],
-            [
-              "ch4",
-              5.0,
-              1.84e-07
-            ],
-            [
-              "n2o",
-              0.1,
-              3.69e-09
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Ethanol (Cars)"
-          },
-          "pk": 101,
-          "f": [
-            [
-              "co2",
-              1508.0,
-              0.032084208
-            ],
-            [
-              "ch4",
-              18.0,
-              0.000382968
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Ethanol (Trucks)"
-          },
-          "pk": 102,
-          "f": [
-            [
-              "co2",
-              1508.0,
-              0.032084208
-            ],
-            [
-              "ch4",
-              260.0,
-              0.00553176
-            ],
-            [
-              "n2o",
-              41.0,
-              0.000872316
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Diesel"
-          },
-          "pk": 103,
-          "f": [
-            [
-              "co2",
-              74100.0,
-              2.6669331
-            ],
-            [
-              "ch4",
-              4.15,
-              0.000149363
-            ],
-            [
-              "n2o",
-              28.6,
-              0.001029343
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Gasoline (2-Stroke)"
-          },
-          "pk": 104,
-          "f": [
-            [
-              "co2",
-              69300.0,
-              2.27486259
-            ],
-            [
-              "ch4",
-              140.0,
-              0.004595682
-            ],
-            [
-              "n2o",
-              0.4,
-              1.31305e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Gasoline (4-Stroke)"
-          },
-          "pk": 105,
-          "f": [
-            [
-              "co2",
-              69300.0,
-              2.27486259
-            ],
-            [
-              "ch4",
-              80.0,
-              0.002626104
-            ],
-            [
-              "n2o",
-              2.0,
-              6.56526e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Wood"
-          },
-          "pk": 106,
-          "f": [
-            [
-              "co2",
-              112000.0,
-              1.7472
-            ],
-            [
-              "ch4",
-              300.0,
-              0.00468
-            ],
-            [
-              "n2o",
-              4.0,
-              6.24e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Peat"
-          },
-          "pk": 107,
-          "f": [
-            [
-              "co2",
-              106000.0,
-              1.03456
-            ],
-            [
-              "ch4",
-              300.0,
-              0.002928
-            ],
-            [
-              "n2o",
-              1.4,
-              1.3664e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "fuel_type": "Charcoal"
-          },
-          "pk": 108,
-          "f": [
-            [
-              "co2",
-              112000.0,
-              3.304
-            ],
-            [
-              "ch4",
-              200.0,
-              0.0059
-            ],
-            [
-              "n2o",
-              1.0,
-              2.95e-05
-            ]
-          ]
-        }
-      ],
-      "unresolved_fk": [
         {
           "k": {
             "fuel_type": "Gasoil /Diesel Oil"
@@ -508,12 +258,215 @@
         },
         {
           "k": {
+            "fuel_type": "Lpg"
+          },
+          "bad": [
+            [
+              "fuel_type",
+              "Lpg"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Natural Gas"
+          },
+          "bad": [
+            [
+              "fuel_type",
+              "Natural Gas"
+            ]
+          ]
+        },
+        {
+          "k": {
             "fuel_type": "Solar"
           },
           "bad": [
             [
               "fuel_type",
               "Solar"
+            ]
+          ]
+        }
+      ],
+      "base_mismatch": [
+        {
+          "k": {
+            "fuel_type": "Ethanol (Cars)"
+          },
+          "pk": 118,
+          "f": [
+            [
+              "co2",
+              1508.0,
+              0.032084208
+            ],
+            [
+              "ch4",
+              18.0,
+              0.000382968
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Ethanol (Trucks)"
+          },
+          "pk": 119,
+          "f": [
+            [
+              "co2",
+              1508.0,
+              0.032084208
+            ],
+            [
+              "ch4",
+              260.0,
+              0.00553176
+            ],
+            [
+              "n2o",
+              41.0,
+              0.000872316
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Diesel"
+          },
+          "pk": 120,
+          "f": [
+            [
+              "co2",
+              74100.0,
+              2.6669331
+            ],
+            [
+              "ch4",
+              4.15,
+              0.000149363
+            ],
+            [
+              "n2o",
+              28.6,
+              0.001029343
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Gasoline (2-Stroke)"
+          },
+          "pk": 121,
+          "f": [
+            [
+              "co2",
+              69300.0,
+              2.27486259
+            ],
+            [
+              "ch4",
+              140.0,
+              0.004595682
+            ],
+            [
+              "n2o",
+              0.4,
+              1.31305e-05
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Gasoline (4-Stroke)"
+          },
+          "pk": 122,
+          "f": [
+            [
+              "co2",
+              69300.0,
+              2.27486259
+            ],
+            [
+              "ch4",
+              80.0,
+              0.002626104
+            ],
+            [
+              "n2o",
+              2.0,
+              6.56526e-05
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Wood"
+          },
+          "pk": 123,
+          "f": [
+            [
+              "co2",
+              112000.0,
+              1.7472
+            ],
+            [
+              "ch4",
+              300.0,
+              0.00468
+            ],
+            [
+              "n2o",
+              4.0,
+              6.24e-05
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Peat"
+          },
+          "pk": 124,
+          "f": [
+            [
+              "co2",
+              106000.0,
+              1.03456
+            ],
+            [
+              "ch4",
+              300.0,
+              0.002928
+            ],
+            [
+              "n2o",
+              1.4,
+              1.3664e-05
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Charcoal"
+          },
+          "pk": 125,
+          "f": [
+            [
+              "co2",
+              112000.0,
+              3.304
+            ],
+            [
+              "ch4",
+              200.0,
+              0.0059
+            ],
+            [
+              "n2o",
+              1.0,
+              2.95e-05
             ]
           ]
         }
@@ -2302,6 +2255,28 @@
       ]
     },
     "ForestCombustionFactor.csv": {
+      "base_mismatch": [
+        {
+          "k": {
+            "climate": "Warm Temperate",
+            "forest_type": "Natural",
+            "land_use_type": "Mangrove Forest"
+          },
+          "pk": 126,
+          "f": [
+            [
+              "co2",
+              1580.0,
+              null
+            ],
+            [
+              "n2o",
+              0.2,
+              null
+            ]
+          ]
+        }
+      ],
       "unmatched": [
         {
           "k": {
@@ -2388,1293 +2363,64 @@
       ]
     },
     "ipcc.forestmanagementbgb.csv": {
+      "base_mismatch": [
+        {
+          "k": {
+            "climate": "Cool Temperate",
+            "region": "South America",
+            "forest_type": "Natural",
+            "land_use_type": "Oceanic Forest",
+            "threshold": "125"
+          },
+          "pk": 1561,
+          "f": [
+            [
+              "value",
+              0.466,
+              0.402
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Cool Temperate",
+            "region": "Central America",
+            "forest_type": "Natural",
+            "land_use_type": "Oceanic Forest",
+            "threshold": "125"
+          },
+          "pk": 1562,
+          "f": [
+            [
+              "value",
+              0.466,
+              0.402
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Cool Temperate",
+            "region": "Caribbean",
+            "forest_type": "Natural",
+            "land_use_type": "Oceanic Forest",
+            "threshold": "125"
+          },
+          "pk": 1563,
+          "f": [
+            [
+              "value",
+              0.466,
+              0.402
+            ]
+          ]
+        }
+      ],
       "groups": [
         "value"
       ]
     },
     "ipcc.foresttotalbiomass.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        }
-      ],
       "base_mismatch": [
         {
           "k": {
@@ -3683,7 +2429,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 31615,
+          "pk": 43375,
           "f": [
             [
               "value",
@@ -3699,7 +2445,7 @@
             "continent": "Central Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 31650,
+          "pk": 43411,
           "f": [
             [
               "value",
@@ -3715,7 +2461,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 31685,
+          "pk": 43447,
           "f": [
             [
               "value",
@@ -3731,7 +2477,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 31720,
+          "pk": 43483,
           "f": [
             [
               "value",
@@ -3747,7 +2493,7 @@
             "continent": "Western Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 31755,
+          "pk": 43519,
           "f": [
             [
               "value",
@@ -3763,7 +2509,7 @@
             "continent": "Central Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 31790,
+          "pk": 43555,
           "f": [
             [
               "value",
@@ -3779,7 +2525,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 31825,
+          "pk": 43591,
           "f": [
             [
               "value",
@@ -3795,7 +2541,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 31860,
+          "pk": 43627,
           "f": [
             [
               "value",
@@ -3811,7 +2557,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 31895,
+          "pk": 43663,
           "f": [
             [
               "value",
@@ -3827,7 +2573,7 @@
             "continent": "Western Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 31930,
+          "pk": 43699,
           "f": [
             [
               "value",
@@ -3843,7 +2589,7 @@
             "continent": "Europe",
             "land_use_type": "Grassland"
           },
-          "pk": 31965,
+          "pk": 43735,
           "f": [
             [
               "value",
@@ -3859,7 +2605,7 @@
             "continent": "Oceania",
             "land_use_type": "Grassland"
           },
-          "pk": 32000,
+          "pk": 43771,
           "f": [
             [
               "value",
@@ -3875,7 +2621,7 @@
             "continent": "North America",
             "land_use_type": "Grassland"
           },
-          "pk": 32035,
+          "pk": 43807,
           "f": [
             [
               "value",
@@ -3891,7 +2637,7 @@
             "continent": "South America",
             "land_use_type": "Grassland"
           },
-          "pk": 32070,
+          "pk": 43843,
           "f": [
             [
               "value",
@@ -3907,7 +2653,7 @@
             "continent": "Central America",
             "land_use_type": "Grassland"
           },
-          "pk": 32105,
+          "pk": 43879,
           "f": [
             [
               "value",
@@ -3923,7 +2669,7 @@
             "continent": "Caribbean",
             "land_use_type": "Grassland"
           },
-          "pk": 32140,
+          "pk": 43915,
           "f": [
             [
               "value",
@@ -3973,6 +2719,24 @@
       ]
     },
     "ipcc.livestockawms.csv": {
+      "base_mismatch": [
+        {
+          "k": {
+            "livestock_production_type": "High-Productivity",
+            "manure_management_type": "Burned For Fuel",
+            "livestock_category_type": "Growing Swine",
+            "ipcc_region": "South Asia"
+          },
+          "pk": 9813,
+          "f": [
+            [
+              "value",
+              2.0,
+              0.0
+            ]
+          ]
+        }
+      ],
       "groups": [
         "value"
       ]
@@ -6714,6 +5478,870 @@
               64.5
             ]
           ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Llamas And Alpacas",
+            "livestock_production_type": "Default",
+            "climate": "Tropical",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 136117,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Llamas And Alpacas",
+            "livestock_production_type": "Default",
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 136103,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Llamas And Alpacas",
+            "livestock_production_type": "Default",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 136047,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Llamas And Alpacas",
+            "livestock_production_type": "Default",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 136005,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Camels",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 132225,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Camels",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 132239,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Camels",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 132253,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Camels",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 132267,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Camels",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 132281,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 128991,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129005,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129019,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Boreal",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129033,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129047,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129061,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical Montane",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129075,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Wet",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129089,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129103,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129117,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129131,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129145,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129159,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129173,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129187,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129201,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical Montane",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129215,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical",
+            "moisture": "Wet",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129229,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129243,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Dairy Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129257,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129271,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129285,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129299,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Boreal",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129313,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129327,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129341,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical Montane",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129355,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Wet",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129369,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129383,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "High-Productivity",
+            "climate": "Tropical",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129397,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129411,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129425,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129439,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Boreal",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129453,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129467,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129481,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical Montane",
+            "moisture": "Dry",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129495,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical",
+            "moisture": "Wet",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129509,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
+        },
+        {
+          "k": {
+            "emission_type": "EmissionType object (2)",
+            "livestock_category_type": "Other Cattle",
+            "livestock_production_type": "Low-Productivity",
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "manure_management_type": "Burned For Fuel"
+          },
+          "pk": 129523,
+          "f": [
+            [
+              "value",
+              0.0,
+              null
+            ]
+          ]
         }
       ],
       "unmatched": [
@@ -8955,1622 +8583,11 @@
       ]
     },
     "ipcc.soilorganiccarbon.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "soil_type": "Low Activity Clay"
-          }
-        }
-      ],
       "groups": [
         "value"
       ]
     },
     "ipcc.totalbiomassafterdefo_from_agb_bgb.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South-Eastern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Southern Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Western Asia",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Europe",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Oceania",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "North America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "South America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Central America",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "continent": "Caribbean",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Eastern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Central Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Northern Africa",
-            "land_use_type": "Settlement"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Other Land (Non-Vegetated)"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "continent": "Southern Africa",
-            "land_use_type": "Settlement"
-          }
-        }
-      ],
       "base_mismatch": [
         {
           "k": {
@@ -10579,7 +8596,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Tea"
           },
-          "pk": 30361,
+          "pk": 42985,
           "f": [
             [
               "value",
@@ -10595,7 +8612,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32685,
+          "pk": 45423,
           "f": [
             [
               "value",
@@ -10611,7 +8628,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32686,
+          "pk": 45424,
           "f": [
             [
               "value",
@@ -10627,7 +8644,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32687,
+          "pk": 45425,
           "f": [
             [
               "value",
@@ -10643,7 +8660,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32688,
+          "pk": 45426,
           "f": [
             [
               "value",
@@ -10659,7 +8676,7 @@
             "continent": "Central Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32721,
+          "pk": 45461,
           "f": [
             [
               "value",
@@ -10675,7 +8692,7 @@
             "continent": "Central Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32722,
+          "pk": 45462,
           "f": [
             [
               "value",
@@ -10691,7 +8708,7 @@
             "continent": "Central Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32723,
+          "pk": 45463,
           "f": [
             [
               "value",
@@ -10707,7 +8724,7 @@
             "continent": "Central Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32724,
+          "pk": 45464,
           "f": [
             [
               "value",
@@ -10723,7 +8740,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32757,
+          "pk": 45499,
           "f": [
             [
               "value",
@@ -10739,7 +8756,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32758,
+          "pk": 45500,
           "f": [
             [
               "value",
@@ -10755,7 +8772,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32759,
+          "pk": 45501,
           "f": [
             [
               "value",
@@ -10771,7 +8788,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32760,
+          "pk": 45502,
           "f": [
             [
               "value",
@@ -10787,7 +8804,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32793,
+          "pk": 45537,
           "f": [
             [
               "value",
@@ -10803,7 +8820,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32794,
+          "pk": 45538,
           "f": [
             [
               "value",
@@ -10819,7 +8836,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32795,
+          "pk": 45539,
           "f": [
             [
               "value",
@@ -10835,7 +8852,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32796,
+          "pk": 45540,
           "f": [
             [
               "value",
@@ -10851,7 +8868,7 @@
             "continent": "Western Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32829,
+          "pk": 45575,
           "f": [
             [
               "value",
@@ -10867,7 +8884,7 @@
             "continent": "Western Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32830,
+          "pk": 45576,
           "f": [
             [
               "value",
@@ -10883,7 +8900,7 @@
             "continent": "Western Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32831,
+          "pk": 45577,
           "f": [
             [
               "value",
@@ -10899,7 +8916,7 @@
             "continent": "Western Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32832,
+          "pk": 45578,
           "f": [
             [
               "value",
@@ -10915,7 +8932,7 @@
             "continent": "Central Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32865,
+          "pk": 45613,
           "f": [
             [
               "value",
@@ -10931,7 +8948,7 @@
             "continent": "Central Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32866,
+          "pk": 45614,
           "f": [
             [
               "value",
@@ -10947,7 +8964,7 @@
             "continent": "Central Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32867,
+          "pk": 45615,
           "f": [
             [
               "value",
@@ -10963,7 +8980,7 @@
             "continent": "Central Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32868,
+          "pk": 45616,
           "f": [
             [
               "value",
@@ -10979,7 +8996,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32901,
+          "pk": 45651,
           "f": [
             [
               "value",
@@ -10995,7 +9012,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32902,
+          "pk": 45652,
           "f": [
             [
               "value",
@@ -11011,7 +9028,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32903,
+          "pk": 45653,
           "f": [
             [
               "value",
@@ -11027,7 +9044,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32904,
+          "pk": 45654,
           "f": [
             [
               "value",
@@ -11043,7 +9060,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32937,
+          "pk": 45689,
           "f": [
             [
               "value",
@@ -11059,7 +9076,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32938,
+          "pk": 45690,
           "f": [
             [
               "value",
@@ -11075,7 +9092,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32939,
+          "pk": 45691,
           "f": [
             [
               "value",
@@ -11091,7 +9108,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32940,
+          "pk": 45692,
           "f": [
             [
               "value",
@@ -11107,7 +9124,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 32973,
+          "pk": 45727,
           "f": [
             [
               "value",
@@ -11123,7 +9140,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 32974,
+          "pk": 45728,
           "f": [
             [
               "value",
@@ -11139,7 +9156,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 32975,
+          "pk": 45729,
           "f": [
             [
               "value",
@@ -11155,7 +9172,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 32976,
+          "pk": 45730,
           "f": [
             [
               "value",
@@ -11171,7 +9188,7 @@
             "continent": "Western Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33009,
+          "pk": 45765,
           "f": [
             [
               "value",
@@ -11187,7 +9204,7 @@
             "continent": "Western Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33010,
+          "pk": 45766,
           "f": [
             [
               "value",
@@ -11203,7 +9220,7 @@
             "continent": "Western Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33011,
+          "pk": 45767,
           "f": [
             [
               "value",
@@ -11219,7 +9236,7 @@
             "continent": "Western Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33012,
+          "pk": 45768,
           "f": [
             [
               "value",
@@ -11235,7 +9252,7 @@
             "continent": "Europe",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33045,
+          "pk": 45803,
           "f": [
             [
               "value",
@@ -11251,7 +9268,7 @@
             "continent": "Europe",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33046,
+          "pk": 45804,
           "f": [
             [
               "value",
@@ -11267,7 +9284,7 @@
             "continent": "Europe",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33047,
+          "pk": 45805,
           "f": [
             [
               "value",
@@ -11283,7 +9300,7 @@
             "continent": "Europe",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33048,
+          "pk": 45806,
           "f": [
             [
               "value",
@@ -11299,7 +9316,7 @@
             "continent": "Oceania",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33081,
+          "pk": 45841,
           "f": [
             [
               "value",
@@ -11315,7 +9332,7 @@
             "continent": "Oceania",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33082,
+          "pk": 45842,
           "f": [
             [
               "value",
@@ -11331,7 +9348,7 @@
             "continent": "Oceania",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33083,
+          "pk": 45843,
           "f": [
             [
               "value",
@@ -11347,7 +9364,7 @@
             "continent": "Oceania",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33084,
+          "pk": 45844,
           "f": [
             [
               "value",
@@ -11363,7 +9380,7 @@
             "continent": "North America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33117,
+          "pk": 45879,
           "f": [
             [
               "value",
@@ -11379,7 +9396,7 @@
             "continent": "North America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33118,
+          "pk": 45880,
           "f": [
             [
               "value",
@@ -11395,7 +9412,7 @@
             "continent": "North America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33119,
+          "pk": 45881,
           "f": [
             [
               "value",
@@ -11411,7 +9428,7 @@
             "continent": "North America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33120,
+          "pk": 45882,
           "f": [
             [
               "value",
@@ -11427,7 +9444,7 @@
             "continent": "South America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33153,
+          "pk": 45917,
           "f": [
             [
               "value",
@@ -11443,7 +9460,7 @@
             "continent": "South America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33154,
+          "pk": 45918,
           "f": [
             [
               "value",
@@ -11459,7 +9476,7 @@
             "continent": "South America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33155,
+          "pk": 45919,
           "f": [
             [
               "value",
@@ -11475,7 +9492,7 @@
             "continent": "South America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33156,
+          "pk": 45920,
           "f": [
             [
               "value",
@@ -11491,7 +9508,7 @@
             "continent": "Central America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33189,
+          "pk": 45955,
           "f": [
             [
               "value",
@@ -11507,7 +9524,7 @@
             "continent": "Central America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33190,
+          "pk": 45956,
           "f": [
             [
               "value",
@@ -11523,7 +9540,7 @@
             "continent": "Central America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33191,
+          "pk": 45957,
           "f": [
             [
               "value",
@@ -11539,7 +9556,7 @@
             "continent": "Central America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33192,
+          "pk": 45958,
           "f": [
             [
               "value",
@@ -11555,7 +9572,7 @@
             "continent": "Caribbean",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 33225,
+          "pk": 45993,
           "f": [
             [
               "value",
@@ -11571,7 +9588,7 @@
             "continent": "Caribbean",
             "land_use_type": "Hedgerow"
           },
-          "pk": 33226,
+          "pk": 45994,
           "f": [
             [
               "value",
@@ -11587,7 +9604,7 @@
             "continent": "Caribbean",
             "land_use_type": "Silvoarable"
           },
-          "pk": 33227,
+          "pk": 45995,
           "f": [
             [
               "value",
@@ -11603,7 +9620,7 @@
             "continent": "Caribbean",
             "land_use_type": "Silvopasture"
           },
-          "pk": 33228,
+          "pk": 45996,
           "f": [
             [
               "value",
@@ -11624,14 +9641,18 @@
       ]
     },
     "IrrigationPhaseData.csv": {
-      "unmatched": [
+      "unresolved_fk": [
         {
           "k": {
             "fuel_type": "Motor Gasoline"
-          }
-        }
-      ],
-      "unresolved_fk": [
+          },
+          "bad": [
+            [
+              "fuel_type",
+              "Motor Gasoline"
+            ]
+          ]
+        },
         {
           "k": {
             "fuel_type": "Gasoil /Diesel Oil"
@@ -11651,6 +9672,28 @@
             [
               "fuel_type",
               "Waste Oil / Lubrificants"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Lpg"
+          },
+          "bad": [
+            [
+              "fuel_type",
+              "Lpg"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "fuel_type": "Natural Gas"
+          },
+          "bad": [
+            [
+              "fuel_type",
+              "Natural Gas"
             ]
           ]
         },
@@ -11718,12 +9761,38 @@
           "k": {
             "climate": "Boreal",
             "moisture": "Dry",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Boreal",
+            "moisture": "Dry",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Boreal",
+            "moisture": "Moist",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },
@@ -11744,12 +9813,38 @@
           "k": {
             "climate": "Cool Temperate",
             "moisture": "Dry",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Cool Temperate",
+            "moisture": "Dry",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Cool Temperate",
+            "moisture": "Moist",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },
@@ -11770,12 +9865,38 @@
           "k": {
             "climate": "Tropical",
             "moisture": "Dry",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical",
+            "moisture": "Dry",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical",
+            "moisture": "Moist",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },
@@ -11796,12 +9917,38 @@
           "k": {
             "climate": "Tropical",
             "moisture": "Wet",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical",
+            "moisture": "Wet",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical Montane",
+            "moisture": "Dry",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },
@@ -11822,12 +9969,38 @@
           "k": {
             "climate": "Tropical Montane",
             "moisture": "Moist",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical Montane",
+            "moisture": "Moist",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Tropical Montane",
+            "moisture": "Wet",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },
@@ -11848,12 +10021,38 @@
           "k": {
             "climate": "Warm Temperate",
             "moisture": "Dry",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Warm Temperate",
+            "moisture": "Dry",
             "land_use_type": "Degraded Land"
           },
           "bad": [
             [
               "land_use_type",
               "Degraded Land"
+            ]
+          ]
+        },
+        {
+          "k": {
+            "climate": "Warm Temperate",
+            "moisture": "Moist",
+            "land_use_type": "Annual Fallow"
+          },
+          "bad": [
+            [
+              "land_use_type",
+              "Annual Fallow"
             ]
           ]
         },

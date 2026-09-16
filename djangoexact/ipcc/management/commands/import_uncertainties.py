@@ -77,6 +77,7 @@ REPORT_COUNT_KEYS = (
     "csv_rows", "fixture_rows", "matched_unique", "written", "carrying_bound",
     "unmatched", "unresolved_fk", "ambiguous", "conflict", "base_mismatch",
 )
+SKIPPED_ROW_KEYS = ("unmatched", "unresolved_fk", "ambiguous", "conflict", "base_mismatch")
 
 # Per bucket, per table. Skipped rows total ~1200 today; the cap only bounds a
 # future drop that goes badly wrong, so --detail can never blow up in memory.
@@ -217,7 +218,10 @@ def build_fk_lookup(related_spec, fixture_cache):
         if name_field is not None:
             display = row["fields"].get(name_field)
             if display is not None:
-                by_name[str(display).strip().lower()] = row["pk"]
+                key = str(display).strip().lower()
+                # A name two rows share can't pick one of them; leaving it unresolved beats
+                # letting row order decide (FuelType has two "Motor Gasoline" rows).
+                by_name[key] = None if key in by_name else row["pk"]
     return by_name, pk_set
 
 
@@ -359,7 +363,14 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache, detail=
                 if base_val is not None:
                     row_base_values[model_field] = base_val
                 fixture_val = fixture_fields.get(model_field)
-                if base_val is not None and isinstance(fixture_val, (int, float)) and not isinstance(fixture_val, bool):
+                if base_val is None:
+                    pass
+                elif fixture_val is None:
+                    # The CSV bounds a value this row doesn't have; a bound beside an empty
+                    # base value would describe a number nobody can see.
+                    mismatch = True
+                    mismatched_fields.append([model_field, base_val, None])
+                elif isinstance(fixture_val, (int, float)) and not isinstance(fixture_val, bool):
                     if not math.isclose(base_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9):
                         mismatch = True
                         mismatched_fields.append([model_field, base_val, fixture_val])
@@ -441,11 +452,20 @@ def iter_mapped_columns():
                 yield spec, model, f"{model_field}_max"
 
 
+def is_publishable(table):
+    """Bounds ship per table, all or nothing: one skipped row holds the whole table back
+    until its data is fixed, so no table is published with partial coverage."""
+    return table["carrying_bound"] > 0 and not any(table[k] for k in SKIPPED_ROW_KEYS)
+
+
 def compute_all(csv_paths, fixture_cache=None, details=None):
     """Runs the full join across the given CSVs. Returns (tables, results) where
-    results is fixture_file -> (spec, patches, groups, base_values). Writes nothing --
-    the whole point is to let the writer fail loudly before touching a single file
-    (CONTEXT)."""
+    results is fixture_file -> (spec, patches, groups, base_values), and patches is
+    empty for every table that isn't publishable. Writes nothing -- the whole point is
+    to let the writer fail loudly before touching a single file (CONTEXT).
+
+    `fixture_cache` (fixture file -> rows in fixture shape) is the join's only data
+    source for any file it holds; `apply_uncertainty_ranges` fills it from a database."""
     manifest_by_fixture = {spec.fixture_file: spec for spec in MANIFEST}
     manifest_by_model = {spec.model.lower(): spec for spec in MANIFEST}
     if fixture_cache is None:
@@ -466,8 +486,9 @@ def compute_all(csv_paths, fixture_cache=None, details=None):
         if details is not None:
             detail["groups"] = sorted(groups)
             details[csv_path.name] = detail
+        table["published"] = is_publishable(table)
         tables.append(table)
-        results[spec.fixture_file] = (spec, patches, groups, base_values)
+        results[spec.fixture_file] = (spec, patches if table["published"] else {}, groups, base_values)
     return tables, results
 
 
@@ -575,13 +596,13 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"wrote {len(new_payloads)} fixtures + combined."))
 
     def _print_report(self, tables, totals):
-        header = f"{'model':<45}{'groups':>7}{'cols':>6}{'rows':>8}{'written':>9}{'unmatch':>9}{'unres_fk':>9}{'ambig':>7}{'conflict':>9}{'basemis':>9}"
+        header = f"{'model':<45}{'groups':>7}{'cols':>6}{'rows':>8}{'written':>9}{'unmatch':>9}{'unres_fk':>9}{'ambig':>7}{'conflict':>9}{'basemis':>9}{'bound':>8}  published"
         self.stdout.write(header)
         for t in tables:
             self.stdout.write(
                 f"{t['model']:<45}{t['ranged_groups']:>7}{t['new_columns']:>6}{t['csv_rows']:>8}"
                 f"{t['written']:>9}{t['unmatched']:>9}{t['unresolved_fk']:>9}{t['ambiguous']:>7}"
-                f"{t['conflict']:>9}{t['base_mismatch']:>9}"
+                f"{t['conflict']:>9}{t['base_mismatch']:>9}{t['carrying_bound']:>8}  {'yes' if t['published'] else '-'}"
             )
         self.stdout.write(
             f"{'TOTAL':<45}{totals['ranged_groups']:>7}{totals['new_columns']:>6}{totals['csv_rows']:>8}"
