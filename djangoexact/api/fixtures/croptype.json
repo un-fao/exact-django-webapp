@@ -7,7 +7,7 @@
       "name_en": "Agroforestry - default",
       "name_fr": "Agroforesterie - défaut\n",
       "name_es": "Agroforestería - Por Defecto",
-      "name_ru": "Агролесомелиорация - по умолчанию",
+      "name_ru": "Агролесоводство - по умолчанию",
       "description": "",
       "is_main_crop": false,
       "is_agrofoforestry": true
@@ -49,7 +49,7 @@
       "name_en": "Alley cropping",
       "name_fr": "Cultures en allées\n",
       "name_es": "Cultivos en fajas",
-      "name_ru": "Междурядные культуры",
+      "name_ru": "Полосное агролесоводство",
       "description": "",
       "is_main_crop": false,
       "is_agrofoforestry": true
@@ -427,7 +427,7 @@
       "name_en": "Perennial fallow",
       "name_fr": "Jachère pérenne\n",
       "name_es": "Barbecho mejorado",
-      "name_ru": "Многолетний пар",
+      "name_ru": "Многолетний залеж",
       "description": "",
       "is_main_crop": false,
       "is_agrofoforestry": false

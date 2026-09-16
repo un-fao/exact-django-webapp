@@ -37,7 +37,7 @@
       "name_en": "Annual Cropland Minor Season",
       "name_fr": "Cultures annuelles Saison mineure",
       "name_es": "Estación secundaria de cultivos anuales",
-      "name_ru": "Однолетние культуры вторичного сезона",
+      "name_ru": "Однолетние посевы вторичного сезона",
       "class_name": "MinorSeasonAnnualCropland",
       "is_luc": false,
       "is_submodule": true,
@@ -52,7 +52,7 @@
       "name_en": "Aquaculture",
       "name_fr": "Aquaculture",
       "name_es": "Acuicultura",
-      "name_ru": "Аквакультурные пруды",
+      "name_ru": "Аквакультура",
       "class_name": "Aquaculture",
       "is_luc": false,
       "is_submodule": false,
@@ -232,7 +232,7 @@
       "name_en": "Input",
       "name_fr": "Intrant",
       "name_es": "Insumo",
-      "name_ru": "Поступления",
+      "name_ru": "входные ресурсы",
       "class_name": "Input",
       "is_luc": false,
       "is_submodule": false,
@@ -247,7 +247,7 @@
       "name_en": "Input Entry",
       "name_fr": "Saisie de données sur Intrants\n",
       "name_es": "Entrada de Insumos",
-      "name_ru": "Ввод Поступлений",
+      "name_ru": "Input Entry",
       "class_name": "InputEntry",
       "is_luc": false,
       "is_submodule": true,
@@ -322,7 +322,7 @@
       "name_en": "Livestock",
       "name_fr": "Bétail",
       "name_es": "Ganado",
-      "name_ru": "Животноводство",
+      "name_ru": "Домашний скот",
       "class_name": "Livestock",
       "is_luc": false,
       "is_submodule": false,
@@ -337,7 +337,7 @@
       "name_en": "Operation Phase of Irrigation",
       "name_fr": "Phase opérationnelle de l’irrigation\n",
       "name_es": "Fase de Operación del Riego",
-      "name_ru": "Фаза эксплуатации орошения",
+      "name_ru": "Фаза эксплуатации ирригации",
       "class_name": "IrrigationPhase",
       "is_luc": false,
       "is_submodule": true,
@@ -406,12 +406,12 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 57,
+    "pk": 56,
     "fields": {
       "name": "Packaging",
       "name_en": "Packaging",
       "name_fr": "Emballage",
-      "name_es": null,
+      "name_es": "Embalaje",
       "name_ru": null,
       "class_name": "Packaging",
       "is_luc": false,
@@ -421,7 +421,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 62,
+    "pk": 60,
     "fields": {
       "name": "Packaging Entry",
       "name_en": "Packaging Entry",
@@ -457,7 +457,7 @@
       "name_en": "Perennial Cropland Minor Season",
       "name_fr": "Cultures pérennes Saison mineure\n",
       "name_es": "Estación secundaria de Cultivo perenne",
-      "name_ru": "Многолетние культуры, малый сезон",
+      "name_ru": "Многолетние сельскохозяйственные угодья, не основной сезон",
       "class_name": "MinorSeasonPerennialCropland",
       "is_luc": false,
       "is_submodule": true,
@@ -481,12 +481,12 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 56,
+    "pk": 58,
     "fields": {
       "name": "Processing",
       "name_en": "Processing",
       "name_fr": "Transformation",
-      "name_es": null,
+      "name_es": "Processing",
       "name_ru": null,
       "class_name": "Processing",
       "is_luc": false,
@@ -496,7 +496,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 59,
+    "pk": 61,
     "fields": {
       "name": "Processing Entry",
       "name_en": "Processing Entry",
@@ -586,12 +586,12 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 55,
+    "pk": 57,
     "fields": {
       "name": "Storage",
       "name_en": "Storage",
       "name_fr": "Stockage",
-      "name_es": null,
+      "name_es": "Almacenamiento",
       "name_ru": null,
       "class_name": "Storage",
       "is_luc": false,
@@ -601,7 +601,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 61,
+    "pk": 62,
     "fields": {
       "name": "Storage Entry",
       "name_en": "Storage Entry",
@@ -616,12 +616,12 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 58,
+    "pk": 55,
     "fields": {
       "name": "Transport",
       "name_en": "Transport",
       "name_fr": "Transport",
-      "name_es": null,
+      "name_es": "Transporte",
       "name_ru": null,
       "class_name": "Transport",
       "is_luc": false,
@@ -631,7 +631,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 60,
+    "pk": 59,
     "fields": {
       "name": "Transport Entry",
       "name_en": "Transport Entry",

@@ -7,7 +7,7 @@
       "name_en": "High C input, no manure",
       "name_fr": "Apport élevé de C, sans fumier (entrées élevées)\n",
       "name_es": "Aporte alto de carbono,  sin estiércol",
-      "name_ru": "Высокий уровень поступления С, без навоза",
+      "name_ru": "Высокое содержание углерода, без навоза",
       "is_active": true
     }
   },
@@ -19,7 +19,7 @@
       "name_en": "High C input, with manure",
       "name_fr": "Apport élevé de C, avec fumier (entrées élevées avec fumier)\n",
       "name_es": "Aporte alto de carbono,  con estiércol",
-      "name_ru": "Высокий уровень поступления С, с навозом",
+      "name_ru": "Высокое содержание углерода, с навозом",
       "is_active": true
     }
   },
@@ -31,7 +31,7 @@
       "name_en": "Low C input",
       "name_fr": "Faible apport de C (à faible entrées)\n",
       "name_es": "Aporte bajo de carbono",
-      "name_ru": "Низкий уротупления С",
+      "name_ru": "Низкий углеродный ввод",
       "is_active": true
     }
   },
@@ -43,7 +43,7 @@
       "name_en": "Medium C input",
       "name_fr": "Apport moyen de C (entrées moyennes)\n",
       "name_es": "Aporte medio de carbono",
-      "name_ru": "Средний уровень поступления С",
+      "name_ru": "Средний углеродный ввод",
       "is_active": true
     }
   }

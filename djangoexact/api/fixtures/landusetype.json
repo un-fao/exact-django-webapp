@@ -35,7 +35,7 @@
       "name_en": "Agroforestry - Default",
       "name_fr": "Agroforesterie - défaut\n",
       "name_es": "Agroforestería - Por defecto",
-      "name_ru": "Агролесомелиорация - по умолчанию",
+      "name_ru": "Агролесоводство - по умолчанию",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -63,7 +63,7 @@
       "name_en": "Alley Cropping",
       "name_fr": "Cultures en allées\n",
       "name_es": "Cultivos en Fajas",
-      "name_ru": "Междурядные Культуры",
+      "name_ru": "Полосное земледелие",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -144,34 +144,7 @@
       "name_en": "Annual Cropland",
       "name_fr": "Cultures annuelles",
       "name_es": "Cultivos Anuales",
-      "name_ru": "Однолетние культуры",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        40
-      ],
-      "climates": [
-        1,
-        2,
-        3,
-        4
-      ],
-      "moistures": [
-        1,
-        2,
-        4
-      ]
-    }
-  },
-  {
-    "model": "api.landusetype",
-    "pk": 2,
-    "fields": {
-      "name": "Annual Fallow",
-      "name_en": "Annual Fallow",
-      "name_fr": "Jachère annuelle\n",
-      "name_es": "Barbecho Anual",
-      "name_ru": "Однолетний пар",
+      "name_ru": "Однолетние посевы",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -1661,6 +1634,25 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 29,
+    "fields": {
+      "name": "Generic Value",
+      "name_en": "Generic Value",
+      "name_fr": "Valeur générique\n",
+      "name_es": "Valor genérico",
+      "name_ru": "Общая ценность",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        4,
+        5
+      ],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 221,
     "fields": {
       "name": "Ginger, raw",
@@ -2350,7 +2342,7 @@
       "name_en": "﻿Long-Term Cultivated",
       "name_fr": "Cultivé à long terme\n",
       "name_es": "Cultivado a largo plazo",
-      "name_ru": "Долговременно культивируемый",
+      "name_ru": "Долгосрочно культивируемый",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
@@ -2366,7 +2358,7 @@
       "name_en": "Long-Term Cultivated",
       "name_fr": "Cultivé à long terme\n",
       "name_es": "Cultivado a largo plazo",
-      "name_ru": "Долговременно культивируемый",
+      "name_ru": "Долгосрочно культивируемый",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
@@ -2621,7 +2613,7 @@
       "name_en": "Moist Deciduous Forest",
       "name_fr": "Forêt décidue tropicale humide\n",
       "name_es": "Bosque húmedo de hojas caducas",
-      "name_ru": "Лиственный лес, увлажненный",
+      "name_ru": "Влажный лиственный лес",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -2645,7 +2637,7 @@
       "name_en": "Mountain System",
       "name_fr": "Système montagneux\n",
       "name_es": "Sistemas montañosos",
-      "name_ru": "Горная система",
+      "name_ru": "Mountain System",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -2672,7 +2664,7 @@
       "name_en": "Multistrata",
       "name_fr": "Multi-strates\n",
       "name_es": "Sistemas de cultivos a diversos niveles",
-      "name_ru": "Многоярусный",
+      "name_ru": "Multistrata",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -2753,7 +2745,7 @@
       "name_en": "N-Fixing Forages",
       "name_fr": "Fourrages fixateurs d’azote\n",
       "name_es": "Forrajes fijadores de N",
-      "name_ru": "N-фиксирующие корма",
+      "name_ru": "Азотфиксирующие корма",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
@@ -2785,7 +2777,7 @@
       "name_en": "Non-N-Fixing Forages",
       "name_fr": "Fourrages non fixateurs d’azote\n",
       "name_es": "Forrajes no fijadores de N",
-      "name_ru": "Не N-фиксирующие корма",
+      "name_ru": "Неазотфиксирующие корма",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
@@ -2881,7 +2873,7 @@
       "name_en": "Oil Palm",
       "name_fr": "Palmier à huile\n",
       "name_es": "Palma Aceitera",
-      "name_ru": "Масличная Пальма",
+      "name_ru": "Масличная пальма",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3100,7 +3092,7 @@
       "name_en": "Orchard",
       "name_fr": "Verger",
       "name_es": "Huerta",
-      "name_ru": "Фруктовый сад",
+      "name_ru": "Плодовый сад",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3209,7 +3201,7 @@
       "name_en": "Other Land",
       "name_fr": "Autres terres\n",
       "name_es": "Otras tierras",
-      "name_ru": "Прочее землепользования",
+      "name_ru": "Прочая земля",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3236,7 +3228,7 @@
       "name_en": "Other Land (Non-Vegetated)",
       "name_fr": "Autres terres (non végétalisées)\n",
       "name_es": "Otras Tierras (Sin Vegetación)",
-      "name_ru": "Прочее землепользования (не покрытая растительностью)",
+      "name_ru": "Прочая земля (не покрытая растительностью)",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3512,7 +3504,7 @@
       "name_en": "Perennial Cropland",
       "name_fr": "Cultures pérennes\n",
       "name_es": "Cultivos perennes",
-      "name_ru": "Многолетние культуры",
+      "name_ru": "Многолетние сельскохозяйственные угодья",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3539,7 +3531,7 @@
       "name_en": "Perennial Fallow",
       "name_fr": "Jachère pérenne\n",
       "name_es": "Barbecho Mejorado",
-      "name_ru": "Многолетний Пар",
+      "name_ru": "Многолетний залеж",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -3961,7 +3953,7 @@
       "name_en": "Rainforest",
       "name_fr": "Forêt dense tropicale\n",
       "name_es": "Bosque lluvioso",
-      "name_ru": "Дождевой лес",
+      "name_ru": "Тропический лес",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -5581,7 +5573,7 @@
       "name_en": "Winter Wheat",
       "name_fr": "Blé d'hiver\n",
       "name_es": "Trigo de Invierno",
-      "name_ru": "Озимая пшеница ",
+      "name_ru": "Озимая пшеница",
       "forest_type": null,
       "is_active": true,
       "module_types": [],

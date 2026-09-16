@@ -25,22 +25,6 @@
   },
   {
     "model": "api.fundingagency",
-    "pk": 12,
-    "fields": {
-      "name": "ebrd",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.fundingagency",
-    "pk": 15,
-    "fields": {
-      "name": "EPJ Soil",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.fundingagency",
     "pk": 8,
     "fields": {
       "name": "FAO",
@@ -89,33 +73,9 @@
   },
   {
     "model": "api.fundingagency",
-    "pk": 13,
-    "fields": {
-      "name": "JICA",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.fundingagency",
-    "pk": 14,
-    "fields": {
-      "name": "test",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.fundingagency",
     "pk": 1,
     "fields": {
       "name": "Test funding Agency",
-      "abbreviation": null
-    }
-  },
-  {
-    "model": "api.fundingagency",
-    "pk": 16,
-    "fields": {
-      "name": "USAID",
       "abbreviation": null
     }
   },

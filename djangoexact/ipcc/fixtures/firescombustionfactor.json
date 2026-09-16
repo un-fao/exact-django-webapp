@@ -473,7 +473,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 187,
     "fields": {
-      "land_use_type": 188,
+      "land_use_type": 189,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -483,7 +483,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 188,
     "fields": {
-      "land_use_type": 189,
+      "land_use_type": 190,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -493,7 +493,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 189,
     "fields": {
-      "land_use_type": 190,
+      "land_use_type": 191,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -503,7 +503,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 190,
     "fields": {
-      "land_use_type": 191,
+      "land_use_type": 192,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -513,7 +513,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 191,
     "fields": {
-      "land_use_type": 192,
+      "land_use_type": 193,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -523,7 +523,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 192,
     "fields": {
-      "land_use_type": 193,
+      "land_use_type": 194,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -533,7 +533,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 193,
     "fields": {
-      "land_use_type": 194,
+      "land_use_type": 195,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -543,7 +543,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 194,
     "fields": {
-      "land_use_type": 195,
+      "land_use_type": 196,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -553,7 +553,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 195,
     "fields": {
-      "land_use_type": 196,
+      "land_use_type": 197,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -563,7 +563,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 196,
     "fields": {
-      "land_use_type": 197,
+      "land_use_type": 198,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -573,7 +573,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 197,
     "fields": {
-      "land_use_type": 198,
+      "land_use_type": 199,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -583,7 +583,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 198,
     "fields": {
-      "land_use_type": 199,
+      "land_use_type": 200,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -593,7 +593,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 199,
     "fields": {
-      "land_use_type": 200,
+      "land_use_type": 201,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -603,7 +603,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 200,
     "fields": {
-      "land_use_type": 201,
+      "land_use_type": 202,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -613,7 +613,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 201,
     "fields": {
-      "land_use_type": 202,
+      "land_use_type": 203,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -623,7 +623,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 202,
     "fields": {
-      "land_use_type": 203,
+      "land_use_type": 204,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -633,7 +633,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 203,
     "fields": {
-      "land_use_type": 204,
+      "land_use_type": 205,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -643,7 +643,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 204,
     "fields": {
-      "land_use_type": 205,
+      "land_use_type": 206,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -653,7 +653,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 205,
     "fields": {
-      "land_use_type": 206,
+      "land_use_type": 207,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -663,7 +663,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 206,
     "fields": {
-      "land_use_type": 207,
+      "land_use_type": 208,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -673,7 +673,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 207,
     "fields": {
-      "land_use_type": 208,
+      "land_use_type": 209,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -683,7 +683,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 208,
     "fields": {
-      "land_use_type": 209,
+      "land_use_type": 210,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -693,7 +693,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 209,
     "fields": {
-      "land_use_type": 210,
+      "land_use_type": 211,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -703,7 +703,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 210,
     "fields": {
-      "land_use_type": 211,
+      "land_use_type": 212,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -713,7 +713,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 211,
     "fields": {
-      "land_use_type": 212,
+      "land_use_type": 213,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -723,7 +723,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 212,
     "fields": {
-      "land_use_type": 213,
+      "land_use_type": 214,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -733,7 +733,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 213,
     "fields": {
-      "land_use_type": 214,
+      "land_use_type": 215,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -743,7 +743,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 214,
     "fields": {
-      "land_use_type": 215,
+      "land_use_type": 216,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -753,7 +753,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 215,
     "fields": {
-      "land_use_type": 216,
+      "land_use_type": 217,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -763,7 +763,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 216,
     "fields": {
-      "land_use_type": 217,
+      "land_use_type": 218,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -773,7 +773,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 217,
     "fields": {
-      "land_use_type": 218,
+      "land_use_type": 219,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -783,7 +783,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 218,
     "fields": {
-      "land_use_type": 219,
+      "land_use_type": 220,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -793,7 +793,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 219,
     "fields": {
-      "land_use_type": 220,
+      "land_use_type": 221,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -803,7 +803,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 220,
     "fields": {
-      "land_use_type": 221,
+      "land_use_type": 222,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -813,7 +813,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 221,
     "fields": {
-      "land_use_type": 222,
+      "land_use_type": 223,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -823,7 +823,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 222,
     "fields": {
-      "land_use_type": 223,
+      "land_use_type": 224,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -833,7 +833,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 223,
     "fields": {
-      "land_use_type": 224,
+      "land_use_type": 225,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -843,7 +843,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 224,
     "fields": {
-      "land_use_type": 225,
+      "land_use_type": 226,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -853,7 +853,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 225,
     "fields": {
-      "land_use_type": 226,
+      "land_use_type": 227,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -863,7 +863,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 226,
     "fields": {
-      "land_use_type": 227,
+      "land_use_type": 228,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -873,7 +873,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 227,
     "fields": {
-      "land_use_type": 228,
+      "land_use_type": 229,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -883,7 +883,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 228,
     "fields": {
-      "land_use_type": 229,
+      "land_use_type": 230,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -893,7 +893,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 229,
     "fields": {
-      "land_use_type": 230,
+      "land_use_type": 231,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -903,7 +903,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 230,
     "fields": {
-      "land_use_type": 231,
+      "land_use_type": 232,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -913,7 +913,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 231,
     "fields": {
-      "land_use_type": 232,
+      "land_use_type": 233,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -923,7 +923,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 232,
     "fields": {
-      "land_use_type": 233,
+      "land_use_type": 234,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -933,7 +933,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 233,
     "fields": {
-      "land_use_type": 234,
+      "land_use_type": 235,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -943,7 +943,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 234,
     "fields": {
-      "land_use_type": 235,
+      "land_use_type": 236,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -953,7 +953,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 235,
     "fields": {
-      "land_use_type": 236,
+      "land_use_type": 237,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -963,7 +963,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 236,
     "fields": {
-      "land_use_type": 237,
+      "land_use_type": 238,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -973,7 +973,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 237,
     "fields": {
-      "land_use_type": 238,
+      "land_use_type": 239,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -983,7 +983,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 238,
     "fields": {
-      "land_use_type": 239,
+      "land_use_type": 240,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -993,7 +993,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 239,
     "fields": {
-      "land_use_type": 240,
+      "land_use_type": 242,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1003,7 +1003,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 240,
     "fields": {
-      "land_use_type": 241,
+      "land_use_type": 243,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1013,7 +1013,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 241,
     "fields": {
-      "land_use_type": 242,
+      "land_use_type": 244,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1023,7 +1023,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 242,
     "fields": {
-      "land_use_type": 243,
+      "land_use_type": 245,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1033,7 +1033,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 243,
     "fields": {
-      "land_use_type": 244,
+      "land_use_type": 246,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1043,7 +1043,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 244,
     "fields": {
-      "land_use_type": 245,
+      "land_use_type": 247,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1053,7 +1053,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 245,
     "fields": {
-      "land_use_type": 246,
+      "land_use_type": 248,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1063,7 +1063,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 246,
     "fields": {
-      "land_use_type": 247,
+      "land_use_type": 249,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1073,7 +1073,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 247,
     "fields": {
-      "land_use_type": 248,
+      "land_use_type": 250,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1083,7 +1083,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 248,
     "fields": {
-      "land_use_type": 249,
+      "land_use_type": 251,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1093,7 +1093,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 249,
     "fields": {
-      "land_use_type": 250,
+      "land_use_type": 252,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1103,7 +1103,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 250,
     "fields": {
-      "land_use_type": 251,
+      "land_use_type": 253,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1113,7 +1113,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 251,
     "fields": {
-      "land_use_type": 252,
+      "land_use_type": 254,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1123,7 +1123,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 252,
     "fields": {
-      "land_use_type": 253,
+      "land_use_type": 255,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1133,7 +1133,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 253,
     "fields": {
-      "land_use_type": 254,
+      "land_use_type": 256,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1143,7 +1143,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 254,
     "fields": {
-      "land_use_type": 255,
+      "land_use_type": 257,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1153,7 +1153,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 255,
     "fields": {
-      "land_use_type": 256,
+      "land_use_type": 258,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1163,7 +1163,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 256,
     "fields": {
-      "land_use_type": 257,
+      "land_use_type": 259,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1173,7 +1173,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 257,
     "fields": {
-      "land_use_type": 258,
+      "land_use_type": 260,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1183,7 +1183,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 258,
     "fields": {
-      "land_use_type": 259,
+      "land_use_type": 261,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1193,7 +1193,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 259,
     "fields": {
-      "land_use_type": 260,
+      "land_use_type": 262,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1203,7 +1203,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 260,
     "fields": {
-      "land_use_type": 261,
+      "land_use_type": 263,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1213,7 +1213,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 261,
     "fields": {
-      "land_use_type": 262,
+      "land_use_type": 264,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1223,7 +1223,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 262,
     "fields": {
-      "land_use_type": 263,
+      "land_use_type": 265,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1233,7 +1233,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 263,
     "fields": {
-      "land_use_type": 264,
+      "land_use_type": 266,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1243,7 +1243,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 264,
     "fields": {
-      "land_use_type": 265,
+      "land_use_type": 267,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1253,7 +1253,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 265,
     "fields": {
-      "land_use_type": 266,
+      "land_use_type": 268,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1263,7 +1263,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 266,
     "fields": {
-      "land_use_type": 267,
+      "land_use_type": 269,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1273,7 +1273,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 267,
     "fields": {
-      "land_use_type": 268,
+      "land_use_type": 270,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1283,7 +1283,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 268,
     "fields": {
-      "land_use_type": 269,
+      "land_use_type": 271,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1293,7 +1293,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 269,
     "fields": {
-      "land_use_type": 270,
+      "land_use_type": 272,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1303,7 +1303,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 270,
     "fields": {
-      "land_use_type": 271,
+      "land_use_type": 273,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1313,7 +1313,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 271,
     "fields": {
-      "land_use_type": 272,
+      "land_use_type": 274,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1323,7 +1323,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 272,
     "fields": {
-      "land_use_type": 273,
+      "land_use_type": 275,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1333,7 +1333,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 273,
     "fields": {
-      "land_use_type": 274,
+      "land_use_type": 276,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1343,7 +1343,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 274,
     "fields": {
-      "land_use_type": 275,
+      "land_use_type": 277,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1353,7 +1353,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 275,
     "fields": {
-      "land_use_type": 276,
+      "land_use_type": 278,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1363,7 +1363,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 276,
     "fields": {
-      "land_use_type": 277,
+      "land_use_type": 279,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1373,7 +1373,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 277,
     "fields": {
-      "land_use_type": 278,
+      "land_use_type": 281,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1383,7 +1383,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 278,
     "fields": {
-      "land_use_type": 279,
+      "land_use_type": 282,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1393,7 +1393,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 279,
     "fields": {
-      "land_use_type": 280,
+      "land_use_type": 283,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1403,7 +1403,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 280,
     "fields": {
-      "land_use_type": 281,
+      "land_use_type": 284,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1413,7 +1413,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 281,
     "fields": {
-      "land_use_type": 282,
+      "land_use_type": 285,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1423,7 +1423,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 282,
     "fields": {
-      "land_use_type": 283,
+      "land_use_type": 286,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1433,7 +1433,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 283,
     "fields": {
-      "land_use_type": 284,
+      "land_use_type": 287,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1443,7 +1443,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 284,
     "fields": {
-      "land_use_type": 285,
+      "land_use_type": 288,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1453,7 +1453,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 285,
     "fields": {
-      "land_use_type": 286,
+      "land_use_type": 289,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1463,7 +1463,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 286,
     "fields": {
-      "land_use_type": 287,
+      "land_use_type": 290,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1473,7 +1473,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 287,
     "fields": {
-      "land_use_type": 288,
+      "land_use_type": 291,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1483,7 +1483,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 288,
     "fields": {
-      "land_use_type": 289,
+      "land_use_type": 292,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1493,7 +1493,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 289,
     "fields": {
-      "land_use_type": 290,
+      "land_use_type": 293,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1503,7 +1503,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 290,
     "fields": {
-      "land_use_type": 291,
+      "land_use_type": 294,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1513,7 +1513,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 291,
     "fields": {
-      "land_use_type": 292,
+      "land_use_type": 295,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1523,7 +1523,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 292,
     "fields": {
-      "land_use_type": 293,
+      "land_use_type": 296,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1533,7 +1533,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 293,
     "fields": {
-      "land_use_type": 294,
+      "land_use_type": 297,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1543,7 +1543,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 294,
     "fields": {
-      "land_use_type": 295,
+      "land_use_type": 298,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1553,7 +1553,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 295,
     "fields": {
-      "land_use_type": 296,
+      "land_use_type": 299,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1563,7 +1563,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 296,
     "fields": {
-      "land_use_type": 297,
+      "land_use_type": 300,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1573,7 +1573,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 297,
     "fields": {
-      "land_use_type": 298,
+      "land_use_type": 301,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1583,7 +1583,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 298,
     "fields": {
-      "land_use_type": 299,
+      "land_use_type": 302,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1593,7 +1593,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 299,
     "fields": {
-      "land_use_type": 300,
+      "land_use_type": 303,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1603,7 +1603,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 300,
     "fields": {
-      "land_use_type": 301,
+      "land_use_type": 304,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1613,7 +1613,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 301,
     "fields": {
-      "land_use_type": 302,
+      "land_use_type": 305,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1623,7 +1623,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 302,
     "fields": {
-      "land_use_type": 303,
+      "land_use_type": 306,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1633,7 +1633,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 303,
     "fields": {
-      "land_use_type": 304,
+      "land_use_type": 307,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1643,7 +1643,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 304,
     "fields": {
-      "land_use_type": 305,
+      "land_use_type": 310,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1653,7 +1653,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 305,
     "fields": {
-      "land_use_type": 306,
+      "land_use_type": 188,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1663,7 +1663,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 306,
     "fields": {
-      "land_use_type": 307,
+      "land_use_type": 241,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1673,7 +1673,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 307,
     "fields": {
-      "land_use_type": 308,
+      "land_use_type": 280,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1683,7 +1683,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 308,
     "fields": {
-      "land_use_type": 309,
+      "land_use_type": 308,
       "value": 0.85,
       "value_min": null,
       "value_max": null
@@ -1693,7 +1693,7 @@
     "model": "ipcc.firescombustionfactor",
     "pk": 309,
     "fields": {
-      "land_use_type": 310,
+      "land_use_type": 309,
       "value": 0.85,
       "value_min": null,
       "value_max": null
