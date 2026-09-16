@@ -18,6 +18,7 @@ from django.core.management import call_command  # noqa: E402
 from django.test import SimpleTestCase  # noqa: E402
 
 from ipcc.management.commands import import_uncertainties as iu  # noqa: E402
+from ipcc.management.commands.apply_uncertainty_ranges import plan_writes  # noqa: E402
 
 
 class SchemaSyncTests(SimpleTestCase):
@@ -131,9 +132,76 @@ class FixtureWriterTests(SimpleTestCase):
                     checked += 1
         self.assertGreater(checked, 0)
 
+    def test_committed_fixtures_carry_bounds_only_for_published_tables(self):
+        report = json.loads((iu.data_dir() / "import_report.json").read_text(encoding="utf-8"))
+        published = {t["model"] for t in report["tables"] if t["published"]}
+        for spec, model, column in iu.iter_mapped_columns():
+            if spec.model in published:
+                continue
+            with open(iu.fixture_path(spec), encoding="utf-8") as fh:
+                bounded = [row["pk"] for row in json.load(fh) if row["fields"].get(column) is not None]
+            self.assertEqual(bounded, [], f"{spec.model}.{column} is unpublished but carries bounds")
+
     def test_report_matches_committed_baseline(self):
         report_path = str(iu.data_dir() / "import_report.json")
         try:
             call_command("import_uncertainties", "--dry-run", "--check", report_path, stdout=StringIO())
         except iu.CommandError as exc:
             self.fail(f"report does not match committed baseline: {exc}")
+
+
+class PublishRuleTests(SimpleTestCase):
+    """The join against a tiny in-memory source: which rows count as issues, and that one
+    issue holds the whole table back."""
+
+    AMENDMENT_FIXTURE = next(s.fixture_file for s in iu.MANIFEST if s.model == "api.OrganicAmendmentType")
+
+    def join(self, csv_rows, fixture_values, amendment_names=None):
+        amendment_names = amendment_names or {3: "Straw", 4: "Compost"}
+        with tempfile.TemporaryDirectory() as tmp:
+            csv_path = Path(tmp) / "ipcc.ricesfo.csv"
+            lines = ["id,organic_amendment_type,value,value_min,value_max", *csv_rows]
+            csv_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            cache = {
+                self.AMENDMENT_FIXTURE: [
+                    {"model": "api.organicamendmenttype", "pk": pk, "fields": {"name": name}}
+                    for pk, name in amendment_names.items()
+                ],
+                "ricesfo.json": [
+                    {"model": "ipcc.ricesfo", "pk": 70 + amendment, "fields": {"organic_amendment_type": amendment, "value": value}}
+                    for amendment, value in fixture_values.items()
+                ],
+            }
+            tables, results = iu.compute_all([csv_path], cache)
+        return tables[0], results["ricesfo.json"][1]
+
+    def test_matching_rows_publish_their_bounds(self):
+        table, patches = self.join(["1,Straw,1.0,0.5,1.5"], {3: 1.0})
+        self.assertTrue(table["published"])
+        self.assertEqual(patches, {73: {"value_min": 0.5, "value_max": 1.5}})
+
+    def test_empty_base_value_is_a_base_mismatch(self):
+        table, patches = self.join(["1,Straw,1.0,0.5,1.5"], {3: None})
+        self.assertEqual(table["base_mismatch"], 1)
+        self.assertFalse(table["published"])
+        self.assertEqual(patches, {})
+
+    def test_name_shared_by_two_rows_stays_unresolved(self):
+        table, patches = self.join(["1,Straw,1.0,0.5,1.5"], {3: 1.0, 4: 1.0}, {3: "Straw", 4: "Straw"})
+        self.assertEqual((table["unresolved_fk"], table["written"]), (1, 0))
+        self.assertEqual(patches, {})
+
+    def test_one_skipped_row_holds_back_the_whole_table(self):
+        table, patches = self.join(["1,Straw,1.0,0.5,1.5", "2,Compost,2.0,1.0,3.0"], {3: 1.0, 4: 9.9})
+        self.assertEqual((table["written"], table["base_mismatch"]), (1, 1))
+        self.assertFalse(table["published"])
+        self.assertEqual(patches, {})
+
+
+class PlanWritesTests(SimpleTestCase):
+    def test_fills_only_empty_columns_and_never_writes_null(self):
+        current = {1: {"value_min": None, "value_max": 2.0}, 2: {"value_min": 0.5, "value_max": None}}
+        patches = {1: {"value_min": 0.1, "value_max": 2.0}, 2: {"value_min": 0.7, "value_max": None}}
+        writes, conflicts = plan_writes(current, patches)
+        self.assertEqual(writes, {1: {"value_min": 0.1}})
+        self.assertEqual(conflicts, [(2, "value_min", 0.5, 0.7)])
