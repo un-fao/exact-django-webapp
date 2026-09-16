@@ -610,7 +610,6 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             changes.append(ChangeLog(record.history_date, history_user_email, ChangeReasons.CREATE.value, []))
             continue
 
-        delta = record.diff_against(record.prev_record)
         fields_to_remove = [
             "last_cached_at",
             "cached_results_total",
@@ -621,7 +620,9 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             "status",
             "map_data",
         ] + (exclude_fields or [])
-        delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
+        # ModelDelta is a frozen dataclass since django-simple-history 3.5, so the
+        # filtering has to happen inside diff_against, not on the returned delta.
+        delta = record.diff_against(record.prev_record, excluded_fields=fields_to_remove)
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
         if record.history_user is None:

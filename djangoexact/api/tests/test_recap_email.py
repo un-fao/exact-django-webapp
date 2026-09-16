@@ -13,9 +13,10 @@ from types import SimpleNamespace
 from unittest.mock import call, patch
 
 from django.test import Client, SimpleTestCase
+from simple_history.models import ModelChange, ModelDelta
 
 import api.security as security
-from api.utilities import ChangeLog, Change, ChangeReasons, send_changes_email, send_due_recaps
+from api.utilities import ChangeLog, Change, ChangeReasons, get_changes, send_changes_email, send_due_recaps
 from api.views import ProjectNotificationPreferenceViewSet
 
 
@@ -360,6 +361,35 @@ class SendDueRecapsTestCase(SimpleTestCase):
         self.assertEqual(sent, 2)
         self.assertEqual(mock_send.call_args_list, [call(broken), call(healthy)])
         self.assertEqual(query.filter_kwargs, {"notification_preferences__is_subscribed": True, "is_archived": False})
+
+
+class _FakeHistoricalRecord:
+    """A history row whose diff_against returns simple-history's real, frozen ModelDelta."""
+
+    def __init__(self):
+        self.prev_record = object()
+        self.history_date = datetime(2026, 9, 16, tzinfo=dt_timezone.utc)
+        self.history_user = SimpleNamespace(email="editor@example.org")
+        self.history_change_reason = "Update"
+        self.name = "New name"
+        self.excluded_fields = None
+
+    def diff_against(self, old_history, excluded_fields=None):
+        self.excluded_fields = excluded_fields
+        return ModelDelta(changes=[ModelChange("name", "Old name", "New name")], changed_fields=["name"], old_record=old_history, new_record=self)
+
+
+class GetChangesTestCase(SimpleTestCase):
+    """get_changes must not mutate the delta: ModelDelta is frozen since simple-history 3.5."""
+
+    def test_noise_fields_are_excluded_inside_the_diff(self):
+        record = _FakeHistoricalRecord()
+
+        changelogs = get_changes([record], exclude_fields=["locked_at"])
+
+        self.assertEqual([(c.field, c.old, c.new) for c in changelogs[0].changes], [("name", "Old name", "New name")])
+        self.assertIn("last_modified", record.excluded_fields)
+        self.assertIn("locked_at", record.excluded_fields)
 
 
 SCHEDULER_EMAIL = "recap-email-scheduler@exact-test.iam.gserviceaccount.com"
