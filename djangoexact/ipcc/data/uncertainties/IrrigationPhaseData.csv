@@ -1,0 +1,8 @@
+﻿id,fuel_type,emission_factor,calorific_value,co2_emissions,ch4_emissions,n2o_emissions,density,emission_factor_min,emission_factor_max,calorific_value_min,calorific_value_max,co2_emissions_min,co2_emissions_max,ch4_emissions_min,ch4_emissions_max,n2o_emissions_min,n2o_emissions_max,density_min,density_max,"Source: 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2006), Volume 2 Energy, tables 1.2, 2.5."
+1,Motor Gasoline,2.289273336,44.3,69300,10,0.6,741,2.12838912,2.442886118,42.5,44.8,67500,73000,3,30,0.2,2,N/A,N/A,
+2,Gasoil /Diesel Oil,2.682733149,43,74100,10,0.6,837,2.518631431,2.732219435,41.4,43.3,72600,74800,3,30,0.2,2,N/A,N/A,
+3,Waste Oil / Lubrificants,2.81609241,40.2,73300,10,0.6,950,1.402511268,6.027028,20.3,80,72200,74400,100,900,1.5,15,N/A,N/A,
+4,Lpg,1.595005405,47.3,63100,5,0.1,533,1.471803686,1.828570829,44.8,52.2,61600,65600,1.5,15,0.03,0.3,N/A,N/A,
+5,Natural Gas,0.002074208,48,56100,5,0.1,0.768,0.001940499,0.002261371,46.5,50.4,54300,58300,1.5,15,0.03,0.3,N/A,N/A,
+6,Electricity,0,,,,,,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,
+7,Solar,0,,,,,,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,

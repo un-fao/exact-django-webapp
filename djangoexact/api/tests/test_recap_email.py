@@ -1,18 +1,21 @@
-"""DB-free regression tests for the recap email window, advance rule and admin gate.
+"""DB-free regression tests for the recap email window, advance rule, admin gate,
+daily sweep and the Cloud Scheduler endpoint.
 
 Follows the fake-object idiom established in test_finalized_member_management.py.
 `api/tests/factories.py` executes reference-data queries at import time, so it
 (and anything that pulls it in) must not be imported here.
 """
 
+import json
+import os
 from datetime import datetime, timezone as dt_timezone
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import call, patch
 
-from django.test import SimpleTestCase
+from django.test import Client, SimpleTestCase
 
 import api.security as security
-from api.utilities import ChangeLog, Change, ChangeReasons, send_changes_email
+from api.utilities import ChangeLog, Change, ChangeReasons, send_changes_email, send_due_recaps
 from api.views import ProjectNotificationPreferenceViewSet
 
 
@@ -288,3 +291,107 @@ class ProjectNotificationPreferenceCreateGateTestCase(SimpleTestCase):
         self.assertEqual(len(mock_model.objects.get_or_create_calls), 1)
         call_kwargs = mock_model.objects.get_or_create_calls[0]
         self.assertEqual(call_kwargs["defaults"], {"is_subscribed": True})
+
+
+class SendChangesEmailSubjectTestCase(SimpleTestCase):
+    """The recap never presents the lock holder as the author of the changes."""
+
+    @patch("api.utilities.send_mail")
+    @patch("api.utilities.render_to_string")
+    @patch("api.utilities.get_changes")
+    def test_locked_project_gets_the_neutral_subject(self, mock_get_changes, mock_render, mock_send_mail):
+        mock_get_changes.return_value = _non_empty_changelog()
+        mock_render.return_value = "<html></html>"
+
+        project = _FakeProject()
+        project.locked_by = SimpleNamespace(get_full_name=lambda: "Rita Reviewer")
+        send_changes_email(project, recipients=[_recipient()])
+
+        self.assertEqual(mock_send_mail.call_args.args[0], "Project Recap - Test Project")
+
+
+class _FakeProjectQuery:
+    """Stands in for `Project.objects` inside send_due_recaps; records the filter kwargs."""
+
+    def __init__(self, projects):
+        self.projects = projects
+        self.filter_kwargs = None
+
+    def filter(self, **kwargs):
+        self.filter_kwargs = kwargs
+        return self
+
+    def distinct(self):
+        return self.projects
+
+
+def _patch_projects(projects):
+    query = _FakeProjectQuery(projects)
+    return query, patch("api.utilities.api_models", SimpleNamespace(Project=SimpleNamespace(objects=query)))
+
+
+class SendDueRecapsTestCase(SimpleTestCase):
+    """The daily sweep starts the clock on a project's first run, mails the others,
+    and one failing project does not stop the rest."""
+
+    @patch("api.utilities.send_changes_email")
+    def test_first_run_starts_the_clock_without_mailing(self, mock_send):
+        project = _FakeProject(last_recap_sent_at=None)
+        _, projects_patch = _patch_projects([project])
+
+        with projects_patch:
+            sent = send_due_recaps()
+
+        self.assertEqual(sent, 0)
+        mock_send.assert_not_called()
+        self.assertEqual(project.save_calls, [["last_recap_sent_at"]])
+        self.assertIsNotNone(project.last_recap_sent_at)
+
+    @patch("api.utilities.send_changes_email")
+    def test_mails_subscribed_projects_and_survives_a_failing_one(self, mock_send):
+        previous = datetime(2026, 1, 1, tzinfo=dt_timezone.utc)
+        broken, healthy = _FakeProject(last_recap_sent_at=previous), _FakeProject(last_recap_sent_at=previous)
+        mock_send.side_effect = [Exception("history is corrupt"), 2]
+        query, projects_patch = _patch_projects([broken, healthy])
+
+        with projects_patch, self.assertLogs(level="ERROR"):
+            sent = send_due_recaps()
+
+        self.assertEqual(sent, 2)
+        self.assertEqual(mock_send.call_args_list, [call(broken), call(healthy)])
+        self.assertEqual(query.filter_kwargs, {"notification_preferences__is_subscribed": True, "is_archived": False})
+
+
+SCHEDULER_EMAIL = "recap-email-scheduler@exact-test.iam.gserviceaccount.com"
+
+
+@patch.dict(os.environ, {"PROJECT_ID": "exact-test"})
+class RecapSweepEndpointTestCase(SimpleTestCase):
+    """The public endpoint runs the sweep only for Cloud Scheduler's own OIDC token.
+    Goes through the real URL and middleware, with CSRF enforced."""
+
+    def _post(self):
+        return Client(enforce_csrf_checks=True).post("/cron/recaps/", HTTP_AUTHORIZATION="Bearer a-token")
+
+    @patch("api.views.utils.send_due_recaps")
+    @patch("api.views.id_token.verify_oauth2_token", side_effect=ValueError("Token expired"))
+    def test_invalid_token_is_rejected(self, mock_verify, mock_sweep):
+        self.assertEqual(self._post().status_code, 403)
+        mock_sweep.assert_not_called()
+
+    @patch("api.views.utils.send_due_recaps")
+    @patch("api.views.id_token.verify_oauth2_token", return_value={"email": "someone@exact-test.iam.gserviceaccount.com", "email_verified": True})
+    def test_token_from_another_account_is_rejected(self, mock_verify, mock_sweep):
+        self.assertEqual(self._post().status_code, 403)
+        mock_sweep.assert_not_called()
+
+    @patch("api.views.utils.send_due_recaps", return_value=3)
+    @patch("api.views.id_token.verify_oauth2_token", return_value={"email": SCHEDULER_EMAIL, "email_verified": True})
+    def test_scheduler_token_runs_the_sweep(self, mock_verify, mock_sweep):
+        response = self._post()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"sent": 3})
+        mock_sweep.assert_called_once_with()
+        self.assertEqual(mock_verify.call_args.args[0], "a-token")
+        self.assertEqual(mock_verify.call_args.kwargs["audience"], "http://testserver/cron/recaps/")

@@ -9,7 +9,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -22,7 +26,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -35,7 +43,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -48,7 +60,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -61,7 +77,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -74,7 +94,11 @@
       "weight": 0.45,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.07,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -87,7 +111,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -100,7 +128,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -113,7 +145,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -126,7 +162,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -139,7 +179,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -152,7 +196,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -165,7 +213,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -178,7 +230,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -191,7 +247,11 @@
       "weight": 0.4,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.24,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -204,7 +264,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -217,7 +281,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   },
   {
@@ -230,7 +298,11 @@
       "weight": 0.34,
       "weight_unit": "tC/t air dry peat",
       "volume": 0.26,
-      "volume_unit": "tC/m3 air dry peat"
+      "volume_unit": "tC/m3 air dry peat",
+      "weight_min": null,
+      "weight_max": null,
+      "volume_min": null,
+      "volume_max": null
     }
   }
 ]

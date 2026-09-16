@@ -757,7 +757,7 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
     Args:
         project (Project): The project object.
         recipients (list[CustomUser], optional): List of members to send the email to.
-            If None, defaults to all Admin members of the project who have not opted out.
+            If None, defaults to the project's Admin members who subscribed to its emails.
 
     Returns:
         int: The number of recipients successfully mailed. Zero when there is
@@ -859,35 +859,15 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
     if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
         return 0
 
-    # Lock context degrades gracefully: the recap button works on an unlocked
-    # project too, so there is not always a lock holder to report.
-    lock_holder = None
-    lock_holder_name = None
-    lock_holder_group_name = None
-    display_date = sent_at
-
-    if project.locked_by is not None:
-        lock_holder = project.members.filter(user=project.locked_by).first()
-        if lock_holder is None:
-            log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
-        lock_holder_name = project.locked_by.get_full_name()
-        lock_holder_group_name = lock_holder.group.name if lock_holder else "Superuser"
-        display_date = project.locked_at
-
-    # Send email to recipients
+    # No lock-holder wording: the daily recap can run while a reviewer holds the
+    # lock, and naming them as the author of everyone's changes would be wrong.
     context = {
         "project": changes["project"],
         "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
         "activities": changes["activities"],
-        "lock_holder_group_name": lock_holder_group_name,
-        "lock_holder_name": lock_holder_name,
-        "lock_unlock_date": display_date,
+        "recap_date": sent_at,
     }
-
-    if lock_holder_name is not None:
-        subject = f"{lock_holder_group_name} Feedback - {context['project']['name']}"
-    else:
-        subject = f"Project Recap - {context['project']['name']}"
+    subject = f"Project Recap - {project.name}"
 
     sent_count = 0
     for recipient in recipients:
@@ -909,3 +889,29 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         project.save(update_fields=["last_recap_sent_at"])
 
     return sent_count
+
+
+def send_due_recaps() -> int:
+    """
+    Send the recap email for every non-archived project with at least one
+    subscribed member. Runs once a day, triggered by Cloud Scheduler.
+
+    Returns:
+        int: The total number of emails sent across all projects.
+    """
+    projects = api_models.Project.objects.filter(notification_preferences__is_subscribed=True, is_archived=False).distinct()
+
+    sent = 0
+    for project in projects:
+        try:
+            if project.last_recap_sent_at is None:
+                # Start the clock instead of mailing the project's entire history,
+                # which would also be the slowest diff this sweep could run.
+                project.last_recap_sent_at = timezone.now()
+                project.save(update_fields=["last_recap_sent_at"])
+                continue
+            sent += send_changes_email(project)
+        except Exception as e:
+            # One broken project must not stop the recaps of the others.
+            log.exception(e)
+    return sent

@@ -41,6 +41,8 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from django.apps import apps
 
+logger = log.getLogger(__name__)
+
 from django.db.models import Q
 import django.db.models as models
 from ipcc import models as ipcc
@@ -4956,6 +4958,8 @@ class LivestockCalculator(BaseCalculator):
         self.LEACHING_MULTI = ApplicationParameter.objects.get(name="leaching_multiplier").value
         self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
+        PRP_T2_ERROR_MESSAGE = "No other system apart from PRP is available to compute manure emissions from. Please select a complementary manure management type."
+
         if module.is_start():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_start,
@@ -5032,6 +5036,12 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_start == 1.0
+                and self.animal_waste_prp_start.value == 1.0
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_start = (
@@ -5291,6 +5301,12 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_w == 1.0
+                and self.animal_waste_prp_w.value == 1.0
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_w = (
@@ -5550,6 +5566,12 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+                
+            if (
+                module.prp_percentage_t2_wo == 1.0
+                and self.animal_waste_prp_wo.value == 1.0
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_wo = (
@@ -5751,7 +5773,7 @@ class LivestockCalculator(BaseCalculator):
         self.get_defaults()
 
         if module.is_with():
-            log.debug("Calculating emissions for WITH")
+            logger.debug("Calculating emissions for WITH")
 
             inputs_w = {
                 "implementation_time": self.activity.implementation_years,

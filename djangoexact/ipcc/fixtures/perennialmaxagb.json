@@ -5,7 +5,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 71,
-      "value": 41.7625
+      "value": 41.7625,
+      "value_min": 8.3525,
+      "value_max": 75.1725
     }
   },
   {
@@ -14,7 +16,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 7,
-      "value": 47.4
+      "value": 47.4,
+      "value_min": 22.752,
+      "value_max": 72.048
     }
   },
   {
@@ -23,7 +27,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 8,
-      "value": 22.1
+      "value": 22.1,
+      "value_min": 10.608,
+      "value_max": 33.592
     }
   },
   {
@@ -32,7 +38,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 9,
-      "value": 9.4
+      "value": 9.4,
+      "value_min": 3.854,
+      "value_max": 14.946
     }
   },
   {
@@ -41,7 +49,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 29.9,
+      "value_max": 100.1
     }
   },
   {
@@ -50,7 +60,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 11,
-      "value": 11.8
+      "value": 11.8,
+      "value_min": 2.832,
+      "value_max": 20.768
     }
   },
   {
@@ -59,7 +71,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 12,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": 21.6,
+      "value_max": 74.4
     }
   },
   {
@@ -68,7 +82,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 13,
-      "value": 72.2
+      "value": 72.2,
+      "value_min": 28.88,
+      "value_max": 115.52
     }
   },
   {
@@ -77,7 +93,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 14,
-      "value": 58.2
+      "value": 58.2,
+      "value_min": 11.64,
+      "value_max": 104.76
     }
   },
   {
@@ -86,7 +104,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 16,
-      "value": 9.1
+      "value": 9.1,
+      "value_min": 7.735,
+      "value_max": 10.465
     }
   },
   {
@@ -95,7 +115,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 17,
-      "value": 8.5
+      "value": 8.5,
+      "value_min": 6.885,
+      "value_max": 10.115
     }
   },
   {
@@ -104,7 +126,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 20,
-      "value": 5.5
+      "value": 5.5,
+      "value_min": 4.51,
+      "value_max": 6.49
     }
   },
   {
@@ -113,7 +137,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 18,
-      "value": 12.69
+      "value": 12.69,
+      "value_min": 7.614,
+      "value_max": 17.766
     }
   },
   {
@@ -122,7 +148,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 21,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 35.4,
+      "value_max": 84.6
     }
   },
   {
@@ -131,7 +159,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 22,
-      "value": 80.2
+      "value": 80.2,
+      "value_min": 68.17,
+      "value_max": 92.23
     }
   },
   {
@@ -140,7 +170,9 @@
     "fields": {
       "climate": 3,
       "land_use_type": 19,
-      "value": 20.7
+      "value": 20.7,
+      "value_min": 10.35,
+      "value_max": 31.05
     }
   },
   {
@@ -149,7 +181,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 71,
-      "value": 39.7
+      "value": 39.7,
+      "value_min": 9.528,
+      "value_max": 69.872
     }
   },
   {
@@ -158,7 +192,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 7,
-      "value": 47.4
+      "value": 47.4,
+      "value_min": 22.752,
+      "value_max": 72.048
     }
   },
   {
@@ -167,7 +203,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 8,
-      "value": 22.1
+      "value": 22.1,
+      "value_min": 10.608,
+      "value_max": 33.592
     }
   },
   {
@@ -176,7 +214,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 9,
-      "value": 26.1
+      "value": 26.1,
+      "value_min": 10.701,
+      "value_max": 41.499
     }
   },
   {
@@ -185,7 +225,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 29.9,
+      "value_max": 100.1
     }
   },
   {
@@ -194,7 +236,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 11,
-      "value": 11.8
+      "value": 11.8,
+      "value_min": 2.832,
+      "value_max": 20.768
     }
   },
   {
@@ -203,7 +247,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 12,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": 21.6,
+      "value_max": 74.4
     }
   },
   {
@@ -212,7 +258,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 13,
-      "value": 27.3
+      "value": 27.3,
+      "value_min": 10.374,
+      "value_max": 44.226
     }
   },
   {
@@ -221,7 +269,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 14,
-      "value": 69.9
+      "value": 69.9,
+      "value_min": 27.261,
+      "value_max": 112.539
     }
   },
   {
@@ -230,7 +280,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 16,
-      "value": 9.1
+      "value": 9.1,
+      "value_min": 7.735,
+      "value_max": 10.465
     }
   },
   {
@@ -239,7 +291,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 17,
-      "value": 8.5
+      "value": 8.5,
+      "value_min": 6.885,
+      "value_max": 10.115
     }
   },
   {
@@ -248,7 +302,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 20,
-      "value": 5.5
+      "value": 5.5,
+      "value_min": 4.51,
+      "value_max": 6.49
     }
   },
   {
@@ -257,7 +313,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 18,
-      "value": 12.69
+      "value": 12.69,
+      "value_min": 7.614,
+      "value_max": 17.766
     }
   },
   {
@@ -266,7 +324,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 21,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 35.4,
+      "value_max": 84.6
     }
   },
   {
@@ -275,7 +335,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 22,
-      "value": 80.2
+      "value": 80.2,
+      "value_min": 68.17,
+      "value_max": 92.23
     }
   },
   {
@@ -284,7 +346,9 @@
     "fields": {
       "climate": 1,
       "land_use_type": 19,
-      "value": 20.7
+      "value": 20.7,
+      "value_min": 10.35,
+      "value_max": 31.05
     }
   },
   {
@@ -293,7 +357,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 71,
-      "value": 39.7
+      "value": 39.7,
+      "value_min": 9.528,
+      "value_max": 69.872
     }
   },
   {
@@ -302,7 +368,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 7,
-      "value": 47.4
+      "value": 47.4,
+      "value_min": 22.752,
+      "value_max": 72.048
     }
   },
   {
@@ -311,7 +379,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 8,
-      "value": 22.1
+      "value": 22.1,
+      "value_min": 10.608,
+      "value_max": 33.592
     }
   },
   {
@@ -320,7 +390,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 9,
-      "value": 26.1
+      "value": 26.1,
+      "value_min": 10.701,
+      "value_max": 41.499
     }
   },
   {
@@ -329,7 +401,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 29.9,
+      "value_max": 100.1
     }
   },
   {
@@ -338,7 +412,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 11,
-      "value": 11.8
+      "value": 11.8,
+      "value_min": 2.832,
+      "value_max": 20.768
     }
   },
   {
@@ -347,7 +423,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 12,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": 21.6,
+      "value_max": 74.4
     }
   },
   {
@@ -356,7 +434,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 13,
-      "value": 27.3
+      "value": 27.3,
+      "value_min": 10.374,
+      "value_max": 44.226
     }
   },
   {
@@ -365,7 +445,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 14,
-      "value": 69.9
+      "value": 69.9,
+      "value_min": 27.261,
+      "value_max": 112.539
     }
   },
   {
@@ -374,7 +456,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 16,
-      "value": 9.1
+      "value": 9.1,
+      "value_min": 7.735,
+      "value_max": 10.465
     }
   },
   {
@@ -383,7 +467,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 17,
-      "value": 8.5
+      "value": 8.5,
+      "value_min": 6.885,
+      "value_max": 10.115
     }
   },
   {
@@ -392,7 +478,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 20,
-      "value": 5.5
+      "value": 5.5,
+      "value_min": 4.51,
+      "value_max": 6.49
     }
   },
   {
@@ -401,7 +489,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 18,
-      "value": 12.69
+      "value": 12.69,
+      "value_min": 7.614,
+      "value_max": 17.766
     }
   },
   {
@@ -410,7 +500,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 21,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 35.4,
+      "value_max": 84.6
     }
   },
   {
@@ -419,7 +511,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 22,
-      "value": 80.2
+      "value": 80.2,
+      "value_min": 68.17,
+      "value_max": 92.23
     }
   },
   {
@@ -428,7 +522,9 @@
     "fields": {
       "climate": 2,
       "land_use_type": 19,
-      "value": 20.7
+      "value": 20.7,
+      "value_min": 10.35,
+      "value_max": 31.05
     }
   },
   {
@@ -437,7 +533,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 71,
-      "value": 36.2875
+      "value": 36.2875,
+      "value_min": 8.709,
+      "value_max": 63.866
     }
   },
   {
@@ -446,7 +544,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 7,
-      "value": 47.4
+      "value": 47.4,
+      "value_min": 22.752,
+      "value_max": 72.048
     }
   },
   {
@@ -455,7 +555,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 8,
-      "value": 22.1
+      "value": 22.1,
+      "value_min": 10.608,
+      "value_max": 33.592
     }
   },
   {
@@ -464,7 +566,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 9,
-      "value": 26.1
+      "value": 26.1,
+      "value_min": 10.701,
+      "value_max": 41.499
     }
   },
   {
@@ -473,7 +577,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 29.9,
+      "value_max": 100.1
     }
   },
   {
@@ -482,7 +588,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 11,
-      "value": 11.8
+      "value": 11.8,
+      "value_min": 2.832,
+      "value_max": 20.768
     }
   },
   {
@@ -491,7 +599,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 12,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": 21.6,
+      "value_max": 74.4
     }
   },
   {
@@ -500,7 +610,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 13,
-      "value": 0.0
+      "value": 0.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -509,7 +621,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 14,
-      "value": 69.9
+      "value": 69.9,
+      "value_min": 27.261,
+      "value_max": 112.539
     }
   },
   {
@@ -518,7 +632,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 16,
-      "value": 9.1
+      "value": 9.1,
+      "value_min": 7.735,
+      "value_max": 10.465
     }
   },
   {
@@ -527,7 +643,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 17,
-      "value": 8.5
+      "value": 8.5,
+      "value_min": 6.885,
+      "value_max": 10.115
     }
   },
   {
@@ -536,7 +654,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 20,
-      "value": 5.5
+      "value": 5.5,
+      "value_min": 4.51,
+      "value_max": 6.49
     }
   },
   {
@@ -545,7 +665,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 18,
-      "value": 12.69
+      "value": 12.69,
+      "value_min": 7.614,
+      "value_max": 17.766
     }
   },
   {
@@ -554,7 +676,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 21,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 35.4,
+      "value_max": 84.6
     }
   },
   {
@@ -563,7 +687,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 22,
-      "value": 80.2
+      "value": 80.2,
+      "value_min": 68.17,
+      "value_max": 92.23
     }
   },
   {
@@ -572,7 +698,9 @@
     "fields": {
       "climate": 4,
       "land_use_type": 19,
-      "value": 20.7
+      "value": 20.7,
+      "value_min": 10.35,
+      "value_max": 31.05
     }
   },
   {
@@ -581,7 +709,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 71,
-      "value": 40.73125
+      "value": 40.73125,
+      "value_min": 9.7755,
+      "value_max": 71.687
     }
   },
   {
@@ -590,7 +720,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 7,
-      "value": 47.4
+      "value": 47.4,
+      "value_min": 22.752,
+      "value_max": 72.048
     }
   },
   {
@@ -599,7 +731,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 8,
-      "value": 22.1
+      "value": 22.1,
+      "value_min": 10.608,
+      "value_max": 33.592
     }
   },
   {
@@ -608,7 +742,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 9,
-      "value": 17.75
+      "value": 17.75,
+      "value_min": 7.2775,
+      "value_max": 28.2225
     }
   },
   {
@@ -617,7 +753,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 10,
-      "value": 65.0
+      "value": 65.0,
+      "value_min": 29.9,
+      "value_max": 100.1
     }
   },
   {
@@ -626,7 +764,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 11,
-      "value": 11.8
+      "value": 11.8,
+      "value_min": 2.832,
+      "value_max": 20.768
     }
   },
   {
@@ -635,7 +775,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 12,
-      "value": 48.0
+      "value": 48.0,
+      "value_min": 21.6,
+      "value_max": 74.4
     }
   },
   {
@@ -644,7 +786,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 13,
-      "value": 49.75
+      "value": 49.75,
+      "value_min": 18.905,
+      "value_max": 80.595
     }
   },
   {
@@ -653,7 +797,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 14,
-      "value": 64.05
+      "value": 64.05,
+      "value_min": 12.81,
+      "value_max": 115.29
     }
   },
   {
@@ -662,7 +808,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 16,
-      "value": 9.1
+      "value": 9.1,
+      "value_min": 7.735,
+      "value_max": 10.465
     }
   },
   {
@@ -671,7 +819,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 17,
-      "value": 8.5
+      "value": 8.5,
+      "value_min": 6.885,
+      "value_max": 10.115
     }
   },
   {
@@ -680,7 +830,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 20,
-      "value": 5.5
+      "value": 5.5,
+      "value_min": 4.51,
+      "value_max": 6.49
     }
   },
   {
@@ -689,7 +841,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 18,
-      "value": 12.69
+      "value": 12.69,
+      "value_min": 7.614,
+      "value_max": 17.766
     }
   },
   {
@@ -698,7 +852,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 21,
-      "value": 60.0
+      "value": 60.0,
+      "value_min": 35.4,
+      "value_max": 84.6
     }
   },
   {
@@ -707,7 +863,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 22,
-      "value": 80.2
+      "value": 80.2,
+      "value_min": 68.17,
+      "value_max": 92.23
     }
   },
   {
@@ -716,7 +874,9 @@
     "fields": {
       "climate": 20,
       "land_use_type": 19,
-      "value": 20.7
+      "value": 20.7,
+      "value_min": 10.35,
+      "value_max": 31.05
     }
   }
 ]

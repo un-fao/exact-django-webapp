@@ -7,7 +7,11 @@
       "forest_type": 1,
       "land_use_type": 82,
       "litter": 4.8,
-      "dw": 14.8
+      "dw": 14.8,
+      "litter_min": 2.1,
+      "litter_max": 16.4,
+      "dw_min": 0.6,
+      "dw_max": 218.9
     }
   },
   {
@@ -18,7 +22,11 @@
       "forest_type": 1,
       "land_use_type": 171,
       "litter": 5.9,
-      "dw": 8.0
+      "dw": 8.0,
+      "litter_min": 1.9,
+      "litter_max": 14.8,
+      "dw_min": 1.2,
+      "dw_max": 21.2
     }
   },
   {
@@ -29,7 +37,11 @@
       "forest_type": 1,
       "land_use_type": 172,
       "litter": 2.4,
-      "dw": 9.0
+      "dw": 9.0,
+      "litter_min": 2.1,
+      "litter_max": 2.7,
+      "dw_min": 1.3,
+      "dw_max": 17.3
     }
   },
   {
@@ -40,7 +52,11 @@
       "forest_type": 1,
       "land_use_type": 173,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -51,7 +67,11 @@
       "forest_type": 1,
       "land_use_type": 174,
       "litter": 8.7,
-      "dw": 13.2
+      "dw": 13.2,
+      "litter_min": 1.2,
+      "litter_max": 24.0,
+      "dw_min": 0.2,
+      "dw_max": 43.8
     }
   },
   {
@@ -62,7 +82,11 @@
       "forest_type": 1,
       "land_use_type": 172,
       "litter": 0.0,
-      "dw": 64.4
+      "dw": 64.4,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 14.4,
+      "dw_max": 134.5
     }
   },
   {
@@ -73,7 +97,11 @@
       "forest_type": 1,
       "land_use_type": 167,
       "litter": 0.0,
-      "dw": 6.8
+      "dw": 6.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 6.0,
+      "dw_max": 7.7
     }
   },
   {
@@ -84,7 +112,11 @@
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 11.8
+      "dw": 11.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 7.2,
+      "dw_max": 16.3
     }
   },
   {
@@ -95,7 +127,11 @@
       "forest_type": 1,
       "land_use_type": 165,
       "litter": 2.9,
-      "dw": 36.8
+      "dw": 36.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 2.8,
+      "dw_max": 95.0
     }
   },
   {
@@ -106,7 +142,11 @@
       "forest_type": 1,
       "land_use_type": 164,
       "litter": 47.8,
-      "dw": 23.0
+      "dw": 23.0,
+      "litter_min": 4.6,
+      "litter_max": 279.1,
+      "dw_min": 1.6,
+      "dw_max": 150.0
     }
   },
   {
@@ -117,7 +157,11 @@
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 3.7,
-      "dw": 37.6
+      "dw": 37.6,
+      "litter_min": 3.4,
+      "litter_max": 3.9,
+      "dw_min": 1.7,
+      "dw_max": 181.8
     }
   },
   {
@@ -128,7 +172,11 @@
       "forest_type": 1,
       "land_use_type": 166,
       "litter": 0.0,
-      "dw": 10.5
+      "dw": 10.5,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -139,7 +187,11 @@
       "forest_type": 1,
       "land_use_type": 167,
       "litter": 28.7,
-      "dw": 21.7
+      "dw": 21.7,
+      "litter_min": 3.8,
+      "litter_max": 98.8,
+      "dw_min": 8.0,
+      "dw_max": 50.0
     }
   },
   {
@@ -150,7 +202,11 @@
       "forest_type": 1,
       "land_use_type": 168,
       "litter": 31.4,
-      "dw": 19.7
+      "dw": 19.7,
+      "litter_min": 4.0,
+      "litter_max": null,
+      "dw_min": 2.3,
+      "dw_max": 76.5
     }
   },
   {
@@ -161,7 +217,11 @@
       "forest_type": 1,
       "land_use_type": 169,
       "litter": 49.5,
-      "dw": 3.1
+      "dw": 3.1,
+      "litter_min": 23.7,
+      "litter_max": 85.1,
+      "dw_min": 0.5,
+      "dw_max": 6.1
     }
   },
   {
@@ -172,7 +232,11 @@
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -183,7 +247,11 @@
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -194,7 +262,11 @@
       "forest_type": 2,
       "land_use_type": 82,
       "litter": 4.8,
-      "dw": 14.8
+      "dw": 14.8,
+      "litter_min": 2.1,
+      "litter_max": 16.4,
+      "dw_min": 0.6,
+      "dw_max": 218.9
     }
   },
   {
@@ -205,7 +277,11 @@
       "forest_type": 2,
       "land_use_type": 171,
       "litter": 5.9,
-      "dw": 8.0
+      "dw": 8.0,
+      "litter_min": 1.9,
+      "litter_max": 14.8,
+      "dw_min": 1.2,
+      "dw_max": 21.2
     }
   },
   {
@@ -216,7 +292,11 @@
       "forest_type": 2,
       "land_use_type": 172,
       "litter": 2.4,
-      "dw": 9.0
+      "dw": 9.0,
+      "litter_min": 2.1,
+      "litter_max": 2.7,
+      "dw_min": 1.3,
+      "dw_max": 17.3
     }
   },
   {
@@ -227,7 +307,11 @@
       "forest_type": 2,
       "land_use_type": 173,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -238,7 +322,11 @@
       "forest_type": 2,
       "land_use_type": 174,
       "litter": 8.7,
-      "dw": 13.2
+      "dw": 13.2,
+      "litter_min": 1.2,
+      "litter_max": 24.0,
+      "dw_min": 0.2,
+      "dw_max": 43.8
     }
   },
   {
@@ -249,7 +337,11 @@
       "forest_type": 2,
       "land_use_type": 172,
       "litter": 0.0,
-      "dw": 64.4
+      "dw": 64.4,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 14.4,
+      "dw_max": 134.5
     }
   },
   {
@@ -260,7 +352,11 @@
       "forest_type": 2,
       "land_use_type": 167,
       "litter": 0.0,
-      "dw": 6.8
+      "dw": 6.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 6.0,
+      "dw_max": 7.7
     }
   },
   {
@@ -271,7 +367,11 @@
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 11.8
+      "dw": 11.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 7.2,
+      "dw_max": 16.3
     }
   },
   {
@@ -282,7 +382,11 @@
       "forest_type": 2,
       "land_use_type": 165,
       "litter": 2.9,
-      "dw": 36.8
+      "dw": 36.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": 2.8,
+      "dw_max": 95.0
     }
   },
   {
@@ -293,7 +397,11 @@
       "forest_type": 2,
       "land_use_type": 164,
       "litter": 47.8,
-      "dw": 23.0
+      "dw": 23.0,
+      "litter_min": 4.6,
+      "litter_max": 279.1,
+      "dw_min": 1.6,
+      "dw_max": 150.0
     }
   },
   {
@@ -304,7 +412,11 @@
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 3.7,
-      "dw": 37.6
+      "dw": 37.6,
+      "litter_min": 3.4,
+      "litter_max": 3.9,
+      "dw_min": 1.7,
+      "dw_max": 181.8
     }
   },
   {
@@ -315,7 +427,11 @@
       "forest_type": 2,
       "land_use_type": 166,
       "litter": 0.0,
-      "dw": 10.5
+      "dw": 10.5,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -326,7 +442,11 @@
       "forest_type": 2,
       "land_use_type": 167,
       "litter": 28.7,
-      "dw": 21.7
+      "dw": 21.7,
+      "litter_min": 3.8,
+      "litter_max": 98.8,
+      "dw_min": 8.0,
+      "dw_max": 50.0
     }
   },
   {
@@ -337,7 +457,11 @@
       "forest_type": 2,
       "land_use_type": 168,
       "litter": 31.4,
-      "dw": 19.7
+      "dw": 19.7,
+      "litter_min": 4.0,
+      "litter_max": null,
+      "dw_min": 2.3,
+      "dw_max": 76.5
     }
   },
   {
@@ -348,7 +472,11 @@
       "forest_type": 2,
       "land_use_type": 169,
       "litter": 49.5,
-      "dw": 3.1
+      "dw": 3.1,
+      "litter_min": 23.7,
+      "litter_max": 85.1,
+      "dw_min": 0.5,
+      "dw_max": 6.1
     }
   },
   {
@@ -359,7 +487,11 @@
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -370,7 +502,11 @@
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -381,7 +517,11 @@
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": 0.0,
+      "litter_max": 1.3,
+      "dw_min": 6.5,
+      "dw_max": 14.8
     }
   },
   {
@@ -392,7 +532,11 @@
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": 0.0,
+      "litter_max": 1.3,
+      "dw_min": 6.5,
+      "dw_max": 14.8
     }
   },
   {
@@ -403,7 +547,11 @@
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": 0.0,
+      "litter_max": 1.3,
+      "dw_min": 6.5,
+      "dw_max": 14.8
     }
   },
   {
@@ -414,7 +562,11 @@
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": 0.0,
+      "litter_max": 1.3,
+      "dw_min": 6.5,
+      "dw_max": 14.8
     }
   },
   {
@@ -425,7 +577,11 @@
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
@@ -436,7 +592,11 @@
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   }
 ]
