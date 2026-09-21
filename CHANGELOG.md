@@ -1,3 +1,43 @@
+## 1.20.4 (2026-09-21)
+
+### Feat
+
+- **uncertainty**: publish ranges per table, straight into a database
+- **recap-email**: send daily recap emails from Cloud Scheduler
+- **livestock-calculator**: add error handling for PRP percentage validation
+- **quick-260904-k80**: --detail emits per-row reasons for every skipped row
+- **quick-260904-k80-03**: write patched fixtures and rebuild the combined file
+- **quick-260904-k80-02**: add 238 nullable uncertainty columns and migration 0065
+- **quick-260904-k80-01**: natural-key join for IPCC uncertainty CSVs, dry-run report
+- **quick-260902-f1z-02**: gate preference write paths on project admin (D-02)
+- **quick-260902-f1z-01**: invert notification preference to opt-in (D-01)
+- **quick-260828-gjy-02**: window recap on last send, unlock trigger, admin-gate endpoint (D-02..D-08)
+- **quick-260828-gjy-01**: add Project.last_recap_sent_at (D-01)
+- **260820-he5**: admin script to import FRA carbon stock for a chosen year
+- **260820-he5**: add Country.iso3, ISO3 mapping data, migration 0292
+- add FRA carbon stock data for 2025
+- **api**: declare reference-data natural keys and enforce uniqueness behind them
+- **offline**: build the offline reference database from fixtures instead of a committed sqlite snapshot
+- **scripts**: sync annual/perennial module types from FAOSTAT crop types sheet
+
+### Fix
+
+- **livestock-calculator**: treat a 0% tier 2 PRP as a value, not as empty
+- **livestock-calculator**: guard the 100% PRP default on its real scale
+- **history**: stop mutating simple-history's frozen ModelDelta
+- **livestock-awms**: zero Burned For Fuel share for South Asia high-productivity growing swine
+- **gas-head-calculation**: handle single system input for percentage calculations
+- **utilities**: exclude b-intact activities from project copy
+- **fixtures**: drop the "Generic Value" land use type
+- **math_model**: put start-year scalars, not per-year series, in OrganicSoil inventory
+- **tests**: stop bare pytest from flushing a real database
+- **api**: let project admins manage members of finalized projects
+- **fixtures**: drop the "Generic Value" land use type
+- **migrations**: write 0286 DDL as literal SQL to clear Semgrep blockers
+- **api**: verify legacy reference ids on formatVersion 1 project import
+- **api**: resolve reference-data FKs by natural key on project import
+- **api**: carry cached results and status through export/import round trip
+
 ## 1.20.3 (2026-08-10)
 
 ### Fix
