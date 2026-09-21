@@ -503,7 +503,7 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
 
         with (
             patch("api.reports.compute_project_result", side_effect=RuntimeError(secret_message)),
-            patch("api.views.log", create=True) as mock_log,
+            patch("api.views.logger") as mock_log,
         ):
             response = viewset.template(request, pk=1)
 
@@ -518,7 +518,7 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
 
         with (
             patch("api.reports.compute_project_result", side_effect=RuntimeError("crash")),
-            patch("api.views.log", create=True),
+            patch("api.views.logger"),
         ):
             response = viewset.template(request, pk=1)
 
@@ -532,7 +532,7 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
 
         with (
             patch("api.reports.compute_project_result", side_effect=exc),
-            patch("api.views.log", create=True) as mock_log,
+            patch("api.views.logger") as mock_log,
         ):
             viewset.template(request, pk=1)
 

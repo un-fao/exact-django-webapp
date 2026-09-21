@@ -1610,7 +1610,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.exception(e)
             return utils.ErrorResponse(
-                f"Error generating PDF ({type(e).__name__}): {e}",
+                "An unexpected error occurred while generating the PDF",
                 status=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
