@@ -900,6 +900,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if fmt == "pdf" and not template_name:
             return utils.ErrorResponse("Template name is required for PDF", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if fmt == "pdf":
+            # Resolve before enqueueing: an unknown name must be a 400 here, not a
+            # job the analyst waits on only to find it failed in the worker.
+            from .reports import catalog
+
+            try:
+                catalog.resolve_template(template_name, lang)
+            except catalog.UnknownReport as e:
+                return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
         params = {
             "project_id": project.pk,
             "activity_ids": activity_ids,
@@ -1572,9 +1582,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}_{lang}.html"):
-            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
+        from .reports import catalog
+
+        try:
+            template_path = catalog.resolve_template(template_name, lang)
+        except catalog.UnknownReport as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
             from .reports import compute_project_result
@@ -1584,9 +1597,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             result = compute_project_result(project)
             context = build_template_context(result, request, lang)
-            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
+            html = render(request, template_path, context).content.decode()
 
-            # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
 
             pdf = HTML(string=html).write_pdf()
@@ -1598,7 +1610,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.exception(e)
             return utils.ErrorResponse(
-                f"Error generating PDF ({type(e).__name__}): {e}",
+                "An unexpected error occurred while generating the PDF",
                 status=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
