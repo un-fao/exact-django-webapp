@@ -412,7 +412,7 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         vs.format_kwarg = None
         return vs
 
-    def _make_request(self, template_name="report", lang="en"):
+    def _make_request(self, template_name="fao", lang="en"):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
         if hasattr(request, "LANGUAGE_CODE"):
@@ -427,7 +427,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         secret_message = "internal db credentials leaked here"
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError(secret_message)),
             patch("api.models.Project") as mock_project_cls,
             patch("public.views.get_object_or_404") as mock_get_obj,
@@ -450,7 +449,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         exc = RuntimeError("boom")
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=exc),
             patch("public.views.get_object_or_404", return_value=Mock()),
             patch("public.views.log") as mock_log,
@@ -465,7 +463,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         request = self._make_request()
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError("crash")),
             patch("public.views.get_object_or_404", return_value=Mock()),
             patch("public.views.log"),
@@ -490,9 +487,11 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         vs.get_object = Mock(return_value=project)
         return vs
 
-    def _make_request(self, template_name="report", lang="en"):
+    def _make_request(self, template_name="fao", lang="en"):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
+        if hasattr(request, "LANGUAGE_CODE"):
+            del request.LANGUAGE_CODE  # avoid the hasattr branch overriding lang
         return request
 
     def test_returns_generic_error_message_not_raw_exception_text(self):
@@ -503,7 +502,6 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         secret_message = "secret db password exposed"
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError(secret_message)),
             patch("api.views.log", create=True) as mock_log,
         ):
@@ -519,7 +517,6 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         request = self._make_request()
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError("crash")),
             patch("api.views.log", create=True),
         ):
@@ -534,7 +531,6 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         exc = RuntimeError("boom")
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=exc),
             patch("api.views.log", create=True) as mock_log,
         ):

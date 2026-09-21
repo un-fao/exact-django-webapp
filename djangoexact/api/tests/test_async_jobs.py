@@ -162,12 +162,12 @@ class ReportAsyncEndpointTestCase(APITestCase):
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=True), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard&lang=en")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=en")
         self.assertEqual(resp.status_code, 202)
         self.assertIn("job_id", resp.data)
         job = AsyncJob.objects.get(pk=resp.data["job_id"])
         self.assertEqual(job.kind, AsyncJob.Kind.REPORT)
-        self.assertEqual(job.params["template"], "standard")
+        self.assertEqual(job.params["template"], "fao")
         self.assertEqual(job.params["format"], "pdf")
         self.assertEqual(job.params["project_id"], project.pk)
         self.assertIsNone(job.params["activity_ids"])
@@ -194,12 +194,30 @@ class ReportAsyncEndpointTestCase(APITestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
+    def test_unknown_template_returns_400_and_does_not_enqueue(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=nope")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_known_template_unknown_language_returns_400(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=de")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
     def test_not_ready_project_returns_400_and_does_not_enqueue(self):
         project = ProjectFactory(owner=self.user)
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=False), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao")
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
@@ -358,7 +376,7 @@ class ReportJobRunTestCase(TestCase):
             kind=AsyncJob.Kind.REPORT,
             created_by=requester,
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
-                    "template": "standard", "lang": "en"},
+                    "template": "fao", "lang": "en"},
         )
         fake_project = mock.Mock(pk=7, name="P")
         with mock.patch("api.services.report_jobs.Project") as m_project, \
