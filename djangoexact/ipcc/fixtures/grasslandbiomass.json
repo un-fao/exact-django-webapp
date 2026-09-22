@@ -1,122 +1,142 @@
 [
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 1,
+    "pk": 21,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
       "bgb_t_dm_ha": 8.5,
-      "bgb_t_c_ha": 3.995
+      "bgb_t_c_ha": 3.995,
+      "agb_t_dm_ha_min": 0.425,
+      "agb_t_dm_ha_max": 2.975
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 2,
+    "pk": 22,
     "fields": {
       "climate": 4,
       "moisture": 1,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
       "bgb_t_dm_ha": 8.5,
-      "bgb_t_c_ha": 3.995
+      "bgb_t_c_ha": 3.995,
+      "agb_t_dm_ha_min": 0.425,
+      "agb_t_dm_ha_max": 2.975
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 3,
+    "pk": 23,
     "fields": {
       "climate": 1,
       "moisture": 1,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
       "bgb_t_dm_ha": 6.5,
-      "bgb_t_c_ha": 3.055
+      "bgb_t_c_ha": 3.055,
+      "agb_t_dm_ha_min": 0.425,
+      "agb_t_dm_ha_max": 2.975
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 4,
+    "pk": 24,
     "fields": {
       "climate": 1,
       "moisture": 2,
       "agb_t_dm_ha": 2.4,
       "agb_t_c_ha": 1.128,
       "bgb_t_dm_ha": 13.6,
-      "bgb_t_c_ha": 6.392
+      "bgb_t_c_ha": 6.392,
+      "agb_t_dm_ha_min": 0.6,
+      "agb_t_dm_ha_max": 4.2
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 5,
+    "pk": 25,
     "fields": {
       "climate": 2,
       "moisture": 2,
       "agb_t_dm_ha": 2.7,
       "agb_t_c_ha": 1.269,
       "bgb_t_dm_ha": 13.5,
-      "bgb_t_c_ha": 6.345
+      "bgb_t_c_ha": 6.345,
+      "agb_t_dm_ha_min": 0.675,
+      "agb_t_dm_ha_max": 4.725
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 6,
+    "pk": 26,
     "fields": {
       "climate": 2,
       "moisture": 1,
       "agb_t_dm_ha": 1.6,
       "agb_t_c_ha": 0.752,
       "bgb_t_dm_ha": 6.1,
-      "bgb_t_c_ha": 2.867
+      "bgb_t_c_ha": 2.867,
+      "agb_t_dm_ha_min": 0.4,
+      "agb_t_dm_ha_max": 2.8
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 7,
+    "pk": 27,
     "fields": {
       "climate": 3,
       "moisture": 1,
       "agb_t_dm_ha": 2.3,
       "agb_t_c_ha": 1.081,
       "bgb_t_dm_ha": 8.7,
-      "bgb_t_c_ha": 4.089
+      "bgb_t_c_ha": 4.089,
+      "agb_t_dm_ha_min": 0.575,
+      "agb_t_dm_ha_max": 4.025
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 8,
+    "pk": 28,
     "fields": {
       "climate": 3,
       "moisture": 2,
       "agb_t_dm_ha": 6.2,
       "agb_t_c_ha": 2.914,
       "bgb_t_dm_ha": 16.1,
-      "bgb_t_c_ha": 7.567
+      "bgb_t_c_ha": 7.567,
+      "agb_t_dm_ha_min": 1.55,
+      "agb_t_dm_ha_max": 10.85
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 9,
+    "pk": 29,
     "fields": {
       "climate": 3,
       "moisture": 4,
       "agb_t_dm_ha": 6.2,
       "agb_t_c_ha": 2.914,
       "bgb_t_dm_ha": 16.1,
-      "bgb_t_c_ha": 7.567
+      "bgb_t_c_ha": 7.567,
+      "agb_t_dm_ha_min": 1.55,
+      "agb_t_dm_ha_max": 10.85
     }
   },
   {
     "model": "ipcc.grasslandbiomass",
-    "pk": 10,
+    "pk": 30,
     "fields": {
       "climate": 20,
       "moisture": 1,
       "agb_t_dm_ha": 2.3,
       "agb_t_c_ha": 1.081,
       "bgb_t_dm_ha": 8.7,
-      "bgb_t_c_ha": 4.089
+      "bgb_t_c_ha": 4.089,
+      "agb_t_dm_ha_min": 0.575,
+      "agb_t_dm_ha_max": 4.025
     }
   }
 ]

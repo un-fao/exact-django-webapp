@@ -304,6 +304,7 @@ class Region(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    iso3 = models.CharField(max_length=3, null=True, blank=True, unique=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     ipcc_region = models.ForeignKey(IPCCRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     gleam_region = models.ForeignKey(GLEAMRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
@@ -690,6 +691,7 @@ class Project(Historical, DirtyFieldsMixin):
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
     lock_updated_at = models.DateTimeField(null=True, blank=True, verbose_name="lock_updated_at")
     locked_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name="locked_projects", verbose_name="locked_by")
+    last_recap_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="last_recap_sent_at")
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE, verbose_name="gw_potential")
 
@@ -760,6 +762,12 @@ class Project(Historical, DirtyFieldsMixin):
                 exclude_fields = [
                     "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
                     "is_finalized", "is_public", "is_archived", "archived_at",
+                    # export_id is assigned lazily by the export endpoint on the
+                    # first download. It identifies the file, never the science,
+                    # so invalidating on it would wipe the cached results of the
+                    # project being exported and guarantee the exported file
+                    # carries no results at all.
+                    "export_id",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):
@@ -795,17 +803,8 @@ class Project(Historical, DirtyFieldsMixin):
         self.locked_by = user
         self.save()
 
-    def unlock(self, send_email=True):
-        """
-        Unlocks the project and sends an email to the user who locked it.
-
-        Args:
-            send_email (bool): If True, sends an email to the user who locked the project.
-        """
-        # TODO: Uncomment this when we have a way to send recap emails again
-        # if send_email and self.is_locked:
-        #     utils.send_changes_email(self)
-
+    def unlock(self):
+        """Unlocks the project. Recap emails go out on the daily schedule, not on unlock."""
         self.is_locked = False
         self.locked_at = None
         self.lock_updated_at = None
@@ -938,7 +937,7 @@ class ProjectNotificationPreference(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="project_notification_preferences")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notification_preferences")
-    is_opted_out = models.BooleanField(default=False, verbose_name="is_opted_out_of_project_notifications")
+    is_subscribed = models.BooleanField(default=False, verbose_name="is_subscribed_to_project_notifications")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -949,7 +948,7 @@ class ProjectNotificationPreference(models.Model):
         verbose_name_plural = "Project Notification Preferences"
 
     def __str__(self):
-        status = "opted out" if self.is_opted_out else "receiving notifications"
+        status = "subscribed to notifications" if self.is_subscribed else "not subscribed"
         return f"({self.pk}) {self.user.email} - {self.project.name} - {status}"
 
 

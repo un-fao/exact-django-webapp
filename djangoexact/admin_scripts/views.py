@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from functools import wraps
 
+import requests
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Count
@@ -14,12 +15,13 @@ from django.urls import reverse
 
 from admin_scripts.catalog import get_catalog
 from admin_scripts.excel_export import build_scenarios_workbook
+from admin_scripts.fra_carbon_stock import fetch_data, fetch_years, parse_payload, replace_carbon_stock
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enqueue_or_join
 from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
 from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
-from api.models import Climate, Moisture, SoilType
+from api.models import Climate, Country, Moisture, SoilType
 from minitool.models import ChangeRecord
 
 
@@ -107,6 +109,11 @@ SCRIPTS = [
         "url": "test-modules",
         "description": "Systematically run a capped computation for every module/field in the catalog and report success/failure per pair.",
     },
+    {
+        "name": "Import FRA Carbon Stock",
+        "url": "fra-carbon-stock",
+        "description": "Replace all FRA carbon stock rows with data for a chosen FRA assessment year.",
+    },
 ]
 
 
@@ -193,6 +200,51 @@ def example_script(request):
         else:
             error = "Please provide a name."
     return render(request, "admin_scripts/scripts/example_script.html", {
+        "result": result,
+        "error": error,
+    })
+
+
+@login_required(login_url="/admin/login/")
+@staff_required
+def fra_carbon_stock(request):
+    """Staff-only, POST-only, destructive replace-all import of FRA carbon
+    stock data for one chosen assessment year. See admin_scripts/fra_carbon_stock.py
+    for the fetch/parse/write logic; kept out of the view for testability.
+    """
+    result = None
+    error = None
+
+    try:
+        years = fetch_years()
+    except requests.RequestException as e:
+        years = []
+        error = f"Could not fetch FRA assessment years: {e}"
+
+    selected_year = max(years, key=int) if years else ""
+
+    if request.method == "POST":
+        posted_year = request.POST.get("year", "")
+        if posted_year not in years:
+            error = "Invalid or stale assessment year. Please try again."
+        else:
+            selected_year = posted_year
+            try:
+                isos = list(
+                    Country.objects.exclude(iso3__isnull=True)
+                    .values_list("iso3", flat=True)
+                )
+                payload = fetch_data(posted_year, isos)
+                by_iso = parse_payload(payload, posted_year)
+                result = replace_carbon_stock(posted_year, by_iso)
+            except requests.RequestException as e:
+                error = f"Could not fetch FRA carbon stock data: {e}"
+            except ValueError as e:
+                error = f"Could not import FRA carbon stock data: {e}"
+
+    return render(request, "admin_scripts/scripts/fra_carbon_stock.html", {
+        "years": years,
+        "selected_year": selected_year,
         "result": result,
         "error": error,
     })

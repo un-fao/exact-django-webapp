@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "refrigerant_type": 1,
-      "gwp": 8,
+      "gwp": 3,
       "value": 11700.0
     }
   },
@@ -13,7 +13,7 @@
     "pk": 2,
     "fields": {
       "refrigerant_type": 1,
-      "gwp": 9,
+      "gwp": 4,
       "value": 14800.0
     }
   },
@@ -22,7 +22,7 @@
     "pk": 3,
     "fields": {
       "refrigerant_type": 1,
-      "gwp": 10,
+      "gwp": 2,
       "value": 12400.0
     }
   },
@@ -31,7 +31,7 @@
     "pk": 4,
     "fields": {
       "refrigerant_type": 1,
-      "gwp": 11,
+      "gwp": 1,
       "value": 12400.0
     }
   },
@@ -40,7 +40,7 @@
     "pk": 5,
     "fields": {
       "refrigerant_type": 1,
-      "gwp": 12,
+      "gwp": 5,
       "value": 14600.0
     }
   },
@@ -49,7 +49,7 @@
     "pk": 6,
     "fields": {
       "refrigerant_type": 2,
-      "gwp": 8,
+      "gwp": 3,
       "value": 650.0
     }
   },
@@ -58,7 +58,7 @@
     "pk": 7,
     "fields": {
       "refrigerant_type": 2,
-      "gwp": 9,
+      "gwp": 4,
       "value": 675.0
     }
   },
@@ -67,7 +67,7 @@
     "pk": 8,
     "fields": {
       "refrigerant_type": 2,
-      "gwp": 10,
+      "gwp": 2,
       "value": 677.0
     }
   },
@@ -76,7 +76,7 @@
     "pk": 9,
     "fields": {
       "refrigerant_type": 2,
-      "gwp": 11,
+      "gwp": 1,
       "value": 677.0
     }
   },
@@ -85,7 +85,7 @@
     "pk": 10,
     "fields": {
       "refrigerant_type": 2,
-      "gwp": 12,
+      "gwp": 5,
       "value": 771.0
     }
   },
@@ -94,7 +94,7 @@
     "pk": 11,
     "fields": {
       "refrigerant_type": 3,
-      "gwp": 8,
+      "gwp": 3,
       "value": 2800.0
     }
   },
@@ -103,7 +103,7 @@
     "pk": 12,
     "fields": {
       "refrigerant_type": 3,
-      "gwp": 9,
+      "gwp": 4,
       "value": 3500.0
     }
   },
@@ -112,7 +112,7 @@
     "pk": 13,
     "fields": {
       "refrigerant_type": 3,
-      "gwp": 10,
+      "gwp": 2,
       "value": 3170.0
     }
   },
@@ -121,7 +121,7 @@
     "pk": 14,
     "fields": {
       "refrigerant_type": 3,
-      "gwp": 11,
+      "gwp": 1,
       "value": 3170.0
     }
   },
@@ -130,7 +130,7 @@
     "pk": 15,
     "fields": {
       "refrigerant_type": 3,
-      "gwp": 12,
+      "gwp": 5,
       "value": 3740.0
     }
   },
@@ -139,7 +139,7 @@
     "pk": 16,
     "fields": {
       "refrigerant_type": 4,
-      "gwp": 8,
+      "gwp": 3,
       "value": 1300.0
     }
   },
@@ -148,7 +148,7 @@
     "pk": 17,
     "fields": {
       "refrigerant_type": 4,
-      "gwp": 9,
+      "gwp": 4,
       "value": 1430.0
     }
   },
@@ -157,7 +157,7 @@
     "pk": 18,
     "fields": {
       "refrigerant_type": 4,
-      "gwp": 10,
+      "gwp": 2,
       "value": 1550.0
     }
   },
@@ -166,7 +166,7 @@
     "pk": 19,
     "fields": {
       "refrigerant_type": 4,
-      "gwp": 11,
+      "gwp": 1,
       "value": 1300.0
     }
   },
@@ -175,7 +175,7 @@
     "pk": 20,
     "fields": {
       "refrigerant_type": 4,
-      "gwp": 12,
+      "gwp": 5,
       "value": 1530.0
     }
   },
@@ -184,7 +184,7 @@
     "pk": 21,
     "fields": {
       "refrigerant_type": 5,
-      "gwp": 8,
+      "gwp": 3,
       "value": 3800.0
     }
   },
@@ -193,7 +193,7 @@
     "pk": 22,
     "fields": {
       "refrigerant_type": 5,
-      "gwp": 9,
+      "gwp": 4,
       "value": 4470.0
     }
   },
@@ -202,7 +202,7 @@
     "pk": 23,
     "fields": {
       "refrigerant_type": 5,
-      "gwp": 10,
+      "gwp": 2,
       "value": 4800.0
     }
   },
@@ -211,7 +211,7 @@
     "pk": 24,
     "fields": {
       "refrigerant_type": 5,
-      "gwp": 11,
+      "gwp": 1,
       "value": 4800.0
     }
   },
@@ -220,7 +220,7 @@
     "pk": 25,
     "fields": {
       "refrigerant_type": 5,
-      "gwp": 12,
+      "gwp": 5,
       "value": 5810.0
     }
   },
@@ -229,7 +229,7 @@
     "pk": 26,
     "fields": {
       "refrigerant_type": 6,
-      "gwp": 8,
+      "gwp": 3,
       "value": 140.0
     }
   },
@@ -238,7 +238,7 @@
     "pk": 27,
     "fields": {
       "refrigerant_type": 6,
-      "gwp": 9,
+      "gwp": 4,
       "value": 124.0
     }
   },
@@ -247,7 +247,7 @@
     "pk": 28,
     "fields": {
       "refrigerant_type": 6,
-      "gwp": 10,
+      "gwp": 2,
       "value": 138.0
     }
   },
@@ -256,7 +256,7 @@
     "pk": 29,
     "fields": {
       "refrigerant_type": 6,
-      "gwp": 11,
+      "gwp": 1,
       "value": 138.0
     }
   },
@@ -265,7 +265,7 @@
     "pk": 30,
     "fields": {
       "refrigerant_type": 6,
-      "gwp": 12,
+      "gwp": 5,
       "value": 164.0
     }
   },
@@ -274,7 +274,7 @@
     "pk": 31,
     "fields": {
       "refrigerant_type": 7,
-      "gwp": 8,
+      "gwp": 3,
       "value": 2900.0
     }
   },
@@ -283,7 +283,7 @@
     "pk": 32,
     "fields": {
       "refrigerant_type": 7,
-      "gwp": 9,
+      "gwp": 4,
       "value": 3220.0
     }
   },
@@ -292,7 +292,7 @@
     "pk": 33,
     "fields": {
       "refrigerant_type": 7,
-      "gwp": 10,
+      "gwp": 2,
       "value": 3350.0
     }
   },
@@ -301,7 +301,7 @@
     "pk": 34,
     "fields": {
       "refrigerant_type": 7,
-      "gwp": 11,
+      "gwp": 1,
       "value": 3350.0
     }
   },
@@ -310,7 +310,7 @@
     "pk": 35,
     "fields": {
       "refrigerant_type": 7,
-      "gwp": 12,
+      "gwp": 5,
       "value": 3600.0
     }
   },
@@ -319,7 +319,7 @@
     "pk": 36,
     "fields": {
       "refrigerant_type": 8,
-      "gwp": 8,
+      "gwp": 3,
       "value": 6300.0
     }
   },
@@ -328,7 +328,7 @@
     "pk": 37,
     "fields": {
       "refrigerant_type": 8,
-      "gwp": 9,
+      "gwp": 4,
       "value": 9810.0
     }
   },
@@ -337,7 +337,7 @@
     "pk": 38,
     "fields": {
       "refrigerant_type": 8,
-      "gwp": 10,
+      "gwp": 2,
       "value": 8060.0
     }
   },
@@ -346,7 +346,7 @@
     "pk": 39,
     "fields": {
       "refrigerant_type": 8,
-      "gwp": 11,
+      "gwp": 1,
       "value": 8060.0
     }
   },
@@ -355,7 +355,7 @@
     "pk": 40,
     "fields": {
       "refrigerant_type": 8,
-      "gwp": 12,
+      "gwp": 5,
       "value": 8690.0
     }
   },
@@ -364,7 +364,7 @@
     "pk": 41,
     "fields": {
       "refrigerant_type": 9,
-      "gwp": 9,
+      "gwp": 4,
       "value": 1030.0
     }
   },
@@ -373,7 +373,7 @@
     "pk": 42,
     "fields": {
       "refrigerant_type": 9,
-      "gwp": 10,
+      "gwp": 2,
       "value": 858.0
     }
   },
@@ -382,7 +382,7 @@
     "pk": 43,
     "fields": {
       "refrigerant_type": 9,
-      "gwp": 11,
+      "gwp": 1,
       "value": 858.0
     }
   },
@@ -391,7 +391,7 @@
     "pk": 44,
     "fields": {
       "refrigerant_type": 9,
-      "gwp": 12,
+      "gwp": 5,
       "value": 962.0
     }
   },
@@ -400,7 +400,7 @@
     "pk": 45,
     "fields": {
       "refrigerant_type": 10,
-      "gwp": 9,
+      "gwp": 4,
       "value": 794.0
     }
   },
@@ -409,7 +409,7 @@
     "pk": 46,
     "fields": {
       "refrigerant_type": 10,
-      "gwp": 10,
+      "gwp": 2,
       "value": 804.0
     }
   },
@@ -418,7 +418,7 @@
     "pk": 47,
     "fields": {
       "refrigerant_type": 10,
-      "gwp": 11,
+      "gwp": 1,
       "value": 804.0
     }
   },
@@ -427,7 +427,7 @@
     "pk": 48,
     "fields": {
       "refrigerant_type": 10,
-      "gwp": 12,
+      "gwp": 5,
       "value": 914.0
     }
   },
@@ -436,7 +436,7 @@
     "pk": 49,
     "fields": {
       "refrigerant_type": 11,
-      "gwp": 8,
+      "gwp": 3,
       "value": 1300.0
     }
   },
@@ -445,7 +445,7 @@
     "pk": 50,
     "fields": {
       "refrigerant_type": 11,
-      "gwp": 9,
+      "gwp": 4,
       "value": 1640.0
     }
   },
@@ -454,7 +454,7 @@
     "pk": 51,
     "fields": {
       "refrigerant_type": 11,
-      "gwp": 10,
+      "gwp": 2,
       "value": 1650.0
     }
   },
@@ -463,7 +463,7 @@
     "pk": 52,
     "fields": {
       "refrigerant_type": 11,
-      "gwp": 11,
+      "gwp": 1,
       "value": 1650.0
     }
   },
@@ -472,7 +472,7 @@
     "pk": 53,
     "fields": {
       "refrigerant_type": 11,
-      "gwp": 12,
+      "gwp": 5,
       "value": 1600.0
     }
   },
@@ -481,7 +481,7 @@
     "pk": 54,
     "fields": {
       "refrigerant_type": 12,
-      "gwp": 9,
+      "gwp": 4,
       "value": 4.0
     }
   },
@@ -490,7 +490,7 @@
     "pk": 55,
     "fields": {
       "refrigerant_type": 12,
-      "gwp": 10,
+      "gwp": 2,
       "value": 0.5
     }
   },
@@ -499,7 +499,7 @@
     "pk": 56,
     "fields": {
       "refrigerant_type": 12,
-      "gwp": 11,
+      "gwp": 1,
       "value": 0.5
     }
   },
@@ -508,7 +508,7 @@
     "pk": 57,
     "fields": {
       "refrigerant_type": 12,
-      "gwp": 12,
+      "gwp": 5,
       "value": 0.5
     }
   },
@@ -517,7 +517,7 @@
     "pk": 58,
     "fields": {
       "refrigerant_type": 13,
-      "gwp": 9,
+      "gwp": 4,
       "value": 7.0
     }
   },
@@ -526,7 +526,7 @@
     "pk": 59,
     "fields": {
       "refrigerant_type": 13,
-      "gwp": 10,
+      "gwp": 2,
       "value": 1.37
     }
   },
@@ -535,7 +535,7 @@
     "pk": 60,
     "fields": {
       "refrigerant_type": 13,
-      "gwp": 11,
+      "gwp": 1,
       "value": 1.37
     }
   },
@@ -544,7 +544,7 @@
     "pk": 61,
     "fields": {
       "refrigerant_type": 13,
-      "gwp": 12,
+      "gwp": 5,
       "value": 1.37
     }
   },
@@ -553,7 +553,7 @@
     "pk": 62,
     "fields": {
       "refrigerant_type": 14,
-      "gwp": 9,
+      "gwp": 4,
       "value": 9.0
     }
   },
@@ -562,7 +562,7 @@
     "pk": 63,
     "fields": {
       "refrigerant_type": 14,
-      "gwp": 10,
+      "gwp": 2,
       "value": 2.0
     }
   },
@@ -571,7 +571,7 @@
     "pk": 64,
     "fields": {
       "refrigerant_type": 14,
-      "gwp": 11,
+      "gwp": 1,
       "value": 2.0
     }
   },
@@ -580,7 +580,7 @@
     "pk": 65,
     "fields": {
       "refrigerant_type": 14,
-      "gwp": 12,
+      "gwp": 5,
       "value": 2.08
     }
   },
@@ -589,7 +589,7 @@
     "pk": 66,
     "fields": {
       "refrigerant_type": 15,
-      "gwp": 10,
+      "gwp": 2,
       "value": 7.0
     }
   },
@@ -598,7 +598,7 @@
     "pk": 67,
     "fields": {
       "refrigerant_type": 15,
-      "gwp": 11,
+      "gwp": 1,
       "value": 7.0
     }
   },
@@ -607,7 +607,7 @@
     "pk": 68,
     "fields": {
       "refrigerant_type": 15,
-      "gwp": 12,
+      "gwp": 5,
       "value": 17.9
     }
   },
@@ -616,7 +616,7 @@
     "pk": 69,
     "fields": {
       "refrigerant_type": 16,
-      "gwp": 9,
+      "gwp": 4,
       "value": 4.5
     }
   },
@@ -625,7 +625,7 @@
     "pk": 70,
     "fields": {
       "refrigerant_type": 16,
-      "gwp": 10,
+      "gwp": 2,
       "value": 1.0
     }
   },
@@ -634,7 +634,7 @@
     "pk": 71,
     "fields": {
       "refrigerant_type": 16,
-      "gwp": 11,
+      "gwp": 1,
       "value": 1.0
     }
   },
@@ -643,7 +643,7 @@
     "pk": 72,
     "fields": {
       "refrigerant_type": 16,
-      "gwp": 12,
+      "gwp": 5,
       "value": 3.88
     }
   },
@@ -652,7 +652,7 @@
     "pk": 73,
     "fields": {
       "refrigerant_type": 17,
-      "gwp": 10,
+      "gwp": 2,
       "value": 1.0
     }
   },
@@ -661,88 +661,115 @@
     "pk": 74,
     "fields": {
       "refrigerant_type": 17,
-      "gwp": 11,
+      "gwp": 1,
       "value": 1.0
+    }
+  },
+  {
+    "model": "ipcc.valuechainrefrigerantemissionfactor",
+    "pk": 75,
+    "fields": {
+      "refrigerant_type": 18,
+      "gwp": 3,
+      "value": 1500.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 76,
     "fields": {
-      "refrigerant_type": 1,
-      "gwp": 8,
-      "value": 11700.0
+      "refrigerant_type": 9,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 77,
     "fields": {
-      "refrigerant_type": 2,
-      "gwp": 8,
-      "value": 650.0
+      "refrigerant_type": 10,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 78,
     "fields": {
-      "refrigerant_type": 3,
-      "gwp": 8,
-      "value": 2800.0
+      "refrigerant_type": 12,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 79,
     "fields": {
-      "refrigerant_type": 4,
-      "gwp": 8,
-      "value": 1300.0
+      "refrigerant_type": 13,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 80,
     "fields": {
-      "refrigerant_type": 5,
-      "gwp": 8,
-      "value": 3800.0
+      "refrigerant_type": 14,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 81,
     "fields": {
-      "refrigerant_type": 6,
-      "gwp": 8,
-      "value": 140.0
+      "refrigerant_type": 15,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 82,
     "fields": {
-      "refrigerant_type": 7,
-      "gwp": 8,
-      "value": 2900.0
+      "refrigerant_type": 16,
+      "gwp": 3,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 83,
     "fields": {
-      "refrigerant_type": 8,
-      "gwp": 8,
-      "value": 6300.0
+      "refrigerant_type": 17,
+      "gwp": 3,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "ipcc.valuechainrefrigerantemissionfactor",
+    "pk": 84,
+    "fields": {
+      "refrigerant_type": 18,
+      "gwp": 4,
+      "value": 1810.0
+    }
+  },
+  {
+    "model": "ipcc.valuechainrefrigerantemissionfactor",
+    "pk": 85,
+    "fields": {
+      "refrigerant_type": 15,
+      "gwp": 4,
+      "value": 0.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 86,
     "fields": {
-      "refrigerant_type": 9,
-      "gwp": 8,
+      "refrigerant_type": 17,
+      "gwp": 4,
       "value": 0.0
     }
   },
@@ -750,134 +777,35 @@
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 87,
     "fields": {
-      "refrigerant_type": 10,
-      "gwp": 8,
-      "value": 0.0
+      "refrigerant_type": 18,
+      "gwp": 1,
+      "value": 1760.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 88,
     "fields": {
-      "refrigerant_type": 12,
-      "gwp": 8,
-      "value": 0.0
+      "refrigerant_type": 18,
+      "gwp": 2,
+      "value": 1760.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 89,
     "fields": {
-      "refrigerant_type": 13,
-      "gwp": 8,
-      "value": 0.0
+      "refrigerant_type": 18,
+      "gwp": 5,
+      "value": 1960.0
     }
   },
   {
     "model": "ipcc.valuechainrefrigerantemissionfactor",
     "pk": 90,
     "fields": {
-      "refrigerant_type": 14,
-      "gwp": 8,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 91,
-    "fields": {
-      "refrigerant_type": 15,
-      "gwp": 8,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 92,
-    "fields": {
-      "refrigerant_type": 16,
-      "gwp": 8,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 93,
-    "fields": {
       "refrigerant_type": 17,
-      "gwp": 8,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 94,
-    "fields": {
-      "refrigerant_type": 27,
-      "gwp": 8,
-      "value": 1500.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 95,
-    "fields": {
-      "refrigerant_type": 27,
-      "gwp": 9,
-      "value": 1810.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 96,
-    "fields": {
-      "refrigerant_type": 15,
-      "gwp": 9,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 97,
-    "fields": {
-      "refrigerant_type": 17,
-      "gwp": 9,
-      "value": 0.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 98,
-    "fields": {
-      "refrigerant_type": 27,
-      "gwp": 11,
-      "value": 1760.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 99,
-    "fields": {
-      "refrigerant_type": 27,
-      "gwp": 10,
-      "value": 1760.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 100,
-    "fields": {
-      "refrigerant_type": 27,
-      "gwp": 12,
-      "value": 1960.0
-    }
-  },
-  {
-    "model": "ipcc.valuechainrefrigerantemissionfactor",
-    "pk": 101,
-    "fields": {
-      "refrigerant_type": 17,
-      "gwp": 12,
+      "gwp": 5,
       "value": 0.0
     }
   }

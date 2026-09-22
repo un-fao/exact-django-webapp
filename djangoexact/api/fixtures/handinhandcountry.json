@@ -73,6 +73,15 @@
   },
   {
     "model": "api.handinhandcountry",
+    "pk": 31,
+    "fields": {
+      "region": 1,
+      "name": "Liberia",
+      "iso_code": "LR"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
     "pk": 9,
     "fields": {
       "region": 1,

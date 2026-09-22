@@ -23,17 +23,6 @@
   },
   {
     "model": "api.roadtype",
-    "pk": 3,
-    "fields": {
-      "name": "Road (Reinforced Concrete)",
-      "name_en": "Road (Reinforced Concrete)",
-      "name_fr": "Route (béton armé)\n",
-      "name_es": "Carretera (Hormigón Armado)",
-      "name_ru": "Дорога (Армированный бетон)"
-    }
-  },
-  {
-    "model": "api.roadtype",
     "pk": 4,
     "fields": {
       "name": "Road Rehabilitated (Pavement)",
@@ -41,6 +30,17 @@
       "name_fr": "Route réhabilitée (revêtement)\n",
       "name_es": "Carretera Rehabilitada (Pavimentada)",
       "name_ru": "Реконструкция дорог (Покрытие)"
+    }
+  },
+  {
+    "model": "api.roadtype",
+    "pk": 3,
+    "fields": {
+      "name": "Road (Reinforced Concrete)",
+      "name_en": "Road (Reinforced Concrete)",
+      "name_fr": "Route (béton armé)\n",
+      "name_es": "Carretera (Hormigón Armado)",
+      "name_ru": "Дорога (Армированный бетон)"
     }
   }
 ]

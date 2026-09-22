@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from api.views import warmup
+from api.views import recap_sweep, warmup
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -28,4 +28,5 @@ urlpatterns = [
     path("api/minitool/", include("minitool.urls")),
     path("api/admin-scripts/", include("admin_scripts.urls")),
     path("_ah/warmup", warmup),
+    path("cron/recaps/", recap_sweep),
 ]

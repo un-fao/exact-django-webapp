@@ -38,6 +38,7 @@ from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
+from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
@@ -140,7 +141,12 @@ from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseForbidden, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from google.auth.exceptions import GoogleAuthError
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
@@ -155,6 +161,73 @@ from api.services import async_jobs
 from api.services import report_links
 
 logger = logging.getLogger("console")
+
+# Columns that carry a module's computed state across an export/import round
+# trip. They are deliberately NOT written during objects.create(): saving a
+# submodule runs CachedResultMixin.save(), which calls
+# parent.invalidate_cached_results() and would wipe a cache restored a moment
+# earlier. Instead they are replayed once the whole module tree exists, via a
+# queryset update() that bypasses save() and so cannot invalidate anything or
+# re-stamp last_modified.
+CACHE_RESTORE_FIELDS = (
+    "last_cached_at",
+    "cached_results_total",
+    "cached_results_by_activity",
+    "cached_results_by_gas",
+    "cached_results_by_activity_by_gas",
+    "cached_units_breakdown",
+    "last_modified",
+)
+
+
+def _parse_export_datetime(value):
+    """Coerce a timestamp from an export file back into an aware datetime.
+
+    Export writes timestamps through json.dumps(default=str), so they arrive as
+    strings such as "2026-08-11 10:31:02.412+00:00". Returns None when the
+    value is missing or unparseable, in which case the caller leaves the field
+    to its normal default.
+    """
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        parsed = parse_datetime(str(value))
+    if parsed is None:
+        return None
+    if timezone.is_naive(parsed):
+        parsed = timezone.make_aware(parsed, timezone.get_default_timezone())
+    return parsed
+
+
+def _extract_cache_restore(module_data, resolve_status_id):
+    """Pop the cache and status columns out of an exported module payload.
+
+    Removing them from ``module_data`` keeps them out of objects.create(), so
+    the values are written exactly once, by the deferred restore pass. Returns
+    the column/value mapping to replay, empty for payloads produced by an older
+    build that did not export these fields.
+    """
+    restore = {}
+
+    for field_name in CACHE_RESTORE_FIELDS:
+        if field_name not in module_data:
+            continue
+        value = module_data.pop(field_name)
+        if field_name in ("last_cached_at", "last_modified"):
+            value = _parse_export_datetime(value)
+            if value is None:
+                continue
+        restore[field_name] = value
+
+    if "status" in module_data:
+        status_id = resolve_status_id(module_data.pop("status"))
+        if status_id is not None:
+            restore["status_id"] = status_id
+
+    return restore
+
 
 activity_id = openapi.Parameter(
     "activity_id",
@@ -260,6 +333,31 @@ class DefaultPagination(PageNumberPagination):
 
 def warmup(request):
     return HttpResponse("Warmup successful.")
+
+
+# One scheduler service account per GCP project, so its address follows from
+# PROJECT_ID and needs no setting of its own.
+RECAP_SCHEDULER_SERVICE_ACCOUNT = "recap-email-scheduler@{}.iam.gserviceaccount.com"
+
+
+@csrf_exempt
+@require_POST
+def recap_sweep(request):
+    # The Cloud Run service accepts unauthenticated calls because it is the public
+    # API, so Cloud Run never checks Cloud Scheduler's OIDC token: it is checked here.
+    token = request.headers.get("Authorization", "").removeprefix("Bearer ")
+    try:
+        claims = id_token.verify_oauth2_token(token, google_requests.Request(), audience=request.build_absolute_uri())
+    except (ValueError, GoogleAuthError):
+        return HttpResponseForbidden()
+
+    expected = RECAP_SCHEDULER_SERVICE_ACCOUNT.format(os.getenv("PROJECT_ID", ""))
+    if not claims.get("email_verified") or claims.get("email") != expected:
+        return HttpResponseForbidden()
+
+    # ponytail: the sweep runs inside one gunicorn request (GUNICORN_TIMEOUT, 120s); move it to
+    # exact-computation-job via an args override once the review workflow rebuilds that image.
+    return JsonResponse({"sent": utils.send_due_recaps()})
 
 
 class BaseWiewSet(viewsets.GenericViewSet):
@@ -1033,6 +1131,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     result[field_name] = value
             return result
 
+        # Queued (model, pk, values) triples replayed after every module and
+        # submodule exists. See CACHE_RESTORE_FIELDS for why this is deferred.
+        cache_restores = []
+        status_id_cache = {}
+
+        def resolve_status_id(value):
+            """Map an exported StatusType PK onto one that exists here.
+
+            Reference-data PKs are stable across EX-ACT installations, so this
+            is normally the identity. An unknown id means the file came from a
+            database with different reference data: drop it rather than abort
+            the whole import with a foreign key violation, and let the module
+            fall back to EMPTY as it did before.
+            """
+            if not isinstance(value, int):
+                return None
+            if value not in status_id_cache:
+                status_id_cache[value] = (
+                    value if StatusType.objects.filter(pk=value).exists() else None
+                )
+            return status_id_cache[value]
+
         try:
             with transaction.atomic():
                 # Extract activities before creating project
@@ -1108,6 +1228,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 original_id = module_data.pop('_original_id', None)
                                 submodules_data = module_data.pop('_submodules', [])
 
+                                restore_values = _extract_cache_restore(
+                                    module_data, resolve_status_id
+                                )
+
                                 filtered_module_data = prepare_model_data(
                                     model_class, module_data, module_id_map
                                 )
@@ -1115,6 +1239,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     activity=activity,
                                     **filtered_module_data
                                 )
+
+                                if restore_values:
+                                    cache_restores.append(
+                                        (model_class, new_instance.pk, restore_values)
+                                    )
 
                                 if original_id is not None:
                                     module_id_map[original_id] = new_instance
@@ -1126,8 +1255,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 if submodules_data:
                                     self._create_submodules(
                                         new_instance, submodules_data, prepare_model_data,
-                                        _reconstruct_threads, author_cache, module_id_map
+                                        _reconstruct_threads, author_cache, module_id_map,
+                                        cache_restores, resolve_status_id
                                     )
+
+                # Replay the exported results now that every module and
+                # submodule exists. update() bypasses save(), so this cannot
+                # retrigger cache invalidation or re-stamp last_modified.
+                for restore_model, restore_pk, restore_values in cache_restores:
+                    restore_model.objects.filter(pk=restore_pk).update(**restore_values)
 
                 return Response({
                     "exists": False,
@@ -1148,7 +1284,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return getattr(models, class_name, None)
 
     def _create_submodules(self, parent_instance, submodules_data, prepare_model_data,
-                           reconstruct_threads_fn, author_cache, module_id_map):
+                           reconstruct_threads_fn, author_cache, module_id_map,
+                           cache_restores, resolve_status_id):
         """
         Create submodules for a parent module from exported submodule data.
 
@@ -1159,6 +1296,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
             reconstruct_threads_fn: Function to reconstruct thread comments
             author_cache: Cache for author lookups
             module_id_map: Map of original IDs to new instances
+            cache_restores: Sink collecting (model, pk, values) triples to
+                replay once the whole module tree exists
+            resolve_status_id: Callable mapping an exported StatusType PK onto
+                one valid in this database
         """
         for submodule_data in submodules_data:
             submodule_data = submodule_data.copy()
@@ -1192,6 +1333,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 logger.warning(f"Could not determine submodule class for {parent_instance.__class__.__name__}")
                 continue
 
+            restore_values = _extract_cache_restore(submodule_data, resolve_status_id)
+
             filtered_submodule_data = prepare_model_data(
                 submodule_class, submodule_data, module_id_map
             )
@@ -1201,6 +1344,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 parent=parent_instance,
                 **filtered_submodule_data
             )
+
+            if restore_values:
+                cache_restores.append(
+                    (submodule_class, new_submodule.pk, restore_values)
+                )
 
             if original_id is not None:
                 module_id_map[original_id] = new_submodule
@@ -1212,7 +1360,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             if nested_submodules:
                 self._create_submodules(
                     new_submodule, nested_submodules, prepare_model_data,
-                    reconstruct_threads_fn, author_cache, module_id_map
+                    reconstruct_threads_fn, author_cache, module_id_map,
+                    cache_restores, resolve_status_id
                 )
 
     @transaction.atomic
@@ -1466,18 +1615,35 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
-        operation_description="Send recap email with project changes",
-        responses={200: "Email sent successfully", 400: "Bad request", 500: "Internal server error"},
+        operation_description="Send a recap email of changes and comments since the last recap to project Admins. Admin-only; works on locked and unlocked projects alike.",
+        responses={
+            200: "Recap processed (see 'sent' in the response body for whether mail actually went out)",
+            403: "Selected user does not have project-admin permission for this project",
+            500: "Internal server error",
+        },
     )
     def recap(self, request, pk=None):
         project = self.get_object()
-        error = security.check_permission("view_project", request.user, project)
+        error = security.check_project_admin(request.user, project)
         if error:
             return error
 
         try:
-            utils.send_changes_email(project)
-            return Response({"message": "Recap email sent successfully"}, status=http_status.HTTP_200_OK)
+            sent_count = utils.send_changes_email(project)
+            if sent_count > 0:
+                return Response(
+                    {"message": "Recap email sent successfully", "sent": True, "count": sent_count},
+                    status=http_status.HTTP_200_OK,
+                )
+
+            return Response(
+                {
+                    "message": "No recap email was sent: there were no changes since the last recap, or every admin has opted out of notifications.",
+                    "sent": False,
+                    "count": 0,
+                },
+                status=http_status.HTTP_200_OK,
+            )
 
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1567,7 +1733,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1582,7 +1748,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1668,6 +1834,7 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
             200: ProjectNotificationPreferenceReadSerializer,
             201: ProjectNotificationPreferenceReadSerializer,
             400: "Bad request",
+            403: "Forbidden",
         },
     )
     def create(self, request, *args, **kwargs):
@@ -1679,12 +1846,16 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         user = request.user
         project = serializer.validated_data["project"]
 
+        error = security.check_project_admin(user, project)
+        if error:
+            return error
+
         # Get or create the preference
-        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_subscribed": serializer.validated_data.get("is_subscribed", False)})
 
         if not created:
             # Update existing preference
-            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.is_subscribed = serializer.validated_data.get("is_subscribed", False)
             preference.save()
 
         response_serializer = ProjectNotificationPreferenceReadSerializer(preference)
@@ -1707,6 +1878,10 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         if instance.user != request.user:
             return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
 
+        error = security.check_project_admin(request.user, instance.project)
+        if error:
+            return error
+
         serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
 
         if not serializer.is_valid():
@@ -1716,6 +1891,12 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
 
         return Response(response_serializer.data, status=http_status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        # Inherited ModelViewSet.update would write through the read serializer and
+        # bypass the ownership + admin gates above; force every PUT through the
+        # gated partial_update path instead.
+        return self.partial_update(request, *args, **kwargs)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

@@ -1,26 +1,7 @@
 [
   {
     "model": "api.handinhandassessment",
-    "pk": 1,
-    "fields": {
-      "country": 1,
-      "name": "test assessment",
-      "link": "https://example.com/assessment",
-      "year": 2020,
-      "files_list": [
-        {
-          "url": "https://storage.googleapis.com/fao-exact-review-uploads/hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
-          "name": "2735-results-report.xlsx",
-          "size": 27548,
-          "blob_path": "hih_uploads/1/184cdc0a-2352-4f5f-bb13-6933cbe565b1.xlsx",
-          "uploaded_at": "2025-10-13T11:41:21.976071"
-        }
-      ]
-    }
-  },
-  {
-    "model": "api.handinhandassessment",
-    "pk": 6,
+    "pk": 5,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025",
@@ -31,7 +12,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 11,
+    "pk": 10,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - lapin",
@@ -42,7 +23,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 13,
+    "pk": 12,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - manioc",
@@ -53,7 +34,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 12,
+    "pk": 11,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - soja",
@@ -64,7 +45,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 10,
+    "pk": 9,
     "fields": {
       "country": 2,
       "name": "Burundi HiH 2025 - tomate",
@@ -75,7 +56,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 7,
+    "pk": 6,
     "fields": {
       "country": 5,
       "name": "Djibouti HiH 2025",
@@ -86,7 +67,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 8,
+    "pk": 7,
     "fields": {
       "country": 7,
       "name": "Ethiopia HiH 2025",
@@ -97,7 +78,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "country": 16,
       "name": "Nepal HiH 2025 - Honey",
@@ -108,7 +89,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 4,
+    "pk": 3,
     "fields": {
       "country": 16,
       "name": "Nepal HiH 2025- Mandarin Orange",
@@ -119,7 +100,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 5,
+    "pk": 4,
     "fields": {
       "country": 16,
       "name": "Nepal HiH 2025- Timur",
@@ -130,7 +111,7 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 2,
+    "pk": 1,
     "fields": {
       "country": 16,
       "name": "Nepal HiH 2025- Yak Cheese",
@@ -141,12 +122,23 @@
   },
   {
     "model": "api.handinhandassessment",
-    "pk": 9,
+    "pk": 8,
     "fields": {
       "country": 27,
       "name": "Paraguay HiH 2025",
       "link": "https://exact.apps.fao.org/public/project/1n23i/activities",
       "year": 2025,
+      "files_list": []
+    }
+  },
+  {
+    "model": "api.handinhandassessment",
+    "pk": 14,
+    "fields": {
+      "country": 31,
+      "name": "HiH Liberia",
+      "link": "https://fao-exact-frontend-mesob2hoya-ew.a.run.app/public/project/13rov/activities",
+      "year": 2026,
       "files_list": []
     }
   }

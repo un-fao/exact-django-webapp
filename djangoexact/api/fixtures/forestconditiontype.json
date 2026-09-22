@@ -12,7 +12,7 @@
   },
   {
     "model": "api.forestconditiontype",
-    "pk": 5,
+    "pk": 2,
     "fields": {
       "name": "Secondary",
       "name_en": "Secondary",

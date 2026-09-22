@@ -1,899 +1,1451 @@
 [
   {
     "model": "ipcc.settlementef",
-    "pk": 1485,
+    "pk": 61,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 1,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1486,
+    "pk": 62,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 1,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1487,
+    "pk": 63,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 1,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1489,
+    "pk": 64,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 2,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1490,
+    "pk": 65,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 2,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1491,
+    "pk": 66,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 2,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1493,
+    "pk": 67,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 68,
+    "fields": {
+      "settlement_type": 1,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 69,
+    "fields": {
+      "settlement_type": 1,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 70,
+    "fields": {
+      "settlement_type": 1,
       "climate": 3,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1494,
+    "pk": 71,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 3,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1495,
+    "pk": 72,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 3,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1497,
+    "pk": 73,
     "fields": {
-      "settlement_type": 21,
-      "climate": 4,
-      "moisture": 1,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1498,
-    "fields": {
-      "settlement_type": 21,
-      "climate": 4,
-      "moisture": 2,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1499,
-    "fields": {
-      "settlement_type": 21,
-      "climate": 4,
-      "moisture": 4,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1501,
-    "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 20,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1502,
+    "pk": 74,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 20,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1503,
+    "pk": 75,
     "fields": {
-      "settlement_type": 21,
+      "settlement_type": 1,
       "climate": 20,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1505,
+    "pk": 76,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 1,
       "moisture": 1,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1506,
+    "pk": 77,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 1,
       "moisture": 2,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1507,
+    "pk": 78,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 1,
       "moisture": 4,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1509,
+    "pk": 79,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 2,
       "moisture": 1,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1510,
+    "pk": 80,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 2,
       "moisture": 2,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1511,
+    "pk": 81,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 2,
       "moisture": 4,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1513,
+    "pk": 82,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
+      "climate": 4,
+      "moisture": 1,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 83,
+    "fields": {
+      "settlement_type": 2,
+      "climate": 4,
+      "moisture": 2,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 84,
+    "fields": {
+      "settlement_type": 2,
+      "climate": 4,
+      "moisture": 4,
+      "flu": 0.8,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 85,
+    "fields": {
+      "settlement_type": 2,
       "climate": 3,
       "moisture": 1,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1514,
+    "pk": 86,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 3,
       "moisture": 2,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1515,
+    "pk": 87,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 3,
       "moisture": 4,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1517,
+    "pk": 88,
     "fields": {
-      "settlement_type": 22,
-      "climate": 4,
-      "moisture": 1,
-      "flu": 0.8,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1518,
-    "fields": {
-      "settlement_type": 22,
-      "climate": 4,
-      "moisture": 2,
-      "flu": 0.8,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1519,
-    "fields": {
-      "settlement_type": 22,
-      "climate": 4,
-      "moisture": 4,
-      "flu": 0.8,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1521,
-    "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 20,
       "moisture": 1,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1522,
+    "pk": 89,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 20,
       "moisture": 2,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1523,
+    "pk": 90,
     "fields": {
-      "settlement_type": 22,
+      "settlement_type": 2,
       "climate": 20,
       "moisture": 4,
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1525,
+    "pk": 91,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 4,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1526,
+    "pk": 92,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 4,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1527,
+    "pk": 93,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 4,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1529,
+    "pk": 94,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 1,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1530,
+    "pk": 95,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 2,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1531,
+    "pk": 96,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 1,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1532,
+    "pk": 97,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 2,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1533,
+    "pk": 98,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 1,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1534,
+    "pk": 99,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 2,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1537,
+    "pk": 100,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 3,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1538,
+    "pk": 101,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 3,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1539,
+    "pk": 102,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 3,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1541,
+    "pk": 103,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 20,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1542,
+    "pk": 104,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 20,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1543,
+    "pk": 105,
     "fields": {
-      "settlement_type": 23,
+      "settlement_type": 3,
       "climate": 20,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1545,
+    "pk": 106,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 1,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1546,
+    "pk": 107,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 1,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1547,
+    "pk": 108,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 1,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1549,
+    "pk": 109,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 2,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1550,
+    "pk": 110,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 2,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1551,
+    "pk": 111,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 2,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1553,
+    "pk": 112,
     "fields": {
-      "settlement_type": 24,
-      "climate": 3,
-      "moisture": 1,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1554,
-    "fields": {
-      "settlement_type": 24,
-      "climate": 3,
-      "moisture": 2,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1555,
-    "fields": {
-      "settlement_type": 24,
-      "climate": 3,
-      "moisture": 4,
-      "flu": 1.0,
-      "fmg": 1.0,
-      "fi": 1.0,
-      "biomass": 0.0
-    }
-  },
-  {
-    "model": "ipcc.settlementef",
-    "pk": 1557,
-    "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 4,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1558,
+    "pk": 113,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 4,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1559,
+    "pk": 114,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 4,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1561,
+    "pk": 115,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
+      "climate": 3,
+      "moisture": 1,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 116,
+    "fields": {
+      "settlement_type": 4,
+      "climate": 3,
+      "moisture": 2,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 117,
+    "fields": {
+      "settlement_type": 4,
+      "climate": 3,
+      "moisture": 4,
+      "flu": 1.0,
+      "fmg": 1.0,
+      "fi": 1.0,
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
+    }
+  },
+  {
+    "model": "ipcc.settlementef",
+    "pk": 118,
+    "fields": {
+      "settlement_type": 4,
       "climate": 20,
       "moisture": 1,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1562,
+    "pk": 119,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 20,
       "moisture": 2,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1563,
+    "pk": 120,
     "fields": {
-      "settlement_type": 24,
+      "settlement_type": 4,
       "climate": 20,
       "moisture": 4,
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1565,
+    "pk": 121,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 4,
       "moisture": 1,
       "flu": 0.77,
       "fmg": 1.03,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6622,
+      "flu_max": 0.8778,
+      "fmg_min": 0.9888,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1566,
+    "pk": 122,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 4,
       "moisture": 2,
       "flu": 0.7,
       "fmg": 1.09,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.616,
+      "flu_max": 0.784,
+      "fmg_min": 1.0464,
+      "fmg_max": 1.1336,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1567,
+    "pk": 123,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 1,
       "moisture": 1,
       "flu": 0.77,
       "fmg": 1.03,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6622,
+      "flu_max": 0.8778,
+      "fmg_min": 0.9888,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1568,
+    "pk": 124,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 1,
       "moisture": 2,
       "flu": 0.7,
       "fmg": 1.09,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.616,
+      "flu_max": 0.784,
+      "fmg_min": 1.0464,
+      "fmg_max": 1.1336,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1569,
+    "pk": 125,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 2,
       "moisture": 1,
       "flu": 0.76,
       "fmg": 1.04,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6688,
+      "flu_max": 0.8512,
+      "fmg_min": 1.0088,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1570,
+    "pk": 126,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 2,
       "moisture": 2,
       "flu": 0.69,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.5796,
+      "flu_max": 0.8004,
+      "fmg_min": 1.056,
+      "fmg_max": 1.144,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1571,
+    "pk": 127,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 3,
       "moisture": 1,
       "flu": 0.92,
       "fmg": 1.04,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.8004,
+      "flu_max": 1.0396,
+      "fmg_min": 0.9672,
+      "fmg_max": 1.1128,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1572,
+    "pk": 128,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 3,
       "moisture": 2,
       "flu": 0.83,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.7387,
+      "flu_max": 0.9213,
+      "fmg_min": 1.045,
+      "fmg_max": 1.155,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
     "model": "ipcc.settlementef",
-    "pk": 1573,
+    "pk": 129,
     "fields": {
-      "settlement_type": 25,
+      "settlement_type": 5,
       "climate": 3,
       "moisture": 4,
       "flu": 0.83,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.7387,
+      "flu_max": 0.9213,
+      "fmg_min": 1.045,
+      "fmg_max": 1.155,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   }
 ]

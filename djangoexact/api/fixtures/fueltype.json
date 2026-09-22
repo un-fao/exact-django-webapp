@@ -13,16 +13,16 @@
       "macro_fuel_type": 2,
       "unit": 2,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        56,
+        58,
+        60,
+        61
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 27,
+    "pk": 56,
     "fields": {
       "name": "Diesel",
       "name_en": "Diesel",
@@ -34,7 +34,7 @@
       "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
@@ -45,11 +45,11 @@
       "name": "Electricity",
       "name_en": "Electricity",
       "name_fr": null,
-      "name_es": null,
+      "name_es": "Electricidad",
       "name_ru": null,
       "parent_fuel_type": 2,
       "fuel_use_type": 1,
-      "macro_fuel_type": 2,
+      "macro_fuel_type": null,
       "unit": 1,
       "module_types": [
         37
@@ -58,7 +58,7 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 25,
+    "pk": 54,
     "fields": {
       "name": "Ethanol (Cars)",
       "name_en": "Ethanol (Cars)",
@@ -70,13 +70,13 @@
       "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 26,
+    "pk": 55,
     "fields": {
       "name": "Ethanol (Trucks)",
       "name_en": "Ethanol (Trucks)",
@@ -88,13 +88,13 @@
       "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 57,
+    "pk": 49,
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
@@ -103,10 +103,10 @@
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
-      "macro_fuel_type": null,
+      "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
@@ -130,7 +130,7 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 28,
+    "pk": 57,
     "fields": {
       "name": "Gasoline (2-stroke)",
       "name_en": "Gasoline (2-stroke)",
@@ -142,13 +142,13 @@
       "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 29,
+    "pk": 58,
     "fields": {
       "name": "Gasoline (4-stroke)",
       "name_en": "Gasoline (4-stroke)",
@@ -160,7 +160,25 @@
       "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 51,
+    "fields": {
+      "name": "LPG",
+      "name_en": "LPG",
+      "name_fr": "GPL",
+      "name_es": "PLG",
+      "name_ru": null,
+      "parent_fuel_type": 1,
+      "fuel_use_type": 2,
+      "macro_fuel_type": 1,
+      "unit": 3,
+      "module_types": [
+        59
       ]
     }
   },
@@ -184,42 +202,6 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 59,
-    "fields": {
-      "name": "LPG",
-      "name_en": "LPG",
-      "name_fr": "GPL",
-      "name_es": null,
-      "name_ru": null,
-      "parent_fuel_type": 1,
-      "fuel_use_type": 2,
-      "macro_fuel_type": null,
-      "unit": 3,
-      "module_types": [
-        63
-      ]
-    }
-  },
-  {
-    "model": "api.fueltype",
-    "pk": 56,
-    "fields": {
-      "name": "Motor Gasoline",
-      "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
-      "name_es": "Motor de Gasolina",
-      "name_ru": "Motor Gasoline",
-      "parent_fuel_type": 1,
-      "fuel_use_type": 2,
-      "macro_fuel_type": null,
-      "unit": 3,
-      "module_types": [
-        63
-      ]
-    }
-  },
-  {
-    "model": "api.fueltype",
     "pk": 21,
     "fields": {
       "name": "Motor Gasoline",
@@ -238,19 +220,19 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 60,
+    "pk": 48,
     "fields": {
-      "name": "Natural Gas",
-      "name_en": "Natural Gas",
-      "name_fr": "Gaz naturel\n",
-      "name_es": "Gas Natural",
-      "name_ru": "Природный газ",
+      "name": "Motor Gasoline",
+      "name_en": "Motor Gasoline",
+      "name_fr": "Essence pour moteurs\n",
+      "name_es": "Motor de Gasolina",
+      "name_ru": "Motor Gasoline",
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
-      "macro_fuel_type": null,
+      "macro_fuel_type": 1,
       "unit": 3,
       "module_types": [
-        63
+        59
       ]
     }
   },
@@ -274,6 +256,24 @@
   },
   {
     "model": "api.fueltype",
+    "pk": 52,
+    "fields": {
+      "name": "Natural Gas",
+      "name_en": "Natural Gas",
+      "name_fr": "Gaz naturel\n",
+      "name_es": "Gas Natural",
+      "name_ru": "Природный газ",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 2,
+      "macro_fuel_type": 1,
+      "unit": 3,
+      "module_types": [
+        59
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
     "pk": 31,
     "fields": {
       "name": "Peat",
@@ -286,10 +286,10 @@
       "macro_fuel_type": 2,
       "unit": 2,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        56,
+        58,
+        60,
+        61
       ]
     }
   },
@@ -304,7 +304,7 @@
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
-      "macro_fuel_type": 2,
+      "macro_fuel_type": null,
       "unit": 1,
       "module_types": [
         37
@@ -343,10 +343,10 @@
       "macro_fuel_type": 2,
       "unit": 2,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        56,
+        58,
+        60,
+        61
       ]
     }
   }

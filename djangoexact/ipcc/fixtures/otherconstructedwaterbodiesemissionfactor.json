@@ -1,402 +1,482 @@
 [
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 143,
+    "pk": 91,
     "fields": {
       "climate": 1,
       "moisture": 2,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 144,
+    "pk": 92,
     "fields": {
       "climate": 1,
       "moisture": 2,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 145,
+    "pk": 93,
     "fields": {
       "climate": 1,
       "moisture": 2,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 146,
+    "pk": 94,
     "fields": {
       "climate": 1,
       "moisture": 2,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 147,
+    "pk": 95,
     "fields": {
       "climate": 1,
       "moisture": 1,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 148,
+    "pk": 96,
     "fields": {
       "climate": 1,
       "moisture": 1,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 149,
+    "pk": 97,
     "fields": {
       "climate": 1,
       "moisture": 1,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 150,
+    "pk": 98,
     "fields": {
       "climate": 1,
       "moisture": 1,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 151,
+    "pk": 99,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 152,
+    "pk": 100,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 153,
+    "pk": 101,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 154,
+    "pk": 102,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 155,
+    "pk": 103,
     "fields": {
       "climate": 4,
       "moisture": 1,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 156,
+    "pk": 104,
     "fields": {
       "climate": 4,
       "moisture": 1,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 157,
+    "pk": 105,
     "fields": {
       "climate": 4,
       "moisture": 1,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 158,
+    "pk": 106,
     "fields": {
       "climate": 4,
       "moisture": 1,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 159,
+    "pk": 107,
     "fields": {
       "climate": 2,
       "moisture": 2,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 160,
+    "pk": 108,
     "fields": {
       "climate": 2,
       "moisture": 2,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 161,
+    "pk": 109,
     "fields": {
       "climate": 2,
       "moisture": 2,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 162,
+    "pk": 110,
     "fields": {
       "climate": 2,
       "moisture": 2,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 163,
+    "pk": 111,
     "fields": {
       "climate": 2,
       "moisture": 1,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 164,
+    "pk": 112,
     "fields": {
       "climate": 2,
       "moisture": 1,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 165,
+    "pk": 113,
     "fields": {
       "climate": 2,
       "moisture": 1,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 166,
+    "pk": 114,
     "fields": {
       "climate": 2,
       "moisture": 1,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 167,
+    "pk": 115,
     "fields": {
       "climate": 20,
       "moisture": 1,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 168,
+    "pk": 116,
     "fields": {
       "climate": 20,
       "moisture": 1,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 169,
+    "pk": 117,
     "fields": {
       "climate": 20,
       "moisture": 1,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 170,
+    "pk": 118,
     "fields": {
       "climate": 20,
       "moisture": 1,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 171,
+    "pk": 119,
     "fields": {
       "climate": 3,
       "moisture": 4,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 172,
+    "pk": 120,
     "fields": {
       "climate": 3,
       "moisture": 4,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 173,
+    "pk": 121,
     "fields": {
       "climate": 3,
       "moisture": 4,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 174,
+    "pk": 122,
     "fields": {
       "climate": 3,
       "moisture": 4,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 175,
+    "pk": 123,
     "fields": {
       "climate": 3,
       "moisture": 2,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 176,
+    "pk": 124,
     "fields": {
       "climate": 3,
       "moisture": 2,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 177,
+    "pk": 125,
     "fields": {
       "climate": 3,
       "moisture": 2,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 178,
+    "pk": 126,
     "fields": {
       "climate": 3,
       "moisture": 2,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 179,
+    "pk": 127,
     "fields": {
       "climate": 3,
       "moisture": 1,
       "waterbody_type": 1,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 180,
+    "pk": 128,
     "fields": {
       "climate": 3,
       "moisture": 1,
       "waterbody_type": 2,
-      "value": 183.0
+      "value": 183.0,
+      "value_min": 118.0,
+      "value_max": 228.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 181,
+    "pk": 129,
     "fields": {
       "climate": 3,
       "moisture": 1,
       "waterbody_type": 3,
-      "value": 416.0
+      "value": 416.0,
+      "value_min": 259.0,
+      "value_max": 669.0
     }
   },
   {
     "model": "ipcc.otherconstructedwaterbodiesemissionfactor",
-    "pk": 182,
+    "pk": 130,
     "fields": {
       "climate": 3,
       "moisture": 1,
       "waterbody_type": 4,
-      "value": 30.0
+      "value": 30.0,
+      "value_min": 16.0,
+      "value_max": 55.0
     }
   }
 ]

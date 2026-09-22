@@ -1,6 +1,17 @@
 [
   {
     "model": "api.vegetationtype",
+    "pk": 40,
+    "fields": {
+      "name": "",
+      "name_en": "",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
     "pk": 27,
     "fields": {
       "name": "Boreal Coniferous Forest",
@@ -49,17 +60,6 @@
     "fields": {
       "name": "Mangrove Forest",
       "name_en": "Mangrove Forest",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
-    "pk": 8,
-    "fields": {
-      "name": "Planted  Tropical Shrubland",
-      "name_en": "Planted  Tropical Shrubland",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -243,54 +243,21 @@
   },
   {
     "model": "api.vegetationtype",
+    "pk": 8,
+    "fields": {
+      "name": "Planted  Tropical Shrubland",
+      "name_en": "Planted  Tropical Shrubland",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
     "pk": 38,
     "fields": {
       "name": "Seagrass",
       "name_en": "Seagrass",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
-    "pk": 46,
-    "fields": {
-      "name": "Sub- Tropical Humid Forests",
-      "name_en": "Sub- Tropical Humid Forests",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
-    "pk": 48,
-    "fields": {
-      "name": "Sub-Tropical Dry Forests",
-      "name_en": "Sub-Tropical Dry Forests",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
-    "pk": 47,
-    "fields": {
-      "name": "Sub-Tropical Humid Forests",
-      "name_en": "Sub-Tropical Humid Forests",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
-    "pk": 49,
-    "fields": {
-      "name": "Sub-Tropical Steppe",
-      "name_en": "Sub-Tropical Steppe",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -309,10 +276,43 @@
   },
   {
     "model": "api.vegetationtype",
+    "pk": 48,
+    "fields": {
+      "name": "Sub-Tropical Dry Forests",
+      "name_en": "Sub-Tropical Dry Forests",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
     "pk": 9,
     "fields": {
       "name": "Subtropical Humid Forest",
       "name_en": "Subtropical Humid Forest",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
+    "pk": 46,
+    "fields": {
+      "name": "Sub- Tropical Humid Forests",
+      "name_en": "Sub- Tropical Humid Forests",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
+    "pk": 47,
+    "fields": {
+      "name": "Sub-Tropical Humid Forests",
+      "name_en": "Sub-Tropical Humid Forests",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -335,6 +335,17 @@
     "fields": {
       "name": "Subtropical Steppe",
       "name_en": "Subtropical Steppe",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
+    "pk": 49,
+    "fields": {
+      "name": "Sub-Tropical Steppe",
+      "name_en": "Sub-Tropical Steppe",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -397,10 +408,10 @@
   },
   {
     "model": "api.vegetationtype",
-    "pk": 36,
+    "pk": 42,
     "fields": {
-      "name": "Tidal Marsh",
-      "name_en": "Tidal Marsh",
+      "name": "﻿Tidal Marsh",
+      "name_en": "﻿Tidal Marsh",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -408,10 +419,10 @@
   },
   {
     "model": "api.vegetationtype",
-    "pk": 42,
+    "pk": 36,
     "fields": {
-      "name": "﻿Tidal Marsh",
-      "name_en": "﻿Tidal Marsh",
+      "name": "Tidal Marsh",
+      "name_en": "Tidal Marsh",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -452,17 +463,6 @@
   },
   {
     "model": "api.vegetationtype",
-    "pk": 45,
-    "fields": {
-      "name": "Tropical Mountai N Systems",
-      "name_en": "Tropical Mountai N Systems",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.vegetationtype",
     "pk": 33,
     "fields": {
       "name": "Tropical Mountain Systems",
@@ -474,10 +474,10 @@
   },
   {
     "model": "api.vegetationtype",
-    "pk": 1,
+    "pk": 45,
     "fields": {
-      "name": "Tropical Rainforest",
-      "name_en": "Tropical Rainforest",
+      "name": "Tropical Mountai N Systems",
+      "name_en": "Tropical Mountai N Systems",
       "name_fr": null,
       "name_es": null,
       "name_ru": null
@@ -489,6 +489,17 @@
     "fields": {
       "name": "﻿Tropical Rainforest",
       "name_en": "﻿Tropical Rainforest",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null
+    }
+  },
+  {
+    "model": "api.vegetationtype",
+    "pk": 1,
+    "fields": {
+      "name": "Tropical Rainforest",
+      "name_en": "Tropical Rainforest",
       "name_fr": null,
       "name_es": null,
       "name_ru": null

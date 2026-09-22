@@ -7,7 +7,13 @@
       "climate": 4,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.11
+      "fi": 1.11,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": 0.9879,
+      "fi_max": 1.2321
     }
   },
   {
@@ -18,7 +24,13 @@
       "climate": 1,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.11
+      "fi": 1.11,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": 0.9879,
+      "fi_max": 1.2321
     }
   },
   {
@@ -29,7 +41,13 @@
       "climate": 3,
       "fmg": 1.17,
       "flu": 1.0,
-      "fi": 1.11
+      "fi": 1.11,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": 0.9879,
+      "fi_max": 1.2321
     }
   },
   {
@@ -40,7 +58,13 @@
       "climate": 20,
       "fmg": 1.16,
       "flu": 1.0,
-      "fi": 1.11
+      "fi": 1.11,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": 0.9879,
+      "fi_max": 1.2321
     }
   },
   {
@@ -51,7 +75,13 @@
       "climate": 2,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.11
+      "fi": 1.11,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": 0.9879,
+      "fi_max": 1.2321
     }
   },
   {
@@ -62,7 +92,13 @@
       "climate": 4,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -73,7 +109,13 @@
       "climate": 1,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -84,7 +126,13 @@
       "climate": 3,
       "fmg": 1.17,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -95,7 +143,13 @@
       "climate": 20,
       "fmg": 1.16,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -106,7 +160,13 @@
       "climate": 2,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -117,7 +177,13 @@
       "climate": 4,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -128,7 +194,13 @@
       "climate": 1,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -139,7 +211,13 @@
       "climate": 3,
       "fmg": 1.17,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -150,7 +228,13 @@
       "climate": 20,
       "fmg": 1.16,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -161,7 +245,13 @@
       "climate": 2,
       "fmg": 1.14,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -172,7 +262,13 @@
       "climate": 4,
       "fmg": 0.7,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.42,
+      "fmg_max": 0.98,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -183,7 +279,13 @@
       "climate": 3,
       "fmg": 0.7,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.42,
+      "fmg_max": 0.98,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -194,7 +296,13 @@
       "climate": 1,
       "fmg": 0.7,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.42,
+      "fmg_max": 0.98,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -205,7 +313,13 @@
       "climate": 2,
       "fmg": 0.7,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.42,
+      "fmg_max": 0.98,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -216,7 +330,13 @@
       "climate": 20,
       "fmg": 0.7,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.42,
+      "fmg_max": 0.98,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -227,7 +347,13 @@
       "climate": 4,
       "fmg": 0.9,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.828,
+      "fmg_max": 0.972,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -238,7 +364,13 @@
       "climate": 3,
       "fmg": 0.9,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.828,
+      "fmg_max": 0.972,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -249,7 +381,13 @@
       "climate": 1,
       "fmg": 0.9,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.828,
+      "fmg_max": 0.972,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -260,7 +398,13 @@
       "climate": 2,
       "fmg": 0.9,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.828,
+      "fmg_max": 0.972,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -271,7 +415,13 @@
       "climate": 20,
       "fmg": 0.9,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": 0.828,
+      "fmg_max": 0.972,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -282,7 +432,13 @@
       "climate": 4,
       "fmg": 1.0,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": null,
+      "fmg_max": null,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -293,7 +449,13 @@
       "climate": 3,
       "fmg": 1.0,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": null,
+      "fmg_max": null,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -304,7 +466,13 @@
       "climate": 1,
       "fmg": 1.0,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": null,
+      "fmg_max": null,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -315,7 +483,13 @@
       "climate": 2,
       "fmg": 1.0,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": null,
+      "fmg_max": null,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   },
   {
@@ -326,7 +500,13 @@
       "climate": 20,
       "fmg": 1.0,
       "flu": 1.0,
-      "fi": 1.0
+      "fi": 1.0,
+      "fmg_min": null,
+      "fmg_max": null,
+      "flu_min": null,
+      "flu_max": null,
+      "fi_min": null,
+      "fi_max": null
     }
   }
 ]

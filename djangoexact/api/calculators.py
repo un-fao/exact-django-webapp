@@ -41,6 +41,8 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from django.apps import apps
 
+logger = log.getLogger(__name__)
+
 from django.db.models import Q
 import django.db.models as models
 from ipcc import models as ipcc
@@ -4956,6 +4958,14 @@ class LivestockCalculator(BaseCalculator):
         self.LEACHING_MULTI = ApplicationParameter.objects.get(name="leaching_multiplier").value
         self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
+        # gas_head_calculation rescales the other systems by (1 - t2 PRP) / (1 - default PRP), which divides by
+        # zero when the default PRP is 100%, whatever the tier 2 PRP or complementary type. Only a system tier 2 EF
+        # skips that rescaling, and CH4 and N2O each need their own.
+        PRP_T2_ERROR_MESSAGE = (
+            "The default Pasture/Range/Paddock share for this livestock is 100%, so there is no other manure management system to assign the rest to. "
+            "Leave the tier 2 PRP percentage empty, or enter both tier 2 CH4 and N2O emission factors."
+        )
+
         if module.is_start():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_start,
@@ -5032,6 +5042,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_start is not None
+                and self.animal_waste_prp_start.value == 100
+                and (module.emission_factor_ch4_t2_start is None or module.emission_factor_n2o_t2_start is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_start = (
@@ -5291,6 +5308,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_w is not None
+                and self.animal_waste_prp_w.value == 100
+                and (module.emission_factor_ch4_t2_w is None or module.emission_factor_n2o_t2_w is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_w = (
@@ -5550,6 +5574,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+                
+            if (
+                module.prp_percentage_t2_wo is not None
+                and self.animal_waste_prp_wo.value == 100
+                and (module.emission_factor_ch4_t2_wo is None or module.emission_factor_n2o_t2_wo is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_wo = (
@@ -5751,7 +5782,7 @@ class LivestockCalculator(BaseCalculator):
         self.get_defaults()
 
         if module.is_with():
-            log.debug("Calculating emissions for WITH")
+            logger.debug("Calculating emissions for WITH")
 
             inputs_w = {
                 "implementation_time": self.activity.implementation_years,
@@ -5768,8 +5799,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_w.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_w.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_w,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5845,8 +5876,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_wo.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_wo.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_wo,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,

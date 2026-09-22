@@ -11,10 +11,9 @@
     </head>
     <body>
         <p>Dear {{ recipient.first_name }} {{ recipient.last_name }},</p>
-        <p>The {{ lock_holder_group_name }} has added comments for your attention.</p>
+        <p>This is a recap of recent changes and comments for your attention.</p>
         <hr />
-        <p>Reviewer: {{ lock_holder_name }}</p>
-        <p>Date: {{ lock_unlock_date | date:"d/m/Y" }}</p>
+        <p>Date: {{ recap_date | date:"d/m/Y" }}</p>
         <p>Project Name: {{ project.name }}</p>
         <p>
             Project URL: <a href="{{ project_url }}">{{ project_url }}</a>
@@ -76,12 +75,15 @@
         {% endfor %}
         <hr />
         <p>
-            For full details, access the review directly via the project link above.
+            For full details, open the project using the link above.
             <br>
             <br>
             Best,
             <br>
             EX-ACT Team
+        </p>
+        <p>
+            <small>You get this email because you turned on emails for this project. You can turn them off on the project page.</small>
         </p>
     </body>
 </html>

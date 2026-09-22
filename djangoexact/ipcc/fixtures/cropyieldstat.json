@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2827,
+    "pk": 1835,
     "fields": {
       "land_use_type": 24,
       "continent": 16,
@@ -15,23 +15,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2828,
+    "pk": 1838,
     "fields": {
-      "land_use_type": 30,
-      "continent": 16,
-      "year_2016": 7938.0,
-      "year_2017": 7626.0,
-      "year_2018": 6065.0,
-      "year_2019": 7634.0,
-      "year_2020": 7018.0,
-      "average": 0.7256199999999999
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2829,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 16,
       "year_2016": 68510.0,
       "year_2017": 68613.0,
@@ -43,7 +29,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2830,
+    "pk": 1839,
     "fields": {
       "land_use_type": 37,
       "continent": 16,
@@ -57,7 +43,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2831,
+    "pk": 1840,
     "fields": {
       "land_use_type": 25,
       "continent": 16,
@@ -71,7 +57,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2832,
+    "pk": 1841,
     "fields": {
       "land_use_type": 38,
       "continent": 16,
@@ -85,7 +71,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2833,
+    "pk": 1842,
     "fields": {
       "land_use_type": 44,
       "continent": 16,
@@ -99,7 +85,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2834,
+    "pk": 1843,
     "fields": {
       "land_use_type": 42,
       "continent": 16,
@@ -113,7 +99,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2835,
+    "pk": 1844,
     "fields": {
       "land_use_type": 28,
       "continent": 16,
@@ -127,7 +113,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2836,
+    "pk": 1845,
     "fields": {
       "land_use_type": 39,
       "continent": 16,
@@ -141,7 +127,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2837,
+    "pk": 1846,
     "fields": {
       "land_use_type": 40,
       "continent": 16,
@@ -155,7 +141,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2838,
+    "pk": 1847,
     "fields": {
       "land_use_type": 26,
       "continent": 16,
@@ -169,7 +155,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2839,
+    "pk": 1848,
     "fields": {
       "land_use_type": 41,
       "continent": 16,
@@ -183,7 +169,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2840,
+    "pk": 1849,
     "fields": {
       "land_use_type": 77,
       "continent": 16,
@@ -197,7 +183,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2841,
+    "pk": 1850,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 16,
+      "year_2016": 7465.0,
+      "year_2017": 6970.0,
+      "year_2018": 5226.0,
+      "year_2019": 6963.0,
+      "year_2020": 6067.0,
+      "average": 0.65382
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1851,
     "fields": {
       "land_use_type": 64,
       "continent": 16,
@@ -211,7 +211,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2842,
+    "pk": 1852,
     "fields": {
       "land_use_type": 65,
       "continent": 16,
@@ -225,7 +225,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2843,
+    "pk": 1853,
     "fields": {
       "land_use_type": 24,
       "continent": 2,
@@ -239,21 +239,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2844,
-    "fields": {
-      "land_use_type": 30,
-      "continent": 2,
-      "year_2016": 6450.0,
-      "year_2017": 6403.0,
-      "year_2018": 6377.0,
-      "year_2019": 6301.0,
-      "year_2020": 6323.0,
-      "average": 0.63708
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2845,
+    "pk": 1856,
     "fields": {
       "land_use_type": 32,
       "continent": 2,
@@ -267,7 +253,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2846,
+    "pk": 1857,
     "fields": {
       "land_use_type": 37,
       "continent": 2,
@@ -281,7 +267,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2847,
+    "pk": 1858,
     "fields": {
       "land_use_type": 25,
       "continent": 2,
@@ -295,7 +281,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2848,
+    "pk": 1859,
     "fields": {
       "land_use_type": 38,
       "continent": 2,
@@ -309,7 +295,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2849,
+    "pk": 1860,
     "fields": {
       "land_use_type": 44,
       "continent": 2,
@@ -323,7 +309,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2850,
+    "pk": 1861,
     "fields": {
       "land_use_type": 42,
       "continent": 2,
@@ -337,7 +323,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2851,
+    "pk": 1862,
     "fields": {
       "land_use_type": 28,
       "continent": 2,
@@ -351,7 +337,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2852,
+    "pk": 1863,
     "fields": {
       "land_use_type": 39,
       "continent": 2,
@@ -365,7 +351,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2853,
+    "pk": 1864,
     "fields": {
       "land_use_type": 40,
       "continent": 2,
@@ -379,7 +365,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2854,
+    "pk": 1865,
     "fields": {
       "land_use_type": 26,
       "continent": 2,
@@ -393,7 +379,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2855,
+    "pk": 1866,
     "fields": {
       "land_use_type": 41,
       "continent": 2,
@@ -407,7 +393,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2856,
+    "pk": 1867,
     "fields": {
       "land_use_type": 77,
       "continent": 2,
@@ -421,7 +407,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2857,
+    "pk": 1868,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 2,
+      "year_2016": 6436.0,
+      "year_2017": 6396.0,
+      "year_2018": 6345.0,
+      "year_2019": 6249.0,
+      "year_2020": 6274.0,
+      "average": 0.634
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1869,
     "fields": {
       "land_use_type": 64,
       "continent": 2,
@@ -435,7 +435,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2858,
+    "pk": 1870,
     "fields": {
       "land_use_type": 65,
       "continent": 2,
@@ -449,7 +449,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2859,
+    "pk": 1871,
     "fields": {
       "land_use_type": 24,
       "continent": 15,
@@ -463,23 +463,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2860,
+    "pk": 1874,
     "fields": {
-      "land_use_type": 30,
-      "continent": 15,
-      "year_2016": 8408.0,
-      "year_2017": 8798.0,
-      "year_2018": 9254.0,
-      "year_2019": 9223.0,
-      "year_2020": 8480.0,
-      "average": 0.88326
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2861,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 15,
       "year_2016": 196945.0,
       "year_2017": 196671.0,
@@ -491,7 +477,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2862,
+    "pk": 1875,
     "fields": {
       "land_use_type": 37,
       "continent": 15,
@@ -505,7 +491,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2863,
+    "pk": 1876,
     "fields": {
       "land_use_type": 25,
       "continent": 15,
@@ -519,7 +505,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2864,
+    "pk": 1877,
     "fields": {
       "land_use_type": 38,
       "continent": 15,
@@ -533,7 +519,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2865,
+    "pk": 1878,
     "fields": {
       "land_use_type": 44,
       "continent": 15,
@@ -547,7 +533,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2866,
+    "pk": 1879,
     "fields": {
       "land_use_type": 42,
       "continent": 15,
@@ -561,7 +547,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2867,
+    "pk": 1880,
     "fields": {
       "land_use_type": 28,
       "continent": 15,
@@ -575,7 +561,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2868,
+    "pk": 1881,
     "fields": {
       "land_use_type": 39,
       "continent": 15,
@@ -589,7 +575,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2869,
+    "pk": 1882,
     "fields": {
       "land_use_type": 40,
       "continent": 15,
@@ -603,7 +589,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2870,
+    "pk": 1883,
     "fields": {
       "land_use_type": 26,
       "continent": 15,
@@ -617,7 +603,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2871,
+    "pk": 1884,
     "fields": {
       "land_use_type": 41,
       "continent": 15,
@@ -631,7 +617,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2872,
+    "pk": 1885,
     "fields": {
       "land_use_type": 77,
       "continent": 15,
@@ -645,7 +631,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2873,
+    "pk": 1886,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 15,
+      "year_2016": 7470.0,
+      "year_2017": 7804.0,
+      "year_2018": 7972.0,
+      "year_2019": 7993.0,
+      "year_2020": 7534.0,
+      "average": 0.77546
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1887,
     "fields": {
       "land_use_type": 64,
       "continent": 15,
@@ -659,7 +659,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2874,
+    "pk": 1888,
     "fields": {
       "land_use_type": 65,
       "continent": 15,
@@ -673,7 +673,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2875,
+    "pk": 1889,
     "fields": {
       "land_use_type": 24,
       "continent": 6,
@@ -687,23 +687,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2876,
+    "pk": 1892,
     "fields": {
-      "land_use_type": 30,
-      "continent": 6,
-      "year_2016": 15969.0,
-      "year_2017": 12059.0,
-      "year_2018": 11407.0,
-      "year_2019": 12708.0,
-      "year_2020": 13603.0,
-      "average": 1.31492
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2877,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 6,
       "year_2016": 217478.0,
       "year_2017": 221276.0,
@@ -715,7 +701,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2878,
+    "pk": 1893,
     "fields": {
       "land_use_type": 37,
       "continent": 6,
@@ -729,7 +715,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2879,
+    "pk": 1894,
     "fields": {
       "land_use_type": 25,
       "continent": 6,
@@ -743,7 +729,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2880,
+    "pk": 1895,
     "fields": {
       "land_use_type": 38,
       "continent": 6,
@@ -757,7 +743,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2881,
+    "pk": 1896,
     "fields": {
       "land_use_type": 44,
       "continent": 6,
@@ -771,7 +757,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2882,
+    "pk": 1897,
     "fields": {
       "land_use_type": 42,
       "continent": 6,
@@ -785,7 +771,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2883,
+    "pk": 1898,
     "fields": {
       "land_use_type": 28,
       "continent": 6,
@@ -799,7 +785,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2884,
+    "pk": 1899,
     "fields": {
       "land_use_type": 39,
       "continent": 6,
@@ -813,7 +799,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2885,
+    "pk": 1900,
     "fields": {
       "land_use_type": 40,
       "continent": 6,
@@ -827,7 +813,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2886,
+    "pk": 1901,
     "fields": {
       "land_use_type": 26,
       "continent": 6,
@@ -841,7 +827,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2887,
+    "pk": 1902,
     "fields": {
       "land_use_type": 41,
       "continent": 6,
@@ -855,7 +841,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2888,
+    "pk": 1903,
     "fields": {
       "land_use_type": 77,
       "continent": 6,
@@ -869,7 +855,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2889,
+    "pk": 1904,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 6,
+      "year_2016": 14627.0,
+      "year_2017": 11189.0,
+      "year_2018": 10988.0,
+      "year_2019": 11790.0,
+      "year_2020": 12604.0,
+      "average": 1.22396
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1905,
     "fields": {
       "land_use_type": 64,
       "continent": 6,
@@ -883,7 +883,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2890,
+    "pk": 1906,
     "fields": {
       "land_use_type": 65,
       "continent": 6,
@@ -897,7 +897,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2891,
+    "pk": 1907,
     "fields": {
       "land_use_type": 24,
       "continent": 1,
@@ -911,23 +911,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2892,
+    "pk": 1910,
     "fields": {
-      "land_use_type": 30,
-      "continent": 1,
-      "year_2016": 9779.0,
-      "year_2017": 10348.0,
-      "year_2018": 10000.0,
-      "year_2019": 9700.0,
-      "year_2020": 9865.0,
-      "average": 0.99384
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2893,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 1,
       "year_2016": 75946.0,
       "year_2017": 76575.0,
@@ -939,7 +925,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2894,
+    "pk": 1911,
     "fields": {
       "land_use_type": 37,
       "continent": 1,
@@ -953,7 +939,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2895,
+    "pk": 1912,
     "fields": {
       "land_use_type": 25,
       "continent": 1,
@@ -967,7 +953,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2896,
+    "pk": 1913,
     "fields": {
       "land_use_type": 38,
       "continent": 1,
@@ -981,7 +967,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2897,
+    "pk": 1914,
     "fields": {
       "land_use_type": 44,
       "continent": 1,
@@ -995,7 +981,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2898,
+    "pk": 1915,
     "fields": {
       "land_use_type": 42,
       "continent": 1,
@@ -1009,7 +995,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2899,
+    "pk": 1916,
     "fields": {
       "land_use_type": 28,
       "continent": 1,
@@ -1023,7 +1009,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2900,
+    "pk": 1917,
     "fields": {
       "land_use_type": 39,
       "continent": 1,
@@ -1037,7 +1023,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2901,
+    "pk": 1918,
     "fields": {
       "land_use_type": 40,
       "continent": 1,
@@ -1051,7 +1037,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2902,
+    "pk": 1919,
     "fields": {
       "land_use_type": 26,
       "continent": 1,
@@ -1065,7 +1051,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2903,
+    "pk": 1920,
     "fields": {
       "land_use_type": 41,
       "continent": 1,
@@ -1079,7 +1065,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2904,
+    "pk": 1921,
     "fields": {
       "land_use_type": 77,
       "continent": 1,
@@ -1093,7 +1079,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2905,
+    "pk": 1922,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 1,
+      "year_2016": 9047.0,
+      "year_2017": 9761.0,
+      "year_2018": 9058.0,
+      "year_2019": 8495.0,
+      "year_2020": 8619.0,
+      "average": 0.8996
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1923,
     "fields": {
       "land_use_type": 64,
       "continent": 1,
@@ -1107,7 +1107,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2906,
+    "pk": 1924,
     "fields": {
       "land_use_type": 65,
       "continent": 1,
@@ -1121,7 +1121,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2907,
+    "pk": 1925,
     "fields": {
       "land_use_type": 24,
       "continent": 7,
@@ -1135,23 +1135,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2909,
+    "pk": 1928,
     "fields": {
-      "land_use_type": 30,
-      "continent": 7,
-      "year_2016": 16197.0,
-      "year_2017": 17393.0,
-      "year_2018": 17057.0,
-      "year_2019": 16890.0,
-      "year_2020": 16997.0,
-      "average": 1.69068
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2910,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 7,
       "year_2016": 185164.0,
       "year_2017": 191443.0,
@@ -1163,7 +1149,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2911,
+    "pk": 1929,
     "fields": {
       "land_use_type": 37,
       "continent": 7,
@@ -1177,7 +1163,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2912,
+    "pk": 1930,
     "fields": {
       "land_use_type": 25,
       "continent": 7,
@@ -1191,7 +1177,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2913,
+    "pk": 1931,
     "fields": {
       "land_use_type": 38,
       "continent": 7,
@@ -1205,7 +1191,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2914,
+    "pk": 1932,
     "fields": {
       "land_use_type": 44,
       "continent": 7,
@@ -1219,7 +1205,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2915,
+    "pk": 1933,
     "fields": {
       "land_use_type": 42,
       "continent": 7,
@@ -1233,7 +1219,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2916,
+    "pk": 1934,
     "fields": {
       "land_use_type": 28,
       "continent": 7,
@@ -1247,7 +1233,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2917,
+    "pk": 1935,
     "fields": {
       "land_use_type": 39,
       "continent": 7,
@@ -1261,7 +1247,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2918,
+    "pk": 1936,
     "fields": {
       "land_use_type": 40,
       "continent": 7,
@@ -1275,7 +1261,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2919,
+    "pk": 1937,
     "fields": {
       "land_use_type": 26,
       "continent": 7,
@@ -1289,7 +1275,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2920,
+    "pk": 1938,
     "fields": {
       "land_use_type": 41,
       "continent": 7,
@@ -1303,7 +1289,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2921,
+    "pk": 1939,
     "fields": {
       "land_use_type": 77,
       "continent": 7,
@@ -1317,7 +1303,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2922,
+    "pk": 1940,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 7,
+      "year_2016": 13792.0,
+      "year_2017": 14890.0,
+      "year_2018": 14726.0,
+      "year_2019": 14804.0,
+      "year_2020": 14618.0,
+      "average": 1.4566
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1941,
     "fields": {
       "land_use_type": 64,
       "continent": 7,
@@ -1331,7 +1331,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2923,
+    "pk": 1942,
     "fields": {
       "land_use_type": 65,
       "continent": 7,
@@ -1345,7 +1345,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2924,
+    "pk": 1943,
     "fields": {
       "land_use_type": 24,
       "continent": 11,
@@ -1359,23 +1359,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2925,
+    "pk": 1946,
     "fields": {
-      "land_use_type": 30,
-      "continent": 11,
-      "year_2016": 21617.0,
-      "year_2017": 22655.0,
-      "year_2018": 16508.0,
-      "year_2019": 19205.0,
-      "year_2020": 20582.0,
-      "average": 2.01134
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2926,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 11,
       "year_2016": 223130.0,
       "year_2017": 237712.0,
@@ -1387,7 +1373,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2927,
+    "pk": 1947,
     "fields": {
       "land_use_type": 37,
       "continent": 11,
@@ -1401,7 +1387,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2928,
+    "pk": 1948,
     "fields": {
       "land_use_type": 25,
       "continent": 11,
@@ -1415,7 +1401,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2929,
+    "pk": 1949,
     "fields": {
       "land_use_type": 38,
       "continent": 11,
@@ -1429,7 +1415,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2930,
+    "pk": 1950,
     "fields": {
       "land_use_type": 44,
       "continent": 11,
@@ -1443,7 +1429,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2931,
+    "pk": 1951,
     "fields": {
       "land_use_type": 42,
       "continent": 11,
@@ -1457,7 +1443,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2932,
+    "pk": 1952,
     "fields": {
       "land_use_type": 28,
       "continent": 11,
@@ -1471,7 +1457,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2933,
+    "pk": 1953,
     "fields": {
       "land_use_type": 39,
       "continent": 11,
@@ -1485,7 +1471,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2934,
+    "pk": 1954,
     "fields": {
       "land_use_type": 40,
       "continent": 11,
@@ -1499,7 +1485,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2935,
+    "pk": 1955,
     "fields": {
       "land_use_type": 26,
       "continent": 11,
@@ -1513,7 +1499,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2936,
+    "pk": 1956,
     "fields": {
       "land_use_type": 41,
       "continent": 11,
@@ -1527,21 +1513,35 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2937,
+    "pk": 1957,
     "fields": {
       "land_use_type": 77,
       "continent": 11,
       "year_2016": 26077.0,
       "year_2017": 27763.0,
-      "year_2018": null,
-      "year_2019": null,
-      "year_2020": null,
-      "average": 2.692
+      "year_2018": 0.0,
+      "year_2019": 0.0,
+      "year_2020": 0.0,
+      "average": 1.0768
     }
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2938,
+    "pk": 1958,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 11,
+      "year_2016": 22988.0,
+      "year_2017": 24315.0,
+      "year_2018": 18434.0,
+      "year_2019": 18109.0,
+      "year_2020": 20406.0,
+      "average": 2.0850400000000002
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1959,
     "fields": {
       "land_use_type": 64,
       "continent": 11,
@@ -1555,7 +1555,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2939,
+    "pk": 1960,
     "fields": {
       "land_use_type": 65,
       "continent": 11,
@@ -1569,7 +1569,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2940,
+    "pk": 1961,
     "fields": {
       "land_use_type": 24,
       "continent": 3,
@@ -1583,23 +1583,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2941,
+    "pk": 1964,
     "fields": {
-      "land_use_type": 30,
-      "continent": 3,
-      "year_2016": 0.0,
-      "year_2017": 13063.0,
-      "year_2018": 13954.0,
-      "year_2019": 11256.0,
-      "year_2020": 7311.0,
-      "average": 0.9116799999999999
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2942,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 3,
       "year_2016": 224679.0,
       "year_2017": 231347.0,
@@ -1611,7 +1597,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2943,
+    "pk": 1965,
     "fields": {
       "land_use_type": 37,
       "continent": 3,
@@ -1625,7 +1611,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2944,
+    "pk": 1966,
     "fields": {
       "land_use_type": 25,
       "continent": 3,
@@ -1639,7 +1625,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2945,
+    "pk": 1967,
     "fields": {
       "land_use_type": 38,
       "continent": 3,
@@ -1653,7 +1639,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2946,
+    "pk": 1968,
     "fields": {
       "land_use_type": 44,
       "continent": 3,
@@ -1667,7 +1653,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2947,
+    "pk": 1969,
     "fields": {
       "land_use_type": 42,
       "continent": 3,
@@ -1681,7 +1667,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2948,
+    "pk": 1970,
     "fields": {
       "land_use_type": 28,
       "continent": 3,
@@ -1695,7 +1681,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2949,
+    "pk": 1971,
     "fields": {
       "land_use_type": 39,
       "continent": 3,
@@ -1709,7 +1695,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2950,
+    "pk": 1972,
     "fields": {
       "land_use_type": 40,
       "continent": 3,
@@ -1723,7 +1709,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2951,
+    "pk": 1973,
     "fields": {
       "land_use_type": 26,
       "continent": 3,
@@ -1737,7 +1723,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2952,
+    "pk": 1974,
     "fields": {
       "land_use_type": 41,
       "continent": 3,
@@ -1751,7 +1737,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2953,
+    "pk": 1975,
     "fields": {
       "land_use_type": 77,
       "continent": 3,
@@ -1765,7 +1751,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2954,
+    "pk": 1976,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 3,
+      "year_2016": 24031.0,
+      "year_2017": 25426.0,
+      "year_2018": 51374.0,
+      "year_2019": 45689.0,
+      "year_2020": 37581.0,
+      "average": 3.6820199999999996
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1977,
     "fields": {
       "land_use_type": 64,
       "continent": 3,
@@ -1779,7 +1779,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2955,
+    "pk": 1978,
     "fields": {
       "land_use_type": 65,
       "continent": 3,
@@ -1793,7 +1793,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2956,
+    "pk": 1979,
     "fields": {
       "land_use_type": 24,
       "continent": 13,
@@ -1807,23 +1807,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2957,
+    "pk": 1982,
     "fields": {
-      "land_use_type": 30,
-      "continent": 13,
-      "year_2016": 20517.0,
-      "year_2017": 18413.0,
-      "year_2018": 19738.0,
-      "year_2019": 20299.0,
-      "year_2020": 22011.0,
-      "average": 2.01956
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2958,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 13,
       "year_2016": 435965.0,
       "year_2017": 439915.0,
@@ -1835,7 +1821,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2959,
+    "pk": 1983,
     "fields": {
       "land_use_type": 37,
       "continent": 13,
@@ -1849,7 +1835,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2960,
+    "pk": 1984,
     "fields": {
       "land_use_type": 25,
       "continent": 13,
@@ -1863,7 +1849,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2961,
+    "pk": 1985,
     "fields": {
       "land_use_type": 38,
       "continent": 13,
@@ -1877,7 +1863,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2962,
+    "pk": 1986,
     "fields": {
       "land_use_type": 44,
       "continent": 13,
@@ -1891,7 +1877,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2963,
+    "pk": 1987,
     "fields": {
       "land_use_type": 42,
       "continent": 13,
@@ -1905,7 +1891,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2964,
+    "pk": 1988,
     "fields": {
       "land_use_type": 28,
       "continent": 13,
@@ -1919,7 +1905,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2965,
+    "pk": 1989,
     "fields": {
       "land_use_type": 39,
       "continent": 13,
@@ -1933,7 +1919,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2966,
+    "pk": 1990,
     "fields": {
       "land_use_type": 40,
       "continent": 13,
@@ -1947,7 +1933,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2967,
+    "pk": 1991,
     "fields": {
       "land_use_type": 26,
       "continent": 13,
@@ -1961,7 +1947,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2968,
+    "pk": 1992,
     "fields": {
       "land_use_type": 41,
       "continent": 13,
@@ -1975,7 +1961,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2969,
+    "pk": 1993,
     "fields": {
       "land_use_type": 77,
       "continent": 13,
@@ -1989,7 +1975,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2970,
+    "pk": 1994,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 13,
+      "year_2016": 20704.0,
+      "year_2017": 23347.0,
+      "year_2018": 24025.0,
+      "year_2019": 20110.0,
+      "year_2020": 23047.0,
+      "average": 2.2246599999999996
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 1995,
     "fields": {
       "land_use_type": 64,
       "continent": 13,
@@ -2003,7 +2003,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2971,
+    "pk": 1996,
     "fields": {
       "land_use_type": 65,
       "continent": 13,
@@ -2017,7 +2017,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2972,
+    "pk": 1997,
     "fields": {
       "land_use_type": 24,
       "continent": 12,
@@ -2031,23 +2031,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2973,
+    "pk": 2000,
     "fields": {
-      "land_use_type": 30,
-      "continent": 12,
-      "year_2016": 11596.0,
-      "year_2017": 17034.0,
-      "year_2018": 10896.0,
-      "year_2019": 9572.0,
-      "year_2020": 10892.0,
-      "average": 1.1998
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2974,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 12,
       "year_2016": 124755.0,
       "year_2017": 125959.0,
@@ -2059,7 +2045,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2975,
+    "pk": 2001,
     "fields": {
       "land_use_type": 37,
       "continent": 12,
@@ -2073,7 +2059,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2976,
+    "pk": 2002,
     "fields": {
       "land_use_type": 25,
       "continent": 12,
@@ -2087,7 +2073,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2977,
+    "pk": 2003,
     "fields": {
       "land_use_type": 38,
       "continent": 12,
@@ -2101,7 +2087,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2978,
+    "pk": 2004,
     "fields": {
       "land_use_type": 44,
       "continent": 12,
@@ -2115,7 +2101,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2979,
+    "pk": 2005,
     "fields": {
       "land_use_type": 42,
       "continent": 12,
@@ -2129,7 +2115,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2980,
+    "pk": 2006,
     "fields": {
       "land_use_type": 28,
       "continent": 12,
@@ -2143,7 +2129,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2981,
+    "pk": 2007,
     "fields": {
       "land_use_type": 39,
       "continent": 12,
@@ -2157,7 +2143,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2982,
+    "pk": 2008,
     "fields": {
       "land_use_type": 40,
       "continent": 12,
@@ -2171,7 +2157,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2983,
+    "pk": 2009,
     "fields": {
       "land_use_type": 26,
       "continent": 12,
@@ -2185,7 +2171,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2984,
+    "pk": 2010,
     "fields": {
       "land_use_type": 41,
       "continent": 12,
@@ -2199,7 +2185,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2985,
+    "pk": 2011,
     "fields": {
       "land_use_type": 77,
       "continent": 12,
@@ -2213,7 +2199,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2986,
+    "pk": 2012,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 12,
+      "year_2016": 9462.0,
+      "year_2017": 9600.0,
+      "year_2018": 9330.0,
+      "year_2019": 9040.0,
+      "year_2020": 8978.0,
+      "average": 0.9282
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2013,
     "fields": {
       "land_use_type": 64,
       "continent": 12,
@@ -2227,7 +2227,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2987,
+    "pk": 2014,
     "fields": {
       "land_use_type": 65,
       "continent": 12,
@@ -2241,7 +2241,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2988,
+    "pk": 2015,
     "fields": {
       "land_use_type": 24,
       "continent": 14,
@@ -2255,23 +2255,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2989,
+    "pk": 2018,
     "fields": {
-      "land_use_type": 30,
-      "continent": 14,
-      "year_2016": 10412.0,
-      "year_2017": 11483.0,
-      "year_2018": 10833.0,
-      "year_2019": 11632.0,
-      "year_2020": 11881.0,
-      "average": 1.1248200000000002
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 2990,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 14,
       "year_2016": 149347.0,
       "year_2017": 154370.0,
@@ -2283,7 +2269,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2991,
+    "pk": 2019,
     "fields": {
       "land_use_type": 37,
       "continent": 14,
@@ -2297,7 +2283,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2992,
+    "pk": 2020,
     "fields": {
       "land_use_type": 25,
       "continent": 14,
@@ -2311,7 +2297,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2993,
+    "pk": 2021,
     "fields": {
       "land_use_type": 38,
       "continent": 14,
@@ -2325,7 +2311,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2994,
+    "pk": 2022,
     "fields": {
       "land_use_type": 44,
       "continent": 14,
@@ -2339,7 +2325,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2995,
+    "pk": 2023,
     "fields": {
       "land_use_type": 42,
       "continent": 14,
@@ -2353,7 +2339,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2996,
+    "pk": 2024,
     "fields": {
       "land_use_type": 28,
       "continent": 14,
@@ -2367,7 +2353,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2997,
+    "pk": 2025,
     "fields": {
       "land_use_type": 39,
       "continent": 14,
@@ -2381,7 +2367,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2998,
+    "pk": 2026,
     "fields": {
       "land_use_type": 40,
       "continent": 14,
@@ -2395,7 +2381,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 2999,
+    "pk": 2027,
     "fields": {
       "land_use_type": 26,
       "continent": 14,
@@ -2409,7 +2395,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3000,
+    "pk": 2028,
     "fields": {
       "land_use_type": 41,
       "continent": 14,
@@ -2423,7 +2409,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3001,
+    "pk": 2029,
     "fields": {
       "land_use_type": 77,
       "continent": 14,
@@ -2437,7 +2423,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3002,
+    "pk": 2030,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 14,
+      "year_2016": 10020.0,
+      "year_2017": 10731.0,
+      "year_2018": 10450.0,
+      "year_2019": 11236.0,
+      "year_2020": 11461.0,
+      "average": 1.07796
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2031,
     "fields": {
       "land_use_type": 64,
       "continent": 14,
@@ -2451,7 +2451,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3003,
+    "pk": 2032,
     "fields": {
       "land_use_type": 65,
       "continent": 14,
@@ -2465,7 +2465,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3004,
+    "pk": 2033,
     "fields": {
       "land_use_type": 24,
       "continent": 8,
@@ -2479,23 +2479,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3005,
+    "pk": 2036,
     "fields": {
-      "land_use_type": 30,
-      "continent": 8,
-      "year_2016": 9988.0,
-      "year_2017": 9657.0,
-      "year_2018": 9667.0,
-      "year_2019": 9550.0,
-      "year_2020": 9453.0,
-      "average": 0.9663
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 3006,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 8,
       "year_2016": 205869.0,
       "year_2017": 205015.0,
@@ -2507,7 +2493,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3007,
+    "pk": 2037,
     "fields": {
       "land_use_type": 37,
       "continent": 8,
@@ -2521,7 +2507,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3008,
+    "pk": 2038,
     "fields": {
       "land_use_type": 25,
       "continent": 8,
@@ -2535,7 +2521,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3009,
+    "pk": 2039,
     "fields": {
       "land_use_type": 38,
       "continent": 8,
@@ -2549,7 +2535,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3010,
+    "pk": 2040,
     "fields": {
       "land_use_type": 44,
       "continent": 8,
@@ -2563,7 +2549,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3011,
+    "pk": 2041,
     "fields": {
       "land_use_type": 42,
       "continent": 8,
@@ -2577,7 +2563,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3012,
+    "pk": 2042,
     "fields": {
       "land_use_type": 28,
       "continent": 8,
@@ -2591,7 +2577,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3013,
+    "pk": 2043,
     "fields": {
       "land_use_type": 39,
       "continent": 8,
@@ -2605,7 +2591,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3014,
+    "pk": 2044,
     "fields": {
       "land_use_type": 40,
       "continent": 8,
@@ -2619,7 +2605,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3015,
+    "pk": 2045,
     "fields": {
       "land_use_type": 26,
       "continent": 8,
@@ -2633,7 +2619,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3016,
+    "pk": 2046,
     "fields": {
       "land_use_type": 41,
       "continent": 8,
@@ -2647,7 +2633,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3017,
+    "pk": 2047,
     "fields": {
       "land_use_type": 77,
       "continent": 8,
@@ -2661,7 +2647,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3018,
+    "pk": 2048,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 8,
+      "year_2016": 9682.0,
+      "year_2017": 9493.0,
+      "year_2018": 9461.0,
+      "year_2019": 9420.0,
+      "year_2020": 9314.0,
+      "average": 0.9474
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2049,
     "fields": {
       "land_use_type": 64,
       "continent": 8,
@@ -2675,7 +2675,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3019,
+    "pk": 2050,
     "fields": {
       "land_use_type": 65,
       "continent": 8,
@@ -2689,7 +2689,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3020,
+    "pk": 2051,
     "fields": {
       "land_use_type": 24,
       "continent": 4,
@@ -2703,23 +2703,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3021,
+    "pk": 2054,
     "fields": {
-      "land_use_type": 30,
-      "continent": 4,
-      "year_2016": 7858.0,
-      "year_2017": 9142.0,
-      "year_2018": 7819.0,
-      "year_2019": 8871.0,
-      "year_2020": 8711.0,
-      "average": 0.8480200000000001
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 3022,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 4,
       "year_2016": 188022.0,
       "year_2017": 193985.0,
@@ -2731,7 +2717,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3023,
+    "pk": 2055,
     "fields": {
       "land_use_type": 37,
       "continent": 4,
@@ -2745,7 +2731,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3024,
+    "pk": 2056,
     "fields": {
       "land_use_type": 25,
       "continent": 4,
@@ -2759,7 +2745,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3025,
+    "pk": 2057,
     "fields": {
       "land_use_type": 38,
       "continent": 4,
@@ -2773,7 +2759,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3026,
+    "pk": 2058,
     "fields": {
       "land_use_type": 44,
       "continent": 4,
@@ -2787,7 +2773,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3027,
+    "pk": 2059,
     "fields": {
       "land_use_type": 42,
       "continent": 4,
@@ -2801,7 +2787,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3028,
+    "pk": 2060,
     "fields": {
       "land_use_type": 28,
       "continent": 4,
@@ -2815,7 +2801,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3029,
+    "pk": 2061,
     "fields": {
       "land_use_type": 39,
       "continent": 4,
@@ -2829,7 +2815,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3030,
+    "pk": 2062,
     "fields": {
       "land_use_type": 40,
       "continent": 4,
@@ -2843,7 +2829,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3031,
+    "pk": 2063,
     "fields": {
       "land_use_type": 26,
       "continent": 4,
@@ -2857,7 +2843,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3032,
+    "pk": 2064,
     "fields": {
       "land_use_type": 41,
       "continent": 4,
@@ -2871,7 +2857,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3033,
+    "pk": 2065,
     "fields": {
       "land_use_type": 77,
       "continent": 4,
@@ -2885,7 +2871,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3034,
+    "pk": 2066,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 4,
+      "year_2016": 9602.0,
+      "year_2017": 11191.0,
+      "year_2018": 9889.0,
+      "year_2019": 10769.0,
+      "year_2020": 11560.0,
+      "average": 1.0602200000000002
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2067,
     "fields": {
       "land_use_type": 64,
       "continent": 4,
@@ -2899,7 +2899,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3035,
+    "pk": 2068,
     "fields": {
       "land_use_type": 65,
       "continent": 4,
@@ -2913,7 +2913,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3036,
+    "pk": 2069,
     "fields": {
       "land_use_type": 24,
       "continent": 9,
@@ -2927,23 +2927,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3037,
+    "pk": 2072,
     "fields": {
-      "land_use_type": 30,
-      "continent": 9,
-      "year_2016": 5981.0,
-      "year_2017": 6809.0,
-      "year_2018": 7325.0,
-      "year_2019": 6983.0,
-      "year_2020": 7085.0,
-      "average": 0.68366
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 3038,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 9,
       "year_2016": 199816.0,
       "year_2017": 210606.0,
@@ -2955,7 +2941,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3039,
+    "pk": 2073,
     "fields": {
       "land_use_type": 37,
       "continent": 9,
@@ -2969,7 +2955,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3040,
+    "pk": 2074,
     "fields": {
       "land_use_type": 25,
       "continent": 9,
@@ -2983,7 +2969,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3041,
+    "pk": 2075,
     "fields": {
       "land_use_type": 38,
       "continent": 9,
@@ -2997,7 +2983,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3042,
+    "pk": 2076,
     "fields": {
       "land_use_type": 44,
       "continent": 9,
@@ -3011,7 +2997,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3043,
+    "pk": 2077,
     "fields": {
       "land_use_type": 42,
       "continent": 9,
@@ -3025,7 +3011,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3044,
+    "pk": 2078,
     "fields": {
       "land_use_type": 28,
       "continent": 9,
@@ -3039,7 +3025,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3045,
+    "pk": 2079,
     "fields": {
       "land_use_type": 39,
       "continent": 9,
@@ -3053,7 +3039,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3046,
+    "pk": 2080,
     "fields": {
       "land_use_type": 40,
       "continent": 9,
@@ -3067,7 +3053,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3047,
+    "pk": 2081,
     "fields": {
       "land_use_type": 26,
       "continent": 9,
@@ -3081,7 +3067,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3048,
+    "pk": 2082,
     "fields": {
       "land_use_type": 41,
       "continent": 9,
@@ -3095,7 +3081,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3049,
+    "pk": 2083,
     "fields": {
       "land_use_type": 77,
       "continent": 9,
@@ -3109,7 +3095,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3050,
+    "pk": 2084,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 9,
+      "year_2016": 4338.0,
+      "year_2017": 4304.0,
+      "year_2018": 4307.0,
+      "year_2019": 4351.0,
+      "year_2020": 4419.0,
+      "average": 0.43438000000000004
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2085,
     "fields": {
       "land_use_type": 64,
       "continent": 9,
@@ -3123,7 +3123,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3051,
+    "pk": 2086,
     "fields": {
       "land_use_type": 65,
       "continent": 9,
@@ -3137,7 +3137,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3052,
+    "pk": 2087,
     "fields": {
       "land_use_type": 24,
       "continent": 5,
@@ -3151,23 +3151,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3053,
+    "pk": 2090,
     "fields": {
-      "land_use_type": 30,
-      "continent": 5,
-      "year_2016": 5833.0,
-      "year_2017": 5533.0,
-      "year_2018": 5871.0,
-      "year_2019": 5972.0,
-      "year_2020": 6157.0,
-      "average": 0.58732
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 3054,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 5,
       "year_2016": 85882.0,
       "year_2017": 83545.0,
@@ -3179,7 +3165,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3055,
+    "pk": 2091,
     "fields": {
       "land_use_type": 37,
       "continent": 5,
@@ -3193,7 +3179,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3056,
+    "pk": 2092,
     "fields": {
       "land_use_type": 25,
       "continent": 5,
@@ -3207,7 +3193,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3057,
+    "pk": 2093,
     "fields": {
       "land_use_type": 38,
       "continent": 5,
@@ -3221,7 +3207,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3058,
+    "pk": 2094,
     "fields": {
       "land_use_type": 44,
       "continent": 5,
@@ -3235,7 +3221,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3059,
+    "pk": 2095,
     "fields": {
       "land_use_type": 42,
       "continent": 5,
@@ -3249,7 +3235,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3060,
+    "pk": 2096,
     "fields": {
       "land_use_type": 28,
       "continent": 5,
@@ -3263,7 +3249,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3061,
+    "pk": 2097,
     "fields": {
       "land_use_type": 39,
       "continent": 5,
@@ -3277,7 +3263,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3062,
+    "pk": 2098,
     "fields": {
       "land_use_type": 40,
       "continent": 5,
@@ -3291,7 +3277,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3063,
+    "pk": 2099,
     "fields": {
       "land_use_type": 26,
       "continent": 5,
@@ -3305,7 +3291,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3064,
+    "pk": 2100,
     "fields": {
       "land_use_type": 41,
       "continent": 5,
@@ -3319,7 +3305,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3065,
+    "pk": 2101,
     "fields": {
       "land_use_type": 77,
       "continent": 5,
@@ -3333,7 +3319,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3066,
+    "pk": 2102,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 5,
+      "year_2016": 9424.0,
+      "year_2017": 9516.0,
+      "year_2018": 9647.0,
+      "year_2019": 9805.0,
+      "year_2020": 9797.0,
+      "average": 0.96378
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2103,
     "fields": {
       "land_use_type": 64,
       "continent": 5,
@@ -3347,7 +3347,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3067,
+    "pk": 2104,
     "fields": {
       "land_use_type": 65,
       "continent": 5,
@@ -3361,7 +3361,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3068,
+    "pk": 2105,
     "fields": {
       "land_use_type": 24,
       "continent": 10,
@@ -3375,23 +3375,9 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3069,
+    "pk": 2108,
     "fields": {
-      "land_use_type": 30,
-      "continent": 10,
-      "year_2016": 14414.0,
-      "year_2017": 14225.0,
-      "year_2018": 13435.0,
-      "year_2019": 13429.0,
-      "year_2020": 15134.0,
-      "average": 1.4127399999999999
-    }
-  },
-  {
-    "model": "ipcc.cropyieldstat",
-    "pk": 3070,
-    "fields": {
-      "land_use_type": 32,
+      "land_use_type": 31,
       "continent": 10,
       "year_2016": 256664.0,
       "year_2017": 262008.0,
@@ -3403,7 +3389,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3071,
+    "pk": 2109,
     "fields": {
       "land_use_type": 37,
       "continent": 10,
@@ -3417,7 +3403,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3072,
+    "pk": 2110,
     "fields": {
       "land_use_type": 25,
       "continent": 10,
@@ -3431,7 +3417,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3073,
+    "pk": 2111,
     "fields": {
       "land_use_type": 38,
       "continent": 10,
@@ -3445,7 +3431,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3074,
+    "pk": 2112,
     "fields": {
       "land_use_type": 44,
       "continent": 10,
@@ -3459,7 +3445,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3075,
+    "pk": 2113,
     "fields": {
       "land_use_type": 42,
       "continent": 10,
@@ -3473,7 +3459,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3076,
+    "pk": 2114,
     "fields": {
       "land_use_type": 28,
       "continent": 10,
@@ -3487,7 +3473,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3077,
+    "pk": 2115,
     "fields": {
       "land_use_type": 39,
       "continent": 10,
@@ -3501,7 +3487,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3078,
+    "pk": 2116,
     "fields": {
       "land_use_type": 40,
       "continent": 10,
@@ -3515,7 +3501,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3079,
+    "pk": 2117,
     "fields": {
       "land_use_type": 26,
       "continent": 10,
@@ -3529,7 +3515,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3080,
+    "pk": 2118,
     "fields": {
       "land_use_type": 41,
       "continent": 10,
@@ -3543,7 +3529,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3081,
+    "pk": 2119,
     "fields": {
       "land_use_type": 77,
       "continent": 10,
@@ -3557,7 +3543,21 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3082,
+    "pk": 2120,
+    "fields": {
+      "land_use_type": 30,
+      "continent": 10,
+      "year_2016": 25877.0,
+      "year_2017": 25694.0,
+      "year_2018": 25150.0,
+      "year_2019": 24877.0,
+      "year_2020": 26574.0,
+      "average": 2.56344
+    }
+  },
+  {
+    "model": "ipcc.cropyieldstat",
+    "pk": 2121,
     "fields": {
       "land_use_type": 64,
       "continent": 10,
@@ -3571,7 +3571,7 @@
   },
   {
     "model": "ipcc.cropyieldstat",
-    "pk": 3083,
+    "pk": 2122,
     "fields": {
       "land_use_type": 65,
       "continent": 10,

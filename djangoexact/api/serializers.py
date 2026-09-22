@@ -653,9 +653,17 @@ class ModuleExportSerializer(serializers.Serializer):
         # OneToOneField references (e.g. Settlement.land_use_change →
         # LandUseChange) whose PKs change in the target database.
         data['_original_id'] = instance.id
+        # NOTE: 'status' and 'last_modified' are exported on purpose.
+        # An appraisal is a record of the numbers as they were computed, so the
+        # round trip has to carry the module's computed state, not just its
+        # inputs. 'status' is what makes the results endpoint serve a module at
+        # all (it refuses anything that is not READY), and 'last_modified' is
+        # what validates the cache: is_cached_results_valid() compares
+        # last_cached_at against it, so re-stamping it at import time would
+        # silently invalidate every restored result.
         excluded_fields = (
-            'id', 'activity', 'status', 'data_source', 'note',
-            'history', 'last_modified', 'parent'
+            'id', 'activity', 'data_source', 'note',
+            'history', 'parent'
         )
         for field in instance._meta.get_fields():
             if field.name in excluded_fields:
@@ -726,7 +734,8 @@ class ProjectExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
-                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
+                   'last_recap_sent_at']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -3201,6 +3210,24 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
+def check_member_management_allowed(project: Project, request):
+    """Guard for adding/updating project memberships and invitations.
+
+    Archived projects are closed for good. Finalized projects are read-only for
+    everyone except the people who administer them: project Admins (and
+    superusers, who bypass every other project permission check) must still be
+    able to hand over or share administration after finalization.
+    """
+    user = getattr(request, "user", None)
+    is_project_admin = user is not None and user.is_authenticated and (user.is_superuser or project.members.filter(user=user, group__name="Admin").exists())
+
+    if project.is_archived:
+        raise serializers.ValidationError("Cannot add members to an archived project")
+
+    if project.is_finalized and not is_project_admin:
+        raise serializers.ValidationError("Cannot add members to a finalized project")
+
+
 class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
@@ -3216,11 +3243,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         return data
 
@@ -3243,14 +3266,14 @@ class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
         ref_name = "ProjectNotificationPreference"
 
 
 class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["project", "is_opted_out"]
+        fields = ["project", "is_subscribed"]
         ref_name = "ProjectNotificationPreference"
 
     def validate(self, data):
@@ -3551,11 +3574,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()

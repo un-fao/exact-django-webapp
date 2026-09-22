@@ -1,72 +1,626 @@
 [
   {
     "model": "ipcc.soilorganiccarbon",
-    "pk": 486,
+    "pk": 441,
     "fields": {
       "climate": 4,
       "moisture": 2,
       "soil_type": 1,
-      "value": 63.0
+      "value": 63.0,
+      "value_min": 51.66,
+      "value_max": 74.34
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 442,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 3,
+      "value": 10.0,
+      "value_min": 1.0,
+      "value_max": 19.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 443,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 4,
+      "value": 117.0,
+      "value_min": 11.7,
+      "value_max": 222.3
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 444,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 5,
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 445,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "soil_type": 6,
+      "value": 116.0,
+      "value_min": 40.6,
+      "value_max": 191.4
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 446,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 1,
+      "value": 63.0,
+      "value_min": 51.66,
+      "value_max": 74.34
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 447,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 3,
+      "value": 10.0,
+      "value_min": 1.0,
+      "value_max": 19.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 448,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 4,
+      "value": 117.0,
+      "value_min": 11.7,
+      "value_max": 222.3
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 449,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 5,
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 450,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "soil_type": 6,
+      "value": 116.0,
+      "value_min": 40.6,
+      "value_max": 191.4
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 451,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 1,
+      "value": 43.0,
+      "value_min": 39.56,
+      "value_max": 46.44
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 452,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 2,
+      "value": 33.0,
+      "value_min": 3.3,
+      "value_max": 62.7
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 453,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 3,
+      "value": 13.0,
+      "value_min": 8.71,
+      "value_max": 17.29
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 454,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 5,
+      "value": 20.0,
+      "value_min": 2.0,
+      "value_max": 38.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 455,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "soil_type": 6,
+      "value": 87.0,
+      "value_min": 8.7,
+      "value_max": 165.3
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 456,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 1,
+      "value": 81.0,
+      "value_min": 76.95,
+      "value_max": 85.05
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 457,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 2,
+      "value": 76.0,
+      "value_min": 37.24,
+      "value_max": 114.76
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 458,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 3,
+      "value": 51.0,
+      "value_min": 44.37,
+      "value_max": 57.63
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 459,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 4,
+      "value": 128.0,
+      "value_min": 110.08,
+      "value_max": 145.92
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 460,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 5,
+      "value": 136.0,
+      "value_min": 116.96,
+      "value_max": 155.04
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 461,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "soil_type": 6,
+      "value": 128.0,
+      "value_min": 111.36,
+      "value_max": 144.64
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 462,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 1,
+      "value": 24.0,
+      "value_min": 22.8,
+      "value_max": 25.2
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 463,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 2,
+      "value": 19.0,
+      "value_min": 15.96,
+      "value_max": 22.04
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 464,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 3,
+      "value": 10.0,
+      "value_min": 9.5,
+      "value_max": 10.5
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 465,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 5,
+      "value": 84.0,
+      "value_min": 29.4,
+      "value_max": 138.6
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 466,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "soil_type": 6,
+      "value": 74.0,
+      "value_min": 61.42,
+      "value_max": 86.58
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 467,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 1,
+      "value": 64.0,
+      "value_min": 60.8,
+      "value_max": 67.2
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 468,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 2,
+      "value": 55.0,
+      "value_min": 50.6,
+      "value_max": 59.4
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 469,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 3,
+      "value": 36.0,
+      "value_min": 27.72,
+      "value_max": 44.28
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 470,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 4,
+      "value": 143.0,
+      "value_min": 100.1,
+      "value_max": 185.9
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 471,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 5,
+      "value": 138.0,
+      "value_min": 121.44,
+      "value_max": 154.56
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 472,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "soil_type": 6,
+      "value": 135.0,
+      "value_min": 97.2,
+      "value_max": 172.8
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 473,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 1,
+      "value": 21.0,
+      "value_min": 19.95,
+      "value_max": 22.05
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 474,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 2,
+      "value": 19.0,
+      "value_min": 17.1,
+      "value_max": 20.9
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 475,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 3,
+      "value": 9.0,
+      "value_min": 8.19,
+      "value_max": 9.81
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 476,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 5,
+      "value": 50.0,
+      "value_min": 5.0,
+      "value_max": 95.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 477,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "soil_type": 6,
+      "value": 22.0,
+      "value_min": 18.26,
+      "value_max": 25.74
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 478,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 1,
+      "value": 40.0,
+      "value_min": 37.2,
+      "value_max": 42.8
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 479,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 2,
+      "value": 38.0,
+      "value_min": 36.1,
+      "value_max": 39.9
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 480,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 3,
+      "value": 27.0,
+      "value_min": 23.76,
+      "value_max": 30.24
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 481,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 5,
+      "value": 70.0,
+      "value_min": 7.0,
+      "value_max": 133.0
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 482,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "soil_type": 6,
+      "value": 68.0,
+      "value_min": 56.44,
+      "value_max": 79.56
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 483,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 1,
+      "value": 60.0,
+      "value_min": 55.2,
+      "value_max": 64.8
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 484,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 2,
+      "value": 52.0,
+      "value_min": 48.88,
+      "value_max": 55.12
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 485,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 3,
+      "value": 46.0,
+      "value_min": 36.8,
+      "value_max": 55.2
+    }
+  },
+  {
+    "model": "ipcc.soilorganiccarbon",
+    "pk": 486,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 5,
+      "value": 77.0,
+      "value_min": 56.21,
+      "value_max": 97.79
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 487,
     "fields": {
-      "climate": 4,
-      "moisture": 2,
-      "soil_type": 3,
-      "value": 10.0
+      "climate": 3,
+      "moisture": 4,
+      "soil_type": 6,
+      "value": 49.0,
+      "value_min": 39.69,
+      "value_max": 58.31
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 488,
     "fields": {
-      "climate": 4,
-      "moisture": 2,
-      "soil_type": 4,
-      "value": 117.0
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 1,
+      "value": 51.0,
+      "value_min": 45.9,
+      "value_max": 56.1
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 489,
     "fields": {
-      "climate": 4,
-      "moisture": 2,
-      "soil_type": 5,
-      "value": 20.0
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 2,
+      "value": 44.0,
+      "value_min": 39.16,
+      "value_max": 48.84
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 490,
     "fields": {
-      "climate": 4,
-      "moisture": 2,
-      "soil_type": 6,
-      "value": 116.0
+      "climate": 20,
+      "moisture": 1,
+      "soil_type": 3,
+      "value": 52.0,
+      "value_min": 34.32,
+      "value_max": 69.68
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 491,
     "fields": {
-      "climate": 4,
+      "climate": 20,
       "moisture": 1,
-      "soil_type": 1,
-      "value": 63.0
+      "soil_type": 5,
+      "value": 96.0,
+      "value_min": 66.24,
+      "value_max": 125.76
     }
   },
   {
     "model": "ipcc.soilorganiccarbon",
     "pk": 492,
     "fields": {
-      "climate": 4,
+      "climate": 20,
       "moisture": 1,
-      "soil_type": 3,
-      "value": 10.0
+      "soil_type": 6,
+      "value": 82.0,
+      "value_min": 41.0,
+      "value_max": 123.0
     }
   },
   {
@@ -75,448 +629,10 @@
     "fields": {
       "climate": 4,
       "moisture": 1,
-      "soil_type": 4,
-      "value": 117.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 494,
-    "fields": {
-      "climate": 4,
-      "moisture": 1,
-      "soil_type": 5,
-      "value": 20.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 495,
-    "fields": {
-      "climate": 4,
-      "moisture": 1,
-      "soil_type": 6,
-      "value": 116.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 496,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
-      "soil_type": 1,
-      "value": 43.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 497,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
       "soil_type": 2,
-      "value": 33.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 498,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
-      "soil_type": 3,
-      "value": 13.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 499,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
-      "soil_type": 5,
-      "value": 20.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 500,
-    "fields": {
-      "climate": 1,
-      "moisture": 1,
-      "soil_type": 6,
-      "value": 87.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 501,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 1,
-      "value": 81.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 502,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 2,
-      "value": 76.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 503,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 3,
-      "value": 51.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 504,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 4,
-      "value": 128.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 505,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 5,
-      "value": 136.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 506,
-    "fields": {
-      "climate": 1,
-      "moisture": 2,
-      "soil_type": 6,
-      "value": 128.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 507,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "soil_type": 1,
-      "value": 24.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 508,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "soil_type": 2,
-      "value": 19.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 509,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "soil_type": 3,
-      "value": 10.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 510,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "soil_type": 5,
-      "value": 84.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 511,
-    "fields": {
-      "climate": 2,
-      "moisture": 1,
-      "soil_type": 6,
-      "value": 74.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 512,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 1,
-      "value": 64.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 513,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 2,
-      "value": 55.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 514,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 3,
-      "value": 36.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 515,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 4,
-      "value": 143.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 516,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 5,
-      "value": 138.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 517,
-    "fields": {
-      "climate": 2,
-      "moisture": 2,
-      "soil_type": 6,
-      "value": 135.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 518,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "soil_type": 1,
-      "value": 21.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 519,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "soil_type": 2,
-      "value": 19.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 520,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "soil_type": 3,
-      "value": 9.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 521,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "soil_type": 5,
-      "value": 50.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 522,
-    "fields": {
-      "climate": 3,
-      "moisture": 1,
-      "soil_type": 6,
-      "value": 22.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 523,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "soil_type": 1,
-      "value": 40.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 524,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "soil_type": 2,
-      "value": 38.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 525,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "soil_type": 3,
-      "value": 27.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 526,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "soil_type": 5,
-      "value": 70.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 527,
-    "fields": {
-      "climate": 3,
-      "moisture": 2,
-      "soil_type": 6,
-      "value": 68.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 528,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "soil_type": 1,
-      "value": 60.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 529,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "soil_type": 2,
-      "value": 52.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 530,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "soil_type": 3,
-      "value": 46.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 531,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "soil_type": 5,
-      "value": 77.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 532,
-    "fields": {
-      "climate": 3,
-      "moisture": 4,
-      "soil_type": 6,
-      "value": 49.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 533,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "soil_type": 1,
-      "value": 51.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 534,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "soil_type": 2,
-      "value": 44.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 535,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "soil_type": 3,
-      "value": 52.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 536,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "soil_type": 5,
-      "value": 96.0
-    }
-  },
-  {
-    "model": "ipcc.soilorganiccarbon",
-    "pk": 537,
-    "fields": {
-      "climate": 20,
-      "moisture": 1,
-      "soil_type": 6,
-      "value": 82.0
+      "value": null,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

@@ -1,134 +1,178 @@
 [
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 20,
+    "pk": 15,
     "fields": {
       "irrigation_system_type": 7,
       "initial_denomination": null,
       "bar_start": 1.0,
       "bar_end": 3.0,
       "avg_pressure": 2.0,
-      "head": 21.399
+      "head": 21.399,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 21,
+    "pk": 16,
     "fields": {
       "irrigation_system_type": 9,
       "initial_denomination": null,
       "bar_start": 0.5,
       "bar_end": 3.0,
       "avg_pressure": 0.9,
-      "head": 9.62955
+      "head": 9.62955,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 22,
+    "pk": 17,
     "fields": {
       "irrigation_system_type": 10,
       "initial_denomination": null,
       "bar_start": 0.5,
       "bar_end": 2.0,
       "avg_pressure": 1.25,
-      "head": 13.374375
+      "head": 13.374375,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 23,
+    "pk": 18,
     "fields": {
       "irrigation_system_type": 11,
       "initial_denomination": null,
       "bar_start": 2.0,
       "bar_end": 5.0,
       "avg_pressure": 3.5,
-      "head": 37.44825
+      "head": 37.44825,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 24,
+    "pk": 19,
     "fields": {
       "irrigation_system_type": 8,
       "initial_denomination": null,
       "bar_start": 2.0,
       "bar_end": 8.0,
       "avg_pressure": 5.0,
-      "head": 53.4975
+      "head": 53.4975,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 25,
+    "pk": 20,
     "fields": {
       "irrigation_system_type": 1,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 26,
+    "pk": 21,
     "fields": {
       "irrigation_system_type": 2,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 27,
+    "pk": 22,
     "fields": {
       "irrigation_system_type": 3,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 28,
+    "pk": 23,
     "fields": {
       "irrigation_system_type": 4,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 29,
+    "pk": 24,
     "fields": {
       "irrigation_system_type": 5,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
     "model": "ipcc.irrigationpressurerequirement",
-    "pk": 30,
+    "pk": 25,
     "fields": {
       "irrigation_system_type": 6,
       "initial_denomination": null,
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   }
 ]
