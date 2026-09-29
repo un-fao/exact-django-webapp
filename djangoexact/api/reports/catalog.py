@@ -12,6 +12,7 @@ from __future__ import annotations
 
 REPORTS: dict[str, frozenset[str]] = {
     "fao": frozenset({"en", "es", "fr"}),
+    "ifad": frozenset({"en"}),
 }
 
 

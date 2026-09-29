@@ -1,0 +1,61 @@
+<style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @top-left { content: element(page-header); }
+            @bottom-left { content: element(page-footer); }
+        }
+        header, footer {
+            position: running(page-header);
+            height: 1.5cm;
+            line-height: 1.5cm;
+            font-size: 10px;
+            color: #555;
+        }
+        body {
+            font-family: 'Open Sans', Calibri, Candara, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+        h1 { font-size: 17pt; margin-bottom: 0.8em; }
+        h2 { font-size: 13pt; margin-top: 1.6em; margin-bottom: 0.5em; }
+        p { text-align: justify; margin: 0 0 0.7em; }
+        ul { margin: 0 0 0.7em; padding-left: 1.4em; }
+        li { margin-bottom: 0.3em; text-align: justify; }
+        section { page-break-inside: avoid; break-inside: avoid; }
+        .page-break { page-break-before: always; }
+
+        table { border-collapse: collapse; width: 100%; margin: 0.6em 0 1em; font-size: 10pt; }
+        th, td { border: 1px solid #999; padding: 5px 8px; text-align: left; vertical-align: top; }
+        th { background: #eee; font-weight: bold; }
+        td.num, th.num { text-align: right; }
+        .identity-table td:first-child { width: 32%; font-weight: bold; background: #f6f6f6; }
+        .table-caption { font-weight: bold; margin-top: 1.2em; }
+
+        /* Deliberately loud: an un-editable PDF gives the analyst no chance to
+           notice a passage that silently rendered blank. */
+        .analyst-input {
+            background: #fff4d6;
+            border: 1px dashed #c9a227;
+            padding: 0 5px;
+            font-style: italic;
+            color: #6b5400;
+        }
+        .analyst-box {
+            display: block;
+            background: #fff4d6;
+            border: 1px dashed #c9a227;
+            padding: 8px 10px;
+            margin: 0.6em 0;
+            font-style: italic;
+            color: #6b5400;
+        }
+        .analyst-box .box-title {
+            display: block;
+            font-style: normal;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .deferred { color: #777; font-style: italic; }
+</style>
