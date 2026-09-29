@@ -23,6 +23,7 @@ Run with:
 """
 from __future__ import annotations
 
+from datetime import date
 from unittest.mock import Mock, patch
 
 from django.template.loader import render_to_string
@@ -74,7 +75,7 @@ def _make_result(project, *, mitigating=False):
     return result
 
 
-def _build_context(*, mitigating=False, implementation_years=None):
+def _build_context(*, mitigating=False, implementation_years=None, narrative=None):
     """Run the real build_template_context with only its I/O boundaries mocked."""
     from api.reports import html_context
 
@@ -92,7 +93,7 @@ def _build_context(*, mitigating=False, implementation_years=None):
         if implementation_years is not None:
             project.implementation_years = implementation_years
         result = _make_result(project, mitigating=mitigating)
-        return html_context.build_template_context(result)
+        return html_context.build_template_context(result, narrative=narrative)
 
 
 class TestEveryReportTemplateRenders(SimpleTestCase):
@@ -227,3 +228,182 @@ class TestIfadReportWithActivities(SimpleTestCase):
         for value in ("500,000", "200,000", "300,000", "150,000", "90,000", "30,000"):
             with self.subTest(value=value):
                 self.assertIn(value, html)
+
+
+NARRATIVE = {
+    "tier2_specification": "dairy cattle productivity from the national inventory",
+    "data_limitations": "Tier 1 defaults were used for soil carbon.",
+    "assumption_set_date": date(2026, 3, 14),
+    "top_activity_driver": "avoided deforestation on the project boundary",
+    "additional_sources": ["Mwangi et al. (2021), Agroforestry in Kenya, p. 44."],
+}
+
+# The placeholder strings milestone 2 renders when nothing is supplied. Each must
+# survive an omitted field: a blank in an un-editable PDF is invisible.
+PLACEHOLDERS = (
+    "Tier 2 parameters",
+    "Analyst input",
+    "data limitations",
+    "DD/MM/YYYY",
+    "driver behind this activity",
+    "additional literature",
+)
+
+
+def _section(html, start, end):
+    """The slice of the document between two headings.
+
+    Asserting placement needs this: a whole-document assertIn passes when a
+    passage renders in the wrong section, which is exactly the defect that
+    "correctly placed" names.
+    """
+    collapsed = " ".join(html.split())
+    assert start in collapsed, "missing heading: %s" % start
+    assert end in collapsed, "missing heading: %s" % end
+    return collapsed[collapsed.index(start):collapsed.index(end)]
+
+
+def _render_with(narrative, *, activities=None):
+    context = _build_context(narrative=narrative)
+    if activities is not None:
+        context["activities_total"] = activities
+        context["largest_contributing_activity"] = activities[0]
+    return render_to_string("reports/ifad_en.html", context)
+
+
+def _activity(name, balance, narrative=None):
+    activity = Mock()
+    activity.name = name
+    activity.results = {"balance": balance}
+    activity.modules_emissions = []
+    activity.narrative = narrative
+    return activity
+
+
+class TestNarrativeReachesThePage(SimpleTestCase):
+    """Analyst free text renders, in the right section, or not at all."""
+
+    def test_every_supplied_field_appears(self):
+        html = " ".join(
+            _render_with(NARRATIVE, activities=[_activity("Agroforestry", -12345.0)]).split()
+        )
+        for value in (
+            "dairy cattle productivity from the national inventory",
+            "Tier 1 defaults were used for soil carbon.",
+            "14/03/2026",
+            "avoided deforestation on the project boundary",
+            "Mwangi et al. (2021), Agroforestry in Kenya, p. 44.",
+        ):
+            with self.subTest(value=value):
+                self.assertIn(value, html)
+
+    def test_each_field_lands_in_its_own_section(self):
+        html = _render_with(NARRATIVE, activities=[_activity("Agroforestry", -12345.0)])
+        assumptions = _section(html, "III. Assumptions and activities", "IV. Results")
+        results = _section(html, "IV. Results", "Sources")
+
+        self.assertIn("dairy cattle productivity", assumptions)
+        self.assertIn("Tier 1 defaults were used", assumptions)
+        self.assertIn("14/03/2026", assumptions)
+        self.assertNotIn("avoided deforestation", assumptions)
+
+        self.assertIn("avoided deforestation", results)
+        self.assertNotIn("dairy cattle productivity", results)
+
+        self.assertIn("Mwangi et al. (2021)", html[html.index("Sources</h2>"):])
+
+    def test_omitted_fields_keep_their_placeholders(self):
+        # One activity, so the top-activity driver branch is reachable at all.
+        html = _render_with(None, activities=[_activity("Agroforestry", -12345.0)])
+        for placeholder in PLACEHOLDERS:
+            with self.subTest(placeholder=placeholder):
+                self.assertIn(placeholder, html)
+
+    def test_a_partial_narrative_leaves_the_rest_placeheld(self):
+        html = _render_with({"data_limitations": "Only this one was supplied."})
+        self.assertIn("Only this one was supplied.", html)
+        self.assertIn("DD/MM/YYYY", html)
+        self.assertIn("Tier 2 parameters", html)
+
+
+class TestNarrativeIsEscaped(SimpleTestCase):
+    """The PDF engine is version-pinned under a CVE exemption.
+
+    These assertions are what stops a later `|safe` -- added to make some
+    formatting work -- from silently turning analyst prose into markup. Each
+    checks the raw string is ABSENT as well as that the escaped one is present:
+    asserting only the latter passes even when a raw copy is also in the page.
+    """
+
+    HOSTILE = '<script>alert(1)</script>" onload="x'
+
+    def test_markup_is_escaped_in_every_field(self):
+        html = _render_with(
+            {
+                "tier2_specification": self.HOSTILE,
+                "data_limitations": self.HOSTILE,
+                "top_activity_driver": self.HOSTILE,
+                "additional_sources": [self.HOSTILE],
+            },
+            activities=[_activity("Agroforestry", -1.0)],
+        )
+        self.assertNotIn("<script>", html)
+        self.assertNotIn('" onload="', html)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html)
+
+    def test_per_activity_markup_is_escaped(self):
+        activity = _activity(
+            "Agroforestry", -1.0,
+            narrative={"wop": self.HOSTILE, "wp": self.HOSTILE, "data_source": self.HOSTILE},
+        )
+        html = _render_with(None, activities=[activity])
+        self.assertNotIn("<script>", html)
+        self.assertIn("&lt;script&gt;", html)
+
+    def test_linebreaksbr_adds_breaks_without_opening_a_hole(self):
+        html = _render_with({"data_limitations": "first line\n<i>second</i>"})
+        self.assertIn("first line<br>", html)
+        self.assertIn("&lt;i&gt;second&lt;/i&gt;", html)
+        self.assertNotIn("<i>second</i>", html)
+
+
+class TestPerActivityNarrative(SimpleTestCase):
+    """Narrative keyed by activity id reaches the right activity, and only it."""
+
+    def test_attached_by_string_id(self):
+        from api.reports import html_context
+
+        first, second = _activity("Agroforestry", -5.0), _activity("Rice", 3.0)
+        first.pk, second.pk = 41, 42
+        with patch.object(html_context, "_compute_activity_contexts", return_value=[first, second]):
+            context = _build_context(narrative={"activities": {"41": {"wop": "Continuous maize."}}})
+
+        self.assertEqual(first.narrative, {"wop": "Continuous maize."})
+        self.assertIsNone(second.narrative)
+        self.assertEqual(context["narrative"]["activities"], {"41": {"wop": "Continuous maize."}})
+
+    def test_one_activity_does_not_inherit_its_neighbours_prose(self):
+        described = _activity(
+            "Agroforestry", -5.0,
+            narrative={
+                "wop": "Degraded grazing land.",
+                "wp": "Trees on 4,000 ha.",
+                "data_source": "PDR p. 37",
+            },
+        )
+        bare = _activity("Rice intensification", 3.0)
+        html = " ".join(_render_with(None, activities=[described, bare]).split())
+
+        self.assertIn("Degraded grazing land.", html)
+        self.assertIn("Trees on 4,000 ha.", html)
+        self.assertIn("PDR p. 37", html)
+        self.assertIn(
+            "Rice intensification</span> WOP situation, WP practice change, "
+            "and data source to be supplied by the analyst.",
+            html,
+        )
+
+    def test_instructions_box_disappears_once_activities_are_described(self):
+        with_text = _render_with({"activities": {"41": {"wop": "x"}}})
+        self.assertNotIn("For each activity assessed, describe", with_text)
+        self.assertIn("For each activity assessed, describe", _render_with(None))
