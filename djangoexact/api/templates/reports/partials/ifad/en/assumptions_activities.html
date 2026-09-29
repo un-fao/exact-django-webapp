@@ -17,7 +17,7 @@
         {% if soc %}{{ soc|floatformat:1 }} tC/ha{% else %}<span class="analyst-input">not available</span>{% endif %}.
         Parameters were applied at Tier 1 (IPCC default values) unless otherwise noted; where
         project-specific data was available, Tier 2 parameters were used for
-        {% if narrative.tier2_specification %}{{ narrative.tier2_specification|linebreaksbr }}{% else %}<span class="analyst-input">Tier 2 parameters — specify, or state &lsquo;not applicable&rsquo;</span>{% endif %}.
+        {% if tier2_parameters %}{{ tier2_parameters|join:", " }}{% if narrative.tier2_specification %}; {{ narrative.tier2_specification|linebreaksbr }}{% endif %}{% elif narrative.tier2_specification %}{{ narrative.tier2_specification|linebreaksbr }}{% else %}<span class="analyst-input">Tier 2 parameters — specify, or state &lsquo;not applicable&rsquo;</span>{% endif %}.
     </p>
 
     {% if not narrative.activities %}
