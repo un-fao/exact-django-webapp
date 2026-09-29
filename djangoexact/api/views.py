@@ -809,7 +809,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get", "post"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -849,6 +849,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.query_params.get("template", None):
             response = self.template(request, pk=pk)
             return response
+
+        # No template means the Excel report, which has no narrative sections.
+        # Dropping it silently would hand back a file missing prose they wrote.
+        from .reports import narrative as report_narrative
+
+        report_narrative.narrative_from_request(request, None, [])
 
         try:
             from .reports import generate_excel_report
@@ -910,12 +916,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
             except catalog.UnknownReport as e:
                 return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
 
+        from .reports import narrative as report_narrative
+
+        narrative_raw, _narrative = report_narrative.narrative_from_request(
+            request, template_name, selected_activities,
+        )
+
         params = {
             "project_id": project.pk,
             "activity_ids": activity_ids,
             "format": fmt,
             "template": template_name,
             "lang": lang,
+            "narrative": narrative_raw,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1589,14 +1602,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except catalog.UnknownReport as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
 
+        from .reports import narrative as report_narrative
+
+        project: Project = self.get_object()
+        # compute_project_result below is called without an activity filter, so
+        # any of the project's activities may carry narrative.
+        _raw, narrative = report_narrative.narrative_from_request(
+            request, template_name, project.activities.all(),
+        )
+
         try:
             from .reports import compute_project_result
             from .reports.html_context import build_template_context
 
-            project: Project = self.get_object()
-
             result = compute_project_result(project)
-            context = build_template_context(result, request, lang)
+            context = build_template_context(result, request, lang, narrative=narrative)
             html = render(request, template_path, context).content.decode()
 
             from weasyprint import HTML
