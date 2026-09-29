@@ -23,7 +23,7 @@
                         </p>
                         <p>
                             Sous le scénario Avec Projet, l'activité impactera
-                            {% if activity.is_fishery %}{{ activity.catch|floatformat:2|intcomma }}{% else %}{{ activity.area }}{% endif %}
+                            {% if activity.is_luc %}{{ activity.area }}{% elif activity.is_fishery %}{{ activity.catch|floatformat:2|intcomma }}{% elif activity.is_livestock %}{{ activity.heads }}{% else %}{{ activity.area }}{% endif %}
                             {{ activity.main_impact }}
                             {% if activity.secondary_impacts %}, plus les émissions relatives à {{ activity.secondary_impacts }}.{% endif %}
                         </p>
