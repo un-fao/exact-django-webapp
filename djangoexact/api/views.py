@@ -894,7 +894,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
         fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
 
         if fmt == "pdf" and not template_name:
@@ -1565,9 +1565,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", "en")
-        if hasattr(request, "LANGUAGE_CODE"):
-            lang = request.LANGUAGE_CODE
+        lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
