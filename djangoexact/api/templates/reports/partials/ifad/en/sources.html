@@ -17,10 +17,15 @@
             MDBs and IDFC (2023). Common Principles for Climate Mitigation Finance Tracking,
             Version 4, 5 December 2023.
         </li>
+        {% for source in narrative.additional_sources %}
+            <li>{{ source }}</li>
+        {% endfor %}
     </ul>
+    {% if not narrative.additional_sources %}
     <span class="analyst-box">
         <span class="box-title">Analyst input — additional literature</span>
         Any other literature used for Tier 2 parameters or assumptions, including grey literature
         backing management practices, fertilizer use or other derived parameters.
     </span>
+    {% endif %}
 </section>

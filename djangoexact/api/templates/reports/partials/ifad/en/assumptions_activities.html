@@ -17,30 +17,45 @@
         {% if soc %}{{ soc|floatformat:1 }} tC/ha{% else %}<span class="analyst-input">not available</span>{% endif %}.
         Parameters were applied at Tier 1 (IPCC default values) unless otherwise noted; where
         project-specific data was available, Tier 2 parameters were used for
-        <span class="analyst-input">Tier 2 parameters — specify, or state &lsquo;not applicable&rsquo;</span>.
+        {% if narrative.tier2_specification %}{{ narrative.tier2_specification|linebreaksbr }}{% else %}<span class="analyst-input">Tier 2 parameters — specify, or state &lsquo;not applicable&rsquo;</span>{% endif %}.
     </p>
 
+    {% if not narrative.activities %}
     <span class="analyst-box">
         <span class="box-title">Analyst input — activity descriptions</span>
         For each activity assessed, describe: the without-project (WOP) situation; the with-project
         (WP) practice change introduced by the investment; and the main data source used (PDR / PIM
         / EFA, with page reference).
     </span>
+    {% endif %}
     {% for activity in activities_total %}
-        <span class="analyst-box">
-            <span class="box-title">{{ forloop.counter }}. {{ activity.name }}</span>
-            WOP situation, WP practice change, and data source to be supplied by the analyst.
-        </span>
+        {% if activity.narrative %}
+            <p>
+                <b>{{ forloop.counter }}. {{ activity.name }}</b><br>
+                {% if activity.narrative.wop %}<i>Without project:</i> {{ activity.narrative.wop|linebreaksbr }}<br>{% endif %}
+                {% if activity.narrative.wp %}<i>With project:</i> {{ activity.narrative.wp|linebreaksbr }}<br>{% endif %}
+                {% if activity.narrative.data_source %}<i>Data source:</i> {{ activity.narrative.data_source }}{% endif %}
+            </p>
+        {% else %}
+            <span class="analyst-box">
+                <span class="box-title">{{ forloop.counter }}. {{ activity.name }}</span>
+                WOP situation, WP practice change, and data source to be supplied by the analyst.
+            </span>
+        {% endif %}
     {% endfor %}
+    {% if narrative.data_limitations %}
+        <p><b>Data limitations:</b> {{ narrative.data_limitations|linebreaksbr }}</p>
+    {% else %}
     <span class="analyst-box">
         <span class="box-title">Analyst input — data limitations</span>
         e.g. reliance on Tier 1 default parameters where project-specific data was unavailable, or
         assumptions to be confirmed with the project team.
     </span>
+    {% endif %}
 
     <p>
         Notes: This assumption set reflects the baseline and project activities as of
-        <span class="analyst-input">DD/MM/YYYY</span> and according to the documents cited in each
+        {% if narrative.assumption_set_date %}{{ narrative.assumption_set_date|date:"d/m/Y" }}{% else %}<span class="analyst-input">DD/MM/YYYY</span>{% endif %} and according to the documents cited in each
         activity description.
     </p>
 </section>
