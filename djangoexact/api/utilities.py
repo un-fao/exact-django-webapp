@@ -124,6 +124,17 @@ def get_query_param_or_validation_error(request, param_name):
     return param
 
 
+def requested_activity_ids(request):
+    """Activity ids named by ?activities=, or [] when the parameter is absent.
+
+    Non-numeric entries are dropped silently rather than rejected. That is the
+    behaviour of the five hand-rolled copies this replaces, kept deliberately:
+    changing it is a separate decision from removing the duplication.
+    """
+    raw = request.query_params.get("activities", "")
+    return [pk.strip() for pk in raw.split(",") if pk.strip().isdigit()]
+
+
 def get_url_name(model_name):
     url_name = model_name
 

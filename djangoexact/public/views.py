@@ -95,7 +95,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
@@ -152,7 +152,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = None
         else:
@@ -202,7 +202,13 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             from api.reports.html_context import build_template_context
 
             project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
-            result = compute_project_result(project)
+            # Honour ?activities= here too. report() and the async worker both
+            # filter; without this the same request produced a different document
+            # depending on which path served it.
+            activity_ids = utils.requested_activity_ids(request)
+            activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
+
+            result = compute_project_result(project, activities)
             context = build_template_context(result, request, lang)
             html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
             from weasyprint import HTML
