@@ -24,6 +24,7 @@ Run with:
 from __future__ import annotations
 
 from datetime import date
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.template.loader import render_to_string
@@ -276,6 +277,7 @@ def _activity(name, balance, narrative=None):
     activity.name = name
     activity.results = {"balance": balance}
     activity.modules_emissions = []
+    activity.t2_overrides = []
     activity.narrative = narrative
     return activity
 
@@ -407,3 +409,54 @@ class TestPerActivityNarrative(SimpleTestCase):
         with_text = _render_with({"activities": {"41": {"wop": "x"}}})
         self.assertNotIn("For each activity assessed, describe", with_text)
         self.assertIn("For each activity assessed, describe", _render_with(None))
+
+
+class TestComputedTier2Parameters(SimpleTestCase):
+    """The seven activity-level Tier 2 overrides fill the sentence the analyst used to type.
+
+    They were already computed for the Excel report and carried on
+    ActivityResult.t2_overrides; nothing read them on the HTML side.
+
+    An empty list is not the same as "not applicable". Only these seven
+    parameters are detectable, so a module that overrode its own parameters
+    leaves no trace here, and the placeholder has to survive that case.
+    """
+
+    def _context_with_overrides(self, *label_sets):
+        from api.reports import html_context
+
+        activities = []
+        for labels in label_sets:
+            activity = _activity("Activity %d" % len(activities), -1.0)
+            activity.t2_overrides = [SimpleNamespace(label=lbl) for lbl in labels]
+            activities.append(activity)
+        with patch.object(html_context, "_compute_activity_contexts", return_value=activities):
+            return _build_context()
+
+    def test_labels_are_deduplicated_and_sorted_across_activities(self):
+        context = self._context_with_overrides(["SOC", "Climate"], ["Climate", "Soil type"])
+        self.assertEqual(context["tier2_parameters"], ["Climate", "SOC", "Soil type"])
+
+    def test_no_overrides_yields_an_empty_list(self):
+        self.assertEqual(self._context_with_overrides([])["tier2_parameters"], [])
+
+    def test_computed_list_replaces_the_placeholder(self):
+        context = self._context_with_overrides(["Climate", "SOC"])
+        html = " ".join(render_to_string("reports/ifad_en.html", context).split())
+        self.assertIn("Tier 2 parameters were used for Climate, SOC", html)
+        self.assertNotIn("specify, or state", html)
+
+    def test_analyst_text_is_appended_not_replaced(self):
+        from api.reports import html_context
+
+        activity = _activity("Agroforestry", -1.0)
+        activity.t2_overrides = [SimpleNamespace(label="Climate")]
+        with patch.object(html_context, "_compute_activity_contexts", return_value=[activity]):
+            context = _build_context(narrative={"tier2_specification": "manure management factors"})
+        html = " ".join(render_to_string("reports/ifad_en.html", context).split())
+        self.assertIn("used for Climate; manure management factors", html)
+
+    def test_placeholder_survives_when_nothing_is_detected(self):
+        context = self._context_with_overrides([])
+        html = render_to_string("reports/ifad_en.html", context)
+        self.assertIn("specify, or state", html)

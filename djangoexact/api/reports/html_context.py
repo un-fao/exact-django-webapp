@@ -209,6 +209,7 @@ def _compute_activity_contexts(
             secondary_impacts.append(_("agricultural inputs use"))
 
         db_activity.main_impact = main_impact
+        db_activity.t2_overrides = ar.t2_overrides
         db_activity.secondary_impacts = ", ".join(secondary_impacts) if secondary_impacts else None
         processed_activities.append(db_activity)
 
@@ -433,6 +434,15 @@ def build_template_context(
         for activity in processed_activities
         for module in activity.modules_emissions
     })
+    # Activity-level Tier 2 overrides, which the Excel report already shows and
+    # the IFAD annex asked the analyst to retype. An empty list does NOT mean
+    # "not applicable": only these seven parameters are detectable, and a module
+    # that overrode its own parameters is invisible here.
+    tier2_parameters = sorted({
+        override.label
+        for activity in processed_activities
+        for override in activity.t2_overrides
+    })
 
     # Indicator aggregates
     indicators = _compute_indicator_aggregates(activities_by_name, project)
@@ -477,6 +487,7 @@ def build_template_context(
         "activities_total": processed_activities,
         "largest_contributing_activity": largest_contributing_activity,
         "modules_used": modules_used,
+        "tier2_parameters": tier2_parameters,
         "ghg_rows": ghg_rows,
         "project_chart_base64": project_chart_base64,
         "project_gases_chart_base64": project_gases_chart_base64,
