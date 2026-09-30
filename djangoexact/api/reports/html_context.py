@@ -362,8 +362,34 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     total_wo = float(sum(result.aggregated.yearly_balance_wo))
     total_balance = total_w - total_wo
 
+    # Rebuilt from the w/wo pair rather than sliced off aggregated.yearly_balance:
+    # that property sums the unsuffixed field set, which is not the same quantity
+    # as total_balance, so slicing it yields halves that silently fail to add up.
+    yearly_bal = [
+        w - wo
+        for w, wo in zip_longest(
+            result.aggregated.yearly_balance_w,
+            result.aggregated.yearly_balance_wo,
+            fillvalue=0.0,
+        )
+    ]
+    impl_years = project.implementation_years or 0
+    balance_during_implementation = float(sum(yearly_bal[:impl_years]))
+    balance_after_implementation = float(sum(yearly_bal[impl_years:]))
+
     # Gas-level totals and GHG ranking
     gas_data = _compute_gas_totals(result, total_balance)
+
+    # Django templates cannot subtract, so the per-gas balance column is built here.
+    ghg_rows = [
+        {
+            "gas": gas,
+            "w": gas_data["gas_totals_w"][gas],
+            "wo": gas_data["gas_totals_wo"][gas],
+            "balance": gas_data["gas_totals_w"][gas] - gas_data["gas_totals_wo"][gas],
+        }
+        for gas in ("CO2", "CH4", "N2O")
+    ]
 
     # Direction helper uses locale-aware strings (activated above)
     INCREASES = _("increases")
@@ -381,6 +407,19 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         a.cache_modules()
         activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
+
+    # Ranked by absolute contribution: the largest driver of the balance may be
+    # a net sink, which the sign-ordered sort above would put last.
+    largest_contributing_activity = max(
+        processed_activities,
+        key=lambda a: abs(a.results["balance"]),
+        default=None,
+    )
+    modules_used = sorted({
+        module["name"]
+        for activity in processed_activities
+        for module in activity.modules_emissions
+    })
 
     # Indicator aggregates
     indicators = _compute_indicator_aggregates(activities_by_name, project)
@@ -406,6 +445,9 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "total_carbon_balance": total_balance,
         "project_emissions_w": total_w,
         "project_emissions_wo": total_wo,
+        "balance_during_implementation": balance_during_implementation,
+        "balance_after_implementation": balance_after_implementation,
+        "capitalization_years": project.capitalization_years,
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
@@ -420,6 +462,9 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "project_tertiary_ghg_emissions": gas_data["tertiary_ghg_emissions"],
         "project_tertiary_ghg_direction": _direction(gas_data["tertiary_ghg_emissions"]),
         "activities_total": processed_activities,
+        "largest_contributing_activity": largest_contributing_activity,
+        "modules_used": modules_used,
+        "ghg_rows": ghg_rows,
         "project_chart_base64": project_chart_base64,
         "project_gases_chart_base64": project_gases_chart_base64,
         "faologo_base64": faologo_base64,

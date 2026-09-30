@@ -16,8 +16,9 @@ set closed:
     time in front of an analyst.
 
 Known ceiling: get_template resolves the top-level file only. Django resolves
-{% include %} at render time, so a broken partial still passes here. Closing
-that needs an end-to-end render assertion, which milestone 2 owns.
+{% include %} at render time, so a broken partial still passes here. That is
+closed by api/tests/reports/test_report_render.py, which renders every report
+and asserts on the values that come out.
 
 Run with:
     python manage.py test api.tests.reports.test_catalog
@@ -58,8 +59,18 @@ class ReportCatalogTestCase(SimpleTestCase):
             resolve_template(secret, "en")
         self.assertNotIn(secret, str(ctx.exception))
 
-    def test_catalog_still_holds_only_fao(self):
-        """IFAD is milestone 2. A registration without a template behind it is
-        worse than no registration, so this fails loudly when one is added
-        ahead of its template."""
-        self.assertEqual(sorted(REPORTS), ["fao"])
+    def test_catalog_holds_exactly_the_shipped_reports(self):
+        """A registration without a template behind it is worse than no
+        registration, so this fails loudly when one is added ahead of its
+        template. test_every_registered_pair_loads is what proves the template
+        is really there; this only pins the set so a new report is a deliberate
+        edit rather than a silent import."""
+        self.assertEqual(sorted(REPORTS), ["fao", "ifad"])
+
+    def test_ifad_is_english_only(self):
+        """The IFAD template was delivered in English only. Without a per-report
+        language set, ifad&lang=fr would 500 at render time instead of 400 here."""
+        self.assertEqual(resolve_template("ifad", "en"), "reports/ifad_en.html")
+        for lang in ("es", "fr"):
+            with self.subTest(lang=lang), self.assertRaises(UnknownReport):
+                resolve_template("ifad", lang)
