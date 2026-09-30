@@ -1,7 +1,7 @@
 import io
 import sys
 import types
-from datetime import timedelta
+from datetime import date, timedelta
 from unittest import mock
 
 from django.test import TestCase, override_settings
@@ -162,12 +162,12 @@ class ReportAsyncEndpointTestCase(APITestCase):
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=True), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard&lang=en")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=en")
         self.assertEqual(resp.status_code, 202)
         self.assertIn("job_id", resp.data)
         job = AsyncJob.objects.get(pk=resp.data["job_id"])
         self.assertEqual(job.kind, AsyncJob.Kind.REPORT)
-        self.assertEqual(job.params["template"], "standard")
+        self.assertEqual(job.params["template"], "fao")
         self.assertEqual(job.params["format"], "pdf")
         self.assertEqual(job.params["project_id"], project.pk)
         self.assertIsNone(job.params["activity_ids"])
@@ -194,12 +194,72 @@ class ReportAsyncEndpointTestCase(APITestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
+    def test_unknown_template_returns_400_and_does_not_enqueue(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=nope")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_known_template_unknown_language_returns_400(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=de")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
     def test_not_ready_project_returns_400_and_does_not_enqueue(self):
         project = ProjectFactory(owner=self.user)
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=False), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+
+    def test_narrative_is_carried_into_job_params(self):
+        project = ProjectFactory(owner=self.user)
+        narrative = {"data_limitations": "Tier 1 defaults.", "assumption_set_date": "2026-03-14"}
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(
+                f"/api/projects/{project.pk}/report/async/?template=ifad",
+                {"narrative": narrative}, format="json",
+            )
+        self.assertEqual(resp.status_code, 202)
+        job = AsyncJob.objects.get(pk=resp.data["job_id"])
+        # Stored raw: params must stay JSON-serializable, so the date is still
+        # a string here and the worker is what turns it back into a date.
+        self.assertEqual(job.params["narrative"], narrative)
+
+    def test_a_report_that_ignores_narrative_refuses_it(self):
+        """Passing it through would be silent: a PDF without the prose, and no way to tell."""
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(
+                f"/api/projects/{project.pk}/report/async/?template=fao",
+                {"narrative": {"data_limitations": "x"}}, format="json",
+            )
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_narrative_for_an_unknown_activity_is_rejected_before_enqueue(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(
+                f"/api/projects/{project.pk}/report/async/?template=ifad",
+                {"narrative": {"activities": {"999": {"wop": "Lost prose."}}}}, format="json",
+            )
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
@@ -358,7 +418,7 @@ class ReportJobRunTestCase(TestCase):
             kind=AsyncJob.Kind.REPORT,
             created_by=requester,
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
-                    "template": "standard", "lang": "en"},
+                    "template": "fao", "lang": "en"},
         )
         fake_project = mock.Mock(pk=7, name="P")
         with mock.patch("api.services.report_jobs.Project") as m_project, \
@@ -375,6 +435,52 @@ class ReportJobRunTestCase(TestCase):
         m_render.assert_called_once()
         rendered_context = m_render.call_args.args[1]
         self.assertEqual(rendered_context["user"], requester)
+
+
+    def test_worker_parses_the_narrative_it_was_handed(self):
+        """params travel as JSON, so the assumption-set date is a string until the worker runs."""
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            created_by=UserFactory(email="narrative-job-requester@example.com"),
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "ifad", "lang": "en",
+                    "narrative": {"assumption_set_date": "2026-03-14",
+                                  "data_limitations": "Tier 1 defaults."}},
+        )
+        fake_project = mock.Mock(pk=7)
+        fake_project.activities.all.return_value = []
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
+            m_project.objects.get.return_value = fake_project
+            report_jobs.run(job)
+
+        narrative = m_ctx.call_args.kwargs["narrative"]
+        self.assertEqual(narrative["assumption_set_date"], date(2026, 3, 14))
+        self.assertEqual(narrative["data_limitations"], "Tier 1 defaults.")
+
+    def test_a_report_without_narrative_passes_none(self):
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            created_by=UserFactory(email="plain-job-requester@example.com"),
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "fao", "lang": "en"},
+        )
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
+            m_project.objects.get.return_value = mock.Mock(pk=7)
+            report_jobs.run(job)
+
+        self.assertIsNone(m_ctx.call_args.kwargs["narrative"])
 
 
 class ReportDownloadTestCase(APITestCase):

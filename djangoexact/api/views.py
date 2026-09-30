@@ -783,7 +783,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
@@ -809,7 +809,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get", "post"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -835,7 +835,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.all()
         else:
@@ -849,6 +849,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if request.query_params.get("template", None):
             response = self.template(request, pk=pk)
             return response
+
+        # No template means the Excel report, which has no narrative sections.
+        # Dropping it silently would hand back a file missing prose they wrote.
+        from .reports import narrative as report_narrative
+
+        report_narrative.narrative_from_request(request, None, [])
 
         try:
             from .reports import generate_excel_report
@@ -880,7 +886,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             activity_ids = None
             selected_activities = project.activities.all()
@@ -894,11 +900,27 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        lang = utils.requested_language(request)
         fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
 
         if fmt == "pdf" and not template_name:
             return utils.ErrorResponse("Template name is required for PDF", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if fmt == "pdf":
+            # Resolve before enqueueing: an unknown name must be a 400 here, not a
+            # job the analyst waits on only to find it failed in the worker.
+            from .reports import catalog
+
+            try:
+                catalog.resolve_template(template_name, lang)
+            except catalog.UnknownReport as e:
+                return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
+        from .reports import narrative as report_narrative
+
+        narrative_raw, _narrative = report_narrative.narrative_from_request(
+            request, template_name, selected_activities,
+        )
 
         params = {
             "project_id": project.pk,
@@ -906,6 +928,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "format": fmt,
             "template": template_name,
             "lang": lang,
+            "narrative": narrative_raw,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1565,28 +1588,43 @@ class ProjectViewSet(viewsets.ModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", "en")
-        if hasattr(request, "LANGUAGE_CODE"):
-            lang = request.LANGUAGE_CODE
+        lang = utils.requested_language(request)
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}_{lang}.html"):
-            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
+        from .reports import catalog
+
+        try:
+            template_path = catalog.resolve_template(template_name, lang)
+        except catalog.UnknownReport as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
+        from .reports import narrative as report_narrative
+
+        project: Project = self.get_object()
+
+        # Honour ?activities= here too. report() and the async worker both
+        # filter; without this the same request produced a different document
+        # depending on which path served it.
+        activity_ids = utils.requested_activity_ids(request)
+        activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
+
+        # Narrative is validated against the activities that reach the report,
+        # the way report() does it. Validating against all of them would accept
+        # text for an activity ?activities= excluded and then render it.
+        _raw, narrative = report_narrative.narrative_from_request(
+            request, template_name, activities if activities is not None else project.activities.all(),
+        )
 
         try:
             from .reports import compute_project_result
             from .reports.html_context import build_template_context
 
-            project: Project = self.get_object()
+            result = compute_project_result(project, activities)
+            context = build_template_context(result, request, lang, narrative=narrative)
+            html = render(request, template_path, context).content.decode()
 
-            result = compute_project_result(project)
-            context = build_template_context(result, request, lang)
-            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
-
-            # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
 
             pdf = HTML(string=html).write_pdf()
@@ -1598,7 +1636,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.exception(e)
             return utils.ErrorResponse(
-                f"Error generating PDF ({type(e).__name__}): {e}",
+                "An unexpected error occurred while generating the PDF",
                 status=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

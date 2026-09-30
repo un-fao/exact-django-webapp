@@ -1,3 +1,20 @@
+## 1.21.0 (2026-09-30)
+
+### Feat
+
+- **reports**: compute the Tier 2 parameter list for the IFAD annex (#298)
+- **reports**: analyst narrative reaches the IFAD annex (#293)
+- **reports**: add the English IFAD annex report (#292)
+- **reports**: resolve report selection against a closed catalog (#285)
+- **api**: expose IPCC uncertainty ranges in module defaults
+- **api**: expose IPCC uncertainty ranges in module defaults
+
+### Fix
+
+- **reports**: let ?lang= select the report language on the sync path (#297)
+- **reports**: honour the activity filter on the synchronous PDF path (#296)
+- **reports**: print livestock head counts in the es and fr reports (#295)
+
 ## 1.20.4 (2026-09-21)
 
 ### Feat

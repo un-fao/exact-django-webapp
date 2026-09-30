@@ -11,7 +11,8 @@ from django.template.loader import render_to_string
 from django.utils.translation import activate
 
 from api.models import AsyncJob, Project
-from api.reports import compute_project_result, generate_excel_report
+from api.reports import catalog, compute_project_result, generate_excel_report
+from api.reports.narrative import clean_narrative
 from api.reports.html_context import build_template_context
 
 
@@ -30,7 +31,10 @@ def run(job: AsyncJob) -> dict:
 
     if fmt == "pdf":
         template_name = params["template"]
-        content = _render_pdf(project, activities, template_name, lang, job.created_by)
+        content = _render_pdf(
+            project, activities, template_name, lang, job.created_by,
+            narrative=params.get("narrative"),
+        )
         content_type = "application/pdf"
         ext = "pdf"
         default_name = f"{template_name}.pdf"
@@ -49,11 +53,19 @@ def run(job: AsyncJob) -> dict:
     }
 
 
-def _render_pdf(project, activities, template_name, lang, user):
+def _render_pdf(project, activities, template_name, lang, user, narrative=None):
+    # Resolved here as well as at enqueue, because jobs persisted before the
+    # catalog existed can still be replayed; first, so an unrenderable report
+    # fails before a carbon balance is computed for it.
+    template_path = catalog.resolve_template(template_name, lang)
+    # Parsed here rather than at enqueue because params travel as JSON: the
+    # assumption-set date is a string until this call turns it back into a date.
+    if narrative:
+        narrative = clean_narrative(narrative, activities or project.activities.all())
     result = compute_project_result(project, activities)
-    context = build_template_context(result, None, lang)
+    context = build_template_context(result, None, lang, narrative=narrative)
     context["user"] = user
-    html = render_to_string(f"reports/{template_name}_{lang}.html", context)
+    html = render_to_string(template_path, context)
     return _weasyprint_pdf(html)
 
 

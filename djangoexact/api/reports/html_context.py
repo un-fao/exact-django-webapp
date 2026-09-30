@@ -209,6 +209,7 @@ def _compute_activity_contexts(
             secondary_impacts.append(_("agricultural inputs use"))
 
         db_activity.main_impact = main_impact
+        db_activity.t2_overrides = ar.t2_overrides
         db_activity.secondary_impacts = ", ".join(secondary_impacts) if secondary_impacts else None
         processed_activities.append(db_activity)
 
@@ -332,7 +333,10 @@ def _load_fao_logo(lang: str) -> str:
     """Load the FAO logo SVG for the given language and return it as base64."""
     lang_path = os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg")
     fallback_path = os.path.join(settings.BASE_DIR, "media", "faologo.svg")
-    logo_path = lang_path if os.path.exists(lang_path) else fallback_path
+    # A separator in lang escapes media/ ("/../../etc/passwd" -> BASE_DIR/etc/
+    # passwd.svg, whose bytes would be base64'd into the PDF). Worker jobs replay
+    # lang from stored params, so this cannot assume a view validated it.
+    logo_path = lang_path if lang.isalpha() and os.path.exists(lang_path) else fallback_path
     with open(logo_path, "rb") as faologo:
         faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
     return faologo_base64
@@ -342,7 +346,9 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request=None, lang: str = "en") -> dict:
+def build_template_context(
+    result: ProjectResult, request=None, lang: str = "en", *, narrative=None,
+) -> dict:
     """Return the full context dict for the PDF HTML template.
 
     ``request`` is accepted for backward compatibility with the synchronous
@@ -350,6 +356,11 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     function; all i18n is driven by ``lang`` via ``activate(lang)``. It may
     be omitted (or ``None``) when calling from a non-request context, such
     as the async report worker.
+
+    ``narrative`` is the analyst free text validated by
+    ``api.reports.narrative.clean_narrative``. It is keyword-only so that no
+    positional caller can be broken by it, and every key is optional: a key
+    that is absent leaves the template's own labelled placeholder in place.
     """
     activate(lang)
     project = result.project
@@ -359,8 +370,34 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     total_wo = float(sum(result.aggregated.yearly_balance_wo))
     total_balance = total_w - total_wo
 
+    # Rebuilt from the w/wo pair rather than sliced off aggregated.yearly_balance:
+    # that property sums the unsuffixed field set, which is not the same quantity
+    # as total_balance, so slicing it yields halves that silently fail to add up.
+    yearly_bal = [
+        w - wo
+        for w, wo in zip_longest(
+            result.aggregated.yearly_balance_w,
+            result.aggregated.yearly_balance_wo,
+            fillvalue=0.0,
+        )
+    ]
+    impl_years = project.implementation_years or 0
+    balance_during_implementation = float(sum(yearly_bal[:impl_years]))
+    balance_after_implementation = float(sum(yearly_bal[impl_years:]))
+
     # Gas-level totals and GHG ranking
     gas_data = _compute_gas_totals(result, total_balance)
+
+    # Django templates cannot subtract, so the per-gas balance column is built here.
+    ghg_rows = [
+        {
+            "gas": gas,
+            "w": gas_data["gas_totals_w"][gas],
+            "wo": gas_data["gas_totals_wo"][gas],
+            "balance": gas_data["gas_totals_w"][gas] - gas_data["gas_totals_wo"][gas],
+        }
+        for gas in ("CO2", "CH4", "N2O")
+    ]
 
     # Direction helper uses locale-aware strings (activated above)
     INCREASES = _("increases")
@@ -378,6 +415,34 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         a.cache_modules()
         activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
+
+    # Same dynamic-attribute mutation the activity contexts already use.
+    # JSON object keys are strings, hence str(pk).
+    activity_narrative = (narrative or {}).get("activities", {})
+    for activity in processed_activities:
+        activity.narrative = activity_narrative.get(str(activity.pk))
+
+    # Ranked by absolute contribution: the largest driver of the balance may be
+    # a net sink, which the sign-ordered sort above would put last.
+    largest_contributing_activity = max(
+        processed_activities,
+        key=lambda a: abs(a.results["balance"]),
+        default=None,
+    )
+    modules_used = sorted({
+        module["name"]
+        for activity in processed_activities
+        for module in activity.modules_emissions
+    })
+    # Activity-level Tier 2 overrides, which the Excel report already shows and
+    # the IFAD annex asked the analyst to retype. An empty list does NOT mean
+    # "not applicable": only these seven parameters are detectable, and a module
+    # that overrode its own parameters is invisible here.
+    tier2_parameters = sorted({
+        override.label
+        for activity in processed_activities
+        for override in activity.t2_overrides
+    })
 
     # Indicator aggregates
     indicators = _compute_indicator_aggregates(activities_by_name, project)
@@ -403,6 +468,9 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "total_carbon_balance": total_balance,
         "project_emissions_w": total_w,
         "project_emissions_wo": total_wo,
+        "balance_during_implementation": balance_during_implementation,
+        "balance_after_implementation": balance_after_implementation,
+        "capitalization_years": project.capitalization_years,
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
@@ -417,6 +485,10 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "project_tertiary_ghg_emissions": gas_data["tertiary_ghg_emissions"],
         "project_tertiary_ghg_direction": _direction(gas_data["tertiary_ghg_emissions"]),
         "activities_total": processed_activities,
+        "largest_contributing_activity": largest_contributing_activity,
+        "modules_used": modules_used,
+        "tier2_parameters": tier2_parameters,
+        "ghg_rows": ghg_rows,
         "project_chart_base64": project_chart_base64,
         "project_gases_chart_base64": project_gases_chart_base64,
         "faologo_base64": faologo_base64,
@@ -426,4 +498,5 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "aquaculture_data": indicators["aquaculture_data"],
         "land_types": indicators["land_types"],
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "narrative": narrative or {},
     }

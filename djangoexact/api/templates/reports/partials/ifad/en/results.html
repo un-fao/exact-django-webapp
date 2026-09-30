@@ -1,0 +1,56 @@
+{% load humanize %}
+<section>
+    <h2>IV. Results</h2>
+    <p>
+        Overall, results show a total carbon balance (CB) of
+        <b>{{ total_carbon_balance|floatformat:0|intcomma }}</b> tCO<sub>2</sub>eq over
+        {{ total_project_years }} years, for a total of
+        {% if total_area %}{{ total_area|floatformat:0|intcomma }} hectares{% endif %}
+        {% if total_heads %}{% if total_area %} / {% endif %}{{ total_heads|floatformat:0|intcomma }} livestock heads{% endif %}
+        {% if total_tonnes_of_catch %}{% if total_area or total_heads %} / {% endif %}{{ total_tonnes_of_catch|floatformat:0|intcomma }} tonnes of fish catch{% endif %}{% if not total_area and not total_heads and not total_tonnes_of_catch %}&mdash;{% endif %}.
+        The carbon balance obtained during the implementation time corresponds to
+        {{ balance_during_implementation|floatformat:0|intcomma }} tCO<sub>2</sub>eq, while the
+        carbon balance accrued after the end of project activities and until the end of accounting
+        corresponds to {{ balance_after_implementation|floatformat:0|intcomma }} tCO<sub>2</sub>eq.
+    </p>
+    <p>
+        Gross GHG fluxes with the project are
+        {{ project_emissions_w|floatformat:0|intcomma }} tCO<sub>2</sub>eq and
+        {{ project_emissions_wo|floatformat:0|intcomma }} tCO<sub>2</sub>eq without the project. The
+        project hence
+        {% if total_carbon_balance < 0 %}contributes to emission reduction{% else %}is a source of GHG emissions{% endif %}.
+        {% if largest_contributing_activity %}
+            {{ largest_contributing_activity.name }} accounts for the largest share of the balance,
+            at {{ largest_contributing_activity.results.balance|floatformat:0|intcomma }}
+            tCO<sub>2</sub>eq, mainly due to
+            {% if narrative.top_activity_driver %}{{ narrative.top_activity_driver|linebreaksbr }}{% else %}<span class="analyst-input">driver behind this activity</span>{% endif %}.
+        {% endif %}
+        An estimated <span class="analyst-input">area pending — see Table 2</span> hectares fall
+        under conservation or sustainable management as a result of the project.
+    </p>
+
+    <p class="table-caption">Table 2: MDB-aligned indicators</p>
+    <span class="analyst-box">
+        <span class="box-title">Pending confirmation with IFAD</span>
+        The MDB-aligned indicator set has not yet been agreed. The drafted indicators are under
+        review and this table will be populated once IFAD confirms which indicators it reports.
+    </span>
+
+    <p class="table-caption">Table 3: Carbon balance by GHG</p>
+    <table>
+        <tr>
+            <th>GHG</th>
+            <th class="num">With project (tCO<sub>2</sub>eq)</th>
+            <th class="num">Without project (tCO<sub>2</sub>eq)</th>
+            <th class="num">Balance (tCO<sub>2</sub>eq)</th>
+        </tr>
+        {% for row in ghg_rows %}
+            <tr>
+                <td>{{ row.gas }}</td>
+                <td class="num">{{ row.w|floatformat:0|intcomma }}</td>
+                <td class="num">{{ row.wo|floatformat:0|intcomma }}</td>
+                <td class="num">{{ row.balance|floatformat:0|intcomma }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</section>

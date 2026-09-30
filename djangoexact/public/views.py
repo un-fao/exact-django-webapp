@@ -20,10 +20,8 @@ import types
 import api.labels as labels
 from django.http import HttpResponse
 from django.utils.translation import activate
-from django.conf import settings
 from django.utils.translation import gettext as _
 from datetime import datetime
-import os
 import base64
 import io
 import numpy as np
@@ -95,7 +93,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
@@ -152,7 +150,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = None
         else:
@@ -186,25 +184,32 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", "en")
-        if hasattr(request, "LANGUAGE_CODE"):
-            lang = request.LANGUAGE_CODE
+        lang = utils.requested_language(request)
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
-        template_dir = os.path.join(settings.BASE_DIR, "api", "templates", "reports")
-        if not os.path.exists(f"{template_dir}/{template_name}_{lang}.html"):
-            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
+        from api.reports import catalog
+
+        try:
+            template_path = catalog.resolve_template(template_name, lang)
+        except catalog.UnknownReport as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
             from api.reports import compute_project_result
             from api.reports.html_context import build_template_context
 
             project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
-            result = compute_project_result(project)
+            # Honour ?activities= here too. report() and the async worker both
+            # filter; without this the same request produced a different document
+            # depending on which path served it.
+            activity_ids = utils.requested_activity_ids(request)
+            activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
+
+            result = compute_project_result(project, activities)
             context = build_template_context(result, request, lang)
-            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
+            html = render(request, template_path, context).content.decode()
             from weasyprint import HTML
             pdf = HTML(string=html).write_pdf()
             response = HttpResponse(pdf, content_type="application/pdf")
