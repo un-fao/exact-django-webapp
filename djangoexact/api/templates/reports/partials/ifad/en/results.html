@@ -23,7 +23,7 @@
             {{ largest_contributing_activity.name }} accounts for the largest share of the balance,
             at {{ largest_contributing_activity.results.balance|floatformat:0|intcomma }}
             tCO<sub>2</sub>eq, mainly due to
-            <span class="analyst-input">driver behind this activity</span>.
+            {% if narrative.top_activity_driver %}{{ narrative.top_activity_driver|linebreaksbr }}{% else %}<span class="analyst-input">driver behind this activity</span>{% endif %}.
         {% endif %}
         An estimated <span class="analyst-input">area pending — see Table 2</span> hectares fall
         under conservation or sustainable management as a result of the project.

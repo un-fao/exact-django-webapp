@@ -516,9 +516,12 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         vs.get_object = Mock(return_value=project)
         return vs
 
-    def _make_request(self, template_name="fao", lang="en"):
+    def _make_request(self, template_name="fao", lang="en", data=None):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
+        # A DRF request always has a dict-like .data; a bare Mock would make
+        # request.data.get("narrative") return a truthy Mock.
+        request.data = data or {}
         if hasattr(request, "LANGUAGE_CODE"):
             del request.LANGUAGE_CODE  # avoid the hasattr branch overriding lang
         return request

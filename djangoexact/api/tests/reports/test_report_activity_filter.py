@@ -27,6 +27,8 @@ def _request(activities=None, **params):
         query["activities"] = activities
     request = Mock()
     request.query_params = query
+    # Without this a bare Mock hands narrative_from_request a truthy payload.
+    request.data = {}
     del request.LANGUAGE_CODE
     return request
 

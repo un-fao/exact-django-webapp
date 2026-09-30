@@ -345,7 +345,9 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request=None, lang: str = "en") -> dict:
+def build_template_context(
+    result: ProjectResult, request=None, lang: str = "en", *, narrative=None,
+) -> dict:
     """Return the full context dict for the PDF HTML template.
 
     ``request`` is accepted for backward compatibility with the synchronous
@@ -353,6 +355,11 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     function; all i18n is driven by ``lang`` via ``activate(lang)``. It may
     be omitted (or ``None``) when calling from a non-request context, such
     as the async report worker.
+
+    ``narrative`` is the analyst free text validated by
+    ``api.reports.narrative.clean_narrative``. It is keyword-only so that no
+    positional caller can be broken by it, and every key is optional: a key
+    that is absent leaves the template's own labelled placeholder in place.
     """
     activate(lang)
     project = result.project
@@ -407,6 +414,12 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         a.cache_modules()
         activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
+
+    # Same dynamic-attribute mutation the activity contexts already use.
+    # JSON object keys are strings, hence str(pk).
+    activity_narrative = (narrative or {}).get("activities", {})
+    for activity in processed_activities:
+        activity.narrative = activity_narrative.get(str(activity.pk))
 
     # Ranked by absolute contribution: the largest driver of the balance may be
     # a net sink, which the sign-ordered sort above would put last.
@@ -474,4 +487,5 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "aquaculture_data": indicators["aquaculture_data"],
         "land_types": indicators["land_types"],
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "narrative": narrative or {},
     }
