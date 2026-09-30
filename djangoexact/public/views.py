@@ -186,7 +186,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
+        lang = utils.requested_language(request)
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)

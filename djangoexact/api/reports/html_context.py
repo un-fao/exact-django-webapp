@@ -332,7 +332,7 @@ def _load_fao_logo(lang: str) -> str:
     """Load the FAO logo SVG for the given language and return it as base64."""
     lang_path = os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg")
     fallback_path = os.path.join(settings.BASE_DIR, "media", "faologo.svg")
-    logo_path = lang_path if os.path.exists(lang_path) else fallback_path
+    logo_path = lang_path if lang.isalpha() and os.path.exists(lang_path) else fallback_path
     with open(logo_path, "rb") as faologo:
         faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
     return faologo_base64

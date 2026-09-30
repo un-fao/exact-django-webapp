@@ -401,6 +401,31 @@ class TestLoadFaoLogo(unittest.TestCase):
             msg=f"Expected fallback path to be opened, got: {opened_paths}",
         )
 
+    def test_separator_in_lang_never_reaches_open(self):
+        """A separator in lang leaves media/ altogether: faologo_/../../etc/passwd.svg
+        resolves to BASE_DIR/etc/passwd.svg, and those bytes would be base64'd into
+        the PDF. exists() answers True for every path here, so the isalpha() guard is
+        the only thing standing between lang and open()."""
+        opened_paths: list[str] = []
+
+        def fake_open(path, mode="r", *args, **kwargs):
+            opened_paths.append(path)
+            return mock_open(read_data=b"<svg/>")()
+
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.open", side_effect=fake_open),
+        ):
+            self._call("/../../etc/passwd")
+
+        self.assertEqual(len(opened_paths), 1, msg=f"opened: {opened_paths}")
+        opened = opened_paths[0]
+        self.assertTrue(
+            opened.endswith("faologo.svg") and "faologo_" not in opened,
+            msg=f"lang escaped media/ and was opened: {opened}",
+        )
+        self.assertNotIn("passwd", opened)
+
 
 # ---------------------------------------------------------------------------
 # Fix 4 — Generic error message in views
