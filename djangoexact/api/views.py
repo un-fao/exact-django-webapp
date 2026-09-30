@@ -783,7 +783,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
@@ -835,7 +835,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.all()
         else:
@@ -886,7 +886,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             activity_ids = None
             selected_activities = project.activities.all()
@@ -900,7 +900,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", getattr(request, "LANGUAGE_CODE", "en"))
+        lang = utils.requested_language(request)
         fmt = "pdf" if template_name else request.query_params.get("format", "xlsx")
 
         if fmt == "pdf" and not template_name:
@@ -1588,9 +1588,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", "en")
-        if hasattr(request, "LANGUAGE_CODE"):
-            lang = request.LANGUAGE_CODE
+        lang = utils.requested_language(request)
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1605,17 +1603,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         project: Project = self.get_object()
-        # compute_project_result below is called without an activity filter, so
-        # any of the project's activities may carry narrative.
+
+        # Honour ?activities= here too. report() and the async worker both
+        # filter; without this the same request produced a different document
+        # depending on which path served it.
+        activity_ids = utils.requested_activity_ids(request)
+        activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
+
+        # Narrative is validated against the activities that reach the report,
+        # the way report() does it. Validating against all of them would accept
+        # text for an activity ?activities= excluded and then render it.
         _raw, narrative = report_narrative.narrative_from_request(
-            request, template_name, project.activities.all(),
+            request, template_name, activities if activities is not None else project.activities.all(),
         )
 
         try:
             from .reports import compute_project_result
             from .reports.html_context import build_template_context
 
-            result = compute_project_result(project)
+            result = compute_project_result(project, activities)
             context = build_template_context(result, request, lang, narrative=narrative)
             html = render(request, template_path, context).content.decode()
 
