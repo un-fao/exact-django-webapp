@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import activate
 
 from api.models import AsyncJob, Project
-from api.reports import compute_project_result, generate_excel_report
+from api.reports import catalog, compute_project_result, generate_excel_report
 from api.reports.html_context import build_template_context
 
 
@@ -50,10 +50,14 @@ def run(job: AsyncJob) -> dict:
 
 
 def _render_pdf(project, activities, template_name, lang, user):
+    # Resolved here as well as at enqueue, because jobs persisted before the
+    # catalog existed can still be replayed; first, so an unrenderable report
+    # fails before a carbon balance is computed for it.
+    template_path = catalog.resolve_template(template_name, lang)
     result = compute_project_result(project, activities)
     context = build_template_context(result, None, lang)
     context["user"] = user
-    html = render_to_string(f"reports/{template_name}_{lang}.html", context)
+    html = render_to_string(template_path, context)
     return _weasyprint_pdf(html)
 
 
