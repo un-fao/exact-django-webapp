@@ -135,6 +135,28 @@ def requested_activity_ids(request):
     return [pk.strip() for pk in raw.split(",") if pk.strip().isdigit()]
 
 
+def requested_language(request):
+    """Language named by ?lang=, then the Accept-Language header, then "en".
+
+    Raises ValidationError when the value is not a configured language. The
+    result is interpolated into template paths and into the logo filename that
+    _load_fao_logo opens, where a separator escapes the directory outright:
+    "/../../etc/passwd" resolves to BASE_DIR/etc/passwd.svg. Until ?lang= was
+    honoured, LocaleMiddleware's validated LANGUAGE_CODE overwrote it on every
+    request and stood in for this check by accident.
+
+    The message does not echo the submitted value back: it reaches both the
+    response body and the logs.
+    """
+    lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
+    configured = dict(settings.LANGUAGES)
+    if lang not in configured:
+        raise exceptions.ValidationError(
+            f"Unsupported language. Available: {', '.join(sorted(configured))}"
+        )
+    return lang
+
+
 def get_url_name(model_name):
     url_name = model_name
 
