@@ -325,8 +325,9 @@ class TestLoadFaoLogo(unittest.TestCase):
         ):
             self._call("en")
 
-        # mock_open's handle has a close() that is called by the context manager
-        m().close.assert_called()
+        # mock_open never calls close() on its handle; __exit__ is the only
+        # evidence available that the read happened inside a with block.
+        m.return_value.__exit__.assert_called_once()
 
     def test_file_handle_is_closed_on_read_error(self):
         """The context-manager ensures close() is called even when read() raises."""
@@ -344,8 +345,11 @@ class TestLoadFaoLogo(unittest.TestCase):
         m.return_value.__exit__.assert_called_once()
 
     def test_raises_when_neither_lang_nor_fallback_file_exists(self):
-        """_load_fao_logo raises FileNotFoundError when no file path exists."""
-        with patch("os.path.exists", return_value=False):
+        """A missing logo propagates instead of yielding a report with a blank one."""
+        with (
+            patch("os.path.exists", return_value=False),
+            patch("builtins.open", side_effect=FileNotFoundError),
+        ):
             with self.assertRaises(FileNotFoundError):
                 self._call("fr")
 
