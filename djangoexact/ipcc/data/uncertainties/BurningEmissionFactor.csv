@@ -1,0 +1,6 @@
+id,category,co2,co,ch4,n2o,nox,co2_min,co2_max,co_min,co_max,ch4_min,ch4_max,n2o_min,n2o_max,nox_min,nox_max,"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, table 2.5"
+6,Savanna and grassland,1613,65,2.3,0.21,3.9,1518,1708,85,45,1.4,3.2,0.11,0.31,1.5,6.3,
+7,Agricultural residues,1515,92,2.7,0.07,2.5,1338,1692,176,8,N/A,N/A,N/A,N/A,1.5,3.5,
+8,Tropical forest,1580,104,6.8,0.2,1.6,1490,1670,124,84,4.8,8.8,N/A,N/A,0.9,2.3,
+9,Extra tropical forest,1569,107,4.7,0.26,3,1438,1700,144,70,2.8,6.6,0.19,0.33,1.6,4.4,
+10,Biofuel burning,1550,78,6.1,0.06,1.1,1455,1645,109,47,3.9,8.3,N/A,N/A,0.5,1.7,

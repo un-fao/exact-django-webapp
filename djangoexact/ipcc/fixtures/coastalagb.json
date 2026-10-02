@@ -7,7 +7,9 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -18,7 +20,9 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -29,7 +33,9 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -40,7 +46,9 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -51,7 +59,9 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 75.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": 66.0,
+      "value_max": 84.0
     }
   },
   {
@@ -62,7 +72,9 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 75.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": 66.0,
+      "value_max": 84.0
     }
   },
   {
@@ -73,7 +85,9 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 92.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": 88.0,
+      "value_max": 97.0
     }
   },
   {
@@ -84,7 +98,9 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 192.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": 187.0,
+      "value_max": 204.0
     }
   },
   {
@@ -95,7 +111,9 @@
       "moisture": 4,
       "land_use_type": 155,
       "value": 192.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": 187.0,
+      "value_max": 204.0
     }
   },
   {
@@ -106,7 +124,9 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -117,7 +137,9 @@
       "moisture": 1,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -128,7 +150,9 @@
       "moisture": 2,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -139,7 +163,9 @@
       "moisture": 1,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -150,7 +176,9 @@
       "moisture": 2,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -161,7 +189,9 @@
       "moisture": 1,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -172,7 +202,9 @@
       "moisture": 2,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -183,7 +215,9 @@
       "moisture": 1,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -194,7 +228,9 @@
       "moisture": 2,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -205,7 +241,9 @@
       "moisture": 4,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -216,7 +254,9 @@
       "moisture": 1,
       "land_use_type": 156,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -227,7 +267,9 @@
       "moisture": 1,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -238,7 +280,9 @@
       "moisture": 2,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -249,7 +293,9 @@
       "moisture": 1,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -260,7 +306,9 @@
       "moisture": 2,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -271,7 +319,9 @@
       "moisture": 1,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -282,7 +332,9 @@
       "moisture": 2,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -293,7 +345,9 @@
       "moisture": 1,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -304,7 +358,9 @@
       "moisture": 2,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -315,7 +371,9 @@
       "moisture": 4,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -326,7 +384,9 @@
       "moisture": 1,
       "land_use_type": 157,
       "value": 0.0,
-      "unit": "t dry matter/ha"
+      "unit": "t dry matter/ha",
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

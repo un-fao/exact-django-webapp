@@ -7,7 +7,9 @@
       "moisture": 2,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -18,7 +20,9 @@
       "moisture": 1,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -29,7 +33,9 @@
       "moisture": 2,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -40,7 +46,9 @@
       "moisture": 1,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -51,7 +59,9 @@
       "moisture": 2,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -62,7 +72,9 @@
       "moisture": 1,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -73,7 +85,9 @@
       "moisture": 2,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -84,7 +98,9 @@
       "moisture": 1,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -95,7 +111,9 @@
       "moisture": 4,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -106,7 +124,9 @@
       "moisture": 2,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.94
+      "value": 0.94,
+      "value_min": 0.47,
+      "value_max": 1.41
     }
   },
   {
@@ -117,7 +137,9 @@
       "moisture": 1,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.94
+      "value": 0.94,
+      "value_min": 0.47,
+      "value_max": 1.41
     }
   },
   {
@@ -128,7 +150,9 @@
       "moisture": 4,
       "organic_input_type": 8,
       "grassland_management_type": null,
-      "value": 0.94
+      "value": 0.94,
+      "value_min": 0.47,
+      "value_max": 1.41
     }
   },
   {
@@ -139,7 +163,9 @@
       "moisture": 2,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 0.999,
+      "value_max": 1.221
     }
   },
   {
@@ -150,7 +176,9 @@
       "moisture": 1,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9048,
+      "value_max": 1.1752
     }
   },
   {
@@ -161,7 +189,9 @@
       "moisture": 2,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 0.999,
+      "value_max": 1.221
     }
   },
   {
@@ -172,7 +202,9 @@
       "moisture": 1,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9048,
+      "value_max": 1.1752
     }
   },
   {
@@ -183,7 +215,9 @@
       "moisture": 2,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 0.999,
+      "value_max": 1.221
     }
   },
   {
@@ -194,7 +228,9 @@
       "moisture": 1,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9048,
+      "value_max": 1.1752
     }
   },
   {
@@ -205,7 +241,9 @@
       "moisture": 2,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 0.999,
+      "value_max": 1.221
     }
   },
   {
@@ -216,7 +254,9 @@
       "moisture": 1,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9048,
+      "value_max": 1.1752
     }
   },
   {
@@ -227,7 +267,9 @@
       "moisture": 4,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 0.999,
+      "value_max": 1.221
     }
   },
   {
@@ -238,7 +280,9 @@
       "moisture": 2,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.08
+      "value": 1.08,
+      "value_min": 0.54,
+      "value_max": 1.62
     }
   },
   {
@@ -249,7 +293,9 @@
       "moisture": 1,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.08
+      "value": 1.08,
+      "value_min": 0.54,
+      "value_max": 1.62
     }
   },
   {
@@ -260,7 +306,9 @@
       "moisture": 4,
       "organic_input_type": 10,
       "grassland_management_type": null,
-      "value": 1.08
+      "value": 1.08,
+      "value_min": 0.54,
+      "value_max": 1.62
     }
   },
   {
@@ -271,7 +319,9 @@
       "moisture": 2,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -282,7 +332,9 @@
       "moisture": 1,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -293,7 +345,9 @@
       "moisture": 2,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -304,7 +358,9 @@
       "moisture": 1,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -315,7 +371,9 @@
       "moisture": 2,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -326,7 +384,9 @@
       "moisture": 1,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -337,7 +397,9 @@
       "moisture": 2,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -348,7 +410,9 @@
       "moisture": 1,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -359,7 +423,9 @@
       "moisture": 4,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -370,7 +436,9 @@
       "moisture": 2,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.41
+      "value": 1.41,
+      "value_min": 0.705,
+      "value_max": 2.115
     }
   },
   {
@@ -381,7 +449,9 @@
       "moisture": 1,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.41
+      "value": 1.41,
+      "value_min": 0.705,
+      "value_max": 2.115
     }
   },
   {
@@ -392,7 +462,9 @@
       "moisture": 4,
       "organic_input_type": 11,
       "grassland_management_type": null,
-      "value": 1.41
+      "value": 1.41,
+      "value_min": 0.705,
+      "value_max": 2.115
     }
   },
   {
@@ -403,7 +475,9 @@
       "moisture": 2,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -414,7 +488,9 @@
       "moisture": 1,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -425,7 +501,9 @@
       "moisture": 2,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -436,7 +514,9 @@
       "moisture": 1,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -447,7 +527,9 @@
       "moisture": 2,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -458,7 +540,9 @@
       "moisture": 1,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -469,7 +553,9 @@
       "moisture": 2,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -480,7 +566,9 @@
       "moisture": 1,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -491,7 +579,9 @@
       "moisture": 4,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -502,7 +592,9 @@
       "moisture": 2,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -513,7 +605,9 @@
       "moisture": 1,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -524,7 +618,9 @@
       "moisture": 4,
       "organic_input_type": 9,
       "grassland_management_type": null,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -535,7 +631,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -546,7 +644,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -557,7 +657,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -568,7 +670,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -579,7 +683,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -590,7 +696,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -601,7 +709,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -612,7 +722,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -623,7 +735,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -634,7 +748,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -645,7 +761,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -656,7 +774,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 6,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -667,7 +787,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -678,7 +800,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -689,7 +813,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -700,7 +826,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -711,7 +839,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -722,7 +852,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -733,7 +865,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -744,7 +878,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -755,7 +891,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -766,7 +904,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -777,7 +917,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -788,7 +930,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -799,7 +943,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -810,7 +956,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -821,7 +969,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -832,7 +982,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -843,7 +995,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -854,7 +1008,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -865,7 +1021,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -876,7 +1034,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -887,7 +1047,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -898,7 +1060,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -909,7 +1073,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -920,7 +1086,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -931,7 +1099,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -942,7 +1112,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -953,7 +1125,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -964,7 +1138,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -975,7 +1151,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -986,7 +1164,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -997,7 +1177,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1008,7 +1190,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1019,7 +1203,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1030,7 +1216,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1041,7 +1229,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1052,7 +1242,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 3,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1063,7 +1255,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1074,7 +1268,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1085,7 +1281,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1096,7 +1294,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1107,7 +1307,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1118,7 +1320,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1129,7 +1333,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1140,7 +1346,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1151,7 +1359,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1162,7 +1372,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1173,7 +1385,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1184,7 +1398,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 4,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1195,7 +1411,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1206,7 +1424,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1217,7 +1437,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1228,7 +1450,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1239,7 +1463,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1250,7 +1476,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1261,7 +1489,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1272,7 +1502,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1283,7 +1515,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1294,7 +1528,9 @@
       "moisture": 2,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1305,7 +1541,9 @@
       "moisture": 1,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -1316,7 +1554,9 @@
       "moisture": 4,
       "organic_input_type": null,
       "grassland_management_type": 5,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

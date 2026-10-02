@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 21,
+    "pk": 11,
     "fields": {
       "climate": 4,
       "moisture": 1,
@@ -15,7 +15,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 22,
+    "pk": 12,
     "fields": {
       "climate": 4,
       "moisture": 2,
@@ -29,7 +29,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 23,
+    "pk": 13,
     "fields": {
       "climate": 1,
       "moisture": 1,
@@ -43,7 +43,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 24,
+    "pk": 14,
     "fields": {
       "climate": 1,
       "moisture": 2,
@@ -57,7 +57,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 25,
+    "pk": 15,
     "fields": {
       "climate": 2,
       "moisture": 1,
@@ -71,7 +71,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 26,
+    "pk": 16,
     "fields": {
       "climate": 2,
       "moisture": 2,
@@ -85,7 +85,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 27,
+    "pk": 17,
     "fields": {
       "climate": 3,
       "moisture": 1,
@@ -99,7 +99,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 28,
+    "pk": 18,
     "fields": {
       "climate": 3,
       "moisture": 2,
@@ -113,7 +113,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 29,
+    "pk": 19,
     "fields": {
       "climate": 3,
       "moisture": 4,
@@ -127,7 +127,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 30,
+    "pk": 20,
     "fields": {
       "climate": 20,
       "moisture": 1,

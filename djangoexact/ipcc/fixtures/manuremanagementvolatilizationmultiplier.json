@@ -4,7 +4,9 @@
     "pk": 1,
     "fields": {
       "moisture": 2,
-      "value": 0.01
+      "value": 0.01,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -12,7 +14,9 @@
     "pk": 2,
     "fields": {
       "moisture": 1,
-      "value": 0.005
+      "value": 0.005,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -20,7 +24,9 @@
     "pk": 3,
     "fields": {
       "moisture": 4,
-      "value": 0.014
+      "value": 0.014,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

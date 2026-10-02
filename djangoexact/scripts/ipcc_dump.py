@@ -4801,7 +4801,7 @@ def add_density_zero_where_density_is_none_in_irrigation_phase_data():
     print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
 
 
-def import_fra_carbon_stock_data():
+def import_fra_carbon_stock_data_2020():
     """
     Import FRA carbon stock data from CSV file.
     """
@@ -4811,7 +4811,7 @@ def import_fra_carbon_stock_data():
     FRACarbonStock.objects.all().delete()
 
     df = pd.read_csv(
-        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock.csv"),
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock2020.csv"),
         header=0,
         sep=",",
     )
@@ -4825,12 +4825,12 @@ def import_fra_carbon_stock_data():
             print(f"Country {row['country']} not found. Skipping...")
             missing_countries.append(row["country"])
             continue
-        agb = parse_csv_number(row["agb"])
-        bgb = parse_csv_number(row["bgb"])
-        litter = parse_csv_number(row["litter"])
-        deadwood = parse_csv_number(row["deadwood"])
-        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"])
-        carbon_stock_total = parse_csv_number(row["carbon_stock_total"])
+        agb = parse_csv_number(row["agb"]) if row["agb"] else None
+        bgb = parse_csv_number(row["bgb"]) if row["bgb"] else None
+        litter = parse_csv_number(row["litter"]) if row["litter"] else None
+        deadwood = parse_csv_number(row["deadwood"]) if row["deadwood"] else None
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row["carbon_stock_biomass_total"] else None
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row["carbon_stock_total"] else None
 
         print(f"Creating {country} {2020} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
 
@@ -4847,6 +4847,53 @@ def import_fra_carbon_stock_data():
 
     print(f"Missing countries: {missing_countries}")
 
+
+def import_fra_carbon_stock_data_2025():
+    """
+    Import FRA carbon stock data from CSV file.
+    """
+    log.debug("Importing FRA carbon stock data...")
+
+    # Delete existing data
+    FRACarbonStock.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FRACarbonStock2025.csv"),
+        header=0,
+        sep=",",
+    )
+
+    missing_countries = []
+
+    for i, row in df.iterrows():
+        try:
+            country = Country.objects.get(name__iexact=row["country"])
+        except Country.DoesNotExist:
+            print(f"Country {row['country']} not found. Skipping...")
+            missing_countries.append(row["country"])
+            continue
+        agb = parse_csv_number(row["agb"]) if row.get("agb") is not None else None
+        bgb = parse_csv_number(row["bgb"]) if row.get("bgb") is not None else None
+        litter = parse_csv_number(row["litter"]) if row.get("litter") is not None else None
+        deadwood = parse_csv_number(row["deadwood"]) if row.get("deadwood") is not None else None
+        carbon_stock_biomass_total = parse_csv_number(row["carbon_stock_biomass_total"]) if row.get("carbon_stock_biomass_total") is not None else None
+        carbon_stock_total = parse_csv_number(row["carbon_stock_total"]) if row.get("carbon_stock_total") is not None else None
+        year = 2025
+
+        print(f"Creating {country} {year} with {agb}, {bgb}, {litter}, {deadwood}, {carbon_stock_biomass_total}, {carbon_stock_total}")
+
+        FRACarbonStock.objects.create(
+            year=year,
+            country=country,
+            agb=agb,
+            bgb=bgb,
+            litter=litter,
+            deadwood=deadwood,
+            carbon_stock_biomass_total=carbon_stock_biomass_total,
+            carbon_stock_total=carbon_stock_total,
+        )
+
+    print(f"Missing countries: {missing_countries}")
 
 def add_ipcc_and_fra_as_data_sources():
     """
@@ -5208,6 +5255,113 @@ def update_crop_types_annuals_perennials():
                 land_use_type.module_types.remove(module_type)
                 print(f"Removed {module_type} from {land_use_type}")
 
+def delete_and_import_set_aside_organic_soil_rewetting_emission_factors():
+    """
+    Replace the Set Aside OrganicSoilRewettingEmissionFactor rows.
+
+    Reads ipcc.organicsoilrewettingemissionfactor.xlsx and re-imports every row
+    whose module_type is Set Aside. Rows for other module types are left alone.
+    The min/max columns in the sheet have no counterpart on the model and are
+    ignored.
+    """
+    module_type = ModuleType.objects.get(class_name__iexact="SetAside")
+
+    df = pd.read_excel(
+        os.path.join(
+            os.path.dirname(__file__),
+            "ipcc_data",
+            "ipcc.organicsoilrewettingemissionfactor.xlsx",
+        ),
+        header=0,
+    )
+
+    OrganicSoilRewettingEmissionFactor.objects.filter(module_type=module_type).delete()
+
+    for i, row in df.iterrows():
+        if sanitize(row["module_type"]) != "Set Aside":
+            print(f"Skipping row {i}: module_type is '{row['module_type']}'")
+            continue
+
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        peat_type = PeatType.objects.get(name__iexact=sanitize(row["peat_type"]))
+
+        factor = OrganicSoilRewettingEmissionFactor.objects.create(
+            climate=climate,
+            moisture=moisture,
+            peat_type=peat_type,
+            module_type=module_type,
+            co2=parse_csv_number(row["co2"], nan_value=0),
+            co2_unit=row["co2_unit"],
+            doc=parse_csv_number(row["doc"], nan_value=0),
+            doc_unit=row["doc_unit"],
+            ch4=parse_csv_number(row["ch4"], nan_value=0),
+            ch4_unit=row["ch4_unit"],
+            n2o=parse_csv_number(row["n2o"], nan_value=0),
+            n2o_unit=row["n2o_unit"],
+        )
+
+        print(
+            f"Created {climate}, {moisture}, {peat_type}: "
+            f"co2={factor.co2}, doc={factor.doc}, ch4={factor.ch4}, n2o={factor.n2o}"
+        )
+
+def delete_and_import_set_aside_organic_soil_drainage_emission_factors():
+    """
+    Replace the Set Aside OrganicSoilDrainageEmissionFactor rows.
+
+    Reads ipcc.organicsoildrainageemissionfactor.xlsx and re-imports every row
+    whose module_type is Set Aside. Rows for other module types are left alone.
+    The sheet numbers its site location types ("(1) On-Site"), the database does
+    not, so the prefix is dropped before the lookup. The min/max columns have no
+    counterpart on the model and are ignored.
+    """
+    module_type = ModuleType.objects.get(class_name__iexact="SetAside")
+
+    df = pd.read_excel(
+        os.path.join(
+            os.path.dirname(__file__),
+            "ipcc_data",
+            "ipcc.organicsoildrainageemissionfactor.xlsx",
+        ),
+        header=0,
+    )
+
+    OrganicSoilDrainageEmissionFactor.objects.filter(module_type=module_type).delete()
+
+    for i, row in df.iterrows():
+        if sanitize(row["module_type"]) != "Set Aside":
+            print(f"Skipping row {i}: module_type is '{row['module_type']}'")
+            continue
+
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        peat_type = PeatType.objects.get(name__iexact=sanitize(row["peat_type"]))
+        site_location_type = SiteLocationType.objects.get(
+            name__iexact=str(row["site_location_type"]).split(")")[-1].strip()
+        )
+
+        factor = OrganicSoilDrainageEmissionFactor.objects.create(
+            climate=climate,
+            moisture=moisture,
+            peat_type=peat_type,
+            site_location_type=site_location_type,
+            module_type=module_type,
+            co2=parse_csv_number(row["co2"], nan_value=0),
+            co2_unit=row["co2_unit"],
+            doc=parse_csv_number(row["doc"], nan_value=0),
+            doc_unit=row["doc_unit"],
+            ch4=parse_csv_number(row["ch4"], nan_value=0),
+            ch4_unit=row["ch4_unit"],
+            n2o=parse_csv_number(row["n2o"], nan_value=0),
+            n2o_unit=row["n2o_unit"],
+        )
+
+        print(
+            f"Created {climate}, {moisture}, {peat_type}, {site_location_type}: "
+            f"co2={factor.co2}, doc={factor.doc}, ch4={factor.ch4}, n2o={factor.n2o}"
+        )
+
 def run():
     import os
 
@@ -5223,6 +5377,9 @@ def run():
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
         update_crop_types_annuals_perennials()
+        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "review":
@@ -5230,7 +5387,10 @@ def run():
         # update_value_chain_refrigerant_emission_factors()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
-        update_crop_types_annuals_perennials()
+        # update_crop_types_annuals_perennials()
+        # delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        # delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        # import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "development":
@@ -5242,6 +5402,9 @@ def run():
         delete_and_import_total_biomass_after_defo()
         delete_and_import_forest_total_biomass()
         update_crop_types_annuals_perennials()
+        delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
+        delete_and_import_set_aside_organic_soil_drainage_emission_factors()
+        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "local":

@@ -6,7 +6,9 @@
       "climate": 4,
       "moisture": 2,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -16,7 +18,9 @@
       "climate": 4,
       "moisture": 1,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -26,7 +30,9 @@
       "climate": 1,
       "moisture": 1,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -36,7 +42,9 @@
       "climate": 1,
       "moisture": 2,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -46,7 +54,9 @@
       "climate": 2,
       "moisture": 1,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -56,7 +66,9 @@
       "climate": 2,
       "moisture": 2,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -66,7 +78,9 @@
       "climate": 3,
       "moisture": 1,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -76,7 +90,9 @@
       "climate": 3,
       "moisture": 2,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -86,7 +102,9 @@
       "climate": 3,
       "moisture": 4,
       "tillage_management_type": 1,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -96,7 +114,9 @@
       "climate": 4,
       "moisture": 2,
       "tillage_management_type": 2,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9984,
+      "value_max": 1.0816
     }
   },
   {
@@ -106,7 +126,9 @@
       "climate": 4,
       "moisture": 1,
       "tillage_management_type": 2,
-      "value": 0.98
+      "value": 0.98,
+      "value_min": 0.931,
+      "value_max": 1.029
     }
   },
   {
@@ -116,7 +138,9 @@
       "climate": 1,
       "moisture": 1,
       "tillage_management_type": 2,
-      "value": 0.98
+      "value": 0.98,
+      "value_min": 0.931,
+      "value_max": 1.029
     }
   },
   {
@@ -126,7 +150,9 @@
       "climate": 1,
       "moisture": 2,
       "tillage_management_type": 2,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9984,
+      "value_max": 1.0816
     }
   },
   {
@@ -136,7 +162,9 @@
       "climate": 2,
       "moisture": 1,
       "tillage_management_type": 2,
-      "value": 0.99
+      "value": 0.99,
+      "value_min": 0.9603,
+      "value_max": 1.0197
     }
   },
   {
@@ -146,7 +174,9 @@
       "climate": 2,
       "moisture": 2,
       "tillage_management_type": 2,
-      "value": 1.05
+      "value": 1.05,
+      "value_min": 1.008,
+      "value_max": 1.092
     }
   },
   {
@@ -156,7 +186,9 @@
       "climate": 3,
       "moisture": 1,
       "tillage_management_type": 2,
-      "value": 0.99
+      "value": 0.99,
+      "value_min": 0.9207,
+      "value_max": 1.0593
     }
   },
   {
@@ -166,7 +198,9 @@
       "climate": 3,
       "moisture": 2,
       "tillage_management_type": 2,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -176,7 +210,9 @@
       "climate": 3,
       "moisture": 4,
       "tillage_management_type": 2,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -186,7 +222,9 @@
       "climate": 4,
       "moisture": 2,
       "tillage_management_type": 3,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 1.0464,
+      "value_max": 1.1336
     }
   },
   {
@@ -196,7 +234,9 @@
       "climate": 4,
       "moisture": 1,
       "tillage_management_type": 3,
-      "value": 1.03
+      "value": 1.03,
+      "value_min": 0.9888,
+      "value_max": 1.0712
     }
   },
   {
@@ -206,7 +246,9 @@
       "climate": 1,
       "moisture": 1,
       "tillage_management_type": 3,
-      "value": 1.03
+      "value": 1.03,
+      "value_min": 0.9888,
+      "value_max": 1.0712
     }
   },
   {
@@ -216,7 +258,9 @@
       "climate": 1,
       "moisture": 2,
       "tillage_management_type": 3,
-      "value": 1.09
+      "value": 1.09,
+      "value_min": 1.0464,
+      "value_max": 1.1336
     }
   },
   {
@@ -226,7 +270,9 @@
       "climate": 2,
       "moisture": 1,
       "tillage_management_type": 3,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.0088,
+      "value_max": 1.0712
     }
   },
   {
@@ -236,7 +282,9 @@
       "climate": 2,
       "moisture": 2,
       "tillage_management_type": 3,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.056,
+      "value_max": 1.144
     }
   },
   {
@@ -246,7 +294,9 @@
       "climate": 3,
       "moisture": 1,
       "tillage_management_type": 3,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 0.9672,
+      "value_max": 1.1128
     }
   },
   {
@@ -256,7 +306,9 @@
       "climate": 3,
       "moisture": 2,
       "tillage_management_type": 3,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.045,
+      "value_max": 1.155
     }
   },
   {
@@ -266,7 +318,9 @@
       "climate": 3,
       "moisture": 4,
       "tillage_management_type": 3,
-      "value": 1.1
+      "value": 1.1,
+      "value_min": 1.045,
+      "value_max": 1.155
     }
   }
 ]

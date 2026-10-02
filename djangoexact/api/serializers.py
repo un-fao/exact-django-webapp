@@ -19,7 +19,6 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
-from api.natural_keys import natural_key_for_pk
 from django.utils.text import slugify
 
 from . import labels
@@ -621,22 +620,6 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 class ModuleExportSerializer(serializers.Serializer):
     """Generic serializer for exporting any module type."""
 
-    @property
-    def natural_key_cache(self):
-        """Per-instance `(label, pk) -> key` memo, shared across one activity.
-
-        `ActivityExportSerializer.get_modules` reuses a single
-        `ModuleExportSerializer` for every module in an activity, so an export
-        pays one query per distinct reference row rather than one per module.
-        Deliberately per-instance rather than process-wide: a request must never
-        be served reference data cached by an earlier request.
-        """
-        cache = self.__dict__.get("_natural_key_cache")
-        if cache is None:
-            cache = {}
-            self.__dict__["_natural_key_cache"] = cache
-        return cache
-
     def _serialize_comment(self, comment):
         """Serialize a single comment with its replies."""
         comment_data = {
@@ -702,21 +685,6 @@ class ModuleExportSerializer(serializers.Serializer):
                         value = getattr(instance, f'{field.name}_id', None)
                         if value is not None:
                             data[field.name] = value
-                            # formatVersion 2: emit a natural key beside the
-                            # integer for every relation whose target model is
-                            # in the registry, so the importer can resolve it in
-                            # an installation whose reference PKs have drifted.
-                            # Unregistered targets (Activity, cross-module
-                            # OneToOne refs) get nothing and keep their existing
-                            # path. This lives inside the get_fields() loop on
-                            # purpose: that is what makes it cover every
-                            # multi-table-inheritance subclass with no per-model
-                            # registration.
-                            natural_key = natural_key_for_pk(
-                                field.related_model, value, self.natural_key_cache
-                            )
-                            if natural_key is not None:
-                                data[f'{field.name}__nk'] = list(natural_key)
                 elif field_type in ('ManyToManyField', 'ManyToOneRel', 'GenericRelation'):
                     continue
                 else:
@@ -789,24 +757,6 @@ class ActivityExportSerializer(serializers.ModelSerializer):
             result[module_type].append(module_serializer.to_representation(module))
         return result
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-
-        # formatVersion 2: `module_types` is serialized as a bare pk list by the
-        # inherited Meta.exclude. Emit the natural keys alongside it, leaving the
-        # existing key's name and shape untouched.
-        module_types = data.get('module_types')
-        if module_types:
-            related_model = Activity._meta.get_field('module_types').related_model
-            cache = {}
-            keys = []
-            for pk in module_types:
-                natural_key = natural_key_for_pk(related_model, pk, cache)
-                keys.append(list(natural_key) if natural_key is not None else None)
-            data['module_types__nk'] = keys
-
-        return data
-
 
 class ProjectExportSerializer(serializers.ModelSerializer):
     """Serializer for full project export."""
@@ -815,24 +765,15 @@ class ProjectExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
-                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
+                   'last_recap_sent_at']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        cache = {}
         for field in ['country', 'climate', 'moisture', 'soil_type', 'gw_potential', 'status']:
             if field in data and data[field] is not None:
                 if isinstance(data[field], dict) and 'id' in data[field]:
                     data[field] = data[field]['id']
-                # formatVersion 2: emit the natural key from the same resolved
-                # pk. The target model always comes from the model field, never
-                # from the field name: `status` here is api.ProjectStatus, while
-                # `status` on a module is api.StatusType.
-                if isinstance(data[field], int):
-                    related_model = Project._meta.get_field(field).related_model
-                    natural_key = natural_key_for_pk(related_model, data[field], cache)
-                    if natural_key is not None:
-                        data[f'{field}__nk'] = list(natural_key)
         return data
 
 
@@ -858,14 +799,8 @@ class ProjectImportSerializer(serializers.Serializer):
         return value
 
     def validate_formatVersion(self, value):
-        """Ensure format version is supported.
-
-        Version 1 encodes reference relations as raw integer primary keys only.
-        Version 2 carries a `<field>__nk` natural key beside each of them and is
-        what makes an import survive reference-data drift between installations.
-        Both are accepted: v1 files already in the wild must keep importing.
-        """
-        if value not in (1, 2):
+        """Ensure format version is supported."""
+        if value != 1:
             raise serializers.ValidationError(
                 f"Unsupported file format version: {value}"
             )
@@ -3306,6 +3241,24 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
+def check_member_management_allowed(project: Project, request):
+    """Guard for adding/updating project memberships and invitations.
+
+    Archived projects are closed for good. Finalized projects are read-only for
+    everyone except the people who administer them: project Admins (and
+    superusers, who bypass every other project permission check) must still be
+    able to hand over or share administration after finalization.
+    """
+    user = getattr(request, "user", None)
+    is_project_admin = user is not None and user.is_authenticated and (user.is_superuser or project.members.filter(user=user, group__name="Admin").exists())
+
+    if project.is_archived:
+        raise serializers.ValidationError("Cannot add members to an archived project")
+
+    if project.is_finalized and not is_project_admin:
+        raise serializers.ValidationError("Cannot add members to a finalized project")
+
+
 class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
@@ -3321,11 +3274,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         return data
 
@@ -3348,14 +3297,14 @@ class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
         ref_name = "ProjectNotificationPreference"
 
 
 class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["project", "is_opted_out"]
+        fields = ["project", "is_subscribed"]
         ref_name = "ProjectNotificationPreference"
 
     def validate(self, data):
@@ -3656,11 +3605,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()

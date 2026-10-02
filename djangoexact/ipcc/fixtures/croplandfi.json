@@ -6,7 +6,9 @@
       "climate": 4,
       "moisture": 2,
       "organic_input_type": 8,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -16,7 +18,9 @@
       "climate": 4,
       "moisture": 1,
       "organic_input_type": 8,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -26,7 +30,9 @@
       "climate": 1,
       "moisture": 1,
       "organic_input_type": 8,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -36,7 +42,9 @@
       "climate": 1,
       "moisture": 2,
       "organic_input_type": 8,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -46,7 +54,9 @@
       "climate": 2,
       "moisture": 1,
       "organic_input_type": 8,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -56,7 +66,9 @@
       "climate": 2,
       "moisture": 2,
       "organic_input_type": 8,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -66,7 +78,9 @@
       "climate": 3,
       "moisture": 1,
       "organic_input_type": 8,
-      "value": 0.95
+      "value": 0.95,
+      "value_min": 0.8265,
+      "value_max": 1.0735
     }
   },
   {
@@ -76,7 +90,9 @@
       "climate": 3,
       "moisture": 2,
       "organic_input_type": 8,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -86,7 +102,9 @@
       "climate": 3,
       "moisture": 4,
       "organic_input_type": 8,
-      "value": 0.92
+      "value": 0.92,
+      "value_min": 0.7912,
+      "value_max": 1.0488
     }
   },
   {
@@ -96,7 +114,9 @@
       "climate": 4,
       "moisture": 2,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -106,7 +126,9 @@
       "climate": 4,
       "moisture": 1,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -116,7 +138,9 @@
       "climate": 1,
       "moisture": 1,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -126,7 +150,9 @@
       "climate": 1,
       "moisture": 2,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -136,7 +162,9 @@
       "climate": 2,
       "moisture": 1,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -146,7 +174,9 @@
       "climate": 2,
       "moisture": 2,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -156,7 +186,9 @@
       "climate": 3,
       "moisture": 1,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -166,7 +198,9 @@
       "climate": 3,
       "moisture": 2,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -176,7 +210,9 @@
       "climate": 3,
       "moisture": 4,
       "organic_input_type": 9,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -186,7 +222,9 @@
       "climate": 4,
       "moisture": 2,
       "organic_input_type": 10,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 1.221,
+      "value_max": 0.999
     }
   },
   {
@@ -196,7 +234,9 @@
       "climate": 4,
       "moisture": 1,
       "organic_input_type": 10,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.1752,
+      "value_max": 0.9048
     }
   },
   {
@@ -206,7 +246,9 @@
       "climate": 1,
       "moisture": 1,
       "organic_input_type": 10,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.1752,
+      "value_max": 0.9048
     }
   },
   {
@@ -216,7 +258,9 @@
       "climate": 1,
       "moisture": 2,
       "organic_input_type": 10,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 1.221,
+      "value_max": 0.999
     }
   },
   {
@@ -226,7 +270,9 @@
       "climate": 2,
       "moisture": 1,
       "organic_input_type": 10,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.1752,
+      "value_max": 0.9048
     }
   },
   {
@@ -236,7 +282,9 @@
       "climate": 2,
       "moisture": 2,
       "organic_input_type": 10,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 1.221,
+      "value_max": 0.999
     }
   },
   {
@@ -246,7 +294,9 @@
       "climate": 3,
       "moisture": 1,
       "organic_input_type": 10,
-      "value": 1.04
+      "value": 1.04,
+      "value_min": 1.1752,
+      "value_max": 0.9048
     }
   },
   {
@@ -256,7 +306,9 @@
       "climate": 3,
       "moisture": 2,
       "organic_input_type": 10,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 1.221,
+      "value_max": 0.999
     }
   },
   {
@@ -266,7 +318,9 @@
       "climate": 3,
       "moisture": 4,
       "organic_input_type": 10,
-      "value": 1.11
+      "value": 1.11,
+      "value_min": 1.221,
+      "value_max": 0.999
     }
   },
   {
@@ -276,7 +330,9 @@
       "climate": 4,
       "moisture": 2,
       "organic_input_type": 11,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -286,7 +342,9 @@
       "climate": 4,
       "moisture": 1,
       "organic_input_type": 11,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -296,7 +354,9 @@
       "climate": 1,
       "moisture": 1,
       "organic_input_type": 11,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -306,7 +366,9 @@
       "climate": 1,
       "moisture": 2,
       "organic_input_type": 11,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -316,7 +378,9 @@
       "climate": 2,
       "moisture": 1,
       "organic_input_type": 11,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -326,7 +390,9 @@
       "climate": 2,
       "moisture": 2,
       "organic_input_type": 11,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -336,7 +402,9 @@
       "climate": 3,
       "moisture": 1,
       "organic_input_type": 11,
-      "value": 1.37
+      "value": 1.37,
+      "value_min": 1.2056,
+      "value_max": 1.5344
     }
   },
   {
@@ -346,7 +414,9 @@
       "climate": 3,
       "moisture": 2,
       "organic_input_type": 11,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   },
   {
@@ -356,7 +426,9 @@
       "climate": 3,
       "moisture": 4,
       "organic_input_type": 11,
-      "value": 1.44
+      "value": 1.44,
+      "value_min": 1.2528,
+      "value_max": 1.6272
     }
   }
 ]

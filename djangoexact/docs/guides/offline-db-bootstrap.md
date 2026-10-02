@@ -134,13 +134,6 @@ that branch and its packaging step.
    change, any sqlite run dies with
    `TypeError: 'connect_timeout' is an invalid keyword argument for Connection()`.
 
-Additionally, before the reference-data uniqueness migration on this branch is
-deployed: run `python manage.py check_reference_natural_keys` against the
-production database through `cloud-sql-proxy`. The constraints have been proven
-against the committed fixtures and the shipped offline snapshot only, never
-against production data, and a duplicate `name_en` in production would fail the
-migration at deploy time.
-
 ## Unconfirmed
 
 Recorded verbatim, because guessing here would be worse than saying so. Nothing

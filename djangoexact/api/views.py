@@ -37,12 +37,6 @@ import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
-from api.natural_keys import (
-    ReferenceResolutionError,
-    resolve_natural_key,
-    spec_for,
-    verify_legacy_reference_pk,
-)
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string
@@ -147,7 +141,12 @@ from firebase_admin import auth as firebase_admin_auth
 from auditlog.context import disable_auditlog, LogEntry
 from django.db import connection
 import time
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseForbidden, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from google.auth.exceptions import GoogleAuthError
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
@@ -209,10 +208,6 @@ def _extract_cache_restore(module_data, resolve_status_id):
     the values are written exactly once, by the deferred restore pass. Returns
     the column/value mapping to replay, empty for payloads produced by an older
     build that did not export these fields.
-
-    ``status`` is popped here, before ``prepare_model_data`` ever sees it, so the
-    StatusType relation bypasses the natural-key resolution there. Its natural
-    key is therefore popped alongside it and handed to ``resolve_status_id``.
     """
     restore = {}
 
@@ -226,9 +221,8 @@ def _extract_cache_restore(module_data, resolve_status_id):
                 continue
         restore[field_name] = value
 
-    status_nk = module_data.pop("status__nk", None)
     if "status" in module_data:
-        status_id = resolve_status_id(module_data.pop("status"), status_nk)
+        status_id = resolve_status_id(module_data.pop("status"))
         if status_id is not None:
             restore["status_id"] = status_id
 
@@ -339,6 +333,31 @@ class DefaultPagination(PageNumberPagination):
 
 def warmup(request):
     return HttpResponse("Warmup successful.")
+
+
+# One scheduler service account per GCP project, so its address follows from
+# PROJECT_ID and needs no setting of its own.
+RECAP_SCHEDULER_SERVICE_ACCOUNT = "recap-email-scheduler@{}.iam.gserviceaccount.com"
+
+
+@csrf_exempt
+@require_POST
+def recap_sweep(request):
+    # The Cloud Run service accepts unauthenticated calls because it is the public
+    # API, so Cloud Run never checks Cloud Scheduler's OIDC token: it is checked here.
+    token = request.headers.get("Authorization", "").removeprefix("Bearer ")
+    try:
+        claims = id_token.verify_oauth2_token(token, google_requests.Request(), audience=request.build_absolute_uri())
+    except (ValueError, GoogleAuthError):
+        return HttpResponseForbidden()
+
+    expected = RECAP_SCHEDULER_SERVICE_ACCOUNT.format(os.getenv("PROJECT_ID", ""))
+    if not claims.get("email_verified") or claims.get("email") != expected:
+        return HttpResponseForbidden()
+
+    # ponytail: the sweep runs inside one gunicorn request (GUNICORN_TIMEOUT, 120s); move it to
+    # exact-computation-job via an args override once the review workflow rebuilds that image.
+    return JsonResponse({"sent": utils.send_due_recaps()})
 
 
 class BaseWiewSet(viewsets.GenericViewSet):
@@ -920,11 +939,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # Build export data
         serializer = ProjectExportSerializer(project)
         export_data = {
-            # 2: reference relations carry a `<field>__nk` natural key beside
-            # the legacy integer pk. compatibilityGroup is deliberately NOT
-            # bumped: it hard-rejects on mismatch and would invalidate every
-            # .exactproject already issued.
-            "formatVersion": 2,
+            "formatVersion": 1,
             "appVersion": version_config.get("appVersion", "1.0.0"),
             "compatibilityGroup": version_config.get("compatibilityGroup", 1),
             "exportedAt": timezone.now().isoformat(),
@@ -1063,19 +1078,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             For OneToOneField cross-references between modules in the same
             activity (e.g. Settlement.land_use_change → LandUseChange),
             ``module_id_map`` remaps old PKs to newly-created instances.
-
-            For reference-data relations, a formatVersion 2 payload carries a
-            ``<field>__nk`` natural key beside the integer. The key wins: the
-            integer is only meaningful in the database that produced the file.
-            An unresolvable key raises rather than falling back to the integer,
-            because that fallback is the silent mis-resolution this exists to
-            remove.
-
-            A formatVersion 1 payload carries no key at all, so its integers are
-            the exporting installation's private identifiers. They are verified
-            to name a local row before use rather than written through: a
-            write-through is what surfaced, several frames later, as a bare
-            ``FOREIGN KEY constraint failed`` naming neither table nor column.
             """
             import re
             from django.db.models import ForeignKey
@@ -1083,26 +1085,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             if module_id_map is None:
                 module_id_map = {}
-
-            def reference_pk(field, field_name, value):
-                """Return the local pk for a reference relation, or None.
-
-                None means "not reference data": the target model is absent from
-                the natural-key registry, so the caller keeps the integer and its
-                existing behaviour. Registry membership is the only gate here,
-                which is what leaves ``Activity``, the cross-module OneToOne refs
-                and every other user-data relation untouched.
-                """
-                if spec_for(field.related_model) is None:
-                    return None
-                natural_key = data.get(f"{field_name}__nk")
-                if natural_key:
-                    return resolve_natural_key(
-                        field.related_model, tuple(natural_key), nk_cache
-                    )
-                return verify_legacy_reference_pk(
-                    field.related_model, field_name, value, nk_cache
-                )
 
             result = {}
             for field in model_class._meta.get_fields():
@@ -1138,16 +1120,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         # (the field is nullable).
                     elif isinstance(value, int):
                         # Reference-data FK (e.g. OrganicSoil pointing to
-                        # a shared record), not in the map. Resolve by natural
-                        # key when the file carries one, else verify the integer.
-                        resolved = reference_pk(field, field_name, value)
-                        result[f"{field_name}_id"] = value if resolved is None else resolved
+                        # a shared record) — not in the map, use as-is.
+                        result[f"{field_name}_id"] = value
                     continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
                 if isinstance(field, ForeignKey) and isinstance(value, int):
-                    resolved = reference_pk(field, field_name, value)
-                    result[f"{field_name}_id"] = value if resolved is None else resolved
+                    result[f"{field_name}_id"] = value
                 else:
                     result[field_name] = value
             return result
@@ -1156,26 +1135,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # submodule exists. See CACHE_RESTORE_FIELDS for why this is deferred.
         cache_restores = []
         status_id_cache = {}
-        # `(label, pk) -> key` and `(label, key) -> pk` memo for one import
-        # request. Request-scoped on purpose: never process-cached, so an import
-        # cannot be served reference data resolved before the last fixture load.
-        nk_cache = {}
 
-        def resolve_status_id(value, natural_key=None):
-            """Map an exported StatusType reference onto one that exists here.
+        def resolve_status_id(value):
+            """Map an exported StatusType PK onto one that exists here.
 
-            formatVersion 2 carries `status__nk`. When present it is
-            authoritative and an unresolvable key raises: reference PKs are NOT
-            stable across EX-ACT installations, which is exactly why the key
-            exists.
-
-            Without a key (formatVersion 1) the old behaviour stands: return the
-            integer if such a row exists, else None, so the module falls back to
-            EMPTY rather than aborting the whole import on a foreign key
-            violation.
+            Reference-data PKs are stable across EX-ACT installations, so this
+            is normally the identity. An unknown id means the file came from a
+            database with different reference data: drop it rather than abort
+            the whole import with a foreign key violation, and let the module
+            fall back to EMPTY as it did before.
             """
-            if natural_key:
-                return resolve_natural_key(StatusType, tuple(natural_key), nk_cache)
             if not isinstance(value, int):
                 return None
             if value not in status_id_cache:
@@ -1221,7 +1190,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     activity_data = activity_data.copy()
                     modules_data = activity_data.pop('modules', {})
                     module_types_data = activity_data.pop('module_types', [])
-                    module_types_nk = activity_data.pop('module_types__nk', None)
 
                     # Prepare activity data with proper FK handling
                     filtered_activity_data = prepare_model_data(Activity, activity_data)
@@ -1232,17 +1200,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         **filtered_activity_data
                     )
 
-                    # Set module types. Resolve the natural keys BEFORE set(),
-                    # so an unknown module type fails by name rather than as an
-                    # opaque integrity error on the M2M through table.
-                    if module_types_nk:
-                        module_type_model = Activity._meta.get_field('module_types').related_model
-                        activity.module_types.set([
-                            resolve_natural_key(module_type_model, tuple(key), nk_cache)
-                            for key in module_types_nk
-                            if key
-                        ])
-                    elif module_types_data:
+                    # Set module types
+                    if module_types_data:
                         activity.module_types.set(module_types_data)
 
                     # Sort so modules referenced via OneToOneField are created
@@ -1312,17 +1271,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     "projectName": project.name
                 }, status=http_status.HTTP_201_CREATED)
 
-        except ReferenceResolutionError as e:
-            # Both subclasses already name the model, the relation and what to do
-            # about it, so the message is returned unwrapped. Every resolution and
-            # every existence check happens before the matching objects.create(),
-            # which is what lets this name the relation rather than surface as a
-            # bare "FOREIGN KEY constraint failed" from the sqlite driver.
-            logger.error(str(e))
-            return utils.ErrorResponse(
-                str(e),
-                status=http_status.HTTP_400_BAD_REQUEST
-            )
         except Exception as e:
             logger.error(f"Failed to import project: {str(e)}")
             return utils.ErrorResponse(
@@ -1681,18 +1629,35 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("pk", openapi.IN_PATH, description="Project ID", type=openapi.TYPE_STRING)],
-        operation_description="Send recap email with project changes",
-        responses={200: "Email sent successfully", 400: "Bad request", 500: "Internal server error"},
+        operation_description="Send a recap email of changes and comments since the last recap to project Admins. Admin-only; works on locked and unlocked projects alike.",
+        responses={
+            200: "Recap processed (see 'sent' in the response body for whether mail actually went out)",
+            403: "Selected user does not have project-admin permission for this project",
+            500: "Internal server error",
+        },
     )
     def recap(self, request, pk=None):
         project = self.get_object()
-        error = security.check_permission("view_project", request.user, project)
+        error = security.check_project_admin(request.user, project)
         if error:
             return error
 
         try:
-            utils.send_changes_email(project)
-            return Response({"message": "Recap email sent successfully"}, status=http_status.HTTP_200_OK)
+            sent_count = utils.send_changes_email(project)
+            if sent_count > 0:
+                return Response(
+                    {"message": "Recap email sent successfully", "sent": True, "count": sent_count},
+                    status=http_status.HTTP_200_OK,
+                )
+
+            return Response(
+                {
+                    "message": "No recap email was sent: there were no changes since the last recap, or every admin has opted out of notifications.",
+                    "sent": False,
+                    "count": 0,
+                },
+                status=http_status.HTTP_200_OK,
+            )
 
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1782,7 +1747,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1797,7 +1762,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1883,6 +1848,7 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
             200: ProjectNotificationPreferenceReadSerializer,
             201: ProjectNotificationPreferenceReadSerializer,
             400: "Bad request",
+            403: "Forbidden",
         },
     )
     def create(self, request, *args, **kwargs):
@@ -1894,12 +1860,16 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         user = request.user
         project = serializer.validated_data["project"]
 
+        error = security.check_project_admin(user, project)
+        if error:
+            return error
+
         # Get or create the preference
-        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_opted_out": serializer.validated_data["is_opted_out"]})
+        preference, created = ProjectNotificationPreference.objects.get_or_create(user=user, project=project, defaults={"is_subscribed": serializer.validated_data.get("is_subscribed", False)})
 
         if not created:
             # Update existing preference
-            preference.is_opted_out = serializer.validated_data["is_opted_out"]
+            preference.is_subscribed = serializer.validated_data.get("is_subscribed", False)
             preference.save()
 
         response_serializer = ProjectNotificationPreferenceReadSerializer(preference)
@@ -1922,6 +1892,10 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         if instance.user != request.user:
             return Response({"error": "You can only update your own notification preferences"}, status=http_status.HTTP_403_FORBIDDEN)
 
+        error = security.check_project_admin(request.user, instance.project)
+        if error:
+            return error
+
         serializer = ProjectNotificationPreferenceWriteSerializer(instance, data=request.data, partial=True, context={"request": request})
 
         if not serializer.is_valid():
@@ -1931,6 +1905,12 @@ class ProjectNotificationPreferenceViewSet(viewsets.ModelViewSet, AuthenticatedV
         response_serializer = ProjectNotificationPreferenceReadSerializer(instance)
 
         return Response(response_serializer.data, status=http_status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        # Inherited ModelViewSet.update would write through the read serializer and
+        # bypass the ownership + admin gates above; force every PUT through the
+        # gated partial_update path instead.
+        return self.partial_update(request, *args, **kwargs)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

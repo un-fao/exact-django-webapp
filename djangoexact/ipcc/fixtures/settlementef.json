@@ -9,7 +9,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -22,7 +30,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -35,7 +51,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -48,7 +72,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -61,7 +93,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -74,7 +114,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -87,7 +135,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -100,7 +156,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -113,7 +177,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -126,7 +198,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -139,7 +219,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -152,7 +240,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -165,7 +261,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -178,7 +282,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -191,7 +303,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -204,7 +324,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -217,7 +345,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -230,7 +366,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -243,7 +387,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -256,7 +408,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -269,7 +429,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -282,7 +450,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -295,7 +471,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -308,7 +492,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -321,7 +513,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -334,7 +534,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -347,7 +555,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -360,7 +576,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -373,7 +597,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -386,7 +618,15 @@
       "flu": 0.8,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -399,7 +639,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -412,7 +660,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -425,7 +681,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -438,7 +702,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -451,7 +723,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -464,7 +744,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -477,7 +765,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -490,7 +786,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -503,7 +807,15 @@
       "flu": 1.0,
       "fmg": 1.14,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0146,
+      "fmg_max": 1.2654,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -516,7 +828,15 @@
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -529,7 +849,15 @@
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -542,7 +870,15 @@
       "flu": 1.0,
       "fmg": 1.17,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 1.0647,
+      "fmg_max": 1.2753,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -555,7 +891,15 @@
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -568,7 +912,15 @@
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -581,7 +933,15 @@
       "flu": 1.0,
       "fmg": 1.16,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": 0.696,
+      "fmg_max": 1.624,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -594,7 +954,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -607,7 +975,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -620,7 +996,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -633,7 +1017,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -646,7 +1038,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -659,7 +1059,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -672,7 +1080,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -685,7 +1101,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -698,7 +1122,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -711,7 +1143,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -724,7 +1164,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -737,7 +1185,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -750,7 +1206,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -763,7 +1227,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -776,7 +1248,15 @@
       "flu": 1.0,
       "fmg": 1.0,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": null,
+      "flu_max": null,
+      "fmg_min": null,
+      "fmg_max": null,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -789,7 +1269,15 @@
       "flu": 0.77,
       "fmg": 1.03,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6622,
+      "flu_max": 0.8778,
+      "fmg_min": 0.9888,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -802,7 +1290,15 @@
       "flu": 0.7,
       "fmg": 1.09,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.616,
+      "flu_max": 0.784,
+      "fmg_min": 1.0464,
+      "fmg_max": 1.1336,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -815,7 +1311,15 @@
       "flu": 0.77,
       "fmg": 1.03,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6622,
+      "flu_max": 0.8778,
+      "fmg_min": 0.9888,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -828,7 +1332,15 @@
       "flu": 0.7,
       "fmg": 1.09,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.616,
+      "flu_max": 0.784,
+      "fmg_min": 1.0464,
+      "fmg_max": 1.1336,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -841,7 +1353,15 @@
       "flu": 0.76,
       "fmg": 1.04,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.6688,
+      "flu_max": 0.8512,
+      "fmg_min": 1.0088,
+      "fmg_max": 1.0712,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -854,7 +1374,15 @@
       "flu": 0.69,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.5796,
+      "flu_max": 0.8004,
+      "fmg_min": 1.056,
+      "fmg_max": 1.144,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -867,7 +1395,15 @@
       "flu": 0.92,
       "fmg": 1.04,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.8004,
+      "flu_max": 1.0396,
+      "fmg_min": 0.9672,
+      "fmg_max": 1.1128,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -880,7 +1416,15 @@
       "flu": 0.83,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.7387,
+      "flu_max": 0.9213,
+      "fmg_min": 1.045,
+      "fmg_max": 1.155,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   },
   {
@@ -893,7 +1437,15 @@
       "flu": 0.83,
       "fmg": 1.1,
       "fi": 1.0,
-      "biomass": 0.0
+      "biomass": 0.0,
+      "flu_min": 0.7387,
+      "flu_max": 0.9213,
+      "fmg_min": 1.045,
+      "fmg_max": 1.155,
+      "fi_min": null,
+      "fi_max": null,
+      "biomass_min": null,
+      "biomass_max": null
     }
   }
 ]

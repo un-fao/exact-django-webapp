@@ -109,7 +109,7 @@
   },
   {
     "model": "api.applicationparameter",
-    "pk": 19,
+    "pk": 20,
     "fields": {
       "name": "project_lock_expiration_time_minutes",
       "value": 30.0,
@@ -163,7 +163,7 @@
   },
   {
     "model": "api.applicationparameter",
-    "pk": 20,
+    "pk": 19,
     "fields": {
       "name": "transmission_loss",
       "value": 0.1,

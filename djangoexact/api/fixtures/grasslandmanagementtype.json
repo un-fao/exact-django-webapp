@@ -29,7 +29,7 @@
       "name_en": "Improved With High Inputs",
       "name_fr": "Amélioré avec des intrants élevés\n",
       "name_es": "Pastizal mejorado con insumos altos",
-      "name_ru": "Улучшено с высокими поступлениями"
+      "name_ru": "Улучшено с использованием высоких затрат"
     }
   },
   {
@@ -40,7 +40,7 @@
       "name_en": "Improved With Medium Inputs",
       "name_fr": "Amélioré avec des intrants moyens\n",
       "name_es": "Pastizal mejorado con insumos medios",
-      "name_ru": "Улучшено со средними поступлениями"
+      "name_ru": "Улучшено с использованием средних затрат"
     }
   },
   {
@@ -51,7 +51,7 @@
       "name_en": "Non-Degraded",
       "name_fr": "Non dégradé\n",
       "name_es": "No degradado",
-      "name_ru": "Недеградированный"
+      "name_ru": "Не деградированный"
     }
   },
   {

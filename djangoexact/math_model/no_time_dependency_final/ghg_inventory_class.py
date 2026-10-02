@@ -3,8 +3,22 @@ from .ghg_emissions_classes import Emission, ActivityTypes, GasTypes, BreakdownT
 from collections import defaultdict
 
 
+def _check_value(gas_type, value, activity):
+    """An inventory row is a single baseline (start-year) number.
+
+    Producers have twice put something else in this slot -- a per-year series, and a
+    GasTypes enum from swapped positional args -- and neither failed until
+    Inventory.to_total() summed it three frames later, or never at all, since
+    to_by_activity_gas passes the value straight into the response and cache JSON.
+    Fail at the producer instead. Every value entering an Inventory passes here.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"Inventory value for {gas_type} / {activity} must be a number, got {type(value).__name__}: {value!r}")
+
+
 class InventoryPerGasPerActivity(Emission):
     def __init__(self, gas_type: GasTypes, value: float, activity: ActivityTypes):
+        _check_value(gas_type, value, activity)
         super().__init__(value, gas_type)
         self.activity: ActivityTypes = activity
 
@@ -75,6 +89,7 @@ class Inventory:
                 return self.to_total()
 
     def add_emission(self, gas_type: GasTypes, value: float, activity: ActivityTypes):
+        _check_value(gas_type, value, activity)  # the merge branch below never reaches the constructor
         for item in self.emissions_by_sector_by_gas:
             if item.gas_type == gas_type and item.activity == activity:
                 item.value += value

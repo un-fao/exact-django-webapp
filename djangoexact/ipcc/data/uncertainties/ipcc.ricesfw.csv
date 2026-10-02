@@ -1,0 +1,7 @@
+id,water_management_type_after_cultivation,value,value_min,value_max,"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, tables 5.12 "
+6,"Rainfed, Deep Water",0.06,0.03,0.12,
+5,"Rainfed, Dry Season (Drought Prone)",0.16,0.11,0.24,
+4,"Rainfed, Wet Season (Regular Rainfed)",0.54,0.39,0.74,
+3,"Irrigated, Multiple Drainage Periods",0.55,0.41,0.72,
+2,"Irrigated, Single Drainage Period",0.71,0.53,0.94,
+1,"Irrigated, Continuously Flooded",1,0.73,1.27,

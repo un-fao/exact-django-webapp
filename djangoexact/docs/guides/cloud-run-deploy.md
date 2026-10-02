@@ -43,6 +43,35 @@ beyond whatever App Engine deploys already required:
   to the Cloud Run revision
 - `roles/cloudsql.client` (connect through the `/cloudsql` unix socket)
 
+### Daily recap email job
+
+Recap emails are sent once a day by a Cloud Scheduler job that POSTs to
+`/cron/recaps/`. The job was created by hand, so no workflow recreates it.
+The view only runs the sweep for an OIDC token issued to
+`recap-email-scheduler@$PROJECT_ID.iam.gserviceaccount.com`. That service
+account has no roles. Whoever creates the job needs
+`roles/iam.serviceAccountUser` on that one account (granted to
+`gcp-devs-exact@fao.org` on review).
+
+```
+gcloud scheduler jobs create http recap-emails \
+  --project=fao-exact-review --location=europe-west1 \
+  --schedule="0 7 * * *" --time-zone="Europe/Rome" \
+  --uri="https://exact-api-mesob2hoya-ew.a.run.app/cron/recaps/" \
+  --http-method=POST --message-body="{}" \
+  --oidc-service-account-email=recap-email-scheduler@fao-exact-review.iam.gserviceaccount.com \
+  --oidc-token-audience="https://exact-api-mesob2hoya-ew.a.run.app/cron/recaps/" \
+  --max-retry-attempts=0 --attempt-deadline=180s
+```
+
+- The host in `--uri` must be listed in `CLOUDRUN_ALLOWED_HOSTS`.
+- The audience must match `--uri` exactly, including the trailing slash.
+  Otherwise every call returns 403.
+- The body is a placeholder. Google's front end answers a POST that has no
+  body with 411.
+- Retries are off. A missed day is caught up by the next run, because each
+  project's window starts at its `last_recap_sent_at`.
+
 ## Repository variables and secrets
 
 Every placeholder in `deploy/cloudrun-service.yaml` and every input the

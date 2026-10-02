@@ -213,13 +213,6 @@ class GLEAMRegion(models.Model):
 class ForestType(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py). Constrain
-        # `name_en` explicitly, never `unique=True` on the translated `name`:
-        # modeltranslation copies the wrapped field's __dict__ onto every
-        # language column, so unique=True would also constrain name_es/fr/ru.
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_forest_type_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -272,20 +265,12 @@ class LandUseType(models.Model):
     moistures = models.ManyToManyField("api.Moisture", related_name="land_use_types")
     is_active = models.BooleanField(default=True)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_land_use_type_name_en")]
-
     def __str__(self):
         return self.name
 
 
 class SettlementType(models.Model):
     name = models.CharField(max_length=100)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_settlement_type_name_en")]
 
     def __str__(self):
         return self.name
@@ -305,9 +290,6 @@ class ProjectStatus(models.Model):
 
     class Meta:
         verbose_name_plural = "Project statuses"
-        # Natural key for .exactproject import (api/natural_keys.py). Untranslated
-        # model, so the base `name` column is the key.
-        constraints = [models.UniqueConstraint(fields=["name"], name="uniq_project_status_name")]
 
     def __str__(self):
         return self.name
@@ -322,6 +304,7 @@ class Region(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    iso3 = models.CharField(max_length=3, null=True, blank=True, unique=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     ipcc_region = models.ForeignKey(IPCCRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
     gleam_region = models.ForeignKey(GLEAMRegion, on_delete=models.CASCADE, null=True, blank=True, related_name="countries")
@@ -338,10 +321,6 @@ class Climate(models.Model):
     moistures = models.ManyToManyField("api.Moisture", related_name="climates")
     is_active = models.BooleanField(default=True)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_climate_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -349,10 +328,6 @@ class Climate(models.Model):
 class Moisture(models.Model):
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_moisture_name_en")]
 
     def __str__(self):
         return self.name
@@ -362,10 +337,6 @@ class SoilType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
     is_coastal = models.BooleanField(default=False)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_soil_type_name_en")]
 
     def __str__(self):
         return self.name
@@ -396,10 +367,6 @@ class OrganicInputType(models.Model):
 class ResidueManagementType(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_residue_mgmt_type_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -421,10 +388,6 @@ class PreSeasonWaterRegimeType(models.Model):
 class OrganicAmendmentType(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_organic_amendment_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -439,10 +402,6 @@ class TillageManagementType(models.Model):
 class WaterManagementTypeBeforeCultivation(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_water_mgmt_before_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -450,20 +409,12 @@ class WaterManagementTypeBeforeCultivation(models.Model):
 class WaterManagementTypeAfterCultivation(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_water_mgmt_after_name_en")]
-
     def __str__(self):
         return self.name
 
 
 class GrasslandManagementType(models.Model):
     name = models.CharField(max_length=100)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_grassland_mgmt_name_en")]
 
     def __str__(self):
         return self.name
@@ -480,20 +431,12 @@ class LivestockCategoryType(models.Model):
 class LivestockProductionType(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_livestock_prod_name_en")]
-
     def __str__(self):
         return self.name
 
 
 class ManureManagementType(models.Model):
     name = models.CharField(max_length=100)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_manure_mgmt_name_en")]
 
     def __str__(self):
         return self.name
@@ -563,10 +506,6 @@ class ForestDegradationLevel(models.Model):
 class FireType(models.Model):
     name = models.CharField(max_length=100)
 
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_fire_type_name_en")]
-
     def __str__(self):
         return self.name
 
@@ -587,10 +526,6 @@ class WaterbodyType(models.Model):
 
 class TrophicType(models.Model):
     name = models.CharField(max_length=100)
-
-    class Meta:
-        # Natural key for .exactproject import (api/natural_keys.py).
-        constraints = [models.UniqueConstraint(fields=["name_en"], name="uniq_trophic_type_name_en")]
 
     def __str__(self):
         return self.name
@@ -640,15 +575,6 @@ class FuelUseType(models.Model):
 
 
 class Unit(models.Model):
-    # No UniqueConstraint on `name`, deliberately. `check_reference_natural_keys`
-    # found 46 rows named 'm3/yr', 12 named 'tdm/yr', 8 named 'MWh/yr' and 100
-    # with a blank name in the shipped offline database, against 3 rows in
-    # api/fixtures/unit.json. Adding the constraint would fail there, and making
-    # it pass would mean deleting reference rows that existing projects may point
-    # at. See .planning/quick/260813-fvj-*/260813-fvj-DUPLICATES.md.
-    # This is inert for .exactproject import: Unit's only ForeignKey is
-    # FuelType.unit below, reference data pointing at reference data, so no
-    # exported payload ever carries a Unit relation to resolve.
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -672,19 +598,6 @@ class FuelType(models.Model):
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
-        # The unique_together above constrains the base `name` column. The
-        # natural key (api/natural_keys.py) is composite on `name_en`, so it
-        # needs its own constraint. `macro_fuel_type` is nullable, hence
-        # nulls_distinct=False: honoured on PostgreSQL 15+, silently ignored on
-        # sqlite, which treats NULLs as distinct and therefore enforces less
-        # there than in production. Duplicate detection covers the gap.
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name_en", "fuel_use_type", "macro_fuel_type"],
-                name="uniq_fuel_type_name_en_use_macro",
-                nulls_distinct=False,
-            )
-        ]
 
     def __str__(self):
         return f"{self.name} - {self.fuel_use_type}"
@@ -778,6 +691,7 @@ class Project(Historical, DirtyFieldsMixin):
     locked_at = models.DateTimeField(null=True, blank=True, verbose_name="locked_at")
     lock_updated_at = models.DateTimeField(null=True, blank=True, verbose_name="lock_updated_at")
     locked_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name="locked_projects", verbose_name="locked_by")
+    last_recap_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="last_recap_sent_at")
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE, verbose_name="gw_potential")
 
@@ -889,17 +803,8 @@ class Project(Historical, DirtyFieldsMixin):
         self.locked_by = user
         self.save()
 
-    def unlock(self, send_email=True):
-        """
-        Unlocks the project and sends an email to the user who locked it.
-
-        Args:
-            send_email (bool): If True, sends an email to the user who locked the project.
-        """
-        # TODO: Uncomment this when we have a way to send recap emails again
-        # if send_email and self.is_locked:
-        #     utils.send_changes_email(self)
-
+    def unlock(self):
+        """Unlocks the project. Recap emails go out on the daily schedule, not on unlock."""
         self.is_locked = False
         self.locked_at = None
         self.lock_updated_at = None
@@ -1032,7 +937,7 @@ class ProjectNotificationPreference(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="project_notification_preferences")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notification_preferences")
-    is_opted_out = models.BooleanField(default=False, verbose_name="is_opted_out_of_project_notifications")
+    is_subscribed = models.BooleanField(default=False, verbose_name="is_subscribed_to_project_notifications")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1043,7 +948,7 @@ class ProjectNotificationPreference(models.Model):
         verbose_name_plural = "Project Notification Preferences"
 
     def __str__(self):
-        status = "opted out" if self.is_opted_out else "receiving notifications"
+        status = "subscribed to notifications" if self.is_subscribed else "not subscribed"
         return f"({self.pk}) {self.user.email} - {self.project.name} - {status}"
 
 

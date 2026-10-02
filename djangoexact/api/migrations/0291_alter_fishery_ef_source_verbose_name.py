@@ -1,10 +1,9 @@
 """Realign the fishery `ef_source` field state with the models.
 
-Pre-existing drift, unrelated to the natural-key work in 0290: migration 0286
-created the field as `ef_source_t2` with `verbose_name='ef_source_t2'`, and 0288
-renamed the field without touching the verbose_name. These operations are
-verbatim `makemigrations` output. They carry no SQL: `verbose_name` is model
-metadata only.
+Pre-existing drift: migration 0286 created the field as `ef_source_t2` with
+`verbose_name='ef_source_t2'`, and 0288 renamed the field without touching the
+verbose_name. These operations are verbatim `makemigrations` output. They
+carry no SQL: `verbose_name` is model metadata only.
 """
 
 import django.db.models.deletion
@@ -14,7 +13,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0290_reference_natural_key_constraints'),
+        ('api', '0289_asyncjob'),
     ]
 
     operations = [

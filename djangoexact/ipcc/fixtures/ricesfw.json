@@ -4,7 +4,9 @@
     "pk": 1,
     "fields": {
       "water_management_type_after_cultivation": 2,
-      "value": 1.0
+      "value": 1.0,
+      "value_min": 0.73,
+      "value_max": 1.27
     }
   },
   {
@@ -12,7 +14,9 @@
     "pk": 2,
     "fields": {
       "water_management_type_after_cultivation": 3,
-      "value": 0.71
+      "value": 0.71,
+      "value_min": 0.53,
+      "value_max": 0.94
     }
   },
   {
@@ -20,7 +24,9 @@
     "pk": 3,
     "fields": {
       "water_management_type_after_cultivation": 4,
-      "value": 0.55
+      "value": 0.55,
+      "value_min": 0.41,
+      "value_max": 0.72
     }
   },
   {
@@ -28,7 +34,9 @@
     "pk": 4,
     "fields": {
       "water_management_type_after_cultivation": 5,
-      "value": 0.54
+      "value": 0.54,
+      "value_min": 0.39,
+      "value_max": 0.74
     }
   },
   {
@@ -36,7 +44,9 @@
     "pk": 5,
     "fields": {
       "water_management_type_after_cultivation": 6,
-      "value": 0.16
+      "value": 0.16,
+      "value_min": 0.11,
+      "value_max": 0.24
     }
   },
   {
@@ -44,7 +54,9 @@
     "pk": 6,
     "fields": {
       "water_management_type_after_cultivation": 7,
-      "value": 0.06
+      "value": 0.06,
+      "value_min": 0.03,
+      "value_max": 0.12
     }
   }
 ]

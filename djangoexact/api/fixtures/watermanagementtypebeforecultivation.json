@@ -7,7 +7,7 @@
       "name_en": "Flooded Pre-Season > 30 D",
       "name_fr": "Inondé avant saison > 30 j\n",
       "name_es": "Pretemporada inundada > 30 días",
-      "name_ru": "С затоплениями (>30 суток)"
+      "name_ru": "Затопленный предсезонный период > 30 дней"
     }
   },
   {
@@ -18,7 +18,7 @@
       "name_en": "Non Flooded Pre-Season <180 D",
       "name_fr": "Non inondé pré-saison < 180 j\n",
       "name_es": "Pretemporada no inundada <180 días",
-      "name_ru": "Без затоплений <180 суток"
+      "name_ru": "Не затопленные до сезона, менее 180 дней"
     }
   },
   {
@@ -29,7 +29,7 @@
       "name_en": "Non Flooded Pre-Season >180 D",
       "name_fr": "Non inondé pré-saison > 180 j\n",
       "name_es": "Pretemporada no inundada >180 días",
-      "name_ru": "Без затоплений >180 суток"
+      "name_ru": "Не затопленные до сезона, более 180 дней"
     }
   }
 ]

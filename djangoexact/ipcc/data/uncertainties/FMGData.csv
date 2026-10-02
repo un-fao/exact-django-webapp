@@ -1,0 +1,37 @@
+"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, table 5.5, and 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2006), Volume 4 AFOLU, table 5.5.",climate,moisture,tillage_management_type,value,value_min,value_max
+217,Boreal,Moist,Full Tillage,1,N/A,N/A
+218,Boreal,Dry,Full Tillage,1,N/A,N/A
+219,Cool Temperate,Moist,Full Tillage,1,N/A,N/A
+220,Cool Temperate,Dry,Full Tillage,1,N/A,N/A
+221,Warm Temperate,Moist,Full Tillage,1,N/A,N/A
+222,Warm Temperate,Dry,Full Tillage,1,N/A,N/A
+223,Tropical,Moist,Full Tillage,1,N/A,N/A
+224,Tropical,Dry,Full Tillage,1,N/A,N/A
+225,Tropical,Wet,Full Tillage,1,N/A,N/A
+226,Tropical Montane,Moist,Full Tillage,1,N/A,N/A
+227,Tropical Montane,Dry,Full Tillage,1,N/A,N/A
+228,Tropical Montane,Wet,Full Tillage,1,N/A,N/A
+229,Boreal,Moist,Reduced Tillage,1.04,0.9984,1.0816
+230,Boreal,Dry,Reduced Tillage,0.98,0.931,1.029
+231,Cool Temperate,Moist,Reduced Tillage,1.04,0.9984,1.0816
+232,Cool Temperate,Dry,Reduced Tillage,0.98,0.931,1.029
+233,Warm Temperate,Moist,Reduced Tillage,1.05,1.008,1.092
+234,Warm Temperate,Dry,Reduced Tillage,0.99,0.9603,1.0197
+235,Tropical,Moist,Reduced Tillage,1.04,0.9672,1.1128
+236,Tropical,Dry,Reduced Tillage,0.99,0.9207,1.0593
+237,Tropical,Wet,Reduced Tillage,1.04,0.9672,1.1128
+238,Tropical Montane,Moist,Reduced Tillage,1.09,0.545,1.635
+239,Tropical Montane,Dry,Reduced Tillage,1.09,0.545,1.635
+240,Tropical Montane,Wet,Reduced Tillage,1.09,0.545,1.635
+241,Boreal,Moist,No Tillage,1.09,1.0464,1.1336
+242,Boreal,Dry,No Tillage,1.03,0.9888,1.0712
+243,Cool Temperate,Moist,No Tillage,1.09,1.0464,1.1336
+244,Cool Temperate,Dry,No Tillage,1.03,0.9888,1.0712
+245,Warm Temperate,Moist,No Tillage,1.1,1.056,1.144
+246,Warm Temperate,Dry,No Tillage,1.04,1.0088,1.0712
+247,Tropical,Moist,No Tillage,1.1,1.045,1.155
+248,Tropical,Dry,No Tillage,1.04,0.9672,1.1128
+249,Tropical,Wet,No Tillage,1.1,1.045,1.155
+250,Tropical Montane,Moist,No Tillage,1.16,0.58,1.74
+251,Tropical Montane,Dry,No Tillage,1.16,0.58,1.74
+252,Tropical Montane,Wet,No Tillage,1.16,0.58,1.74

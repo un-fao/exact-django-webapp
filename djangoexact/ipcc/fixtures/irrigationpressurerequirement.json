@@ -8,7 +8,11 @@
       "bar_start": 1.0,
       "bar_end": 3.0,
       "avg_pressure": 2.0,
-      "head": 21.399
+      "head": 21.399,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -20,7 +24,11 @@
       "bar_start": 0.5,
       "bar_end": 3.0,
       "avg_pressure": 0.9,
-      "head": 9.62955
+      "head": 9.62955,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -32,7 +40,11 @@
       "bar_start": 0.5,
       "bar_end": 2.0,
       "avg_pressure": 1.25,
-      "head": 13.374375
+      "head": 13.374375,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -44,7 +56,11 @@
       "bar_start": 2.0,
       "bar_end": 5.0,
       "avg_pressure": 3.5,
-      "head": 37.44825
+      "head": 37.44825,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -56,7 +72,11 @@
       "bar_start": 2.0,
       "bar_end": 8.0,
       "avg_pressure": 5.0,
-      "head": 53.4975
+      "head": 53.4975,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -68,7 +88,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -80,7 +104,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -92,7 +120,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -104,7 +136,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -116,7 +152,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   },
   {
@@ -128,7 +168,11 @@
       "bar_start": null,
       "bar_end": null,
       "avg_pressure": 2.53,
-      "head": 27.069735
+      "head": 27.069735,
+      "avg_pressure_min": null,
+      "avg_pressure_max": null,
+      "head_min": null,
+      "head_max": null
     }
   }
 ]

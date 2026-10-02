@@ -151,7 +151,7 @@
       "name_en": "Mules And Asses",
       "name_fr": "Mules et ânes\n",
       "name_es": "Mulas y asnos",
-      "name_ru": "Мулы и ослы",
+      "name_ru": "Mules And Asses",
       "is_active": true
     }
   },
@@ -175,7 +175,7 @@
       "name_en": "Other Buffalo",
       "name_fr": "Autres buffles\n",
       "name_es": "Búfalo otro",
-      "name_ru": "Прочий буйвол",
+      "name_ru": "Другие буйволы",
       "is_active": true
     }
   },
@@ -187,7 +187,7 @@
       "name_en": "Other Cattle",
       "name_fr": "Autres bovins\n",
       "name_es": "Vacuno otro",
-      "name_ru": "Прочий крупный рогатый скот",
+      "name_ru": "Другие крупный рогатый скот",
       "is_active": true
     }
   },
@@ -199,7 +199,7 @@
       "name_en": "Other Sheep",
       "name_fr": "Autres moutons\n",
       "name_es": "Ovino otro",
-      "name_ru": "Прочий вид овец",
+      "name_ru": "Другие виды овец",
       "is_active": true
     }
   }
