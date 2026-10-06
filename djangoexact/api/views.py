@@ -1156,7 +1156,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 # Extract activities before creating project
-                activities_data = project_data.pop('activities', [])
+                # Files from the online tool or older builds can still carry biodiversity activities.
+                activities_data = [a for a in project_data.pop('activities', []) if not a.get('is_b_intact')]
 
                 # Prepare project data with proper FK handling
                 filtered_project_data = prepare_model_data(Project, project_data)

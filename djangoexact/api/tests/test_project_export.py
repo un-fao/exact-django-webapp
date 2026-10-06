@@ -112,6 +112,15 @@ class ProjectExportTests(TestCase):
 
         self.assertEqual(data1['exportId'], data2['exportId'])
 
+    def test_export_excludes_biodiversity_activities(self):
+        Activity.objects.create(project=self.project, owner=self.user, name="GHG")
+        Activity.objects.create(project=self.project, owner=self.user, name="Bio", is_b_intact=True)
+
+        response = self.client.get(f'/api/projects/{self.project.id}/export/')
+        data = json.loads(response.content)
+
+        self.assertEqual([a['name'] for a in data['project']['activities']], ["GHG"])
+
 
 class ProjectImportTests(TestCase):
     """Tests for the project import endpoint."""
@@ -144,6 +153,20 @@ class ProjectImportTests(TestCase):
         self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
         self.assertFalse(response.data['exists'])
         self.assertTrue(Project.objects.filter(name="Imported Project").exists())
+
+    def test_import_skips_biodiversity_activities(self):
+        self.valid_import_data['project']['activities'] = [
+            {"name": "GHG", "modules": {}, "module_types": []},
+            {"name": "Bio", "is_b_intact": True, "modules": {}, "module_types": []},
+        ]
+        response = self.client.post(
+            '/api/projects/import_project/',
+            data=self.valid_import_data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+        names = Activity.objects.filter(project_id=response.data['projectId']).values_list('name', flat=True)
+        self.assertEqual(list(names), ["GHG"])
 
     def test_import_detects_existing_project(self):
         """Import detects project with same export_id."""

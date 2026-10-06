@@ -760,13 +760,17 @@ class ActivityExportSerializer(serializers.ModelSerializer):
 
 class ProjectExportSerializer(serializers.ModelSerializer):
     """Serializer for full project export."""
-    activities = ActivityExportSerializer(many=True, read_only=True)
+    activities = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
                    'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
                    'last_recap_sent_at']
+
+    def get_activities(self, obj):
+        # Biodiversity activities depend on the online map service, so they never travel in an export.
+        return ActivityExportSerializer(obj.activities.exclude(is_b_intact=True), many=True).data
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
