@@ -279,6 +279,7 @@ def create_project_shell(project, owner):
     project_copy._state.adding = True
     project_copy.is_finalized = False
     project_copy.is_public = False
+    project_copy.export_id = None
     project_copy.owner = owner
     project_copy.save()
 
