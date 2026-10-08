@@ -213,7 +213,8 @@ class ForestManagementRootToShootManager(Manager):
                 land_use_type=land_use_type,
             )
             .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
-            .order_by("threshold")
+            # NULL means "no upper limit"; SQLite sorts NULLs first and Postgres last, so pin it.
+            .order_by(F("threshold").asc(nulls_last=True))
             .first()
         )
 
@@ -229,7 +230,7 @@ class ForestManagementRootToShootManager(Manager):
                 land_use_type=land_use_type,
             )
             .filter(Q(threshold__lt=threshold) | Q(threshold__isnull=True))
-            .order_by("-threshold")
+            .order_by(F("threshold").desc(nulls_first=True))
             .first()
         )
 
