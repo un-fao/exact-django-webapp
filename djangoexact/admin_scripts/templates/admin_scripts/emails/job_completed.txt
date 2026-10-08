@@ -1,10 +1,10 @@
-Hi {{ user.get_short_name|default:user.email }},
+{% load luc_labels %}Hi {{ user.get_short_name|default:user.email }},
 
 Your computation job #{{ job.pk }} has {{ job.get_status_display|lower }}.
 
 Module: {{ job.module_type }}
 Attribute: {{ job.attribute }}
-From: {{ job.from_value }} → To: {{ job.to_value }}
+From: {{ job.from_value|luc_label|safe }} → To: {{ job.to_value|luc_label|safe }}
 Status: {{ job.get_status_display }}
 {% if job.error_message %}
 Error: {{ job.error_message }}
