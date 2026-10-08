@@ -7189,7 +7189,7 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         # The threshold is an AGB stock (t d.m./ha), not an age or a growth rate: "before" is the
         # ratio under it, "after" the unbounded ratio over it. The math model picks between them by stock.
-        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_lowest_value(**crluft)
+        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_highest_finite_value(**crluft)
         self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_highest_value(**crluft) or self.rshoot_before_20_yrs
         if not self.rshoot_after_20_yrs:
             raise ValueError(RSHOOT_OVER_20_NOT_FOUND)

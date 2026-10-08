@@ -19,6 +19,10 @@ class RootToShootForStockTest(SimpleTestCase):
     def test_unknown_stock_uses_over_ratio(self):
         self.assertEqual(root_to_shoot_for_stock(self.under, self.over, None), 0.246)
 
+    def test_missing_threshold_uses_over_ratio(self):
+        no_threshold = SimpleNamespace(threshold=None, value=0.23)
+        self.assertEqual(root_to_shoot_for_stock(no_threshold, self.over, 10.0), 0.246)
+
     def test_only_unbounded_row_always_uses_it(self):
         only = SimpleNamespace(threshold=0, value=0.246)
         self.assertEqual(root_to_shoot_for_stock(only, self.over, 10.0), 0.246)

@@ -1626,9 +1626,9 @@ def root_to_shoot_for_stock(under: ipcc.ForestManagementRootToShoot, over: ipcc.
     """Root-to-shoot ratio for an AGB stock, using the same rule as MathForestManagement.
 
     `under` applies below its AGB threshold and `over` from the threshold up. An unknown stock
-    falls back to `over`.
+    or a missing threshold falls back to `over`.
     """
-    return under.value if agb is not None and agb < under.threshold else over.value
+    return under.value if agb is not None and under.threshold is not None and agb < under.threshold else over.value
 
 
 class ForestManagementDefaults(Defaults):

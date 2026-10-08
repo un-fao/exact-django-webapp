@@ -230,7 +230,7 @@ class ForestManagementRootToShootManager(Manager):
             .first()
         )
 
-    def get_lowest_value(self, climate, forest_type, region, land_use_type):
+    def get_highest_finite_value(self, climate, forest_type, region, land_use_type):
         return (
             self.filter(
                 forest_type=forest_type,
