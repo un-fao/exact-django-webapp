@@ -200,23 +200,6 @@ class SoilOrcanicCarbonCNRatio(Model):
 
 
 class ForestManagementRootToShootManager(Manager):
-    def get_max_below_threshold(self, climate, forest_type, region, land_use_type, threshold):
-        """
-        Returns the highest value below the threshold.
-        NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
-        """
-        return (
-            self.filter(
-                forest_type=forest_type,
-                climate=climate,
-                region=region,
-                land_use_type=land_use_type,
-            )
-            .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
-            .order_by("threshold")
-            .first()
-        )
-
     def get_first_above_threshold(self, climate, forest_type, region, land_use_type, threshold) -> "ForestManagementRootToShoot":
         """
         Returns the first value above the threshold.
@@ -229,7 +212,8 @@ class ForestManagementRootToShootManager(Manager):
                 land_use_type=land_use_type,
             )
             .filter(Q(threshold__lt=threshold) | Q(threshold__isnull=True))
-            .order_by("-threshold")
+            # NULL means "no upper limit"; Postgres sorts NULLs first here and SQLite last, so pin it.
+            .order_by(F("threshold").desc(nulls_first=True))
             .first()
         )
 

@@ -7154,7 +7154,6 @@ class ForestManagementCalculator(LandModuleCalculator):
         }
 
         AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
-        RSHOOT_UNDER_20_NOT_FOUND = f"Root-to-shoot (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for Root-to-shoot (under 20 years) for all scenarios."
         RSHOOT_OVER_20_NOT_FOUND = f"Root-to-shoot (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for Root-to-shoot (over 20 years) for all scenarios."
         LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
 
@@ -7188,18 +7187,15 @@ class ForestManagementCalculator(LandModuleCalculator):
         if not self.agb_growth and (not self.has_t2_growth_start or not self.has_t2_growth_w or not self.has_t2_growth_wo):
             raise ValueError(AGB_GROWTH_NOT_FOUND)
 
-        before_2_yrs = self.agb_growth.value_upto_20_years
-        after_20_yrs = self.agb_growth.value_after_20_years
-
-        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
-        if not self.rshoot_before_20_yrs:
-            raise ValueError(RSHOOT_UNDER_20_NOT_FOUND)
-        if self.rshoot_before_20_yrs.threshold is None:
-            self.rshoot_before_20_yrs.threshold = 0
-
-        self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
+        # The threshold is an AGB stock (t d.m./ha), not an age or a growth rate: "before" is the
+        # ratio under it, "after" the unbounded ratio over it. The math model picks between them by stock.
+        self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_lowest_value(**crluft)
+        self.rshoot_after_20_yrs = ipcc.ForestManagementRootToShoot.objects.get_highest_value(**crluft) or self.rshoot_before_20_yrs
         if not self.rshoot_after_20_yrs:
             raise ValueError(RSHOOT_OVER_20_NOT_FOUND)
+        if not self.rshoot_before_20_yrs:
+            # Only an unbounded row exists: threshold 0 makes every stock count as "over".
+            self.rshoot_before_20_yrs = ipcc.ForestManagementRootToShoot(threshold=0, value=self.rshoot_after_20_yrs.value)
 
         self.agb_under_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=0)
 

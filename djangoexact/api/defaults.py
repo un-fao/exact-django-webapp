@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from ipcc import models as ipcc
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1621,6 +1622,15 @@ class InputDefaults(Defaults):
         return SimpleNamespace()
 
 
+def root_to_shoot_for_stock(under: ipcc.ForestManagementRootToShoot, over: ipcc.ForestManagementRootToShoot, agb: float | None) -> float:
+    """Root-to-shoot ratio for an AGB stock, using the same rule as MathForestManagement.
+
+    `under` applies below its AGB threshold and `over` from the threshold up. An unknown stock
+    falls back to `over`.
+    """
+    return under.value if agb is not None and agb < under.threshold else over.value
+
+
 class ForestManagementDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
@@ -1702,16 +1712,19 @@ class ForestManagementDefaults(Defaults):
         elif defaults.agb_start_wo is not None:
             agb_start = defaults.agb_start_wo
         
+        def rshoot_for(agb):
+            return root_to_shoot_for_stock(defaults.rshoot_before_20_yrs, defaults.rshoot_after_20_yrs, agb)
+
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_start_w is not None:
-            bgb_start = defaults.agb_start_w * defaults.rshoot_after_20_yrs.value
+            bgb_start = defaults.agb_start_w * rshoot_for(defaults.agb_start_w)
         elif defaults.rshoot_after_20_yrs is not None and defaults.agb_start_wo is not None:
-            bgb_start = defaults.agb_start_wo * defaults.rshoot_after_20_yrs.value
+            bgb_start = defaults.agb_start_wo * rshoot_for(defaults.agb_start_wo)
 
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_w is not None:
-            bgb_w = defaults.agb_max_w * defaults.rshoot_after_20_yrs.value
+            bgb_w = defaults.agb_max_w * rshoot_for(defaults.agb_max_w)
 
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_max_wo is not None:
-            bgb_wo = defaults.agb_max_wo * defaults.rshoot_after_20_yrs.value
+            bgb_wo = defaults.agb_max_wo * rshoot_for(defaults.agb_max_wo)
 
         if self.input.data_source is not None and self.input.data_source.short_name == "FRA":
             bgb_start = defaults.bgb_start_start
@@ -1724,11 +1737,12 @@ class ForestManagementDefaults(Defaults):
         if defaults.rshoot_before_20_yrs is not None and defaults.agb_growth_under_20_wo is not None:
             bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.rshoot_before_20_yrs.value
 
+        # A growth rate has no stock of its own, so the ratio follows the scenario's mature AGB.
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_w is not None:
-            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.rshoot_after_20_yrs.value
+            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * rshoot_for(defaults.agb_max_w)
 
         if defaults.rshoot_after_20_yrs is not None and defaults.agb_growth_over_20_wo is not None:
-            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.rshoot_after_20_yrs.value
+            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * rshoot_for(defaults.agb_max_wo)
 
         bgb_max_start = 0
         bgb_max_w = 0
