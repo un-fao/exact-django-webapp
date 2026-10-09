@@ -3019,6 +3019,22 @@ class FieldDefinitionViewSet(viewsets.ViewSet):
         return field_metadata
 
 
+class ReportTemplateViewSet(viewsets.ViewSet):
+    """Report templates accepted by the `template` parameter of the report endpoints.
+
+    Public because the shared-report page offers the same select, and the
+    names are already listed in the 400 message for an unknown template.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(responses={200: "List of {id, label, languages}"})
+    def list(self, request, *args, **kwargs):
+        from .reports import catalog
+
+        return Response(catalog.options())
+
+
 class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectTag.objects.all()
     serializer_class = ProjectTagSerializer

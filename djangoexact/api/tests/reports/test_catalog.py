@@ -28,7 +28,7 @@ from __future__ import annotations
 from django.template.loader import get_template
 from django.test import SimpleTestCase
 
-from api.reports.catalog import REPORTS, UnknownReport, resolve_template
+from api.reports.catalog import LABELS, REPORTS, UnknownReport, options, resolve_template
 
 
 class ReportCatalogTestCase(SimpleTestCase):
@@ -74,3 +74,22 @@ class ReportCatalogTestCase(SimpleTestCase):
         for lang in ("es", "fr"):
             with self.subTest(lang=lang), self.assertRaises(UnknownReport):
                 resolve_template("ifad", lang)
+
+    def test_every_report_has_a_label(self):
+        self.assertEqual(set(LABELS), set(REPORTS))
+
+    def test_every_option_is_renderable(self):
+        """What the select offers must be what the report endpoints accept."""
+        for option in options():
+            for lang in option["languages"]:
+                with self.subTest(report=option["id"], lang=lang):
+                    resolve_template(option["id"], lang)
+
+
+class ReportTemplatesEndpointTestCase(SimpleTestCase):
+    def test_anonymous_gets_the_catalog(self):
+        """The public shared-report page calls this without a token."""
+        response = self.client.get("/api/report-templates/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), options())
+        self.assertIn({"id": "ifad", "label": "IFAD annex", "languages": ["en"]}, response.json())
