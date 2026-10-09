@@ -281,6 +281,16 @@ def create_project_shell(project, owner):
     project_copy.is_public = False
     project_copy.export_id = None
     project_copy.guided_step = None
+    # A copy inheriting the source's lock would be held by a user who may not be a
+    # member of it, and the new owner cannot release someone else's lock.
+    project_copy.is_locked = False
+    project_copy.locked_at = None
+    project_copy.lock_updated_at = None
+    project_copy.locked_by = None
+    project_copy.is_archived = False
+    project_copy.archived_at = None
+    # None makes the daily sweep start the clock instead of mailing the copy operation itself.
+    project_copy.last_recap_sent_at = None
     project_copy.owner = owner
     project_copy.save()
 
