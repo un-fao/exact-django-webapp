@@ -668,7 +668,7 @@ class ModuleExportSerializer(serializers.Serializer):
         # last_cached_at against it, so re-stamping it at import time would
         # silently invalidate every restored result.
         excluded_fields = (
-            'id', 'activity', 'data_source', 'note',
+            'id', 'activity', 'note',
             'history', 'parent'
         )
         for field in instance._meta.get_fields():
