@@ -809,7 +809,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get", "post"])
+    @action(detail=True, methods=["post"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -827,6 +827,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 required=False,
             ),
         ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "content": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
+                                "of text, list, link and table tags. Accepted by the ifad report only.",
+                ),
+                "narrative": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description="Structured analyst narrative. Accepted by the ifad report only.",
+                ),
+            },
+        ),
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
@@ -855,6 +869,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         report_narrative.narrative_from_request(request, None, [])
+        report_narrative.content_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
@@ -878,8 +893,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def report_async(self, request, pk=None):
         """Enqueue a report for background generation. Returns 202 + job id.
 
-        The existing synchronous `report/` action is unchanged. Poll the job at
-        GET /api/async-jobs/{id}/ then download via that job's /download/ action.
+        Takes the same query parameters and body as the synchronous `report/`
+        action. Poll the job at GET /api/async-jobs/{id}/ then download via
+        that job's /download/ action.
         """
         project = self.get_object()
         error = security.check_permission("view_project", request.user, project)
@@ -921,6 +937,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         narrative_raw, _narrative = report_narrative.narrative_from_request(
             request, template_name, selected_activities,
         )
+        content = report_narrative.content_from_request(request, template_name)
 
         params = {
             "project_id": project.pk,
@@ -929,6 +946,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "template": template_name,
             "lang": lang,
             "narrative": narrative_raw,
+            # Stored already sanitized; the worker sanitizes it again anyway.
+            "content": content,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1616,18 +1635,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
         _raw, narrative = report_narrative.narrative_from_request(
             request, template_name, activities if activities is not None else project.activities.all(),
         )
+        content = report_narrative.content_from_request(request, template_name)
 
         try:
             from .reports import compute_project_result
             from .reports.html_context import build_template_context
+            from .reports.pdf import render_pdf
 
             result = compute_project_result(project, activities)
-            context = build_template_context(result, request, lang, narrative=narrative)
+            context = build_template_context(result, request, lang, narrative=narrative, content=content)
             html = render(request, template_path, context).content.decode()
-
-            from weasyprint import HTML
-
-            pdf = HTML(string=html).write_pdf()
+            pdf = render_pdf(html)
 
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'

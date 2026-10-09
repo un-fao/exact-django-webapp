@@ -12,8 +12,9 @@ from django.utils.translation import activate
 
 from api.models import AsyncJob, Project
 from api.reports import catalog, compute_project_result, generate_excel_report
-from api.reports.narrative import clean_narrative
+from api.reports.narrative import clean_content, clean_narrative
 from api.reports.html_context import build_template_context
+from api.reports.pdf import render_pdf
 
 
 def run(job: AsyncJob) -> dict:
@@ -33,7 +34,7 @@ def run(job: AsyncJob) -> dict:
         template_name = params["template"]
         content = _render_pdf(
             project, activities, template_name, lang, job.created_by,
-            narrative=params.get("narrative"),
+            narrative=params.get("narrative"), content=params.get("content"),
         )
         content_type = "application/pdf"
         ext = "pdf"
@@ -53,7 +54,7 @@ def run(job: AsyncJob) -> dict:
     }
 
 
-def _render_pdf(project, activities, template_name, lang, user, narrative=None):
+def _render_pdf(project, activities, template_name, lang, user, narrative=None, content=None):
     # Resolved here as well as at enqueue, because jobs persisted before the
     # catalog existed can still be replayed; first, so an unrenderable report
     # fails before a carbon balance is computed for it.
@@ -62,16 +63,16 @@ def _render_pdf(project, activities, template_name, lang, user, narrative=None):
     # assumption-set date is a string until this call turns it back into a date.
     if narrative:
         narrative = clean_narrative(narrative, activities or project.activities.all())
+    # Sanitized again although the view already did: params are stored JSON,
+    # and a row edited or replayed after enqueue must not reach the page as
+    # trusted markup.
+    if content:
+        content = clean_content(content)
     result = compute_project_result(project, activities)
-    context = build_template_context(result, None, lang, narrative=narrative)
+    context = build_template_context(result, None, lang, narrative=narrative, content=content)
     context["user"] = user
     html = render_to_string(template_path, context)
-    return _weasyprint_pdf(html)
-
-
-def _weasyprint_pdf(html):
-    from weasyprint import HTML
-    return HTML(string=html).write_pdf()
+    return render_pdf(html)
 
 
 def _upload(project, job, content, ext):
