@@ -156,7 +156,9 @@ class CleanContentTestCase(SimpleTestCase):
     def test_tables_survive_with_bounded_spans(self):
         table = '<table><thead><tr><th colspan="2">Area</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>'
         self.assertEqual(clean_content(table), table)
-        for span in ("100000", "0", "-1", "x", "²"):
+        # The last one is past Python's int-from-string digit limit: it must be
+        # dropped like the others, not raise out of the sanitizer as a 500.
+        for span in ("100000", "0", "-1", "x", "²", "9" * 5000):
             with self.subTest(span=span):
                 self.assertNotIn("colspan", clean_content(f'<table><tr><td colspan="{span}">x</td></tr></table>'))
 

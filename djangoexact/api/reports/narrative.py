@@ -95,7 +95,10 @@ def _filter_content_attribute(tag: str, attribute: str, value: str) -> str | Non
         # resolved by whatever renders the page, which is not ours to predict.
         return value if value.lower().startswith(_LINK_PREFIXES) else None
     # colspan / rowspan: an unbounded span is a cheap way to stall table layout.
-    if value.isascii() and value.isdigit() and 0 < int(value) <= MAX_CELL_SPAN:
+    # The length check comes before int(): past 4300 digits int() raises, and
+    # nh3 keeps the attribute when this callback raises, so the filter would
+    # fail open.
+    if value.isascii() and value.isdigit() and len(value) <= 2 and 0 < int(value) <= MAX_CELL_SPAN:
         return value
     return None
 
