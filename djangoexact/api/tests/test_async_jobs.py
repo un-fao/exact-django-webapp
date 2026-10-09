@@ -263,6 +263,39 @@ class ReportAsyncEndpointTestCase(APITestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
+    def test_content_is_sanitized_before_it_is_stored(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(
+                f"/api/projects/{project.pk}/report/async/?template=ifad",
+                {"content": '<p>Notes</p><img src="file:///etc/passwd"><script>x()</script>'},
+                format="json",
+            )
+        self.assertEqual(resp.status_code, 202)
+        job = AsyncJob.objects.get(pk=resp.data["job_id"])
+        self.assertEqual(job.params["content"], "<p>Notes</p>")
+
+    def test_a_report_that_ignores_content_refuses_it(self):
+        project = ProjectFactory(owner=self.user)
+        for query in ("?template=fao", ""):
+            with self.subTest(query=query), \
+                    mock.patch("api.views.security.check_permission", return_value=None), \
+                    mock.patch.object(type(project), "is_ready", return_value=True), \
+                    mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+                resp = self.client.post(
+                    f"/api/projects/{project.pk}/report/async/{query}",
+                    {"content": "<p>Notes</p>"}, format="json",
+                )
+                self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_synchronous_report_no_longer_answers_get(self):
+        project = ProjectFactory(owner=self.user)
+        resp = self.client.get(f"/api/projects/{project.pk}/report/")
+        self.assertEqual(resp.status_code, 405)
+
 
 class ReconcileStaleAsyncJobsTestCase(TestCase):
     def test_marks_old_running_job_failed(self):
@@ -425,7 +458,7 @@ class ReportJobRunTestCase(TestCase):
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}), \
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>") as m_render, \
-             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf") as m_upload:
             m_project.objects.get.return_value = fake_project
             result = report_jobs.run(job)
@@ -454,7 +487,7 @@ class ReportJobRunTestCase(TestCase):
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
-             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
             m_project.objects.get.return_value = fake_project
             report_jobs.run(job)
@@ -462,6 +495,31 @@ class ReportJobRunTestCase(TestCase):
         narrative = m_ctx.call_args.kwargs["narrative"]
         self.assertEqual(narrative["assumption_set_date"], date(2026, 3, 14))
         self.assertEqual(narrative["data_limitations"], "Tier 1 defaults.")
+
+    def test_worker_sanitizes_content_it_did_not_enqueue(self):
+        """A params row edited or replayed after enqueue must not reach the page as trusted markup."""
+        from django.utils.safestring import SafeString
+
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            created_by=UserFactory(email="content-job-requester@example.com"),
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "ifad", "lang": "en",
+                    "content": '<p>Notes</p><img src="file:///etc/passwd">'},
+        )
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
+            m_project.objects.get.return_value = mock.Mock(pk=7)
+            report_jobs.run(job)
+
+        content = m_ctx.call_args.kwargs["content"]
+        self.assertEqual(content, "<p>Notes</p>")
+        self.assertIsInstance(content, SafeString)
 
     def test_a_report_without_narrative_passes_none(self):
         from api.services import report_jobs
@@ -475,7 +533,7 @@ class ReportJobRunTestCase(TestCase):
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
-             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
             m_project.objects.get.return_value = mock.Mock(pk=7)
             report_jobs.run(job)

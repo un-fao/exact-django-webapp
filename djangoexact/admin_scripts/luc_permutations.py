@@ -142,6 +142,45 @@ def parse_identifier(value: str) -> tuple[str, int]:
         raise ValueError(f"LUC identifier has non-integer index: {value!r}") from exc
 
 
+def preset_label(class_name: str, template_idx: int) -> str:
+    """Human-readable label for a preset, for display only.
+
+    Names the class plus the fixed values that distinguish this template from
+    its siblings, so two presets of one class do not read as duplicates.
+    Classes with a single template get the bare class name. The stored
+    from/to value stays :func:`format_identifier`; never persist this label.
+    """
+    templates = LUC_PRESETS[class_name]
+    template = templates[template_idx]
+    parts = []
+    for field_name, selector in template.items():
+        if field_name.startswith("_") or not isinstance(selector, Fixed):
+            continue
+        if all(other.get(field_name) == selector for other in templates):
+            continue
+        if isinstance(selector.name, bool):
+            flag = field_name.removeprefix("is_").replace("_", " ")
+            parts.append(f"{flag}: {'yes' if selector.name else 'no'}")
+        else:
+            parts.append(str(selector.name))
+    return f"{class_name}: {', '.join(parts)}" if parts else class_name
+
+
+def display_value(value: Any) -> Any:
+    """Return the preset label when ``value`` is a LUC preset identifier.
+
+    Anything else is returned unchanged, so display code can pass every
+    from/to value through this without knowing which module it belongs to.
+    """
+    try:
+        class_name, idx = parse_identifier(value)
+    except (ValueError, TypeError):
+        return value
+    if class_name not in LUC_PRESETS or not 0 <= idx < len(LUC_PRESETS[class_name]):
+        return value
+    return preset_label(class_name, idx)
+
+
 def plan_luc_pairs() -> list[dict]:
     """Return one planner entry per directed (start_template, w_template) pair.
 

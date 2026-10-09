@@ -1,0 +1,7 @@
+{% if content %}
+    {# No |safe here, on purpose: only the output of clean_content is already marked safe. #}
+    <div class="analyst-content">
+        <h2>Analyst notes</h2>
+        {{ content }}
+    </div>
+{% endif %}

@@ -8,7 +8,7 @@
       "name_fr": "Agrégé",
       "name_es": "Agregado",
       "name_ru": "совокупный",
-      "active": true,
+      "active": false,
       "is_coastal": true
     }
   },
@@ -47,7 +47,7 @@
       "name_fr": "Minéral",
       "name_es": "Mineral",
       "name_ru": "Минерал",
-      "active": true,
+      "active": false,
       "is_coastal": true
     }
   },

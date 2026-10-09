@@ -76,7 +76,7 @@ def _make_result(project, *, mitigating=False):
     return result
 
 
-def _build_context(*, mitigating=False, implementation_years=None, narrative=None):
+def _build_context(*, mitigating=False, implementation_years=None, narrative=None, content=None):
     """Run the real build_template_context with only its I/O boundaries mocked."""
     from api.reports import html_context
 
@@ -94,7 +94,7 @@ def _build_context(*, mitigating=False, implementation_years=None, narrative=Non
         if implementation_years is not None:
             project.implementation_years = implementation_years
         result = _make_result(project, mitigating=mitigating)
-        return html_context.build_template_context(result, narrative=narrative)
+        return html_context.build_template_context(result, narrative=narrative, content=content)
 
 
 class TestEveryReportTemplateRenders(SimpleTestCase):
@@ -367,6 +367,31 @@ class TestNarrativeIsEscaped(SimpleTestCase):
         self.assertIn("first line<br>", html)
         self.assertIn("&lt;i&gt;second&lt;/i&gt;", html)
         self.assertNotIn("<i>second</i>", html)
+
+
+class TestAnalystContent(SimpleTestCase):
+    """HTML notes render as markup only after the sanitizer has marked them safe."""
+
+    def _render(self, content):
+        return render_to_string("reports/ifad_en.html", _build_context(content=content))
+
+    def test_sanitized_content_renders_as_markup(self):
+        from api.reports.narrative import clean_content
+
+        html = self._render(clean_content('<p>Soil <b>carbon</b></p><img src="file:///etc/passwd">'))
+        self.assertIn("Analyst notes", html)
+        self.assertIn("<p>Soil <b>carbon</b></p>", html)
+        self.assertNotIn("file:", html)
+
+    def test_content_that_skipped_the_sanitizer_is_escaped(self):
+        """Fails if a `|safe` is ever added to the partial."""
+        html = self._render("<script>alert(1)</script><b>raw</b>")
+        self.assertNotIn("<script>alert(1)", html)
+        self.assertNotIn("<b>raw</b>", html)
+        self.assertIn("&lt;b&gt;raw&lt;/b&gt;", html)
+
+    def test_no_content_means_no_section(self):
+        self.assertNotIn("Analyst notes", self._render(None))
 
 
 class TestPerActivityNarrative(SimpleTestCase):
