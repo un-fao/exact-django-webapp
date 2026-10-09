@@ -279,6 +279,7 @@ def create_project_shell(project, owner):
     project_copy._state.adding = True
     project_copy.is_finalized = False
     project_copy.is_public = False
+    project_copy.guided_step = None
     project_copy.owner = owner
     project_copy.save()
 
@@ -652,6 +653,7 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             "last_modified",
             "status",
             "map_data",
+            "guided_step",
         ] + (exclude_fields or [])
         # ModelDelta is a frozen dataclass since django-simple-history 3.5, so the
         # filtering has to happen inside diff_against, not on the returned delta.
