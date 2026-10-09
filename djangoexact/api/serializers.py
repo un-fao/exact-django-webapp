@@ -22,6 +22,7 @@ from api.models import CustomUser as User
 from django.utils.text import slugify
 
 from . import labels
+from .models import guided_step_format
 from .models import (
     Module,
     Submodule,
@@ -375,7 +376,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count", "guided_step"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -496,6 +497,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
     moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False, allow_null=True, write_only=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
+    # Declared explicitly: the model field is blank=True (for the admin), which would make DRF
+    # accept "" and skip the validators, breaking "guided if and only if not null".
+    guided_step = serializers.CharField(max_length=64, allow_null=True, required=False, validators=[guided_step_format])
 
     class Meta:
         model = Project
@@ -536,8 +540,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
             is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+            # The tour must be able to advance or end after the project has been finalized.
+            is_only_guided_step_change = set(data.keys()) == {"guided_step"}
 
-            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+            if project.is_finalized and is_finalized is not False and not is_only_public_change and not is_only_guided_step_change:
                 raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
@@ -735,7 +741,7 @@ class ProjectExportSerializer(serializers.ModelSerializer):
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
                    'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
-                   'last_recap_sent_at']
+                   'last_recap_sent_at', 'guided_step']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

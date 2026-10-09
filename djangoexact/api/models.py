@@ -26,6 +26,7 @@ alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric c
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
 capitalized = validators.RegexValidator(r"[A-Z][a-z]*(\s[A-Z][a-z]*)*", "Only capitalized words are allowed.")
 pc_as_float = validators.RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly formatted percentages are allowed.")
+guided_step_format = validators.RegexValidator(r"^[A-Za-z_]+(\.[A-Za-z_]+)*$", "Only dot-separated identifiers of letters and underscores are allowed.")
 
 RICE_CULTIVATION_DAYS = 113
 
@@ -720,6 +721,10 @@ class Project(Historical, DirtyFieldsMixin):
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
 
+    # Frontend tour checkpoint. The project is a guided project if and only if this is not null.
+    # Values are deliberately not an enum, so new tour steps need no backend release.
+    guided_step = models.CharField(max_length=64, null=True, blank=True, default=None, validators=[guided_step_format], verbose_name="guided_step")
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
@@ -768,6 +773,8 @@ class Project(Historical, DirtyFieldsMixin):
                     # project being exported and guarantee the exported file
                     # carries no results at all.
                     "export_id",
+                    # Tour progress is written on every tour step and never affects the science.
+                    "guided_step",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):
