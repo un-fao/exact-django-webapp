@@ -5376,10 +5376,10 @@ def run():
         # add_fmg_data_for_all_grassland_management_types()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
-        update_crop_types_annuals_perennials()
+        # update_crop_types_annuals_perennials()
+        # import_fra_carbon_stock_data_2025()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
-        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "review":

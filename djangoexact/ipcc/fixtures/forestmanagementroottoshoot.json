@@ -3536,7 +3536,7 @@
       "forest_type": 1,
       "land_use_type": 165,
       "threshold": 125.0,
-      "value": 0.402,
+      "value": 0.466,
       "value_min": null,
       "value_max": null
     }
@@ -3550,7 +3550,7 @@
       "forest_type": 1,
       "land_use_type": 165,
       "threshold": 125.0,
-      "value": 0.402,
+      "value": 0.466,
       "value_min": null,
       "value_max": null
     }
@@ -3564,7 +3564,7 @@
       "forest_type": 1,
       "land_use_type": 165,
       "threshold": 125.0,
-      "value": 0.402,
+      "value": 0.466,
       "value_min": null,
       "value_max": null
     }

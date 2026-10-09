@@ -6,7 +6,8 @@ it straight into a template path, so the only thing standing between user
 input and the template loader was an os.path.exists probe -- which on the
 public, unauthenticated path doubled as a file-existence oracle.
 
-Adding a report is one entry here plus the template file it names.
+Adding a report is one entry in REPORTS and LABELS plus the template file it
+names.
 """
 from __future__ import annotations
 
@@ -15,9 +16,24 @@ REPORTS: dict[str, frozenset[str]] = {
     "ifad": frozenset({"en"}),
 }
 
+# Display names for the frontend select. English only: the frontend can map
+# the id to its own translation and fall back to this.
+LABELS: dict[str, str] = {
+    "fao": "EX-ACT report",
+    "ifad": "IFAD annex",
+}
+
 
 class UnknownReport(Exception):
     """Requested report name or language is not in the catalog."""
+
+
+def options() -> list[dict]:
+    """Return the catalog as select options: id (the `template` value), label, languages."""
+    return [
+        {"id": report, "label": LABELS[report], "languages": sorted(langs)}
+        for report, langs in sorted(REPORTS.items())
+    ]
 
 
 def resolve_template(report: str, lang: str) -> str:

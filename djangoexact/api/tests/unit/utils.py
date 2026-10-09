@@ -437,39 +437,31 @@ class APITestCaseMixin(APITestCase):
     def get_report(self, project, user, template=None):
         """
         Get project report data.
-        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        This method retrieves project report data by sending a POST request to the 'project-report' endpoint
         with the provided project ID. The request is authenticated with the provided user,
         and the response is returned.
         """
         log.debug("Getting project report data")
-        view = ProjectViewSet.as_view({"get": "report"})
-        queryparams = None
+        view = ProjectViewSet.as_view({"post": "report"})
+        url = reverse("project-report", args=[project.id])
         if template:
-            queryparams = {"template": template}
-        request = self.request_factory.get(
-            reverse("project-report", args=[project.id]),
-            queryparams,
-            format="json",
-        )
+            url += f"?template={template}"
+        request = self.request_factory.post(url, format="json")
         force_authenticate(request, user=user)
         return view(request, pk=project.id)
 
     def get_report_anonimously(self, project, templated=False):
         """
         Get project report data without authentication.
-        This method retrieves project report data by sending a GET request to the 'project-report' endpoint
+        This method retrieves project report data by sending a POST request to the 'project-report' endpoint
         with the provided project ID. The request is not authenticated, and the response is returned.
         """
         log.debug("Getting project report data without authentication")
-        view = public_views.PublicProjectViewSet.as_view({"get": "report"})
-        queryparams = None
+        view = public_views.PublicProjectViewSet.as_view({"post": "report"})
+        url = reverse("project-detail", args=[project.id])
         if templated:
-            queryparams = {"template": "fao"}
-        request = self.request_factory.get(
-            reverse("project-detail", args=[project.id]),
-            queryparams,
-            format="json",
-        )
+            url += "?template=fao"
+        request = self.request_factory.post(url, format="json")
         return view(request, pk=project.id)
 
     def get_activities_anonimously(self, project):
