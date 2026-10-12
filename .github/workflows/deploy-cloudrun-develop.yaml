@@ -1,7 +1,7 @@
 name: Deploy Cloud Run (develop)
 
 # Additive dev pipeline, sibling of deploy-cloudrun.yaml (review). It builds the
-# feature/id-responses branch and deploys it as a SEPARATE Cloud Run service
+# develop branch and deploys it as a SEPARATE Cloud Run service
 # (exact-api-dev) in the same fao-exact-review project, connected to the shared
 # review database through the /cloudsql socket.
 #
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/id-responses
+      - develop
 
 concurrency:
   group: cloudrun-develop-${{ github.ref_name }}
@@ -73,8 +73,7 @@ jobs:
           echo "MEMORY_LIMIT=${MEMORY_LIMIT:-4Gi}" >> "$GITHUB_ENV"
           # Hardcoded (not github.ref_name): BRANCH_NAME only selects FRONTEND_URL
           # in settings.py, where it is compared against the literal "review".
-          # "develop" keeps it clean and slash-free; the triggering ref carries a
-          # slash and would only ever resolve to the production frontend anyway.
+          # A workflow_dispatch run from any other branch must not change it.
           echo "BRANCH_NAME=develop" >> "$GITHUB_ENV"
           # Cloud Run gets its own host settings, isolated from App Engine and
           # from the shared develop environment. CLOUDRUN_ALLOWED_HOSTS defaults
