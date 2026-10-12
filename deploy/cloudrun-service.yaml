@@ -38,7 +38,13 @@ spec:
         # Cloud Run Jobs already run under gen2 with this same dependency stack.
         run.googleapis.com/execution-environment: gen2
         run.googleapis.com/startup-cpu-boost: 'true'
-    spec:
+    # runAsNonRoot suppression: this is a Cloud Run (Knative) manifest, not a
+    # Kubernetes pod spec. Cloud Run's admission layer honors only a small
+    # subset of securityContext, and the deployed image
+    # (deploy/Dockerfile.web_service) runs as root by base-image design, so
+    # declaring runAsNonRoot: true would be rejected or would break startup.
+    # Changing the runtime user is tracked separately from this scan fix.
+    spec: # nosemgrep: yaml.kubernetes.security.run-as-non-root.run-as-non-root
       # App Engine Standard caps concurrency near 10 per instance against 4
       # gunicorn workers. CONN_MAX_AGE is 0, so every request opens a new
       # Postgres connection; Cloud Run's default of 80 would multiply connection

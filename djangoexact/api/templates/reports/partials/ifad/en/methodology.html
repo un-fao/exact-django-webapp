@@ -1,0 +1,46 @@
+<section>
+    <h2>II. Methodology</h2>
+    <p>
+        EX-ACT estimates and tracks the impact of agrifood systems interventions on greenhouse gas
+        (GHG) emissions, assessing agricultural commodities across the entire production, processing
+        and distribution value chain. By quantifying the climate outcomes of planned, ongoing and
+        implemented interventions, EX-ACT complements standard economic valuation and supports
+        evidence-based decisions on climate finance and investment.
+    </p>
+    <p>
+        The methodology is based on the 2006 IPCC Guidelines for National Greenhouse Gas
+        Inventories, the 2019 Refinement to the 2006 IPCC Guidelines, and the 2013 Supplement to the
+        2006 IPCC Guidelines for National Greenhouse Gas Inventories: Wetlands, complemented by
+        peer-reviewed scientific literature and emission factors. Calculations are performed at Tier
+        1 using IPCC default parameters differentiated by climate, moisture regime and soil type,
+        refined to Tier 2 where project-specific data is available.
+    </p>
+    <p>
+        The project's carbon balance is calculated as the difference in GHG emissions and removals
+        between the with-project (WP) and without-project (WOP) scenarios over the defined
+        accounting period, consistent with the reference-scenario principles of the IFI Technical
+        Working Group's Framework for a Harmonised Approach to GHG Accounting (2022).
+    </p>
+    <p>
+        The WOP scenario represents the most plausible continuation of existing land use, production
+        systems and management practices in the absence of the project. The WP scenario represents
+        the changes in these systems resulting from project implementation. The target of EX-ACT is
+        to isolate the incremental change introduced by the project, as reflected by the difference
+        in GHG fluxes between the WOP and WP scenarios. The treatment of existing production systems
+        and activities should be defined according to the specific project context and assessment
+        approach, rather than being automatically attributed to one scenario or the other.
+    </p>
+    <p>
+        A negative carbon balance indicates a net reduction in GHG emissions relative to the WOP
+        scenario (mitigation benefit); a positive carbon balance indicates a net increase in
+        emissions relative to the WOP scenario.
+    </p>
+    <p>
+        For this assessment, the following EX-ACT modules were applied:
+        {% if modules_used %}
+            {% for module in modules_used %}{{ module }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+        {% else %}
+            <span class="analyst-input">no modules recorded for this project</span>
+        {% endif %}
+    </p>
+</section>

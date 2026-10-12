@@ -13,6 +13,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.core.mail import send_mail
 import os
 from django.conf import settings
+from django.utils import timezone
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import api.models as api_models
@@ -24,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
 from django.db import transaction
 import api.security as security
+import api.concurrency as concurrency
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -121,6 +123,39 @@ def get_query_param_or_validation_error(request, param_name):
     if param is None:
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
+
+
+def requested_activity_ids(request):
+    """Activity ids named by ?activities=, or [] when the parameter is absent.
+
+    Non-numeric entries are dropped silently rather than rejected. That is the
+    behaviour of the five hand-rolled copies this replaces, kept deliberately:
+    changing it is a separate decision from removing the duplication.
+    """
+    raw = request.query_params.get("activities", "")
+    return [pk.strip() for pk in raw.split(",") if pk.strip().isdigit()]
+
+
+def requested_language(request):
+    """Language named by ?lang=, then the Accept-Language header, then "en".
+
+    Raises ValidationError when the value is not a configured language. The
+    result is interpolated into template paths and into the logo filename that
+    _load_fao_logo opens, where a separator escapes the directory outright:
+    "/../../etc/passwd" resolves to BASE_DIR/etc/passwd.svg. Until ?lang= was
+    honoured, LocaleMiddleware's validated LANGUAGE_CODE overwrote it on every
+    request and stood in for this check by accident.
+
+    The message does not echo the submitted value back: it reaches both the
+    response body and the logs.
+    """
+    lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
+    configured = dict(settings.LANGUAGES)
+    if lang not in configured:
+        raise exceptions.ValidationError(
+            f"Unsupported language. Available: {', '.join(sorted(configured))}"
+        )
+    return lang
 
 
 def get_url_name(model_name):
@@ -245,6 +280,18 @@ def create_project_shell(project, owner):
     project_copy._state.adding = True
     project_copy.is_finalized = False
     project_copy.is_public = False
+    project_copy.export_id = None
+    project_copy.guided_step = None
+    # A copy inheriting the source's lock would be held by a user who may not be a
+    # member of it, and the new owner cannot release someone else's lock.
+    project_copy.is_locked = False
+    project_copy.locked_at = None
+    project_copy.lock_updated_at = None
+    project_copy.locked_by = None
+    project_copy.is_archived = False
+    project_copy.archived_at = None
+    # None makes the daily sweep start the clock instead of mailing the copy operation itself.
+    project_copy.last_recap_sent_at = None
     project_copy.owner = owner
     project_copy.save()
 
@@ -255,7 +302,7 @@ def create_project_shell(project, owner):
 
 def copy_activities_into(source_project, target_project, owner):
     """Deep-copy every activity of source_project into target_project."""
-    for activity in source_project.activities.all():
+    for activity in source_project.activities.exclude(is_b_intact=True).all():
         copy_activity(activity, target_project, owner)
 
 
@@ -605,13 +652,10 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
     changes = []
     for record in records:
         if record.prev_record is None:
-            changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
+            history_user_email = record.history_user.email if record.history_user else None
+            changes.append(ChangeLog(record.history_date, history_user_email, ChangeReasons.CREATE.value, []))
             continue
 
-        if record.next_record is None:
-            continue
-
-        delta = record.diff_against(record.prev_record)
         fields_to_remove = [
             "last_cached_at",
             "cached_results_total",
@@ -621,8 +665,11 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             "last_modified",
             "status",
             "map_data",
+            "guided_step",
         ] + (exclude_fields or [])
-        delta.changes = [change for change in delta.changes if change.field not in fields_to_remove]
+        # ModelDelta is a frozen dataclass since django-simple-history 3.5, so the
+        # filtering has to happen inside diff_against, not on the returned delta.
+        delta = record.diff_against(record.prev_record, excluded_fields=fields_to_remove)
 
         # TODO: Check why history_user is None when history_type = "-", which likely means deletion
         if record.history_user is None:
@@ -749,26 +796,43 @@ def validate_uuid(uuid_string):
     return True
 
 
-def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> None:
+def send_changes_email(project: "api_models.Project", recipients: list["api_models.CustomUser"] = None) -> int:
     """
-    Send an email to all Admin members with the changes made to the project.
+    Send a recap email to all Admin members with the changes made to the project
+    since the last successfully sent recap. If no recap has ever been sent for
+    this project, the recap covers its entire history since creation.
 
     Args:
         project (Project): The project object.
-        lock_holder (CustomUser): The user who holds the lock.
-        last_lock_update_date (datetime): The date when the lock was last updated.
-        recipients (list[CustomUser], optional): List of users to send the email to. If None, defaults to all Admin members of the project.
+        recipients (list[CustomUser], optional): List of members to send the email to.
+            If None, defaults to the project's Admin members who subscribed to its emails.
 
     Returns:
-        None
+        int: The number of recipients successfully mailed. Zero when there is
+        nothing to report, and zero when every send raised. `project.last_recap_sent_at`
+        is advanced to the window boundary captured at the start of this call only
+        when this is greater than 0, so a crash, an empty diff, or a total send
+        failure leaves every change still in scope for the next recap.
     """
+    # Captured before the diff is computed: a change landing mid-run falls into
+    # the next window instead of being lost.
+    sent_at = timezone.now()
 
-    def get_new_comments(threads: list["api_models.CommentThread"], locked_at: str) -> list:
+    history_filter = {} if project.last_recap_sent_at is None else {"history_date__gte": project.last_recap_sent_at}
+    comment_filter = {} if project.last_recap_sent_at is None else {"date_created__gte": project.last_recap_sent_at}
+
+    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at", "last_recap_sent_at"]
+
+    def diff(history_manager) -> list:
+        changelogs = get_changes(history_manager.filter(**history_filter), exclude_fields=fields_to_exclude)
+        return [c for c in changelogs if c.changes]
+
+    def get_new_comments(threads: list["api_models.CommentThread"]) -> list:
         new_comments = []
         for thread in threads:
             if thread is None:
                 continue
-            comments = thread.comments.filter(date_created__gte=locked_at)
+            comments = thread.comments.filter(**comment_filter)
             if comments.exists():
                 for comment in comments:
                     comment: "api_models.Comment"
@@ -787,58 +851,48 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
                     new_comments.append(changelog)
         return new_comments
 
-    if project.locked_at is None or project.locked_by is None:
-        raise ValueError("last_lock_update_date and lock_holder are required. You are probably trying to send an email without a lock.")
-
     if recipients is None:
-        from api.models import ProjectNotificationPreference
-
-        # Get all admin members who haven't opted out globally
-        potential_recipients = project.members.filter(group__name="Admin", user__is_opted_out_of_emails=False).all()
-
-        # Filter out users who have opted out of notifications for this specific project
-        recipients = []
-        for member in potential_recipients:
-            user = member.user
-            project_preference = ProjectNotificationPreference.objects.filter(user=user, project=project).first()
-
-            # If no project-specific preference exists, or if they haven't opted out for this project, include them
-            if project_preference is None or not project_preference.is_opted_out:
-                recipients.append(member)
-
-    locked_at = project.locked_at
-
-    fields_to_exclude = ["locked_at", "locked_by", "is_locked", "lock_updated_at"]
+        # Admin members who haven't opted out globally AND have an explicit subscribed
+        # preference row for THIS project. The two preference conditions below must stay
+        # in this single filter() call: Django only applies conditions on a multi-valued
+        # relation to the same related row within one call, so splitting them into two
+        # chained filter() calls would match a subscribed row for a different project.
+        recipients = project.members.filter(
+            group__name="Admin",
+            user__is_opted_out_of_emails=False,
+            user__project_notification_preferences__project=project,
+            user__project_notification_preferences__is_subscribed=True,
+        )
 
     changes = {
         "project": {
             "name": project.name,
-            "changes": get_changes(project.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude),
+            "changes": diff(project.history),
         },
         "activities": [],
     }
 
     for a in project.activities.all():
-        a_data = {"name": a.name, "changes": get_changes(a.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude), "modules": []}
+        a_data = {"name": a.name, "changes": diff(a.history), "modules": []}
 
         for m in find_modules(a):
             m: "api_models.Module" | "api_models.Submodule"
-            m_changes = get_changes(m.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+            m_changes = diff(m.history)
 
             if hasattr(m, "submodules"):
                 submodules = m.submodules
                 for submodule in submodules:
-                    submodule_changes = get_changes(submodule.history.filter(history_date__gte=locked_at), exclude_fields=fields_to_exclude)
+                    submodule_changes = diff(submodule.history)
                     if submodule_changes:
                         m_changes.extend(submodule_changes)
 
                     threads = submodule.threads
-                    new_comments = get_new_comments(threads, locked_at)
+                    new_comments = get_new_comments(threads)
                     if new_comments:
                         m_changes.extend(new_comments)
 
             threads = m.threads
-            new_comments = get_new_comments(threads, locked_at)
+            new_comments = get_new_comments(threads)
             if new_comments:
                 m_changes.extend(new_comments)
 
@@ -850,25 +904,20 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
         if len(a_data["changes"]) > 0 or len(a_data["modules"]) > 0:
             changes["activities"].append(a_data)
 
-    lock_holder = project.members.filter(user=project.locked_by).first()
-    if lock_holder is None:
-        log.warning(f"Lock holder {project.locked_by} not found in project members. Lock holder does not belong to the project.")
+    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
+        return 0
 
-    # Send email to recipients
+    # No lock-holder wording: the daily recap can run while a reviewer holds the
+    # lock, and naming them as the author of everyone's changes would be wrong.
     context = {
         "project": changes["project"],
         "project_url": f"{settings.FRONTEND_URL}/project/{project.id}/",
         "activities": changes["activities"],
-        "lock_holder_group_name": lock_holder.group.name if lock_holder else "Superuser",
-        "lock_holder_name": project.locked_by.get_full_name(),
-        "lock_unlock_date": locked_at,
+        "recap_date": sent_at,
     }
+    subject = f"Project Recap - {project.name}"
 
-    subject = f"{context['lock_holder_group_name']} Feedback - {context['project']['name']}"
-
-    if len(changes["activities"]) == 0 and len(changes["project"]["changes"]) == 0:
-        return
-
+    sent_count = 0
     for recipient in recipients:
         user: api_models.CustomUser = recipient.user
         context.update({"recipient": user})
@@ -879,64 +928,79 @@ def send_changes_email(project: "api_models.Project", recipients: list["api_mode
             to = user.email
             try:
                 send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+                sent_count += 1
             except Exception as e:
                 log.error(f"Failed to send email to {user.email}: {e}")
 
+    if sent_count > 0:
+        project.last_recap_sent_at = sent_at
+        project.save(update_fields=["last_recap_sent_at"])
 
-def paginated_parallel_response(queryset, request, process_function, paginator_class=None, max_workers=None, serializer_class=None, serializer_kwargs=None):
+    return sent_count
+
+
+def send_due_recaps() -> int:
     """
-    Generalized utility for handling paginated responses with parallel processing.
-    
+    Send the recap email for every non-archived project with at least one
+    subscribed member. Runs once a day, triggered by Cloud Scheduler.
+
+    Returns:
+        int: The total number of emails sent across all projects.
+    """
+    projects = api_models.Project.objects.filter(notification_preferences__is_subscribed=True, is_archived=False).distinct()
+
+    sent = 0
+    for project in projects:
+        try:
+            if project.last_recap_sent_at is None:
+                # Start the clock instead of mailing the project's entire history,
+                # which would also be the slowest diff this sweep could run.
+                project.last_recap_sent_at = timezone.now()
+                project.save(update_fields=["last_recap_sent_at"])
+                continue
+            sent += send_changes_email(project)
+        except Exception as e:
+            # One broken project must not stop the recaps of the others.
+            log.exception(e)
+    return sent
+
+
+def paginated_parallel_response(queryset, request, process_function=None, paginator_class=None, serializer_class=None, serializer_kwargs=None):
+    """
+    Paginate ``queryset`` and build each page item on the bounded serialization pool.
+
     Args:
-        queryset: Django queryset to paginate and process
+        queryset: Django queryset (or list) to paginate and process
         request: Django request object
-        process_function: Function to process each item (optional if serializer_class provided)
+        process_function: Function applied to each item (optional if serializer_class provided)
         paginator_class: Pagination class to use (defaults to DefaultPagination)
-        max_workers: Maximum number of worker threads (defaults to None for automatic)
         serializer_class: Serializer class to use instead of process_function
         serializer_kwargs: Additional kwargs to pass to serializer
-    
+
     Returns:
         Response: Paginated response with processed data
     """
-    from concurrent.futures import ThreadPoolExecutor
-    from rest_framework.pagination import PageNumberPagination
-    from rest_framework import status as http_status
-    
-    # Use default pagination if none provided
     if paginator_class is None:
-        # Import DefaultPagination from views to avoid circular imports
+        # Imported here because api.views imports this module.
         from api.views import DefaultPagination
+
         paginator_class = DefaultPagination
-    
-    # Create processing function if serializer_class is provided
-    if serializer_class is not None and process_function is None:
-        serializer_kwargs = serializer_kwargs or {}
+
+    serializer_kwargs = serializer_kwargs or {}
+    if process_function is None:
+        if serializer_class is None:
+            raise ValueError("Either process_function or serializer_class must be provided")
+
         def process_function(item):
             return serializer_class(item, **serializer_kwargs).data
-    
-    if process_function is None:
-        raise ValueError("Either process_function or serializer_class must be provided")
-    
-    # Create paginator and paginate queryset
+
     paginator = paginator_class()
     page = paginator.paginate_queryset(queryset, request)
-    
     if page is not None:
-        # Process page items in parallel
-        executor_kwargs = {}
-        if max_workers is not None:
-            executor_kwargs['max_workers'] = max_workers
-            
-        with ThreadPoolExecutor(**executor_kwargs) as executor:
-            response_data = list(executor.map(process_function, page))
-        return paginator.get_paginated_response(response_data)
-    
-    # If no pagination, process all items
+        # Each worker thread opens its own DB connection, so the fan-out width
+        # has to stay inside the budget documented in api/concurrency.py.
+        return paginator.get_paginated_response(concurrency.map_in_bounded_threads(process_function, page))
+
     if serializer_class is not None:
-        serializer_kwargs = serializer_kwargs or {}
-        response_data = serializer_class(queryset, many=True, **serializer_kwargs).data
-    else:
-        response_data = list(map(process_function, queryset))
-    
-    return Response(data=response_data, status=http_status.HTTP_200_OK)
+        return Response(data=serializer_class(queryset, many=True, **serializer_kwargs).data)
+    return Response(data=[process_function(item) for item in queryset])

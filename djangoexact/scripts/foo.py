@@ -761,10 +761,10 @@ def run():
         # import_input_types_units()
         # check_how_many_users_logged_in_last_time_period_have_been_forest_management_activities(time_period=90)
         # get_forest_management_modules_in_plantation_projects()
-        change_all_other_land_flu_data_to_1()
-        import_crop_nitrous_estimation_default_factors()
-        import_fires_combustion_factors()
-        set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
+        # change_all_other_land_flu_data_to_1()
+        # import_crop_nitrous_estimation_default_factors()
+        # import_fires_combustion_factors()
+        # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
         pass
 
     if app_mode == "review":

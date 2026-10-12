@@ -5,7 +5,11 @@
     "fields": {
       "continent": 1,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -14,7 +18,11 @@
     "fields": {
       "continent": 2,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -23,7 +31,11 @@
     "fields": {
       "continent": 3,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -32,7 +44,11 @@
     "fields": {
       "continent": 4,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -41,7 +57,11 @@
     "fields": {
       "continent": 5,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -50,7 +70,11 @@
     "fields": {
       "continent": 6,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -59,7 +83,11 @@
     "fields": {
       "continent": 7,
       "cultivation_period": 112,
-      "value": 1.32
+      "value": 1.32,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -68,7 +96,11 @@
     "fields": {
       "continent": 8,
       "cultivation_period": 102,
-      "value": 1.22
+      "value": 1.22,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -77,7 +109,11 @@
     "fields": {
       "continent": 9,
       "cultivation_period": 112,
-      "value": 0.85
+      "value": 0.85,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -86,7 +122,11 @@
     "fields": {
       "continent": 10,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -95,7 +135,11 @@
     "fields": {
       "continent": 11,
       "cultivation_period": 123,
-      "value": 1.56
+      "value": 1.56,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -104,7 +148,11 @@
     "fields": {
       "continent": 12,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -113,7 +161,11 @@
     "fields": {
       "continent": 13,
       "cultivation_period": 139,
-      "value": 0.65
+      "value": 0.65,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -122,7 +174,11 @@
     "fields": {
       "continent": 14,
       "cultivation_period": 124,
-      "value": 1.27
+      "value": 1.27,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -131,7 +187,11 @@
     "fields": {
       "continent": 15,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -140,7 +200,11 @@
     "fields": {
       "continent": 16,
       "cultivation_period": 113,
-      "value": 1.19
+      "value": 1.19,
+      "cultivation_period_min": null,
+      "cultivation_period_max": null,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

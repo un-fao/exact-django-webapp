@@ -10,7 +10,9 @@
 <h1 class="text-2xl font-bold text-gray-900 mb-6">Example Script</h1>
 <p class="text-gray-600 mb-6">A placeholder script to demonstrate the scaffolding pattern.</p>
 
-{# nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-token #}
+{# False positive: csrf_token is present on the line after the form tag, but the rule's #}
+{# generic-mode ellipsis cannot span this form's full body, so it fires anyway. #}
+{# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token #}
 <form method="post" class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
     {% csrf_token %}
     <div class="mb-4">

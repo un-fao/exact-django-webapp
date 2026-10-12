@@ -1,52 +1,7 @@
 [
   {
     "model": "ipcc.globalwarmingpotential",
-    "pk": 8,
-    "fields": {
-      "name": "IPCC Second Assessment Report (SAR)",
-      "name_en": "IPCC Second Assessment Report (SAR)",
-      "name_fr": "2e rapport d’évaluation du GIEC (SAR)\n",
-      "name_es": "Segundo Informe de Evaluación del IPCC (SAR)",
-      "name_ru": "Второй оценочный отчет МГЭИК (SAR)",
-      "co2": 1.0,
-      "ch4": 21.0,
-      "n2o": 310.0,
-      "ch4_fossil": 0.0
-    }
-  },
-  {
-    "model": "ipcc.globalwarmingpotential",
-    "pk": 9,
-    "fields": {
-      "name": "IPCC Fourth Assessment Report (AR4)",
-      "name_en": "IPCC Fourth Assessment Report (AR4)",
-      "name_fr": "4e rapport d’évaluation du GIEC (AR4)\n",
-      "name_es": "Cuarto Informe de Evaluación del IPCC (AR4)",
-      "name_ru": "Четвертый оценочный отчет МГЭИК (ОД4)",
-      "co2": 1.0,
-      "ch4": 25.0,
-      "n2o": 298.0,
-      "ch4_fossil": 0.0
-    }
-  },
-  {
-    "model": "ipcc.globalwarmingpotential",
-    "pk": 10,
-    "fields": {
-      "name": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
-      "name_en": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
-      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique\n",
-      "name_es": "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática",
-      "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата",
-      "co2": 1.0,
-      "ch4": 34.0,
-      "n2o": 298.0,
-      "ch4_fossil": 0.0
-    }
-  },
-  {
-    "model": "ipcc.globalwarmingpotential",
-    "pk": 11,
+    "pk": 1,
     "fields": {
       "name": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
       "name_en": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
@@ -61,7 +16,52 @@
   },
   {
     "model": "ipcc.globalwarmingpotential",
-    "pk": 12,
+    "pk": 2,
+    "fields": {
+      "name": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
+      "name_en": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
+      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique\n",
+      "name_es": "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática",
+      "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата",
+      "co2": 1.0,
+      "ch4": 34.0,
+      "n2o": 298.0,
+      "ch4_fossil": null
+    }
+  },
+  {
+    "model": "ipcc.globalwarmingpotential",
+    "pk": 3,
+    "fields": {
+      "name": "IPCC Second Assessment Report (SAR)",
+      "name_en": "IPCC Second Assessment Report (SAR)",
+      "name_fr": "2e rapport d’évaluation du GIEC (SAR)\n",
+      "name_es": "Segundo Informe de Evaluación del IPCC (SAR)",
+      "name_ru": "Второй оценочный отчет МГЭИК (SAR)",
+      "co2": 1.0,
+      "ch4": 21.0,
+      "n2o": 310.0,
+      "ch4_fossil": 0.0
+    }
+  },
+  {
+    "model": "ipcc.globalwarmingpotential",
+    "pk": 4,
+    "fields": {
+      "name": "IPCC Fourth Assessment Report (AR4)",
+      "name_en": "IPCC Fourth Assessment Report (AR4)",
+      "name_fr": "4e rapport d’évaluation du GIEC (AR4)\n",
+      "name_es": "Cuarto Informe de Evaluación del IPCC (AR4)",
+      "name_ru": "Четвертый оценочный отчет МГЭИК (ОД4)",
+      "co2": 1.0,
+      "ch4": 25.0,
+      "n2o": 298.0,
+      "ch4_fossil": 0.0
+    }
+  },
+  {
+    "model": "ipcc.globalwarmingpotential",
+    "pk": 5,
     "fields": {
       "name": "IPCC Sixth Assessment Report (AR6)",
       "name_en": "IPCC Sixth Assessment Report (AR6)",

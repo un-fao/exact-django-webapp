@@ -3,6 +3,8 @@ import statistics as stats_module
 
 from django.db.models import Avg, Count, Max, Min, Q, Sum
 
+from admin_scripts.luc_permutations import display_value
+
 
 def _coerce_unit(value):
     """Convert a POSTed unit value to a safe float multiplier.
@@ -275,7 +277,7 @@ def stats_for_scenario(changes, global_filters):
         from_value = change["start"]["value"]
         to_value = change["end"]["value"]
         per_change.append({
-            "label": f"{change['module_type']}: {from_value} → {to_value}",
+            "label": f"{change['module_type']}: {display_value(from_value)} → {display_value(to_value)}",
             "module_type": change["module_type"],
             "field": change["start"]["field"],
             "from_value": from_value,

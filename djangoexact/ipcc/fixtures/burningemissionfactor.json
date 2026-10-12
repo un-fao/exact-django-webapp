@@ -8,7 +8,17 @@
       "co": 65.0,
       "ch4": 2.3,
       "n2o": 0.21,
-      "nox": 3.9
+      "nox": 3.9,
+      "co2_min": null,
+      "co2_max": null,
+      "co_min": null,
+      "co_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "nox_min": null,
+      "nox_max": null
     }
   },
   {
@@ -20,7 +30,17 @@
       "co": 92.0,
       "ch4": 2.7,
       "n2o": 0.07,
-      "nox": 2.5
+      "nox": 2.5,
+      "co2_min": null,
+      "co2_max": null,
+      "co_min": null,
+      "co_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "nox_min": null,
+      "nox_max": null
     }
   },
   {
@@ -32,7 +52,17 @@
       "co": 104.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "nox": 1.6
+      "nox": 1.6,
+      "co2_min": null,
+      "co2_max": null,
+      "co_min": null,
+      "co_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "nox_min": null,
+      "nox_max": null
     }
   },
   {
@@ -44,7 +74,17 @@
       "co": 107.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "nox": 3.0
+      "nox": 3.0,
+      "co2_min": null,
+      "co2_max": null,
+      "co_min": null,
+      "co_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "nox_min": null,
+      "nox_max": null
     }
   },
   {
@@ -56,7 +96,17 @@
       "co": 78.0,
       "ch4": 6.1,
       "n2o": 0.06,
-      "nox": 1.1
+      "nox": 1.1,
+      "co2_min": null,
+      "co2_max": null,
+      "co_min": null,
+      "co_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "nox_min": null,
+      "nox_max": null
     }
   }
 ]

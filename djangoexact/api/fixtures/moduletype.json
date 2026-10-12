@@ -1,7 +1,7 @@
 [
   {
     "model": "api.moduletype",
-    "pk": 56,
+    "pk": 54,
     "fields": {
       "name": "Activity",
       "name_en": "Activity",
@@ -31,7 +31,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 50,
+    "pk": 52,
     "fields": {
       "name": "Annual Cropland Minor Season",
       "name_en": "Annual Cropland Minor Season",
@@ -121,7 +121,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 66,
+    "pk": 63,
     "fields": {
       "name": "Energy Entry",
       "name_en": "Energy Entry",
@@ -391,7 +391,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 54,
+    "pk": 51,
     "fields": {
       "name": "OtherLandUse",
       "name_en": "OtherLandUse",
@@ -406,7 +406,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 59,
+    "pk": 57,
     "fields": {
       "name": "Packaging",
       "name_en": "Packaging",
@@ -451,7 +451,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 51,
+    "pk": 47,
     "fields": {
       "name": "Perennial Cropland Minor Season",
       "name_en": "Perennial Cropland Minor Season",
@@ -466,7 +466,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 52,
+    "pk": 50,
     "fields": {
       "name": "Plantation",
       "name_en": "Plantation",
@@ -481,7 +481,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 61,
+    "pk": 56,
     "fields": {
       "name": "Processing",
       "name_en": "Processing",
@@ -496,7 +496,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 64,
+    "pk": 59,
     "fields": {
       "name": "Processing Entry",
       "name_en": "Processing Entry",
@@ -511,7 +511,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 55,
+    "pk": 53,
     "fields": {
       "name": "Project",
       "name_en": "Project",
@@ -586,7 +586,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 60,
+    "pk": 55,
     "fields": {
       "name": "Storage",
       "name_en": "Storage",
@@ -601,7 +601,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 65,
+    "pk": 61,
     "fields": {
       "name": "Storage Entry",
       "name_en": "Storage Entry",
@@ -631,7 +631,7 @@
   },
   {
     "model": "api.moduletype",
-    "pk": 63,
+    "pk": 60,
     "fields": {
       "name": "Transport Entry",
       "name_en": "Transport Entry",

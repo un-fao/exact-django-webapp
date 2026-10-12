@@ -1,14 +1,6 @@
 [
   {
     "model": "ipcc.grasslandsoc",
-    "pk": 1,
-    "fields": {
-      "grassland_management_type": 1,
-      "value": 46.0
-    }
-  },
-  {
-    "model": "ipcc.grasslandsoc",
     "pk": 2,
     "fields": {
       "grassland_management_type": 2,

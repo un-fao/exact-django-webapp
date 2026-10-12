@@ -194,7 +194,7 @@ class TestBuildInventoryFromCache(unittest.TestCase):
         self.assertIsInstance(item, InventoryItem)
         self.assertEqual(item.activity_name, "Activity A")
         self.assertEqual(item.module_name, "Grassland")
-        self.assertEqual(item.ipcc_category, "Biomass")
+        self.assertEqual(item.ipcc_category, "Biomass Carbon stock")
         self.assertEqual(item.gas_type, "CO2")
         self.assertAlmostEqual(item.value, 1530.4)
 
@@ -366,7 +366,7 @@ class TestBaseModuleReportDispatcher(unittest.TestCase):
 
         items = report._inventory_items_from_module("Act")
         self.assertEqual(len(items), 1)
-        self.assertEqual(items[0].ipcc_category, "Biomass")
+        self.assertEqual(items[0].ipcc_category, "Biomass Carbon stock")
         self.assertEqual(items[0].gas_type, "CO2")
         self.assertAlmostEqual(items[0].value, 99.0)
 

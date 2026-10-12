@@ -1,7 +1,7 @@
 [
   {
     "model": "api.definition",
-    "pk": 1,
+    "pk": 2,
     "fields": {
       "module_type": 4,
       "definitions": {
@@ -19,7 +19,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 2,
+    "pk": 3,
     "fields": {
       "module_type": 5,
       "definitions": {
@@ -38,7 +38,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 7,
+    "pk": 8,
     "fields": {
       "module_type": 6,
       "definitions": {
@@ -54,7 +54,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 3,
+    "pk": 4,
     "fields": {
       "module_type": 7,
       "definitions": {
@@ -67,7 +67,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 4,
+    "pk": 5,
     "fields": {
       "module_type": 8,
       "definitions": {
@@ -81,7 +81,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 15,
+    "pk": 16,
     "fields": {
       "module_type": 19,
       "definitions": {
@@ -94,7 +94,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 10,
+    "pk": 11,
     "fields": {
       "module_type": 20,
       "definitions": {
@@ -107,7 +107,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 9,
+    "pk": 10,
     "fields": {
       "module_type": 21,
       "definitions": {
@@ -120,7 +120,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 11,
+    "pk": 12,
     "fields": {
       "module_type": 22,
       "definitions": {
@@ -130,7 +130,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 19,
+    "pk": 20,
     "fields": {
       "module_type": 23,
       "definitions": {
@@ -140,7 +140,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 8,
+    "pk": 9,
     "fields": {
       "module_type": 24,
       "definitions": {
@@ -155,17 +155,17 @@
   },
   {
     "model": "api.definition",
-    "pk": 18,
+    "pk": 19,
     "fields": {
       "module_type": 30,
       "definitions": {
-        "definition_of_degraded_land": "Degraded lands are those whose native vegetation has been heavily disturbed. The land has strongly degraded biomass and soil organic carbon levels."
+        "definition_of_other_land": "Other land includes bare soil, rock, ice, and all land areas that do not fall into any of the other five categories."
       }
     }
   },
   {
     "model": "api.definition",
-    "pk": 17,
+    "pk": 18,
     "fields": {
       "module_type": 33,
       "definitions": {
@@ -175,7 +175,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 5,
+    "pk": 6,
     "fields": {
       "module_type": 34,
       "definitions": {
@@ -185,7 +185,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 6,
+    "pk": 7,
     "fields": {
       "module_type": 35,
       "definitions": {
@@ -196,7 +196,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 12,
+    "pk": 13,
     "fields": {
       "module_type": 38,
       "definitions": {
@@ -208,7 +208,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 14,
+    "pk": 15,
     "fields": {
       "module_type": 39,
       "definitions": {
@@ -222,7 +222,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 16,
+    "pk": 17,
     "fields": {
       "module_type": 40,
       "definitions": {
@@ -233,7 +233,7 @@
   },
   {
     "model": "api.definition",
-    "pk": 13,
+    "pk": 14,
     "fields": {
       "module_type": 44,
       "definitions": {

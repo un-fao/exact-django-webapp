@@ -1,0 +1,8 @@
+id,organic_amendment_type,value,value_min,value_max,"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, tables 5.14"
+7,Straw Incorporated Shortly (<30 Days) Before Cultivation,1,0.85,1.17,
+6,Straw Incorporated Long (>30 Days) Before Cultivation,0.19,0.11,0.28,
+5,Green Manure,0.45,0.36,0.57,
+4,Farm Yard Manure,0.21,0.15,0.28,
+3,Compost,0.17,0.09,0.29,
+2,Straw Exported,0,0,0,
+1,Straw Burnt,0,0,0,

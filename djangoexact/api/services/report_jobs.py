@@ -11,8 +11,10 @@ from django.template.loader import render_to_string
 from django.utils.translation import activate
 
 from api.models import AsyncJob, Project
-from api.reports import compute_project_result, generate_excel_report
+from api.reports import catalog, compute_project_result, generate_excel_report
+from api.reports.narrative import clean_content
 from api.reports.html_context import build_template_context
+from api.reports.pdf import render_pdf
 
 
 def run(job: AsyncJob) -> dict:
@@ -30,7 +32,9 @@ def run(job: AsyncJob) -> dict:
 
     if fmt == "pdf":
         template_name = params["template"]
-        content = _render_pdf(project, activities, template_name, lang, job.created_by)
+        content = _render_pdf(
+            project, activities, template_name, lang, job.created_by, content=params.get("content"),
+        )
         content_type = "application/pdf"
         ext = "pdf"
         default_name = f"{template_name}.pdf"
@@ -49,17 +53,21 @@ def run(job: AsyncJob) -> dict:
     }
 
 
-def _render_pdf(project, activities, template_name, lang, user):
+def _render_pdf(project, activities, template_name, lang, user, content=None):
+    # Resolved here as well as at enqueue, because jobs persisted before the
+    # catalog existed can still be replayed; first, so an unrenderable report
+    # fails before a carbon balance is computed for it.
+    template_path = catalog.resolve_template(template_name, lang)
+    # Sanitized again although the view already did: params are stored JSON,
+    # and a row edited or replayed after enqueue must not reach the page as
+    # trusted markup.
+    if content:
+        content = clean_content(content)
     result = compute_project_result(project, activities)
-    context = build_template_context(result, None, lang)
+    context = build_template_context(result, None, lang, content=content)
     context["user"] = user
-    html = render_to_string(f"reports/{template_name}_{lang}.html", context)
-    return _weasyprint_pdf(html)
-
-
-def _weasyprint_pdf(html):
-    from weasyprint import HTML
-    return HTML(string=html).write_pdf()
+    html = render_to_string(template_path, context)
+    return render_pdf(html)
 
 
 def _upload(project, job, content, ext):

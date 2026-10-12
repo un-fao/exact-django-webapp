@@ -36,7 +36,37 @@ class IdentifierRoundtripTest(SimpleTestCase):
             parse_identifier("AnnualCropland#not_an_int")
 
 
-from admin_scripts.luc_permutations import plan_luc_pairs
+from admin_scripts.luc_permutations import display_value, plan_luc_pairs, preset_label
+
+
+class DisplayValueTest(SimpleTestCase):
+    def test_preset_identifier_becomes_label(self):
+        self.assertEqual(display_value("Grassland#0"), "Grassland: Severely Degraded")
+
+    def test_anything_else_passes_through_unchanged(self):
+        for value in ("Low C input", "Grassland#9", "Unknown#0", "Change #2", "", None, 1):
+            self.assertEqual(display_value(value), value)
+
+
+class PresetLabelTest(SimpleTestCase):
+    def test_two_preset_class_names_only_the_differing_values(self):
+        self.assertEqual(
+            preset_label("AnnualCropland", 0),
+            "AnnualCropland: Full Tillage, Low C input, Burned",
+        )
+        self.assertEqual(
+            preset_label("PerennialCropland", 1),
+            "PerennialCropland: No Tillage, High C input, with manure, biomass burned: no",
+        )
+
+    def test_single_preset_class_is_bare_class_name(self):
+        for class_name in ("ForestManagement", "Settlement", "SetAside", "OtherLand"):
+            self.assertEqual(preset_label(class_name, 0), class_name)
+
+    def test_labels_are_unique_and_hide_the_index(self):
+        labels = [preset_label(c, i) for c, i in list_preset_templates()]
+        self.assertEqual(len(labels), len(set(labels)))
+        self.assertFalse([label for label in labels if "#" in label])
 
 
 class PlanLucPairsTest(SimpleTestCase):

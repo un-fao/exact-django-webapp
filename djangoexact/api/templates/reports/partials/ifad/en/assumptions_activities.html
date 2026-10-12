@@ -1,0 +1,33 @@
+{% load humanize %}
+<section>
+    <h2>III. Assumptions and activities considered</h2>
+    <p>
+        The assessment covers {{ activities_total|length }} project
+        activit{{ activities_total|length|pluralize:"y,ies" }}, applied to a total of
+        {% if total_area %}{{ total_area|floatformat:0|intcomma }} hectares{% endif %}
+        {% if total_heads %}{% if total_area %} / {% endif %}{{ total_heads|floatformat:0|intcomma }} livestock heads{% endif %}
+        {% if total_tonnes_of_catch %}{% if total_area or total_heads %} / {% endif %}{{ total_tonnes_of_catch|floatformat:0|intcomma }} tonnes of fish catch{% endif %}{% if not total_area and not total_heads and not total_tonnes_of_catch %}&mdash;{% endif %}.
+        Project parameters were set as follows: climate zone
+        {% if project.climate %}{{ project.climate.name }}{% else %}<span class="analyst-input">not set</span>{% endif %},
+        moisture regime
+        {% if project.moisture %}{{ project.moisture.name }}{% else %}<span class="analyst-input">not set</span>{% endif %},
+        soil type
+        {% if project.soil_type %}{{ project.soil_type.name }}{% else %}<span class="analyst-input">not set</span>{% endif %},
+        with a reference soil organic carbon stock (SOCref) of
+        {% if soc %}{{ soc|floatformat:1 }} tC/ha{% else %}<span class="analyst-input">not available</span>{% endif %}.
+        {# An empty list is not "not applicable": only activity-level overrides are detectable, so the clause is dropped, not negated. #}
+        Parameters were applied at Tier 1 (IPCC default values) unless otherwise
+        noted{% if tier2_parameters %}; where project-specific data was available, Tier 2 parameters were used for
+        {{ tier2_parameters|join:", " }}{% endif %}.
+    </p>
+
+    {% if activities_total %}
+    <ol>
+        {% for activity in activities_total %}
+            <li>{{ activity.name }}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% include "reports/partials/ifad/en/analyst_notes.html" %}
+</section>

@@ -11,18 +11,15 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 2,
-      "unit": 2,
+      "unit": 160,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        59
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 27,
+    "pk": 47,
     "fields": {
       "name": "Diesel",
       "name_en": "Diesel",
@@ -31,10 +28,10 @@
       "name_ru": "Дизель",
       "parent_fuel_type": 1,
       "fuel_use_type": 3,
-      "macro_fuel_type": 1,
-      "unit": 3,
+      "macro_fuel_type": null,
+      "unit": 165,
       "module_types": [
-        63
+        60
       ]
     }
   },
@@ -45,12 +42,12 @@
       "name": "Electricity",
       "name_en": "Electricity",
       "name_fr": null,
-      "name_es": null,
+      "name_es": "Electricidad",
       "name_ru": null,
       "parent_fuel_type": 2,
       "fuel_use_type": 1,
-      "macro_fuel_type": 2,
-      "unit": 1,
+      "macro_fuel_type": null,
+      "unit": 157,
       "module_types": [
         37
       ]
@@ -58,7 +55,7 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 25,
+    "pk": 45,
     "fields": {
       "name": "Ethanol (Cars)",
       "name_en": "Ethanol (Cars)",
@@ -67,16 +64,16 @@
       "name_ru": "Этанол (Автомобили)",
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
-      "macro_fuel_type": 1,
-      "unit": 3,
+      "macro_fuel_type": null,
+      "unit": 163,
       "module_types": [
-        63
+        60
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 26,
+    "pk": 46,
     "fields": {
       "name": "Ethanol (Trucks)",
       "name_en": "Ethanol (Trucks)",
@@ -85,28 +82,28 @@
       "name_ru": "Этанол (Грузовики)",
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
-      "macro_fuel_type": 1,
-      "unit": 3,
+      "macro_fuel_type": null,
+      "unit": 164,
       "module_types": [
-        63
+        60
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 57,
+    "pk": 41,
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
       "name_fr": "Gasoil / huile diesel\n",
-      "name_es": null,
+      "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
       "macro_fuel_type": null,
-      "unit": 3,
+      "unit": 156,
       "module_types": [
-        63
+        60
       ]
     }
   },
@@ -117,12 +114,12 @@
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
       "name_fr": "Gasoil / huile diesel\n",
-      "name_es": "Gasóleo",
+      "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 1,
-      "unit": 3,
+      "unit": 156,
       "module_types": [
         37
       ]
@@ -130,7 +127,7 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 28,
+    "pk": 48,
     "fields": {
       "name": "Gasoline (2-stroke)",
       "name_en": "Gasoline (2-stroke)",
@@ -139,16 +136,16 @@
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 3,
-      "macro_fuel_type": 1,
-      "unit": 3,
+      "macro_fuel_type": null,
+      "unit": 167,
       "module_types": [
-        63
+        60
       ]
     }
   },
   {
     "model": "api.fueltype",
-    "pk": 29,
+    "pk": 49,
     "fields": {
       "name": "Gasoline (4-stroke)",
       "name_en": "Gasoline (4-stroke)",
@@ -157,10 +154,28 @@
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 3,
-      "macro_fuel_type": 1,
-      "unit": 3,
+      "macro_fuel_type": null,
+      "unit": 166,
       "module_types": [
-        63
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 43,
+    "fields": {
+      "name": "LPG",
+      "name_en": "LPG",
+      "name_fr": "GPL",
+      "name_es": "GLP",
+      "name_ru": null,
+      "parent_fuel_type": 1,
+      "fuel_use_type": 2,
+      "macro_fuel_type": null,
+      "unit": 155,
+      "module_types": [
+        60
       ]
     }
   },
@@ -176,45 +191,9 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 1,
-      "unit": 3,
+      "unit": 155,
       "module_types": [
         37
-      ]
-    }
-  },
-  {
-    "model": "api.fueltype",
-    "pk": 59,
-    "fields": {
-      "name": "LPG",
-      "name_en": "LPG",
-      "name_fr": "GPL",
-      "name_es": null,
-      "name_ru": null,
-      "parent_fuel_type": 1,
-      "fuel_use_type": 2,
-      "macro_fuel_type": null,
-      "unit": 3,
-      "module_types": [
-        63
-      ]
-    }
-  },
-  {
-    "model": "api.fueltype",
-    "pk": 56,
-    "fields": {
-      "name": "Motor Gasoline",
-      "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
-      "name_es": "Motor de Gasolina",
-      "name_ru": "Motor Gasoline",
-      "parent_fuel_type": 1,
-      "fuel_use_type": 2,
-      "macro_fuel_type": null,
-      "unit": 3,
-      "module_types": [
-        63
       ]
     }
   },
@@ -230,7 +209,7 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 1,
-      "unit": 3,
+      "unit": 152,
       "module_types": [
         37
       ]
@@ -238,7 +217,25 @@
   },
   {
     "model": "api.fueltype",
-    "pk": 60,
+    "pk": 40,
+    "fields": {
+      "name": "Motor Gasoline",
+      "name_en": "Motor Gasoline",
+      "name_fr": "Essence pour moteurs\n",
+      "name_es": "Motor de Gasolina",
+      "name_ru": "Motor Gasoline",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 2,
+      "macro_fuel_type": null,
+      "unit": 152,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 44,
     "fields": {
       "name": "Natural Gas",
       "name_en": "Natural Gas",
@@ -248,9 +245,9 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 2,
       "macro_fuel_type": null,
-      "unit": 3,
+      "unit": 162,
       "module_types": [
-        63
+        60
       ]
     }
   },
@@ -266,7 +263,7 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 1,
-      "unit": 3,
+      "unit": 162,
       "module_types": [
         37
       ]
@@ -284,12 +281,9 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 2,
-      "unit": 2,
+      "unit": 159,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        59
       ]
     }
   },
@@ -304,8 +298,8 @@
       "name_ru": null,
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
-      "macro_fuel_type": 2,
-      "unit": 1,
+      "macro_fuel_type": null,
+      "unit": 161,
       "module_types": [
         37
       ]
@@ -323,7 +317,7 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 1,
-      "unit": 3,
+      "unit": 153,
       "module_types": [
         37
       ]
@@ -341,12 +335,9 @@
       "parent_fuel_type": 1,
       "fuel_use_type": 1,
       "macro_fuel_type": 2,
-      "unit": 2,
+      "unit": 158,
       "module_types": [
-        59,
-        61,
-        62,
-        64
+        59
       ]
     }
   }

@@ -1,7 +1,7 @@
 [
   {
     "model": "api.settlementtype",
-    "pk": 25,
+    "pk": 5,
     "fields": {
       "name": "Cultivated soil",
       "name_en": "Cultivated soil",
@@ -12,7 +12,7 @@
   },
   {
     "model": "api.settlementtype",
-    "pk": 21,
+    "pk": 1,
     "fields": {
       "name": "Infrastructure on existing land (no paving)",
       "name_en": "Infrastructure on existing land (no paving)",
@@ -23,7 +23,7 @@
   },
   {
     "model": "api.settlementtype",
-    "pk": 22,
+    "pk": 2,
     "fields": {
       "name": "Paved settlement",
       "name_en": "Paved settlement",
@@ -34,7 +34,7 @@
   },
   {
     "model": "api.settlementtype",
-    "pk": 23,
+    "pk": 3,
     "fields": {
       "name": "Turfgrass",
       "name_en": "Turfgrass",
@@ -45,7 +45,7 @@
   },
   {
     "model": "api.settlementtype",
-    "pk": 24,
+    "pk": 4,
     "fields": {
       "name": "Wooded area",
       "name_en": "Wooded area",

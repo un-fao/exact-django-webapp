@@ -17,7 +17,7 @@
   },
   {
     "model": "api.configparam",
-    "pk": 5,
+    "pk": 4,
     "fields": {
       "name": "INPUT_ENTRIES_LIMIT",
       "value": "10"
@@ -25,7 +25,7 @@
   },
   {
     "model": "api.configparam",
-    "pk": 7,
+    "pk": 6,
     "fields": {
       "name": "IRRIGATION_PHASES_LIMIT",
       "value": "10"
@@ -33,7 +33,7 @@
   },
   {
     "model": "api.configparam",
-    "pk": 6,
+    "pk": 5,
     "fields": {
       "name": "IRRIGATION_SYSTEMS_LIMIT",
       "value": "10"

@@ -29,6 +29,7 @@ def _module_result(units_w, units_wo, duration):
         title="Land",
         metadata_section_title="Land",
         result_rows=[],
+        metadata_writes=[],
         total_emissions=[0.0] * duration,
         units_breakdown_w=units_w,
         units_breakdown_wo=units_wo,
@@ -77,6 +78,10 @@ def _activity(modules):
         soc_t2=None,
     )
     activity.name = "Act"
+    # BaseActivityReport iterates cache_modules(), not .modules. On a bare
+    # MagicMock that call returns an empty iterator and every total silently
+    # comes back zero.
+    activity.cache_modules.return_value = modules
     return activity
 
 

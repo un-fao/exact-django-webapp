@@ -162,12 +162,12 @@ class ReportAsyncEndpointTestCase(APITestCase):
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=True), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard&lang=en")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=en")
         self.assertEqual(resp.status_code, 202)
         self.assertIn("job_id", resp.data)
         job = AsyncJob.objects.get(pk=resp.data["job_id"])
         self.assertEqual(job.kind, AsyncJob.Kind.REPORT)
-        self.assertEqual(job.params["template"], "standard")
+        self.assertEqual(job.params["template"], "fao")
         self.assertEqual(job.params["format"], "pdf")
         self.assertEqual(job.params["project_id"], project.pk)
         self.assertIsNone(job.params["activity_ids"])
@@ -194,14 +194,81 @@ class ReportAsyncEndpointTestCase(APITestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
 
+    def test_unknown_template_returns_400_and_does_not_enqueue(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=nope")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_known_template_unknown_language_returns_400(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao&lang=de")
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
     def test_not_ready_project_returns_400_and_does_not_enqueue(self):
         project = ProjectFactory(owner=self.user)
         with mock.patch("api.views.security.check_permission", return_value=None), \
                 mock.patch.object(type(project), "is_ready", return_value=False), \
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
-            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=standard")
+            resp = self.client.post(f"/api/projects/{project.pk}/report/async/?template=fao")
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+
+    def test_the_retired_narrative_key_is_refused_before_enqueue(self):
+        """Ignoring it would be silent: a PDF without the prose, and no way to tell."""
+        project = ProjectFactory(owner=self.user)
+        for query in ("?template=ifad", "?template=fao", ""):
+            with self.subTest(query=query), \
+                    mock.patch("api.views.security.check_permission", return_value=None), \
+                    mock.patch.object(type(project), "is_ready", return_value=True), \
+                    mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+                resp = self.client.post(
+                    f"/api/projects/{project.pk}/report/async/{query}",
+                    {"narrative": {"data_limitations": "x"}}, format="json",
+                )
+                self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_content_is_sanitized_before_it_is_stored(self):
+        project = ProjectFactory(owner=self.user)
+        with mock.patch("api.views.security.check_permission", return_value=None), \
+                mock.patch.object(type(project), "is_ready", return_value=True), \
+                mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+            resp = self.client.post(
+                f"/api/projects/{project.pk}/report/async/?template=ifad",
+                {"content": '<p>Notes</p><img src="file:///etc/passwd"><script>x()</script>'},
+                format="json",
+            )
+        self.assertEqual(resp.status_code, 202)
+        job = AsyncJob.objects.get(pk=resp.data["job_id"])
+        self.assertEqual(job.params["content"], "<p>Notes</p>")
+
+    def test_a_report_that_ignores_content_refuses_it(self):
+        project = ProjectFactory(owner=self.user)
+        for query in ("?template=fao", ""):
+            with self.subTest(query=query), \
+                    mock.patch("api.views.security.check_permission", return_value=None), \
+                    mock.patch.object(type(project), "is_ready", return_value=True), \
+                    mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
+                resp = self.client.post(
+                    f"/api/projects/{project.pk}/report/async/{query}",
+                    {"content": "<p>Notes</p>"}, format="json",
+                )
+                self.assertEqual(resp.status_code, 400)
+        self.assertFalse(AsyncJob.objects.filter(project=project).exists())
+
+    def test_synchronous_report_no_longer_answers_get(self):
+        project = ProjectFactory(owner=self.user)
+        resp = self.client.get(f"/api/projects/{project.pk}/report/")
+        self.assertEqual(resp.status_code, 405)
 
 
 class ReconcileStaleAsyncJobsTestCase(TestCase):
@@ -358,14 +425,14 @@ class ReportJobRunTestCase(TestCase):
             kind=AsyncJob.Kind.REPORT,
             created_by=requester,
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
-                    "template": "standard", "lang": "en"},
+                    "template": "fao", "lang": "en"},
         )
         fake_project = mock.Mock(pk=7, name="P")
         with mock.patch("api.services.report_jobs.Project") as m_project, \
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}), \
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>") as m_render, \
-             mock.patch("api.services.report_jobs._weasyprint_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf") as m_upload:
             m_project.objects.get.return_value = fake_project
             result = report_jobs.run(job)
@@ -375,6 +442,51 @@ class ReportJobRunTestCase(TestCase):
         m_render.assert_called_once()
         rendered_context = m_render.call_args.args[1]
         self.assertEqual(rendered_context["user"], requester)
+
+
+    def test_worker_sanitizes_content_it_did_not_enqueue(self):
+        """A params row edited or replayed after enqueue must not reach the page as trusted markup."""
+        from django.utils.safestring import SafeString
+
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            created_by=UserFactory(email="content-job-requester@example.com"),
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "ifad", "lang": "en",
+                    "content": '<p>Notes</p><img src="file:///etc/passwd">'},
+        )
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
+            m_project.objects.get.return_value = mock.Mock(pk=7)
+            report_jobs.run(job)
+
+        content = m_ctx.call_args.kwargs["content"]
+        self.assertEqual(content, "<p>Notes</p>")
+        self.assertIsInstance(content, SafeString)
+
+    def test_a_report_without_content_passes_none(self):
+        from api.services import report_jobs
+        job = AsyncJob.objects.create(
+            kind=AsyncJob.Kind.REPORT,
+            created_by=UserFactory(email="plain-job-requester@example.com"),
+            params={"project_id": 7, "activity_ids": None, "format": "pdf",
+                    "template": "fao", "lang": "en"},
+        )
+        with mock.patch("api.services.report_jobs.Project") as m_project, \
+             mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
+             mock.patch("api.services.report_jobs.build_template_context", return_value={}) as m_ctx, \
+             mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
+             mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
+             mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
+            m_project.objects.get.return_value = mock.Mock(pk=7)
+            report_jobs.run(job)
+
+        self.assertIsNone(m_ctx.call_args.kwargs["content"])
 
 
 class ReportDownloadTestCase(APITestCase):

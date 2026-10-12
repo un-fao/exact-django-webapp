@@ -1,431 +1,602 @@
 [
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 72,
+    "pk": 150,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 82,
       "litter": 4.8,
-      "dw": 14.8
+      "dw": 14.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 73,
+    "pk": 151,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 171,
       "litter": 5.9,
-      "dw": 8.0
+      "dw": 8.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 74,
+    "pk": 152,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 172,
       "litter": 2.4,
-      "dw": 9.0
+      "dw": 9.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 75,
+    "pk": 153,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 173,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 76,
+    "pk": 154,
     "fields": {
       "climate": 2,
       "forest_type": 1,
       "land_use_type": 174,
       "litter": 8.7,
-      "dw": 13.2
+      "dw": 13.2,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 77,
+    "pk": 155,
     "fields": {
       "climate": 2,
       "forest_type": 1,
       "land_use_type": 172,
       "litter": 0.0,
-      "dw": 64.4
+      "dw": 64.4,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 78,
+    "pk": 156,
     "fields": {
       "climate": 2,
       "forest_type": 1,
       "land_use_type": 167,
       "litter": 0.0,
-      "dw": 6.8
+      "dw": 6.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 79,
+    "pk": 157,
     "fields": {
       "climate": 2,
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 11.8
+      "dw": 11.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 80,
+    "pk": 158,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 165,
       "litter": 2.9,
-      "dw": 36.8
+      "dw": 36.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 81,
+    "pk": 159,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 164,
       "litter": 47.8,
-      "dw": 23.0
+      "dw": 23.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 82,
+    "pk": 160,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 3.7,
-      "dw": 37.6
+      "dw": 37.6,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 83,
+    "pk": 161,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 166,
       "litter": 0.0,
-      "dw": 10.5
+      "dw": 10.5,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 84,
+    "pk": 162,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 167,
       "litter": 28.7,
-      "dw": 21.7
+      "dw": 21.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 85,
+    "pk": 163,
     "fields": {
       "climate": 4,
       "forest_type": 1,
       "land_use_type": 168,
       "litter": 31.4,
-      "dw": 19.7
+      "dw": 19.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 86,
+    "pk": 164,
     "fields": {
       "climate": 4,
       "forest_type": 1,
       "land_use_type": 169,
       "litter": 49.5,
-      "dw": 3.1
+      "dw": 3.1,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 87,
+    "pk": 165,
     "fields": {
       "climate": 4,
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 88,
+    "pk": 166,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 89,
+    "pk": 167,
     "fields": {
       "climate": 3,
       "forest_type": 2,
       "land_use_type": 82,
       "litter": 4.8,
-      "dw": 14.8
+      "dw": 14.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 90,
+    "pk": 168,
     "fields": {
       "climate": 3,
       "forest_type": 2,
       "land_use_type": 171,
       "litter": 5.9,
-      "dw": 8.0
+      "dw": 8.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 91,
+    "pk": 169,
     "fields": {
       "climate": 3,
       "forest_type": 2,
       "land_use_type": 172,
       "litter": 2.4,
-      "dw": 9.0
+      "dw": 9.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 92,
+    "pk": 170,
     "fields": {
       "climate": 3,
       "forest_type": 2,
       "land_use_type": 173,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 93,
+    "pk": 171,
     "fields": {
       "climate": 2,
       "forest_type": 2,
       "land_use_type": 174,
       "litter": 8.7,
-      "dw": 13.2
+      "dw": 13.2,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 94,
+    "pk": 172,
     "fields": {
       "climate": 2,
       "forest_type": 2,
       "land_use_type": 172,
       "litter": 0.0,
-      "dw": 64.4
+      "dw": 64.4,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 95,
+    "pk": 173,
     "fields": {
       "climate": 2,
       "forest_type": 2,
       "land_use_type": 167,
       "litter": 0.0,
-      "dw": 6.8
+      "dw": 6.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 96,
+    "pk": 174,
     "fields": {
       "climate": 2,
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 11.8
+      "dw": 11.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 97,
+    "pk": 175,
     "fields": {
       "climate": 1,
       "forest_type": 2,
       "land_use_type": 165,
       "litter": 2.9,
-      "dw": 36.8
+      "dw": 36.8,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 98,
+    "pk": 176,
     "fields": {
       "climate": 1,
       "forest_type": 2,
       "land_use_type": 164,
       "litter": 47.8,
-      "dw": 23.0
+      "dw": 23.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 99,
+    "pk": 177,
     "fields": {
       "climate": 1,
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 3.7,
-      "dw": 37.6
+      "dw": 37.6,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 100,
+    "pk": 178,
     "fields": {
       "climate": 1,
       "forest_type": 2,
       "land_use_type": 166,
       "litter": 0.0,
-      "dw": 10.5
+      "dw": 10.5,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 101,
+    "pk": 179,
     "fields": {
       "climate": 1,
       "forest_type": 2,
       "land_use_type": 167,
       "litter": 28.7,
-      "dw": 21.7
+      "dw": 21.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 102,
+    "pk": 180,
     "fields": {
       "climate": 4,
       "forest_type": 2,
       "land_use_type": 168,
       "litter": 31.4,
-      "dw": 19.7
+      "dw": 19.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 103,
+    "pk": 181,
     "fields": {
       "climate": 4,
       "forest_type": 2,
       "land_use_type": 169,
       "litter": 49.5,
-      "dw": 3.1
+      "dw": 3.1,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 104,
+    "pk": 182,
     "fields": {
       "climate": 4,
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 0.0
+      "dw": 0.0,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 106,
+    "pk": 183,
+    "fields": {
+      "climate": 4,
+      "forest_type": 2,
+      "land_use_type": 163,
+      "litter": 0.0,
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
+    }
+  },
+  {
+    "model": "ipcc.litterdeadwoodcarbonstock",
+    "pk": 184,
     "fields": {
       "climate": 3,
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 107,
+    "pk": 185,
     "fields": {
       "climate": 2,
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 108,
+    "pk": 186,
     "fields": {
       "climate": 1,
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 109,
+    "pk": 187,
     "fields": {
       "climate": 4,
       "forest_type": 1,
       "land_use_type": 120,
       "litter": 0.7,
-      "dw": 10.7
+      "dw": 10.7,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 110,
+    "pk": 188,
     "fields": {
       "climate": 20,
       "forest_type": 1,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   },
   {
     "model": "ipcc.litterdeadwoodcarbonstock",
-    "pk": 111,
+    "pk": 189,
     "fields": {
       "climate": 20,
       "forest_type": 2,
       "land_use_type": 163,
       "litter": 0.0,
-      "dw": 3.3
+      "dw": 3.3,
+      "litter_min": null,
+      "litter_max": null,
+      "dw_min": null,
+      "dw_max": null
     }
   }
 ]

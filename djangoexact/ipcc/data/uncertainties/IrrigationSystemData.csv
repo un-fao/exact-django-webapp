@@ -1,0 +1,10 @@
+id,irrigation_system_type,value,value_min,value_max,"Source: Lal, R. 2004. Carbon emission from farm operations. Environment International, 30(7) : 981–990. https://doi.org/10.1016/j.envint.2004.03.005"
+2,Surface Without IRRS,34.46666667,N/A,N/A,
+3,Surface With IRRS,90.2,N/A,N/A,
+4,Solid Set Sprinkler,444.7666667,N/A,N/A,
+5,Permanent Sprinkler,130.1666667,N/A,N/A,
+6,Hand Moved Sprinkler,59.76666667,N/A,N/A,
+7,Solid Roll Sprinkler,85.43333333,N/A,N/A,
+8,Center-Pivot Sprinkler,79.2,N/A,N/A,
+9,Traveler Sprinkler,61.96666667,N/A,N/A,
+10,Trickle,311.3,N/A,N/A,

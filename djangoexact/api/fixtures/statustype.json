@@ -13,14 +13,14 @@
   },
   {
     "model": "api.statustype",
-    "pk": 4,
+    "pk": 3,
     "fields": {
       "name": "IN PROGRESS",
       "name_en": "IN PROGRESS",
       "name_fr": "EN COURS\n",
       "name_es": "EN CURSO",
       "name_ru": "В ПРОЦЕССЕ",
-      "value": 0.4
+      "value": 3.0
     }
   },
   {
@@ -37,7 +37,7 @@
   },
   {
     "model": "api.statustype",
-    "pk": 3,
+    "pk": 5,
     "fields": {
       "name": "SUBMODULES_EMPTY",
       "name_en": "SUBMODULES_EMPTY",

@@ -53,6 +53,8 @@ class TotalBiomassAfterDefo(Model):
     value = FloatField(null=True)
 
     objects = TotalBiomassAfterDefoManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class DataOnMangrove(Model):
@@ -72,6 +74,24 @@ class DataOnMangrove(Model):
     litter = FloatField()
     dw = FloatField()
     soc_ref = FloatField()
+    agb_dry_matter_min = FloatField(null=True, blank=True)
+    agb_dry_matter_max = FloatField(null=True, blank=True)
+    c_fraction_min = FloatField(null=True, blank=True)
+    c_fraction_max = FloatField(null=True, blank=True)
+    agb_c_min = FloatField(null=True, blank=True)
+    agb_c_max = FloatField(null=True, blank=True)
+    agb_growth_min = FloatField(null=True, blank=True)
+    agb_growth_max = FloatField(null=True, blank=True)
+    r_min = FloatField(null=True, blank=True)
+    r_max = FloatField(null=True, blank=True)
+    bgb_min = FloatField(null=True, blank=True)
+    bgb_max = FloatField(null=True, blank=True)
+    litter_min = FloatField(null=True, blank=True)
+    litter_max = FloatField(null=True, blank=True)
+    dw_min = FloatField(null=True, blank=True)
+    dw_max = FloatField(null=True, blank=True)
+    soc_ref_min = FloatField(null=True, blank=True)
+    soc_ref_max = FloatField(null=True, blank=True)
 
 
 class ForestCombustionFactor(Model):
@@ -86,6 +106,14 @@ class ForestCombustionFactor(Model):
     ch4 = FloatField(null=True)
     n2o = FloatField(null=True)
     value = FloatField()
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class AfforestationCombustionFactorManager(Manager):
@@ -108,6 +136,14 @@ class AfforestationCombustionFactor(Model):
     value = FloatField()
 
     objects = AfforestationCombustionFactorManager()
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class LitterDeadwoodCarbonStock(Model):
@@ -120,6 +156,10 @@ class LitterDeadwoodCarbonStock(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     litter = FloatField()
     dw = FloatField()
+    litter_min = FloatField(null=True, blank=True)
+    litter_max = FloatField(null=True, blank=True)
+    dw_min = FloatField(null=True, blank=True)
+    dw_max = FloatField(null=True, blank=True)
 
 
 class LandUseCarbonStockExchangeFactorManager(Manager):
@@ -145,6 +185,8 @@ class LandUseCarbonStockExchangeFactor(Model):
     value = FloatField()
 
     objects = LandUseCarbonStockExchangeFactorManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Land Use Carbon Stock Exchange Factor"
@@ -230,6 +272,8 @@ class ForestManagementRootToShoot(Model):
     threshold = FloatField(null=True, blank=True)  # Maximum acceptable ag_biomass needed for this value to be chosen
     value = FloatField()
     objects = ForestManagementRootToShootManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class SoilOrganicCarbon(Model):
@@ -241,6 +285,8 @@ class SoilOrganicCarbon(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class ForestTotalBiomassManager(Manager):
@@ -277,6 +323,8 @@ class ForestTotalBiomass(Model):
     value = FloatField()
 
     objects = ForestTotalBiomassManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class AfforestationLandUseStockExchangeFactorManager(Manager):
@@ -340,6 +388,16 @@ class BurningEmissionFactor(Model):
     ch4 = FloatField()
     n2o = FloatField()
     nox = FloatField()
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    co_min = FloatField(null=True, blank=True)
+    co_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
+    nox_min = FloatField(null=True, blank=True)
+    nox_max = FloatField(null=True, blank=True)
 
 
 class FiresCombustionFactorManager(Manager):
@@ -366,6 +424,8 @@ class FiresCombustionFactor(Model):
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CropNitrousEstimationDefaultFactorManager(Manager):
@@ -399,6 +459,16 @@ class CropNitrousEstimationDefaultFactor(Model):
     comment = CharField(max_length=250, null=True, blank=True)
 
     objects = CropNitrousEstimationDefaultFactorManager()
+    slope_min = FloatField(null=True, blank=True)
+    slope_max = FloatField(null=True, blank=True)
+    intercept_min = FloatField(null=True, blank=True)
+    intercept_max = FloatField(null=True, blank=True)
+    n_ag_residues_min = FloatField(null=True, blank=True)
+    n_ag_residues_max = FloatField(null=True, blank=True)
+    rs_t_min = FloatField(null=True, blank=True)
+    rs_t_max = FloatField(null=True, blank=True)
+    n_bg_t_min = FloatField(null=True, blank=True)
+    n_bg_t_max = FloatField(null=True, blank=True)
 
 
 class TillageCarbonStockExchangeFactor(Model):
@@ -437,6 +507,8 @@ class CoastalAGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
     unit = CharField(max_length=50, null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CoastalBGB(Model):
@@ -453,6 +525,8 @@ class CoastalBGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
     unit = CharField(max_length=50, null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CoastalLitter(Model):
@@ -468,6 +542,8 @@ class CoastalLitter(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CoastalDeadwood(Model):
@@ -483,6 +559,8 @@ class CoastalDeadwood(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RewettingCarbonFactor(Model):
@@ -500,6 +578,8 @@ class RewettingCarbonFactor(Model):
     soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RewettingMethaneFactor(Model):
@@ -517,6 +597,8 @@ class RewettingMethaneFactor(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
     salinity = ForeignKey("api.SalinityType", on_delete=CASCADE)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class OtherConstructedWaterbodiesEmissionFactor(Model):
@@ -528,6 +610,8 @@ class OtherConstructedWaterbodiesEmissionFactor(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     waterbody_type = ForeignKey("api.WaterbodyType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class Atwood(Model):
@@ -541,6 +625,16 @@ class Atwood(Model):
     mg_c_ha = FloatField(default=0)
     sd = FloatField(default=None, null=True, blank=True)
     score = FloatField(default=None, null=True, blank=True)
+    n_min = FloatField(null=True, blank=True)
+    n_max = FloatField(null=True, blank=True)
+    mg_c_ha_min = FloatField(null=True, blank=True)
+    mg_c_ha_max = FloatField(null=True, blank=True)
+    area_2014_km2_min = FloatField(null=True, blank=True)
+    area_2014_km2_max = FloatField(null=True, blank=True)
+    sd_min = FloatField(null=True, blank=True)
+    sd_max = FloatField(null=True, blank=True)
+    score_min = FloatField(null=True, blank=True)
+    score_max = FloatField(null=True, blank=True)
 
 
 class DefaultSoilCarbonStock(Model):
@@ -553,6 +647,8 @@ class DefaultSoilCarbonStock(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class DrainageEmissionFactor(Model):
@@ -564,6 +660,8 @@ class DrainageEmissionFactor(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("climate", "moisture", "land_use_type")
@@ -605,6 +703,8 @@ class PerennialAGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialAGBManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class PerennialBGBManager(Manager):
@@ -637,6 +737,8 @@ class PerennialBGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialBGBManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class PerennialMaxAGBManager(Manager):
@@ -666,6 +768,8 @@ class PerennialMaxAGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialMaxAGBManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("climate", "land_use_type")
@@ -686,6 +790,8 @@ class CroplandFLU(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CroplandFMG(Model):
@@ -697,6 +803,8 @@ class CroplandFMG(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     tillage_management_type = ForeignKey("api.TillageManagementType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CroplandFI(Model):
@@ -708,6 +816,8 @@ class CroplandFI(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class AfforestationFLU(Model):
@@ -715,6 +825,8 @@ class AfforestationFLU(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("climate", "moisture", "land_use_type")
@@ -733,6 +845,8 @@ class GrasslandBiomass(Model):
     agb_t_c_ha = FloatField()
     bgb_t_dm_ha = FloatField()
     bgb_t_c_ha = FloatField()
+    agb_t_dm_ha_min = FloatField(null=True, blank=True)
+    agb_t_dm_ha_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("climate", "moisture")
@@ -770,6 +884,12 @@ class GrasslandStockExchangeFactor(Model):
     fi = FloatField(default=1)
 
     objects = GrasslandStockExchangeFactorManager()
+    fmg_min = FloatField(null=True, blank=True)
+    fmg_max = FloatField(null=True, blank=True)
+    flu_min = FloatField(null=True, blank=True)
+    flu_max = FloatField(null=True, blank=True)
+    fi_min = FloatField(null=True, blank=True)
+    fi_max = FloatField(null=True, blank=True)
 
 
 class ElectricityEmission(Model):
@@ -825,6 +945,8 @@ class LargeFisheryFUI(Model):
     value = FloatField()
 
     objects = LargeFisheryFUIManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Large Fishery FUI"
@@ -843,6 +965,8 @@ class SmallFisheryFUI(Model):
     value = FloatField()
 
     objects = SmallFisheryFUIManager()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class CropYieldStatManager(Manager):
@@ -903,6 +1027,12 @@ class InputEmissionFactor(Model):
     co2_value = FloatField(null=True, blank=True)
     n2o_value = FloatField(null=True, blank=True)
     co2_eq_value = FloatField(null=True, blank=True)
+    co2_value_min = FloatField(null=True, blank=True)
+    co2_value_max = FloatField(null=True, blank=True)
+    n2o_value_min = FloatField(null=True, blank=True)
+    n2o_value_max = FloatField(null=True, blank=True)
+    co2_eq_value_min = FloatField(null=True, blank=True)
+    co2_eq_value_max = FloatField(null=True, blank=True)
 
 
 class BuildingEmissionFactor(Model):
@@ -912,6 +1042,8 @@ class BuildingEmissionFactor(Model):
 
     building_type = ForeignKey("api.BuildingType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RoadEmissionFactor(Model):
@@ -921,6 +1053,8 @@ class RoadEmissionFactor(Model):
 
     road_type = ForeignKey("api.RoadType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class LivestockEntericEF(Model):
@@ -959,6 +1093,8 @@ class LivestockManureEF(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     manure_management_type = ForeignKey("api.ManureManagementType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class LivestockTAM(Model):
@@ -974,6 +1110,8 @@ class LivestockTAM(Model):
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class LivestockVSER(Model):
@@ -990,6 +1128,8 @@ class LivestockVSER(Model):
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     @staticmethod
     def get_average_value(emission_type, production_type, livestock_category, ipcc_region):
@@ -1013,6 +1153,8 @@ class LivestockAWMS(Model):
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("livestock_production_type", "manure_management_type", "livestock_category_type", "ipcc_region")
@@ -1032,6 +1174,8 @@ class LivestockNER(Model):
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class MethaneEntericFermentationFactor(Model):
@@ -1047,6 +1191,8 @@ class MethaneEntericFermentationFactor(Model):
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class ManureManagementVolatilizationMultiplier(Model):
@@ -1056,6 +1202,8 @@ class ManureManagementVolatilizationMultiplier(Model):
 
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class EnergyDefaultEmissionFactor(Model):
@@ -1068,6 +1216,12 @@ class EnergyDefaultEmissionFactor(Model):
     co2 = FloatField(null=True, blank=True)
     ch4 = FloatField(null=True, blank=True)
     n2o = FloatField(null=True, blank=True)
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Energy default emission factors"
@@ -1077,6 +1231,8 @@ class EnergyDefaultEmissionFactor(Model):
 class IrrigationSystemData(Model):
     irrigation_system_type = OneToOneField("api.IrrigationSystemType", on_delete=CASCADE, unique=True)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Irrigation system data"
@@ -1094,6 +1250,18 @@ class IrrigationPhaseData(Model):
     ch4_emissions = FloatField(blank=True, null=True)
     n2o_emissions = FloatField(blank=True, null=True)
     density = FloatField(blank=True, null=True)
+    emission_factor_min = FloatField(null=True, blank=True)
+    emission_factor_max = FloatField(null=True, blank=True)
+    calorific_value_min = FloatField(null=True, blank=True)
+    calorific_value_max = FloatField(null=True, blank=True)
+    co2_emissions_min = FloatField(null=True, blank=True)
+    co2_emissions_max = FloatField(null=True, blank=True)
+    ch4_emissions_min = FloatField(null=True, blank=True)
+    ch4_emissions_max = FloatField(null=True, blank=True)
+    n2o_emissions_min = FloatField(null=True, blank=True)
+    n2o_emissions_max = FloatField(null=True, blank=True)
+    density_min = FloatField(null=True, blank=True)
+    density_max = FloatField(null=True, blank=True)
 
 
 class IrrigationPressureRequirement(Model):
@@ -1107,6 +1275,10 @@ class IrrigationPressureRequirement(Model):
     bar_end = FloatField(null=True, blank=True)
     avg_pressure = FloatField()
     head = FloatField()
+    avg_pressure_min = FloatField(null=True, blank=True)
+    avg_pressure_max = FloatField(null=True, blank=True)
+    head_min = FloatField(null=True, blank=True)
+    head_max = FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.avg_pressure:
@@ -1126,6 +1298,10 @@ class RiceDefaultEmissionFactor(Model):
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     cultivation_period = IntegerField()
     value = FloatField()
+    cultivation_period_min = FloatField(null=True, blank=True)
+    cultivation_period_max = FloatField(null=True, blank=True)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RiceSFO(Model):
@@ -1139,6 +1315,8 @@ class RiceSFO(Model):
 
     organic_amendment_type = ForeignKey("api.OrganicAmendmentType", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RiceSFP(Model):
@@ -1152,6 +1330,8 @@ class RiceSFP(Model):
 
     water_management_type_before_cultivation = ForeignKey("api.WaterManagementTypeBeforeCultivation", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RiceSFW(Model):
@@ -1165,6 +1345,8 @@ class RiceSFW(Model):
 
     water_management_type_after_cultivation = ForeignKey("api.WaterManagementTypeAfterCultivation", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class RiceYield(Model):
@@ -1178,6 +1360,8 @@ class RiceYield(Model):
 
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class TrophicStateFactor(Model):
@@ -1192,6 +1376,10 @@ class TrophicStateFactor(Model):
     trophic_type = ForeignKey("api.TrophicType", on_delete=CASCADE)
     value = FloatField()
     chloa = FloatField()
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
+    chloa_min = FloatField(null=True, blank=True)
+    chloa_max = FloatField(null=True, blank=True)
 
 
 class OrganicSoilDrainageEmissionFactorManager(Manager):
@@ -1238,6 +1426,14 @@ class OrganicSoilDrainageEmissionFactor(Model):
     n2o_unit = CharField(max_length=100, default="kg N2O/ha/yr")
 
     objects = OrganicSoilDrainageEmissionFactorManager()
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    doc_min = FloatField(null=True, blank=True)
+    doc_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
 
 
 class PeatExtractionEmissionFactor(Model):
@@ -1261,6 +1457,14 @@ class PeatExtractionEmissionFactor(Model):
 
     n2o = FloatField(default=0)
     n2o_unit = CharField(max_length=100, default="kg N2O/ha/yr")
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    doc_min = FloatField(null=True, blank=True)
+    doc_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
 
 
 class PeatExtractionConversionFactor(Model):
@@ -1275,6 +1479,10 @@ class PeatExtractionConversionFactor(Model):
     weight_unit = CharField(max_length=100, default="tC/t air dry peat")
     volume = FloatField(default=0)
     volume_unit = CharField(max_length=100, default="tC/m3 air dry peat")
+    weight_min = FloatField(null=True, blank=True)
+    weight_max = FloatField(null=True, blank=True)
+    volume_min = FloatField(null=True, blank=True)
+    volume_max = FloatField(null=True, blank=True)
 
 
 class OrganicSoilFuelConsumption(Model):
@@ -1287,6 +1495,8 @@ class OrganicSoilFuelConsumption(Model):
     fire_type = ForeignKey("api.FireType", on_delete=CASCADE)
     value = FloatField(default=0)
     unit = CharField(max_length=100, default="t dm/ha")
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class OrganicSoilGefEmissionFactor(Model):
@@ -1325,6 +1535,14 @@ class OrganicSoilRewettingEmissionFactor(Model):
 
     n2o = FloatField(default=0)
     n2o_unit = CharField(max_length=100, default="tN2O-N/ha/yr")
+    co2_min = FloatField(null=True, blank=True)
+    co2_max = FloatField(null=True, blank=True)
+    doc_min = FloatField(null=True, blank=True)
+    doc_max = FloatField(null=True, blank=True)
+    ch4_min = FloatField(null=True, blank=True)
+    ch4_max = FloatField(null=True, blank=True)
+    n2o_min = FloatField(null=True, blank=True)
+    n2o_max = FloatField(null=True, blank=True)
 
 
 class ForestManagementAGB(Model):
@@ -1339,6 +1557,10 @@ class ForestManagementAGB(Model):
     agb_growth_min = FloatField(blank=True, null=True)
     agb_growth_max = FloatField(blank=True, null=True)
     agb_unit = CharField(max_length=100, default="tonnes d.m./ha")
+    agb_min_min = FloatField(null=True, blank=True)
+    agb_max_max = FloatField(null=True, blank=True)
+    agb_growth_min_min = FloatField(null=True, blank=True)
+    agb_growth_max_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Forest Management AGB"
@@ -1356,6 +1578,8 @@ class FMGData(Model):
     tillage_management_type = ForeignKey("api.TillageManagementType", on_delete=CASCADE, null=True)
     grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class FIData(Model):
@@ -1364,6 +1588,8 @@ class FIData(Model):
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE, null=True)
     grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = "FI Data"
@@ -1381,6 +1607,8 @@ class FLUData(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE, null=True)
     grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("climate", "moisture", "land_use_type", "grassland_management_type")
@@ -1394,6 +1622,14 @@ class SettlementEF(Model):
     fmg = FloatField(default=1)
     fi = FloatField(default=1)
     biomass = FloatField(default=0)
+    flu_min = FloatField(null=True, blank=True)
+    flu_max = FloatField(null=True, blank=True)
+    fmg_min = FloatField(null=True, blank=True)
+    fmg_max = FloatField(null=True, blank=True)
+    fi_min = FloatField(null=True, blank=True)
+    fi_max = FloatField(null=True, blank=True)
+    biomass_min = FloatField(null=True, blank=True)
+    biomass_max = FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Settlement Emission Factor"
@@ -1408,6 +1644,8 @@ class NitrousEmissionFactor(Model):
 
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField(default=0)
+    value_min = FloatField(null=True, blank=True)
+    value_max = FloatField(null=True, blank=True)
 
 
 class InputsNitrousEmissionFactor(Model):

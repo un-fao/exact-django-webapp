@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 75,
+    "pk": 73,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -9,7 +9,57 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.32,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 74,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 171,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.forestcombustionfactor",
+    "pk": 75,
+    "fields": {
+      "climate": 3,
+      "forest_type": 1,
+      "land_use_type": 172,
+      "co2": 1580.0,
+      "ch4": 6.8,
+      "n2o": 0.2,
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -18,11 +68,19 @@
     "fields": {
       "climate": 3,
       "forest_type": 1,
-      "land_use_type": 171,
+      "land_use_type": 173,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.72,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -31,11 +89,19 @@
     "fields": {
       "climate": 3,
       "forest_type": 1,
-      "land_use_type": 172,
+      "land_use_type": 120,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.32,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -43,12 +109,20 @@
     "pk": 78,
     "fields": {
       "climate": 3,
-      "forest_type": 1,
-      "land_use_type": 173,
+      "forest_type": 2,
+      "land_use_type": 82,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.72
+      "value": 0.32,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -56,12 +130,20 @@
     "pk": 79,
     "fields": {
       "climate": 3,
-      "forest_type": 1,
-      "land_use_type": 155,
+      "forest_type": 2,
+      "land_use_type": 171,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -70,11 +152,19 @@
     "fields": {
       "climate": 3,
       "forest_type": 2,
-      "land_use_type": 82,
+      "land_use_type": 172,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.32
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -83,37 +173,61 @@
     "fields": {
       "climate": 3,
       "forest_type": 2,
-      "land_use_type": 171,
+      "land_use_type": 173,
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.72,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 82,
     "fields": {
-      "climate": 3,
-      "forest_type": 2,
-      "land_use_type": 172,
-      "co2": 1580.0,
-      "ch4": 6.8,
-      "n2o": 0.2,
-      "value": 0.36
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 174,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 83,
     "fields": {
-      "climate": 3,
-      "forest_type": 2,
-      "land_use_type": 173,
-      "co2": 1580.0,
-      "ch4": 6.8,
-      "n2o": 0.2,
-      "value": 0.72
+      "climate": 2,
+      "forest_type": 1,
+      "land_use_type": 172,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -122,11 +236,19 @@
     "fields": {
       "climate": 2,
       "forest_type": 1,
-      "land_use_type": 174,
+      "land_use_type": 167,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.74,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -135,11 +257,19 @@
     "fields": {
       "climate": 2,
       "forest_type": 1,
-      "land_use_type": 172,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -147,12 +277,20 @@
     "pk": 86,
     "fields": {
       "climate": 2,
-      "forest_type": 1,
-      "land_use_type": 167,
+      "forest_type": 2,
+      "land_use_type": 174,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.74
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -160,12 +298,20 @@
     "pk": 87,
     "fields": {
       "climate": 2,
-      "forest_type": 1,
-      "land_use_type": 163,
+      "forest_type": 2,
+      "land_use_type": 172,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -174,11 +320,19 @@
     "fields": {
       "climate": 2,
       "forest_type": 2,
-      "land_use_type": 174,
+      "land_use_type": 167,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.74,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -187,11 +341,19 @@
     "fields": {
       "climate": 2,
       "forest_type": 2,
-      "land_use_type": 172,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -199,38 +361,62 @@
     "pk": 90,
     "fields": {
       "climate": 2,
-      "forest_type": 2,
-      "land_use_type": 167,
-      "co2": 1569.0,
-      "ch4": 4.7,
-      "n2o": 0.26,
-      "value": 0.74
+      "forest_type": 1,
+      "land_use_type": 120,
+      "co2": null,
+      "ch4": 6.8,
+      "n2o": null,
+      "value": 0.32,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 91,
     "fields": {
-      "climate": 2,
-      "forest_type": 2,
-      "land_use_type": 163,
+      "climate": 1,
+      "forest_type": 1,
+      "land_use_type": 165,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.36
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 92,
     "fields": {
-      "climate": 2,
+      "climate": 1,
       "forest_type": 1,
-      "land_use_type": 155,
-      "co2": null,
-      "ch4": 6.8,
-      "n2o": null,
-      "value": 0.32
+      "land_use_type": 164,
+      "co2": 1569.0,
+      "ch4": 4.7,
+      "n2o": 0.26,
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -239,11 +425,19 @@
     "fields": {
       "climate": 1,
       "forest_type": 1,
-      "land_use_type": 165,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -252,11 +446,19 @@
     "fields": {
       "climate": 1,
       "forest_type": 1,
-      "land_use_type": 164,
+      "land_use_type": 166,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -265,11 +467,19 @@
     "fields": {
       "climate": 1,
       "forest_type": 1,
-      "land_use_type": 163,
+      "land_use_type": 167,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -277,12 +487,20 @@
     "pk": 96,
     "fields": {
       "climate": 1,
-      "forest_type": 1,
-      "land_use_type": 166,
+      "forest_type": 2,
+      "land_use_type": 165,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -290,12 +508,20 @@
     "pk": 97,
     "fields": {
       "climate": 1,
-      "forest_type": 1,
-      "land_use_type": 167,
+      "forest_type": 2,
+      "land_use_type": 164,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -304,11 +530,19 @@
     "fields": {
       "climate": 1,
       "forest_type": 2,
-      "land_use_type": 165,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -317,11 +551,19 @@
     "fields": {
       "climate": 1,
       "forest_type": 2,
-      "land_use_type": 164,
+      "land_use_type": 166,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -330,37 +572,61 @@
     "fields": {
       "climate": 1,
       "forest_type": 2,
-      "land_use_type": 163,
+      "land_use_type": 167,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.45,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 101,
     "fields": {
-      "climate": 1,
-      "forest_type": 2,
-      "land_use_type": 166,
+      "climate": 4,
+      "forest_type": 1,
+      "land_use_type": 168,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 102,
     "fields": {
-      "climate": 1,
-      "forest_type": 2,
-      "land_use_type": 167,
+      "climate": 4,
+      "forest_type": 1,
+      "land_use_type": 169,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.45
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -369,11 +635,19 @@
     "fields": {
       "climate": 4,
       "forest_type": 1,
-      "land_use_type": 168,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -381,12 +655,20 @@
     "pk": 104,
     "fields": {
       "climate": 4,
-      "forest_type": 1,
-      "land_use_type": 169,
+      "forest_type": 2,
+      "land_use_type": 168,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -394,12 +676,20 @@
     "pk": 105,
     "fields": {
       "climate": 4,
-      "forest_type": 1,
-      "land_use_type": 163,
+      "forest_type": 2,
+      "land_use_type": 169,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -408,42 +698,24 @@
     "fields": {
       "climate": 4,
       "forest_type": 2,
-      "land_use_type": 168,
+      "land_use_type": 163,
       "co2": 1569.0,
       "ch4": 4.7,
       "n2o": 0.26,
-      "value": 0.34
+      "value": 0.34,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
     "pk": 107,
-    "fields": {
-      "climate": 4,
-      "forest_type": 2,
-      "land_use_type": 169,
-      "co2": 1569.0,
-      "ch4": 4.7,
-      "n2o": 0.26,
-      "value": 0.34
-    }
-  },
-  {
-    "model": "ipcc.forestcombustionfactor",
-    "pk": 108,
-    "fields": {
-      "climate": 4,
-      "forest_type": 2,
-      "land_use_type": 163,
-      "co2": 1569.0,
-      "ch4": 4.7,
-      "n2o": 0.26,
-      "value": 0.34
-    }
-  },
-  {
-    "model": "ipcc.forestcombustionfactor",
-    "pk": 109,
     "fields": {
       "climate": 20,
       "forest_type": 1,
@@ -451,12 +723,20 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 110,
+    "pk": 108,
     "fields": {
       "climate": 20,
       "forest_type": 2,
@@ -464,7 +744,15 @@
       "co2": 1580.0,
       "ch4": 6.8,
       "n2o": 0.2,
-      "value": 0.36
+      "value": 0.36,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

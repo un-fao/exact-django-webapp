@@ -1,7 +1,7 @@
 [
   {
     "model": "api.datasource",
-    "pk": 3,
+    "pk": 1,
     "fields": {
       "name": "",
       "short_name": "IPCC",
@@ -12,7 +12,7 @@
   },
   {
     "model": "api.datasource",
-    "pk": 4,
+    "pk": 2,
     "fields": {
       "name": "",
       "short_name": "FRA",

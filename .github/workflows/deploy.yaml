@@ -4,17 +4,24 @@ on:
   push:
     branches:
       - main
-      - review
-      - develop
-      - feature/id-responses
+      # - review
+      # - develop
+      # - feature/id-responses
   pull_request:
     branches:
-      - develop
+      # - develop
       - main
-      - review
+      # - review
 
 jobs:
   test:
+    # GitHub-hosted. The self-hosted 'gcp-temporary' label this used to target
+    # stopped registering runners on 2026-07-30, and a queued job only starts
+    # when a matching runner appears, so every Deploy run since then sat in the
+    # queue indefinitely (22 of them by 2026-08-03, main included). Nothing in
+    # this job needs to run inside GCP: it talks to a service container, not to
+    # any Google API. Pinned to 22.04 rather than ubuntu-latest because that is
+    # the image this job has actually been proven green on.
     runs-on: ubuntu-22.04
     services:
       postgres:
@@ -44,10 +51,10 @@ jobs:
       # `check --deploy` step below fail on test-env DEBUG/CORS values.
     steps:
       - name: 'Checkout Code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
           cache: pip
@@ -130,6 +137,8 @@ jobs:
             api.tests.test_luc_compute_iterator \
             api.tests.test_project_export \
             api.tests.test_production_config_check \
+            api.tests.test_finalized_member_management \
+            api.tests.test_recap_email \
             api.tests.unit.test_soc_t2_w_unit_simple \
             api.tests.unit.test_sync_firebase_emails \
             api.tests.unit.activity \
@@ -203,10 +212,15 @@ jobs:
 
   deploy:
     needs: test
-    # WR-04: pushes to develop run the test job only; develop has no deploy
-    # target, so the ref guard keeps deploy off while the merged state of
-    # the default branch still gets exercised by the gate.
-    if: github.event_name == 'push' && github.ref_name != 'develop'
+    # develop is the non-production deployment target; main remains production
+    # and review remains the review environment.
+    if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main' || github.ref_name == 'review' || github.ref_name == 'feature/id-responses')
+    # GitHub-hosted, same reason as the test job above. Leaving GCP costs this
+    # job no reachability: it authenticates through Workload Identity Federation
+    # rather than the metadata server, and the cloud-sql-proxy step below is
+    # invoked without --private-ip, so it was already reaching the instance over
+    # its public IP with an ephemeral client cert. Both work from any host with
+    # egress.
     runs-on: ubuntu-22.04
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'review' && 'review' || 'develop' }}
     permissions:
@@ -215,18 +229,18 @@ jobs:
       actions: 'read'
     steps:
     - name: 'Checkout Code'
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
         lfs: true
 
     - name: Authenticate to Google Cloud
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed' # v2.1.9
       with:
         workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
         service_account: ${{ vars.SERVICE_ACCOUNT }}
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
       
@@ -345,6 +359,13 @@ jobs:
         gcloud app deploy app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
+    - name: Set up Docker Buildx
+      # Originally here because the self-hosted runner might not have the Docker
+      # CLI plugin installed. The GitHub-hosted image ships Buildx, so this is
+      # now about pinning the builder rather than supplying a missing one; keep
+      # it so the build stays BuildKit-backed regardless of image changes.
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
     - name: Build computation-job image
       if: vars.CLOUD_RUN_COMPUTATION_JOB_NAME != ''
       env:
@@ -392,6 +413,14 @@ jobs:
         EMAIL_PORT: ${{ vars.EMAIL_PORT }}
         SMTP_USER_EMAIL: ${{ vars.SMTP_USER_EMAIL }}
         BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
+        # This Cloud Run job is the process that sends the report-ready email,
+        # so the download link's host comes from HERE, not from the web service.
+        # Where an environment serves its API from Cloud Run rather than App
+        # Engine, vars.BACKEND_BASE_URL still names the App Engine host and the
+        # emailed link 404s at Google's routing layer. Prefer the Cloud Run
+        # value when the environment defines one. Environments still on App
+        # Engine leave it unset and keep vars.BACKEND_BASE_URL unchanged.
+        CLOUDRUN_BACKEND_BASE_URL: ${{ vars.CLOUDRUN_BACKEND_BASE_URL }}
         FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
         FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
         FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
@@ -432,9 +461,15 @@ jobs:
             'EMAIL_PORT': os.environ['EMAIL_PORT'],
             'SMTP_USER_EMAIL': os.environ['SMTP_USER_EMAIL'],
             # Base URL for the emailed report download link (see async-jobs.md).
+            # CLOUDRUN_BACKEND_BASE_URL wins when the environment defines one:
+            # this job is the sender, and an environment served from Cloud Run
+            # must not mint links pointing at its old App Engine hostname.
             # .get with a default so an unset var soft-disables the report email
             # (the sender no-ops on empty) rather than failing the whole job deploy.
-            'BACKEND_BASE_URL': os.environ.get('BACKEND_BASE_URL', ''),
+            'BACKEND_BASE_URL': (
+                os.environ.get('CLOUDRUN_BACKEND_BASE_URL', '')
+                or os.environ.get('BACKEND_BASE_URL', '')
+            ),
             'SMTP_USER_PASSWORD': os.environ['SMTP_USER_PASSWORD'],
             'FIREBASE_API_KEY': os.environ['FIREBASE_API_KEY'],
             'FIREBASE_AUTH_DOMAIN': os.environ['FIREBASE_AUTH_DOMAIN'],
@@ -471,4 +506,4 @@ jobs:
 
     - name: Create Issue
       if: failure()
-      uses: un-fao/fao-ga-create-issue@v2
+      uses: un-fao/fao-ga-create-issue@4962b0126ebbb8d025b900ab29f56dcb03ecf2be # v2

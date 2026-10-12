@@ -1,0 +1,11 @@
+id,climate,moisture,value,value_min,value_max,"Source: 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2006), Volume 4 AFOLU, table 6.4."
+22,Boreal,Moist,1.7,0.425,2.975,
+23,Boreal,Dry,1.7,0.425,2.975,
+24,Cool Temperate,Dry,1.7,0.425,2.975,
+25,Cool Temperate,Moist,2.4,0.6,4.2,
+26,Warm Temperate,Moist,2.7,0.675,4.725,
+27,Warm Temperate,Dry,1.6,0.4,2.8,
+28,Tropical,Dry,2.3,0.575,4.025,
+29,Tropical,Moist,6.2,1.55,10.85,
+30,Tropical,Wet,6.2,1.55,10.85,
+31,Tropical Montane,Dry,2.3,0.575,4.025,

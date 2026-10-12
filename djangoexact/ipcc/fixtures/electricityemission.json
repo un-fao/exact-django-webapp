@@ -1,25 +1,25 @@
 [
   {
     "model": "ipcc.electricityemission",
-    "pk": 3068,
+    "pk": 762,
     "fields": {
-      "country": 145,
+      "country": 262,
       "operating_margin": 0.414,
       "combined_margin": 0.193
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3069,
+    "pk": 763,
     "fields": {
-      "country": 285,
+      "country": 254,
       "operating_margin": 0.48626,
       "combined_margin": 0.27362
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3070,
+    "pk": 764,
     "fields": {
       "country": 208,
       "operating_margin": 0.0,
@@ -28,7 +28,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3071,
+    "pk": 765,
     "fields": {
       "country": 106,
       "operating_margin": 0.528,
@@ -37,7 +37,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3072,
+    "pk": 766,
     "fields": {
       "country": 1,
       "operating_margin": 0.753,
@@ -46,7 +46,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3073,
+    "pk": 767,
     "fields": {
       "country": 209,
       "operating_margin": 0.188,
@@ -55,7 +55,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3074,
+    "pk": 768,
     "fields": {
       "country": 156,
       "operating_margin": 1.476,
@@ -64,7 +64,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3075,
+    "pk": 769,
     "fields": {
       "country": 54,
       "operating_margin": 0.753,
@@ -73,7 +73,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3076,
+    "pk": 770,
     "fields": {
       "country": 55,
       "operating_margin": 0.753,
@@ -82,7 +82,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3077,
+    "pk": 771,
     "fields": {
       "country": 56,
       "operating_margin": 0.478,
@@ -91,7 +91,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3078,
+    "pk": 772,
     "fields": {
       "country": 107,
       "operating_margin": 0.39,
@@ -100,7 +100,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3079,
+    "pk": 773,
     "fields": {
       "country": 57,
       "operating_margin": 0.753,
@@ -109,7 +109,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3080,
+    "pk": 774,
     "fields": {
       "country": 142,
       "operating_margin": 0.808,
@@ -118,7 +118,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3081,
+    "pk": 775,
     "fields": {
       "country": 210,
       "operating_margin": 0.242,
@@ -127,7 +127,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3082,
+    "pk": 776,
     "fields": {
       "country": 108,
       "operating_margin": 0.534,
@@ -136,7 +136,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3084,
+    "pk": 777,
+    "fields": {
+      "country": 287,
+      "operating_margin": 0.753,
+      "combined_margin": 0.384
+    }
+  },
+  {
+    "model": "ipcc.electricityemission",
+    "pk": 778,
     "fields": {
       "country": 58,
       "operating_margin": 0.753,
@@ -145,7 +154,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3085,
+    "pk": 779,
     "fields": {
       "country": 109,
       "operating_margin": 0.726,
@@ -154,7 +163,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3086,
+    "pk": 780,
     "fields": {
       "country": 146,
       "operating_margin": 0.528,
@@ -163,7 +172,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3087,
+    "pk": 781,
     "fields": {
       "country": 59,
       "operating_margin": 0.749,
@@ -172,7 +181,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3088,
+    "pk": 782,
     "fields": {
       "country": 45,
       "operating_margin": 0.4,
@@ -181,7 +190,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3089,
+    "pk": 783,
     "fields": {
       "country": 211,
       "operating_margin": 0.252,
@@ -190,7 +199,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3090,
+    "pk": 784,
     "fields": {
       "country": 60,
       "operating_margin": 0.403,
@@ -199,7 +208,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3091,
+    "pk": 785,
     "fields": {
       "country": 157,
       "operating_margin": 0.745,
@@ -208,7 +217,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3092,
+    "pk": 786,
     "fields": {
       "country": 137,
       "operating_margin": 0.753,
@@ -217,7 +226,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3093,
+    "pk": 787,
     "fields": {
       "country": 147,
       "operating_margin": 0.0,
@@ -226,7 +235,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3094,
+    "pk": 788,
     "fields": {
       "country": 61,
       "operating_margin": 0.604,
@@ -235,7 +244,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3095,
+    "pk": 789,
     "fields": {
       "country": 62,
       "operating_margin": 0.753,
@@ -244,7 +253,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3096,
+    "pk": 790,
     "fields": {
       "country": 212,
       "operating_margin": 1.197,
@@ -253,7 +262,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3097,
+    "pk": 791,
     "fields": {
       "country": 158,
       "operating_margin": 1.486,
@@ -262,7 +271,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3098,
+    "pk": 792,
     "fields": {
       "country": 63,
       "operating_margin": 0.528785714,
@@ -271,7 +280,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3099,
+    "pk": 793,
     "fields": {
       "country": 64,
       "operating_margin": 0.284,
@@ -280,7 +289,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3100,
+    "pk": 794,
     "fields": {
       "country": 148,
       "operating_margin": 0.6571,
@@ -289,7 +298,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3101,
+    "pk": 795,
     "fields": {
       "country": 65,
       "operating_margin": 0.753,
@@ -298,7 +307,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3102,
+    "pk": 796,
     "fields": {
       "country": 263,
       "operating_margin": 0.681,
@@ -307,7 +316,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3103,
+    "pk": 797,
     "fields": {
       "country": 46,
       "operating_margin": 0.911,
@@ -316,7 +325,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3104,
+    "pk": 798,
     "fields": {
       "country": 159,
       "operating_margin": 0.753,
@@ -325,7 +334,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3105,
+    "pk": 799,
     "fields": {
       "country": 160,
       "operating_margin": 0.414,
@@ -334,7 +343,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3106,
+    "pk": 800,
     "fields": {
       "country": 161,
       "operating_margin": 0.753,
@@ -343,7 +352,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3107,
+    "pk": 801,
     "fields": {
       "country": 264,
       "operating_margin": 1.046,
@@ -352,7 +361,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3108,
+    "pk": 802,
     "fields": {
       "country": 162,
       "operating_margin": 0.659,
@@ -361,7 +370,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3109,
+    "pk": 803,
     "fields": {
       "country": 138,
       "operating_margin": 0.372,
@@ -370,7 +379,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3111,
+    "pk": 804,
+    "fields": {
+      "country": 288,
+      "operating_margin": 0.753,
+      "combined_margin": 0.435
+    }
+  },
+  {
+    "model": "ipcc.electricityemission",
+    "pk": 805,
     "fields": {
       "country": 66,
       "operating_margin": 0.753,
@@ -379,7 +397,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3112,
+    "pk": 806,
     "fields": {
       "country": 163,
       "operating_margin": 0.188,
@@ -388,7 +406,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3113,
+    "pk": 807,
     "fields": {
       "country": 164,
       "operating_margin": 0.753,
@@ -397,7 +415,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3115,
+    "pk": 808,
+    "fields": {
+      "country": 289,
+      "operating_margin": 0.753,
+      "combined_margin": 0.389
+    }
+  },
+  {
+    "model": "ipcc.electricityemission",
+    "pk": 809,
     "fields": {
       "country": 67,
       "operating_margin": 0.657,
@@ -406,7 +433,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3116,
+    "pk": 810,
     "fields": {
       "country": 4,
       "operating_margin": 0.899,
@@ -415,7 +442,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3117,
+    "pk": 811,
     "fields": {
       "country": 5,
       "operating_margin": 0.754833333,
@@ -424,7 +451,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3118,
+    "pk": 812,
     "fields": {
       "country": 6,
       "operating_margin": 0.754833333,
@@ -433,7 +460,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3119,
+    "pk": 813,
     "fields": {
       "country": 7,
       "operating_margin": 0.719904762,
@@ -442,7 +469,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3120,
+    "pk": 814,
     "fields": {
       "country": 274,
       "operating_margin": 0.719904762,
@@ -451,7 +478,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3121,
+    "pk": 815,
     "fields": {
       "country": 68,
       "operating_margin": 0.41,
@@ -460,7 +487,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3122,
+    "pk": 816,
     "fields": {
       "country": 165,
       "operating_margin": 0.753,
@@ -469,7 +496,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3123,
+    "pk": 817,
     "fields": {
       "country": 166,
       "operating_margin": 0.659,
@@ -478,7 +505,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3124,
+    "pk": 818,
     "fields": {
       "country": 9,
       "operating_margin": 0.753,
@@ -487,7 +514,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3125,
+    "pk": 819,
     "fields": {
       "country": 69,
       "operating_margin": 0.108,
@@ -496,16 +523,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3126,
+    "pk": 820,
     "fields": {
-      "country": 258,
+      "country": 265,
       "operating_margin": 0.466,
       "combined_margin": 0.314
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3127,
+    "pk": 821,
     "fields": {
       "country": 213,
       "operating_margin": 0.294,
@@ -514,7 +541,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3128,
+    "pk": 822,
     "fields": {
       "country": 70,
       "operating_margin": 0.559,
@@ -523,7 +550,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3129,
+    "pk": 823,
     "fields": {
       "country": 256,
       "operating_margin": 0.876,
@@ -532,7 +559,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3130,
+    "pk": 824,
     "fields": {
       "country": 110,
       "operating_margin": 0.751,
@@ -541,16 +568,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3131,
+    "pk": 825,
     "fields": {
-      "country": 282,
+      "country": 47,
       "operating_margin": 0.902,
       "combined_margin": 0.461
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3132,
+    "pk": 826,
     "fields": {
       "country": 275,
       "operating_margin": 0.754,
@@ -559,7 +586,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3133,
+    "pk": 827,
     "fields": {
       "country": 168,
       "operating_margin": 0.0,
@@ -568,7 +595,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3134,
+    "pk": 828,
     "fields": {
       "country": 214,
       "operating_margin": 0.362,
@@ -577,7 +604,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3135,
+    "pk": 829,
     "fields": {
       "country": 169,
       "operating_margin": 0.753,
@@ -586,7 +613,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3136,
+    "pk": 830,
     "fields": {
       "country": 72,
       "operating_margin": 0.753,
@@ -595,7 +622,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3137,
+    "pk": 831,
     "fields": {
       "country": 73,
       "operating_margin": 0.601,
@@ -604,7 +631,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3138,
+    "pk": 832,
     "fields": {
       "country": 74,
       "operating_margin": 0.56,
@@ -613,7 +640,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3139,
+    "pk": 833,
     "fields": {
       "country": 111,
       "operating_margin": 0.554,
@@ -622,7 +649,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3140,
+    "pk": 834,
     "fields": {
       "country": 75,
       "operating_margin": 0.547,
@@ -631,7 +658,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3141,
+    "pk": 835,
     "fields": {
       "country": 170,
       "operating_margin": 0.632,
@@ -640,7 +667,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3142,
+    "pk": 836,
     "fields": {
       "country": 171,
       "operating_margin": 0.915,
@@ -649,7 +676,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3143,
+    "pk": 837,
     "fields": {
       "country": 215,
       "operating_margin": 1.057,
@@ -658,7 +685,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3144,
+    "pk": 838,
     "fields": {
       "country": 172,
       "operating_margin": 0.0,
@@ -667,7 +694,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3145,
+    "pk": 839,
     "fields": {
       "country": 173,
       "operating_margin": 0.0,
@@ -676,7 +703,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3146,
+    "pk": 840,
     "fields": {
       "country": 276,
       "operating_margin": 0.753,
@@ -685,7 +712,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3147,
+    "pk": 841,
     "fields": {
       "country": 216,
       "operating_margin": 0.753,
@@ -694,7 +721,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3148,
+    "pk": 842,
     "fields": {
       "country": 11,
       "operating_margin": 0.64,
@@ -703,7 +730,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3149,
+    "pk": 843,
     "fields": {
       "country": 217,
       "operating_margin": 0.267,
@@ -712,7 +739,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3150,
+    "pk": 844,
     "fields": {
       "country": 218,
       "operating_margin": 0.158,
@@ -721,7 +748,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3151,
+    "pk": 845,
     "fields": {
       "country": 77,
       "operating_margin": 0.423,
@@ -730,7 +757,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3152,
+    "pk": 846,
     "fields": {
       "country": 12,
       "operating_margin": 0.753,
@@ -739,7 +766,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3153,
+    "pk": 847,
     "fields": {
       "country": 174,
       "operating_margin": 0.6571,
@@ -748,7 +775,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3154,
+    "pk": 848,
     "fields": {
       "country": 175,
       "operating_margin": 0.946,
@@ -757,7 +784,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3155,
+    "pk": 849,
     "fields": {
       "country": 176,
       "operating_margin": 0.753,
@@ -766,7 +793,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3156,
+    "pk": 850,
     "fields": {
       "country": 112,
       "operating_margin": 0.289,
@@ -775,7 +802,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3157,
+    "pk": 851,
     "fields": {
       "country": 219,
       "operating_margin": 0.65,
@@ -784,7 +811,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3158,
+    "pk": 852,
     "fields": {
       "country": 177,
       "operating_margin": 0.495,
@@ -793,7 +820,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3159,
+    "pk": 853,
     "fields": {
       "country": 220,
       "operating_margin": 0.779,
@@ -802,7 +829,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3160,
+    "pk": 854,
     "fields": {
       "country": 221,
       "operating_margin": 0.507,
@@ -811,7 +838,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3161,
+    "pk": 855,
     "fields": {
       "country": 139,
       "operating_margin": 0.264,
@@ -820,7 +847,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3162,
+    "pk": 856,
     "fields": {
       "country": 78,
       "operating_margin": 0.753,
@@ -829,7 +856,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3163,
+    "pk": 857,
     "fields": {
       "country": 79,
       "operating_margin": 0.753,
@@ -838,7 +865,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3164,
+    "pk": 858,
     "fields": {
       "country": 13,
       "operating_margin": 0.753,
@@ -847,7 +874,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3165,
+    "pk": 859,
     "fields": {
       "country": 80,
       "operating_margin": 0.798,
@@ -856,7 +883,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3166,
+    "pk": 860,
     "fields": {
       "country": 222,
       "operating_margin": 0.48626,
@@ -865,7 +892,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3167,
+    "pk": 861,
     "fields": {
       "country": 178,
       "operating_margin": 0.753,
@@ -874,7 +901,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3168,
+    "pk": 862,
     "fields": {
       "country": 179,
       "operating_margin": 0.753,
@@ -883,7 +910,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3169,
+    "pk": 863,
     "fields": {
       "country": 81,
       "operating_margin": 0.847,
@@ -892,7 +919,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3170,
+    "pk": 864,
     "fields": {
       "country": 82,
       "operating_margin": 1.048,
@@ -901,7 +928,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3171,
+    "pk": 865,
     "fields": {
       "country": 14,
       "operating_margin": 0.719904762,
@@ -910,7 +937,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3172,
+    "pk": 866,
     "fields": {
       "country": 223,
       "operating_margin": 0.48626,
@@ -919,7 +946,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3173,
+    "pk": 867,
     "fields": {
       "country": 83,
       "operating_margin": 0.662,
@@ -928,7 +955,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3174,
+    "pk": 868,
     "fields": {
       "country": 48,
       "operating_margin": 0.296,
@@ -937,7 +964,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3175,
+    "pk": 869,
     "fields": {
       "country": 224,
       "operating_margin": 0.0,
@@ -946,7 +973,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3176,
+    "pk": 870,
     "fields": {
       "country": 149,
       "operating_margin": 0.951,
@@ -955,7 +982,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3177,
+    "pk": 871,
     "fields": {
       "country": 266,
       "operating_margin": 0.783,
@@ -964,7 +991,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3178,
+    "pk": 872,
     "fields": {
       "country": 150,
       "operating_margin": 0.592,
@@ -973,7 +1000,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3179,
+    "pk": 873,
     "fields": {
       "country": 113,
       "operating_margin": 1.08,
@@ -982,7 +1009,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3180,
+    "pk": 874,
     "fields": {
       "country": 225,
       "operating_margin": 0.38,
@@ -991,7 +1018,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3181,
+    "pk": 875,
     "fields": {
       "country": 226,
       "operating_margin": 0.436,
@@ -1000,7 +1027,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3182,
+    "pk": 876,
     "fields": {
       "country": 114,
       "operating_margin": 0.394,
@@ -1009,7 +1036,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3183,
+    "pk": 877,
     "fields": {
       "country": 227,
       "operating_margin": 0.414,
@@ -1018,7 +1045,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3184,
+    "pk": 878,
     "fields": {
       "country": 84,
       "operating_margin": 0.711,
@@ -1027,7 +1054,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3185,
+    "pk": 879,
     "fields": {
       "country": 16,
       "operating_margin": 0.471,
@@ -1036,7 +1063,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3186,
+    "pk": 880,
     "fields": {
       "country": 228,
       "operating_margin": 0.48626,
@@ -1045,7 +1072,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3187,
+    "pk": 881,
     "fields": {
       "country": 115,
       "operating_margin": 0.529,
@@ -1054,7 +1081,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3188,
+    "pk": 882,
     "fields": {
       "country": 116,
       "operating_margin": 0.797,
@@ -1063,7 +1090,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3189,
+    "pk": 883,
     "fields": {
       "country": 180,
       "operating_margin": 0.574,
@@ -1072,7 +1099,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3190,
+    "pk": 884,
     "fields": {
       "country": 17,
       "operating_margin": 0.753,
@@ -1081,7 +1108,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3192,
+    "pk": 885,
+    "fields": {
+      "country": 290,
+      "operating_margin": 1.145,
+      "combined_margin": 0.843
+    }
+  },
+  {
+    "model": "ipcc.electricityemission",
+    "pk": 886,
     "fields": {
       "country": 117,
       "operating_margin": 0.675,
@@ -1090,7 +1126,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3193,
+    "pk": 887,
     "fields": {
       "country": 118,
       "operating_margin": 0.217,
@@ -1099,7 +1135,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3194,
+    "pk": 888,
     "fields": {
       "country": 277,
       "operating_margin": 1.069,
@@ -1108,7 +1144,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3195,
+    "pk": 889,
     "fields": {
       "country": 229,
       "operating_margin": 0.24,
@@ -1117,7 +1153,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3196,
+    "pk": 890,
     "fields": {
       "country": 119,
       "operating_margin": 0.794,
@@ -1126,7 +1162,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3197,
+    "pk": 891,
     "fields": {
       "country": 181,
       "operating_margin": 0.0,
@@ -1135,7 +1171,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3198,
+    "pk": 892,
     "fields": {
       "country": 182,
       "operating_margin": 0.677,
@@ -1144,7 +1180,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3199,
+    "pk": 893,
     "fields": {
       "country": 120,
       "operating_margin": 0.668,
@@ -1153,7 +1189,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3200,
+    "pk": 894,
     "fields": {
       "country": 230,
       "operating_margin": 0.151,
@@ -1162,7 +1198,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3201,
+    "pk": 895,
     "fields": {
       "country": 231,
       "operating_margin": 0.211,
@@ -1171,7 +1207,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3202,
+    "pk": 896,
     "fields": {
       "country": 232,
       "operating_margin": 0.22,
@@ -1180,7 +1216,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3203,
+    "pk": 897,
     "fields": {
       "country": 183,
       "operating_margin": 0.876,
@@ -1189,16 +1225,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3204,
+    "pk": 898,
     "fields": {
-      "country": 290,
+      "country": 291,
       "operating_margin": 0.663,
       "combined_margin": 0.369
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3205,
+    "pk": 899,
     "fields": {
       "country": 184,
       "operating_margin": 0.489,
@@ -1207,7 +1243,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3206,
+    "pk": 900,
     "fields": {
       "country": 267,
       "operating_margin": 0.551,
@@ -1216,7 +1252,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3207,
+    "pk": 901,
     "fields": {
       "country": 151,
       "operating_margin": 0.753,
@@ -1225,7 +1261,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3208,
+    "pk": 902,
     "fields": {
       "country": 185,
       "operating_margin": 1.076,
@@ -1234,7 +1270,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3209,
+    "pk": 903,
     "fields": {
       "country": 233,
       "operating_margin": 0.52,
@@ -1243,7 +1279,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3210,
+    "pk": 904,
     "fields": {
       "country": 20,
       "operating_margin": 0.753,
@@ -1252,7 +1288,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3211,
+    "pk": 905,
     "fields": {
       "country": 85,
       "operating_margin": 0.753,
@@ -1261,7 +1297,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3212,
+    "pk": 906,
     "fields": {
       "country": 186,
       "operating_margin": 0.753,
@@ -1270,7 +1306,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3213,
+    "pk": 907,
     "fields": {
       "country": 187,
       "operating_margin": 0.7,
@@ -1279,7 +1315,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3214,
+    "pk": 908,
     "fields": {
       "country": 188,
       "operating_margin": 0.753,
@@ -1288,7 +1324,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3215,
+    "pk": 909,
     "fields": {
       "country": 86,
       "operating_margin": 0.531,
@@ -1297,7 +1333,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3216,
+    "pk": 910,
     "fields": {
       "country": 268,
       "operating_margin": 0.753,
@@ -1306,7 +1342,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3217,
+    "pk": 911,
     "fields": {
       "country": 234,
       "operating_margin": 0.158,
@@ -1315,7 +1351,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3218,
+    "pk": 912,
     "fields": {
       "country": 22,
       "operating_margin": 1.366,
@@ -1324,7 +1360,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3219,
+    "pk": 913,
     "fields": {
       "country": 235,
       "operating_margin": 0.899,
@@ -1333,7 +1369,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3220,
+    "pk": 914,
     "fields": {
       "country": 87,
       "operating_margin": 0.753,
@@ -1342,7 +1378,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3221,
+    "pk": 915,
     "fields": {
       "country": 121,
       "operating_margin": 0.729,
@@ -1351,7 +1387,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3222,
+    "pk": 916,
     "fields": {
       "country": 189,
       "operating_margin": 0.234,
@@ -1360,7 +1396,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3223,
+    "pk": 917,
     "fields": {
       "country": 269,
       "operating_margin": 0.719,
@@ -1369,7 +1405,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3224,
+    "pk": 918,
     "fields": {
       "country": 190,
       "operating_margin": 0.355,
@@ -1378,7 +1414,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3225,
+    "pk": 919,
     "fields": {
       "country": 24,
       "operating_margin": 0.753,
@@ -1387,7 +1423,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3226,
+    "pk": 920,
     "fields": {
       "country": 152,
       "operating_margin": 0.0,
@@ -1396,7 +1432,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3227,
+    "pk": 921,
     "fields": {
       "country": 236,
       "operating_margin": 0.326,
@@ -1405,7 +1441,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3228,
+    "pk": 922,
     "fields": {
       "country": 25,
       "operating_margin": 0.779,
@@ -1414,7 +1450,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3229,
+    "pk": 923,
     "fields": {
       "country": 143,
       "operating_margin": 0.246,
@@ -1423,7 +1459,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3230,
+    "pk": 924,
     "fields": {
       "country": 88,
       "operating_margin": 0.675,
@@ -1432,7 +1468,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3231,
+    "pk": 925,
     "fields": {
       "country": 191,
       "operating_margin": 0.772,
@@ -1441,7 +1477,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3232,
+    "pk": 926,
     "fields": {
       "country": 192,
       "operating_margin": 0.526,
@@ -1450,7 +1486,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3233,
+    "pk": 927,
     "fields": {
       "country": 26,
       "operating_margin": 0.753,
@@ -1459,7 +1495,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3234,
+    "pk": 928,
     "fields": {
       "country": 27,
       "operating_margin": 0.719904762,
@@ -1468,7 +1504,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3235,
+    "pk": 929,
     "fields": {
       "country": 237,
       "operating_margin": 0.851,
@@ -1477,7 +1513,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3236,
+    "pk": 930,
     "fields": {
       "country": 28,
       "operating_margin": 0.753,
@@ -1486,7 +1522,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3237,
+    "pk": 931,
     "fields": {
       "country": 238,
       "operating_margin": 0.047,
@@ -1495,7 +1531,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3238,
+    "pk": 932,
     "fields": {
       "country": 122,
       "operating_margin": 0.479,
@@ -1504,7 +1540,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3239,
+    "pk": 933,
     "fields": {
       "country": 153,
       "operating_margin": 0.592,
@@ -1513,7 +1549,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3240,
+    "pk": 934,
     "fields": {
       "country": 29,
       "operating_margin": 0.753,
@@ -1522,7 +1558,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3241,
+    "pk": 935,
     "fields": {
       "country": 89,
       "operating_margin": 0.477,
@@ -1531,7 +1567,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3242,
+    "pk": 936,
     "fields": {
       "country": 30,
       "operating_margin": 0.597,
@@ -1540,7 +1576,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3243,
+    "pk": 937,
     "fields": {
       "country": 90,
       "operating_margin": 0.0,
@@ -1549,7 +1585,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3244,
+    "pk": 938,
     "fields": {
       "country": 91,
       "operating_margin": 0.473,
@@ -1558,7 +1594,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3245,
+    "pk": 939,
     "fields": {
       "country": 270,
       "operating_margin": 0.672,
@@ -1567,7 +1603,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3246,
+    "pk": 940,
     "fields": {
       "country": 154,
       "operating_margin": 0.719904762,
@@ -1576,7 +1612,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3247,
+    "pk": 941,
     "fields": {
       "country": 49,
       "operating_margin": 0.828,
@@ -1585,7 +1621,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3248,
+    "pk": 942,
     "fields": {
       "country": 239,
       "operating_margin": 0.389,
@@ -1594,7 +1630,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3249,
+    "pk": 943,
     "fields": {
       "country": 92,
       "operating_margin": 0.596,
@@ -1603,7 +1639,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3250,
+    "pk": 944,
     "fields": {
       "country": 123,
       "operating_margin": 0.503,
@@ -1612,7 +1648,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3251,
+    "pk": 945,
     "fields": {
       "country": 32,
       "operating_margin": 0.555,
@@ -1621,7 +1657,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3252,
+    "pk": 946,
     "fields": {
       "country": 50,
       "operating_margin": 0.541,
@@ -1630,7 +1666,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3253,
+    "pk": 947,
     "fields": {
       "country": 259,
       "operating_margin": 0.772,
@@ -1639,7 +1675,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3254,
+    "pk": 948,
     "fields": {
       "country": 51,
       "operating_margin": 0.489,
@@ -1648,7 +1684,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3255,
+    "pk": 949,
     "fields": {
       "country": 144,
       "operating_margin": 0.476,
@@ -1657,7 +1693,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3256,
+    "pk": 950,
     "fields": {
       "country": 194,
       "operating_margin": 0.712,
@@ -1666,7 +1702,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3257,
+    "pk": 951,
     "fields": {
       "country": 257,
       "operating_margin": 0.737148148,
@@ -1675,7 +1711,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3258,
+    "pk": 952,
     "fields": {
       "country": 195,
       "operating_margin": 0.753,
@@ -1684,7 +1720,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3259,
+    "pk": 953,
     "fields": {
       "country": 94,
       "operating_margin": 0.753,
@@ -1693,7 +1729,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3260,
+    "pk": 954,
     "fields": {
       "country": 95,
       "operating_margin": 0.753,
@@ -1702,16 +1738,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3261,
+    "pk": 955,
     "fields": {
-      "country": 283,
+      "country": 278,
       "operating_margin": 0.753,
       "combined_margin": 0.484
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3262,
+    "pk": 956,
     "fields": {
       "country": 140,
       "operating_margin": 0.753,
@@ -1720,7 +1756,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3263,
+    "pk": 957,
     "fields": {
       "country": 97,
       "operating_margin": 0.753,
@@ -1729,7 +1765,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3264,
+    "pk": 958,
     "fields": {
       "country": 33,
       "operating_margin": 0.753,
@@ -1738,7 +1774,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3265,
+    "pk": 959,
     "fields": {
       "country": 240,
       "operating_margin": 0.414,
@@ -1747,7 +1783,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3266,
+    "pk": 960,
     "fields": {
       "country": 196,
       "operating_margin": 0.753,
@@ -1756,7 +1792,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3267,
+    "pk": 961,
     "fields": {
       "country": 241,
       "operating_margin": 0.48626,
@@ -1765,7 +1801,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3268,
+    "pk": 962,
     "fields": {
       "country": 124,
       "operating_margin": 0.592,
@@ -1774,7 +1810,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3269,
+    "pk": 963,
     "fields": {
       "country": 197,
       "operating_margin": 0.87,
@@ -1783,7 +1819,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3270,
+    "pk": 964,
     "fields": {
       "country": 242,
       "operating_margin": 1.086,
@@ -1792,7 +1828,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3271,
+    "pk": 965,
     "fields": {
       "country": 198,
       "operating_margin": 0.753,
@@ -1801,7 +1837,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3272,
+    "pk": 966,
     "fields": {
       "country": 199,
       "operating_margin": 0.489,
@@ -1810,7 +1846,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3273,
+    "pk": 967,
     "fields": {
       "country": 271,
       "operating_margin": 0.379,
@@ -1819,7 +1855,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3274,
+    "pk": 968,
     "fields": {
       "country": 279,
       "operating_margin": 0.753,
@@ -1828,7 +1864,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3275,
+    "pk": 969,
     "fields": {
       "country": 52,
       "operating_margin": 0.332,
@@ -1837,7 +1873,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3276,
+    "pk": 970,
     "fields": {
       "country": 243,
       "operating_margin": 0.62,
@@ -1846,7 +1882,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3277,
+    "pk": 971,
     "fields": {
       "country": 35,
       "operating_margin": 0.753,
@@ -1855,7 +1891,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3278,
+    "pk": 972,
     "fields": {
       "country": 200,
       "operating_margin": 0.753,
@@ -1864,7 +1900,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3279,
+    "pk": 973,
     "fields": {
       "country": 201,
       "operating_margin": 1.07,
@@ -1873,7 +1909,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3280,
+    "pk": 974,
     "fields": {
       "country": 99,
       "operating_margin": 0.528785714,
@@ -1882,7 +1918,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3281,
+    "pk": 975,
     "fields": {
       "country": 125,
       "operating_margin": 0.89,
@@ -1891,7 +1927,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3282,
+    "pk": 976,
     "fields": {
       "country": 244,
       "operating_margin": 0.402,
@@ -1900,7 +1936,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3283,
+    "pk": 977,
     "fields": {
       "country": 155,
       "operating_margin": 0.731,
@@ -1909,7 +1945,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3284,
+    "pk": 978,
     "fields": {
       "country": 126,
       "operating_margin": 0.719,
@@ -1918,7 +1954,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3285,
+    "pk": 979,
     "fields": {
       "country": 127,
       "operating_margin": 0.736,
@@ -1927,7 +1963,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3286,
+    "pk": 980,
     "fields": {
       "country": 100,
       "operating_margin": 1.029,
@@ -1936,7 +1972,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3287,
+    "pk": 981,
     "fields": {
       "country": 245,
       "operating_margin": 0.48626,
@@ -1945,7 +1981,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3288,
+    "pk": 982,
     "fields": {
       "country": 246,
       "operating_margin": 0.068,
@@ -1954,7 +1990,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3289,
+    "pk": 983,
     "fields": {
       "country": 247,
       "operating_margin": 0.048,
@@ -1963,7 +1999,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3290,
+    "pk": 984,
     "fields": {
       "country": 128,
       "operating_margin": 0.713,
@@ -1972,16 +2008,16 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3291,
+    "pk": 985,
     "fields": {
-      "country": 291,
+      "country": 292,
       "operating_margin": 0.484,
       "combined_margin": 0.331
     }
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3292,
+    "pk": 986,
     "fields": {
       "country": 129,
       "operating_margin": 0.255,
@@ -1990,7 +2026,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3293,
+    "pk": 987,
     "fields": {
       "country": 273,
       "operating_margin": 0.45,
@@ -1999,7 +2035,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3294,
+    "pk": 988,
     "fields": {
       "country": 280,
       "operating_margin": 0.753,
@@ -2008,7 +2044,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3295,
+    "pk": 989,
     "fields": {
       "country": 202,
       "operating_margin": 0.859,
@@ -2017,7 +2053,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3296,
+    "pk": 990,
     "fields": {
       "country": 38,
       "operating_margin": 0.719904762,
@@ -2026,7 +2062,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3297,
+    "pk": 991,
     "fields": {
       "country": 39,
       "operating_margin": 0.753,
@@ -2035,7 +2071,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3298,
+    "pk": 992,
     "fields": {
       "country": 101,
       "operating_margin": 0.559,
@@ -2044,7 +2080,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3299,
+    "pk": 993,
     "fields": {
       "country": 130,
       "operating_margin": 0.468,
@@ -2053,7 +2089,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3300,
+    "pk": 994,
     "fields": {
       "country": 131,
       "operating_margin": 0.376,
@@ -2062,7 +2098,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3301,
+    "pk": 995,
     "fields": {
       "country": 132,
       "operating_margin": 0.927,
@@ -2071,7 +2107,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3302,
+    "pk": 996,
     "fields": {
       "country": 102,
       "operating_margin": 0.753,
@@ -2080,7 +2116,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3303,
+    "pk": 997,
     "fields": {
       "country": 40,
       "operating_margin": 0.753,
@@ -2089,7 +2125,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3304,
+    "pk": 998,
     "fields": {
       "country": 203,
       "operating_margin": 0.279,
@@ -2098,7 +2134,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3305,
+    "pk": 999,
     "fields": {
       "country": 53,
       "operating_margin": 0.768,
@@ -2107,7 +2143,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3306,
+    "pk": 1000,
     "fields": {
       "country": 133,
       "operating_margin": 0.556,
@@ -2116,7 +2152,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3307,
+    "pk": 1001,
     "fields": {
       "country": 248,
       "operating_margin": 0.38,
@@ -2125,7 +2161,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3308,
+    "pk": 1002,
     "fields": {
       "country": 204,
       "operating_margin": 0.531,
@@ -2134,7 +2170,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3309,
+    "pk": 1003,
     "fields": {
       "country": 41,
       "operating_margin": 0.719904762,
@@ -2143,7 +2179,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3310,
+    "pk": 1004,
     "fields": {
       "country": 141,
       "operating_margin": 0.416,
@@ -2152,7 +2188,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3311,
+    "pk": 1005,
     "fields": {
       "country": 103,
       "operating_margin": 0.65,
@@ -2161,7 +2197,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3312,
+    "pk": 1006,
     "fields": {
       "country": 104,
       "operating_margin": 0.174,
@@ -2170,7 +2206,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3313,
+    "pk": 1007,
     "fields": {
       "country": 134,
       "operating_margin": 0.612,
@@ -2179,7 +2215,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3314,
+    "pk": 1008,
     "fields": {
       "country": 42,
       "operating_margin": 0.753,
@@ -2188,7 +2224,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3315,
+    "pk": 1009,
     "fields": {
       "country": 105,
       "operating_margin": 0.711,
@@ -2197,7 +2233,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3316,
+    "pk": 1010,
     "fields": {
       "country": 281,
       "operating_margin": 0.56,
@@ -2206,7 +2242,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3317,
+    "pk": 1011,
     "fields": {
       "country": 44,
       "operating_margin": 0.719904762,
@@ -2215,7 +2251,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3318,
+    "pk": 1012,
     "fields": {
       "country": 135,
       "operating_margin": 0.613833333,
@@ -2224,7 +2260,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3319,
+    "pk": 1013,
     "fields": {
       "country": 136,
       "operating_margin": 0.807,
@@ -2233,7 +2269,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3320,
+    "pk": 1014,
     "fields": {
       "country": 205,
       "operating_margin": 0.416,
@@ -2242,7 +2278,7 @@
   },
   {
     "model": "ipcc.electricityemission",
-    "pk": 3321,
+    "pk": 1015,
     "fields": {
       "country": 206,
       "operating_margin": 1.575,

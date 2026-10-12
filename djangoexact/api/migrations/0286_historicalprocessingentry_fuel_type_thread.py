@@ -13,6 +13,99 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
+TABLE = "api_historicalprocessingentry"
+COLUMN = "fuel_type_thread_id"
+
+# PostgreSQL: PL/pgSQL guard, unchanged. This is what production applied.
+# Identifiers are written out literally (no f-strings) so static SQL-injection
+# scanners don't flag these constant DDL statements.
+POSTGRES_FORWARD = """
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = 'api_historicalprocessingentry'
+          AND column_name = 'fuel_type_thread_id'
+    ) THEN
+        ALTER TABLE api_historicalprocessingentry
+            ADD COLUMN fuel_type_thread_id bigint NULL;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_indexes
+        WHERE schemaname = current_schema()
+          AND tablename = 'api_historicalprocessingentry'
+          AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
+    ) THEN
+        CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
+            ON api_historicalprocessingentry (fuel_type_thread_id);
+    END IF;
+END
+$$;
+"""
+
+POSTGRES_REVERSE = """
+DROP INDEX IF EXISTS api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a;
+ALTER TABLE api_historicalprocessingentry DROP COLUMN IF EXISTS fuel_type_thread_id;
+"""
+
+SQLITE_ADD_COLUMN = (
+    "ALTER TABLE api_historicalprocessingentry "
+    "ADD COLUMN fuel_type_thread_id bigint NULL"
+)
+SQLITE_CREATE_INDEX = (
+    'CREATE INDEX IF NOT EXISTS '
+    '"api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a" '
+    "ON api_historicalprocessingentry (fuel_type_thread_id)"
+)
+SQLITE_DROP_INDEX = (
+    'DROP INDEX IF EXISTS '
+    '"api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a"'
+)
+SQLITE_DROP_COLUMN = (
+    "ALTER TABLE api_historicalprocessingentry DROP COLUMN fuel_type_thread_id"
+)
+
+
+def _column_exists(connection):
+    with connection.cursor() as cursor:
+        description = connection.introspection.get_table_description(cursor, TABLE)
+    return any(column.name == COLUMN for column in description)
+
+
+def add_column_if_missing(apps, schema_editor):
+    """Add the column, on any backend.
+
+    The original migration was PostgreSQL-only (`DO $$ ... $$`), which made a
+    fresh sqlite database impossible to migrate and so blocked the fixture-based
+    offline bootstrap (scripts/build_offline_db.sh). The PostgreSQL path below is
+    the original statement verbatim; other backends get the same effect through
+    plain SQL guarded by introspection.
+    """
+    connection = schema_editor.connection
+    if connection.vendor == "postgresql":
+        schema_editor.execute(POSTGRES_FORWARD)
+        return
+
+    if _column_exists(connection):
+        return
+    schema_editor.execute(SQLITE_ADD_COLUMN)
+    schema_editor.execute(SQLITE_CREATE_INDEX)
+
+
+def drop_column_if_present(apps, schema_editor):
+    connection = schema_editor.connection
+    if connection.vendor == "postgresql":
+        schema_editor.execute(POSTGRES_REVERSE)
+        return
+
+    schema_editor.execute(SQLITE_DROP_INDEX)
+    if _column_exists(connection):
+        # sqlite supports DROP COLUMN from 3.35 onwards.
+        schema_editor.execute(SQLITE_DROP_COLUMN)
+
 
 class Migration(migrations.Migration):
 
@@ -37,37 +130,9 @@ class Migration(migrations.Migration):
                 ),
             ],
             database_operations=[
-                migrations.RunSQL(
-                    sql="""
-                    DO $$
-                    BEGIN
-                        IF NOT EXISTS (
-                            SELECT 1
-                            FROM information_schema.columns
-                            WHERE table_name = 'api_historicalprocessingentry'
-                              AND column_name = 'fuel_type_thread_id'
-                        ) THEN
-                            ALTER TABLE api_historicalprocessingentry
-                                ADD COLUMN fuel_type_thread_id bigint NULL;
-                        END IF;
-
-                        IF NOT EXISTS (
-                            SELECT 1
-                            FROM pg_indexes
-                            WHERE schemaname = current_schema()
-                              AND tablename = 'api_historicalprocessingentry'
-                              AND indexname = 'api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a'
-                        ) THEN
-                            CREATE INDEX api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a
-                                ON api_historicalprocessingentry (fuel_type_thread_id);
-                        END IF;
-                    END
-                    $$;
-                    """,
-                    reverse_sql="""
-                    DROP INDEX IF EXISTS api_historicalprocessingentry_fuel_type_thread_id_f2b5f99a;
-                    ALTER TABLE api_historicalprocessingentry DROP COLUMN IF EXISTS fuel_type_thread_id;
-                    """,
+                migrations.RunPython(
+                    add_column_if_missing,
+                    drop_column_if_present,
                 ),
             ],
         ),

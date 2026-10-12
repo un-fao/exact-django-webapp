@@ -22,6 +22,7 @@ from api.models import CustomUser as User
 from django.utils.text import slugify
 
 from . import labels
+from .models import guided_step_format
 from .models import (
     Module,
     Submodule,
@@ -182,6 +183,56 @@ def validate_module_fields(data, mandatory_fields: list):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
 
+class _SerializerRegistry(dict):
+    """Lazily-populated allowlist of DRF serializer classes resolvable by
+    dynamic name.
+
+    Populated from this module's namespace on first miss and refreshed on
+    later misses rather than snapshotted at import time: some lookups run
+    while the module is still being imported (class bodies below call
+    get_model_serializer), so an early snapshot would miss classes defined
+    later and change resolution behavior. Hits cost O(1); a miss rescans the
+    namespace before failing, which is what every lookup cost before caching.
+    Restricting entries to serializer classes keeps dynamically-built,
+    model-derived names from indexing arbitrary module globals.
+    """
+
+    def _refresh(self):
+        self.update(
+            (name, obj)
+            for name, obj in globals().items()
+            if isinstance(obj, type) and issubclass(obj, serializers.BaseSerializer)
+        )
+
+    def __missing__(self, key):
+        self._refresh()
+        # dict.__getitem__ on a subclass re-enters __missing__ for an absent
+        # key, so raise directly instead of re-indexing after the refresh.
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        raise KeyError(key)
+
+    def __contains__(self, key):
+        if dict.__contains__(self, key):
+            return True
+        self._refresh()
+        return dict.__contains__(self, key)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+_SERIALIZER_REGISTRY = _SerializerRegistry()
+
+
+def _serializer_registry() -> dict:
+    """Return the lazily-populated serializer allowlist registry."""
+    return _SERIALIZER_REGISTRY
+
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -193,7 +244,7 @@ def get_model_serializer(model_arg):
             super().__init__(*args, **kwargs)
 
     try:
-        return globals()[model_arg.__name__ + "Serializer"]
+        return _serializer_registry()[model_arg.__name__ + "Serializer"]
     except KeyError:
         return GenericSerializer
 
@@ -202,9 +253,9 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
     try:
         match action:
             case ActionTypes.CREATE | ActionTypes.UPDATE:
-                return globals()[model_arg.__name__ + "WriteSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "WriteSerializer"]
             case ActionTypes.RETRIEVE:
-                return globals()[model_arg.__name__ + "ReadSerializer"]
+                return _serializer_registry()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
         raise ValueError(f"Serializer for {model_arg.__name__} not found")
 
@@ -324,7 +375,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count", "guided_step"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -438,6 +489,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
     moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False, allow_null=True, write_only=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
+    # Declared explicitly: the model field is blank=True (for the admin), which would make DRF
+    # accept "" and skip the validators, breaking "guided if and only if not null".
+    guided_step = serializers.CharField(max_length=64, allow_null=True, required=False, validators=[guided_step_format])
 
     class Meta:
         model = Project
@@ -478,8 +532,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
             is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+            # The tour must be able to advance or end after the project has been finalized.
+            is_only_guided_step_change = set(data.keys()) == {"guided_step"}
 
-            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+            if project.is_finalized and is_finalized is not False and not is_only_public_change and not is_only_guided_step_change:
                 raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
@@ -595,9 +651,17 @@ class ModuleExportSerializer(serializers.Serializer):
         # OneToOneField references (e.g. Settlement.land_use_change →
         # LandUseChange) whose PKs change in the target database.
         data['_original_id'] = instance.id
+        # NOTE: 'status' and 'last_modified' are exported on purpose.
+        # An appraisal is a record of the numbers as they were computed, so the
+        # round trip has to carry the module's computed state, not just its
+        # inputs. 'status' is what makes the results endpoint serve a module at
+        # all (it refuses anything that is not READY), and 'last_modified' is
+        # what validates the cache: is_cached_results_valid() compares
+        # last_cached_at against it, so re-stamping it at import time would
+        # silently invalidate every restored result.
         excluded_fields = (
-            'id', 'activity', 'status', 'data_source', 'note',
-            'history', 'last_modified', 'parent'
+            'id', 'activity', 'note',
+            'history', 'parent'
         )
         for field in instance._meta.get_fields():
             if field.name in excluded_fields:
@@ -668,7 +732,8 @@ class ProjectExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
-                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id']
+                   'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
+                   'last_recap_sent_at', 'guided_step']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -1527,7 +1592,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         return super().validate(data)
 
     def parent_validation(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        ParentWriteSerializer = _serializer_registry().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
 
@@ -3154,6 +3219,24 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
+def check_member_management_allowed(project: Project, request):
+    """Guard for adding/updating project memberships and invitations.
+
+    Archived projects are closed for good. Finalized projects are read-only for
+    everyone except the people who administer them: project Admins (and
+    superusers, who bypass every other project permission check) must still be
+    able to hand over or share administration after finalization.
+    """
+    user = getattr(request, "user", None)
+    is_project_admin = user is not None and user.is_authenticated and (user.is_superuser or project.members.filter(user=user, group__name="Admin").exists())
+
+    if project.is_archived:
+        raise serializers.ValidationError("Cannot add members to an archived project")
+
+    if project.is_finalized and not is_project_admin:
+        raise serializers.ValidationError("Cannot add members to a finalized project")
+
+
 class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
@@ -3169,11 +3252,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         return data
 
@@ -3188,14 +3267,14 @@ class ProjectMembershipReadSerializer(serializers.ModelSerializer):
 class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["id", "project", "user", "is_opted_out", "created_at", "updated_at"]
+        fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
         ref_name = "ProjectNotificationPreference"
 
 
 class ProjectNotificationPreferenceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectNotificationPreference
-        fields = ["project", "is_opted_out"]
+        fields = ["project", "is_subscribed"]
         ref_name = "ProjectNotificationPreference"
 
     def validate(self, data):
@@ -3496,11 +3575,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
         project: Project = utils.getany([data, self.instance], "project")
 
-        if project.is_archived:
-            raise serializers.ValidationError("Cannot add members to an archived project")
-
-        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
-            raise serializers.ValidationError("Cannot add members to a finalized project")
+        check_member_management_allowed(project, self.context.get("request"))
 
         if self.instance:
             new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()

@@ -1,0 +1,19 @@
+[DEBUG 2026-07-29 08:57:56,969] __init__ 	 matplotlib data path: /home/sirvosterzo/Developer/FAO/EXACT/exact-django-webapp/.venv/lib/python3.11/site-packages/matplotlib/mpl-data
+[DEBUG 2026-07-29 08:57:56,971] __init__ 	 CONFIGDIR=/home/sirvosterzo/.config/matplotlib
+[DEBUG 2026-07-29 08:57:56,971] __init__ 	 interactive is False
+[DEBUG 2026-07-29 08:57:56,971] __init__ 	 platform is linux
+[DEBUG 2026-07-29 08:57:56,990] __init__ 	 CACHEDIR=/home/sirvosterzo/.cache/matplotlib
+[DEBUG 2026-07-29 08:57:56,991] font_manager 	 Using fontManager instance from /home/sirvosterzo/.cache/matplotlib/fontlist-v330.json
+[DEBUG 2026-07-29 08:57:57,061] pyplot 	 Loaded backend agg version v2.2.
+[DEBUG 2026-07-29 08:57:57,215] _opentelemetry_tracing 	 This service is instrumented using OpenTelemetry. OpenTelemetry or one of its components could not be imported; please add compatible versions of opentelemetry-api and opentelemetry-instrumentation packages in order to get Storage Tracing data.
+Running in review mode
+279 objects imported automatically (use -v 2 for details).
+
+CHECK_1_STAFF_GROUP_ABSENT=PASS
+CHECK_2_ZERO_STAFF_MEMBERSHIPS=PASS remaining=0
+CHECK_3_ZERO_STAFF_INVITATIONS=PASS remaining=0
+CHECK_4_ZERO_THROUGH_TABLE_ROWS=PASS remaining=0
+CHECK_5_USERS_PRESERVED=PASS total_users baseline=82 now=82; is_staff_users baseline=6 now=6
+CHECK_6_GROUP_COUNT_MINUS_ONE=PASS baseline=4 expected=3 now=3 no_staff_name_remaining=True
+CHECK_7_MEMBERSHIP_COUNT_DELTA=PASS baseline=734 staff_removed=0 expected=734 now=734
+RESULT: VERIFICATION_PASSED

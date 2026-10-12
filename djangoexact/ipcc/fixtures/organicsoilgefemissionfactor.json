@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 1,
+    "pk": 21,
     "fields": {
       "climate": 4,
       "moisture": 1,
@@ -15,7 +15,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 2,
+    "pk": 22,
     "fields": {
       "climate": 4,
       "moisture": 2,
@@ -29,7 +29,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 3,
+    "pk": 23,
     "fields": {
       "climate": 1,
       "moisture": 1,
@@ -43,7 +43,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 4,
+    "pk": 24,
     "fields": {
       "climate": 1,
       "moisture": 2,
@@ -57,7 +57,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 5,
+    "pk": 25,
     "fields": {
       "climate": 2,
       "moisture": 1,
@@ -71,7 +71,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 6,
+    "pk": 26,
     "fields": {
       "climate": 2,
       "moisture": 2,
@@ -85,7 +85,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 7,
+    "pk": 27,
     "fields": {
       "climate": 3,
       "moisture": 1,
@@ -99,7 +99,7 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 8,
+    "pk": 28,
     "fields": {
       "climate": 3,
       "moisture": 2,
@@ -113,10 +113,24 @@
   },
   {
     "model": "ipcc.organicsoilgefemissionfactor",
-    "pk": 9,
+    "pk": 29,
     "fields": {
       "climate": 3,
       "moisture": 4,
+      "co2": 464.0,
+      "co2_unit": "g CO2-C/kg dry matter burned",
+      "co": 210.0,
+      "co_unit": "g CO/kg dry matter burned",
+      "ch4": 21.0,
+      "ch4_unit": "g CH4/kg dry matter burned"
+    }
+  },
+  {
+    "model": "ipcc.organicsoilgefemissionfactor",
+    "pk": 30,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
       "co2": 464.0,
       "co2_unit": "g CO2-C/kg dry matter burned",
       "co": 210.0,

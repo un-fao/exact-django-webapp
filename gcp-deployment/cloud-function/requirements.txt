@@ -1,11 +1,17 @@
 # Cloud Function requirements for minitool processing
 # Optimized for Python 3.11 runtime
+#
+# Alignment invariant: every package this manifest shares with
+# djangoexact/requirements.txt must be pinned to the identical version,
+# with djangoexact/requirements.txt as the reference. This manifest is not
+# covered by .github/dependabot.yml, which watches /djangoexact only, so
+# drift here is caught by review rather than by tooling.
 
 # Core function framework
 functions-framework==3.*
 
 # Django and database
-Django==4.2.30
+Django==5.2.17
 psycopg2-binary==2.9.6
 
 # Google Cloud services
@@ -18,16 +24,16 @@ numpy==1.24.3
 tqdm==4.67.1
 
 # Configuration
-PyYAML==6.0
+PyYAML==6.0.2
 python-dotenv==1.2.2
 
 # Django REST framework (if needed for models)
-djangorestframework==3.15.2
+djangorestframework==3.16.1
 
 # Additional dependencies from main requirements
-django-filter==23.5
-django-cors-headers==4.0.0
-django-environ==0.10.0
+django-filter==24.3
+django-cors-headers==4.4.0
+django-environ==0.11.2
 python-dateutil==2.8.2
 pytz==2023.3
 

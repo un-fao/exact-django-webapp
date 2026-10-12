@@ -4,7 +4,9 @@
     "pk": 11,
     "fields": {
       "irrigation_system_type": 1,
-      "value": 34.46666667
+      "value": 34.46666667,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -12,7 +14,9 @@
     "pk": 12,
     "fields": {
       "irrigation_system_type": 2,
-      "value": 90.2
+      "value": 90.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -20,7 +24,9 @@
     "pk": 13,
     "fields": {
       "irrigation_system_type": 3,
-      "value": 444.7666667
+      "value": 444.7666667,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -28,7 +34,9 @@
     "pk": 14,
     "fields": {
       "irrigation_system_type": 4,
-      "value": 130.1666667
+      "value": 130.1666667,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -36,7 +44,9 @@
     "pk": 15,
     "fields": {
       "irrigation_system_type": 5,
-      "value": 59.76666667
+      "value": 59.76666667,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -44,7 +54,9 @@
     "pk": 16,
     "fields": {
       "irrigation_system_type": 6,
-      "value": 85.43333333
+      "value": 85.43333333,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -52,7 +64,9 @@
     "pk": 17,
     "fields": {
       "irrigation_system_type": 7,
-      "value": 79.2
+      "value": 79.2,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -60,7 +74,9 @@
     "pk": 18,
     "fields": {
       "irrigation_system_type": 8,
-      "value": 61.96666667
+      "value": 61.96666667,
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -68,7 +84,9 @@
     "pk": 19,
     "fields": {
       "irrigation_system_type": 9,
-      "value": 311.3
+      "value": 311.3,
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

@@ -139,14 +139,14 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Counting all records...")
 
-            # Count all records first. Table names are validated identifiers.
-            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
-            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            # Count all records first. Table names are validated identifiers with no
+            # values to bind. Semgrep only honors a suppression on the line directly
+            # above the match, so both rule ids share one comment line.
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query, python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(f"SELECT COUNT(*) FROM {change_record_table}")  # nosec B608
             change_records_count = cursor.fetchone()[0]
 
-            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
-            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query, python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(f"SELECT COUNT(*) FROM {change_aggregate_table}")  # nosec B608
             aggregate_records_count = cursor.fetchone()[0]
 
@@ -164,12 +164,12 @@ class Command(BaseCommand):
             if show_progress:
                 self.stdout.write("  - Deleting all records (fastest method)...")
 
-            # Delete all records from both tables
-            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
-            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            # Delete all records from both tables. Table names are validated
+            # identifiers with no values to bind; one combined suppression line
+            # per statement, directly above it, so Semgrep honors both rule ids.
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query, python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(f"DELETE FROM {change_record_table}")  # nosec B608
-            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query
-            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            # nosemgrep: python.lang.security.audit.formatted-sql-query.formatted-sql-query, python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(f"DELETE FROM {change_aggregate_table}")  # nosec B608
 
             # For SQLite, we can also run VACUUM to reclaim space immediately

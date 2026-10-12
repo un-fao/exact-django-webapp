@@ -12,6 +12,17 @@
   },
   {
     "model": "api.invitationstatustype",
+    "pk": 4,
+    "fields": {
+      "name": "canceled",
+      "name_en": "canceled",
+      "name_fr": "annulé",
+      "name_es": "cancelada",
+      "name_ru": "Отменённый"
+    }
+  },
+  {
+    "model": "api.invitationstatustype",
     "pk": 1,
     "fields": {
       "name": "pending",

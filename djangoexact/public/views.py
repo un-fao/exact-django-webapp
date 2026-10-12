@@ -10,7 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework import status as http_status
 from rest_framework.response import Response
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import api.concurrency as concurrency
 from api import security
 import api.utilities as utils
 from rest_framework.decorators import action
@@ -20,10 +20,8 @@ import types
 import api.labels as labels
 from django.http import HttpResponse
 from django.utils.translation import activate
-from django.conf import settings
 from django.utils.translation import gettext as _
 from datetime import datetime
-import os
 import base64
 import io
 import numpy as np
@@ -95,7 +93,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         serialized_project = api_serializers.ProjectResultSerializer(project, context={"request": request}).data
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = project.activities.values_list("id", flat=True)
 
@@ -108,23 +106,20 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit all tasks to the executor
-            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+        def log_activity_failure(activity_pk, exc):
+            log.error(f"Activity {activity_pk} generated an exception: {exc}")
 
-            for future in as_completed(future_to_pk):
-                pk = future_to_pk[future]
-                try:
-                    data = future.result()
-                    response["activities"].append(data)
-                except Exception as exc:
-                    log.error(f"Activity {pk} generated an exception: {exc}")
-                    # You can choose to handle exceptions differently if needed
+        # Bounded fan-out: every worker opens its own Postgres connection, so
+        # pool width is a per-instance connection cost (see api/concurrency.py).
+        response["activities"] = concurrency.map_in_bounded_threads(
+            process_activity,
+            activity_pks,
+            on_error=log_activity_failure,
+        )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["post"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -142,6 +137,16 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
                 required=False,
             ),
         ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "content": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
+                                "of text, list, link and table tags. Accepted by the ifad report only.",
+                ),
+            },
+        ),
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
@@ -155,7 +160,13 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        selected_activities = [pk.strip() for pk in request.query_params.get("activities", "").split(",") if pk.strip().isdigit()]
+        # The Excel report has nowhere to put analyst content; refuse it
+        # instead of returning a file without it.
+        from api.reports import narrative as report_narrative
+
+        report_narrative.content_from_request(request, None)
+
+        selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
             selected_activities = None
         else:
@@ -189,27 +200,39 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        lang = request.query_params.get("lang", "en")
-        if hasattr(request, "LANGUAGE_CODE"):
-            lang = request.LANGUAGE_CODE
+        lang = utils.requested_language(request)
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
-        template_dir = os.path.join(settings.BASE_DIR, "api", "templates", "reports")
-        if not os.path.exists(f"{template_dir}/{template_name}_{lang}.html"):
-            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
+        from api.reports import catalog
+
+        try:
+            template_path = catalog.resolve_template(template_name, lang)
+        except catalog.UnknownReport as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
+        from api.reports import narrative as report_narrative
+
+        # Outside the try below, so a rejected body is a 400 and not its catch-all 500.
+        content = report_narrative.content_from_request(request, template_name)
 
         try:
             from api.reports import compute_project_result
             from api.reports.html_context import build_template_context
+            from api.reports.pdf import render_pdf
 
             project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
-            result = compute_project_result(project)
-            context = build_template_context(result, request, lang)
-            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
-            from weasyprint import HTML
-            pdf = HTML(string=html).write_pdf()
+            # Honour ?activities= here too. report() and the async worker both
+            # filter; without this the same request produced a different document
+            # depending on which path served it.
+            activity_ids = utils.requested_activity_ids(request)
+            activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
+
+            result = compute_project_result(project, activities)
+            context = build_template_context(result, request, lang, content=content)
+            html = render(request, template_path, context).content.decode()
+            pdf = render_pdf(html)
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
             return response
@@ -266,8 +289,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
-            with ThreadPoolExecutor() as executor:
-                response = list(executor.map(process_activity, page))
+            response = concurrency.map_in_bounded_threads(process_activity, page)
             return paginator.get_paginated_response(response)
 
         return Response(data=self.serializer_class(activities_list, many=True).data, status=http_status.HTTP_200_OK)

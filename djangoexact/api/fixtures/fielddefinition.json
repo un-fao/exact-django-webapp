@@ -1,7 +1,7 @@
 [
   {
     "model": "api.fielddefinition",
-    "pk": 11,
+    "pk": 9,
     "fields": {
       "module_type": 4,
       "field_name": "categories_of_crop_residue_management",
@@ -14,7 +14,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 9,
+    "pk": 7,
     "fields": {
       "module_type": 4,
       "field_name": "categories_of_input_organic_material",
@@ -27,7 +27,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 7,
+    "pk": 5,
     "fields": {
       "module_type": 4,
       "field_name": "categories_of_tillage_management",
@@ -40,20 +40,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 10,
-    "fields": {
-      "module_type": 4,
-      "field_name": "crop_residue_management",
-      "description": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
-      "description_en": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
-      "description_fr": null,
-      "description_es": null,
-      "description_ru": null
-    }
-  },
-  {
-    "model": "api.fielddefinition",
-    "pk": 8,
+    "pk": 6,
     "fields": {
       "module_type": 4,
       "field_name": "cropland_input_level",
@@ -66,7 +53,20 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 3,
+    "pk": 8,
+    "fields": {
+      "module_type": 4,
+      "field_name": "crop_residue_management",
+      "description": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
+      "description_en": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 1,
     "fields": {
       "module_type": 4,
       "field_name": "definition_of_annual_cropland",
@@ -79,7 +79,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 4,
+    "pk": 2,
     "fields": {
       "module_type": 4,
       "field_name": "main_season_crop",
@@ -92,7 +92,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 5,
+    "pk": 3,
     "fields": {
       "module_type": 4,
       "field_name": "minor_season_crop",
@@ -105,7 +105,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 6,
+    "pk": 4,
     "fields": {
       "module_type": 4,
       "field_name": "tillage_management",
@@ -118,7 +118,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 15,
+    "pk": 13,
     "fields": {
       "module_type": 5,
       "field_name": "categories_of_agroforestry_systems",
@@ -131,7 +131,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 21,
+    "pk": 19,
     "fields": {
       "module_type": 5,
       "field_name": "categories_of_crop_residue_management",
@@ -144,7 +144,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 19,
+    "pk": 17,
     "fields": {
       "module_type": 5,
       "field_name": "categories_of_input_organic_material",
@@ -157,7 +157,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 17,
+    "pk": 15,
     "fields": {
       "module_type": 5,
       "field_name": "categories_of_tillage_management",
@@ -170,20 +170,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 20,
-    "fields": {
-      "module_type": 5,
-      "field_name": "crop_residue_management",
-      "description": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
-      "description_en": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
-      "description_fr": null,
-      "description_es": null,
-      "description_ru": null
-    }
-  },
-  {
-    "model": "api.fielddefinition",
-    "pk": 18,
+    "pk": 16,
     "fields": {
       "module_type": 5,
       "field_name": "cropland_input_level",
@@ -196,7 +183,20 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 12,
+    "pk": 18,
+    "fields": {
+      "module_type": 5,
+      "field_name": "crop_residue_management",
+      "description": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
+      "description_en": "Crop residue management refers to the handling of plant materials remaining in the field after harvesting.",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 10,
     "fields": {
       "module_type": 5,
       "field_name": "definition_of_perennial_cropland",
@@ -209,7 +209,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 13,
+    "pk": 11,
     "fields": {
       "module_type": 5,
       "field_name": "main_season_crop",
@@ -222,7 +222,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 14,
+    "pk": 12,
     "fields": {
       "module_type": 5,
       "field_name": "minor_season_crop",
@@ -235,7 +235,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 16,
+    "pk": 14,
     "fields": {
       "module_type": 5,
       "field_name": "tillage_management",
@@ -248,7 +248,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 31,
+    "pk": 53,
     "fields": {
       "module_type": 6,
       "field_name": "categories_of_organic_amendment",
@@ -261,7 +261,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 28,
+    "pk": 50,
     "fields": {
       "module_type": 6,
       "field_name": "categories_of_water_management_before_cultivation",
@@ -274,7 +274,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 30,
+    "pk": 52,
     "fields": {
       "module_type": 6,
       "field_name": "categories_of_water_management_during_cultivation",
@@ -287,7 +287,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 26,
+    "pk": 48,
     "fields": {
       "module_type": 6,
       "field_name": "cultivation_period",
@@ -300,7 +300,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 25,
+    "pk": 47,
     "fields": {
       "module_type": 6,
       "field_name": "definition_of_flooded_rice",
@@ -313,7 +313,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 27,
+    "pk": 49,
     "fields": {
       "module_type": 6,
       "field_name": "water_management_before_cultivation",
@@ -326,7 +326,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 29,
+    "pk": 51,
     "fields": {
       "module_type": 6,
       "field_name": "water_management_during_cultivation",
@@ -339,7 +339,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 46,
+    "pk": 66,
     "fields": {
       "module_type": 7,
       "field_name": "categories_of_grassland_management",
@@ -352,7 +352,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 44,
+    "pk": 64,
     "fields": {
       "module_type": 7,
       "field_name": "definition_of_grassland",
@@ -365,7 +365,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 47,
+    "pk": 67,
     "fields": {
       "module_type": 7,
       "field_name": "definitions_of_fire_management",
@@ -378,7 +378,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 45,
+    "pk": 65,
     "fields": {
       "module_type": 7,
       "field_name": "grassland_management",
@@ -391,7 +391,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 52,
+    "pk": 72,
     "fields": {
       "module_type": 8,
       "field_name": "categories_of_manure_management",
@@ -404,7 +404,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 50,
+    "pk": 70,
     "fields": {
       "module_type": 8,
       "field_name": "categories_of_productivity_systems",
@@ -417,7 +417,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 48,
+    "pk": 68,
     "fields": {
       "module_type": 8,
       "field_name": "definition_of_livestock",
@@ -430,7 +430,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 51,
+    "pk": 71,
     "fields": {
       "module_type": 8,
       "field_name": "manure_management",
@@ -443,7 +443,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 49,
+    "pk": 69,
     "fields": {
       "module_type": 8,
       "field_name": "productivity_systems",
@@ -456,7 +456,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 72,
+    "pk": 94,
     "fields": {
       "module_type": 19,
       "field_name": "categories_of_trophic_class",
@@ -469,7 +469,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 70,
+    "pk": 92,
     "fields": {
       "module_type": 19,
       "field_name": "categories_of_waterbodies",
@@ -482,7 +482,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 71,
+    "pk": 93,
     "fields": {
       "module_type": 19,
       "field_name": "definition_of_trophic_class",
@@ -495,20 +495,20 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 69,
+    "pk": 91,
     "fields": {
       "module_type": 19,
       "field_name": "definition_of_waterbodies",
       "description": "Water bodies include all flooded land where human activities have caused changes in the amount of surface area covered by water, typically through water level regulation.",
       "description_en": "Water bodies include all flooded land where human activities have caused changes in the amount of surface area covered by water, typically through water level regulation.",
-      "description_fr": "",
-      "description_es": "rfeerferverver",
+      "description_fr": null,
+      "description_es": null,
       "description_ru": null
     }
   },
   {
     "model": "api.fielddefinition",
-    "pk": 54,
+    "pk": 78,
     "fields": {
       "module_type": 20,
       "field_name": "categories_of_fisheries",
@@ -521,7 +521,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 53,
+    "pk": 77,
     "fields": {
       "module_type": 20,
       "field_name": "definition_of_fisheries",
@@ -534,7 +534,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 55,
+    "pk": 79,
     "fields": {
       "module_type": 20,
       "field_name": "gear_category",
@@ -547,12 +547,12 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 57,
+    "pk": 73,
     "fields": {
-      "module_type": 20,
-      "field_name": "gear_definitions_url",
-      "description": "https://openknowledge.fao.org/server/api/core/bitstreams/d194ba36-af7a-48ed-9e58-563143b96863/content",
-      "description_en": "https://openknowledge.fao.org/server/api/core/bitstreams/d194ba36-af7a-48ed-9e58-563143b96863/content",
+      "module_type": 21,
+      "field_name": "a_fishery_is_an_activity_leading_to_the_harvesting_of_fish,_within_the_boundaries_of_a_defined_area.",
+      "description": "",
+      "description_en": "",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -560,7 +560,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 74,
+    "pk": 75,
     "fields": {
       "module_type": 21,
       "field_name": "categories_of_fisheries",
@@ -573,7 +573,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 73,
+    "pk": 74,
     "fields": {
       "module_type": 21,
       "field_name": "definition_of_fisheries",
@@ -586,7 +586,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 75,
+    "pk": 76,
     "fields": {
       "module_type": 21,
       "field_name": "gear_category",
@@ -599,20 +599,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 76,
-    "fields": {
-      "module_type": 21,
-      "field_name": "gear_definitions_url",
-      "description": "https://openknowledge.fao.org/server/api/core/bitstreams/d194ba36-af7a-48ed-9e58-563143b96863/content",
-      "description_en": "https://openknowledge.fao.org/server/api/core/bitstreams/d194ba36-af7a-48ed-9e58-563143b96863/content",
-      "description_fr": null,
-      "description_es": null,
-      "description_ru": null
-    }
-  },
-  {
-    "model": "api.fielddefinition",
-    "pk": 38,
+    "pk": 60,
     "fields": {
       "module_type": 22,
       "field_name": "definition_of_aquaculture",
@@ -625,7 +612,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 43,
+    "pk": 96,
     "fields": {
       "module_type": 23,
       "field_name": "definition_of_settlements",
@@ -638,7 +625,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 37,
+    "pk": 59,
     "fields": {
       "module_type": 24,
       "field_name": "categories_of_disturbance",
@@ -651,7 +638,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 33,
+    "pk": 55,
     "fields": {
       "module_type": 24,
       "field_name": "categories_of_forest",
@@ -664,7 +651,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 36,
+    "pk": 58,
     "fields": {
       "module_type": 24,
       "field_name": "definition_of_disturbance",
@@ -677,7 +664,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 34,
+    "pk": 56,
     "fields": {
       "module_type": 24,
       "field_name": "definition_of_rotations",
@@ -690,7 +677,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 35,
+    "pk": 57,
     "fields": {
       "module_type": 24,
       "field_name": "definition_of_timber_harvesting",
@@ -703,7 +690,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 32,
+    "pk": 54,
     "fields": {
       "module_type": 24,
       "field_name": "forest_management",
@@ -716,20 +703,20 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 42,
+    "pk": 95,
     "fields": {
       "module_type": 30,
-      "field_name": "definition_of_degraded_land",
-      "description": "Degraded lands are those whose native vegetation has been heavily disturbed. The land has strongly degraded biomass and soil organic carbon levels.",
-      "description_en": "Degraded lands are those whose native vegetation has been heavily disturbed. The land has strongly degraded biomass and soil organic carbon levels.",
-      "description_fr": null,
-      "description_es": null,
-      "description_ru": null
+      "field_name": "definition_of_other_land",
+      "description": "Other land includes bare soil, rock, ice, and all land areas that do not fall into any of the other five categories.",
+      "description_en": "Other land includes bare soil, rock, ice, and all land areas that do not fall into any of the other five categories.",
+      "description_fr": "",
+      "description_es": "",
+      "description_ru": ""
     }
   },
   {
     "model": "api.fielddefinition",
-    "pk": 41,
+    "pk": 63,
     "fields": {
       "module_type": 33,
       "field_name": "definition_of_set_aside_land",
@@ -742,12 +729,38 @@
   },
   {
     "model": "api.fielddefinition",
+    "pk": 20,
+    "fields": {
+      "module_type": 34,
+      "field_name": "biodiesels:_liquid_biofuels_that_are_added_to,_blended_with,_or_used_straight_as_transport_diesel._examples:_biodiesel_(methyl_ester_from_vegetable_or_animal_oil),_biodimethylether,_fischer_tropsch,_cold_pressed_bio_oil.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 21,
+    "fields": {
+      "module_type": 34,
+      "field_name": "biogasoline:_liquid_biofuels_that_are_blended_with_or_used_straight_as_motor_gasoline._examples:_bioethanol,_biomethanol,_bio_etbe,_bio_mtbe.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
     "pk": 22,
     "fields": {
       "module_type": 34,
-      "field_name": "sources_of_energy",
-      "description": "Biodiesels: Liquid biofuels that are added to, blended with, or used straight as transport diesel. Examples: Biodiesel (methyl-ester from vegetable or animal oil), biodimethylether, Fischer Tropsch, cold pressed bio-oil.\nBiogasoline: Liquid biofuels that are blended with or used straight as motor gasoline. Examples: Bioethanol, biomethanol, bioETBE, bioMTBE.\nCharcoal: Solid residue of the destructive distillation and pyrolysis of wood and other vegetal material.\nGas/diesel oil: Includes heavy gas oils obtained from the lowest fraction from atmospheric distillation of crude oil to vacuum redistillation of the residual.\nJet kerosene: Medium distillate used for aviation turbine power units, with specific characteristics established by the International Air Transport Association (IATA).\nLandfill gas: Gas derived from the anaerobic fermentation of biomass and solid wastes in landfills.\nLiquefied petroleum gases (LPG): Light hydrocarbons of the paraffin series, derived from refinery processes, crude oil stabilization, and natural gas processing plants.\nLubricants: Hydrocarbons produced from distillate or residue, mainly used to reduce friction between bearing surfaces.\nMotor gasoline: Light hydrocarbon oil for use in internal combustion engines, excluding aircraft.\nMunicipal wastes (biomass fraction): Biomass fraction of waste produced by households, industry, hospitals, and the tertiary sector, incinerated at specific installations for energy purposes.\nNatural Gas: Includes natural gas and blended natural gas (sometimes referred to as Town Gas or City Gas).\nNatural Gas liquids (NGL): Liquid or liquefied hydrocarbons produced in the manufacture, purification, and stabilization of natural gas.\nOther biogas: Biogas not included in landfill gas or sludge gas.\nOther kerosene: Refined petroleum distillate intermediate in volatility between gasoline and gas/diesel oil.\nOther liquefied biofuels: Liquid biofuels not included in biogasoline or biodiesels.\nOther petroleum products: Includes petroleum products not classified above, such as tar, sulphur, and grease.\nOther primary solid biomass: Plant matter used directly as fuel, not included in wood/wood waste or sulphite lyes.\nParaffin waxes: Saturated aliphatic hydrocarbons with a crystalline structure and carbon number greater than 12.\nPeat: Combustible soft, porous or compressed sedimentary deposit of plant origin with high water content.\nRefinery gas: Non-condensable gas obtained during distillation of crude oil or treatment of oil products in refineries.\nResidual fuel oil: Oils that make up the distillation residue, with specific physical characteristics.\nSludge gas: Gas derived from the anaerobic fermentation of biomass and solid wastes from sewage and animal slurries.\nSub-bituminous coal: Non-agglomerating coals with specific calorific value and volatile matter content.\nWhite spirit & SBP (Special Boiling Point): Refined distillate intermediates with a distillation in the naphtha/kerosene range.\nWood/Wood waste: Wood and wood waste combusted directly for energy, including wood for charcoal production.",
-      "description_en": "Biodiesels: Liquid biofuels that are added to, blended with, or used straight as transport diesel. Examples: Biodiesel (methyl-ester from vegetable or animal oil), biodimethylether, Fischer Tropsch, cold pressed bio-oil.\nBiogasoline: Liquid biofuels that are blended with or used straight as motor gasoline. Examples: Bioethanol, biomethanol, bioETBE, bioMTBE.\nCharcoal: Solid residue of the destructive distillation and pyrolysis of wood and other vegetal material.\nGas/diesel oil: Includes heavy gas oils obtained from the lowest fraction from atmospheric distillation of crude oil to vacuum redistillation of the residual.\nJet kerosene: Medium distillate used for aviation turbine power units, with specific characteristics established by the International Air Transport Association (IATA).\nLandfill gas: Gas derived from the anaerobic fermentation of biomass and solid wastes in landfills.\nLiquefied petroleum gases (LPG): Light hydrocarbons of the paraffin series, derived from refinery processes, crude oil stabilization, and natural gas processing plants.\nLubricants: Hydrocarbons produced from distillate or residue, mainly used to reduce friction between bearing surfaces.\nMotor gasoline: Light hydrocarbon oil for use in internal combustion engines, excluding aircraft.\nMunicipal wastes (biomass fraction): Biomass fraction of waste produced by households, industry, hospitals, and the tertiary sector, incinerated at specific installations for energy purposes.\nNatural Gas: Includes natural gas and blended natural gas (sometimes referred to as Town Gas or City Gas).\nNatural Gas liquids (NGL): Liquid or liquefied hydrocarbons produced in the manufacture, purification, and stabilization of natural gas.\nOther biogas: Biogas not included in landfill gas or sludge gas.\nOther kerosene: Refined petroleum distillate intermediate in volatility between gasoline and gas/diesel oil.\nOther liquefied biofuels: Liquid biofuels not included in biogasoline or biodiesels.\nOther petroleum products: Includes petroleum products not classified above, such as tar, sulphur, and grease.\nOther primary solid biomass: Plant matter used directly as fuel, not included in wood/wood waste or sulphite lyes.\nParaffin waxes: Saturated aliphatic hydrocarbons with a crystalline structure and carbon number greater than 12.\nPeat: Combustible soft, porous or compressed sedimentary deposit of plant origin with high water content.\nRefinery gas: Non-condensable gas obtained during distillation of crude oil or treatment of oil products in refineries.\nResidual fuel oil: Oils that make up the distillation residue, with specific physical characteristics.\nSludge gas: Gas derived from the anaerobic fermentation of biomass and solid wastes from sewage and animal slurries.\nSub-bituminous coal: Non-agglomerating coals with specific calorific value and volatile matter content.\nWhite spirit & SBP (Special Boiling Point): Refined distillate intermediates with a distillation in the naphtha/kerosene range.\nWood/Wood waste: Wood and wood waste combusted directly for energy, including wood for charcoal production.",
+      "field_name": "charcoal:_solid_residue_of_the_destructive_distillation_and_pyrolysis_of_wood_and_other_vegetal_material.",
+      "description": "",
+      "description_en": "",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -756,6 +769,292 @@
   {
     "model": "api.fielddefinition",
     "pk": 23,
+    "fields": {
+      "module_type": 34,
+      "field_name": "gas/diesel_oil:_includes_heavy_gas_oils_obtained_from_the_lowest_fraction_from_atmospheric_distillation_of_crude_oil_to_vacuum_redistillation_of_the_residual.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 24,
+    "fields": {
+      "module_type": 34,
+      "field_name": "jet_kerosene:_medium_distillate_used_for_aviation_turbine_power_units,_with_specific_characteristics_established_by_the_international_air_transport_association_(_iata).",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 25,
+    "fields": {
+      "module_type": 34,
+      "field_name": "landfill_gas:_gas_derived_from_the_anaerobic_fermentation_of_biomass_and_solid_wastes_in_landfills.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 26,
+    "fields": {
+      "module_type": 34,
+      "field_name": "liquefied_petroleum_gases_(_lpg):_light_hydrocarbons_of_the_paraffin_series,_derived_from_refinery_processes,_crude_oil_stabilization,_and_natural_gas_processing_plants.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 27,
+    "fields": {
+      "module_type": 34,
+      "field_name": "lubricants:_hydrocarbons_produced_from_distillate_or_residue,_mainly_used_to_reduce_friction_between_bearing_surfaces.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 28,
+    "fields": {
+      "module_type": 34,
+      "field_name": "motor_gasoline:_light_hydrocarbon_oil_for_use_in_internal_combustion_engines,_excluding_aircraft.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 29,
+    "fields": {
+      "module_type": 34,
+      "field_name": "municipal_wastes_(biomass_fraction):_biomass_fraction_of_waste_produced_by_households,_industry,_hospitals,_and_the_tertiary_sector,_incinerated_at_specific_installations_for_energy_purposes.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 30,
+    "fields": {
+      "module_type": 34,
+      "field_name": "natural_gas:_includes_natural_gas_and_blended_natural_gas_(sometimes_referred_to_as_town_gas_or_city_gas).",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 31,
+    "fields": {
+      "module_type": 34,
+      "field_name": "natural_gas_liquids_(_ngl):_liquid_or_liquefied_hydrocarbons_produced_in_the_manufacture,_purification,_and_stabilization_of_natural_gas.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 32,
+    "fields": {
+      "module_type": 34,
+      "field_name": "other_biogas:_biogas_not_included_in_landfill_gas_or_sludge_gas.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 33,
+    "fields": {
+      "module_type": 34,
+      "field_name": "other_kerosene:_refined_petroleum_distillate_intermediate_in_volatility_between_gasoline_and_gas/diesel_oil.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 34,
+    "fields": {
+      "module_type": 34,
+      "field_name": "other_liquefied_biofuels:_liquid_biofuels_not_included_in_biogasoline_or_biodiesels.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 35,
+    "fields": {
+      "module_type": 34,
+      "field_name": "other_petroleum_products:_includes_petroleum_products_not_classified_above,_such_as_tar,_sulphur,_and_grease.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 36,
+    "fields": {
+      "module_type": 34,
+      "field_name": "other_primary_solid_biomass:_plant_matter_used_directly_as_fuel,_not_included_in_wood/wood_waste_or_sulphite_lyes.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 37,
+    "fields": {
+      "module_type": 34,
+      "field_name": "paraffin_waxes:_saturated_aliphatic_hydrocarbons_with_a_crystalline_structure_and_carbon_number_greater_than_12.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 38,
+    "fields": {
+      "module_type": 34,
+      "field_name": "peat:_combustible_soft,_porous_or_compressed_sedimentary_deposit_of_plant_origin_with_high_water_content.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 39,
+    "fields": {
+      "module_type": 34,
+      "field_name": "refinery_gas:_non_condensable_gas_obtained_during_distillation_of_crude_oil_or_treatment_of_oil_products_in_refineries.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 40,
+    "fields": {
+      "module_type": 34,
+      "field_name": "residual_fuel_oil:_oils_that_make_up_the_distillation_residue,_with_specific_physical_characteristics.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 41,
+    "fields": {
+      "module_type": 34,
+      "field_name": "sludge_gas:_gas_derived_from_the_anaerobic_fermentation_of_biomass_and_solid_wastes_from_sewage_and_animal_slurries.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 42,
+    "fields": {
+      "module_type": 34,
+      "field_name": "sub_bituminous_coal:_non_agglomerating_coals_with_specific_calorific_value_and_volatile_matter_content.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 43,
+    "fields": {
+      "module_type": 34,
+      "field_name": "white_spirit_&_sbp_(_special_boiling_point):_refined_distillate_intermediates_with_a_distillation_in_the_naphtha/kerosene_range.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 44,
+    "fields": {
+      "module_type": 34,
+      "field_name": "wood/_wood_waste:_wood_and_wood_waste_combusted_directly_for_energy,_including_wood_for_charcoal_production.",
+      "description": "",
+      "description_en": "",
+      "description_fr": null,
+      "description_es": null,
+      "description_ru": null
+    }
+  },
+  {
+    "model": "api.fielddefinition",
+    "pk": 45,
     "fields": {
       "module_type": 35,
       "field_name": "categories_of_irrigation",
@@ -768,7 +1067,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 24,
+    "pk": 46,
     "fields": {
       "module_type": 35,
       "field_name": "source_of_energy",
@@ -781,7 +1080,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 58,
+    "pk": 80,
     "fields": {
       "module_type": 38,
       "field_name": "definition_of_organic_soil",
@@ -794,7 +1093,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 59,
+    "pk": 81,
     "fields": {
       "module_type": 38,
       "field_name": "drainage",
@@ -807,7 +1106,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 60,
+    "pk": 82,
     "fields": {
       "module_type": 38,
       "field_name": "rewetting_and_revegetation_(_restored_vegetation)",
@@ -820,7 +1119,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 65,
+    "pk": 87,
     "fields": {
       "module_type": 39,
       "field_name": "categories_of_vegetation",
@@ -833,7 +1132,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 64,
+    "pk": 86,
     "fields": {
       "module_type": 39,
       "field_name": "definition_of_coastal_wetlands",
@@ -846,7 +1145,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 66,
+    "pk": 88,
     "fields": {
       "module_type": 39,
       "field_name": "drainage",
@@ -859,7 +1158,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 67,
+    "pk": 89,
     "fields": {
       "module_type": 39,
       "field_name": "excavation_(_extraction)",
@@ -872,7 +1171,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 68,
+    "pk": 90,
     "fields": {
       "module_type": 39,
       "field_name": "rewetting_and_revegetation_(_restored_vegetation)",
@@ -885,7 +1184,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 40,
+    "pk": 62,
     "fields": {
       "module_type": 40,
       "field_name": "categories_of_land_use",
@@ -898,7 +1197,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 39,
+    "pk": 61,
     "fields": {
       "module_type": 40,
       "field_name": "definition_of_land_use_change",
@@ -911,7 +1210,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 62,
+    "pk": 84,
     "fields": {
       "module_type": 44,
       "field_name": "categories_of_inputs",
@@ -924,7 +1223,7 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 61,
+    "pk": 83,
     "fields": {
       "module_type": 44,
       "field_name": "definition_of_inputs",
@@ -937,25 +1236,12 @@
   },
   {
     "model": "api.fielddefinition",
-    "pk": 63,
+    "pk": 85,
     "fields": {
       "module_type": 44,
       "field_name": "fertilizer_categories",
       "description": "Lime application: Liming is the addition of carbonates to soils in the form of calcic limestone or dolomite, which lead to CO2 emissions from carbonate dissolution.\nSynthetic fertilizers: Synthetic or inorganic fertilizers included all products obtained by chemical processes, mineral extraction or by mechanical grinding. Note that though urea is technically an organic material, it is referred as an inorganic fertilizer  in line with the FAO fertilizer code.\nN-fertilizers on irrigated rice: It includes the use of nitrogen based fertilizers on irrigated rice. Since nitrogen emissions are significantly dependent on moisture conditions and use in dry or wet land, the category is presented in a dedicated section.\nOrganic N-fertilizers: Organic fertilizers are derived from organic materials, including treated or untreated livestock manures, compost, vermicompost, sewage sludge and other organic materials or mixed materials used to supply nutrients",
       "description_en": "Lime application: Liming is the addition of carbonates to soils in the form of calcic limestone or dolomite, which lead to CO2 emissions from carbonate dissolution.\nSynthetic fertilizers: Synthetic or inorganic fertilizers included all products obtained by chemical processes, mineral extraction or by mechanical grinding. Note that though urea is technically an organic material, it is referred as an inorganic fertilizer  in line with the FAO fertilizer code.\nN-fertilizers on irrigated rice: It includes the use of nitrogen based fertilizers on irrigated rice. Since nitrogen emissions are significantly dependent on moisture conditions and use in dry or wet land, the category is presented in a dedicated section.\nOrganic N-fertilizers: Organic fertilizers are derived from organic materials, including treated or untreated livestock manures, compost, vermicompost, sewage sludge and other organic materials or mixed materials used to supply nutrients",
-      "description_fr": null,
-      "description_es": null,
-      "description_ru": null
-    }
-  },
-  {
-    "model": "api.fielddefinition",
-    "pk": 2,
-    "fields": {
-      "module_type": 55,
-      "field_name": "test_field",
-      "description": "erfdsxa",
-      "description_en": "erfdsxa",
       "description_fr": null,
       "description_es": null,
       "description_ru": null

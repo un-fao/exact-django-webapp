@@ -12,17 +12,6 @@
   },
   {
     "model": "api.macroinputtype",
-    "pk": 10,
-    "fields": {
-      "name": "Electricity",
-      "name_en": "Electricity",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.macroinputtype",
     "pk": 1,
     "fields": {
       "name": "Lime Application",
@@ -56,7 +45,7 @@
   },
   {
     "model": "api.macroinputtype",
-    "pk": 11,
+    "pk": 10,
     "fields": {
       "name": "Other",
       "name_en": "Other",

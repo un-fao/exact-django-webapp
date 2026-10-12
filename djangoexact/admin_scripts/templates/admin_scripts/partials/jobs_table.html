@@ -1,4 +1,4 @@
-<div data-active-jobs="{% if active_count %}true{% else %}false{% endif %}" class="space-y-3">
+{% load luc_labels %}<div data-active-jobs="{% if active_count %}true{% else %}false{% endif %}" class="space-y-3">
     {% if jobs %}
         {% for job in jobs %}
         <article class="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition">
@@ -8,9 +8,9 @@
                         {{ job.module_type }} <span class="text-gray-400">/</span> {{ job.attribute }}
                     </h3>
                     <p class="mt-1 text-sm text-gray-600">
-                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ job.from_value }}</span>
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ job.from_value|luc_label }}</span>
                         <span class="mx-1 text-gray-400">&rarr;</span>
-                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ job.to_value }}</span>
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ job.to_value|luc_label }}</span>
                     </p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0" id="job-status-{{ job.pk }}">

@@ -764,6 +764,25 @@ class CompileScenariosViewTest(TestCase):
         self.assertContains(response, "from_value")
         self.assertContains(response, "to_value")
 
+    def test_htmx_values_luc_shows_label_but_submits_identifier(self):
+        self.client.login(email="staff@example.com", password="testpass123")
+        response = self.client.get(
+            "/api/admin-scripts/compile-scenarios/htmx/values/",
+            {
+                "change-0-module_type": "LandUseChange",
+                "change-0-field": "module_type",
+                "index": "0",
+                "prefix": "change-0-",
+            },
+        )
+        self.assertContains(
+            response,
+            '<option value="AnnualCropland#0">AnnualCropland: Full Tillage, Low C input, Burned</option>',
+            count=2,
+            html=True,
+        )
+        self.assertNotContains(response, ">AnnualCropland#0<")
+
     def test_htmx_values_requires_both_params(self):
         self.client.login(email="staff@example.com", password="testpass123")
         response = self.client.get("/api/admin-scripts/compile-scenarios/htmx/values/")

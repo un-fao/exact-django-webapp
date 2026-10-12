@@ -1,0 +1,4 @@
+id,water_management_type_before_cultivation,value,value_min,value_max,"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, tables 5.13"
+3,Flooded Pre-Season > 30 D,2.41,2.13,2.73,
+2,Non Flooded Pre-Season >180 D,0.89,0.8,0.99,
+1,Non Flooded Pre-Season <180 D,1,0.88,1.12,

@@ -13,7 +13,7 @@ from django.db.models import ManyToOneRel
 from api.models import Country
 
 
-Q1_RENAMES: list[tuple[str, str]] = [
+RENAMES: list[tuple[str, str]] = [
     ("Bolivia", "Bolivia (Plurinational State of)"),
     ("Channel Islands (U.K)", "Channel Islands"),
     ("China, Hong Kong Special Administrative Region", "China, Hong Kong SAR"),
@@ -27,7 +27,7 @@ Q1_RENAMES: list[tuple[str, str]] = [
 ]
 
 
-Q3_MERGES: list[tuple[str, str]] = [
+MERGES: list[tuple[str, str]] = [
     ("Aland Islands", "Åland Islands"),
     ("Cote D'ivoire", "Côte d'Ivoire"),
     ("Taiwan (Chinese Taipei)", "Taiwan"),
@@ -123,21 +123,21 @@ class MergeAction(CountryAction):
 
 def run(*args):
     apply = "--apply" in args
-    only_q1 = "--q1" in args
-    only_q3 = "--q3" in args
-    run_q1 = only_q1 or not only_q3
-    run_q3 = only_q3 or not only_q1
+    renames_only = "--renames" in args
+    merges_only = "--merges" in args
+    run_renames = renames_only or not merges_only
+    run_merges = merges_only or not renames_only
 
     try:
         with transaction.atomic():
-            if run_q1:
-                print("Q1: renames")
-                for action in [RenameAction(o, n) for o, n in Q1_RENAMES]:
+            if run_renames:
+                print("Renames:")
+                for action in [RenameAction(o, n) for o, n in RENAMES]:
                     n = action.execute()
                     print(f"  {action.describe()}: {n} row(s)")
-            if run_q3:
-                print("Q3: merges")
-                for action in [MergeAction(o, n) for o, n in Q3_MERGES]:
+            if run_merges:
+                print("Merges:")
+                for action in [MergeAction(o, n) for o, n in MERGES]:
                     n = action.execute()
                     print(f"  {action.describe()}: {n} row(s)")
             if not apply:

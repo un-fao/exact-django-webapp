@@ -41,6 +41,8 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from django.apps import apps
 
+logger = log.getLogger(__name__)
+
 from django.db.models import Q
 import django.db.models as models
 from ipcc import models as ipcc
@@ -517,6 +519,25 @@ class CalculatorFactory:
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
 
 
+# Attribute names under which calculators keep their math modules, grouped by
+# COMPONENT. Within a component the start / with / without variants are all built
+# from the same start-year figures and therefore carry identical inventory rows,
+# so BaseCalculator.inventory takes exactly one representative per component.
+# Separate components contribute genuinely different rows (a value chain's own
+# emissions versus the energy it consumes) and are summed.
+#
+# The list is explicit rather than a scan of __dict__ so that adding a new
+# component to a calculator is a deliberate act: a silently missed component is
+# exactly the defect this grouping was introduced to fix.
+MATH_COMPONENT_GROUPS = (
+    ("math_start", "math_start_w", "math_start_wo", "math_w", "math_wo"),
+    ("energy_math_start_w", "energy_math_start_wo", "energy_math_w", "energy_math_wo"),
+    ("electricity_math_w", "electricity_math_wo"),
+    ("organic_soil_math_w", "organic_soil_math_wo"),
+    ("peat_extraction_math_w", "peat_extraction_math_wo"),
+)
+
+
 class BaseCalculator(ABC):
     """
     Abstract base class for all calculators.
@@ -548,6 +569,10 @@ class BaseCalculator(ABC):
         self.results_start = None
         self.results_w = None
         self.results_wo = None
+
+        # Entry calculators tracked by container calculators for inventory
+        # roll-up. See BaseCalculator.inventory.
+        self._entry_calculators: list["BaseCalculator"] = []
 
         self.project: Project = getattr(self.data, "parent", self.data).activity.project
         self.activity: Activity = getattr(self.data, "parent", self.data).activity
@@ -585,11 +610,68 @@ class BaseCalculator(ABC):
 
     @property
     def inventory(self) -> Inventory:
-        """Get inventory from the first non-None start module."""
-        for math_module in [self.math_start, self.math_start_w, self.math_start_wo, self.math_w, self.math_wo]:
-            if math_module and hasattr(math_module, "inventory"):
-                return math_module.inventory
-        return Inventory()
+        """Baseline (start-year) GHG inventory contributed by this module.
+
+        Two sources are combined:
+
+        1. This calculator's own math modules, looked up through
+           ``MATH_COMPONENT_GROUPS``. Within one component the start / with /
+           without variants are all built from the same start-year figures and
+           therefore carry identical inventory rows, so exactly one
+           representative is taken. Across components (a value chain's own
+           emissions versus the energy it consumes) the rows are distinct and
+           are summed.
+        2. The inventories of any entry calculators this calculator delegated
+           to. Container calculators (Input, Energy, Irrigation, Storage,
+           Processing, Packaging, Transport) own no math module at all, so
+           without this roll-up their inventory is silently empty and the Excel
+           Inventory sheet omits them entirely.
+
+        Returns a freshly aggregated ``Inventory`` rather than a reference to a
+        math module's own inventory, so callers cannot mutate calculator state.
+        """
+        inventory = Inventory()
+
+        for group in MATH_COMPONENT_GROUPS:
+            for attribute in group:
+                math_module = getattr(self, attribute, None)
+                if math_module is None:
+                    continue
+                component_inventory = getattr(math_module, "inventory", None)
+                if component_inventory is None:
+                    continue
+                inventory = inventory + component_inventory
+                break
+
+        for entry_calculator in self.entry_calculators:
+            inventory = inventory + entry_calculator.inventory
+
+        return inventory
+
+    @property
+    def entry_calculators(self) -> list["BaseCalculator"]:
+        """Sub-calculators whose inventories roll up into this one.
+
+        Populated by container calculators through ``_track_entry_calculator``
+        while they iterate their entries in ``calculate()``.
+        """
+        return self._entry_calculators
+
+    def _track_entry_calculator(self, calculator_class, entry) -> "BaseCalculator":
+        """Build an entry calculator and register it for inventory roll-up.
+
+        Container calculators must call ``_reset_entry_calculators()`` at the
+        top of ``calculate()``; ``calculate()`` can be invoked more than once on
+        the same instance (for example via ``get_defaults(calculate=True)``) and
+        without the reset the entries would accumulate and double count.
+        """
+        calculator = calculator_class(entry)
+        self._entry_calculators.append(calculator)
+        return calculator
+
+    def _reset_entry_calculators(self) -> None:
+        """Drop entry calculators tracked by a previous ``calculate()`` run."""
+        self._entry_calculators = []
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -3743,10 +3825,11 @@ class InputCalculator(BaseCalculator):
 
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
 
         entries = module.input_entries.all()
         for entry in entries:
-            r_w, r_wo = InputEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(InputEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -3910,9 +3993,10 @@ class EnergyCalculator(BaseCalculator):
         module: Energy = self.data
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
 
         for entry in module.entries.all():
-            r_w, r_wo = EnergyEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(EnergyEntryCalculator, entry).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
@@ -4874,6 +4958,14 @@ class LivestockCalculator(BaseCalculator):
         self.LEACHING_MULTI = ApplicationParameter.objects.get(name="leaching_multiplier").value
         self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
+        # gas_head_calculation rescales the other systems by (1 - t2 PRP) / (1 - default PRP), which divides by
+        # zero when the default PRP is 100%, whatever the tier 2 PRP or complementary type. Only a system tier 2 EF
+        # skips that rescaling, and CH4 and N2O each need their own.
+        PRP_T2_ERROR_MESSAGE = (
+            "The default Pasture/Range/Paddock share for this livestock is 100%, so there is no other manure management system to assign the rest to. "
+            "Leave the tier 2 PRP percentage empty, or enter both tier 2 CH4 and N2O emission factors."
+        )
+
         if module.is_start():
             production_category_region_flt = {
                 "livestock_production_type": module.livestock_production_type_start,
@@ -4950,6 +5042,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_start is not None
+                and self.animal_waste_prp_start.value == 100
+                and (module.emission_factor_ch4_t2_start is None or module.emission_factor_n2o_t2_start is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_start = (
@@ -5209,6 +5308,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+            
+            if (
+                module.prp_percentage_t2_w is not None
+                and self.animal_waste_prp_w.value == 100
+                and (module.emission_factor_ch4_t2_w is None or module.emission_factor_n2o_t2_w is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_w = (
@@ -5468,6 +5574,13 @@ class LivestockCalculator(BaseCalculator):
                 production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value},
                 f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region}",
             )
+                
+            if (
+                module.prp_percentage_t2_wo is not None
+                and self.animal_waste_prp_wo.value == 100
+                and (module.emission_factor_ch4_t2_wo is None or module.emission_factor_n2o_t2_wo is None)
+            ):
+                raise ValueError(PRP_T2_ERROR_MESSAGE)
 
             # Animal Waste PRP of other systems
             self.animal_waste_management_systems_wo = (
@@ -5669,7 +5782,7 @@ class LivestockCalculator(BaseCalculator):
         self.get_defaults()
 
         if module.is_with():
-            log.debug("Calculating emissions for WITH")
+            logger.debug("Calculating emissions for WITH")
 
             inputs_w = {
                 "implementation_time": self.activity.implementation_years,
@@ -5686,8 +5799,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_w.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_w.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_w,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5763,8 +5876,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_wo.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_wo.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo else None,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start is not None else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo is not None else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_wo,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -5837,13 +5950,15 @@ class IrrigationCalculator(BaseCalculator):
         module: Irrigation = self.data
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self._reset_entry_calculators()
+
         for system in module.irrigation_systems.all():
-            r_w, r_wo = IrrigationSystemCalculator(system).calculate()
+            r_w, r_wo = self._track_entry_calculator(IrrigationSystemCalculator, system).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
         for phase in module.irrigation_phases.all():
-            r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
+            r_w, r_wo = self._track_entry_calculator(IrrigationPhaseCalculator, phase).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
 
@@ -7912,8 +8027,10 @@ class StorageCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = StorageEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(StorageEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8045,8 +8162,10 @@ class ProcessingCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = ProcessingEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(ProcessingEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8111,8 +8230,10 @@ class PackagingCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = PackagingEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(PackagingEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
@@ -8235,8 +8356,10 @@ class TransportCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
+        self._reset_entry_calculators()
+
         for entry in self.module.submodules:
-            r_w, r_wo = TransportEntryCalculator(entry).calculate()
+            r_w, r_wo = self._track_entry_calculator(TransportEntryCalculator, entry).calculate()
 
             self.results_w += r_w
             self.results_wo += r_wo
