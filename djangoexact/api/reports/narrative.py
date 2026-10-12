@@ -85,9 +85,10 @@ def content_from_request(request, template_name) -> SafeString | None:
     data = getattr(request, "data", None)
     if not hasattr(data, "get"):
         return None
-    if data.get("narrative"):
+    if "narrative" in data:
         # The structured narrative was replaced by content. A client still
         # sending it would otherwise get a PDF without the prose it carried.
+        # Refused even when empty, so the retired key has one behaviour.
         raise serializers.ValidationError(
             "narrative is no longer accepted: send the analyst notes as HTML in content."
         )

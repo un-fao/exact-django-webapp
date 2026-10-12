@@ -128,10 +128,11 @@ class ContentFromRequestTestCase(SimpleTestCase):
 
     def test_the_retired_narrative_key_is_refused_not_dropped(self):
         for template_name in ("ifad", "fao", None):
-            with self.subTest(template=template_name):
-                with self.assertRaises(ValidationError) as caught:
-                    content_from_request(_request({"narrative": {"data_limitations": "x"}}), template_name)
-                self.assertIn("content", str(caught.exception))
+            for value in ({"data_limitations": "x"}, {}, None):
+                with self.subTest(template=template_name, value=value):
+                    with self.assertRaises(ValidationError) as caught:
+                        content_from_request(_request({"narrative": value}), template_name)
+                    self.assertIn("content", str(caught.exception))
 
 
 class ReportEndpointsArePostOnlyTestCase(SimpleTestCase):
