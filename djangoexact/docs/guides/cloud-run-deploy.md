@@ -11,8 +11,12 @@ What it does NOT do:
 - It does not touch App Engine. `djangoexact/app.yaml` and
   `.github/workflows/deploy.yaml` are unmodified, and App Engine keeps
   serving production exactly as it does today.
-- It does not touch the existing Cloud Run Jobs (`exact-computation-job`).
-  Those are a separate image, a separate workflow, and out of scope here.
+- It does not own the computation job's environment. It rebuilds the
+  `exact-computation-job` **image** on every deploy, so async reports and
+  project copies run the same commit as the service, and it re-syncs
+  `BACKEND_BASE_URL` and `SECRET_KEY`. Every other env var on the job is still
+  written only by `.github/workflows/deploy.yaml`. See "Computation job image"
+  in `async-jobs.md`.
 - It does not perform a production cutover. Both platforms can serve the
   same Cloud SQL instance and the same GCS bucket at once, so the eventual
   cutover is a hostname flip, not a data migration.
