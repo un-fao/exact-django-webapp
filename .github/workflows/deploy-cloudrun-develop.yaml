@@ -5,8 +5,11 @@ name: Deploy Cloud Run (develop)
 # (exact-api-dev) in the same fao-exact-review project, connected to the shared
 # review database through the /cloudsql socket.
 #
-# It never touches App Engine, the review Cloud Run service (exact-api), or the
-# review DB schema. Unlike the review pipeline it deliberately SKIPS migrate and
+# It also deploys its own computation job (exact-computation-job-dev) from the
+# same commit, so async reports and project copies run the code the service runs.
+#
+# It never touches App Engine, the review Cloud Run service (exact-api), the
+# review computation job (exact-computation-job), or the review DB schema. Unlike the review pipeline it deliberately SKIPS migrate and
 # every other runner-side DB step: this dev pipeline must never mutate the shared
 # review database. The review Cloud Run and App Engine pipelines own migrations.
 on:
@@ -58,7 +61,12 @@ jobs:
           # to match the App Engine dev service on an internet-facing deployment.
           echo "CLOUD_RUN_REGION=${CLOUD_RUN_REGION:-europe-west1}" >> "$GITHUB_ENV"
           echo "DJANGO_DEBUG=${DJANGO_DEBUG:-False}" >> "$GITHUB_ENV"
-          echo "CLOUD_RUN_COMPUTATION_JOB_NAME=${CLOUD_RUN_COMPUTATION_JOB_NAME:-projects/fao-exact-review/locations/europe-west1/jobs/exact-computation-job}" >> "$GITHUB_ENV"
+          # The dev service dispatches to its OWN job, deployed below from this
+          # same commit. It used to share review's exact-computation-job, whose
+          # image only review deploys refresh, so async work on dev ran code
+          # months older than the service that enqueued it (TemplateDoesNotExist
+          # on every report template added since).
+          echo "CLOUD_RUN_COMPUTATION_JOB_NAME=${CLOUD_RUN_COMPUTATION_JOB_NAME:-projects/$PROJECT_ID/locations/${CLOUD_RUN_REGION:-europe-west1}/jobs/exact-computation-job-dev}" >> "$GITHUB_ENV"
           # SERVICE_NAME is already taken: the variables dump above sets it to
           # the App Engine dev service name (exact-dev). The Cloud Run service
           # gets its own, distinct from the review Cloud Run service (exact-api).
@@ -90,11 +98,17 @@ jobs:
         # reaches the run body directly (SAST: github context in a run step).
         env:
           RUN_NUMBER: ${{ github.run_number }}
+          SHA: ${{ github.sha }}
         run: |
           set -eu
           base="$CLOUD_RUN_REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_REPO/$CLOUD_RUN_SERVICE_NAME"
           echo "TAG=$base:$RUN_NUMBER" >> "$GITHUB_ENV"
           echo "TAG_LATEST=$base:latest" >> "$GITHUB_ENV"
+          # Tagged by commit so `gcloud run jobs describe` answers "which code is
+          # this job running" directly.
+          job="${CLOUD_RUN_COMPUTATION_JOB_NAME##*/}"
+          echo "JOB_SHORT_NAME=$job" >> "$GITHUB_ENV"
+          echo "JOB_IMAGE=$CLOUD_RUN_REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_REPO/$job:$SHA" >> "$GITHUB_ENV"
 
       - name: 'Checkout Code'
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -177,6 +191,14 @@ jobs:
           docker push "$TAG"
           docker push "$TAG_LATEST"
 
+      - name: Build and push computation job image
+        env:
+          DOCKER_BUILDKIT: '1'
+        run: |
+          set -eu
+          docker build -f deploy/Dockerfile.computation_job -t "$JOB_IMAGE" .
+          docker push "$JOB_IMAGE"
+
       - name: Render Cloud Run service manifest
         run: |
           set -eu
@@ -228,6 +250,53 @@ jobs:
 
           python3 -c "import yaml; yaml.safe_load(open('/tmp/service.yaml'))"
           echo "Manifest rendered and parsed."
+
+      - name: Deploy computation job
+        # Runs before the service deploy so the service never points at a job
+        # that does not exist yet or still carries the previous commit.
+        #
+        # The job's env is copied from the rendered service manifest instead of
+        # being assembled a second time. The job signs report download tokens
+        # that the service verifies and mints links from BACKEND_BASE_URL, so
+        # any divergence between the two env sets (SECRET_KEY, base URL) breaks
+        # emailed links with a bare 404. One source makes that drift impossible.
+        run: |
+          set -eu
+          python3 - <<'PYEOF'
+          import yaml
+          svc = yaml.safe_load(open('/tmp/service.yaml'))
+          env = {e['name']: e['value'] for e in svc['spec']['template']['spec']['containers'][0]['env']}
+          # Parity with the review job (deploy.yaml): ComputationJob completion emails.
+          env['JOB_NOTIFICATIONS_ENABLED'] = 'True'
+          with open('/tmp/job-env.yaml', 'w') as f:
+              yaml.safe_dump(env, f, default_flow_style=False, allow_unicode=True)
+          PYEOF
+
+          # --task-timeout=3600 matches the 1h STALE_THRESHOLD of
+          # reconcile_stale_async_jobs; keep them in sync.
+          gcloud run jobs deploy "$JOB_SHORT_NAME" \
+            --image="$JOB_IMAGE" \
+            --region="$CLOUD_RUN_REGION" \
+            --project="$PROJECT_ID" \
+            --service-account="$RUNTIME_SERVICE_ACCOUNT" \
+            --set-cloudsql-instances="$DB_INSTANCE_CONNECTION" \
+            --memory=4Gi \
+            --cpu=2 \
+            --task-timeout=3600 \
+            --max-retries=0 \
+            --env-vars-file=/tmp/job-env.yaml \
+            --quiet
+          rm -f /tmp/job-env.yaml
+
+          # The service dispatches executions with overridden container args,
+          # which needs run.jobs.runWithOverrides on THIS job. On the review job
+          # that is a job-level roles/run.developer binding, so a new job has to
+          # be granted the same or every dispatch fails with 403.
+          gcloud run jobs add-iam-policy-binding "$JOB_SHORT_NAME" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --member="serviceAccount:$RUNTIME_SERVICE_ACCOUNT" \
+            --role="roles/run.developer" --quiet >/dev/null
+          echo "Computation job $JOB_SHORT_NAME deployed at $JOB_IMAGE" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy to Cloud Run
         # Debug-level gcloud logging is deliberately not enabled on this step.
