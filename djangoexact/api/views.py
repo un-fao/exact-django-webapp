@@ -835,10 +835,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
                                 "of text, list, link and table tags. Accepted by the ifad report only.",
                 ),
-                "narrative": openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    description="Structured analyst narrative. Accepted by the ifad report only.",
-                ),
             },
         ),
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
@@ -864,11 +860,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        # No template means the Excel report, which has no narrative sections.
-        # Dropping it silently would hand back a file missing prose they wrote.
+        # No template means the Excel report, which has nowhere to put analyst
+        # notes. Dropping them silently would hand back a file missing prose they wrote.
         from .reports import narrative as report_narrative
 
-        report_narrative.narrative_from_request(request, None, [])
         report_narrative.content_from_request(request, None)
 
         try:
@@ -934,9 +929,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         from .reports import narrative as report_narrative
 
-        narrative_raw, _narrative = report_narrative.narrative_from_request(
-            request, template_name, selected_activities,
-        )
         content = report_narrative.content_from_request(request, template_name)
 
         params = {
@@ -945,7 +937,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "format": fmt,
             "template": template_name,
             "lang": lang,
-            "narrative": narrative_raw,
             # Stored already sanitized; the worker sanitizes it again anyway.
             "content": content,
         }
@@ -1629,12 +1620,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         activity_ids = utils.requested_activity_ids(request)
         activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
 
-        # Narrative is validated against the activities that reach the report,
-        # the way report() does it. Validating against all of them would accept
-        # text for an activity ?activities= excluded and then render it.
-        _raw, narrative = report_narrative.narrative_from_request(
-            request, template_name, activities if activities is not None else project.activities.all(),
-        )
         content = report_narrative.content_from_request(request, template_name)
 
         try:
@@ -1643,7 +1628,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             from .reports.pdf import render_pdf
 
             result = compute_project_result(project, activities)
-            context = build_template_context(result, request, lang, narrative=narrative, content=content)
+            context = build_template_context(result, request, lang, content=content)
             html = render(request, template_path, context).content.decode()
             pdf = render_pdf(html)
 

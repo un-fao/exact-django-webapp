@@ -1,21 +1,14 @@
-"""Validation for the analyst narrative supplied with a report request.
+"""Validation for the analyst notes supplied with a report request.
 
-This is the first user-supplied prose the app renders into a generated PDF, and
-the PDF engine is version-pinned under a CVE exemption. The caps and types here
-are the trust boundary: nothing reaches a template that was not length-capped,
-and the one date is parsed into a date rather than carried as text.
+``content`` is the only user-supplied input a report renders: analyst notes
+that arrive as HTML and must render as markup. The PDF engine is version-pinned
+under a CVE exemption, so ``clean_content``, an allowlist sanitizer, is the
+trust boundary, and api.reports.pdf refuses any fetch the sanitizer might have
+missed.
 
-Escaping itself is the template's job and Django's autoescaping already does it.
-What would break it is a `|safe` added later to make formatting work --
-api/tests/reports/test_report_render.py is the guard against that.
-
-``content`` is the exception: analyst notes that arrive as HTML and must render
-as markup. It goes through ``clean_content``, an allowlist sanitizer, and
-api.reports.pdf refuses any fetch the sanitizer might have missed.
-
-Only reports whose template reads the narrative accept one. Passing it to a
-report that ignores it would be harmless and silent: the analyst writes six
-passages, receives a PDF without them, and has no way to tell.
+Only reports whose template renders the notes accept them. Passing them to a
+report that ignores them would be harmless and silent: the analyst writes the
+notes, receives a file without them, and has no way to tell.
 """
 from __future__ import annotations
 
@@ -23,7 +16,7 @@ import nh3
 from django.utils.safestring import SafeString, mark_safe
 from rest_framework import serializers
 
-NARRATIVE_REPORTS = frozenset({"ifad"})
+CONTENT_REPORTS = frozenset({"ifad"})
 
 CONTENT_MAX_LENGTH = 20_000
 MAX_CELL_SPAN = 50
@@ -39,54 +32,6 @@ CONTENT_TAGS = frozenset({
 _CELL_ATTRIBUTES = {"colspan", "rowspan"}
 CONTENT_ATTRIBUTES = {"a": {"href"}, "th": _CELL_ATTRIBUTES, "td": _CELL_ATTRIBUTES}
 _LINK_PREFIXES = ("http://", "https://", "mailto:")
-
-
-class ActivityNarrativeSerializer(serializers.Serializer):
-    wop = serializers.CharField(max_length=4000, allow_blank=True, required=False)
-    wp = serializers.CharField(max_length=4000, allow_blank=True, required=False)
-    data_source = serializers.CharField(max_length=500, allow_blank=True, required=False)
-
-
-class ReportNarrativeSerializer(serializers.Serializer):
-    tier2_specification = serializers.CharField(max_length=2000, allow_blank=True, required=False)
-    data_limitations = serializers.CharField(max_length=4000, allow_blank=True, required=False)
-    assumption_set_date = serializers.DateField(required=False)
-    top_activity_driver = serializers.CharField(max_length=2000, allow_blank=True, required=False)
-    additional_sources = serializers.ListField(
-        child=serializers.CharField(max_length=500), max_length=20, required=False,
-    )
-    activities = serializers.DictField(child=ActivityNarrativeSerializer(), required=False)
-
-    def validate(self, attrs):
-        unknown = set(self.initial_data) - set(self.fields)
-        if unknown:
-            # DRF drops unknown keys without complaint. A typo would otherwise
-            # reach an un-editable PDF as a passage the analyst has to notice
-            # is missing.
-            raise serializers.ValidationError(
-                f"Unknown narrative field(s): {', '.join(sorted(unknown))}. "
-                f"Available: {', '.join(sorted(self.fields))}"
-            )
-        return attrs
-
-
-def clean_narrative(raw, activities) -> dict:
-    """Validate a raw narrative payload against the activities it names.
-
-    Raises ``serializers.ValidationError``, which DRF renders as a 400 from a
-    view and fails the job from the worker.
-    """
-    serializer = ReportNarrativeSerializer(data=raw)
-    serializer.is_valid(raise_exception=True)
-    narrative = serializer.validated_data
-
-    known = {str(activity.pk) for activity in activities}
-    unknown = sorted(set(narrative.get("activities", {})) - known)
-    if unknown:
-        raise serializers.ValidationError(
-            f"Narrative supplied for activities that are not in this report: {', '.join(unknown)}."
-        )
-    return narrative
 
 
 def _filter_content_attribute(tag: str, attribute: str, value: str) -> str | None:
@@ -135,30 +80,20 @@ def clean_content(raw) -> SafeString:
 def content_from_request(request, template_name) -> SafeString | None:
     """Return the sanitized ``content`` of a report request, or ``None``.
 
-    Refused for reports that do not render it, for the same reason narrative is.
+    Refused for reports that do not render it.
     """
     data = getattr(request, "data", None)
-    raw = data.get("content") if hasattr(data, "get") else None
+    if not hasattr(data, "get"):
+        return None
+    if data.get("narrative"):
+        # The structured narrative was replaced by content. A client still
+        # sending it would otherwise get a PDF without the prose it carried.
+        raise serializers.ValidationError(
+            "narrative is no longer accepted: send the analyst notes as HTML in content."
+        )
+    raw = data.get("content")
     if raw is None or raw == "":
         return None
-    if template_name not in NARRATIVE_REPORTS:
+    if template_name not in CONTENT_REPORTS:
         raise serializers.ValidationError("This report does not accept analyst content.")
     return clean_content(raw)
-
-
-def narrative_from_request(request, template_name, activities):
-    """Return ``(raw, cleaned)`` narrative for a report request, or ``(None, None)``.
-
-    Both forms are returned because both are needed: the synchronous path renders
-    ``cleaned``, whose date is a real ``date``, while the async path stores ``raw``
-    in ``AsyncJob.params``, which must stay JSON-serializable, and parses it again
-    in the worker. Validating here means a malformed body is a 400 at request time
-    rather than a job the analyst waits on only to find it failed.
-    """
-    data = getattr(request, "data", None)
-    raw = data.get("narrative") if hasattr(data, "get") else None
-    if not raw:
-        return None, None
-    if template_name not in NARRATIVE_REPORTS:
-        raise serializers.ValidationError("This report does not accept analyst narrative.")
-    return raw, clean_narrative(raw, activities)
