@@ -167,7 +167,12 @@ class UnitTestForestManagementFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def land_use_type_start(self):
-        return self._get_land_use_type()
+        """Get appropriate land use type for ForestManagement based on project climate."""
+        if hasattr(self, "activity") and self.activity and self.activity.project:
+            climate = self.activity.project.climate
+            moisture = self.activity.project.moisture
+            return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", climates=climate, moistures=moisture, is_active=True).first()
+        return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", is_active=True).first()
 
     forest_type = factory.LazyAttribute(lambda obj: models.ForestType.objects.get(name_en="Natural"))
     forest_condition_type = factory.LazyAttribute(lambda obj: models.ForestConditionType.objects.get(name_en="Primary"))
@@ -178,14 +183,6 @@ class UnitTestForestManagementFactory(DjangoModelFactory):
     rotation_length_yrs_start = 2
     rotation_length_yrs_w = 2
     rotation_length_yrs_wo = 2
-
-    def _get_land_use_type(self):
-        """Get appropriate land use type for ForestManagement based on project climate."""
-        if hasattr(self, "activity") and self.activity and self.activity.project:
-            climate = self.activity.project.climate
-            moisture = self.activity.project.moisture
-            return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", climates=climate, moistures=moisture, is_active=True).first()
-        return models.LandUseType.objects.filter(module_types__class_name="ForestManagement", is_active=True).first()
 
 
 class UnitTestGrasslandFactory(DjangoModelFactory):

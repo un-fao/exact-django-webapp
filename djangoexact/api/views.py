@@ -119,8 +119,10 @@ from .serializers import (
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
-    ActivitySummarySerializer,
     ProjectTagSerializer,
+    ProjectTotalHectaresSerializer,
+    ProjectTotalCatchSerializer,
+    ProjectTotalLivestockSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
     APIStatusSerializer,
@@ -129,10 +131,9 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
-    HandInHandRegionSerializer,
-    HandInHandCountrySerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
+    ModuleTypeIdModuleIdAreaSerializer,
     ProjectInvitationAcceptSerializer,
     AsyncJobSerializer,
 )
@@ -680,7 +681,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             200: ReadProjectSerializer,
             201: ProjectSummarySerializer,
         },
-        serializer_class=ReadProjectSerializer,
     )
     def list(self, request):
         """
@@ -710,15 +710,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 else:
                     filters[f"project__{key}"] = value
 
-        # NOTE: Users can have multiple memberships to the same project, so we need to filter by distinct projects
-        # And deduplicate them by assigning them to a dictionary with the project id as the unique key
-        shared_projects = request.user.memberships.filter(**filters).distinct()
-        project_map = {}
-        for share in shared_projects:
-            project = share.project
-            if utils.has_project_permission("view_project", self.request.user, project):
-                project_map[project.pk] = project
-        projects_list = list(project_map.values())
+        # Get projects that the user has access to with view permission
+        projects_list = Project.objects.filter(members__user=request.user, members__group__permissions__codename="view_project", **{f"members__{k}": v for k, v in filters.items()}).distinct()
 
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
@@ -1576,15 +1569,74 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
-    def activities(self, request, pk=None):
+    @action(detail=True, methods=["get"], url_path="total-hectares")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalHectaresSerializer})
+    def total_hectares(self, request, pk=None):
+        """
+        Returns the total hectares for all land modules in the project.
+        """
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
 
-        activities = project.activities.all()
-        serializer = ActivitySerializer(activities, many=True)
+        total_hectares = sum([activity.get_land_modules_area() for activity in project.activities.all()])
+
+        data = {"total_hectares": total_hectares}
+        serializer = ProjectTotalHectaresSerializer(data)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-catch")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalCatchSerializer})
+    def total_catch(self, request, pk=None):
+        """
+        Returns the total catch for all fisheries and aquaculture in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        small_fisheries = SmallFishery.objects.filter(activity__project=project).all()
+        large_fisheries = LargeFishery.objects.filter(activity__project=project).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=project).all()
+
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
+
+        scenario_based_catch = {
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
+        }
+
+        serializer = ProjectTotalCatchSerializer(scenario_based_catch)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-livestock")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalLivestockSerializer})
+    def total_livestock(self, request, pk=None):
+        """
+        Returns the total number of livestock heads in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        livestock = Livestock.objects.filter(activity__project=project).all()
+
+        all_livestock_start = sum([animal.heads_number_start for animal in list(filter(lambda animal: animal.heads_number_start is not None, livestock))])
+        all_livestock_w = sum([animal.heads_number_w for animal in list(filter(lambda animal: animal.heads_number_w is not None, livestock))])
+        all_livestock_wo = sum([animal.heads_number_wo for animal in list(filter(lambda animal: animal.heads_number_wo is not None, livestock))])
+
+        scenario_based_livestock = {
+            "start": all_livestock_start,
+            "w": all_livestock_w,
+            "wo": all_livestock_wo,
+        }
+
+        serializer = ProjectTotalLivestockSerializer(scenario_based_livestock)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -1688,6 +1740,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        responses={200: ProjectSummarySerializer},
+        operation_description="Get a summary of a project, including user roles and tags",
+    )
+    def summary(self, request, pk=None):
+        serializer = ProjectSummarySerializer(self.get_object(), context={"request": request})
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -2145,7 +2206,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Activity.objects.all()
-    serializer_class = ActivitySerializerWithModules
+    serializer_class = ActivitySerializer
     permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
     def update(self, request, *args, **kwargs):
@@ -2223,7 +2284,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id, activity_status, activity_ready],
+        manual_parameters=[project_id, activity_status, activity_ready, openapi.Parameter("modules", openapi.IN_QUERY, description="Return modules", type=openapi.TYPE_BOOLEAN)],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -2243,19 +2304,14 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
-        is_summary = request.query_params.get("summary", False)
+        modules = self.request.query_params.get("modules", False)
         is_b_intact_param = request.query_params.get("is_b_intact", None)
-        SerializerClass = ActivitySerializerWithModules
-        if is_summary:
-            SerializerClass = ActivitySummarySerializer
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
             return error
 
-        def process_activity(activity):
-            activity_dict = SerializerClass(activity).data
-            return activity_dict
+        SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
 
         # Prefetch module_types in a single query: both the optional status
         # filter below and activity serialization walk each activity's modules,
@@ -2306,20 +2362,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if allowed_statuses is not None:
             activities_list = [activity for activity in activities_list if activity.status.name_en in allowed_statuses]
 
-        # Start measuring time
-        start = time.time()
-
-        paginator = DefaultPagination()
-        page = paginator.paginate_queryset(activities_list, request)
-        if page is not None:
-            response = concurrency.map_in_bounded_threads(process_activity, page)
-            logger.debug(f"Time taken to process activities: {time.time() - start}")
-            return paginator.get_paginated_response(response)
-
-        # End measuring time
-        logger.debug(f"Time taken to process activities: {time.time() - start}")
-
-        return Response(data=SerializerClass(activities_list, many=True).data, status=http_status.HTTP_200_OK)
+        return utils.paginated_parallel_response(queryset=activities_list, request=request, serializer_class=SerializerClass, process_function=lambda activity: SerializerClass(activity).data)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
@@ -2368,6 +2411,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(response)
 
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity modules", 200: ModuleTypeIdModuleIdAreaSerializer(many=True)})
     def modules(self, request, pk=None):
         """
         Lists the modules of a given activity.
@@ -2378,7 +2422,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        modules = get_modules(activity)
+        modules = ModuleTypeIdModuleIdAreaSerializer(activity.modules, many=True).data
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(modules, request)
@@ -2484,6 +2528,8 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
 class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+    filterset_class = api_filters.NoteFilter
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     @transaction.atomic
     @swagger_auto_schema(responses={400: "Bad request", 201: NoteSerializer}, request_body=NewNoteSerializer)
@@ -2660,7 +2706,7 @@ class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
 
 def generic_module_viewset(model: Module):
-    class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    class GenericModuleViewSet(viewsets.ModelViewSet):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
         permission_classes = [api_permissions.IsPublicOrAuthenticated]

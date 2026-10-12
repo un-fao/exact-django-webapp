@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
 from django.db import transaction
 import api.security as security
+import api.concurrency as concurrency
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -962,3 +963,44 @@ def send_due_recaps() -> int:
             # One broken project must not stop the recaps of the others.
             log.exception(e)
     return sent
+
+
+def paginated_parallel_response(queryset, request, process_function=None, paginator_class=None, serializer_class=None, serializer_kwargs=None):
+    """
+    Paginate ``queryset`` and build each page item on the bounded serialization pool.
+
+    Args:
+        queryset: Django queryset (or list) to paginate and process
+        request: Django request object
+        process_function: Function applied to each item (optional if serializer_class provided)
+        paginator_class: Pagination class to use (defaults to DefaultPagination)
+        serializer_class: Serializer class to use instead of process_function
+        serializer_kwargs: Additional kwargs to pass to serializer
+
+    Returns:
+        Response: Paginated response with processed data
+    """
+    if paginator_class is None:
+        # Imported here because api.views imports this module.
+        from api.views import DefaultPagination
+
+        paginator_class = DefaultPagination
+
+    serializer_kwargs = serializer_kwargs or {}
+    if process_function is None:
+        if serializer_class is None:
+            raise ValueError("Either process_function or serializer_class must be provided")
+
+        def process_function(item):
+            return serializer_class(item, **serializer_kwargs).data
+
+    paginator = paginator_class()
+    page = paginator.paginate_queryset(queryset, request)
+    if page is not None:
+        # Each worker thread opens its own DB connection, so the fan-out width
+        # has to stay inside the budget documented in api/concurrency.py.
+        return paginator.get_paginated_response(concurrency.map_in_bounded_threads(process_function, page))
+
+    if serializer_class is not None:
+        return Response(data=serializer_class(queryset, many=True, **serializer_kwargs).data)
+    return Response(data=[process_function(item) for item in queryset])
