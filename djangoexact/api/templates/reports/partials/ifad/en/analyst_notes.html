@@ -1,7 +1,14 @@
 {% if content %}
     {# No |safe here, on purpose: only the output of clean_content is already marked safe. #}
     <div class="analyst-content">
-        <h2>Analyst notes</h2>
+        <h3>Analyst notes</h3>
         {{ content }}
     </div>
+{% else %}
+    <span class="analyst-box">
+        <span class="box-title">Analyst notes</span>
+        For each activity assessed, describe the without-project (WOP) situation, the with-project
+        (WP) practice change introduced by the investment and the main data source used (PDR / PIM
+        / EFA, with page reference). Add any data limitations and additional literature.
+    </span>
 {% endif %}

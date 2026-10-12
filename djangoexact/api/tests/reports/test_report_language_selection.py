@@ -30,7 +30,7 @@ def _request(*, lang=None, header_lang=None):
         query["lang"] = lang
     request = Mock()
     request.query_params = query
-    # Without this a bare Mock hands narrative_from_request a truthy payload.
+    # Without this a bare Mock hands content_from_request a truthy payload.
     request.data = {}
     if header_lang is None:
         del request.LANGUAGE_CODE
