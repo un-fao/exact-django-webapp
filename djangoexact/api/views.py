@@ -527,6 +527,43 @@ def get_version_config():
     return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
+# Shared by report/ and report/async/: without an explicit request_body, drf-yasg
+# documents a ModelViewSet POST action with the viewset's ProjectSerializer.
+_REPORT_QUERY_PARAMS = [
+    openapi.Parameter(
+        "activities",
+        openapi.IN_QUERY,
+        description="List of activity IDs to include in the report",
+        type=openapi.TYPE_ARRAY,
+        items={"type": openapi.TYPE_INTEGER},
+    ),
+    openapi.Parameter(
+        "template",
+        openapi.IN_QUERY,
+        description="Name of the report template to render (PDF). Omit for the Excel results report.",
+        type=openapi.TYPE_STRING,
+        required=False,
+    ),
+    openapi.Parameter(
+        "lang",
+        openapi.IN_QUERY,
+        description="Report language; falls back to Accept-Language, then en",
+        type=openapi.TYPE_STRING,
+        required=False,
+    ),
+]
+_REPORT_BODY = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "content": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
+                        "of text, list, link and table tags. Accepted by the ifad report only.",
+        ),
+    },
+)
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -804,32 +841,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                "activities",
-                openapi.IN_QUERY,
-                description="List of activity IDs to include in the report",
-                type=openapi.TYPE_ARRAY,
-                items={"type": openapi.TYPE_INTEGER},
-            ),
-            openapi.Parameter(
-                "template",
-                openapi.IN_QUERY,
-                description="Name of the report template to render",
-                type=openapi.TYPE_STRING,
-                required=False,
-            ),
-        ],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "content": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
-                                "of text, list, link and table tags. Accepted by the ifad report only.",
-                ),
-            },
-        ),
+        manual_parameters=_REPORT_QUERY_PARAMS,
+        request_body=_REPORT_BODY,
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
@@ -878,6 +891,31 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["post"], url_path="report/async")
+    @swagger_auto_schema(
+        manual_parameters=_REPORT_QUERY_PARAMS + [
+            openapi.Parameter(
+                "format",
+                openapi.IN_QUERY,
+                description="Output when no template is given. Only xlsx is supported.",
+                type=openapi.TYPE_STRING,
+                enum=["xlsx"],
+                required=False,
+            ),
+        ],
+        request_body=_REPORT_BODY,
+        responses={
+            202: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "job_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                    "status": openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            ),
+            400: "Project not ready, unknown report, or content sent to a report that ignores it",
+            403: "Selected user does not have permission to view project results",
+            404: "Project not found",
+        },
+    )
     def report_async(self, request, pk=None):
         """Enqueue a report for background generation. Returns 202 + job id.
 
