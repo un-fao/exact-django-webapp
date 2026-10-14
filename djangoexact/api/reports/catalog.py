@@ -11,6 +11,8 @@ names.
 """
 from __future__ import annotations
 
+import re
+
 REPORTS: dict[str, frozenset[str]] = {
     "fao": frozenset({"en", "es", "fr"}),
     "ifad": frozenset({"en"}),
@@ -36,11 +38,16 @@ def options() -> list[dict]:
     ]
 
 
-def report_filename(project_id: int, report: str | None) -> str:
-    """Download filename shared by the sync and async paths: `{id}-{report}-report.pdf`, or the Excel results."""
+def report_filename(project_name: str, report: str | None) -> str:
+    """Download filename shared by the sync and async paths: `{name}-{report}-report.pdf`, or the Excel results.
+
+    Separators and control characters become "-" so the name stays one file
+    name. Quoting and non-ASCII are left to django.utils.http.content_disposition_header.
+    """
+    name = re.sub(r"[\\/\x00-\x1f\x7f]", "-", project_name or "").strip() or "project"
     if report:
-        return f"{project_id}-{report}-report.pdf"
-    return f"{project_id}-results-report.xlsx"
+        return f"{name}-{report}-report.pdf"
+    return f"{name}-results-report.xlsx"
 
 
 def resolve_template(report: str, lang: str) -> str:

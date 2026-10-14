@@ -427,7 +427,8 @@ class ReportJobRunTestCase(TestCase):
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
                     "template": "fao", "lang": "en"},
         )
-        fake_project = mock.Mock(pk=7, name="P")
+        fake_project = mock.Mock(pk=7)
+        fake_project.name = "Kenya agroforestry"
         with mock.patch("api.services.report_jobs.Project") as m_project, \
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
              mock.patch("api.services.report_jobs.build_template_context", return_value={}), \
@@ -438,7 +439,7 @@ class ReportJobRunTestCase(TestCase):
             result = report_jobs.run(job)
         self.assertEqual(result["gcs_path"], "reports/7/1.pdf")
         self.assertEqual(result["content_type"], "application/pdf")
-        self.assertEqual(result["filename"], "7-fao-report.pdf")
+        self.assertEqual(result["filename"], "Kenya agroforestry-fao-report.pdf")
         m_upload.assert_called_once()
         m_render.assert_called_once()
         rendered_context = m_render.call_args.args[1]
@@ -463,7 +464,7 @@ class ReportJobRunTestCase(TestCase):
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
              mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
-            m_project.objects.get.return_value = mock.Mock(pk=7)
+            m_project.objects.get.return_value = types.SimpleNamespace(pk=7, name="P")
             report_jobs.run(job)
 
         content = m_ctx.call_args.kwargs["content"]
@@ -484,7 +485,7 @@ class ReportJobRunTestCase(TestCase):
              mock.patch("api.services.report_jobs.render_to_string", return_value="<html></html>"), \
              mock.patch("api.services.report_jobs.render_pdf", return_value=b"%PDF-1.7"), \
              mock.patch("api.services.report_jobs._upload", return_value="reports/7/1.pdf"):
-            m_project.objects.get.return_value = mock.Mock(pk=7)
+            m_project.objects.get.return_value = types.SimpleNamespace(pk=7, name="P")
             report_jobs.run(job)
 
         self.assertIsNone(m_ctx.call_args.kwargs["content"])

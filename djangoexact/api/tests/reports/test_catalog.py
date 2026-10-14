@@ -77,9 +77,23 @@ class ReportCatalogTestCase(SimpleTestCase):
 
     def test_report_filename_matches_the_frontend_contract(self):
         """Sync and async downloads both take this name; the frontend reads it from Content-Disposition."""
-        self.assertEqual(report_filename(7, "fao"), "7-fao-report.pdf")
-        self.assertEqual(report_filename(7, "ifad"), "7-ifad-report.pdf")
-        self.assertEqual(report_filename(7, None), "7-results-report.xlsx")
+        self.assertEqual(report_filename("Kenya", "fao"), "Kenya-fao-report.pdf")
+        self.assertEqual(report_filename("Kenya", "ifad"), "Kenya-ifad-report.pdf")
+        self.assertEqual(report_filename("Kenya", None), "Kenya-results-report.xlsx")
+
+    def test_report_filename_keeps_the_name_one_file_name(self):
+        self.assertEqual(report_filename("a/b\\c\nd", "fao"), "a-b-c-d-fao-report.pdf")
+        self.assertEqual(report_filename("  ", None), "project-results-report.xlsx")
+
+    def test_non_ascii_name_survives_the_header(self):
+        """A plain filename="..." cannot carry non-ASCII; the RFC 6266 filename* form can."""
+        from urllib.parse import unquote
+
+        from django.utils.http import content_disposition_header
+
+        header = content_disposition_header(True, report_filename('Projet "Côte d\'Ivoire"', "fao"))
+        self.assertIn("filename*=utf-8''", header)
+        self.assertEqual(unquote(header.split("''", 1)[1]), 'Projet "Côte d\'Ivoire"-fao-report.pdf')
 
     def test_every_report_has_a_label(self):
         self.assertEqual(set(LABELS), set(REPORTS))

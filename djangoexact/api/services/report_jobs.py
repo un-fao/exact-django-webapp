@@ -37,13 +37,13 @@ def run(job: AsyncJob) -> dict:
         )
         content_type = "application/pdf"
         ext = "pdf"
-        filename = catalog.report_filename(project.pk, template_name)
+        filename = catalog.report_filename(project.name, template_name)
     else:
         buffer = generate_excel_report(project, activities)
         content = buffer.getvalue() if isinstance(buffer, io.BytesIO) else buffer
         content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ext = "xlsx"
-        filename = catalog.report_filename(project.pk, None)
+        filename = catalog.report_filename(project.name, None)
 
     gcs_path = _upload(project, job, content, ext)
     return {
