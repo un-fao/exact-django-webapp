@@ -40,8 +40,20 @@ jobs:
       - name: Export repository variables
         run: echo '${{ toJson(vars) }}' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
 
+      # Only the secrets the rendered manifest needs, each JSON-encoded so the
+      # values reach $GITHUB_ENV through the same literal path as before.
+      # Dumping toJson(secrets) and then shipping the env out via
+      # --env-vars-file got every run held by GitHub as a "may be malicious"
+      # workflow, and it exposed unrelated secrets (GITHUB_TOKEN, org app key)
+      # to every step.
       - name: Export repository secrets
-        run: echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
+        run: |
+          echo '{
+            "DB_PASSWORD": ${{ toJson(secrets.DB_PASSWORD) }},
+            "SECRET_KEY": ${{ toJson(secrets.SECRET_KEY) }},
+            "SMTP_USER_PASSWORD": ${{ toJson(secrets.SMTP_USER_PASSWORD) }},
+            "FIREBASE_SERVICE_ACCOUNT": ${{ toJson(secrets.FIREBASE_SERVICE_ACCOUNT) }}
+          }' | jq -r 'to_entries[] | "\(.key)<<GHEOF\n\(.value)\nGHEOF"' >> "$GITHUB_ENV"
 
       - name: Resolve deployment identifiers
         run: |
