@@ -39,6 +39,7 @@ from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
+from django.utils.http import content_disposition_header
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
@@ -882,7 +883,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            response["Content-Disposition"] = f'attachment; filename="{project.name}_report.xlsx"'
+            from .reports import catalog
+
+            response["Content-Disposition"] = content_disposition_header(True, catalog.report_filename(project.name, None))
 
             return response
         except FileNotFoundError:
@@ -1723,7 +1726,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             pdf = render_pdf(html)
 
             response = HttpResponse(pdf, content_type="application/pdf")
-            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+            response["Content-Disposition"] = content_disposition_header(True, catalog.report_filename(project.name, template_name))
             return response
 
         except Exception as e:
@@ -3517,8 +3520,7 @@ class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
             stream,
             content_type=job.result.get("content_type", "application/octet-stream"),
         )
-        filename = job.result.get("filename", "report")
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Content-Disposition"] = content_disposition_header(True, job.result.get("filename", "report"))
         return response
 
 
