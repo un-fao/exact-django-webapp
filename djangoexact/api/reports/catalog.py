@@ -36,6 +36,13 @@ def options() -> list[dict]:
     ]
 
 
+def report_filename(project_id: int, report: str | None) -> str:
+    """Download filename shared by the sync and async paths: `{id}-{report}-report.pdf`, or the Excel results."""
+    if report:
+        return f"{project_id}-{report}-report.pdf"
+    return f"{project_id}-results-report.xlsx"
+
+
 def resolve_template(report: str, lang: str) -> str:
     """Return the template path for a report, or raise UnknownReport.
 

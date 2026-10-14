@@ -869,7 +869,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            response["Content-Disposition"] = f'attachment; filename="{project.name}_report.xlsx"'
+            from .reports import catalog
+
+            response["Content-Disposition"] = f'attachment; filename="{catalog.report_filename(project.pk, None)}"'
 
             return response
         except FileNotFoundError:
@@ -1685,7 +1687,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             pdf = render_pdf(html)
 
             response = HttpResponse(pdf, content_type="application/pdf")
-            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+            response["Content-Disposition"] = f'attachment; filename="{catalog.report_filename(project.pk, template_name)}"'
             return response
 
         except Exception as e:

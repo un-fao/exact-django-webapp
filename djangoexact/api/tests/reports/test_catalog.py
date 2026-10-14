@@ -28,7 +28,7 @@ from __future__ import annotations
 from django.template.loader import get_template
 from django.test import SimpleTestCase
 
-from api.reports.catalog import LABELS, REPORTS, UnknownReport, options, resolve_template
+from api.reports.catalog import LABELS, REPORTS, UnknownReport, options, report_filename, resolve_template
 
 
 class ReportCatalogTestCase(SimpleTestCase):
@@ -74,6 +74,12 @@ class ReportCatalogTestCase(SimpleTestCase):
         for lang in ("es", "fr"):
             with self.subTest(lang=lang), self.assertRaises(UnknownReport):
                 resolve_template("ifad", lang)
+
+    def test_report_filename_matches_the_frontend_contract(self):
+        """Sync and async downloads both take this name; the frontend reads it from Content-Disposition."""
+        self.assertEqual(report_filename(7, "fao"), "7-fao-report.pdf")
+        self.assertEqual(report_filename(7, "ifad"), "7-ifad-report.pdf")
+        self.assertEqual(report_filename(7, None), "7-results-report.xlsx")
 
     def test_every_report_has_a_label(self):
         self.assertEqual(set(LABELS), set(REPORTS))

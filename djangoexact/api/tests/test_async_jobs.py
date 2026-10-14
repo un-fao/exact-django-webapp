@@ -438,6 +438,7 @@ class ReportJobRunTestCase(TestCase):
             result = report_jobs.run(job)
         self.assertEqual(result["gcs_path"], "reports/7/1.pdf")
         self.assertEqual(result["content_type"], "application/pdf")
+        self.assertEqual(result["filename"], "7-fao-report.pdf")
         m_upload.assert_called_once()
         m_render.assert_called_once()
         rendered_context = m_render.call_args.args[1]
