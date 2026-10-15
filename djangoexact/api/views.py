@@ -1686,7 +1686,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True),
             openapi.Parameter("lang", openapi.IN_QUERY, description="Language of the template", type=openapi.TYPE_STRING, required=False),
         ],
-        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
+        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 422: "A module cannot be calculated; the body names it", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
     def template(self, request, pk=None):
@@ -1715,12 +1715,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         content = report_narrative.content_from_request(request, template_name)
 
+        from .reports import NotReadyError, compute_project_result
+
         try:
-            from .reports import compute_project_result
+            result = compute_project_result(project, activities)
+        except NotReadyError as e:
+            # Same contract as report(): a module that cannot be calculated is
+            # the user's data to fix, so name it instead of a generic 500.
+            logger.warning(e)
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        try:
             from .reports.html_context import build_template_context
             from .reports.pdf import render_pdf
 
-            result = compute_project_result(project, activities)
             context = build_template_context(result, request, lang, content=content)
             html = render(request, template_path, context).content.decode()
             pdf = render_pdf(html)
