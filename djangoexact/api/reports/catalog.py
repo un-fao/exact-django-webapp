@@ -6,18 +6,48 @@ it straight into a template path, so the only thing standing between user
 input and the template loader was an os.path.exists probe -- which on the
 public, unauthenticated path doubled as a file-existence oracle.
 
-Adding a report is one entry here plus the template file it names.
+Adding a report is one entry in REPORTS and LABELS plus the template file it
+names.
 """
 from __future__ import annotations
+
+import re
 
 REPORTS: dict[str, frozenset[str]] = {
     "fao": frozenset({"en", "es", "fr"}),
     "ifad": frozenset({"en"}),
 }
 
+# Display names for the frontend select. English only: the frontend can map
+# the id to its own translation and fall back to this.
+LABELS: dict[str, str] = {
+    "fao": "EX-ACT report",
+    "ifad": "IFAD annex",
+}
+
 
 class UnknownReport(Exception):
     """Requested report name or language is not in the catalog."""
+
+
+def options() -> list[dict]:
+    """Return the catalog as select options: id (the `template` value), label, languages."""
+    return [
+        {"id": report, "label": LABELS[report], "languages": sorted(langs)}
+        for report, langs in sorted(REPORTS.items())
+    ]
+
+
+def report_filename(project_name: str, report: str | None) -> str:
+    """Download filename shared by the sync and async paths: `{name}-{report}-report.pdf`, or the Excel results.
+
+    Separators and control characters become "-" so the name stays one file
+    name. Quoting and non-ASCII are left to django.utils.http.content_disposition_header.
+    """
+    name = re.sub(r"[\\/\x00-\x1f\x7f]", "-", project_name or "").strip() or "project"
+    if report:
+        return f"{name}-{report}-report.pdf"
+    return f"{name}-results-report.xlsx"
 
 
 def resolve_template(report: str, lang: str) -> str:

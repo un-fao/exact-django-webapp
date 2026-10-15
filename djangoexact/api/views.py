@@ -39,6 +39,7 @@ from api.inventory_labels import inventory_label
 from api.models import CustomUser as User
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
+from django.utils.http import content_disposition_header
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
@@ -119,8 +120,10 @@ from .serializers import (
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
-    ActivitySummarySerializer,
     ProjectTagSerializer,
+    ProjectTotalHectaresSerializer,
+    ProjectTotalCatchSerializer,
+    ProjectTotalLivestockSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
     APIStatusSerializer,
@@ -129,10 +132,9 @@ from .serializers import (
     Aquaculture,
     DynamicResultFactory,
     PublicTokenSerializer,
-    HandInHandRegionSerializer,
-    HandInHandCountrySerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
+    ModuleTypeIdModuleIdAreaSerializer,
     ProjectInvitationAcceptSerializer,
     AsyncJobSerializer,
 )
@@ -526,6 +528,43 @@ def get_version_config():
     return {"appVersion": "1.0.0", "compatibilityGroup": 1}
 
 
+# Shared by report/ and report/async/: without an explicit request_body, drf-yasg
+# documents a ModelViewSet POST action with the viewset's ProjectSerializer.
+_REPORT_QUERY_PARAMS = [
+    openapi.Parameter(
+        "activities",
+        openapi.IN_QUERY,
+        description="List of activity IDs to include in the report",
+        type=openapi.TYPE_ARRAY,
+        items={"type": openapi.TYPE_INTEGER},
+    ),
+    openapi.Parameter(
+        "template",
+        openapi.IN_QUERY,
+        description="Name of the report template to render (PDF). Omit for the Excel results report.",
+        type=openapi.TYPE_STRING,
+        required=False,
+    ),
+    openapi.Parameter(
+        "lang",
+        openapi.IN_QUERY,
+        description="Report language; falls back to Accept-Language, then en",
+        type=openapi.TYPE_STRING,
+        required=False,
+    ),
+]
+_REPORT_BODY = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "content": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
+                        "of text, list, link and table tags. Accepted by the ifad report only.",
+        ),
+    },
+)
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -680,7 +719,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             200: ReadProjectSerializer,
             201: ProjectSummarySerializer,
         },
-        serializer_class=ReadProjectSerializer,
     )
     def list(self, request):
         """
@@ -710,15 +748,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 else:
                     filters[f"project__{key}"] = value
 
-        # NOTE: Users can have multiple memberships to the same project, so we need to filter by distinct projects
-        # And deduplicate them by assigning them to a dictionary with the project id as the unique key
-        shared_projects = request.user.memberships.filter(**filters).distinct()
-        project_map = {}
-        for share in shared_projects:
-            project = share.project
-            if utils.has_project_permission("view_project", self.request.user, project):
-                project_map[project.pk] = project
-        projects_list = list(project_map.values())
+        # Get projects that the user has access to with view permission
+        projects_list = Project.objects.filter(members__user=request.user, members__group__permissions__codename="view_project", **{f"members__{k}": v for k, v in filters.items()}).distinct()
 
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
@@ -809,24 +840,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get", "post"])
+    @action(detail=True, methods=["post"])
     @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                "activities",
-                openapi.IN_QUERY,
-                description="List of activity IDs to include in the report",
-                type=openapi.TYPE_ARRAY,
-                items={"type": openapi.TYPE_INTEGER},
-            ),
-            openapi.Parameter(
-                "template",
-                openapi.IN_QUERY,
-                description="Name of the report template to render",
-                type=openapi.TYPE_STRING,
-                required=False,
-            ),
-        ],
+        manual_parameters=_REPORT_QUERY_PARAMS,
+        request_body=_REPORT_BODY,
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
@@ -850,11 +867,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
             response = self.template(request, pk=pk)
             return response
 
-        # No template means the Excel report, which has no narrative sections.
-        # Dropping it silently would hand back a file missing prose they wrote.
+        # No template means the Excel report, which has nowhere to put analyst
+        # notes. Dropping them silently would hand back a file missing prose they wrote.
         from .reports import narrative as report_narrative
 
-        report_narrative.narrative_from_request(request, None, [])
+        report_narrative.content_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
@@ -866,7 +883,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            response["Content-Disposition"] = f'attachment; filename="{project.name}_report.xlsx"'
+            from .reports import catalog
+
+            response["Content-Disposition"] = content_disposition_header(True, catalog.report_filename(project.name, None))
 
             return response
         except FileNotFoundError:
@@ -875,11 +894,37 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["post"], url_path="report/async")
+    @swagger_auto_schema(
+        manual_parameters=_REPORT_QUERY_PARAMS + [
+            openapi.Parameter(
+                "format",
+                openapi.IN_QUERY,
+                description="Output when no template is given. Only xlsx is supported.",
+                type=openapi.TYPE_STRING,
+                enum=["xlsx"],
+                required=False,
+            ),
+        ],
+        request_body=_REPORT_BODY,
+        responses={
+            202: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "job_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                    "status": openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            ),
+            400: "Project not ready, unknown report, or content sent to a report that ignores it",
+            403: "Selected user does not have permission to view project results",
+            404: "Project not found",
+        },
+    )
     def report_async(self, request, pk=None):
         """Enqueue a report for background generation. Returns 202 + job id.
 
-        The existing synchronous `report/` action is unchanged. Poll the job at
-        GET /api/async-jobs/{id}/ then download via that job's /download/ action.
+        Takes the same query parameters and body as the synchronous `report/`
+        action. Poll the job at GET /api/async-jobs/{id}/ then download via
+        that job's /download/ action.
         """
         project = self.get_object()
         error = security.check_permission("view_project", request.user, project)
@@ -918,9 +963,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         from .reports import narrative as report_narrative
 
-        narrative_raw, _narrative = report_narrative.narrative_from_request(
-            request, template_name, selected_activities,
-        )
+        content = report_narrative.content_from_request(request, template_name)
 
         params = {
             "project_id": project.pk,
@@ -928,7 +971,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "format": fmt,
             "template": template_name,
             "lang": lang,
-            "narrative": narrative_raw,
+            # Stored already sanitized; the worker sanitizes it again anyway.
+            "content": content,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1566,15 +1610,74 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
-    def activities(self, request, pk=None):
+    @action(detail=True, methods=["get"], url_path="total-hectares")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalHectaresSerializer})
+    def total_hectares(self, request, pk=None):
+        """
+        Returns the total hectares for all land modules in the project.
+        """
         project: Project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
 
-        activities = project.activities.all()
-        serializer = ActivitySerializer(activities, many=True)
+        total_hectares = sum([activity.get_land_modules_area() for activity in project.activities.all()])
+
+        data = {"total_hectares": total_hectares}
+        serializer = ProjectTotalHectaresSerializer(data)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-catch")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalCatchSerializer})
+    def total_catch(self, request, pk=None):
+        """
+        Returns the total catch for all fisheries and aquaculture in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        small_fisheries = SmallFishery.objects.filter(activity__project=project).all()
+        large_fisheries = LargeFishery.objects.filter(activity__project=project).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=project).all()
+
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
+
+        scenario_based_catch = {
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
+        }
+
+        serializer = ProjectTotalCatchSerializer(scenario_based_catch)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="total-livestock")
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project", 200: ProjectTotalLivestockSerializer})
+    def total_livestock(self, request, pk=None):
+        """
+        Returns the total number of livestock heads in the project across all scenarios.
+        """
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        livestock = Livestock.objects.filter(activity__project=project).all()
+
+        all_livestock_start = sum([animal.heads_number_start for animal in list(filter(lambda animal: animal.heads_number_start is not None, livestock))])
+        all_livestock_w = sum([animal.heads_number_w for animal in list(filter(lambda animal: animal.heads_number_w is not None, livestock))])
+        all_livestock_wo = sum([animal.heads_number_wo for animal in list(filter(lambda animal: animal.heads_number_wo is not None, livestock))])
+
+        scenario_based_livestock = {
+            "start": all_livestock_start,
+            "w": all_livestock_w,
+            "wo": all_livestock_wo,
+        }
+
+        serializer = ProjectTotalLivestockSerializer(scenario_based_livestock)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -1583,7 +1686,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True),
             openapi.Parameter("lang", openapi.IN_QUERY, description="Language of the template", type=openapi.TYPE_STRING, required=False),
         ],
-        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
+        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 422: "A module cannot be calculated; the body names it", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
     def template(self, request, pk=None):
@@ -1610,27 +1713,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
         activity_ids = utils.requested_activity_ids(request)
         activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
 
-        # Narrative is validated against the activities that reach the report,
-        # the way report() does it. Validating against all of them would accept
-        # text for an activity ?activities= excluded and then render it.
-        _raw, narrative = report_narrative.narrative_from_request(
-            request, template_name, activities if activities is not None else project.activities.all(),
-        )
+        content = report_narrative.content_from_request(request, template_name)
+
+        from .reports import NotReadyError, compute_project_result
 
         try:
-            from .reports import compute_project_result
-            from .reports.html_context import build_template_context
-
             result = compute_project_result(project, activities)
-            context = build_template_context(result, request, lang, narrative=narrative)
+        except NotReadyError as e:
+            # Same contract as report(): a module that cannot be calculated is
+            # the user's data to fix, so name it instead of a generic 500.
+            logger.warning(e)
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        try:
+            from .reports.html_context import build_template_context
+            from .reports.pdf import render_pdf
+
+            context = build_template_context(result, request, lang, content=content)
             html = render(request, template_path, context).content.decode()
-
-            from weasyprint import HTML
-
-            pdf = HTML(string=html).write_pdf()
+            pdf = render_pdf(html)
 
             response = HttpResponse(pdf, content_type="application/pdf")
-            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+            response["Content-Disposition"] = content_disposition_header(True, catalog.report_filename(project.name, template_name))
             return response
 
         except Exception as e:
@@ -1685,6 +1789,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return utils.ErrorResponse(f"Error sending recap email: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        responses={200: ProjectSummarySerializer},
+        operation_description="Get a summary of a project, including user roles and tags",
+    )
+    def summary(self, request, pk=None):
+        serializer = ProjectSummarySerializer(self.get_object(), context={"request": request})
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -2142,7 +2255,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Activity.objects.all()
-    serializer_class = ActivitySerializerWithModules
+    serializer_class = ActivitySerializer
     permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
     def update(self, request, *args, **kwargs):
@@ -2220,7 +2333,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[project_id, activity_status, activity_ready],
+        manual_parameters=[project_id, activity_status, activity_ready, openapi.Parameter("modules", openapi.IN_QUERY, description="Return modules", type=openapi.TYPE_BOOLEAN)],
         responses={
             400: "activity_id not provided",
             403: "Selected user does not have permission to view activities in the project",
@@ -2240,19 +2353,14 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
-        is_summary = request.query_params.get("summary", False)
+        modules = self.request.query_params.get("modules", False)
         is_b_intact_param = request.query_params.get("is_b_intact", None)
-        SerializerClass = ActivitySerializerWithModules
-        if is_summary:
-            SerializerClass = ActivitySummarySerializer
 
         error = security.check_permission("view_activity", self.request.user, project)
         if error:
             return error
 
-        def process_activity(activity):
-            activity_dict = SerializerClass(activity).data
-            return activity_dict
+        SerializerClass = ActivitySerializerWithModules if modules else ActivitySerializer
 
         # Prefetch module_types in a single query: both the optional status
         # filter below and activity serialization walk each activity's modules,
@@ -2303,20 +2411,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if allowed_statuses is not None:
             activities_list = [activity for activity in activities_list if activity.status.name_en in allowed_statuses]
 
-        # Start measuring time
-        start = time.time()
-
-        paginator = DefaultPagination()
-        page = paginator.paginate_queryset(activities_list, request)
-        if page is not None:
-            response = concurrency.map_in_bounded_threads(process_activity, page)
-            logger.debug(f"Time taken to process activities: {time.time() - start}")
-            return paginator.get_paginated_response(response)
-
-        # End measuring time
-        logger.debug(f"Time taken to process activities: {time.time() - start}")
-
-        return Response(data=SerializerClass(activities_list, many=True).data, status=http_status.HTTP_200_OK)
+        return utils.paginated_parallel_response(queryset=activities_list, request=request, serializer_class=SerializerClass, process_function=lambda activity: SerializerClass(activity).data)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
@@ -2365,6 +2460,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(response)
 
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity modules", 200: ModuleTypeIdModuleIdAreaSerializer(many=True)})
     def modules(self, request, pk=None):
         """
         Lists the modules of a given activity.
@@ -2375,7 +2471,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        modules = get_modules(activity)
+        modules = ModuleTypeIdModuleIdAreaSerializer(activity.modules, many=True).data
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(modules, request)
@@ -2481,6 +2577,8 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
 class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+    filterset_class = api_filters.NoteFilter
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
     @transaction.atomic
     @swagger_auto_schema(responses={400: "Bad request", 201: NoteSerializer}, request_body=NewNoteSerializer)
@@ -2657,7 +2755,7 @@ class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
 
 def generic_module_viewset(model: Module):
-    class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    class GenericModuleViewSet(viewsets.ModelViewSet):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
         permission_classes = [api_permissions.IsPublicOrAuthenticated]
@@ -3017,6 +3115,22 @@ class FieldDefinitionViewSet(viewsets.ViewSet):
             }
 
         return field_metadata
+
+
+class ReportTemplateViewSet(viewsets.ViewSet):
+    """Report templates accepted by the `template` parameter of the report endpoints.
+
+    Public because the shared-report page offers the same select, and the
+    names are already listed in the 400 message for an unknown template.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(responses={200: "List of {id, label, languages}"})
+    def list(self, request, *args, **kwargs):
+        from .reports import catalog
+
+        return Response(catalog.options())
 
 
 class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -3414,8 +3528,7 @@ class AsyncJobViewSet(viewsets.ReadOnlyModelViewSet):
             stream,
             content_type=job.result.get("content_type", "application/octet-stream"),
         )
-        filename = job.result.get("filename", "report")
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Content-Disposition"] = content_disposition_header(True, job.result.get("filename", "report"))
         return response
 
 

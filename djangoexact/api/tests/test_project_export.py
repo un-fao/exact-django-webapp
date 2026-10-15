@@ -1,12 +1,13 @@
 """Tests for project export/import functionality."""
 import json
 import uuid
-from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status as http_status
 
-from .factories import UserFactory, ProjectFactory
+from django.test import TestCase
+from rest_framework import status as http_status
+from rest_framework.test import APIClient
+
 from ..models import Project
+from .factories import ProjectFactory, UserFactory
 
 
 class ProjectExportIdFieldTests(TestCase):
@@ -497,6 +498,19 @@ class ProjectImportCachedResultsTests(TestCase):
         submodule = exported_module['_submodules'][0]
         self.assertIn('status', submodule)
         self.assertIn('last_modified', submodule)
+
+    def test_import_preserves_forest_management_data_source(self):
+        """FRA survives the round trip instead of being reset to IPCC by save()."""
+        from ..models import DataSource, ForestManagement, ModuleType
+        from .factories import ForestManagementFactory
+
+        fra = DataSource.objects.get_or_create(short_name="FRA")[0]
+        self.activity.module_types.add(ModuleType.objects.get(class_name="ForestManagement"))
+        ForestManagementFactory(activity=self.activity, data_source=fra)
+
+        imported = self._round_trip()
+
+        self.assertEqual(self._imported(ForestManagement, imported).data_source, fra)
 
     def test_import_of_legacy_payload_without_cache_fields(self):
         """A file produced by an older build still imports cleanly.

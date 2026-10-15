@@ -5,8 +5,8 @@
     "fields": {
       "water_management_type_before_cultivation": 2,
       "value": 1.0,
-      "value_min": 0.88,
-      "value_max": 1.12
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -15,8 +15,8 @@
     "fields": {
       "water_management_type_before_cultivation": 3,
       "value": 0.89,
-      "value_min": 0.8,
-      "value_max": 0.99
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -25,8 +25,8 @@
     "fields": {
       "water_management_type_before_cultivation": 4,
       "value": 2.41,
-      "value_min": 2.13,
-      "value_max": 2.73
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

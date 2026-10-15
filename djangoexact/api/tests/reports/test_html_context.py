@@ -444,6 +444,8 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
     def _make_request(self, template_name="fao", lang="en"):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
+        # A bare Mock's .data.get() is truthy, which reads as a request body.
+        request.data = {}
         if hasattr(request, "LANGUAGE_CODE"):
             del request.LANGUAGE_CODE  # avoid the hasattr branch overriding lang
         return request

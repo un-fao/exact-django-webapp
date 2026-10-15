@@ -3479,9 +3479,16 @@ for i, row in enumerate(df_dict):
         ch4_fossil,
     )
 
-    # Look for existing GWP containing the name
-
-    gwp = GlobalWarmingPotential.objects.filter(name__icontains=filter_name).first()
+    # Both AR5 rows share the "(AR5)" token; without this split both CSV rows
+    # updated the same DB row and the other kept a NULL ch4_fossil.
+    matches = GlobalWarmingPotential.objects.filter(name__icontains=filter_name)
+    if "without" in name.lower():
+        matches = matches.filter(name__icontains="without")
+    else:
+        matches = matches.exclude(name__icontains="without")
+    if matches.count() > 1:
+        raise ValueError(f"GWP CSV row '{name}' matches several rows: {list(matches.values_list('name', flat=True))}")
+    gwp = matches.first()
 
     if gwp:
         print(f"Updating {gwp.name}")
@@ -5376,10 +5383,10 @@ def run():
         # add_fmg_data_for_all_grassland_management_types()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
-        update_crop_types_annuals_perennials()
+        # update_crop_types_annuals_perennials()
+        # import_fra_carbon_stock_data_2025()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
-        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "review":

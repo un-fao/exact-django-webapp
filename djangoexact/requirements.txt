@@ -64,10 +64,12 @@ django-dirtyfields==1.9.3
 python-slugify==8.0.4
 drf-nested-routers==0.94.1
 # CVE-2026-49452 only affects WeasyPrint when the presentational_hints option is enabled.
-# This codebase never enables it; all call sites use HTML(string=html).write_pdf() in
-# api/views.py, api/services/report_jobs.py and public/views.py. The exemption is enforced by
+# This codebase never enables it; the single call site is render_pdf() in
+# api/reports/pdf.py. The exemption is enforced by
 # api/tests/test_weasyprint_presentational_hints_guard.py, so held at 68.0 rather than 69.0.
 weasyprint==68.0
+# Sanitizes the analyst HTML accepted by the report endpoints (api/reports/narrative.py).
+nh3==0.3.7
 google-cloud-storage==2.19.0
 google-cloud-run==0.16.0
 factory-boy==3.3.3

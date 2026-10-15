@@ -119,7 +119,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["post"])
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -137,6 +137,16 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
                 required=False,
             ),
         ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "content": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
+                                "of text, list, link and table tags. Accepted by the ifad report only.",
+                ),
+            },
+        ),
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
@@ -149,6 +159,12 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         if request.query_params.get("template", None):
             response = self.template(request, pk=pk)
             return response
+
+        # The Excel report has nowhere to put analyst content; refuse it
+        # instead of returning a file without it.
+        from api.reports import narrative as report_narrative
+
+        report_narrative.content_from_request(request, None)
 
         selected_activities = utils.requested_activity_ids(request)
         if not selected_activities:
@@ -196,9 +212,15 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         except catalog.UnknownReport as e:
             return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
 
+        from api.reports import narrative as report_narrative
+
+        # Outside the try below, so a rejected body is a 400 and not its catch-all 500.
+        content = report_narrative.content_from_request(request, template_name)
+
         try:
             from api.reports import compute_project_result
             from api.reports.html_context import build_template_context
+            from api.reports.pdf import render_pdf
 
             project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
             # Honour ?activities= here too. report() and the async worker both
@@ -208,10 +230,9 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
             activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
 
             result = compute_project_result(project, activities)
-            context = build_template_context(result, request, lang)
+            context = build_template_context(result, request, lang, content=content)
             html = render(request, template_path, context).content.decode()
-            from weasyprint import HTML
-            pdf = HTML(string=html).write_pdf()
+            pdf = render_pdf(html)
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
             return response

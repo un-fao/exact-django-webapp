@@ -8,8 +8,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -21,8 +21,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -47,8 +47,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -60,8 +60,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -86,8 +86,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -99,8 +99,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -125,8 +125,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -138,8 +138,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -164,8 +164,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -177,8 +177,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -203,8 +203,8 @@
       "fire_type": 1,
       "value": 66.0,
       "unit": "t dm/ha",
-      "value_min": 46.0,
-      "value_max": 86.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -216,8 +216,8 @@
       "fire_type": 2,
       "value": 336.0,
       "unit": "t dm/ha",
-      "value_min": 332.0,
-      "value_max": 340.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -255,8 +255,8 @@
       "fire_type": 2,
       "value": 353.0,
       "unit": "t dm/ha",
-      "value_min": 170.0,
-      "value_max": 536.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -268,8 +268,8 @@
       "fire_type": 3,
       "value": 155.0,
       "unit": "t dm/ha",
-      "value_min": 82.0,
-      "value_max": 228.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -294,8 +294,8 @@
       "fire_type": 2,
       "value": 353.0,
       "unit": "t dm/ha",
-      "value_min": 170.0,
-      "value_max": 536.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -307,8 +307,8 @@
       "fire_type": 3,
       "value": 155.0,
       "unit": "t dm/ha",
-      "value_min": 82.0,
-      "value_max": 228.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -333,8 +333,8 @@
       "fire_type": 2,
       "value": 353.0,
       "unit": "t dm/ha",
-      "value_min": 170.0,
-      "value_max": 536.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -346,8 +346,8 @@
       "fire_type": 3,
       "value": 155.0,
       "unit": "t dm/ha",
-      "value_min": 82.0,
-      "value_max": 228.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -372,8 +372,8 @@
       "fire_type": 2,
       "value": 353.0,
       "unit": "t dm/ha",
-      "value_min": 170.0,
-      "value_max": 536.0
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -385,8 +385,8 @@
       "fire_type": 3,
       "value": 155.0,
       "unit": "t dm/ha",
-      "value_min": 82.0,
-      "value_max": 228.0
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

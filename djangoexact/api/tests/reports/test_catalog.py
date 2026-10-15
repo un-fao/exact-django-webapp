@@ -28,7 +28,7 @@ from __future__ import annotations
 from django.template.loader import get_template
 from django.test import SimpleTestCase
 
-from api.reports.catalog import REPORTS, UnknownReport, resolve_template
+from api.reports.catalog import LABELS, REPORTS, UnknownReport, options, report_filename, resolve_template
 
 
 class ReportCatalogTestCase(SimpleTestCase):
@@ -74,3 +74,42 @@ class ReportCatalogTestCase(SimpleTestCase):
         for lang in ("es", "fr"):
             with self.subTest(lang=lang), self.assertRaises(UnknownReport):
                 resolve_template("ifad", lang)
+
+    def test_report_filename_matches_the_frontend_contract(self):
+        """Sync and async downloads both take this name; the frontend reads it from Content-Disposition."""
+        self.assertEqual(report_filename("Kenya", "fao"), "Kenya-fao-report.pdf")
+        self.assertEqual(report_filename("Kenya", "ifad"), "Kenya-ifad-report.pdf")
+        self.assertEqual(report_filename("Kenya", None), "Kenya-results-report.xlsx")
+
+    def test_report_filename_keeps_the_name_one_file_name(self):
+        self.assertEqual(report_filename("a/b\\c\nd", "fao"), "a-b-c-d-fao-report.pdf")
+        self.assertEqual(report_filename("  ", None), "project-results-report.xlsx")
+
+    def test_non_ascii_name_survives_the_header(self):
+        """A plain filename="..." cannot carry non-ASCII; the RFC 6266 filename* form can."""
+        from urllib.parse import unquote
+
+        from django.utils.http import content_disposition_header
+
+        header = content_disposition_header(True, report_filename('Projet "Côte d\'Ivoire"', "fao"))
+        self.assertIn("filename*=utf-8''", header)
+        self.assertEqual(unquote(header.split("''", 1)[1]), 'Projet "Côte d\'Ivoire"-fao-report.pdf')
+
+    def test_every_report_has_a_label(self):
+        self.assertEqual(set(LABELS), set(REPORTS))
+
+    def test_every_option_is_renderable(self):
+        """What the select offers must be what the report endpoints accept."""
+        for option in options():
+            for lang in option["languages"]:
+                with self.subTest(report=option["id"], lang=lang):
+                    resolve_template(option["id"], lang)
+
+
+class ReportTemplatesEndpointTestCase(SimpleTestCase):
+    def test_anonymous_gets_the_catalog(self):
+        """The public shared-report page calls this without a token."""
+        response = self.client.get("/api/report-templates/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), options())
+        self.assertIn({"id": "ifad", "label": "IFAD annex", "languages": ["en"]}, response.json())

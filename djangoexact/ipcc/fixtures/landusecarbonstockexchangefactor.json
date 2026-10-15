@@ -13,6 +13,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 537,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 538,
     "fields": {
       "climate": 4,
@@ -259,6 +271,18 @@
       "moisture": 2,
       "land_use_type": 1,
       "value": 0.7,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 559,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82,
       "value_min": null,
       "value_max": null
     }
@@ -517,6 +541,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 581,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 582,
     "fields": {
       "climate": 1,
@@ -763,6 +799,18 @@
       "moisture": 2,
       "land_use_type": 1,
       "value": 0.7,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 603,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82,
       "value_min": null,
       "value_max": null
     }
@@ -1021,6 +1069,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 625,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 626,
     "fields": {
       "climate": 3,
@@ -1267,6 +1327,18 @@
       "moisture": 2,
       "land_use_type": 1,
       "value": 0.83,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 647,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82,
       "value_min": null,
       "value_max": null
     }
@@ -1525,6 +1597,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 669,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "land_use_type": 2,
+      "value": 0.82,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 670,
     "fields": {
       "climate": 3,
@@ -1771,6 +1855,18 @@
       "moisture": 1,
       "land_use_type": 1,
       "value": 0.64,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 691,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.88,
       "value_min": null,
       "value_max": null
     }
@@ -2029,6 +2125,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 713,
+    "fields": {
+      "climate": 20,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.88,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 714,
     "fields": {
       "climate": 20,
@@ -2275,6 +2383,18 @@
       "moisture": 4,
       "land_use_type": 1,
       "value": 0.64,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 735,
+    "fields": {
+      "climate": 20,
+      "moisture": 4,
+      "land_use_type": 2,
+      "value": 0.88,
       "value_min": null,
       "value_max": null
     }
@@ -2533,6 +2653,18 @@
   },
   {
     "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 757,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "land_use_type": 2,
+      "value": 0.93,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
     "pk": 758,
     "fields": {
       "climate": 2,
@@ -2779,6 +2911,18 @@
       "moisture": 2,
       "land_use_type": 1,
       "value": 0.69,
+      "value_min": null,
+      "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.landusecarbonstockexchangefactor",
+    "pk": 779,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "land_use_type": 2,
+      "value": 0.82,
       "value_min": null,
       "value_max": null
     }

@@ -12,8 +12,9 @@ from django.utils.translation import activate
 
 from api.models import AsyncJob, Project
 from api.reports import catalog, compute_project_result, generate_excel_report
-from api.reports.narrative import clean_narrative
+from api.reports.narrative import clean_content
 from api.reports.html_context import build_template_context
+from api.reports.pdf import render_pdf
 
 
 def run(job: AsyncJob) -> dict:
@@ -32,46 +33,41 @@ def run(job: AsyncJob) -> dict:
     if fmt == "pdf":
         template_name = params["template"]
         content = _render_pdf(
-            project, activities, template_name, lang, job.created_by,
-            narrative=params.get("narrative"),
+            project, activities, template_name, lang, job.created_by, content=params.get("content"),
         )
         content_type = "application/pdf"
         ext = "pdf"
-        default_name = f"{template_name}.pdf"
+        filename = catalog.report_filename(project.name, template_name)
     else:
         buffer = generate_excel_report(project, activities)
         content = buffer.getvalue() if isinstance(buffer, io.BytesIO) else buffer
         content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ext = "xlsx"
-        default_name = f"{project.name}_report.xlsx"
+        filename = catalog.report_filename(project.name, None)
 
     gcs_path = _upload(project, job, content, ext)
     return {
         "gcs_path": gcs_path,
-        "filename": params.get("filename") or default_name,
+        "filename": filename,
         "content_type": content_type,
     }
 
 
-def _render_pdf(project, activities, template_name, lang, user, narrative=None):
+def _render_pdf(project, activities, template_name, lang, user, content=None):
     # Resolved here as well as at enqueue, because jobs persisted before the
     # catalog existed can still be replayed; first, so an unrenderable report
     # fails before a carbon balance is computed for it.
     template_path = catalog.resolve_template(template_name, lang)
-    # Parsed here rather than at enqueue because params travel as JSON: the
-    # assumption-set date is a string until this call turns it back into a date.
-    if narrative:
-        narrative = clean_narrative(narrative, activities or project.activities.all())
+    # Sanitized again although the view already did: params are stored JSON,
+    # and a row edited or replayed after enqueue must not reach the page as
+    # trusted markup.
+    if content:
+        content = clean_content(content)
     result = compute_project_result(project, activities)
-    context = build_template_context(result, None, lang, narrative=narrative)
+    context = build_template_context(result, None, lang, content=content)
     context["user"] = user
     html = render_to_string(template_path, context)
-    return _weasyprint_pdf(html)
-
-
-def _weasyprint_pdf(html):
-    from weasyprint import HTML
-    return HTML(string=html).write_pdf()
+    return render_pdf(html)
 
 
 def _upload(project, job, content, ext):
