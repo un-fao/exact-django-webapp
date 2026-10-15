@@ -44,6 +44,19 @@ FOSSIL_METHANE_FUELS = ["peat", "charcoal"]
 ELECTRIC_FUEL_TYPES = ["electricity", "renewable"]
 
 
+def methane_gwp(gwp: "ipcc_models.GlobalWarmingPotential", fuel_type: "api_models.FuelType | None") -> float:
+    """Return the CH4 GWP for burning ``fuel_type``: ``ch4_fossil`` for fossil-methane fuels, else ``ch4``.
+
+    Raises ValueError when the fossil value is not configured, because a None
+    here otherwise surfaces deep in the math as an opaque TypeError.
+    """
+    if fuel_type is None or fuel_type.name_en.casefold() not in FOSSIL_METHANE_FUELS:
+        return gwp.ch4
+    if gwp.ch4_fossil is None:
+        raise ValueError(f"Fossil CH4 global warming potential is not configured for '{gwp.name}'. Please contact an administrator.")
+    return gwp.ch4_fossil
+
+
 class ManureManagementTypes(Enum):
     PRP = "Pasture/Range/Paddock"
 

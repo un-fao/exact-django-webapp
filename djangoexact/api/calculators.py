@@ -98,7 +98,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
 
-from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
+from api.utilities import getattr_or_default
 from api import reference_cache
 
 from . import utilities as utils
@@ -4024,17 +4024,6 @@ class EnergyEntryCalculator(BaseCalculator):
         self.energy_ef_default_w = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_default_wo = ipcc.EnergyDefaultEmissionFactor()
 
-        self.methane_constant_start = 0
-        self.methane_constant_w = 0
-        self.methane_constant_wo = 0
-
-        for scenario in utils.ScenarioTypes:
-            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
-            else:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
-
         self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
@@ -4138,7 +4127,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_start,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_start),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4179,7 +4168,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_w,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_w),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4219,7 +4208,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_wo,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_wo),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4360,17 +4349,6 @@ class FuelCalculator(BaseCalculator):
         self.energy_ef_default_w = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_default_wo = ipcc.EnergyDefaultEmissionFactor()
 
-        self.methane_constant_start = 0
-        self.methane_constant_w = 0
-        self.methane_constant_wo = 0
-
-        for scenario in utils.ScenarioTypes:
-            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
-            else:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
-
         self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
@@ -4438,7 +4416,7 @@ class FuelCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_w,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_w),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4460,7 +4438,7 @@ class FuelCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_wo,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_wo),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -8180,19 +8158,6 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         super().__init__(input)
 
         self.module: ProcessingEntry
-
-        self.methane_constant_start = self.project.gwp.ch4
-        self.methane_constant_w = self.project.gwp.ch4
-        self.methane_constant_wo = self.project.gwp.ch4
-
-        if self.module.fuel_type_start and self.module.fuel_type_start.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_start = self.project.gwp.ch4_fossil
-
-        if self.module.fuel_type_w and self.module.fuel_type_w.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_w = self.project.gwp.ch4_fossil
-
-        if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)
