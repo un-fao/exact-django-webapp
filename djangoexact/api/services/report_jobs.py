@@ -33,7 +33,8 @@ def run(job: AsyncJob) -> dict:
     if fmt == "pdf":
         template_name = params["template"]
         content = _render_pdf(
-            project, activities, template_name, lang, job.created_by, content=params.get("content"),
+            project, activities, template_name, lang, job.created_by,
+            content=params.get("content"), additional_sources=params.get("additional_sources"),
         )
         content_type = "application/pdf"
         ext = "pdf"
@@ -53,7 +54,7 @@ def run(job: AsyncJob) -> dict:
     }
 
 
-def _render_pdf(project, activities, template_name, lang, user, content=None):
+def _render_pdf(project, activities, template_name, lang, user, content=None, additional_sources=None):
     # Resolved here as well as at enqueue, because jobs persisted before the
     # catalog existed can still be replayed; first, so an unrenderable report
     # fails before a carbon balance is computed for it.
@@ -63,8 +64,12 @@ def _render_pdf(project, activities, template_name, lang, user, content=None):
     # trusted markup.
     if content:
         content = clean_content(content)
+    if additional_sources:
+        additional_sources = clean_content(additional_sources, "additional_sources")
     result = compute_project_result(project, activities)
-    context = build_template_context(result, None, lang, content=content)
+    context = build_template_context(
+        result, None, lang, content=content, additional_sources=additional_sources,
+    )
     context["user"] = user
     html = render_to_string(template_path, context)
     return render_pdf(html)

@@ -18,4 +18,6 @@
             Version 4, 5 December 2023.
         </li>
     </ul>
+    {# No |safe, as in analyst_notes.html: only clean_content output is marked safe. #}
+    {% if additional_sources %}<div class="analyst-content">{{ additional_sources }}</div>{% endif %}
 </section>

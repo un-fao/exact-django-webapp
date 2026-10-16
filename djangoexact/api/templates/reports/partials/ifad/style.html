@@ -2,11 +2,10 @@
         @page {
             size: A4;
             margin: 2cm;
-            @top-left { content: element(page-header); }
             @bottom-left { content: element(page-footer); }
         }
-        header, footer {
-            position: running(page-header);
+        footer {
+            position: running(page-footer);
             height: 1.5cm;
             line-height: 1.5cm;
             font-size: 10px;
