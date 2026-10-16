@@ -935,6 +935,9 @@ class ProjectMembership(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="members")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "project"], name="unique_project_membership")]
+
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email} - {self.group.name}"
 

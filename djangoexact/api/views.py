@@ -135,7 +135,6 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ModuleTypeIdModuleIdAreaSerializer,
-    ProjectInvitationAcceptSerializer,
     AsyncJobSerializer,
 )
 
@@ -161,6 +160,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from api.services import async_jobs
 from api.services import report_links
+from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
 
@@ -373,6 +373,17 @@ class BaseWiewSet(viewsets.GenericViewSet):
                 return super().get_queryset()
 
         return super().get_queryset()
+
+
+def project_members(project, request):
+    """A project's memberships, narrowed to one user when the request carries ``?user=<id>``."""
+    members = project.members.select_related("user")
+    user_id = request.query_params.get("user")
+    if user_id is None:
+        return members
+    if not user_id.isdigit():
+        raise ValidationError({"user": "Must be a user id."})
+    return members.filter(user_id=int(user_id))
 
 
 class AuthenticatedViewSet(BaseWiewSet):
@@ -1531,7 +1542,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project_members(project, request), many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     # TODO: Remove this action when the frontend is updated
@@ -1841,7 +1852,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project_members(project, request), many=True)
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
@@ -2164,19 +2175,17 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
-        if invitation.status == "declined" or invitation.status == "accepted":
-            logger.warning(f"Invitation already {invitation.status.name}. No further action is possible.")
-            return Response({"message": f"Invitation already {invitation.status.name}. No further action is possible."}, status=http_status.HTTP_200_OK)
-
         new_status = data.validated_data.get("status", None)
 
         if new_status == invitation.status:
             logger.warning(f"Invitation already {new_status.name}")
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
-        does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
-        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
-            ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value:
+            try:
+                accept_invitation(invitation)
+            except InvitationNotAcceptableError as e:
+                return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
 
@@ -2221,26 +2230,36 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
-    @transaction.atomic
     @swagger_auto_schema(
+        methods=["get", "post"],
         manual_parameters=[openapi.Parameter("token", openapi.IN_PATH, description="Token of the invitation", type=openapi.TYPE_STRING)],
         responses={
-            400: "Bad request",
-            200: "Invitations deleted successfully",
-            403: "Selected user does not have permission to delete invitations",
+            200: "HTML page: confirm form (GET) or invitation accepted (POST)",
+            400: "HTML page: invitation is not pending or has expired",
+            404: "Unknown token",
         },
     )
-    @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=["get", "post"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
     def accept(self, request, token=None):
-        invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
+        """GET shows a confirm page; only the POST from its button accepts.
 
-        serializer = ProjectInvitationAcceptSerializer(data=request.data, instance=invitation, partial=True, context={"token": token})
-        serializer.is_valid(raise_exception=True)
+        Email security scanners pre-fetch links with GET, so accepting on GET let them
+        accept invitations (and, before accepting was idempotent, add duplicate memberships).
+        """
+        invitation: ProjectInvitation = get_object_or_404(ProjectInvitation.objects.select_related("project", "group", "status"), token=token)
+        context = {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL}
 
-        invitation = serializer.save()
-        ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+        if invitation.status.name_en == utils.InvitationStatus.ACCEPTED.value:
+            return render(request, "invitation_accepted.html", context)
+        if request.method == "GET":
+            return render(request, "invitation_confirm.html", context)
 
-        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
+        try:
+            accept_invitation(invitation)
+        except InvitationNotAcceptableError as e:
+            return render(request, "invitation_not_acceptable.html", {**context, "reason": str(e)}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        return render(request, "invitation_accepted.html", context)
 
 
 # The three statuses Activity.status (api/models.py __get_status) can resolve to.
