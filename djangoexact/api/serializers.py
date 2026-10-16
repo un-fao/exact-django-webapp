@@ -1,6 +1,5 @@
 import logging as log
 from enum import Enum
-import uuid
 
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
@@ -3258,9 +3257,12 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipReadSerializer(serializers.ModelSerializer):
+    # Clients can't look up other members via /users/{id}/ (own user only), so the email rides along here.
+    user_email = serializers.EmailField(source="user.email", read_only=True)
+
     class Meta:
         model = ProjectMembership
-        fields = ["project", "user", "group"]
+        fields = ["id", "project", "user", "user_email", "group"]
         ref_name = "ProjectMembership"
 
 
@@ -3583,29 +3585,6 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Cannot accept an invitation that is not pending")
 
         return data
-
-
-class ProjectInvitationAcceptSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectInvitation
-        fields = ["status"]
-        ref_name = "ProjectInvitation"
-
-    def validate(self, data):
-        super().validate(data)
-
-        if uuid.UUID(self.context.get("token", None)) != self.instance.token:
-            raise serializers.ValidationError("Invalid token")
-
-        if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (data.get("status", None) and data.get("status", None).name_en == utils.InvitationStatus.ACCEPTED.value):
-            raise serializers.ValidationError("Cannot accept an invitation that is not pending")
-
-        return data
-
-    def save(self, **kwargs):
-        self.instance.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
-        self.instance.save()
-        return self.instance
 
 
 class NewNoteSerializer(serializers.ModelSerializer):
