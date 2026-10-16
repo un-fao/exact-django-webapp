@@ -347,7 +347,7 @@ def _load_fao_logo(lang: str) -> str:
 # ---------------------------------------------------------------------------
 
 def build_template_context(
-    result: ProjectResult, request=None, lang: str = "en", *, content=None,
+    result: ProjectResult, request=None, lang: str = "en", *, content=None, additional_sources=None,
 ) -> dict:
     """Return the full context dict for the PDF HTML template.
 
@@ -358,8 +358,9 @@ def build_template_context(
     as the async report worker.
 
     ``content`` is the analyst HTML returned by
-    ``api.reports.narrative.clean_content``. It is keyword-only so that no
-    positional caller can be broken by it. Pass nothing else: a plain string
+    ``api.reports.narrative.clean_content``, and so is ``additional_sources``.
+    Both are keyword-only so that no
+    positional caller can be broken by them. Pass nothing else: a plain string
     is escaped by the template, so it would render as visible tags.
     """
     activate(lang)
@@ -493,4 +494,5 @@ def build_template_context(
         "land_types": indicators["land_types"],
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "content": content or "",
+        "additional_sources": additional_sources or "",
     }

@@ -572,6 +572,11 @@ _REPORT_BODY = openapi.Schema(
             description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
                         "of text, list, link and table tags. Accepted by the ifad report only.",
         ),
+        "additional_sources": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description="Extra references as HTML, appended to the Sources section. Same limit, "
+                        "allowlist and report restriction as content.",
+        ),
     },
 )
 
@@ -883,6 +888,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         report_narrative.content_from_request(request, None)
+        report_narrative.sources_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
@@ -975,6 +981,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         content = report_narrative.content_from_request(request, template_name)
+        additional_sources = report_narrative.sources_from_request(request, template_name)
 
         params = {
             "project_id": project.pk,
@@ -984,6 +991,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "lang": lang,
             # Stored already sanitized; the worker sanitizes it again anyway.
             "content": content,
+            "additional_sources": additional_sources,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1725,6 +1733,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
 
         content = report_narrative.content_from_request(request, template_name)
+        additional_sources = report_narrative.sources_from_request(request, template_name)
 
         from .reports import NotReadyError, compute_project_result
 
@@ -1740,7 +1749,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             from .reports.html_context import build_template_context
             from .reports.pdf import render_pdf
 
-            context = build_template_context(result, request, lang, content=content)
+            context = build_template_context(
+                result, request, lang, content=content, additional_sources=additional_sources,
+            )
             html = render(request, template_path, context).content.decode()
             pdf = render_pdf(html)
 

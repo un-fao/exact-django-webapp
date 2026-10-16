@@ -244,12 +244,14 @@ class ReportAsyncEndpointTestCase(APITestCase):
                 mock.patch("api.views.ProjectViewSet.get_object", return_value=project):
             resp = self.client.post(
                 f"/api/projects/{project.pk}/report/async/?template=ifad",
-                {"content": '<p>Notes</p><img src="file:///etc/passwd"><script>x()</script>'},
+                {"content": '<p>Notes</p><img src="file:///etc/passwd"><script>x()</script>',
+                 "additional_sources": '<p>FAO 2021</p><script>x()</script>'},
                 format="json",
             )
         self.assertEqual(resp.status_code, 202)
         job = AsyncJob.objects.get(pk=resp.data["job_id"])
         self.assertEqual(job.params["content"], "<p>Notes</p>")
+        self.assertEqual(job.params["additional_sources"], "<p>FAO 2021</p>")
 
     def test_a_report_that_ignores_content_refuses_it(self):
         project = ProjectFactory(owner=self.user)
@@ -456,7 +458,8 @@ class ReportJobRunTestCase(TestCase):
             created_by=UserFactory(email="content-job-requester@example.com"),
             params={"project_id": 7, "activity_ids": None, "format": "pdf",
                     "template": "ifad", "lang": "en",
-                    "content": '<p>Notes</p><img src="file:///etc/passwd">'},
+                    "content": '<p>Notes</p><img src="file:///etc/passwd">',
+                    "additional_sources": '<p>FAO 2021</p><img src="file:///etc/passwd">'},
         )
         with mock.patch("api.services.report_jobs.Project") as m_project, \
              mock.patch("api.services.report_jobs.compute_project_result", return_value=mock.Mock()), \
@@ -467,9 +470,11 @@ class ReportJobRunTestCase(TestCase):
             m_project.objects.get.return_value = types.SimpleNamespace(pk=7, name="P")
             report_jobs.run(job)
 
-        content = m_ctx.call_args.kwargs["content"]
-        self.assertEqual(content, "<p>Notes</p>")
-        self.assertIsInstance(content, SafeString)
+        for kwarg, expected in (("content", "<p>Notes</p>"), ("additional_sources", "<p>FAO 2021</p>")):
+            with self.subTest(kwarg=kwarg):
+                value = m_ctx.call_args.kwargs[kwarg]
+                self.assertEqual(value, expected)
+                self.assertIsInstance(value, SafeString)
 
     def test_a_report_without_content_passes_none(self):
         from api.services import report_jobs
