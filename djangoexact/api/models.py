@@ -604,6 +604,15 @@ class FuelType(models.Model):
         return f"{self.name} - {self.fuel_use_type}"
 
 
+class ValueChainStage(models.Model):
+    """Agrifood value-chain stage an energy use belongs to (ported from NEXT, List sheet L87:M98)."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class SalinityType(models.Model):
     value = models.CharField(max_length=3)
 
@@ -2837,6 +2846,7 @@ class Fuel(Submodule, FuelMixin, FuelTier2Mixin):
 
 class EnergyEntry(Submodule, ElectricityTier2Mixin, FuelTier2Mixin):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+    value_chain_stage = models.ForeignKey(ValueChainStage, on_delete=models.SET_NULL, null=True, blank=True, related_name="energy_entries")
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_start", related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_w", related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_wo", related_name="%(class)s_fuel_type_wo")
