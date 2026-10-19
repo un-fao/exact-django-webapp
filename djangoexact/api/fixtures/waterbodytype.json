@@ -58,17 +58,5 @@
       "name_ru": "Солёный пруд",
       "is_reservoir": false
     }
-  },
-  {
-    "model": "api.waterbodytype",
-    "pk": 5,
-    "fields": {
-      "name": "﻿Freshwater Pond",
-      "name_en": "﻿Freshwater Pond",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null,
-      "is_reservoir": false
-    }
   }
 ]
