@@ -94,6 +94,14 @@ class SmallFisheryTestCase(base_module.BaseModuleTestCase):
         expected = ipcc_models.ElectricityEmission.objects.get(country=country).operating_margin
         self.assertEqual(response.data["electricity_ef_t2_default"], expected)
 
+    def test_refrigerant_gwp_default_is_the_refrigerant_gwp(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected = ipcc_models.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type__name="HCFC-22 (R22)", gwp=self.project.gw_potential).value
+        self.assertGreater(expected, 1)
+        for scenario in ("start", "w", "wo"):
+            self.assertEqual(response.data[f"refrigerant_gwp_t2_{scenario}_default"], expected)
+
     def test_patch_country_t2_and_ef_source_t2(self):
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["country_t2"] = self.project.country.id
