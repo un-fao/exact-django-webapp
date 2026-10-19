@@ -44,6 +44,8 @@ router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
 router.register(r"notes", views.NoteViewSet, basename="notes")
 
 router.register(r"statuses", views.public_generic_viewset(models.ProjectStatus), basename="statuses")
+router.register(r"analysis-purposes", views.public_generic_viewset(models.AnalysisPurpose), basename="analysispurposes")
+router.register(r"project-phases", views.public_generic_viewset(models.ProjectPhase), basename="projectphases")
 router.register(r"regions", views.public_generic_viewset(models.Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-potentials", views.public_generic_viewset(GlobalWarmingPotential), basename="globalwarmingpotentials")

@@ -1,0 +1,74 @@
+[
+  {
+    "model": "api.analysispurpose",
+    "pk": 1,
+    "fields": {
+      "name": "Project - Farm level",
+      "name_en": "Project - Farm level",
+      "name_fr": "Projet - Niveau de l'exploitation",
+      "name_es": "Proyecto - Nivel de finca",
+      "name_ru": "Проект - уровень хозяйства",
+      "value": 1
+    }
+  },
+  {
+    "model": "api.analysispurpose",
+    "pk": 2,
+    "fields": {
+      "name": "Project - Subnational",
+      "name_en": "Project - Subnational",
+      "name_fr": "Projet - Infranational",
+      "name_es": "Proyecto - Subnacional",
+      "name_ru": "Проект - субнациональный уровень",
+      "value": 2
+    }
+  },
+  {
+    "model": "api.analysispurpose",
+    "pk": 3,
+    "fields": {
+      "name": "Project - National",
+      "name_en": "Project - National",
+      "name_fr": "Projet - National",
+      "name_es": "Proyecto - Nacional",
+      "name_ru": "Проект - национальный уровень",
+      "value": 3
+    }
+  },
+  {
+    "model": "api.analysispurpose",
+    "pk": 4,
+    "fields": {
+      "name": "Project - Regional",
+      "name_en": "Project - Regional",
+      "name_fr": "Projet - Régional",
+      "name_es": "Proyecto - Regional",
+      "name_ru": "Проект - региональный уровень",
+      "value": 4
+    }
+  },
+  {
+    "model": "api.analysispurpose",
+    "pk": 5,
+    "fields": {
+      "name": "Nationally Determined Contribution",
+      "name_en": "Nationally Determined Contribution",
+      "name_fr": "Contribution déterminée au niveau national",
+      "name_es": "Contribución determinada a nivel nacional",
+      "name_ru": "Определяемый на национальном уровне вклад",
+      "value": 5
+    }
+  },
+  {
+    "model": "api.analysispurpose",
+    "pk": 6,
+    "fields": {
+      "name": "Long-term Low Emission Development Strategy",
+      "name_en": "Long-term Low Emission Development Strategy",
+      "name_fr": "Stratégie de développement à faibles émissions à long terme",
+      "name_es": "Estrategia de desarrollo con bajas emisiones a largo plazo",
+      "name_ru": "Долгосрочная стратегия развития с низким уровнем выбросов",
+      "value": 6
+    }
+  }
+]

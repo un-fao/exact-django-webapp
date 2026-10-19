@@ -296,6 +296,26 @@ class ProjectStatus(models.Model):
         return self.name
 
 
+class AnalysisPurpose(models.Model):
+    """Why the appraisal is run (NEXT HOME sheet, "Analysis purpose")."""
+
+    name = models.CharField(max_length=100)
+    value = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectPhase(models.Model):
+    """Project cycle stage the appraisal belongs to (NEXT HOME sheet, "Project phase")."""
+
+    name = models.CharField(max_length=100)
+    value = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -677,6 +697,8 @@ class Project(Historical, DirtyFieldsMixin):
     funding_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name="funding_agency")
     executing_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name="executing_agency")
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True, verbose_name="status")
+    analysis_purpose = models.ForeignKey(AnalysisPurpose, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="analysis_purpose")
+    project_phase = models.ForeignKey(ProjectPhase, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="project_phase")
     note = GenericRelation("api.Note", related_name="projects")
 
     implementation_years = models.IntegerField(verbose_name="implementation_years")
@@ -775,6 +797,8 @@ class Project(Historical, DirtyFieldsMixin):
                     "export_id",
                     # Tour progress is written on every tour step and never affects the science.
                     "guided_step",
+                    "analysis_purpose",
+                    "project_phase",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):
@@ -1009,6 +1033,12 @@ class NoteMixin(models.Model):
 
 
 class Activity(Historical, NoteMixin, DirtyFieldsMixin):
+    class Conditionality(models.TextChoices):
+        """NDC measure type (NEXT U/C flag). Null means not specified."""
+
+        UNCONDITIONAL = "unconditional", "Unconditional"
+        CONDITIONAL = "conditional", "Conditional"
+
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities", verbose_name="project")
     name = models.CharField(max_length=255, verbose_name="name")
     description = models.TextField(null=True, blank=True, verbose_name="description")
@@ -1030,6 +1060,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
 
     is_b_intact = models.BooleanField(default=False)
+    conditionality = models.CharField(max_length=16, choices=Conditionality.choices, null=True, blank=True, default=None, verbose_name="conditionality")
 
     @property
     def soc(self):
@@ -1183,7 +1214,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         if self.pk:
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
-                exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
+                exclude_fields = ["cost", "description", "name", "owner", "updated_at", "conditionality"]
 
                 if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(activity=self)
