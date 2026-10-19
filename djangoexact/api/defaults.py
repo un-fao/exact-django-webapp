@@ -1987,6 +1987,19 @@ class PackagingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
         return self.get_defaults_for_frontend()
 
 
+class ValueChainParentDefaults(Defaults):
+    """
+    Value chain parents (Storage, Transport, Processing, Packaging) hold no tier 2
+    fields; their defaults live on each entry's own /defaults/ endpoint.
+    """
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return SimpleNamespace()
+
+
+StorageDefaults = TransportDefaults = ProcessingDefaults = PackagingDefaults = ValueChainParentDefaults
+
+
 @dataclass
 class EnergyEntryDefaults(Defaults):
     input: api.EnergyEntry
