@@ -26,6 +26,8 @@ from .constants import (
     META_COL_TIER2,
     META_COL_WITH,
     META_COL_WITHOUT,
+    META_ROW_ANALYSIS_PURPOSE,
+    META_ROW_PROJECT_PHASE,
     ROW_BIOMASS_CO2,
     ROW_CH4,
     ROW_CUMULATIVE_BALANCE,
@@ -33,6 +35,7 @@ from .constants import (
     ROW_CUMULATIVE_HEADS,
     ROW_CUMULATIVE_CATCH,
     ROW_N2O,
+    ROW_NDC_FIRST,
     ROW_OTHER_CO2,
     ROW_OTHER_GHGS,
     ROW_SOIL_CO2,
@@ -83,6 +86,7 @@ class ExcelRenderer:
         wb = self._manager.get_workbook()
 
         self._write_skeleton(wb)
+        self._write_conditionality_summary(wb)
 
         for activity_result in self.result.activity_results:
             self._write_activity(wb, activity_result)
@@ -158,8 +162,10 @@ class ExcelRenderer:
         ws_meta.cell(row=13, column=2, value=proj.gwp.ch4)
         ws_meta.cell(row=14, column=2, value=proj.gwp.n2o)
         ws_meta.cell(row=15, column=2, value=proj.gwp.ch4_fossil)
-        ws_meta.cell(row=16, column=1, value="")
-        ws_meta.cell(row=17, column=1, value="")
+        ws_meta.cell(row=META_ROW_ANALYSIS_PURPOSE, column=1, value="Analysis purpose")
+        ws_meta.cell(row=META_ROW_ANALYSIS_PURPOSE, column=2, value=proj.analysis_purpose.name if proj.analysis_purpose else "N/A")
+        ws_meta.cell(row=META_ROW_PROJECT_PHASE, column=1, value="Project phase")
+        ws_meta.cell(row=META_ROW_PROJECT_PHASE, column=2, value=proj.project_phase.name if proj.project_phase else "N/A")
         ws_meta.cell(row=18, column=2, value="START")
         ws_meta.cell(row=18, column=3, value="WITH")
         ws_meta.cell(row=18, column=4, value="WITHOUT")
@@ -174,6 +180,28 @@ class ExcelRenderer:
             ["Activity", "Module", "IPCC Category", "Gas Type", "Value (tCO2-eq)"], 1
         ):
             ws_inv.cell(row=1, column=col, value=header).fill = _ORANGE
+
+    def _write_conditionality_summary(self, wb: pxl.Workbook) -> None:
+        """Balance split by NDC conditionality (NEXT DASHBOARD "Conditionality impact")."""
+        activities = self.result.activity_results
+        if not any(ar.conditionality for ar in activities):
+            return
+
+        dur = self.result.duration
+        groups = [("unconditional", "Unconditional"), ("conditional", "Conditional"), (None, "Not specified")]
+        yearly = {key: [0.0] * dur for key, _ in groups}
+        for ar in activities:
+            yearly[ar.conditionality] = list(map(sum, zip_longest(yearly[ar.conditionality], ar.total_emissions[:dur], fillvalue=0)))
+
+        ws_res = wb[WS_RESULTS]
+        row = ROW_NDC_FIRST
+        for kind in ("Cumulative", "Yearly"):
+            for key, label in groups:
+                values = list(np.cumsum(yearly[key])) if kind == "Cumulative" else yearly[key]
+                ws_res.cell(row=row, column=1, value=f"{label} - {kind.lower()} balance in Tco2-eq").fill = _ORANGE
+                for i, v in enumerate(values):
+                    ws_res.cell(row=row, column=i + DATA_COL_START, value=float(v))
+                row += 1
 
     # -------------------------------------------------------------------------
     # Activity writing
@@ -192,6 +220,10 @@ class ExcelRenderer:
         # Metadata: activity title + T2 overrides
         meta_row = ws_meta.max_row + 1
         ws_meta.cell(row=meta_row, column=1, value=str(ar.title)).fill = _BLUE
+        if ar.conditionality:
+            meta_row += 1
+            ws_meta.cell(row=meta_row, column=META_COL_LABEL, value="NDC conditionality")
+            ws_meta.cell(row=meta_row, column=META_COL_START, value=ar.conditionality.capitalize())
         for t2 in ar.t2_overrides:
             meta_row += 1
             ws_meta.cell(row=meta_row, column=META_COL_LABEL, value=t2.label)

@@ -25,6 +25,8 @@ ROW_CUMULATIVE_HEADS = 11
 ROW_CUMULATIVE_CATCH = 12
 ROW_YEARLY_FLUX_WO = 13
 ROW_YEARLY_FLUX_W = 14
+# Written only when at least one activity has an NDC conditionality, so other reports keep their layout.
+ROW_NDC_FIRST = 15
 
 # Metadata worksheet column indices
 META_COL_LABEL = 1
@@ -50,6 +52,8 @@ META_ROW_GWP_CO2 = 12
 META_ROW_GWP_CH4 = 13
 META_ROW_GWP_N2O = 14
 META_ROW_GWP_CH4_FOSSIL = 15
+META_ROW_ANALYSIS_PURPOSE = 16
+META_ROW_PROJECT_PHASE = 17
 META_ROW_START_WITH_HEADER = 18
 
 # Shadow price worksheet row constants
