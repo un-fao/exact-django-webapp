@@ -43,7 +43,7 @@ class FloodedRiceTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_modify_and_check_cache_invalidation(self):
         self.test_modify()
@@ -66,7 +66,7 @@ class FloodedRiceTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
         # Check that the cache is invalidated
         view = self.module_viewset.as_view({"get": "results"})
@@ -89,7 +89,7 @@ class FloodedRiceTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate__results(self):
 
