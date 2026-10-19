@@ -795,7 +795,7 @@ def _flooded_rice_minor_season_metadata_writes(
             continue
         cultivation_period_t2 = getattr(season, f"cultivation_period_t2_{sfx}")
         writes += [
-            MetadataWrite(base_row + 0, col, season.area),
+            MetadataWrite(base_row + 0, col, season_calc.area),
             MetadataWrite(
                 base_row + 1,
                 col,
