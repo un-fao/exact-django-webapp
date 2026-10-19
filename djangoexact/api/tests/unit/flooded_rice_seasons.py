@@ -59,16 +59,6 @@ class FloodedRiceSeasonsTestCase(base_module.BaseModuleTestCase):
         self.ModuleClass = models.FloodedRice
         super().setUp()
 
-        # The base class picks a random country; regions without IPCC rice
-        # yield data crash the Tier 1 defaults path, unrelated to seasons.
-        self.project.country = (
-            models.Country.objects.filter(region__in=ipcc_models.RiceYield.objects.values("continent"))
-            .filter(region__in=ipcc_models.RiceDefaultEmissionFactor.objects.values("continent"))
-            .order_by("id")
-            .first()
-        )
-        self.project.save()
-
         self.fk_payload = {}
         before = models.WaterManagementTypeBeforeCultivation.objects.order_by("id").first().id
         after = models.WaterManagementTypeAfterCultivation.objects.order_by("id").first().id
@@ -126,6 +116,21 @@ class FloodedRiceSeasonsTestCase(base_module.BaseModuleTestCase):
             self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
             self.assertTrue(models.MinorSeasonFloodedRice.objects.get(pk=response.data["id"]).is_ready())
         self._assert_matches_hand_calc([MAIN, SEASON_2, SEASON_3])
+
+    def test_country_without_ipcc_rice_yield_uses_tier_2_yield(self):
+        # North America has a RiceDefaultEmissionFactor but no RiceYield row.
+        self.project.country = models.Country.objects.filter(region__name_en="North America").order_by("id").first()
+        self.project.save()
+        self.assertFalse(ipcc_models.RiceYield.objects.filter(continent=self.project.country.region).exists())
+        self.module = models.FloodedRice.objects.get(pk=self.module.pk)
+
+        self.assertEqual(self.get_module_defaults(self.module, self.user).status_code, status.HTTP_200_OK)
+        self._assert_matches_hand_calc([MAIN])
+
+        self.module.crop_yield_t2_w = None
+        self.module.save()
+        with self.assertRaisesMessage(Exception, "Please provide Tier 2 values for scenarios: w"):
+            FloodedRiceSeasonCalculator(self.module).get_defaults()
 
     def test_seasons_keep_creation_order(self):
         for season in (SEASON_3, SEASON_2, SEASON_3):
