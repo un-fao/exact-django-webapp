@@ -127,6 +127,22 @@ class WaterbodyReservoirTestCase(base_module.BaseModuleTestCase):
         self.assertAlmostEqual(ch4_wo, AREA * 9.9 * 10 * EF_POND / 1000 * self.gwp, places=6)
         self.assertEqual([s for s in results_w.yearly_emissions_by_sector_by_gas if s.activity != ActivityTypes.COASTAL_WATERBODIES], [])
 
+    def test_pond_chlorophyll_a_drives_alpha(self):
+        # Chl-a 40 ug/L everywhere: alpha 0.26 x 40 = 10.4 (Eq. 7.11) overrides the Default class.
+        self._edit(
+            waterbody_type=models.WaterbodyType.objects.get(name_en="Freshwater Pond").id,
+            area=AREA,
+            trophic_type_start=self.trophic["Default"],
+            trophic_type_w=self.trophic["Default"],
+            trophic_type_wo=self.trophic["Default"],
+            mean_annual_t2_start=40,
+            mean_annual_t2_w=40,
+            mean_annual_t2_wo=40,
+        )
+        results_w, _ = WaterbodyCalculator(self.module).calculate()
+        ch4_w = sum(_yearly(results_w, ActivityTypes.COASTAL_WATERBODIES, GasTypes.CH4))
+        self.assertAlmostEqual(ch4_w, AREA * 10.4 * 10 * EF_POND / 1000 * self.gwp, places=6)
+
     def test_report_rows_and_inventory(self):
         from unittest.mock import Mock
 
