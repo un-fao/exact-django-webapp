@@ -221,7 +221,8 @@ class BaseActivityReport:
                 continue
 
             report = report_cls(module, self)
-            result = report.compute()
+            frozen = self.project_report.frozen
+            result = frozen.module_result(module) if frozen else report.compute()
             module_results.append(result)
             module_reports.append(report)
 
@@ -255,6 +256,21 @@ class BaseActivityReport:
                     total_catch_yearly, result.units_catch_w, fillvalue=0
                 )))
 
+        frozen = self.project_report.frozen
+        t2_overrides = frozen.t2_overrides(self.activity) if frozen else self._t2_overrides()
+
+        return ActivityResult(
+            title=self.activity.name,
+            module_results=module_results,
+            total_emissions=total_emissions,
+            total_hectares_yearly=total_hectares_yearly,
+            total_heads_yearly=total_heads_yearly,
+            total_catch_yearly=total_catch_yearly,
+            t2_overrides=t2_overrides,
+            _module_reports=module_reports,
+        )
+
+    def _t2_overrides(self) -> list[T2Override]:
         t2_overrides = []
         if self.activity.climate_t2:
             t2_overrides.append(T2Override("Climate", self.activity.climate_t2.name))
@@ -270,17 +286,7 @@ class BaseActivityReport:
             t2_overrides.append(T2Override("Last year of accounting", self.activity.last_year_of_accounting_t2))
         if self.activity.soc_t2:
             t2_overrides.append(T2Override("SOC", self.activity.soc_t2))
-
-        return ActivityResult(
-            title=self.activity.name,
-            module_results=module_results,
-            total_emissions=total_emissions,
-            total_hectares_yearly=total_hectares_yearly,
-            total_heads_yearly=total_heads_yearly,
-            total_catch_yearly=total_catch_yearly,
-            t2_overrides=t2_overrides,
-            _module_reports=module_reports,
-        )
+        return t2_overrides
 
 
 @dataclass
@@ -289,13 +295,20 @@ class BaseProjectReport:
 
     project: api_models.Project
     activities: Any = None  # QuerySet or list; None → use project.activities.all()
+    # None: frozen report data for finalized projects, live otherwise. False forces the live
+    # path, which is how the data is captured at finalization.
+    use_frozen: bool | None = None
 
     def __post_init__(self):
         from .cache import CacheWriteBatch
+        from .frozen import FrozenReport
 
         if self.activities is None:
             self.activities = self.project.activities.all()
         self.cache_batch = CacheWriteBatch()
+        if self.use_frozen is None:
+            self.use_frozen = bool(self.project.is_finalized)
+        self.frozen = FrozenReport(self.project) if self.use_frozen else None
 
     @property
     def duration(self) -> int:
@@ -341,6 +354,7 @@ class BaseProjectReport:
             nominal_shadow_prices=nominal_spcs,
             extra_shadow_prices=extra_spcs,
             inventory_items=inventory_items,
+            frozen_indicators=self.frozen.indicators() if self.frozen else None,
         )
 
     def _build_aggregated(self, activity_results: list[ActivityResult]) -> EmissionsAggregator:
@@ -445,8 +459,12 @@ class BaseProjectReport:
         return cumulative
 
     def _build_shadow_price_data(self, aggregated: EmissionsAggregator):
-        shadow_prices_qs = ipcc_models.ShadowPriceOfCarbon.objects.all()
-        last_known = shadow_prices_qs.last()
+        shadow_prices = (
+            self.frozen.shadow_prices()
+            if self.frozen
+            else list(ipcc_models.ShadowPriceOfCarbon.objects.order_by("pk"))
+        )
+        last_known = shadow_prices[-1] if shadow_prices else None
 
         shadow_rows: list[ShadowPriceRow] = []
         extra_spcs = []
@@ -455,7 +473,7 @@ class BaseProjectReport:
         yearly_balance_wo = aggregated.yearly_balance_wo
 
         # Bulk-fetch all shadow prices once to avoid N+1 queries inside the loop
-        shadow_prices_by_year = {sp.year: sp for sp in shadow_prices_qs}
+        shadow_prices_by_year = {sp.year: sp for sp in shadow_prices}
 
         for i, year in enumerate(range(self.start_year, self.last_year)):
             sp = shadow_prices_by_year.get(year)
@@ -491,7 +509,7 @@ class BaseProjectReport:
                 sp_max_value=sp.max_value if sp else None,
             ))
 
-        return shadow_rows, list(shadow_prices_qs), extra_spcs
+        return shadow_rows, shadow_prices, extra_spcs
 
     def _build_inventory_items(self, activity_results: list[ActivityResult]) -> list[InventoryItem]:
         items = []

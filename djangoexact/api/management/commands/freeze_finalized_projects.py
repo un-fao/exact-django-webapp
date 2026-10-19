@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from api.models import Project
-from api.services.finalization import FinalizationError, restore_frozen_results
+from api.services.finalization import FinalizationError, restore_frozen_results, restore_report_data
 
 
 class Command(BaseCommand):
@@ -12,7 +12,8 @@ class Command(BaseCommand):
         "Freeze the results of projects finalized before frozen results existed, as they stood at "
         "finalized_at: live cache written before finalization, else module history, else a "
         "calculation now (marked frozen_retroactively). Re-runnable: modules already frozen for "
-        "the current finalization are skipped. Dry run by default."
+        "the current finalization are skipped. Then freezes their report data (parameters, reference "
+        "names, shadow prices, indicators), which no history kept, as computed now. Dry run by default."
     )
 
     def add_arguments(self, parser):
@@ -41,6 +42,14 @@ class Command(BaseCommand):
                 failed.append(project.pk)
                 self.stderr.write(f"Project {project.pk}: {e}")
                 continue
+            # Separate transaction: frozen results must land even when the report cannot be produced
+            # (e.g. a module that is not ready); that project's report then answers 422 until fixed.
+            try:
+                with transaction.atomic():
+                    counts.update(restore_report_data(project, dry_run=dry_run))
+            except FinalizationError as e:
+                failed.append(project.pk)
+                self.stderr.write(f"Project {project.pk}, report data: {e}")
             totals.update(counts)
             if counts:
                 summary = ", ".join(f"{k}={v}" for k, v in sorted(counts.items()))

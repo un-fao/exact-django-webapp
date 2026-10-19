@@ -89,7 +89,7 @@ class TestActivityHectaresNoDoubleCount(unittest.TestCase):
     DURATION = 3
 
     def _compute(self, modules):
-        project_report = MagicMock(duration=self.DURATION)
+        project_report = MagicMock(duration=self.DURATION, frozen=None)  # an open project: live report path
         activity = _activity(modules)
         report = BaseActivityReport(project_report=project_report, activity=activity)
         with patch("api.reports.registry.get_report_class", return_value=_FakeReport):

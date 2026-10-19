@@ -14,7 +14,7 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from api import utilities as utils
-from api.models import FinalizedModuleResult, Group, Input, ModuleType, Project
+from api.models import Climate, FinalizedModuleResult, Group, Input, ModuleType, Project, SoilType
 from api.reports.cache import load_emissions_from_cache
 from api.services import finalization
 from api.tests.factories import ActivityFactory, InputFactory, ProjectFactory, UserFactory
@@ -37,15 +37,24 @@ def add_input_module(activity) -> Input:
     return InputFactory(activity=activity)
 
 
+def calculable_project(owner) -> Project:
+    # Calculators (built by the report pipeline even when results are faked) need the pedoclimate.
+    climate = Climate.objects.filter(moistures__isnull=False).order_by("pk").first()
+    soil_type = SoilType.objects.filter(active=True).exclude(name__in=["Mineral", "Organic"]).order_by("pk").first()
+    return ProjectFactory(owner=owner, country=pick_country(), climate=climate, moisture=climate.moistures.order_by("pk").first(), soil_type=soil_type)
+
+
 def calculator_returning(value: float):
     return mock.patch(COMPUTE, side_effect=lambda module: payload(value))
 
 
-class FrozenResultsTestCase(TestCase):
+class FrozenProjectTestCase(TestCase):
+    """A project with one ready Input module; holds no tests itself."""
+
     def setUp(self):
         Group.objects.get_or_create(name="Admin")
         self.user = UserFactory(email="frozen-results@example.com")
-        self.project = ProjectFactory(owner=self.user, country=pick_country())
+        self.project = calculable_project(self.user)
         self.activity = ActivityFactory(project=self.project, name="Frozen activity")
         self.module = add_input_module(self.activity)
 
@@ -65,6 +74,8 @@ class FrozenResultsTestCase(TestCase):
         module.cache_results(data["total"], data["by_activity"], data["by_gas"], data["by_activity_by_gas"])
         self.fresh_module().save()  # records the cache in the module history
 
+
+class FrozenResultsTestCase(FrozenProjectTestCase):
     def test_finalizing_sets_finalized_at_and_freezes_every_ready_module(self):
         with calculator_returning(1.0):
             self.finalize()
@@ -181,7 +192,7 @@ class FrozenResultsTestCase(TestCase):
         self.assertIsNone(shell.finalized_at)
 
 
-class RestoreFrozenResultsTestCase(FrozenResultsTestCase):
+class RestoreFrozenResultsTestCase(FrozenProjectTestCase):
     """Projects finalized before snapshots existed are frozen as they stood at finalized_at."""
 
     def finalize_legacy(self, finalized_at):
@@ -247,7 +258,7 @@ class FinalizeThroughTheApiTestCase(APITestCase):
         Group.objects.get_or_create(name="Admin")
         self.user = UserFactory(email="frozen-results-api@example.com")
         self.client.force_authenticate(self.user)
-        self.project = ProjectFactory(owner=self.user, country=pick_country())
+        self.project = calculable_project(self.user)
         self.module = add_input_module(ActivityFactory(project=self.project, name="Api activity"))
 
     def patch_project(self, payload_):
