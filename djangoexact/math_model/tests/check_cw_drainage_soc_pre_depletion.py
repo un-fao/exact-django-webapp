@@ -28,6 +28,8 @@ DEPLETED_SOIL = SOIL - 20 * EF
 LITTER = 2.0  # the only biomass pool, so biomass C per hectare is easy to check
 PCT_LOST = 0.5
 CO2 = 44 / 12
+# The salinity fix (#331) removes the soil_type input; pass it only while the model still has it.
+LEGACY_INPUTS = {"soil_type": "<18"} if "soil_type" in CoastalWetland.__dataclass_fields__ else {}
 
 
 def build(rate="linear", drained=(0.0, 0.0), excavated=(0.0, 0.0)):
@@ -40,7 +42,7 @@ def build(rate="linear", drained=(0.0, 0.0), excavated=(0.0, 0.0)):
         area_revegated_start=0, area_revegated_end=0,
         percentage_c_lost_excavation_default=PCT_LOST,
         ef_rewetting_carbon_default=0, ef_rewetting_methane_default=0,
-        soil_type="<18", methane_constant=27, mangrove_factor=1,
+        methane_constant=27, mangrove_factor=1, **LEGACY_INPUTS,
     )
     module.calculate_emissions()
     return module
