@@ -2879,6 +2879,15 @@ class WaterbodySerializer(LandModuleSeralizer):
             },
         }
 
+    def is_ready(self, data, mandatory_fields, instance=None):
+        is_ready, errors = super().is_ready(data, mandatory_fields, instance=instance)
+        combined_data = self.merge_instance_data(data, instance=instance)
+        waterbody_type = combined_data.get("waterbody_type")
+        if waterbody_type and waterbody_type.is_reservoir and combined_data.get("reservoir_age_start") is None:
+            errors.setdefault("start", []).append("Missing mandatory fields: reservoir_age_start")
+            return False, errors
+        return is_ready, errors
+
 
 class WaterbodyWriteSerializer(WaterbodySerializer):
     pass

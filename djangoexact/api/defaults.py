@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services import reservoirs
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1121,6 +1122,7 @@ class WaterbodyDefaults(Defaults):
             mean_annual_t2_start_default=0,
             mean_annual_t2_w_default=0,
             mean_annual_t2_wo_default=0,
+            rd_t2_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1129,16 +1131,24 @@ class WaterbodyDefaults(Defaults):
         defaults = calcs.WaterbodyCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        if self.input.is_reservoir():
+            ch4_ef = reservoirs.ch4_ef_at_start(self.input, defaults.reservoir_ef)
+            rd_t2 = reservoirs.RD_DEFAULT
+        else:
+            ch4_ef = defaults.methane_emission_factor.value
+            rd_t2 = None
+
         return _with_ranges(SimpleNamespace(
-            ch4_ef_t2_start_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_w_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_wo_default=defaults.methane_emission_factor.value,
+            ch4_ef_t2_start_default=ch4_ef,
+            ch4_ef_t2_w_default=ch4_ef,
+            ch4_ef_t2_wo_default=ch4_ef,
             alpha_t2_start_default=defaults.trophic_state_start.value,
             alpha_t2_w_default=defaults.trophic_state_w.value,
             alpha_t2_wo_default=defaults.trophic_state_wo.value,
             mean_annual_t2_start_default=defaults.trophic_state_start.chloa,
             mean_annual_t2_w_default=defaults.trophic_state_w.chloa,
             mean_annual_t2_wo_default=defaults.trophic_state_wo.chloa,
+            rd_t2_default=rd_t2,
         ), [
             (('ch4_ef_t2_start_default', 'ch4_ef_t2_w_default', 'ch4_ef_t2_wo_default'), defaults.methane_emission_factor, 'value'),
             (('alpha_t2_start_default',), defaults.trophic_state_start, 'value'),

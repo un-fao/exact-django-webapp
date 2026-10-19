@@ -22,7 +22,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
-            "waterbody_type": models.WaterbodyType.objects.order_by("?").first().id,
+            "waterbody_type": models.WaterbodyType.objects.filter(is_reservoir=False).order_by("?").first().id,
             "area": FuzzyInteger(1, 100).fuzz(),
             "trophic_type_start": models.TrophicType.objects.order_by("?").first().id,
             "trophic_type_w": models.TrophicType.objects.order_by("?").first().id,
@@ -35,7 +35,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["waterbody_type"] = models.WaterbodyType.objects.order_by("?").first().id
+        validated_data["waterbody_type"] = models.WaterbodyType.objects.filter(is_reservoir=False).order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
