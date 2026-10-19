@@ -6,8 +6,8 @@ from django.test import TestCase
 from rest_framework import status as http_status
 from rest_framework.test import APIClient
 
-from ..models import Project
-from .factories import ProjectFactory, UserFactory
+from ..models import Group, Project, ProjectMembership
+from .factories import ProjectFactory, UserFactory, reference_country
 
 
 class ProjectExportIdFieldTests(TestCase):
@@ -44,6 +44,8 @@ class ProjectExportTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
         self.project = ProjectFactory(owner=self.user, name="Test Project")
+        # Ownership alone grants nothing: the API creates this membership on project create.
+        ProjectMembership.objects.create(project=self.project, user=self.user, group=Group.objects.get_or_create(name="Admin")[0])
 
     def test_export_returns_json_file(self):
         """Export endpoint returns .exactproject file."""
@@ -166,7 +168,7 @@ class ThreadCommentExportImportTests(TestCase):
     def setUp(self):
         from ..models import (
             Activity, ModuleType, Comment, CommentThread,
-            Climate, Moisture, SoilType, Country, GlobalWarmingPotential
+            Climate, Moisture, SoilType
         )
         from ipcc.models import GlobalWarmingPotential as IPCCGwp
 
@@ -179,7 +181,7 @@ class ThreadCommentExportImportTests(TestCase):
         self.climate, _ = Climate.objects.get_or_create(name_en='Tropical')
         self.moisture, _ = Moisture.objects.get_or_create(name_en='Wet')
         self.soil_type, _ = SoilType.objects.get_or_create(name_en='High')
-        self.country, _ = Country.objects.get_or_create(name='Test Country', defaults={'code': 'TC'})
+        self.country = reference_country()
 
         # Create project
         self.project = ProjectFactory(
@@ -190,6 +192,7 @@ class ThreadCommentExportImportTests(TestCase):
             soil_type=self.soil_type,
             country=self.country
         )
+        ProjectMembership.objects.create(project=self.project, user=self.user, group=Group.objects.get_or_create(name="Admin")[0])
 
     def test_export_includes_thread_comments(self):
         """Export should include thread comments with full data."""
