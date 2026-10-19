@@ -54,8 +54,12 @@ class BaseModuleReport:
     _cache_result: Any = field(default=None, repr=False)
 
     def __post_init__(self):
+        from api.services.finalization import FrozenResultMissingError
         from .cache import load_emissions_from_cache
-        cache_result = load_emissions_from_cache(self.module)
+        try:
+            cache_result = load_emissions_from_cache(self.module)
+        except FrozenResultMissingError as e:
+            raise NotReadyError(str(e)) from e
         if cache_result is not None:
             self._init_from_cache(cache_result)
         else:

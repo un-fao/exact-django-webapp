@@ -14,7 +14,7 @@ import api.concurrency as concurrency
 from api import security
 import api.utilities as utils
 from rest_framework.decorators import action
-import api.calculators as calculators
+from api.services import finalization
 import api.defaults as api_defaults
 import types
 import api.labels as labels
@@ -443,36 +443,13 @@ def generic_public_module_viewset(model: api_models.Module):
 
             try:
                 aggregate_by = api_serializers.BreakdownTypes(request.query_params.get("aggregate", api_serializers.BreakdownTypes.TOTAL))
-                module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
-
-                if module_results is None or not use_cached_results:
-                    log.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = calculators.CalculatorFactory().calculate_result(module)
-
-                    results_total = api_serializers.DynamicResultFactory.create(activity, total, aggregate_by=api_serializers.BreakdownTypes.TOTAL).data
-                    results_by_activity = api_serializers.DynamicResultFactory.create(activity, by_activity, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY).data
-                    results_by_gas = api_serializers.DynamicResultFactory.create(activity, by_gas, aggregate_by=api_serializers.BreakdownTypes.GAS).data
-                    results_by_activity_gas = api_serializers.DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY_GAS).data
-
-                    results_total["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.TOTAL)
-                    results_by_activity["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY)
-                    results_by_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.GAS)
-                    results_by_activity_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY_GAS)
-
-                    module_results = (
-                        results_total
-                        if aggregate_by == api_serializers.BreakdownTypes.TOTAL
-                        else results_by_activity
-                        if aggregate_by == api_serializers.BreakdownTypes.ACTIVITY
-                        else results_by_gas
-                        if aggregate_by == api_serializers.BreakdownTypes.GAS
-                        else results_by_activity_gas
-                    )
-                    module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
+                module_results, frozen = finalization.module_results(module, aggregate_by, use_cache=use_cached_results)
 
                 serializer = api_serializers.DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
+                if frozen is not None:
+                    serialized_data["frozen"] = frozen.provenance()
 
                 return Response(serialized_data)
 

@@ -47,6 +47,8 @@ def _make_module_mock(
 ):
     """Return a Mock that behaves like a CachedResultMixin-aware module."""
     module = Mock()
+    # An open project: a finalized one is served from its frozen snapshot, not this cache.
+    module.project.is_finalized = False
     module.is_cached_results_valid.return_value = cache_valid
     module.cached_results_by_activity_by_gas = cached_results
     module.cached_units_breakdown = cached_units

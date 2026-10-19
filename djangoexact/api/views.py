@@ -43,7 +43,6 @@ from django.utils.http import content_disposition_header
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
-from .calculators import CalculatorFactory
 from .models import (
     Activity,
     Comment,
@@ -130,7 +129,6 @@ from .serializers import (
     FuelTypeSerializer,
     ProjectLockHolderInformationSerializer,
     Aquaculture,
-    DynamicResultFactory,
     PublicTokenSerializer,
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
@@ -159,6 +157,7 @@ import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from api.services import async_jobs
+from api.services import finalization
 from api.services import report_links
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
@@ -1246,6 +1245,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
                 # Prepare project data with proper FK handling
                 filtered_project_data = prepare_model_data(Project, project_data)
+                # Finalized imports are created open and finalized at the end, once their modules and
+                # restored caches exist, so the frozen snapshot captures the exported results.
+                import_finalized = bool(filtered_project_data.pop("is_finalized", False))
+                filtered_project_data.pop("finalized_at", None)
 
                 # Generate unique name if needed (unique_together on name + owner)
                 base_name = filtered_project_data.get('name', 'Imported Project')
@@ -1350,6 +1353,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 # retrigger cache invalidation or re-stamp last_modified.
                 for restore_model, restore_pk, restore_values in cache_restores:
                     restore_model.objects.filter(pk=restore_pk).update(**restore_values)
+
+                if import_finalized:
+                    project.refresh_from_db()
+                    project.is_finalized = True
+                    project.save()
 
                 return Response({
                     "exists": False,
@@ -2963,33 +2971,8 @@ def generic_module_viewset(model: Module):
 
             try:
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
-                module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
-
-                if module_results is None or not use_cached_results:
-                    logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = CalculatorFactory().calculate_result(module)
-
-                    results_total = DynamicResultFactory.create(activity, total, aggregate_by=BreakdownTypes.TOTAL).data
-                    results_by_activity = DynamicResultFactory.create(activity, by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data
-                    results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS).data
-                    results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
-
-                    results_total["inventory"] = inventory.breakdown(by=BreakdownTypes.TOTAL)
-                    results_by_activity["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY)
-                    results_by_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.GAS)
-                    results_by_activity_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
-
-                    module_results = (
-                        results_total
-                        if aggregate_by == BreakdownTypes.TOTAL
-                        else results_by_activity
-                        if aggregate_by == BreakdownTypes.ACTIVITY
-                        else results_by_gas
-                        if aggregate_by == BreakdownTypes.GAS
-                        else results_by_activity_gas
-                    )
-                    module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
+                module_results, frozen = finalization.module_results(module, aggregate_by, use_cache=use_cached_results)
 
                 # Relabel Inventory rows for display only. module_results may be the raw
                 # in-memory value of a model JSON field on the cached branch, so build new
@@ -3006,6 +2989,8 @@ def generic_module_viewset(model: Module):
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
+                if frozen is not None:
+                    serialized_data["frozen"] = frozen.provenance()
 
                 return Response(serialized_data)
 

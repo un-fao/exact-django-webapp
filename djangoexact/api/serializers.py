@@ -374,7 +374,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count", "guided_step"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "finalized_at", "activity_count", "module_count", "guided_step"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -495,6 +495,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ["owner"]
+        read_only_fields = ["finalized_at"]
         ref_name = "Project"
 
     def sanitize_soc_ref_t2(self, data):
@@ -612,6 +613,14 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         # Ask the frontend team if this is still necessary before removing it.
         self.sanitize_soc_ref_t2(self.initial_data)
         return super().is_valid(raise_exception=raise_exception)
+
+    def update(self, instance, validated_data):
+        from api.services.finalization import FinalizationError
+
+        try:
+            return super().update(instance, validated_data)
+        except FinalizationError as e:
+            raise serializers.ValidationError({"is_finalized": f"The project cannot be finalized. {e}"}) from e
 
 
 class ModuleExportSerializer(serializers.Serializer):

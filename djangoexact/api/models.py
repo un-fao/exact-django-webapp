@@ -720,6 +720,7 @@ class Project(Historical, DirtyFieldsMixin):
 
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
+    finalized_at = models.DateTimeField(null=True, blank=True, verbose_name="finalized_at")
 
     # Frontend tour checkpoint. The project is a guided project if and only if this is not null.
     # Values are deliberately not an enum, so new tour steps need no backend release.
@@ -766,7 +767,7 @@ class Project(Historical, DirtyFieldsMixin):
                 # thousands), exhausting connections and timing the request out (finalize failure).
                 exclude_fields = [
                     "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
-                    "is_finalized", "is_public", "is_archived", "archived_at",
+                    "is_finalized", "finalized_at", "is_public", "is_archived", "archived_at",
                     # export_id is assigned lazily by the export endpoint on the
                     # first download. It identifies the file, never the science,
                     # so invalidating on it would wipe the cached results of the
@@ -780,7 +781,25 @@ class Project(Historical, DirtyFieldsMixin):
                 if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(project=self)
 
-        super().save(*args, **kwargs)
+        # Only an existing project can be finalized: a new one has no modules to freeze yet.
+        is_finalizing = self.is_finalized and bool(self.pk) and self.get_dirty_fields().get("is_finalized") is False
+        if is_finalizing:
+            self.finalized_at = timezone.now()
+        elif not self.is_finalized:
+            self.finalized_at = None
+
+        if not is_finalizing:
+            super().save(*args, **kwargs)
+            return
+
+        # Saving the flag and freezing the results in one transaction is what makes "finalized"
+        # imply "has frozen results": a project can never be finalized without its snapshot.
+        from django.db import transaction
+        from api.services.finalization import freeze_project
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            freeze_project(self)
 
     def clean(self):
         """Validate that climate, moisture, and soil_type are present if activities exist."""
@@ -999,6 +1018,65 @@ class Note(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
+
+
+class FinalizedModuleResult(models.Model):
+    """Results of one module or submodule, frozen when its project was finalized.
+
+    Finalized projects read their results only from here, never from the live cache and never
+    from a fresh calculation, so a calculator or reference-data change cannot move them. Rows are
+    append-only: a database trigger (migration 0297) rejects UPDATE and DELETE, and removes a
+    project's rows only when the project itself is deleted. Re-finalizing an un-finalized
+    project adds a new set of rows keyed by the new ``finalized_at``; older sets stay as an
+    audit trail.
+    """
+
+    class Source(models.TextChoices):
+        FINALIZE = "finalize", "Frozen at finalization"
+        LIVE_CACHE = "restored_from_live_cache", "Restored from the cache as it was at finalization"
+        HISTORY = "restored_from_history", "Restored from module history as of finalization"
+        RETROACTIVE = "frozen_retroactively", "No results existed at finalization; calculated when frozen"
+
+    # DO_NOTHING plus no DB constraint: Django's delete collector must never touch this table.
+    # The project's AFTER DELETE trigger purges the rows instead.
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, db_constraint=False, related_name="finalized_results")
+    finalized_at = models.DateTimeField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField()
+    module = GenericForeignKey("content_type", "object_id")
+
+    results_total = models.JSONField(null=True)
+    results_by_activity = models.JSONField(null=True)
+    results_by_gas = models.JSONField(null=True)
+    results_by_activity_by_gas = models.JSONField(null=True)
+    units_breakdown = models.JSONField(null=True)
+
+    computed_at = models.DateTimeField(null=True, help_text="When these numbers were calculated")
+    app_version = models.CharField(max_length=32, null=True, help_text="Backend version that calculated them, when known")
+    source = models.CharField(max_length=32, choices=Source.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["content_type", "object_id", "finalized_at"], name="unique_frozen_result_per_finalization"),
+        ]
+        indexes = [models.Index(fields=["project", "finalized_at"])]
+
+    def results(self, by: BreakdownTypes):
+        return {
+            BreakdownTypes.TOTAL: self.results_total,
+            BreakdownTypes.ACTIVITY: self.results_by_activity,
+            BreakdownTypes.GAS: self.results_by_gas,
+            BreakdownTypes.ACTIVITY_GAS: self.results_by_activity_by_gas,
+        }[by]
+
+    def provenance(self) -> dict:
+        return {
+            "finalized_at": self.finalized_at,
+            "computed_at": self.computed_at,
+            "app_version": self.app_version,
+            "source": self.source,
+        }
 
 
 class NoteMixin(models.Model):
