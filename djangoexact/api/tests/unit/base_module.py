@@ -6,6 +6,7 @@ from api.views import generic_module_viewset
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
+import api.tests.unit.factories as unit_factories
 from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 import logging as log
@@ -369,6 +370,12 @@ class BaseLandUseChangeTestCase(APITestCaseMixin):
         self.module_w = apps.get_model("api", self.module_type_w.class_name).objects.get(activity=self.activity)
         self.module_wo = apps.get_model("api", self.module_type_wo.class_name).objects.get(activity=self.activity)
 
+    def make_modules_ready(self):
+        # A LUC only computes once every module is READY, and a module shared by two roles is one row.
+        for module in {self.module_start, self.module_w, self.module_wo}:
+            response = self.edit_module(module, self.user, unit_factories.ready_payload(module.__class__.__name__, self.activity))
+            self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
     def get_land_use_change_results(self, cached="true"):
         """
         Get the results for the land use change calculation.
@@ -499,6 +506,7 @@ class AnyToAnyLandUseChangeTestCase(BaseLandUseChangeTestCase):
             wo_module (str): Without project module class name
         """
         self.setup_land_use_change(start_module, w_module, wo_module)
+        self.make_modules_ready()
 
     def test_generic_calculation(self):
         """

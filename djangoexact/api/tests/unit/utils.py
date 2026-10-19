@@ -10,6 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 import public.views as public_views
 import logging
+import uuid
 import factory.random
 from django.db import connection
 from api.tests.factories import reference_country
@@ -65,7 +66,8 @@ class APITestCaseMixin(APITestCase):
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
         self.project_data = {
-            "name": FuzzyText().fuzz(),
+            # Not fuzzed: helpers that call setUp() again re-seed, and a repeated name breaks unique (name, owner).
+            "name": f"Test project {uuid.uuid4().hex}",
             "start_year_of_activities": 2024,
             "implementation_years": 10,
             "last_year_of_accounting": 2040,
