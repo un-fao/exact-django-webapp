@@ -1416,6 +1416,10 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
     cached_results_by_activity = serializers.SerializerMethodField()
     cached_results_by_gas = serializers.SerializerMethodField()
     cached_results_by_activity_by_gas = serializers.SerializerMethodField()
+    # Server-owned: a client that PUTs back a GET payload would otherwise overwrite the
+    # edit stamp written by CachedResultMixin.save(), so the stale cache keeps validating.
+    last_modified = serializers.DateTimeField(read_only=True)
+    cached_units_breakdown = serializers.JSONField(read_only=True)
 
     def get_last_cached_at(self, obj):
         return None
