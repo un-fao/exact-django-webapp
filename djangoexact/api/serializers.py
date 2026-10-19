@@ -796,9 +796,10 @@ class ProjectTotalLivestockSerializer(serializers.Serializer):
 
 
 class ActivityResultSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
     cost = serializers.FloatField(read_only=True)
-    pass
+    conditionality = serializers.CharField(read_only=True, allow_null=True)
 
 
 class ActivitySerializer(serializers.ModelSerializer):
