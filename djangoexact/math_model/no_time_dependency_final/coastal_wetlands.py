@@ -3,6 +3,7 @@ import traceback
 from .general_functions import (
     breakdown_proportionally_to_values,
     compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_new_area,
     compute_yearly_or_half_year_cumulative,
 )
 from .ghg_emissions_classes import (
@@ -67,7 +68,10 @@ class CoastalWetland(BaseModule):
         self.excavated_on_newly_drained = min(newly_excavated_area, max(0, self.area_drained_end - self.area_drained_start))
         self.excavated_on_pre_drained = newly_excavated_area - self.excavated_on_newly_drained
 
-        self.hectares_drained = compute_yearly_or_half_year_cumulative(0, self.area_drained_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        # Biomass clearing and excavation happen once per hectare, so they are spread over the hectares
+        # converted each year, not over the cumulative area (which would carry them into capitalization).
+        self.hectares_newly_drained = compute_yearly_new_area(self.newly_drained_area, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_newly_excavated = compute_yearly_new_area(newly_excavated_area, self.implementation_time, self.capitalization_time, self.rate_type)
 
         self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = compute_half_year_cumulative_n_year_maturity(
             0, self.area_revegated_end, self.implementation_time, self.capitalization_time, self.rate_type
@@ -77,8 +81,6 @@ class CoastalWetland(BaseModule):
         self.area_start_rewetting = max(0, -self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = max(0, -self.area_drained_end + self.area_drained_start)
 
-        # TODO: ask Lorenzo about this variable and how it should be split across the years
-        self.hectares_excavated = compute_yearly_or_half_year_cumulative(self.area_excavated_end - self.area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
 
         # TIER 2 VALUES
         self.agb_tier_2_default = None
@@ -107,7 +109,7 @@ class CoastalWetland(BaseModule):
                     # project, so only the newly drained (and not excavated) area counts.
                     emissions_biomass_total_drainage = (agb + bgb + litter + deadwood) * self.newly_drained_area * (44 / 12)
 
-                    emissions_biomass_yearly = breakdown_proportionally_to_values(emissions_biomass_total_drainage, self.hectares_drained)
+                    emissions_biomass_yearly = breakdown_proportionally_to_values(emissions_biomass_total_drainage, self.hectares_newly_drained)
 
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
@@ -178,8 +180,8 @@ class CoastalWetland(BaseModule):
                     self.excavated_on_newly_drained * soil_1m + self.excavated_on_pre_drained * pre_drained_soil_1m
                 )
 
-                emissions_yearly_biomass_extraction_excavation = breakdown_proportionally_to_values(total_biomass, self.hectares_excavated)
-                emissions_yearly_soil_extraction_excavation = breakdown_proportionally_to_values(total_soil, self.hectares_excavated)
+                emissions_yearly_biomass_extraction_excavation = breakdown_proportionally_to_values(total_biomass, self.hectares_newly_excavated)
+                emissions_yearly_soil_extraction_excavation = breakdown_proportionally_to_values(total_soil, self.hectares_newly_excavated)
 
                 biomass_emission_set = YearlyGasActivityEmissionSet(
                     0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay

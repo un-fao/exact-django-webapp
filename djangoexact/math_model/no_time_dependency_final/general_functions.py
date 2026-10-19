@@ -123,6 +123,17 @@ def compute_yearly_delta(start_value, end_value, years_implementation, years_cap
 
     return delta_yearly
 
+
+def compute_yearly_new_area(area, years_implementation, years_capitalization, function):
+    """Hectares newly converted in each year. Use these as weights for one-off losses (clearing,
+    excavation): weighting by cumulative area instead leaks the loss into the capitalization years."""
+    area = abs(area)
+    if function == "immediate":
+        # compute_yearly_delta returns all zeros for "immediate"; the whole change happens in year 1.
+        return [area] + [0] * (years_implementation + years_capitalization - 1)
+    return compute_yearly_delta(0, area, years_implementation, years_capitalization, function)
+
+
 def compute_luc_hectare_delta(start_value, end_value, years_implementation, years_capitalization, function):
     if function != "immediate":
         values_at_year = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
