@@ -21,7 +21,7 @@ from api.models import CustomUser as User
 from django.utils.text import slugify
 
 from . import labels
-from .models import guided_step_format
+from .models import guided_step_format, MAX_ADDITIONAL_RICE_SEASONS
 from .models import (
     Module,
     Submodule,
@@ -2157,6 +2157,12 @@ class MinorSeasonFloodedRiceWriteSerializer(ScenarioSubmoduleSerializer):
             },
         }
 
+    def validate(self, data):
+        parent = data.get("parent")
+        if self.instance is None and parent and parent.minor_seasons.count() >= MAX_ADDITIONAL_RICE_SEASONS:
+            raise serializers.ValidationError({"parent": f"A flooded rice module can have at most {MAX_ADDITIONAL_RICE_SEASONS} additional seasons."})
+        return super().validate(data)
+
 
 class MinorSeasonFloodedRiceReadSerializer(BaseGenericModuleSerializer):
     class Meta:
@@ -2196,17 +2202,7 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
-        # Get cultivation_days of all minor_seasons and check that they are not greater than 365 including the main season
         cultivation_days = data.get("cultivation_days", 0)  # TODO: This must be fetched from IPCC data (or t2)
-        minor_seasons = data.get("minor_seasons", None)
-
-        if minor_seasons:
-            # TODO: Move to database Parameter
-            if minor_seasons.count() > 4:
-                raise serializers.ValidationError("Minor seasons cannot be more than 4")
-
-            # for season in minor_seasons:
-            #     cultivation_days += season.get("cultivation_days", 0)
 
         # TODO: Move to database Parameter
         if cultivation_days > 365:

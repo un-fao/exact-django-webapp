@@ -30,6 +30,11 @@ guided_step_format = validators.RegexValidator(r"^[A-Za-z_]+(\.[A-Za-z_]+)*$", "
 
 RICE_CULTIVATION_DAYS = 113
 
+# Additional flooded-rice seasons on top of the main one (4 per year in total).
+# NEXT allows 3 seasons; 4 leaves room for 90-day varieties grown year-round
+# (4 x 90 = 360 days) without allowing combinations that cannot fit in a year.
+MAX_ADDITIONAL_RICE_SEASONS = 3
+
 # Hard cap on activities per project; enforced on every creation path (create, build, copy).
 MAX_ACTIVITIES_PER_PROJECT = 50
 
@@ -2204,7 +2209,16 @@ class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
 
 
 class MinorSeasonFloodedRice(Rice, LandSubmodule, BiomassMixin):
+    """Additional flooded-rice season (Season 2, 3, ...), ordered by creation.
+
+    Uses the parent's area, like the main season: IPCC 2019 Vol 4 ch.5
+    eq. 5.1 sums EF_i x t_i x A_i over cultivation periods of the same field.
+    """
+
     parent = models.ForeignKey(FloodedRice, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
+
+    class Meta:
+        ordering = ["id"]
 
 
 ##### Grassland and Livestock #####
