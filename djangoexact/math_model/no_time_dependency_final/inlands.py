@@ -435,6 +435,25 @@ class AnnexedModule(BaseModule):
             raise e
 
 
+PEAT_UNIT_WEIGHT = "weight"
+PEAT_UNIT_VOLUME = "volume"
+
+
+def peat_offsite_co2(quantity_unit, quantity_per_ha, hectares, percentage_ditches, carbon_fraction, bulk_density, counted=True):
+    """Yearly off-site CO2 (tCO2) from extracted peat, IPCC 2006 V4 Ch7 Eq. 7.4.
+
+    quantity_per_ha is air-dry tonnes or m3 per hectare per year; carbon_fraction is tC per tonne of
+    air-dry peat and bulk_density (t air-dry peat per m3) converts a volume to a weight. Ditches are
+    excluded from the producing area, as in NEXT (WETLAND!ET4, Peatland row 61).
+    """
+    if not counted:
+        return 0.0
+    tonnes = quantity_per_ha * hectares * (1 - percentage_ditches)
+    if quantity_unit == PEAT_UNIT_VOLUME:
+        tonnes *= bulk_density
+    return tonnes * carbon_fraction * 44 / 12
+
+
 @dataclass
 class PeatExtraction(BaseModule):
     hectares_end: float
@@ -461,6 +480,17 @@ class PeatExtraction(BaseModule):
     extraction_height_end: float
 
     peat_density_tier_2_default: Optional[float] = None
+
+    # Quantity-based off-site path (IPCC 2006 V4 Ch7 Eq. 7.4). None keeps the legacy extraction-height path above.
+    quantity_unit: Optional[str] = None
+    quantity_start: float = 0.0
+    quantity_end: float = 0.0
+    carbon_fraction_start: float = 0.0
+    carbon_fraction_end: float = 0.0
+    bulk_density_start: float = 0.0
+    bulk_density_end: float = 0.0
+    offsite_counted_start: bool = True
+    offsite_counted_end: bool = True
 
     def __post_init__(self):
         super().__post_init__()
@@ -534,11 +564,16 @@ class PeatExtraction(BaseModule):
                 return mass_tonnes * hectares_start * height_of_extraction_start * 100, mass_tonnes * hectares_end * height_of_extraction_end * 100
 
             try:
-                mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if self.mass_tonnes_tier_2 is None else self.mass_tonnes_tier_2
-                air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(mass_tonnes, self.hectares_start, self.hectares_end, self.extraction_height_start, self.extraction_height_end)
+                if self.quantity_unit is None:
+                    mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if self.mass_tonnes_tier_2 is None else self.mass_tonnes_tier_2
+                    air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(mass_tonnes, self.hectares_start, self.hectares_end, self.extraction_height_start, self.extraction_height_end)
 
-                em_start = air_dry_weight_start * self.c_fraction_ref * 44 / 12
-                em_end = air_dry_weight_end * self.c_fraction_ref * 44 / 12
+                    em_start = air_dry_weight_start * self.c_fraction_ref * 44 / 12
+                    em_end = air_dry_weight_end * self.c_fraction_ref * 44 / 12
+                    self.peat_density_tier_2_default = mass_tonnes
+                else:
+                    em_start = peat_offsite_co2(self.quantity_unit, self.quantity_start, self.hectares_start, self.percentage_ditches_start, self.carbon_fraction_start, self.bulk_density_start, self.offsite_counted_start)
+                    em_end = peat_offsite_co2(self.quantity_unit, self.quantity_end, self.hectares_end, self.percentage_ditches_end, self.carbon_fraction_end, self.bulk_density_end, self.offsite_counted_end)
 
                 offsite_emissions_yearly = compute_yearly_or_half_year_cumulative(em_start, em_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                 offsite_emissions_total = sum(offsite_emissions_yearly)
@@ -548,8 +583,6 @@ class PeatExtraction(BaseModule):
 
                 inventory = InventoryPerGasPerActivity(gas_type=GasTypes.CO2, value=em_start, activity=ActivityTypes.OFFSITE_PEAT)
                 self.inventory.emissions_by_sector_by_gas.append(inventory)
-
-                self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity
 
             except Exception as e:
                 traceback.print_exc()
