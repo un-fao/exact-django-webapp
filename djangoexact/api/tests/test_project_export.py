@@ -6,6 +6,8 @@ from django.test import TestCase
 from rest_framework import status as http_status
 from rest_framework.test import APIClient
 
+from ipcc.models import GlobalWarmingPotential
+
 from ..models import Group, Project, ProjectMembership
 from .factories import ProjectFactory, UserFactory, reference_country
 
@@ -99,6 +101,9 @@ class ProjectImportTests(TestCase):
                 "name": "Imported Project",
                 "implementation_years": 20,
                 "start_year_of_activities": 2024,
+                "last_year_of_accounting": 2050,
+                "country": reference_country().id,
+                "gw_potential": GlobalWarmingPotential.objects.first().id,
                 "activities": []
             }
         }
@@ -284,6 +289,9 @@ class ThreadCommentExportImportTests(TestCase):
                 "name": "Project with Comments",
                 "implementation_years": 20,
                 "start_year_of_activities": 2024,
+                "last_year_of_accounting": 2050,
+                "country": reference_country().id,
+                "gw_potential": GlobalWarmingPotential.objects.first().id,
                 "activities": []
             }
         }
