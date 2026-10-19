@@ -218,6 +218,9 @@ else:
         # drop or flush the developer's real database.
         DATABASES["default"]["TEST"] = {"NAME": os.getenv("DB_NAME", default="$DB_NAME")}
 
+# Seeds the project groups' permissions, which no fixture or migration provides.
+TEST_RUNNER = "api.tests.runner.SeededTestRunner"
+
 DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
 # Database connection management
