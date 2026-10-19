@@ -1,6 +1,17 @@
 [
   {
     "model": "api.fuelusetype",
+    "pk": 9,
+    "fields": {
+      "name": "Civil Aviation",
+      "name_en": "Civil Aviation",
+      "name_fr": "Aviation civile",
+      "name_es": "Aviación civil",
+      "name_ru": "Гражданская авиация"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
     "pk": 2,
     "fields": {
       "name": "Mobile",
@@ -23,6 +34,50 @@
   },
   {
     "model": "api.fuelusetype",
+    "pk": 4,
+    "fields": {
+      "name": "Off-Road Forestry",
+      "name_en": "Off-Road Forestry",
+      "name_fr": "Hors-route - Foresterie",
+      "name_es": "Fuera de carretera - Silvicultura",
+      "name_ru": "Внедорожная техника - лесное хозяйство"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 6,
+    "fields": {
+      "name": "Off-Road Household",
+      "name_en": "Off-Road Household",
+      "name_fr": "Hors-route - Ménages",
+      "name_es": "Fuera de carretera - Hogares",
+      "name_ru": "Внедорожная техника - домохозяйства"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 5,
+    "fields": {
+      "name": "Off-Road Industry",
+      "name_en": "Off-Road Industry",
+      "name_fr": "Hors-route - Industrie",
+      "name_es": "Fuera de carretera - Industria",
+      "name_ru": "Внедорожная техника - промышленность"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 7,
+    "fields": {
+      "name": "Railways",
+      "name_en": "Railways",
+      "name_fr": "Chemins de fer",
+      "name_es": "Ferrocarriles",
+      "name_ru": "Железнодорожный транспорт"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
     "pk": 1,
     "fields": {
       "name": "Stationary",
@@ -30,6 +85,17 @@
       "name_fr": "Stationnaire",
       "name_es": "Estacionario",
       "name_ru": "Стационарный"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 8,
+    "fields": {
+      "name": "Water-Borne Navigation",
+      "name_en": "Water-Borne Navigation",
+      "name_fr": "Navigation",
+      "name_es": "Navegación",
+      "name_ru": "Водный транспорт"
     }
   }
 ]

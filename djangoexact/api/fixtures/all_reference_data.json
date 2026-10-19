@@ -9030,6 +9030,72 @@
     }
   },
   {
+    "model": "api.fuelusetype",
+    "pk": 9,
+    "fields": {
+      "name": "Civil Aviation",
+      "name_en": "Civil Aviation",
+      "name_fr": "Aviation civile",
+      "name_es": "Aviación civil",
+      "name_ru": "Гражданская авиация"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 4,
+    "fields": {
+      "name": "Off-Road Forestry",
+      "name_en": "Off-Road Forestry",
+      "name_fr": "Hors-route - Foresterie",
+      "name_es": "Fuera de carretera - Silvicultura",
+      "name_ru": "Внедорожная техника - лесное хозяйство"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 6,
+    "fields": {
+      "name": "Off-Road Household",
+      "name_en": "Off-Road Household",
+      "name_fr": "Hors-route - Ménages",
+      "name_es": "Fuera de carretera - Hogares",
+      "name_ru": "Внедорожная техника - домохозяйства"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 5,
+    "fields": {
+      "name": "Off-Road Industry",
+      "name_en": "Off-Road Industry",
+      "name_fr": "Hors-route - Industrie",
+      "name_es": "Fuera de carretera - Industria",
+      "name_ru": "Внедорожная техника - промышленность"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 7,
+    "fields": {
+      "name": "Railways",
+      "name_en": "Railways",
+      "name_fr": "Chemins de fer",
+      "name_es": "Ferrocarriles",
+      "name_ru": "Железнодорожный транспорт"
+    }
+  },
+  {
+    "model": "api.fuelusetype",
+    "pk": 8,
+    "fields": {
+      "name": "Water-Borne Navigation",
+      "name_en": "Water-Borne Navigation",
+      "name_fr": "Navigation",
+      "name_es": "Navegación",
+      "name_ru": "Водный транспорт"
+    }
+  },
+  {
     "model": "api.unit",
     "pk": 41,
     "fields": {
@@ -10192,6 +10258,13 @@
     }
   },
   {
+    "model": "api.unit",
+    "pk": 168,
+    "fields": {
+      "name": "t/yr"
+    }
+  },
+  {
     "model": "api.parentfueltype",
     "pk": 2,
     "fields": {
@@ -10544,6 +10617,240 @@
       "unit": 158,
       "module_types": [
         59
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 50,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 4,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 51,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 4,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 52,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 53,
+    "fields": {
+      "name": "Gasoline (4-stroke)",
+      "name_en": "Gasoline (4-stroke)",
+      "name_fr": "Essence (4 temps)",
+      "name_es": "Gasolina (4-tiempos)",
+      "name_ru": "Бензин (4-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 166,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 54,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 55,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 56,
+    "fields": {
+      "name": "Gasoline (4-stroke)",
+      "name_en": "Gasoline (4-stroke)",
+      "name_fr": "Essence (4 temps)",
+      "name_es": "Gasolina (4-tiempos)",
+      "name_ru": "Бензин (4-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 166,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 57,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 58,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 7,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 59,
+    "fields": {
+      "name": "Gasoil/Diesel Oil",
+      "name_en": "Gasoil/Diesel Oil",
+      "name_fr": "Gasoil / huile diesel",
+      "name_es": "Gasóleo/Diésel",
+      "name_ru": "Газойль/дизельное топливо",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 8,
+      "macro_fuel_type": null,
+      "unit": 156,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 60,
+    "fields": {
+      "name": "Residual Fuel Oil",
+      "name_en": "Residual Fuel Oil",
+      "name_fr": "Fioul résiduel",
+      "name_es": "Fuelóleo residual",
+      "name_ru": "Остаточное жидкое топливо",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 8,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 61,
+    "fields": {
+      "name": "Aviation Gasoline",
+      "name_en": "Aviation Gasoline",
+      "name_fr": "Essence aviation",
+      "name_es": "Gasolina de aviación",
+      "name_ru": "Авиационный бензин",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 9,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 62,
+    "fields": {
+      "name": "Jet Kerosene",
+      "name_en": "Jet Kerosene",
+      "name_fr": "Kérosène carburéacteur",
+      "name_es": "Queroseno para motores a reacción",
+      "name_ru": "Керосин для реактивных двигателей",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 9,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
       ]
     }
   },
@@ -772064,6 +772371,227 @@
       "co2": 3.304,
       "ch4": 0.0059,
       "n2o": 2.95e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 109,
+    "fields": {
+      "fuel_use_type": 4,
+      "fuel_type": 50,
+      "co2": 2.6669331,
+      "ch4": 0.00014936265,
+      "n2o": 0.0010293426,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 110,
+    "fields": {
+      "fuel_use_type": 4,
+      "fuel_type": 51,
+      "co2": 2.27486259,
+      "ch4": 0.005580471,
+      "n2o": 1.313052e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 111,
+    "fields": {
+      "fuel_use_type": 5,
+      "fuel_type": 52,
+      "co2": 2.6669331,
+      "ch4": 0.00014936265,
+      "n2o": 0.0010293426,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 112,
+    "fields": {
+      "fuel_use_type": 5,
+      "fuel_type": 53,
+      "co2": 2.27486259,
+      "ch4": 0.001641315,
+      "n2o": 6.56526e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 113,
+    "fields": {
+      "fuel_use_type": 5,
+      "fuel_type": 54,
+      "co2": 2.27486259,
+      "ch4": 0.004267419,
+      "n2o": 1.313052e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 114,
+    "fields": {
+      "fuel_use_type": 6,
+      "fuel_type": 55,
+      "co2": 2.6669331,
+      "ch4": 0.00014936265,
+      "n2o": 0.0010293426,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 115,
+    "fields": {
+      "fuel_use_type": 6,
+      "fuel_type": 56,
+      "co2": 2.27486259,
+      "ch4": 0.003939156,
+      "n2o": 6.56526e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 116,
+    "fields": {
+      "fuel_use_type": 6,
+      "fuel_type": 57,
+      "co2": 2.27486259,
+      "ch4": 0.005908734,
+      "n2o": 1.313052e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 117,
+    "fields": {
+      "fuel_use_type": 7,
+      "fuel_type": 58,
+      "co2": 2.6669331,
+      "ch4": 0.00014936265,
+      "n2o": 0.0010293426,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 118,
+    "fields": {
+      "fuel_use_type": 8,
+      "fuel_type": 59,
+      "co2": 2.6669331,
+      "ch4": 0.000251937,
+      "n2o": 7.1982e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 119,
+    "fields": {
+      "fuel_use_type": 8,
+      "fuel_type": 60,
+      "co2": 3.12696,
+      "ch4": 0.0002828,
+      "n2o": 8.08e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 120,
+    "fields": {
+      "fuel_use_type": 9,
+      "fuel_type": 61,
+      "co2": 3.101,
+      "ch4": 2.215e-05,
+      "n2o": 8.86e-05,
+      "co2_min": null,
+      "co2_max": null,
+      "ch4_min": null,
+      "ch4_max": null,
+      "n2o_min": null,
+      "n2o_max": null
+    }
+  },
+  {
+    "model": "ipcc.energydefaultemissionfactor",
+    "pk": 121,
+    "fields": {
+      "fuel_use_type": 9,
+      "fuel_type": 62,
+      "co2": 3.15315,
+      "ch4": 2.205e-05,
+      "n2o": 8.82e-05,
       "co2_min": null,
       "co2_max": null,
       "ch4_min": null,
