@@ -2321,6 +2321,23 @@ class Livestock(Module):
     emission_factor_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name="emission_factor_ch4_t2_wo")
     emission_factor_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name="emission_factor_n2o_t2_wo")
 
+    # IPCC 2019 Vol 4 Ch 10 Eq. 10.25-10.27 and 10.34: N_cdg added to the anaerobic digester, kg N/yr.
+    co_digestate_n_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_digestate_n_start")
+    co_digestate_n_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_digestate_n_w")
+    co_digestate_n_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_digestate_n_wo")
+
+    # Eq. 10.34 N_beddingMS, solid storage and deep bedding only, kg N/animal/yr.
+    co_bedding_n_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_bedding_n_start")
+    co_bedding_n_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_bedding_n_w")
+    co_bedding_n_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="co_bedding_n_wo")
+
+    class ManagementOption(models.TextChoices):
+        # NEXT's livestock options list; the herd change itself is already modelled by heads_number_*.
+        POPULATION_CONTROL = "population_control", "Population control"
+        MANAGEMENT_PRACTICES = "management_practices", "Change of management practices"
+
+    livestock_management_option = models.CharField(max_length=32, choices=ManagementOption.choices, null=True, blank=True, verbose_name="livestock_management_option")
+
     implementation_year_start = models.IntegerField(null=True, blank=True, verbose_name="implementation_year_start")
 
 
