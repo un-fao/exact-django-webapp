@@ -9,7 +9,7 @@ from math_model.no_time_dependency_final.inlands import PEAT_UNIT_VOLUME
 # Drainage EFs for temperate nutrient-rich grassland by water-table depth, IPCC 2013 Wetlands Supplement,
 # chapter 2: Table 2.1 (CO2, tCO2-C/ha/yr), Table 2.3 (CH4, kg CH4/ha/yr), Table 2.5 (N2O, kg N2O-N/ha/yr).
 # No other land use, climate or nutrient status is split by water-table depth in those tables, and the
-# fixture rows for this case hold the mean of the two classes (CH4 27.5, N2O 4.9).
+# fixture rows for this case hold the mean of the two classes (CO2 4.85, CH4 27.5, N2O 4.9).
 WATER_TABLE_DRAINAGE_EF = {
     "deep_drained": {"co2": 6.1, "ch4": 39.0, "n2o": 8.2},
     "shallow_drained": {"co2": 3.6, "ch4": 16.0, "n2o": 1.6},

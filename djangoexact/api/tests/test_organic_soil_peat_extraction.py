@@ -77,8 +77,12 @@ class OrganicSoilPeatExtractionTestCase(APITestCaseMixin):
         self.assertEqual(set(calculator.peat_extraction_inputs_wo), LEGACY_PEAT_KEYS)
         # Legacy height path: 0.4 x 0.24 density proxy x 100 ha x 2 x 100 x carbon fraction 1 x 44/12
         self.assertAlmostEqual(self._offsite_baseline(calculator), 0.4 * 0.24 * 100 * 2.0 * 100 * 44 / 12)
+        self.assertAlmostEqual(calculator.ef_onsite_start.co2, 4.85)
+        self.assertAlmostEqual(calculator.ef_onsite_w.co2, 4.85)
+
+    def test_nutrient_poor_onsite_co2_is_table_2_1_value(self):
+        calculator = self._calculate(peat_type=models.PeatType.objects.get(name_en="Nutrient Poor"))
         self.assertAlmostEqual(calculator.ef_onsite_start.co2, 5.3)
-        self.assertAlmostEqual(calculator.ef_onsite_w.co2, 5.3)
 
     def test_horticulture_peat_by_weight(self):
         # 10 t/ha x 100 ha x 0.9 x 0.4 tC/t x 44/12 = 1320 tCO2
@@ -112,7 +116,7 @@ class OrganicSoilPeatExtractionTestCase(APITestCaseMixin):
     def test_water_table_class_swaps_drainage_efs_per_scenario(self):
         calculator = self._calculate(water_table_class_w="deep_drained", water_table_class_wo="shallow_drained")
 
-        self.assertAlmostEqual(calculator.ef_onsite_start.co2, 5.3)
+        self.assertAlmostEqual(calculator.ef_onsite_start.co2, 4.85)
         self.assertEqual((calculator.ef_onsite_w.co2, calculator.ef_onsite_w.ch4, calculator.ef_onsite_w.n2o), (6.1, 39.0, 8.2))
         self.assertEqual((calculator.ef_onsite_wo.co2, calculator.ef_onsite_wo.ch4, calculator.ef_onsite_wo.n2o), (3.6, 16.0, 1.6))
 
