@@ -2584,6 +2584,32 @@ class CoastalWetland(Module):
 
     avg_salinity_t2 = models.ForeignKey(SalinityType, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="avg_salinity_t2")
 
+    # Aquaculture ponds. Pond type follows avg_salinity_t2: > 18 ppt saline, otherwise brackish (IPCC 2019 Table 7.12).
+    pond_area_start = models.FloatField(default=0, verbose_name="pond_area_start")
+    pond_area_w = models.FloatField(default=0, verbose_name="pond_area_w")
+    pond_area_wo = models.FloatField(default=0, verbose_name="pond_area_wo")
+    pond_area_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_pond_area_thread")
+
+    fish_production_start = models.FloatField(null=True, blank=True, verbose_name="fish_production_start")
+    fish_production_w = models.FloatField(null=True, blank=True, verbose_name="fish_production_w")
+    fish_production_wo = models.FloatField(null=True, blank=True, verbose_name="fish_production_wo")
+
+    pond_trophic_type_start = models.ForeignKey(TrophicType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_pond_trophic_type_start", verbose_name="pond_trophic_type_start")
+    pond_trophic_type_w = models.ForeignKey(TrophicType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_pond_trophic_type_w", verbose_name="pond_trophic_type_w")
+    pond_trophic_type_wo = models.ForeignKey(TrophicType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_pond_trophic_type_wo", verbose_name="pond_trophic_type_wo")
+
+    pond_ch4_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name="pond_ch4_ef_t2_start")
+    pond_ch4_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name="pond_ch4_ef_t2_w")
+    pond_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name="pond_ch4_ef_t2_wo")
+
+    pond_alpha_t2_start = models.FloatField(null=True, blank=True, verbose_name="pond_alpha_t2_start")
+    pond_alpha_t2_w = models.FloatField(null=True, blank=True, verbose_name="pond_alpha_t2_w")
+    pond_alpha_t2_wo = models.FloatField(null=True, blank=True, verbose_name="pond_alpha_t2_wo")
+
+    fish_n2o_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name="fish_n2o_ef_t2_start")
+    fish_n2o_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name="fish_n2o_ef_t2_w")
+    fish_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fish_n2o_ef_t2_wo")
+
 
 ##### Fisheries and Aquaculture #####
 
