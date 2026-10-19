@@ -776,7 +776,7 @@ class ProjectImportSerializer(serializers.Serializer):
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
+        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact", "conditionality"]
         ref_name = "Activity"
 
 class ProjectTotalHectaresSerializer(serializers.Serializer):

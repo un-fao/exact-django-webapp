@@ -17,7 +17,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from api.models import Activity, AnalysisPurpose, Climate, Country, Group, Moisture, Project, ProjectMembership, ProjectPhase, SoilType
 from api.reports.data_types import ActivityResult
 from api.reports.renderer import ExcelRenderer
-from api.serializers import ActivityResultSerializer, ProjectExportSerializer, ReadProjectSerializer, WriteActivitySerializer
+from api.serializers import ActivityResultSerializer, ActivitySummarySerializer, ProjectExportSerializer, ReadProjectSerializer, WriteActivitySerializer
 from api.services.conditionality_results import aggregate_by_conditionality
 from api.tests.factories import ActivityFactory, ProjectFactory, UserFactory
 
@@ -139,6 +139,7 @@ class FieldRoundTripTests(TestCase):
         activity.refresh_from_db()
         self.assertEqual(activity.conditionality, Activity.Conditionality.CONDITIONAL)
         self.assertEqual(ActivityResultSerializer(activity).data["conditionality"], "conditional")
+        self.assertEqual(ActivitySummarySerializer(activity).data["conditionality"], "conditional")
 
         bad = WriteActivitySerializer(activity, data={"conditionality": "maybe"}, partial=True, context={"request": request})
         self.assertFalse(bad.is_valid())
