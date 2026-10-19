@@ -73,9 +73,15 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
 
         prev_balance = response.data["balance"]
 
+        # The start scenario is shared by both totals and cancels out of the balance, so edit
+        # with-scenario values; both the electricity and the fuel path are covered because
+        # the seeded fuel type of the with scenario can be either.
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()  # Electricity
-        validated_data["energy_ef_ch4_t2_start"] = FuzzyFloat(0, 10).fuzz()  # Fuel
+        validated_data["transmission_loss_t2_w"] = 0.5
+        validated_data["electricity_ef_t2_w"] = 9.0
+        validated_data["energy_ef_co2_t2_w"] = 9.0
+        validated_data["energy_ef_ch4_t2_w"] = 9.0
+        validated_data["energy_ef_n2o_t2_w"] = 9.0
 
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
