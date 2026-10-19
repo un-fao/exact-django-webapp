@@ -228,7 +228,7 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request)
 
-    def create_activity(self, project, user, module_types=None, land_use_change=False):
+    def create_activity(self, project, user, module_types=None, land_use_change=False, extra=None):
         """
         Create an activity using the ActivityViewSet.
 
@@ -256,6 +256,7 @@ class APITestCaseMixin(APITestCase):
             activity_builder_data["module_types"] = [module_type.id for module_type in module_types]
         else:
             activity_builder_data["module_types"] = [self.module_type.id]
+        activity_builder_data.update(extra or {})
 
         view = ActivityViewSet.as_view({"post": "build"})
         request = self.request_factory.post(

@@ -953,6 +953,21 @@ class ProjectTestCase(APITestCaseMixin):
 
         log.info("END - test_create_activity_with_module_requires_fields_but_missing_on_project_and_activity")
 
+    def test_create_activity_rejects_moisture_not_valid_for_climate(self):
+        climate = models.Climate.objects.filter(moistures__isnull=False).first()
+        invalid_moisture = models.Moisture.objects.exclude(climates=climate).first()
+        valid_moisture = climate.moistures.first()
+        annual_cropland = models.ModuleType.objects.get(class_name="AnnualCropland")
+        project = models.Project.objects.get(id=self.create_project().data["id"])
+
+        response = self.create_activity(project, self.user, [annual_cropland], extra={"climate_t2": climate.id, "moisture_t2": invalid_moisture.id})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("moisture_t2", response.data)
+        self.assertFalse(models.Activity.objects.filter(project=project).exists())
+
+        response = self.create_activity(project, self.user, [annual_cropland], extra={"climate_t2": climate.id, "moisture_t2": valid_moisture.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_create_activity_with_module_requires_fields_set_on_activity(self):
         """
         Test that creating an activity with climate_t2/moisture_t2/soil_type_t2 set on activity

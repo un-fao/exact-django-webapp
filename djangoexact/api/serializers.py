@@ -1010,9 +1010,40 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if land_use_change and any(not module.is_luc for module in land_use_change.values()):
             raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
 
+        self.validate_site_conditions(data, project, list(module_types) + list(land_use_change.values() if land_use_change else []))
+
         super().validate(data)
 
         return data
+
+    def validate_site_conditions(self, data, project, module_types):
+        def effective(field):
+            value = data.get(f"{field}_t2") or (getattr(self.instance, f"{field}_t2") if self.instance else None)
+            return value or getattr(project, field)
+
+        climate, moisture, soil_type = effective("climate"), effective("moisture"), effective("soil_type")
+        errors = {}
+
+        # Every module model reads the activity's site conditions in its calculations, so any module needs them.
+        if any(self._is_module_type(module_type) for module_type in module_types):
+            for field, value in (("climate", climate), ("moisture", moisture), ("soil_type", soil_type)):
+                if value is None:
+                    errors[f"{field}_t2"] = [f"{field.replace('_', ' ').capitalize()} is required for the selected modules. Set {field}_t2 on the activity or {field} on the project."]
+
+        # Only an activity override is checked: a project with a legacy invalid pair must stay editable.
+        overrides_pair = data.get("climate_t2") or data.get("moisture_t2")
+        if overrides_pair and climate and moisture and not climate.moistures.filter(pk=moisture.pk).exists():
+            errors["moisture_t2"] = [f"Moisture '{moisture.name}' is not valid for climate '{climate.name}'."]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+    @staticmethod
+    def _is_module_type(module_type):
+        try:
+            return bool(module_type.class_name) and issubclass(apps.get_model("api", module_type.class_name), (Module, Submodule))
+        except LookupError:
+            return False
 
     def create_activity(self):
         default_change_rate = ChangeRate.objects.get(name="linear")
@@ -1057,27 +1088,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return luc
 
     def create_modules(self, activity, luc, has_organic_soil, has_luc_module):
-        from api.models import Module, Submodule
-
-        project = activity.project
-
         module_types = activity.module_types.all()
-
-        if any(issubclass(apps.get_model("api", module_type.class_name).__class__, (Module, Submodule)) for module_type in module_types):
-            climate = activity.climate_t2 or project.climate
-            moisture = activity.moisture_t2 or project.moisture
-            soil_type = activity.soil_type_t2 or project.soil_type
-
-            missing_fields = []
-            if climate is None:
-                missing_fields.append("climate")
-            if moisture is None:
-                missing_fields.append("moisture")
-            if soil_type is None:
-                missing_fields.append("soil_type")
-
-            if missing_fields:
-                raise serializers.ValidationError(f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} on the activity or {', '.join(missing_fields)} on the project.")
 
         for module_type in module_types:
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
