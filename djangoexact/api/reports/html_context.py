@@ -439,8 +439,13 @@ def build_template_context(
         for override in activity.t2_overrides
     })
 
-    # Indicator aggregates
-    indicators = _compute_indicator_aggregates(activities_by_name, project)
+    # Indicator aggregates: frozen at finalization for a finalized project (SOC already a value).
+    if result.frozen_indicators is not None:
+        indicators = result.frozen_indicators
+        soc_value = indicators["soc"]
+    else:
+        indicators = _compute_indicator_aggregates(activities_by_name, project)
+        soc_value = indicators["soc"].value if indicators["soc"] is not None else None
 
     # Charts
     project_chart_base64, project_gases_chart_base64 = _build_chart_data(
@@ -469,7 +474,7 @@ def build_template_context(
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
-        "soc": indicators["soc"].value if indicators["soc"] is not None else None,
+        "soc": soc_value,
         "project_primary_ghg": gas_data["primary_ghg"],
         "project_primary_ghg_emissions": gas_data["primary_ghg_emissions"],
         "project_primary_ghg_direction": _direction(gas_data["primary_ghg_emissions"]),

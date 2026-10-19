@@ -167,7 +167,54 @@ def freeze_project(project) -> int:
             rows.append(_compute_row(project, project.finalized_at, module, finalize, required))
     rows = [row for row in rows if row is not None]
     models.FinalizedModuleResult.objects.bulk_create(rows)
+    freeze_report_data(project, finalize, APP_VERSION)
     return len(rows)
+
+
+def freeze_report_data(project, source, app_version) -> int:
+    """Freeze the report data (parameters, reference names, shadow prices, indicators) of a project.
+
+    Runs after its results snapshot exists. A finalized project must be able to produce its
+    report, so any module the report would include that is not ready, or a report that cannot be
+    computed, raises FinalizationError.
+    """
+    from api.reports import NotReadyError
+    from api.reports.frozen import capture_report_data, report_data_rows
+    from api.reports.registry import get_report_class
+
+    for activity in project.activities.all():
+        for module in activity.modules:
+            if module and get_report_class(module) is not None and not is_ready_for_results(module):
+                raise FinalizationError(
+                    f"{module.module_type.name} in activity {activity.name} is not ready. Complete or remove it: "
+                    "a finalized project must be able to produce its report."
+                )
+    try:
+        captured = capture_report_data(project)
+    except Exception as e:
+        # Calculators raise ValidationError (e.g. a missing climate) as well as NotReadyError; either
+        # way the project cannot be finalized, and the request must answer 400, not 500.
+        if not isinstance(e, NotReadyError):
+            log.exception(f"Report data of project {project.pk} could not be captured")
+        raise FinalizationError(f"The report of this project cannot be produced: {e}") from e
+    rows = report_data_rows(project, captured, source=source, app_version=app_version)
+    _models().FinalizedReportData.objects.bulk_create(rows)
+    return len(rows)
+
+
+def restore_report_data(project, dry_run: bool = True) -> Counter:
+    """Freeze the report data of an already-finalized project that has none, computing it now.
+
+    No history ever stored report parameters, so they can only be frozen as of today and are
+    marked frozen_retroactively. Requires the results snapshot (restore_frozen_results) first.
+    """
+    models = _models()
+    if models.FinalizedReportData.objects.filter(project=project, finalized_at=project.finalized_at).exists():
+        return Counter(report_data_already_frozen=1)
+    if dry_run:
+        return Counter(report_data_frozen_retroactively=1)
+    freeze_report_data(project, models.FinalizedModuleResult.Source.RETROACTIVE, APP_VERSION)
+    return Counter(report_data_frozen_retroactively=1)
 
 
 def frozen_result(module):

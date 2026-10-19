@@ -50,6 +50,7 @@ def _make_project_result(project=None):
     aggregated.yearly_balance_wo = [5.0, 10.0]
 
     result = Mock()
+    result.frozen_indicators = None  # an open project: indicators computed live
     result.project = project
     result.aggregated = aggregated
     result.activity_results = []

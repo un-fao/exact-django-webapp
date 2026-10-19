@@ -217,3 +217,7 @@ class ProjectResult:
     extra_shadow_prices: list[Any]     # Extrapolated SPC instances
 
     inventory_items: list[InventoryItem]
+
+    # Finalized projects only: the PDF indicators (and SOC value) frozen at finalization, in the
+    # active language. None means the template context computes them live.
+    frozen_indicators: dict | None = None

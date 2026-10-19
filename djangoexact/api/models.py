@@ -1079,6 +1079,32 @@ class FinalizedModuleResult(models.Model):
         }
 
 
+class FinalizedReportData(models.Model):
+    """Report data of a finalized project, frozen next to its results.
+
+    One row per module (its ``ModuleResult``), per activity (its tier 2 overrides) and one per
+    project (shadow prices, indicators, SOC), keyed by the object's content type. Module and
+    activity data, and the project indicators, are stored per language because reference names
+    are translated at compute time. ``data`` is versioned (``schema``) and decoded by
+    ``api.reports.frozen``. Append-only under the same triggers as ``FinalizedModuleResult``.
+    """
+
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, db_constraint=False, related_name="finalized_report_data")
+    finalized_at = models.DateTimeField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField()
+    data = models.JSONField()
+    app_version = models.CharField(max_length=32, null=True)
+    source = models.CharField(max_length=32, choices=FinalizedModuleResult.Source.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["content_type", "object_id", "finalized_at"], name="unique_frozen_report_data_per_finalization"),
+        ]
+        indexes = [models.Index(fields=["project", "finalized_at"])]
+
+
 class NoteMixin(models.Model):
     note = GenericRelation(Note)
 
