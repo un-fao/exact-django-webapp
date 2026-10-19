@@ -66,8 +66,9 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
 
         old_balance = response.data["balance"]
 
+        # yield_* is descriptive metadata (reports only) and never enters the calculation.
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["yield_w"] = 10000
+        validated_data["soc_t2_w"] = 10000
 
         response = self.edit_module(self.module, self.user, validated_data)
 
