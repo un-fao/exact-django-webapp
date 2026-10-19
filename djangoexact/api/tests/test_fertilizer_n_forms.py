@@ -5,7 +5,7 @@ independently of the migration's own tables:
     Eq. 11.1  direct:          N x EF1
     Eq. 11.9  volatilisation:  N x Frac_GAS x EF4
     Eq. 11.10 leaching:        N x Frac_LEACH x EF5
-    N2O = N2O-N x 44/28, in tCO2-eq x 265 (the Inputs module's fixed GWP).
+    N2O = N2O-N x 44/28, in tCO2-eq x the project's N2O GWP (265 under AR5).
 """
 
 from importlib import import_module
@@ -17,12 +17,15 @@ from api.calculators import InputEntryCalculator
 from api.models import Activity, Climate, Country, Input, InputEntry, InputType, Moisture, SoilType
 from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, ProjectFactory
-from ipcc.models import InputEmissionFactor, InputReference
+from ipcc.models import GlobalWarmingPotential, InputEmissionFactor, InputReference
 from math_model.no_time_dependency_final.ghg_emissions_classes import GasTypes
 
 migration = import_module("ipcc.migrations.0068_fertilizer_n_forms_ipcc_2019")
+cache_migration = import_module("ipcc.migrations.0069_invalidate_input_caches_project_gwp")
 
 N2O_TO_CO2E = 44 / 28 * 265
+AR5 = "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+AR6 = "IPCC Sixth Assessment Report (AR6)"
 
 # Hand-worked kg N2O-N per kg N: EF1 + Frac_GAS x EF4 + Frac_LEACH x EF5.
 # Wet: EF1 synthetic 0.016 / other 0.006, EF4 0.014, Frac_LEACH 0.24, EF5 0.011.
@@ -51,13 +54,14 @@ def ef_for(type_name, climate, moisture):
 
 
 class FertilizerNFormsTestCase(TestCase):
-    def entry_n2o_start(self, type_name, climate, moisture, value=100.0):
+    def entry_n2o_start(self, type_name, climate, moisture, value=100.0, gwp=AR5):
         project = ProjectFactory(
             owner=User.objects.get(email="testuser@example.com"),
             climate=Climate.objects.get(name_en=climate),
             moisture=Moisture.objects.get(name_en=moisture),
             country=Country.objects.exclude(region=None).first(),
             soil_type=SoilType.objects.filter(active=True).first(),
+            gw_potential=GlobalWarmingPotential.objects.get(name=gwp),
         )
         activity: Activity = ActivityFactory(project=project)
         entry = InputEntry.objects.create(
@@ -111,6 +115,29 @@ class FertilizerNFormsTestCase(TestCase):
         self.assertEqual(ef_for("Urea", "Tropical", "Dry").n2o_value, 0.005)
         self.assertAlmostEqual(self.entry_n2o_start(migration.SYNTHETIC_N, "Tropical", "Wet"), 100 * 0.016 * N2O_TO_CO2E, places=6)
         self.assertAlmostEqual(self.entry_n2o_start("Sewage", "Tropical", "Wet"), 100 * 0.006 * N2O_TO_CO2E, places=6)
+
+    def test_n2o_follows_project_gwp(self):
+        n2o = self.entry_n2o_start(migration.SYNTHETIC_N, "Tropical", "Wet", gwp=AR6)
+        self.assertAlmostEqual(n2o, 100 * 0.016 * 44 / 28 * 273, places=6)
+
+    def test_cache_migration_clears_only_open_projects_off_265(self):
+        def cached_input(gwp, finalized=False):
+            project = ProjectFactory(
+                owner=User.objects.get(email="testuser@example.com"),
+                country=Country.objects.exclude(region=None).first(),
+                gw_potential=GlobalWarmingPotential.objects.get(name=gwp),
+                is_finalized=finalized,
+            )
+            module = Input.objects.create(activity=ActivityFactory(project=project))
+            Input.objects.filter(pk=module.pk).update(cached_results_total={"x": 1})
+            return module
+
+        stale, ar5, finalized = cached_input(AR6), cached_input(AR5), cached_input(AR6, finalized=True)
+        cache_migration.invalidate_input_caches(apps, None)
+        cached = lambda m: Input.objects.get(pk=m.pk).cached_results_total  # noqa: E731
+        self.assertIsNone(cached(stale))
+        self.assertEqual(cached(ar5), {"x": 1})
+        self.assertEqual(cached(finalized), {"x": 1})
 
     def test_migration_is_idempotent(self):
         before = InputEmissionFactor.objects.count(), InputType.objects.count()
