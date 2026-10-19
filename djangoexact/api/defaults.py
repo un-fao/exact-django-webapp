@@ -1029,6 +1029,18 @@ class SettlementDefaults(Defaults):
         ])
 
 
+def _pond_defaults(factors) -> dict:
+    return {
+        f"{name}_{s}_default": value
+        for s in ("start", "w", "wo")
+        for name, value in (
+            ("pond_ch4_ef_t2", factors.ch4_ef),
+            ("pond_alpha_t2", factors.alpha[s]),
+            ("fish_n2o_ef_t2", factors.n2o_ef),
+        )
+    }
+
+
 class CoastalWetlandDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
@@ -1059,6 +1071,7 @@ class CoastalWetlandDefaults(Defaults):
             soil_type_t2_default=None,
             litter_t2_default=0,
             deadwood_t2_default=0,
+            **{f"{name}_{s}_default": 0 for name in ("pond_ch4_ef_t2", "pond_alpha_t2", "fish_n2o_ef_t2") for s in ("start", "w", "wo")},
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1093,6 +1106,7 @@ class CoastalWetlandDefaults(Defaults):
             soil_type_t2_default=defaults.soil_type_name,
             litter_t2_default=defaults.litter.value,
             deadwood_t2_default=defaults.dw.value,
+            **_pond_defaults(defaults.pond_factors),
         ), [
             (('agb_t2_start_default', 'agb_t2_w_default', 'agb_t2_wo_default'), defaults.agb_default, 'value'),
             (('bgb_t2_start_default', 'bgb_t2_w_default', 'bgb_t2_wo_default'), defaults.bgb_default, 'value'),

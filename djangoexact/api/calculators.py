@@ -99,6 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
+from api.services import coastal_aquaculture
 from api import reference_cache
 
 from . import utilities as utils
@@ -535,6 +536,7 @@ MATH_COMPONENT_GROUPS = (
     ("electricity_math_w", "electricity_math_wo"),
     ("organic_soil_math_w", "organic_soil_math_wo"),
     ("peat_extraction_math_w", "peat_extraction_math_wo"),
+    ("pond_math_w", "pond_math_wo"),
 )
 
 
@@ -6221,6 +6223,8 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
+        self.pond_math_w = None
+        self.pond_math_wo = None
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
@@ -6298,6 +6302,8 @@ class CoastalWetlandCalculator(BaseCalculator):
             if missing_scenarios:
                 raise ValueError(f"Rewetting CH4 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} with {self.salinity_type} salinity is missing. Please insert tier 2 values for the relevant scenarios.")
 
+        self.pond_factors = coastal_aquaculture.pond_factors(self.module, self.climate, self.moisture, self.salinity_type.value)
+
     def calculate(self) -> Result:
         """
         Calculates the emissions of the coastal wetland
@@ -6343,6 +6349,7 @@ class CoastalWetlandCalculator(BaseCalculator):
 
             self.math_w = MathCoastalWetland(**self.inputs_w)
             self.math_w.calculate_emissions()
+            self.pond_math_w = coastal_aquaculture.build(self, "w")
 
         if self.module.is_without():
             self.inputs_wo = {
@@ -6382,9 +6389,14 @@ class CoastalWetlandCalculator(BaseCalculator):
 
             self.math_wo = MathCoastalWetland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
+            self.pond_math_wo = coastal_aquaculture.build(self, "wo")
 
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        if self.pond_math_w:
+            self.results_w = self.results_w + self.pond_math_w.result
+        if self.pond_math_wo:
+            self.results_wo = self.results_wo + self.pond_math_wo.result
 
         results_tuple = (self.results_w, self.results_wo)
 

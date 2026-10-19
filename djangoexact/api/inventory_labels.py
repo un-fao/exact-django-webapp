@@ -30,6 +30,9 @@ MODULE_OVERRIDES = {
         "N2O Field": "FISH EMISSION (EXCRETA)",
         "Electricity": "Electricity emissions (CO2-eq)",
     },
+    "CoastalWetland": {
+        "N2O Field": "FISH EMISSION (EXCRETA)",
+    },
 }
 
 
