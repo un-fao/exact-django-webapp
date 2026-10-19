@@ -1387,7 +1387,7 @@ class RiceYield(Model):
 
 class TrophicStateFactor(Model):
     """
-    IPCC:3222
+    IPCC:3222. IPCC 2019 Refinement Vol. 4 Ch. 7 Table 7.11, recommended alpha per trophic class.
     """
 
     class Meta:

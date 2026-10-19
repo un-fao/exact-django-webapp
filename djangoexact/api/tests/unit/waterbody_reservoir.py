@@ -112,7 +112,7 @@ class WaterbodyReservoirTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(defaults.rd_t2_default, 0.09)
 
     def test_pond_results_unchanged(self):
-        # Pinned on develop @ 9dcc3d3b with the same inputs: start eutrophic (9.9), w oligotrophic (0.7).
+        # Same inputs as pinned on develop @ 9dcc3d3b: start eutrophic (Table 7.11 alpha 10), w oligotrophic (0.7).
         self._edit(
             waterbody_type=models.WaterbodyType.objects.get(name_en="Freshwater Pond").id,
             area=AREA,
@@ -123,8 +123,8 @@ class WaterbodyReservoirTestCase(base_module.BaseModuleTestCase):
         results_w, results_wo = WaterbodyCalculator(self.module).calculate()
         ch4_w = sum(_yearly(results_w, ActivityTypes.COASTAL_WATERBODIES, GasTypes.CH4))
         ch4_wo = sum(_yearly(results_wo, ActivityTypes.COASTAL_WATERBODIES, GasTypes.CH4))
-        self.assertAlmostEqual(ch4_w, AREA * (9.9 * 2.5 + 0.7 * 7.5) * EF_POND / 1000 * self.gwp, places=6)
-        self.assertAlmostEqual(ch4_wo, AREA * 9.9 * 10 * EF_POND / 1000 * self.gwp, places=6)
+        self.assertAlmostEqual(ch4_w, AREA * (10 * 2.5 + 0.7 * 7.5) * EF_POND / 1000 * self.gwp, places=6)
+        self.assertAlmostEqual(ch4_wo, AREA * 10 * 10 * EF_POND / 1000 * self.gwp, places=6)
         self.assertEqual([s for s in results_w.yearly_emissions_by_sector_by_gas if s.activity != ActivityTypes.COASTAL_WATERBODIES], [])
 
     def test_pond_chlorophyll_a_drives_alpha(self):
