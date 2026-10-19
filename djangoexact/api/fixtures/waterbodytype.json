@@ -7,7 +7,8 @@
       "name_en": "Brackishwater Pond",
       "name_fr": "Étang d'eau saumâtre\n",
       "name_es": "Estanque de agua salobre",
-      "name_ru": "Солоноватый пруд"
+      "name_ru": "Солоноватый пруд",
+      "is_reservoir": false
     }
   },
   {
@@ -18,18 +19,20 @@
       "name_en": "Canals & Ditches",
       "name_fr": "Canaux et fossés\n",
       "name_es": "Canales y Acequia",
-      "name_ru": "Каналы, Канавы"
+      "name_ru": "Каналы, Канавы",
+      "is_reservoir": false
     }
   },
   {
     "model": "api.waterbodytype",
-    "pk": 5,
+    "pk": 6,
     "fields": {
-      "name": "﻿Freshwater Pond",
-      "name_en": "﻿Freshwater Pond",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
+      "name": "Flooded Land (Reservoir)",
+      "name_en": "Flooded Land (Reservoir)",
+      "name_fr": "Terres inondées (réservoir)",
+      "name_es": "Tierras inundadas (embalse)",
+      "name_ru": "Затопленные земли (водохранилище)",
+      "is_reservoir": true
     }
   },
   {
@@ -40,7 +43,8 @@
       "name_en": "Freshwater Pond",
       "name_fr": "Étang d'eau douce\n",
       "name_es": "Estanque de agua dulce",
-      "name_ru": "Пресноводный пруд"
+      "name_ru": "Пресноводный пруд",
+      "is_reservoir": false
     }
   },
   {
@@ -51,7 +55,20 @@
       "name_en": "Saline Pond",
       "name_fr": "Étang salin\n",
       "name_es": "Estanque Salino",
-      "name_ru": "Солёный пруд"
+      "name_ru": "Солёный пруд",
+      "is_reservoir": false
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 5,
+    "fields": {
+      "name": "﻿Freshwater Pond",
+      "name_en": "﻿Freshwater Pond",
+      "name_fr": null,
+      "name_es": null,
+      "name_ru": null,
+      "is_reservoir": false
     }
   }
 ]

@@ -520,6 +520,8 @@ class PeatType(models.Model):
 
 class WaterbodyType(models.Model):
     name = models.CharField(max_length=100)
+    # Reservoirs follow IPCC 2019 Vol. 4 Ch. 7 flooded land methods (age-dependent EFs, CO2, downstream CH4).
+    is_reservoir = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -2516,6 +2518,15 @@ class Waterbody(Module):
     mean_annual_t2_start = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_start")
     mean_annual_t2_w = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_w")
     mean_annual_t2_wo = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_wo")
+
+    # Reservoir-only inputs. Years since flooding at the project start: the reservoir is "land converted to
+    # flooded land" while younger than 20 years and "flooded land remaining flooded land" after.
+    reservoir_age_start = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="reservoir_age_start")
+    downstream_emissions = models.BooleanField(default=True, verbose_name="downstream_emissions")
+    rd_t2 = models.FloatField(null=True, blank=True, verbose_name="rd_t2")
+
+    def is_reservoir(self) -> bool:
+        return bool(self.waterbody_type and self.waterbody_type.is_reservoir)
 
 
 class CoastalWetland(Module):
