@@ -1059,6 +1059,12 @@ class CoastalWetlandDefaults(Defaults):
             soil_type_t2_default=None,
             litter_t2_default=0,
             deadwood_t2_default=0,
+            litter_t2_start_default=0,
+            litter_t2_w_default=0,
+            litter_t2_wo_default=0,
+            deadwood_t2_start_default=0,
+            deadwood_t2_w_default=0,
+            deadwood_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1093,6 +1099,12 @@ class CoastalWetlandDefaults(Defaults):
             soil_type_t2_default=defaults.soil_type_name,
             litter_t2_default=defaults.litter.value,
             deadwood_t2_default=defaults.dw.value,
+            litter_t2_start_default=defaults.litter.value,
+            litter_t2_w_default=defaults.litter.value,
+            litter_t2_wo_default=defaults.litter.value,
+            deadwood_t2_start_default=defaults.dw.value,
+            deadwood_t2_w_default=defaults.dw.value,
+            deadwood_t2_wo_default=defaults.dw.value,
         ), [
             (('agb_t2_start_default', 'agb_t2_w_default', 'agb_t2_wo_default'), defaults.agb_default, 'value'),
             (('bgb_t2_start_default', 'bgb_t2_w_default', 'bgb_t2_wo_default'), defaults.bgb_default, 'value'),
@@ -1102,8 +1114,8 @@ class CoastalWetlandDefaults(Defaults):
             (('co2_rewetting_t2_start_default', 'co2_rewetting_t2_w_default', 'co2_rewetting_t2_wo_default'), defaults.rewetting_c, 'value'),
             (('ch4_rewetting_t2_start_default', 'ch4_rewetting_t2_w_default', 'ch4_rewetting_t2_wo_default'), defaults.rewetting_ch4, 'value'),
             (('avg_salinity_t2_default',), defaults.salinity_type, 'value'),
-            (('litter_t2_default',), defaults.litter, 'value'),
-            (('deadwood_t2_default',), defaults.dw, 'value'),
+            (('litter_t2_default', 'litter_t2_start_default', 'litter_t2_w_default', 'litter_t2_wo_default'), defaults.litter, 'value'),
+            (('deadwood_t2_default', 'deadwood_t2_start_default', 'deadwood_t2_w_default', 'deadwood_t2_wo_default'), defaults.dw, 'value'),
         ])
 
 
