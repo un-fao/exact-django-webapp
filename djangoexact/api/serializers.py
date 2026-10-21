@@ -274,7 +274,8 @@ class YearlyGasEmissionSerializer(serializers.Serializer):
 
 
 class YearlyActivityEmissionSerializer(serializers.Serializer):
-    year = serializers.IntegerField()
+    # Report caches written before year was stored lack the key; the module GET reads them too.
+    year = serializers.IntegerField(default=0)
     gas_type = get_model_serializer(GasType)(many=False, read_only=True)
     emissions = EmissionSerializer(many=True)
     activity = serializers.CharField()
