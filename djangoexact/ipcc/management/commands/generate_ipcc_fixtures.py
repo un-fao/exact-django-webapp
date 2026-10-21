@@ -134,6 +134,8 @@ class Command(BaseCommand):
             "RewettingCarbonFactor",
             "RewettingMethaneFactor",
             "OtherConstructedWaterbodiesEmissionFactor",
+            "FoodIndustryWastewater",
+            "WastewaterTreatmentSystem",
             "Atwood",
             "DefaultSoilCarbonStock",
             "DrainageEmissionFactor",
