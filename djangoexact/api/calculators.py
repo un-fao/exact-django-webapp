@@ -6333,7 +6333,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "percentage_c_lost_excavation_tier_2": self.module.pc_c_lost_after_excavation_t2_w,
                 "ef_rewetting_carbon_default": self.rewetting_c.value,
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
-                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_start,
+                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_w,
                 "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_w,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,

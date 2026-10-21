@@ -218,11 +218,20 @@ class CoastalWetland(BaseModule):
                     raise e
 
             try:
-                ef_rewetting_carbon = self.ef_rewetting_carbon_default if self.ef_rewetting_carbon_tier_2 is None else self.ef_rewetting_carbon_tier_2
+                # IPCC Wetlands Supplement, ch. 4 p. 4.28: at Tier 1 the rewetting CO2 factor applies only where
+                # vegetation is re-established by replanting or reseeding; rewetting alone or natural recolonization
+                # gets 0. A Tier 2 factor is the user's own estimate (e.g. for natural recolonization), so it applies
+                # to the whole rewetted area. CH4 applies to the whole rewetted area either way.
+                if self.ef_rewetting_carbon_tier_2 is None:
+                    ef_rewetting_carbon = self.ef_rewetting_carbon_default
+                    rewetting_carbon_area = min(max(0, self.area_revegated_end), self.area_end_rewetting)
+                else:
+                    ef_rewetting_carbon = self.ef_rewetting_carbon_tier_2
+                    rewetting_carbon_area = self.area_end_rewetting
                 ef_rewetting_methane = self.ef_rewetting_methane_default if self.ef_rewetting_methane_tier_2 is None else self.ef_rewetting_methane_tier_2
 
                 emissions_yearly_rewetting_carbon = compute_yearly_or_half_year_cumulative(
-                    0, 44 / 12 * self.area_end_rewetting * ef_rewetting_carbon, self.implementation_time, self.capitalization_time, self.rate_type
+                    0, 44 / 12 * rewetting_carbon_area * ef_rewetting_carbon, self.implementation_time, self.capitalization_time, self.rate_type
                 )
                 emissions_yearly_rewetting_methane = compute_yearly_or_half_year_cumulative(
                     0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.implementation_time, self.capitalization_time, self.rate_type
