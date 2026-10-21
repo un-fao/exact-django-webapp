@@ -192,6 +192,7 @@ def save_results_to_cache(module, emissions_set, emissions_set_w, emissions_set_
             if hasattr(activity, "value"):
                 activity = activity.value
             rows.append({
+                "year": e.year,
                 "activity": activity,
                 "gas_type": {"name": e.gas_type.name if e.gas_type else None},
                 "emissions": [{"value": v.value} for v in e.emissions],
