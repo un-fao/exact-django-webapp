@@ -45,7 +45,6 @@ class CoastalWetland(BaseModule):
     ef_rewetting_methane_default: float
     ef_rewetting_carbon_tier_2: Optional[float] = None
     ef_rewetting_methane_tier_2: Optional[float] = None
-    soil_type: float
     methane_constant: float
     mangrove_factor: float
 
@@ -219,7 +218,6 @@ class CoastalWetland(BaseModule):
                     raise e
 
             try:
-                self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
                 ef_rewetting_carbon = self.ef_rewetting_carbon_default if self.ef_rewetting_carbon_tier_2 is None else self.ef_rewetting_carbon_tier_2
                 ef_rewetting_methane = self.ef_rewetting_methane_default if self.ef_rewetting_methane_tier_2 is None else self.ef_rewetting_methane_tier_2
 
