@@ -2,6 +2,7 @@ from rest_framework.routers import DefaultRouter
 import public.views as public_views
 import api.models as api_models
 import api.views as api_views
+import ipcc.models as ipcc_models
 
 router = DefaultRouter()
 router.register(r"projects", public_views.PublicProjectViewSet, basename="project")
@@ -30,6 +31,8 @@ router.register(r"livestocks", public_views.generic_public_module_viewset(api_mo
 router.register(r"forest-managements", public_views.generic_public_module_viewset(api_models.ForestManagement), basename="forestmanagement")
 router.register(r"forest-disturbances", public_views.generic_public_module_viewset(api_models.ForestDisturbance), basename="forestdisturbance")
 router.register(r"food-processing-wastewaters", public_views.generic_public_module_viewset(api_models.FoodProcessingWastewater), basename="foodprocessingwastewater")
+router.register(r"food-industry-types", api_views.public_read_only_viewset(ipcc_models.FoodIndustryWastewater), basename="foodindustrytypes")
+router.register(r"wastewater-treatment-systems", api_views.public_read_only_viewset(ipcc_models.WastewaterTreatmentSystem), basename="wastewatertreatmentsystems")
 router.register(r"waterbodies", public_views.generic_public_module_viewset(api_models.Waterbody), basename="waterbody")
 router.register(r"settlements", public_views.generic_public_module_viewset(api_models.Settlement), basename="settlement")
 router.register(r"buildings", public_views.generic_public_module_viewset(api_models.Building), basename="building")

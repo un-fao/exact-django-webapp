@@ -12,6 +12,7 @@ import ipcc.models as ipcc_models
 from api import calculators
 from api.reports.base import BaseProjectReport
 from api.reports.modules import FoodProcessingWastewaterReport
+from api import views
 from api.views import ProjectViewSet, generic_module_viewset
 from math_model.no_time_dependency_final.food_wastewater import ScenarioInputs, TreatmentShare, annual_emissions
 from math_model.no_time_dependency_final.ghg_emissions_classes import ActivityTypes
@@ -186,3 +187,20 @@ class FoodWastewaterBackwardCompatibilityTestCase(base_module.BaseModuleTestCase
         self.module.refresh_from_db()
         self.assertEqual(self.get_results(cached="false").data, before)
         self.assertNotIn(CH4, json.dumps(before))
+
+
+class FoodWastewaterReferenceEndpointsTestCase(base_module.BaseModuleTestCase):
+    def setUp(self):
+        self.ModuleClass = models.FoodProcessingWastewater
+        super().setUp()
+
+    def test_lists_are_public_and_read_only(self):
+        for model, name in ((ipcc_models.FoodIndustryWastewater, "foodindustrytypes"), (ipcc_models.WastewaterTreatmentSystem, "wastewatertreatmentsystems")):
+            viewset = views.public_read_only_viewset(model)
+            response = viewset.as_view({"get": "list"})(self.request_factory.get(reverse(f"{name}-list")))
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), model.objects.count())
+            post = viewset.as_view({"post": "create"})(self.request_factory.post(reverse(f"{name}-list"), {"code": "x"}, format="json"))
+            self.assertEqual(post.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(ipcc_models.WastewaterTreatmentSystem.objects.count(), 8)
+        self.assertEqual(ipcc_models.FoodIndustryWastewater.objects.count(), 11)
