@@ -20,6 +20,8 @@ DEFAULT_LABELS = {
     "Refrigerant": "Refrigerant emissions (CO2-eq)",
     "Ice": "Ice emissions (CO2-eq)",
     "Coastal Waterbodies": "Waterbody emissions (CH4)",
+    "Food Processing Wastewater CH4": "Industrial wastewater CH4 (CRT 5.D.2)",
+    "Food Processing Wastewater N2O": "Industrial wastewater N2O (CRT 5.D.2)",
 }
 
 MODULE_OVERRIDES = {

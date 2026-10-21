@@ -20,6 +20,7 @@ import numpy as np
 
 import api.models as api_models
 import api.calculators as calculators
+import ipcc.models as ipcc_models
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
@@ -160,6 +161,54 @@ class WaterbodyReport(BaseModuleReport):
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Food processing wastewater
+# ---------------------------------------------------------------------------
+
+@dataclass
+class FoodProcessingWastewaterReport(BaseModuleReport):
+    module: api_models.FoodProcessingWastewater
+
+    def __post_init__(self):
+        self.calculator = calculators.FoodProcessingWastewaterCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        es = self.emissions_set
+        systems = {s.code: s.name for s in ipcc_models.WastewaterTreatmentSystem.objects.all()}
+
+        mw = [
+            MetadataWrite(1, 1, "Industry"),
+            MetadataWrite(2, 1, "Production (t/year)"),
+            MetadataWrite(3, 1, "Treatment and discharge"),
+        ]
+        for col, is_state, sfx in ((2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")):
+            if not is_state:
+                continue
+            industry = getattr(m, f"industry_type_{sfx}")
+            mix = getattr(m, f"treatment_mix_{sfx}") or {}
+            mw += [
+                MetadataWrite(1, col, industry.name if industry else ""),
+                MetadataWrite(2, col, getattr(m, f"production_{sfx}")),
+                MetadataWrite(3, col, ", ".join(f"{systems.get(code, code)} {share * 100:g}%" for code, share in mix.items())),
+            ]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Food Processing Wastewater",
+            result_rows=[
+                ResultRow("CH4 from industrial wastewater (CRT 5.D.2)", self._extract(es, math_utils.ActivityTypes.FOOD_WASTEWATER_CH4, math_utils.GasTypes.CH4)),
+                ResultRow("N2O from industrial wastewater (CRT 5.D.2)", self._extract(es, math_utils.ActivityTypes.FOOD_WASTEWATER_N2O, math_utils.GasTypes.N2O)),
+            ],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
         )
 
 

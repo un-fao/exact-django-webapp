@@ -134,6 +134,9 @@ router.register(r"forest-types", views.public_generic_viewset(models.ForestType)
 router.register(r"forest-condition-types", views.public_generic_viewset(models.ForestConditionType), basename="forestconditiontypes")
 router.register(r"forest-disturbances", views.generic_module_viewset(models.ForestDisturbance), basename="forestdisturbance")
 
+# Food processing wastewater
+router.register(r"food-processing-wastewaters", views.generic_module_viewset(models.FoodProcessingWastewater), basename="foodprocessingwastewater")
+
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")
 router.register(r"waterbody-types", views.public_generic_viewset(models.WaterbodyType), basename="waterbodytypes")
