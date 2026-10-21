@@ -9,6 +9,7 @@ WS_METADATA = "Metadata"
 WS_ADDITIONAL_INDICATORS = "Additional Indicators"
 WS_SHADOW_PRICE = "Shadow Price of Carbon"
 WS_INVENTORY = "Inventory"
+WS_INDICATORS = "Indicators"
 
 # Results worksheet header rows
 ROW_HEADER_YEARS = 1
