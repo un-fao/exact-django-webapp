@@ -25,18 +25,6 @@
   },
   {
     "model": "api.waterbodytype",
-    "pk": 6,
-    "fields": {
-      "name": "Reservoir (flooded land)",
-      "name_en": "Reservoir (flooded land)",
-      "name_fr": "Réservoir (terres inondées)",
-      "name_es": "Embalse (tierras inundadas)",
-      "name_ru": "Водохранилище (затопленные земли)",
-      "is_reservoir": true
-    }
-  },
-  {
-    "model": "api.waterbodytype",
     "pk": 1,
     "fields": {
       "name": "Freshwater Pond",
@@ -45,6 +33,18 @@
       "name_es": "Estanque de agua dulce",
       "name_ru": "Пресноводный пруд",
       "is_reservoir": false
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 6,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "is_reservoir": true
     }
   },
   {
