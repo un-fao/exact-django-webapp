@@ -99,7 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
-from api.services import reservoirs
+from api.services import flooded_land, reservoirs
 from api import reference_cache
 
 from . import utilities as utils
@@ -7778,6 +7778,13 @@ class OtherLandCalculator(LandModuleCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+class FloodedLandCalculator(LandModuleCalculator):
+    """Reservoir (flooded land) at the end of a land use change, see api.services.flooded_land."""
+
+    def calculate(self) -> tuple:
+        return flooded_land.calculate(self)
 
 
 class SetAsideCalculator(LandModuleCalculator):

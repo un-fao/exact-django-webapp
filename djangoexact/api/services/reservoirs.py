@@ -19,7 +19,7 @@ def reservoir_emission_factor(climate, moisture) -> ipcc.ReservoirEmissionFactor
 def class_alpha(trophic_state) -> float:
     """Table 7.11 alpha of the selected trophic class. EX-ACT's "Default" class (alpha 1, for ponds) is not a
     Table 7.11 class, so reservoirs use the oligotrophic value instead, as NEXT does."""
-    trophic_type = trophic_state.trophic_type if trophic_state.trophic_type_id else None
+    trophic_type = trophic_state.trophic_type if trophic_state is not None and trophic_state.trophic_type_id else None
     if trophic_type is None or trophic_type.name_en == "Default":
         return RESERVOIR_DEFAULT_ALPHA
     return trophic_state.value
