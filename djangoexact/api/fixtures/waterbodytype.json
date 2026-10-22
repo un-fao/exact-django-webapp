@@ -27,11 +27,11 @@
     "model": "api.waterbodytype",
     "pk": 6,
     "fields": {
-      "name": "Flooded Land (Reservoir)",
-      "name_en": "Flooded Land (Reservoir)",
-      "name_fr": "Terres inondées (réservoir)",
-      "name_es": "Tierras inundadas (embalse)",
-      "name_ru": "Затопленные земли (водохранилище)",
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
       "is_reservoir": true
     }
   },

@@ -95,6 +95,12 @@ class WaterbodyReservoirTestCase(base_module.BaseModuleTestCase):
         ch4_wo = sum(_yearly(results_wo, ActivityTypes.FLOODED_LAND_CH4, GasTypes.CH4))
         self.assertAlmostEqual(ch4_wo, 300 * 10 * EF_GT_20 * 1.2 / 1000 * self.gwp, places=6)
 
+    def test_reservoir_type_label(self):
+        self.assertEqual(
+            (self.reservoir.name_en, self.reservoir.name_fr, self.reservoir.name_es),
+            ("Reservoir (flooded land)", "Réservoir (terres inondées)", "Embalse (tierras inundadas)"),
+        )
+
     def test_reservoir_without_age_is_not_ready(self):
         self._edit(
             waterbody_type=self.reservoir.id,
