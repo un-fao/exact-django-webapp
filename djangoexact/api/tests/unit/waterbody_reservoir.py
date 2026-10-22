@@ -90,6 +90,13 @@ class WaterbodyReservoirTestCase(base_module.BaseModuleTestCase):
         self.assertAlmostEqual(ch4_w, (300 * 2.5 + 260 * 7.5) * EF_GT_20 / 1000 * self.gwp, places=6)
         self.assertEqual(sum(_yearly(results_w, ActivityTypes.FLOODED_LAND_CO2, GasTypes.CO2)), 0)
 
+    def test_default_trophic_class_uses_oligotrophic_alpha(self):
+        # Table 7.11 has no "Default" class; reservoirs fall back to the oligotrophic 0.7 (ponds keep 1.0).
+        _, results_wo = self._reservoir(trophic_type_start=self.trophic["Default"], trophic_type_wo=self.trophic["Default"], reservoir_age_start=40)
+        ch4_wo = sum(_yearly(results_wo, ActivityTypes.FLOODED_LAND_CH4, GasTypes.CH4))
+        self.assertAlmostEqual(ch4_wo, AREA * 10 * 0.7 * EF_GT_20 * 1.09 / 1000 * self.gwp, places=6)
+        self.assertEqual(WaterbodyDefaults(self.module).get_defaults().alpha_t2_wo_default, 0.7)
+
     def test_downstream_tier_2_ratio(self):
         _, results_wo = self._reservoir(rd_t2=0.2, reservoir_age_start=40)
         ch4_wo = sum(_yearly(results_wo, ActivityTypes.FLOODED_LAND_CH4, GasTypes.CH4))

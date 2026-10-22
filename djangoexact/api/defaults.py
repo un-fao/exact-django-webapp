@@ -1131,9 +1131,11 @@ class WaterbodyDefaults(Defaults):
         defaults = calcs.WaterbodyCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        alpha = {s: getattr(defaults, f"trophic_state_{s}").value for s in ("start", "w", "wo")}
         if self.input.is_reservoir():
             ch4_ef = reservoirs.ch4_ef_at_start(self.input, defaults.reservoir_ef)
             rd_t2 = reservoirs.RD_DEFAULT
+            alpha = {s: reservoirs.class_alpha(getattr(defaults, f"trophic_state_{s}")) for s in alpha}
         else:
             ch4_ef = defaults.methane_emission_factor.value
             rd_t2 = None
@@ -1142,9 +1144,9 @@ class WaterbodyDefaults(Defaults):
             ch4_ef_t2_start_default=ch4_ef,
             ch4_ef_t2_w_default=ch4_ef,
             ch4_ef_t2_wo_default=ch4_ef,
-            alpha_t2_start_default=defaults.trophic_state_start.value,
-            alpha_t2_w_default=defaults.trophic_state_w.value,
-            alpha_t2_wo_default=defaults.trophic_state_wo.value,
+            alpha_t2_start_default=alpha["start"],
+            alpha_t2_w_default=alpha["w"],
+            alpha_t2_wo_default=alpha["wo"],
             mean_annual_t2_start_default=defaults.trophic_state_start.chloa,
             mean_annual_t2_w_default=defaults.trophic_state_w.chloa,
             mean_annual_t2_wo_default=defaults.trophic_state_wo.chloa,

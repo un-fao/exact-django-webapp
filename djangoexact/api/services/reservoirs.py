@@ -4,7 +4,7 @@ Kept out of calculators.py: WaterbodyCalculator delegates here when the waterbod
 """
 
 from math_model.no_time_dependency_final.ghg_emissions_classes import Result as MathResult
-from math_model.no_time_dependency_final.reservoirs import LAND_CONVERTED_YEARS, RD_DEFAULT, Reservoir, trophic_alpha
+from math_model.no_time_dependency_final.reservoirs import LAND_CONVERTED_YEARS, RD_DEFAULT, RESERVOIR_DEFAULT_ALPHA, Reservoir, trophic_alpha
 
 import ipcc.models as ipcc
 
@@ -14,6 +14,15 @@ def reservoir_emission_factor(climate, moisture) -> ipcc.ReservoirEmissionFactor
         return ipcc.ReservoirEmissionFactor.objects.get(climate=climate, moisture=moisture)
     except ipcc.ReservoirEmissionFactor.DoesNotExist:
         raise ValueError(f"No IPCC reservoir emission factor for {climate} / {moisture}.")
+
+
+def class_alpha(trophic_state) -> float:
+    """Table 7.11 alpha of the selected trophic class. EX-ACT's "Default" class (alpha 1, for ponds) is not a
+    Table 7.11 class, so reservoirs use the oligotrophic value instead, as NEXT does."""
+    trophic_type = trophic_state.trophic_type if trophic_state.trophic_type_id else None
+    if trophic_type is None or trophic_type.name_en == "Default":
+        return RESERVOIR_DEFAULT_ALPHA
+    return trophic_state.value
 
 
 def require_age(module) -> int:
@@ -58,7 +67,7 @@ def _math(calculator, module, ef, scenario: str, area_start: float, area_end: fl
 
 
 def _alpha(calculator, module, scenario: str) -> float:
-    default = getattr(calculator, f"trophic_state_{scenario}").value
+    default = class_alpha(getattr(calculator, f"trophic_state_{scenario}"))
     return trophic_alpha(getattr(module, f"alpha_t2_{scenario}"), getattr(module, f"mean_annual_t2_{scenario}"), default)
 
 
