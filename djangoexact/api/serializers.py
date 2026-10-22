@@ -36,6 +36,7 @@ from .models import (
     ConfigParam,
     Country,
     CustomUser,
+    FloodedLand,
     OtherLand,
     Electricity,
     Energy,
@@ -1009,6 +1010,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if land_use_change and any(not module.is_luc for module in land_use_change.values()):
             raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
+
+        # A reservoir only exists as the result of flooding another land use (flooded land remaining flooded
+        # land is a Waterbody of type "Reservoir (flooded land)").
+        if any(module.class_name == FloodedLand.__name__ for module in module_types):
+            raise serializers.ValidationError("Reservoir (flooded land) can only be the final land use of a Land Use Change")
+        if land_use_change and land_use_change["module_type_start"].class_name == FloodedLand.__name__:
+            raise serializers.ValidationError("Reservoir (flooded land) cannot be the starting land use of a Land Use Change")
 
         super().validate(data)
 
@@ -3343,6 +3351,25 @@ class OtherLandReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "OtherLand"
         mandatory_fields = {}
+
+
+class FloodedLandWriteSerializer(LandModuleSeralizer):
+    class Meta:
+        model = FloodedLand
+        fields = "__all__"
+        ref_name = "FloodedLand"
+        mandatory_fields = {
+            "with": {"mandatory": ["trophic_type_w"]},
+            "without": {"mandatory": ["trophic_type_wo"]},
+        }
+
+
+class FloodedLandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = FloodedLand
+        fields = "__all__"
+        ref_name = "FloodedLand"
+        mandatory_fields = FloodedLandWriteSerializer.Meta.mandatory_fields
 
 
 class SettlementSerializer(LandModuleSeralizer):

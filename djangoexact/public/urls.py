@@ -21,6 +21,7 @@ router.register(r"irrigation-systems", public_views.generic_public_module_viewse
 router.register(r"irrigation-phases", public_views.generic_public_module_viewset(api_models.IrrigationPhase), basename="irrigationphase")
 router.register(r"set-asides", public_views.generic_public_module_viewset(api_models.SetAside), basename="setaside")
 router.register(r"other-lands", public_views.generic_public_module_viewset(api_models.OtherLand), basename="otherland")
+router.register(r"flooded-lands", public_views.generic_public_module_viewset(api_models.FloodedLand), basename="floodedland")
 router.register(r"coastal-wetlands", public_views.generic_public_module_viewset(api_models.CoastalWetland), basename="coastalwetland")
 router.register(r"land-use-changes", public_views.generic_public_module_viewset(api_models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", public_views.generic_public_module_viewset(api_models.OrganicSoil), basename="organicsoil")
