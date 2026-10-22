@@ -482,6 +482,24 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 312,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        67
+      ],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 73,
     "fields": {
       "name": "﻿Long-Term Cultivated",
@@ -2359,24 +2377,6 @@
     }
   },
   {
-    "model": "api.landusetype",
-    "pk": 312,
-    "fields": {
-      "name": "Reservoir (flooded land)",
-      "name_en": "Reservoir (flooded land)",
-      "name_fr": "Réservoir (terres inondées)",
-      "name_es": "Embalse (tierras inundadas)",
-      "name_ru": "Водохранилище (затопленные земли)",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        67
-      ],
-      "climates": [],
-      "moistures": []
-    }
-  },
-  {
     "model": "api.moduletype",
     "pk": 39,
     "fields": {
@@ -2537,6 +2537,21 @@
       "name_ru": null,
       "class_name": "Livestock",
       "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
+    "pk": 67,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "class_name": "FloodedLand",
+      "is_luc": true,
       "is_submodule": false,
       "is_container": false
     }
@@ -3034,21 +3049,6 @@
       "is_luc": false,
       "is_submodule": false,
       "is_container": true
-    }
-  },
-  {
-    "model": "api.moduletype",
-    "pk": 67,
-    "fields": {
-      "name": "Reservoir (flooded land)",
-      "name_en": "Reservoir (flooded land)",
-      "name_fr": "Réservoir (terres inondées)",
-      "name_es": "Embalse (tierras inundadas)",
-      "name_ru": "Водохранилище (затопленные земли)",
-      "class_name": "FloodedLand",
-      "is_luc": true,
-      "is_submodule": false,
-      "is_container": false
     }
   },
   {

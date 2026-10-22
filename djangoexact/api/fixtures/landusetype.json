@@ -2363,6 +2363,24 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 312,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        67
+      ],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 73,
     "fields": {
       "name": "﻿Long-Term Cultivated",
@@ -5662,24 +5680,6 @@
         2,
         4
       ]
-    }
-  },
-  {
-    "model": "api.landusetype",
-    "pk": 312,
-    "fields": {
-      "name": "Reservoir (flooded land)",
-      "name_en": "Reservoir (flooded land)",
-      "name_fr": "Réservoir (terres inondées)",
-      "name_es": "Embalse (tierras inundadas)",
-      "name_ru": "Водохранилище (затопленные земли)",
-      "forest_type": null,
-      "is_active": true,
-      "module_types": [
-        67
-      ],
-      "climates": [],
-      "moistures": []
     }
   }
 ]
