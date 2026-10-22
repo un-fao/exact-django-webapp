@@ -1,13 +1,19 @@
+import io
 from types import SimpleNamespace
 
+import openpyxl
+
 from django.test import SimpleTestCase
+from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import force_authenticate
 
 import api.models as models
 import ipcc.models as ipcc_models
 from api.defaults import DefaultsFactory
 from api.services.forest_stock_difference import STOCK_DIFFERENCE_LUC_ERROR, calculate_stock_difference, stock_difference_defaults
 from api.utilities import NON_MANGROVE_FACTOR
+from api.views import ProjectViewSet
 
 from . import base_module
 
@@ -74,6 +80,23 @@ class ForestStockDifferenceTestCase(base_module.BaseModuleTestCase):
         self.edit_module(self.module, self.user, {"approach": "stock_difference", **fields})
         self.module.refresh_from_db()
         self.assertEqual(self.module.status.name_en, "EMPTY")
+
+    def test_excel_report_lists_the_stock_inputs_instead_of_gain_loss_defaults(self):
+        self.edit_module(self.module, self.user, {"approach": "stock_difference", **stock_fields()})
+
+        request = self.request_factory.post(reverse("project-report", args=[self.project.pk]), {}, format="json")
+        force_authenticate(request, user=self.user)
+        response = ProjectViewSet.as_view({"post": "report"})(request, pk=self.project.pk)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, getattr(response, "data", None))
+
+        workbook = openpyxl.load_workbook(io.BytesIO(response.content))
+        rows = [row for sheet in workbook.worksheets for row in sheet.iter_rows(values_only=True)]
+        by_label = {row[0]: row[1:4] for row in rows if row and isinstance(row[0], str)}
+        for pool, label in (("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood"), ("soc", "SOC")):
+            self.assertEqual(tuple(by_label[f"{label} stock (tC/ha)"]), (START[pool], END_W[pool], END_WO[pool]))
+        self.assertEqual(by_label["Approach"][0], "Stock difference")
+        self.assertEqual(by_label["Data source"][0], self.module.data_source.short_name)
+        self.assertNotIn("AGB growth rate <=20 years (tC/ha)", by_label)
 
 
 class StockDifferenceLandUseChangeTestCase(SimpleTestCase):
