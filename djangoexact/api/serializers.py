@@ -18,6 +18,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from api.services import iwms_rewetting
 from django.utils.text import slugify
 
 from . import labels
@@ -1699,6 +1700,15 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
     pass
 
 
+class IwmsRewettingReadMixin(serializers.Serializer):
+    """Tells the client whether the per-scenario rewetted toggle applies (activity on Wetland soil)."""
+
+    iwms_rewetting_available = serializers.SerializerMethodField()
+
+    def get_iwms_rewetting_available(self, instance) -> bool:
+        return iwms_rewetting.is_wetland_soil(iwms_rewetting.activity_soil_type(instance.activity))
+
+
 class LandModuleSeralizer(ScenarioModuleSerializer):
     class Meta:
         model = None
@@ -1711,6 +1721,7 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
         log.debug(f"Data: {data}")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
+        iwms_rewetting.validate_rewetting(data, activity)
         luc: LandUseChange = activity.landusechange.first()
 
         if self.instance and not isinstance(self.instance, LandUseChange):
@@ -1790,7 +1801,7 @@ class GrasslandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class GrasslandReadSerializer(BaseGenericModuleSerializer):
+class GrasslandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
     class Meta:
         model = Grassland
         fields = "__all__"
@@ -1900,7 +1911,7 @@ class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
     pass
 
 
-class AnnualCroplandReadSerializer(BaseGenericModuleSerializer):
+class AnnualCroplandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
     class Meta:
         model = AnnualCropland
         fields = "__all__"
@@ -1977,7 +1988,7 @@ class PerennialCroplandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class PerennialCroplandReadSerializer(BaseGenericModuleSerializer):
+class PerennialCroplandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
     minor_seasons = MinorSeasonPerennialCroplandReadSerializer(many=True, read_only=True)
 
     class Meta:
@@ -3312,7 +3323,7 @@ class SetAsideWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class SetAsideReadSerializer(BaseGenericModuleSerializer):
+class SetAsideReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
     class Meta:
         model = SetAside
         fields = "__all__"
@@ -3328,7 +3339,7 @@ class OtherLandWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class OtherLandReadSerializer(BaseGenericModuleSerializer):
+class OtherLandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
     class Meta:
         model = OtherLand
         fields = "__all__"
