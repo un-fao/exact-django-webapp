@@ -50,6 +50,7 @@ from .constants import (
     SPC_ROW_WO_LOW,
     SPC_ROW_YEAR,
     WS_ADDITIONAL_INDICATORS,
+    WS_INDICATORS,
     WS_INVENTORY,
     WS_METADATA,
     WS_RESULTS,
@@ -90,6 +91,7 @@ class ExcelRenderer:
         self._write_results_summary(wb)
         self._write_shadow_price(wb)
         self._write_inventory(wb)
+        self._write_indicators(wb)
 
         return self._manager.finalize()
 
@@ -486,3 +488,56 @@ class ExcelRenderer:
             ws_inv.cell(row=i, column=INV_COL_IPCC_CATEGORY, value=item.ipcc_category)
             ws_inv.cell(row=i, column=INV_COL_GAS_TYPE, value=item.gas_type)
             ws_inv.cell(row=i, column=INV_COL_VALUE, value=item.value)
+
+    def _write_indicators(self, wb: pxl.Workbook) -> None:
+        data = self.result.indicators
+        if not data:
+            return
+        ws = wb.create_sheet(WS_INDICATORS)
+        headers = ["Indicator", "Unit", "Start", "With project", "Without project", "Value", "Target"]
+        row = 1
+        for group in data["groups"]:
+            ws.cell(row=row, column=1, value=str(group["label"])).fill = _BLUE
+            row += 1
+            if not group["available"]:
+                ws.cell(row=row, column=1, value="Not applicable to this project").fill = _BEIGE
+                row += 2
+                continue
+            for col, header in enumerate(headers, start=1):
+                ws.cell(row=row, column=col, value=header)
+            row += 1
+            series_rows = []
+            for item in group["indicators"]:
+                values = [str(item["label"]), item["unit"], item["start"], item["with"], item["without"], item["value"], item["target"]]
+                for col, value in enumerate(values, start=1):
+                    ws.cell(row=row, column=col, value=value)
+                if item.get("series"):
+                    series_rows.append(item)
+                row += 1
+            for item in series_rows:
+                row += 1
+                series = item["series"]
+                ws.cell(row=row, column=1, value=f"{item['label']} ({item['unit']})").fill = _ORANGE
+                for i, year in enumerate(series["years"]):
+                    ws.cell(row=row, column=i + DATA_COL_START, value=year)
+                for label, key in (("With project", "with"), ("Without project", "without")):
+                    row += 1
+                    ws.cell(row=row, column=1, value=label)
+                    for i, value in enumerate(series[key]):
+                        ws.cell(row=row, column=i + DATA_COL_START, value=value)
+                row += 1
+            matrix = (group.get("data") or {}) if group["id"] == "land_use_change_matrix" else {}
+            for label, key in (("With project (ha), from row to column", "with"), ("Without project (ha), from row to column", "without")):
+                if key not in matrix:
+                    continue
+                row += 1
+                ws.cell(row=row, column=1, value=label).fill = _ORANGE
+                for j, category in enumerate(matrix["categories"]):
+                    ws.cell(row=row, column=j + DATA_COL_START, value=str(category["label"]))
+                for i, category in enumerate(matrix["categories"]):
+                    row += 1
+                    ws.cell(row=row, column=1, value=str(category["label"]))
+                    for j, value in enumerate(matrix[key][i]):
+                        ws.cell(row=row, column=j + DATA_COL_START, value=value)
+                row += 1
+            row += 1

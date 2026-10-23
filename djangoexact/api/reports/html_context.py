@@ -492,6 +492,7 @@ def build_template_context(
         "large_fishery_data": indicators["large_fishery_data"],
         "aquaculture_data": indicators["aquaculture_data"],
         "land_types": indicators["land_types"],
+        "indicators": result.indicators if isinstance(result.indicators, dict) else None,
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "content": content or "",
         "additional_sources": additional_sources or "",
