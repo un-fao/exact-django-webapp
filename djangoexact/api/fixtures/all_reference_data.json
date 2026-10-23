@@ -597,6 +597,21 @@
   },
   {
     "model": "api.moduletype",
+    "pk": 66,
+    "fields": {
+      "name": "Food Processing Wastewater",
+      "name_en": "Food Processing Wastewater",
+      "name_fr": "Eaux usées de la transformation alimentaire",
+      "name_es": "Aguas residuales del procesamiento de alimentos",
+      "name_ru": "Сточные воды пищевой переработки",
+      "class_name": "FoodProcessingWastewater",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
     "pk": 49,
     "fields": {
       "name": "Forest Disturbance",
@@ -830949,6 +830964,373 @@
       "litter": null,
       "carbon_stock_biomass_total": null,
       "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 1,
+    "fields": {
+      "code": "alcohol_refining",
+      "name": "Alcohol refining",
+      "name_en": "Alcohol refining",
+      "name_fr": "Raffinage de l'alcool",
+      "name_es": "Refinación de alcohol",
+      "name_ru": "Производство спирта",
+      "wastewater": 24,
+      "wastewater_min": 16,
+      "wastewater_max": 32,
+      "cod": 11,
+      "cod_min": 5,
+      "cod_max": 22,
+      "total_n": 2.4,
+      "total_n_min": 0.94,
+      "total_n_max": 3.86
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 2,
+    "fields": {
+      "code": "beer_malt",
+      "name": "Beer and malt",
+      "name_en": "Beer and malt",
+      "name_fr": "Bière et malt",
+      "name_es": "Cerveza y malta",
+      "name_ru": "Пиво и солод",
+      "wastewater": 6.3,
+      "wastewater_min": 5,
+      "wastewater_max": 9,
+      "cod": 2.9,
+      "cod_min": 2,
+      "cod_max": 7,
+      "total_n": 0.055,
+      "total_n_min": 0.02,
+      "total_n_max": 0.08
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 3,
+    "fields": {
+      "code": "coffee",
+      "name": "Coffee",
+      "name_en": "Coffee",
+      "name_fr": "Café",
+      "name_es": "Café",
+      "name_ru": "Кофе",
+      "wastewater": null,
+      "wastewater_min": null,
+      "wastewater_max": null,
+      "cod": 9,
+      "cod_min": 3,
+      "cod_max": 15,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 4,
+    "fields": {
+      "code": "dairy",
+      "name": "Dairy products",
+      "name_en": "Dairy products",
+      "name_fr": "Produits laitiers",
+      "name_es": "Productos lácteos",
+      "name_ru": "Молочные продукты",
+      "wastewater": 7,
+      "wastewater_min": 3,
+      "wastewater_max": 10,
+      "cod": 2.7,
+      "cod_min": 1.5,
+      "cod_max": 5.2,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 5,
+    "fields": {
+      "code": "fish_processing",
+      "name": "Fish processing",
+      "name_en": "Fish processing",
+      "name_fr": "Transformation du poisson",
+      "name_es": "Procesamiento de pescado",
+      "name_ru": "Переработка рыбы",
+      "wastewater": 5,
+      "wastewater_min": 2,
+      "wastewater_max": 8,
+      "cod": 2.5,
+      "cod_min": null,
+      "cod_max": null,
+      "total_n": 0.6,
+      "total_n_min": 0.21,
+      "total_n_max": 0.98
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 6,
+    "fields": {
+      "code": "meat_poultry",
+      "name": "Meat and poultry",
+      "name_en": "Meat and poultry",
+      "name_fr": "Viande et volaille",
+      "name_es": "Carne y aves",
+      "name_ru": "Мясо и птица",
+      "wastewater": 13,
+      "wastewater_min": 8,
+      "wastewater_max": 18,
+      "cod": 4.1,
+      "cod_min": 2,
+      "cod_max": 7,
+      "total_n": 0.19,
+      "total_n_min": 0.17,
+      "total_n_max": 0.2
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 7,
+    "fields": {
+      "code": "starch",
+      "name": "Starch production",
+      "name_en": "Starch production",
+      "name_fr": "Production d'amidon",
+      "name_es": "Producción de almidón",
+      "name_ru": "Производство крахмала",
+      "wastewater": 9,
+      "wastewater_min": 4,
+      "wastewater_max": 18,
+      "cod": 10,
+      "cod_min": 1.5,
+      "cod_max": 42,
+      "total_n": 0.9,
+      "total_n_min": 0.8,
+      "total_n_max": 1.1
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 8,
+    "fields": {
+      "code": "sugar_refining",
+      "name": "Sugar refining",
+      "name_en": "Sugar refining",
+      "name_fr": "Raffinage du sucre",
+      "name_es": "Refinación de azúcar",
+      "name_ru": "Рафинирование сахара",
+      "wastewater": null,
+      "wastewater_min": 4,
+      "wastewater_max": 18,
+      "cod": 3.2,
+      "cod_min": 1,
+      "cod_max": 6,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 9,
+    "fields": {
+      "code": "vegetable_oils",
+      "name": "Vegetable oils",
+      "name_en": "Vegetable oils",
+      "name_fr": "Huiles végétales",
+      "name_es": "Aceites vegetales",
+      "name_ru": "Растительные масла",
+      "wastewater": 3.1,
+      "wastewater_min": 1,
+      "wastewater_max": 5,
+      "cod": null,
+      "cod_min": 0.5,
+      "cod_max": 1.2,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 10,
+    "fields": {
+      "code": "fruits_vegetables",
+      "name": "Vegetables, fruits and juices",
+      "name_en": "Vegetables, fruits and juices",
+      "name_fr": "Légumes, fruits et jus",
+      "name_es": "Verduras, frutas y jugos",
+      "name_ru": "Овощи, фрукты и соки",
+      "wastewater": 20,
+      "wastewater_min": 7,
+      "wastewater_max": 35,
+      "cod": 5.0,
+      "cod_min": 2,
+      "cod_max": 10,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 11,
+    "fields": {
+      "code": "wine_vinegar",
+      "name": "Wine and vinegar",
+      "name_en": "Wine and vinegar",
+      "name_fr": "Vin et vinaigre",
+      "name_es": "Vino y vinagre",
+      "name_ru": "Вино и уксус",
+      "wastewater": 23,
+      "wastewater_min": 11,
+      "wastewater_max": 46,
+      "cod": 1.5,
+      "cod_min": 0.7,
+      "cod_max": 3.0,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 1,
+    "fields": {
+      "code": "discharge_aquatic",
+      "name": "Untreated, discharged to aquatic environments (Tier 1 default)",
+      "name_en": "Untreated, discharged to aquatic environments (Tier 1 default)",
+      "name_fr": "Non traitées, rejetées dans les milieux aquatiques",
+      "name_es": "Sin tratar, vertidas a medios acuáticos",
+      "name_ru": "Без очистки, сброс в водную среду",
+      "mcf": 0.11,
+      "mcf_min": 0.004,
+      "mcf_max": 0.27,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 2,
+    "fields": {
+      "code": "discharge_rivers",
+      "name": "Untreated, discharged to other aquatic environments (not reservoirs, lakes or estuaries)",
+      "name_en": "Untreated, discharged to other aquatic environments (not reservoirs, lakes or estuaries)",
+      "name_fr": "Non traitées, rejetées dans d'autres milieux aquatiques (hors réservoirs, lacs et estuaires)",
+      "name_es": "Sin tratar, vertidas a otros medios acuáticos (no embalses, lagos ni estuarios)",
+      "name_ru": "Без очистки, сброс в другую водную среду (кроме водохранилищ, озёр и эстуариев)",
+      "mcf": 0.035,
+      "mcf_min": 0.004,
+      "mcf_max": 0.06,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 3,
+    "fields": {
+      "code": "discharge_lakes",
+      "name": "Untreated, discharged to reservoirs, lakes or estuaries",
+      "name_en": "Untreated, discharged to reservoirs, lakes or estuaries",
+      "name_fr": "Non traitées, rejetées dans des réservoirs, lacs ou estuaires",
+      "name_es": "Sin tratar, vertidas a embalses, lagos o estuarios",
+      "name_ru": "Без очистки, сброс в водохранилища, озёра или эстуарии",
+      "mcf": 0.19,
+      "mcf_min": 0.08,
+      "mcf_max": 0.27,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 4,
+    "fields": {
+      "code": "aerobic",
+      "name": "Aerobic treatment plant, well managed",
+      "name_en": "Aerobic treatment plant, well managed",
+      "name_fr": "Station de traitement aérobie bien gérée",
+      "name_es": "Planta de tratamiento aerobio bien gestionada",
+      "name_ru": "Аэробные очистные сооружения, нормальная эксплуатация",
+      "mcf": 0,
+      "mcf_min": 0,
+      "mcf_max": 0.1,
+      "ef_n2o_plant": 0.016,
+      "n_removal": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 5,
+    "fields": {
+      "code": "aerobic_overloaded",
+      "name": "Aerobic treatment plant, overloaded or poorly managed",
+      "name_en": "Aerobic treatment plant, overloaded or poorly managed",
+      "name_fr": "Station de traitement aérobie surchargée ou mal gérée",
+      "name_es": "Planta de tratamiento aerobio sobrecargada o mal gestionada",
+      "name_ru": "Аэробные очистные сооружения, перегрузка или плохая эксплуатация",
+      "mcf": 0.3,
+      "mcf_min": 0.2,
+      "mcf_max": 0.4,
+      "ef_n2o_plant": 0.016,
+      "n_removal": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 6,
+    "fields": {
+      "code": "anaerobic_reactor",
+      "name": "Anaerobic reactor (e.g. UASB)",
+      "name_en": "Anaerobic reactor (e.g. UASB)",
+      "name_fr": "Réacteur anaérobie (p. ex. UASB)",
+      "name_es": "Reactor anaerobio (p. ej. UASB)",
+      "name_ru": "Анаэробный реактор (например, UASB)",
+      "mcf": 0.8,
+      "mcf_min": 0.8,
+      "mcf_max": 1.0,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 7,
+    "fields": {
+      "code": "anaerobic_shallow_lagoon",
+      "name": "Anaerobic shallow or facultative lagoon (less than 2 m deep)",
+      "name_en": "Anaerobic shallow or facultative lagoon (less than 2 m deep)",
+      "name_fr": "Lagune anaérobie peu profonde ou facultative (moins de 2 m)",
+      "name_es": "Laguna anaerobia poco profunda o facultativa (menos de 2 m)",
+      "name_ru": "Мелкий анаэробный или факультативный пруд (глубина менее 2 м)",
+      "mcf": 0.2,
+      "mcf_min": 0,
+      "mcf_max": 0.3,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 8,
+    "fields": {
+      "code": "anaerobic_deep_lagoon",
+      "name": "Anaerobic deep lagoon (more than 2 m deep)",
+      "name_en": "Anaerobic deep lagoon (more than 2 m deep)",
+      "name_fr": "Lagune anaérobie profonde (plus de 2 m)",
+      "name_es": "Laguna anaerobia profunda (más de 2 m)",
+      "name_ru": "Глубокий анаэробный пруд (глубина более 2 м)",
+      "mcf": 0.8,
+      "mcf_min": 0.8,
+      "mcf_max": 1.0,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
     }
   },
   {

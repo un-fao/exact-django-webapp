@@ -202,6 +202,8 @@ _IPCC_ENTRIES = [
     ("ipcc.ValueChainRefrigerantEmissionFactor", ("id",), "valuechainrefrigerantemissionfactor.json", "ipcc"),
     ("ipcc.ShadowPriceOfCarbon", ("id",), "shadowpriceofcarbon.json", "ipcc"),
     ("ipcc.FRACarbonStock", ("id",), "fracarbonstock.json", "ipcc"),
+    ("ipcc.FoodIndustryWastewater", ("id",), "foodindustrywastewater.json", "ipcc"),
+    ("ipcc.WastewaterTreatmentSystem", ("id",), "wastewatertreatmentsystem.json", "ipcc"),
     # Custom-manager dependent — must be last
     ("ipcc.TotalBiomassAfterDefo", ("id",), "totalbiomassafterdefo.json", "ipcc-terminal"),
 ]

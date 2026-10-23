@@ -3100,6 +3100,12 @@ def public_generic_viewset(model: Model):
     return PublicGenericViewSet
 
 
+def public_read_only_viewset(model: Model):
+    # public_generic_viewset is a ModelViewSet with AllowAny, so it also accepts anonymous writes.
+    viewset = public_generic_viewset(model)
+    return type(viewset.__name__, (viewset,), {"http_method_names": ["get", "head", "options"]})
+
+
 class FieldDefinitionViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=FieldDefinitionSerializer,

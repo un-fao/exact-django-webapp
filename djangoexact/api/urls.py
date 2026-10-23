@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from ipcc.models import GlobalWarmingPotential
+import ipcc.models as ipcc_models
 from rest_framework import permissions, routers
 from rest_framework_nested import routers as nested_routers
 from django.urls import include
@@ -133,6 +134,11 @@ router.register(r"disturbance-types", views.public_generic_viewset(models.Distur
 router.register(r"forest-types", views.public_generic_viewset(models.ForestType), basename="foresttypes")
 router.register(r"forest-condition-types", views.public_generic_viewset(models.ForestConditionType), basename="forestconditiontypes")
 router.register(r"forest-disturbances", views.generic_module_viewset(models.ForestDisturbance), basename="forestdisturbance")
+
+# Food processing wastewater
+router.register(r"food-processing-wastewaters", views.generic_module_viewset(models.FoodProcessingWastewater), basename="foodprocessingwastewater")
+router.register(r"food-industry-types", views.public_read_only_viewset(ipcc_models.FoodIndustryWastewater), basename="foodindustrytypes")
+router.register(r"wastewater-treatment-systems", views.public_read_only_viewset(ipcc_models.WastewaterTreatmentSystem), basename="wastewatertreatmentsystems")
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")

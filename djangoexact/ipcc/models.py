@@ -1705,3 +1705,57 @@ class FRACarbonStock(Model):
     litter = FloatField(null=True, blank=True)
     carbon_stock_biomass_total = FloatField(null=True, blank=True)
     carbon_stock_total = FloatField(null=True, blank=True)
+
+
+class FoodIndustryWastewater(Model):
+    """Food and beverage industries with Tier 1 wastewater data, for the Food Processing Wastewater module.
+
+    W and COD: 2006 IPCC Guidelines Vol. 5 ch. 6 Table 6.9 (Doorn et al. 1997). W and TN where listed: 2019 Refinement
+    Vol. 5 ch. 6 Table 6.12 (New), which also gives the W of fish processing that Table 6.9 lacks. Null means IPCC gives
+    no default and the user has to enter a Tier 2 value (for TN: no N2O is estimated without one).
+    """
+
+    class Meta:
+        verbose_name = "Food Industry Wastewater"
+        verbose_name_plural = "Food Industry Wastewater"
+        ordering = ("name",)
+
+    code = CharField(max_length=40, unique=True)
+    name = CharField(max_length=100)
+    wastewater = FloatField(null=True, blank=True)
+    wastewater_min = FloatField(null=True, blank=True)
+    wastewater_max = FloatField(null=True, blank=True)
+    cod = FloatField(null=True, blank=True)
+    cod_min = FloatField(null=True, blank=True)
+    cod_max = FloatField(null=True, blank=True)
+    total_n = FloatField(null=True, blank=True)
+    total_n_min = FloatField(null=True, blank=True)
+    total_n_max = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class WastewaterTreatmentSystem(Model):
+    """Industrial wastewater treatment and discharge systems.
+
+    MCF: 2019 Refinement Vol. 5 ch. 6 Table 6.8 (Updated); the overloaded aerobic plant is the 2006 Table 6.8 row the
+    Refinement dropped. N2O plant EF: 2019 Refinement Table 6.8A (New). Nrem: 2019 Refinement Table 6.10c (New),
+    secondary (biological) treatment for aerobic plants, no removal otherwise.
+    """
+
+    class Meta:
+        verbose_name = "Wastewater Treatment System"
+        verbose_name_plural = "Wastewater Treatment Systems"
+        ordering = ("id",)
+
+    code = CharField(max_length=40, unique=True)
+    name = CharField(max_length=150)
+    mcf = FloatField()
+    mcf_min = FloatField(null=True, blank=True)
+    mcf_max = FloatField(null=True, blank=True)
+    ef_n2o_plant = FloatField(default=0)
+    n_removal = FloatField(default=0)
+
+    def __str__(self):
+        return self.name
