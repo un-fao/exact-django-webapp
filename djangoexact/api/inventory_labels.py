@@ -20,6 +20,7 @@ DEFAULT_LABELS = {
     "Refrigerant": "Refrigerant emissions (CO2-eq)",
     "Ice": "Ice emissions (CO2-eq)",
     "Coastal Waterbodies": "Waterbody emissions (CH4)",
+    "CH4 rewetted mineral soils": "4(II) Rewetting of inland wetland mineral soils (CH4)",
 }
 
 MODULE_OVERRIDES = {

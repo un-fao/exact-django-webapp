@@ -223,4 +223,5 @@ class PerennialCropland(LandModule):
         calculate_som()
         calculate_soil()
         calculate_biomass_emissions()
+        self.calculate_iwms_rewetting()
 
