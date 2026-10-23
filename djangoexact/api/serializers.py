@@ -777,7 +777,7 @@ class ProjectImportSerializer(serializers.Serializer):
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
+        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact", "conditionality"]
         ref_name = "Activity"
 
 class ProjectTotalHectaresSerializer(serializers.Serializer):
@@ -797,9 +797,10 @@ class ProjectTotalLivestockSerializer(serializers.Serializer):
 
 
 class ActivityResultSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
     cost = serializers.FloatField(read_only=True)
-    pass
+    conditionality = serializers.CharField(read_only=True, allow_null=True)
 
 
 class ActivitySerializer(serializers.ModelSerializer):

@@ -275,6 +275,7 @@ class BaseActivityReport:
             total_heads_yearly=total_heads_yearly,
             total_catch_yearly=total_catch_yearly,
             t2_overrides=t2_overrides,
+            conditionality=self.activity.conditionality,
             _module_reports=module_reports,
         )
 

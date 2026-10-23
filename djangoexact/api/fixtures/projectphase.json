@@ -1,0 +1,62 @@
+[
+  {
+    "model": "api.projectphase",
+    "pk": 1,
+    "fields": {
+      "name": "Concept note / PIF / Ex-ante",
+      "name_en": "Concept note / PIF / Ex-ante",
+      "name_fr": "Note conceptuelle / PIF / Ex-ante",
+      "name_es": "Nota conceptual / PIF / Ex ante",
+      "name_ru": "Концептуальная записка / PIF / Ex-ante",
+      "value": 1
+    }
+  },
+  {
+    "model": "api.projectphase",
+    "pk": 2,
+    "fields": {
+      "name": "Design",
+      "name_en": "Design",
+      "name_fr": "Conception",
+      "name_es": "Diseño",
+      "name_ru": "Разработка",
+      "value": 2
+    }
+  },
+  {
+    "model": "api.projectphase",
+    "pk": 3,
+    "fields": {
+      "name": "Monitoring",
+      "name_en": "Monitoring",
+      "name_fr": "Suivi",
+      "name_es": "Seguimiento",
+      "name_ru": "Мониторинг",
+      "value": 3
+    }
+  },
+  {
+    "model": "api.projectphase",
+    "pk": 4,
+    "fields": {
+      "name": "Ex-post",
+      "name_en": "Ex-post",
+      "name_fr": "Ex-post",
+      "name_es": "Ex post",
+      "name_ru": "Ex-post",
+      "value": 4
+    }
+  },
+  {
+    "model": "api.projectphase",
+    "pk": 5,
+    "fields": {
+      "name": "Other",
+      "name_en": "Other",
+      "name_fr": "Autre",
+      "name_es": "Otro",
+      "name_ru": "Другое",
+      "value": 5
+    }
+  }
+]

@@ -40,6 +40,8 @@ _API_ENTRIES = [
     ("api.SettlementType", ("name",), "settlementtype.json", "core"),
     ("api.ChangeRate", ("name",), "changerate.json", "core"),
     ("api.ProjectStatus", ("name",), "projectstatus.json", "core"),
+    ("api.AnalysisPurpose", ("value",), "analysispurpose.json", "core"),
+    ("api.ProjectPhase", ("value",), "projectphase.json", "core"),
     ("api.DataSource", ("name",), "datasource.json", "core"),
     ("api.ForestDegradationLevel", ("name",), "forestdegradationlevel.json", "core"),
     ("api.FireType", ("name",), "firetype.json", "core"),
