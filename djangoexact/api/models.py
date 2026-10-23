@@ -278,6 +278,15 @@ class SettlementType(models.Model):
 
 
 class ChangeRate(models.Model):
+    """Dynamic of change applied over the implementation phase.
+
+    ``name`` is the key math_model dispatches on (see
+    ``general_functions.compute_yearly_or_half_year_cumulative``). ``value`` is the legacy EX-ACT
+    coefficient (share of the change counted on average over implementation) and is not used in
+    calculations; "s-curve" stores 0.5001 because its true 0.5 collides with "linear" under the
+    unique constraint.
+    """
+
     name = models.CharField(max_length=25)
     value = models.FloatField(unique=True)
 
