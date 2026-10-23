@@ -17,6 +17,7 @@ from abc import ABC, abstractmethod
 
 import api.calculators as calcs
 import api.utilities as utils
+from api.services.organic_soil_peat import water_table_class_applies
 from api.models import CustomUser as User
 from django.utils.text import slugify
 
@@ -2016,6 +2017,18 @@ class LandUseChangeReadSerializer(LandUseChangeWriteSerializer):
 # Organic Soil
 
 
+def _peat_quantity_mandatory_fields(mandatory_fields: dict) -> dict:
+    """With a quantity unit set, extraction height is unused and the per-scenario quantity is required instead."""
+    swapped = {}
+    for scenario, config in mandatory_fields.items():
+        conditional = {
+            field: [dep.replace("peat_extraction_height_", "peat_quantity_") for dep in deps]
+            for field, deps in config.get("conditional", {}).items()
+        }
+        swapped[scenario] = {**config, "conditional": conditional}
+    return swapped
+
+
 class OrganicSoilWriteSerializer(LandModuleSeralizer):
     class Meta:
         model = OrganicSoil
@@ -2064,6 +2077,9 @@ class OrganicSoilWriteSerializer(LandModuleSeralizer):
     def is_ready(self, data, mandatory_fields, instance=None):
         combined_data = self.merge_instance_data(data, instance=instance)
 
+        if combined_data.get("peat_quantity_unit"):
+            mandatory_fields = _peat_quantity_mandatory_fields(mandatory_fields)
+
         errors = {}
 
         for scenario, config in mandatory_fields.items():
@@ -2107,12 +2123,14 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         luc: LandUseChange = self.instance.land_use_change
 
         if luc:
+            self.parent_module_types = (luc.module_type_start, luc.module_type_w, luc.module_type_wo)
             self.parent_land_use_type_start = luc.module_type_start.id if luc.module_type_start else None
             self.parent_land_use_type_w = luc.module_type_w.id if luc.module_type_w else None
             self.parent_land_use_type_wo = luc.module_type_wo.id if luc.module_type_wo else None
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
 
+            self.parent_module_types = (parent_module_type,) * 3
             self.parent_land_use_type_start = parent_module_type.id if parent_module_type else None
             self.parent_land_use_type_w = parent_module_type.id
             self.parent_land_use_type_wo = parent_module_type.id
@@ -2122,6 +2140,9 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         representation["parent_land_use_type_start"] = self.parent_land_use_type_start
         representation["parent_land_use_type_w"] = self.parent_land_use_type_w
         representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
+        climate = instance.activity.climate_t2 or instance.activity.project.climate
+        for scenario, module_type in zip(("start", "w", "wo"), self.parent_module_types):
+            representation[f"water_table_class_applicable_{scenario}"] = water_table_class_applies(module_type, climate, instance.peat_type)
         return representation
 
 
