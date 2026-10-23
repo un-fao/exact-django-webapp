@@ -110,6 +110,7 @@ from .models import (
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
+from api.services.forest_stock_difference import STOCK_DIFFERENCE_LUC_ERROR, supports_stock_difference
 from django.conf import settings
 
 
@@ -3033,10 +3034,19 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             if pc_biomass_destruction_w > max_pc:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (with) cannot be greater than 100%")]
 
+        is_stock_difference = data.get("approach") == ForestManagement.APPROACH_STOCK_DIFFERENCE
+        if is_stock_difference and instance and not supports_stock_difference(instance):
+            errors.append(STOCK_DIFFERENCE_LUC_ERROR)
+
         if errors:
             raise serializers.ValidationError(errors)
 
-        if any([not d.is_ready() for d in instance.disturbances.all()]):
+        if is_stock_difference:
+            # Gain-loss inputs and disturbances are ignored, so only the 15 stocks decide readiness.
+            stock_fields = [f"stock_{pool}_{scenario}" for pool in ForestManagement.STOCK_DIFFERENCE_POOLS for scenario in ("start", "w", "wo")]
+            if any(data.get(field) is None for field in stock_fields):
+                data["status"] = StatusType.objects.get(name_en="EMPTY")
+        elif any([not d.is_ready() for d in instance.disturbances.all()]):
             data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         return data

@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services.forest_stock_difference import stock_difference_defaults
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1681,9 +1682,17 @@ class ForestManagementDefaults(Defaults):
             degradation_dry_matter_impacted_t2_w_default=0,
             degradation_dry_matter_impacted_t2_wo_default=0,
         )
+        # Computed here too because DefaultsFactory returns self.values for a module that is not ready, which is
+        # exactly when the stock inputs still need prefilling.
+        self.stock_defaults = stock_difference_defaults(input)
+        vars(self.values).update(self.stock_defaults)
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.ForestManagement
+
+        if self.input.is_stock_difference():
+            # The gain-loss path below raises on missing growth / root-to-shoot data that stock difference never uses.
+            return SimpleNamespace(**self.stock_defaults)
 
         defaults = calcs.ForestManagementCalculator(self.input)
         defaults.get_defaults(calculate=True)
@@ -1744,6 +1753,7 @@ class ForestManagementDefaults(Defaults):
             bgb_max_wo = defaults.bgb_max_wo
 
         return _with_ranges(SimpleNamespace(
+            **self.stock_defaults,
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
             soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
