@@ -75,5 +75,16 @@
       "name_es": "Fertilizantes sintéticos",
       "name_ru": "Синтетические удобрения"
     }
+  },
+  {
+    "model": "api.macroinputtype",
+    "pk": 11,
+    "fields": {
+      "name": "Synthetic N-Fertilizers By Form (IPCC 2019)",
+      "name_en": "Synthetic N-Fertilizers By Form (IPCC 2019)",
+      "name_fr": "Engrais azotés synthétiques par forme (GIEC 2019)",
+      "name_es": "Fertilizantes de N sintéticos por forma (IPCC 2019)",
+      "name_ru": "Синтетические азотные удобрения по форме (МГЭИК 2019)"
+    }
   }
 ]
