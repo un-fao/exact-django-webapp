@@ -23,6 +23,8 @@ from django.utils.text import slugify
 from . import labels
 from .models import guided_step_format
 from .models import (
+    HWP_PRODUCTS,
+    HarvestedWoodProducts,
     Module,
     Submodule,
     Activity,
@@ -1011,6 +1013,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if land_use_change and any(not module.is_luc for module in land_use_change.values()):
             raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
 
+        class_names = {module.class_name for module in module_types} | {module.class_name for module in (land_use_change or {}).values()}
+        is_hwp_new = HarvestedWoodProducts.__name__ in class_names and not (self.instance and self.instance.harvestedwoodproducts.exists())
+        if is_hwp_new and not (land_use_change or class_names & set(HarvestedWoodProducts.HWP_SOURCE_CLASSES)):
+            raise serializers.ValidationError(HWP_NO_SOURCE_ERROR)
+
         super().validate(data)
 
         return data
@@ -1481,7 +1488,8 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
     def validate(self, data):
         log.debug(f"START BaseModuleSerializer[{self.Meta.ref_name}].validate")
 
-        activity = data["parent"].activity if data.get("parent") else data.get("activity", self.instance.activity)
+        # The default is not passed to data.get: it would be evaluated, and fail, on create where there is no instance.
+        activity = data["parent"].activity if data.get("parent") else data["activity"] if "activity" in data else self.instance.activity
         project: Project = activity.project
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
@@ -3162,6 +3170,13 @@ class DynamicResultSerializer(serializers.Serializer):
     def get_inventory(self, obj):
         return obj.get("inventory")
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Harvested wood products: per-source breakdown, pool stock and warnings (see api/hwp_calculator.py).
+        if isinstance(instance, dict) and "hwp" in instance:
+            data["hwp"] = instance["hwp"]
+        return data
+
     def _serialize_data(self, data):
         match self.aggregate_by:
             case BreakdownTypes.TOTAL:
@@ -3530,6 +3545,50 @@ class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "ForestDisturbance"
         mandatory_fields = ForestDisturbanceWriteSerializer.Meta.mandatory_fields
+
+
+# Harvested wood products
+
+HWP_NO_SOURCE_ERROR = "Harvested wood products need a forest management, perennial cropland or land use change module in the activity to collect harvested wood from"
+
+
+class HarvestedWoodProductsWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = HarvestedWoodProducts
+        fields = "__all__"
+        ref_name = "HarvestedWoodProducts"
+        mandatory_fields = {}
+
+    def validate(self, data):
+        merged = self.merge_instance_data(data, instance=self.instance)
+        errors = []
+
+        for scenario in (utils.ScenarioTypes.START, utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT):
+            if sum(merged.get(f"share_{product}_{scenario.value}") or 0 for product in HWP_PRODUCTS) > 1 + 1e-9:
+                errors.append(f"Harvested wood products: product shares cannot add up to more than 100% in the {scenario.verbose_name} scenario")
+
+        # Only at creation: if the sources go away later the module stays and reports a no_sources warning instead.
+        activity = data.get("activity")
+        if self.instance is None and activity is not None and not HarvestedWoodProducts.sources_of(activity):
+            errors.append(HWP_NO_SOURCE_ERROR)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate(data)
+
+
+class HarvestedWoodProductsReadSerializer(BaseGenericModuleSerializer):
+    sources = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HarvestedWoodProducts
+        fields = "__all__"
+        ref_name = "HarvestedWoodProducts"
+        mandatory_fields = {}
+
+    def get_sources(self, obj: HarvestedWoodProducts) -> list[dict]:
+        return [{"id": source.pk, "module_type": source.module_type.pk, "class_name": type(source).__name__} for source in obj.sources]
 
 
 class ChangeSerializer(serializers.Serializer):

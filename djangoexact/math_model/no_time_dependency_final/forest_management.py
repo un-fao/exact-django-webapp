@@ -40,6 +40,11 @@ import traceback
 class ForestManagement(BaseModule):
     """Forest management module"""
 
+    # The HWP_* lines already book the harvest as emitted in the year it is cut.
+    HWP_INFLOW_ALREADY_EMITTED = True
+    # The harvested AGB goes to CO2 with 44/12 only (general_functions.breakdown_agb_bgb_emissions).
+    HWP_INFLOW_CARBON_FRACTION = 1.0
+
     ########### VARIABLES FOR W AND WO CASES ############
     is_same_forest_type: bool
     forest_start: Optional[Self] = None
@@ -282,6 +287,9 @@ class ForestManagement(BaseModule):
         self.bgb_matrix = bgb_matrix
 
     def calculate_emissions(self):
+        # Harvested AGB not used for energy, counted once (calculate_rotation books the HWP lines twice).
+        self.hwp_inflow_co2 = np.zeros(self.hectares_for_rot_log_dis.shape[1])
+
         def calculate_rotation():
             try:
                 # NOTE: No emissions for Rotation are generated in the START scenario, new practices are applied. Even though the matrix is not null,
@@ -319,6 +327,7 @@ class ForestManagement(BaseModule):
                         self.ef_methane,
                     )
 
+                    self.hwp_inflow_co2 = self.hwp_inflow_co2 + np.asarray(hwp_rotation_agb)
                     self.result.yearly_emissions_by_sector_by_gas.append(
                         YearlyGasActivityEmissionSet(
                             year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay
@@ -546,6 +555,8 @@ class ForestManagement(BaseModule):
                         self.ef_nitrous,
                         self.ef_methane,
                     )
+
+                    self.hwp_inflow_co2 = self.hwp_inflow_co2 + np.asarray(hwp_logging_agb)
 
                     self.result.yearly_emissions_by_sector_by_gas.append(
                         YearlyGasActivityEmissionSet(

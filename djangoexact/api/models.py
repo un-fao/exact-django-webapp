@@ -18,6 +18,7 @@ import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from math_model.no_time_dependency_final.hwp_decay import PRODUCTS as HWP_PRODUCTS
 from dirtyfields import DirtyFieldsMixin
 from django.utils.text import slugify
 
@@ -1346,6 +1347,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         if isinstance(self, Submodule):
             parent: Module = self.parent
             parent.invalidate_cached_results()
+        elif type(self).__name__ in HarvestedWoodProducts.HWP_SOURCE_CLASSES:
+            # A submodule change or deletion reaches its parent only here, without moving last_modified, which is
+            # what the pool's cache check compares.
+            HarvestedWoodProducts.objects.filter(activity_id=self.activity_id).update(**_MODULE_CACHE_INVALIDATION)
         self.save()
 
     def is_cached_results_valid(self):
@@ -3212,6 +3217,13 @@ class LandUseChange(Module):
 
     organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil", verbose_name="organic_soil")
 
+    # Only land that had trees has wood to harvest before the conversion; for any other start the input is ignored so the
+    # biomass is emitted in full instead of vanishing.
+    WOODY_START_CLASSES = ("ForestManagement", "PerennialCropland")
+
+    def harvests_wood_before_conversion(self) -> bool:
+        return self.module_type_start is not None and self.module_type_start.class_name in self.WOODY_START_CLASSES
+
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
 
@@ -3258,6 +3270,92 @@ class LandUseChange(Module):
             raise Exception("At least one module type is missing")
 
         return module_types
+
+
+class HarvestedWoodProducts(Module):
+    """Harvested wood products (HWP) module: a first-order decay pool fed by the wood the activity's other modules harvest.
+
+    IPCC 2019 Refinement, Vol. 4, ch. 12 (eq. 12.1 and 12.2, Table 12.3 half-lives); the math lives in
+    math_model/no_time_dependency_final/hwp_decay.py and the calculator in api/hwp_calculator.py. The pool collects from
+    every source module of the activity (HWP_SOURCE_CLASSES), so a module only exists when the activity harvests wood
+    for long-lived products; without it every result stays as before. Shares are fractions (0-1) of the harvested
+    carbon going to each product, the rest is oxidised at once. Half-lives are Tier 2 overrides in years (null = IPCC).
+    """
+
+    HWP_SOURCE_CLASSES = ("ForestManagement", "PerennialCropland", "LandUseChange")
+
+    share_sawnwood_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_sawnwood_thread")
+
+    share_panels_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_panels_thread")
+
+    share_paper_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_paper_thread")
+
+    half_life_sawnwood_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_sawnwood_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_sawnwood_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    half_life_panels_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_panels_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_panels_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    half_life_paper_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_paper_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_paper_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    def shares(self, scenario: str) -> dict[str, float]:
+        return {product: getattr(self, f"share_{product}_{scenario}") or 0.0 for product in HWP_PRODUCTS}
+
+    def half_lives_t2(self, scenario: str) -> dict[str, float]:
+        values = {product: getattr(self, f"half_life_{product}_t2_{scenario}") for product in HWP_PRODUCTS}
+        return {product: value for product, value in values.items() if value is not None}
+
+    @classmethod
+    def sources_of(cls, activity: Activity) -> list[Module]:
+        """The activity's modules that can feed the pool. A stock-difference forest has no harvest to feed it."""
+        return [
+            module
+            for module in activity.modules
+            if type(module).__name__ in cls.HWP_SOURCE_CLASSES
+            and not getattr(module, "is_stock_difference", lambda: False)()
+            and (not isinstance(module, LandUseChange) or module.harvests_wood_before_conversion())
+        ]
+
+    @property
+    def sources(self) -> list[Module]:
+        return self.sources_of(self.activity)
+
+    def is_cached_results_valid(self):
+        if not super().is_cached_results_valid():
+            return False
+        sources = self.sources
+        cached = self.cached_results_total
+        cached_sources = {(entry["class_name"], entry["id"]) for entry in cached["hwp"]["sources"]} if isinstance(cached, dict) and "hwp" in cached else None
+        # A source added or deleted since the cache changes the pool without touching any remaining module.
+        if cached_sources != {(type(source).__name__, source.pk) for source in sources}:
+            return False
+        # Only edits count, not whether a source is cached: an edit can clear a source's cache, and the pool never
+        # caches its sources. Every forest, perennial or land use change module counts, sources or not: a land use
+        # change from forest reads the forest module even when that forest uses stock difference and feeds nothing.
+        # Changes that clear a cache without an edit (submodules) reach the pool through invalidate_cached_results.
+        return all(
+            module.last_modified is None or module.last_modified <= self.last_cached_at
+            for module in self.activity.modules
+            if type(module).__name__ in self.HWP_SOURCE_CLASSES
+        )
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        results = super().get_cached_results(by)
+        # Report runs cache emissions without the per-source breakdown the module page reads: recompute those.
+        return results if isinstance(results, dict) and "hwp" in results else None
 
 
 ### MODEL PARAMETERS TABLES ###
