@@ -99,6 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
+from api.services import livestock_manure_n
 from api import reference_cache
 
 from . import utilities as utils
@@ -5829,6 +5830,7 @@ class LivestockCalculator(BaseCalculator):
                 "volatilization_multiplier": self.volatilization_multi.value,
                 "leaching_multiplier": self.LEACHING_MULTI,
                 "delay": self.activity.delay,
+                **livestock_manure_n.math_inputs(self, module, "w"),
             }
 
             log.debug(f"Inputs for WITH: {inputs_w}")
@@ -5906,6 +5908,7 @@ class LivestockCalculator(BaseCalculator):
                 "volatilization_multiplier": self.volatilization_multi.value,
                 "leaching_multiplier": self.LEACHING_MULTI,
                 "delay": self.activity.delay,
+                **livestock_manure_n.math_inputs(self, module, "wo"),
             }
 
             log.debug(f"Inputs for WITHOUT: {inputs_wo}")
