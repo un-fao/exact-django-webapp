@@ -18,6 +18,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from api.services import livestock_manure_n
 from django.utils.text import slugify
 
 from . import labels
@@ -2700,6 +2701,16 @@ class LivestockWriteSerializer(LandModuleSeralizer):
             },
         }
 
+    def validate(self, data):
+        # Before super().validate, which saves the instance.
+        values = self.merge_instance_data(data, instance=self.instance)
+        activity = values.get("activity")
+        country = activity.project.country if activity else None
+        errors = livestock_manure_n.input_errors(values, country.ipcc_region if country else None)
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super().validate(data)
+
 
 class LivestockReadSerializer(BaseGenericModuleSerializer):
     class Meta:
@@ -2707,6 +2718,9 @@ class LivestockReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "Livestock"
         mandatory_fields = LivestockWriteSerializer.Meta.mandatory_fields
+
+    def to_representation(self, instance):
+        return {**super().to_representation(instance), **livestock_manure_n.applicability(instance)}
 
 
 # Aquaculture
