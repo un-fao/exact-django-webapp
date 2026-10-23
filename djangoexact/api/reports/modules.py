@@ -164,6 +164,38 @@ class WaterbodyReport(BaseModuleReport):
 
 
 # ---------------------------------------------------------------------------
+# Harvested wood products
+# ---------------------------------------------------------------------------
+
+@dataclass
+class HarvestedWoodProductsReport(BaseModuleReport):
+    module: api_models.HarvestedWoodProducts
+
+    def __post_init__(self):
+        self.calculator = calculators.HarvestedWoodProductsCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        products = (("sawnwood", "Sawnwood share (%)"), ("panels", "Wood-based panels share (%)"), ("paper", "Paper and paperboard share (%)"))
+        mw = [MetadataWrite(row, 1, label) for row, (_product, label) in enumerate(products, start=1)]
+        for col, scenario in ((2, "start"), (3, "w"), (4, "wo")):
+            shares = m.shares(scenario)
+            mw += [MetadataWrite(row, col, shares[product] * 100) for row, (product, _label) in enumerate(products, start=1)]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Harvested Wood Products",
+            result_rows=[ResultRow("CO2 from HWP pool (CRT 4.G)", self._extract(self.emissions_set, math_utils.ActivityTypes.HWP_POOL, math_utils.GasTypes.CO2))],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
+        )
+
+
+# ---------------------------------------------------------------------------
 # Aquaculture
 # ---------------------------------------------------------------------------
 

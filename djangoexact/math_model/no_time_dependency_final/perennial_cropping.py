@@ -28,6 +28,10 @@ from dataclasses import dataclass
 
 @dataclass(kw_only=True)
 class PerennialCropland(LandModule):
+    # The removed trees are part of the BIOMASS stock loss line.
+    HWP_INFLOW_ALREADY_EMITTED = True
+    # AGB is in tC; dry matter is tC / 0.47, as for the residue biomass in calculate_residue.
+    HWP_INFLOW_CARBON_FRACTION = 0.47
 
     nitrous_constant: float
     methane_constant: float
@@ -46,6 +50,8 @@ class PerennialCropland(LandModule):
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float] = None
     end_module_has_growth: bool
+    # Only a complete renewal sends the removed trees to wood products; change of system and conversion do not (yet).
+    hwp_complete_renewal: bool = False
     
     # NOTE: Add specific AGB and BGB and t2 values
     agb_start_default: float
@@ -161,6 +167,9 @@ class PerennialCropland(LandModule):
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+                        if self.hwp_complete_renewal and self.agb_end < self.agb_start:
+                            self.hwp_inflow_co2, _ = biomass_emissions(self.agb_start, self.agb_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
                     else:
                         # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated

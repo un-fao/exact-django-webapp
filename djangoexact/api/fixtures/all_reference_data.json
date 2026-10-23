@@ -1091,6 +1091,21 @@
     }
   },
   {
+    "model": "api.moduletype",
+    "pk": 64,
+    "fields": {
+      "name": "Harvested Wood Products",
+      "name_en": "Harvested Wood Products",
+      "name_fr": "Produits ligneux récoltés",
+      "name_es": "Productos de madera recolectada",
+      "name_ru": "Заготовленные древесные продукты",
+      "class_name": "HarvestedWoodProducts",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
     "model": "api.foresttype",
     "pk": 1,
     "fields": {

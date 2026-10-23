@@ -133,6 +133,7 @@ router.register(r"disturbance-types", views.public_generic_viewset(models.Distur
 router.register(r"forest-types", views.public_generic_viewset(models.ForestType), basename="foresttypes")
 router.register(r"forest-condition-types", views.public_generic_viewset(models.ForestConditionType), basename="forestconditiontypes")
 router.register(r"forest-disturbances", views.generic_module_viewset(models.ForestDisturbance), basename="forestdisturbance")
+router.register(r"harvested-wood-products", views.generic_module_viewset(models.HarvestedWoodProducts), basename="harvestedwoodproducts")
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")

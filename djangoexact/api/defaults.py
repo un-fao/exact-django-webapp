@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from math_model.no_time_dependency_final.hwp_decay import DEFAULT_HALF_LIVES
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1850,6 +1851,19 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class HarvestedWoodProductsDefaults(Defaults):
+    """IPCC 2019 Refinement Vol. 4 ch. 12 Table 12.3 Tier 1 half-lives (years), the same in every scenario."""
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        self.values = SimpleNamespace(
+            **{f"half_life_{product}_t2_{scenario}_default": value for product, value in DEFAULT_HALF_LIVES.items() for scenario in ("start", "w", "wo")}
+        )
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return self.values
 
 
 @dataclass
