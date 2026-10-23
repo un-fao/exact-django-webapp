@@ -21,8 +21,10 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
+        # Pinned: the fixture also ships a duplicate "Freshwater Pond" whose name starts with a BOM,
+        # with no tier-2 EF rows, which made a random pick fail roughly 1 run in 5.
         self.validated_data = {
-            "waterbody_type": models.WaterbodyType.objects.order_by("?").first().id,
+            "waterbody_type": models.WaterbodyType.objects.get(name="Freshwater Pond").id,
             "area": FuzzyInteger(1, 100).fuzz(),
             "trophic_type_start": models.TrophicType.objects.order_by("?").first().id,
             "trophic_type_w": models.TrophicType.objects.order_by("?").first().id,
@@ -35,11 +37,11 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["waterbody_type"] = models.WaterbodyType.objects.order_by("?").first().id
+        validated_data["waterbody_type"] = models.WaterbodyType.objects.get(name="Brackishwater Pond").id
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
 
@@ -48,7 +50,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
 

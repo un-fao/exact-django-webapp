@@ -48,7 +48,7 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_modify_and_check_cache_invalidation(self):
         self.test_modify()
@@ -66,13 +66,14 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
 
         old_balance = response.data["balance"]
 
+        # yield_* is descriptive metadata (reports only) and never enters the calculation.
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["yield_w"] = 10000
+        validated_data["soc_t2_w"] = 10000
 
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
         # Check that the cache is invalidated
         view = self.module_viewset.as_view({"get": "results"})
@@ -95,7 +96,7 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
@@ -127,4 +128,4 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")

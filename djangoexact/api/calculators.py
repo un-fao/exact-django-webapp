@@ -1580,7 +1580,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                         land_use_type=minor_lut_start,
                     )
                 except FAOSTATNoDataError:
-                    if module.crop_yield_t2_start is None:
+                    if module.minor_yield_start is None:
                         raise Exception(f"No FAOSTAT yield data found for {minor_lut_start} in {self.country.name}. Provide a manual yield (T2) for the start scenario.")
 
             elif self.module.minor_yield_start is not None:
@@ -1625,7 +1625,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                         land_use_type=minor_lut_w,
                     )
                 except FAOSTATNoDataError:
-                    if module.crop_yield_t2_w is None:
+                    if module.minor_yield_w is None:
                         raise Exception(f"No FAOSTAT yield data found for {minor_lut_w} in {self.country.name}. Provide a manual yield (T2) for the w scenario.")
 
             elif self.module.minor_yield_w is not None:
@@ -1652,7 +1652,7 @@ class AnnualCropCalculator(LandModuleCalculator):
 
             if minor_lut_wo is not None:
                 try:
-                    self.minor_fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
+                    self.minor_fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=minor_lut_wo)
                 except ipcc.FiresCombustionFactor.DoesNotExist:
                     raise Exception(f"FiresCombustionFactor for {minor_lut_wo} does not exist")
 
@@ -1670,11 +1670,15 @@ class AnnualCropCalculator(LandModuleCalculator):
                         land_use_type=minor_lut_wo,
                     )
                 except FAOSTATNoDataError:
-                    if module.crop_yield_t2_wo is None:
+                    if module.minor_yield_wo is None:
                         raise Exception(f"No FAOSTAT yield data found for {minor_lut_wo} in {self.country.name}. Provide a manual yield (T2) for the wo scenario.")
 
             elif self.module.minor_yield_wo is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type} is specified but the minor crop is missing for the without scenario")
+
+    def _is_minor_residue_burned(self, scenario: str) -> bool:
+        residue_management = getattr(self.module, f"minor_residue_management_type_{scenario}")
+        return residue_management is not None and residue_management.name_en == "Burned"
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> tuple[MathResult]:
         """
@@ -1724,17 +1728,17 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start.average,
-                "yield_main_tier_2": self.module.crop_yield_t2_w,
-                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
+                "yield_main_tier_2": self.module.crop_yield_t2_start,
+                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4 if self._is_minor_residue_burned("start") else None,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
                 "yield_value_minor": self.minor_yield_default_start.average,
-                "yield_minor_tier_2": self.module.crop_yield_t2_w,
+                "yield_minor_tier_2": self.module.minor_yield_start,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
-                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
+                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o if self._is_minor_residue_burned("start") else None,
                 "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
@@ -1788,17 +1792,17 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start.average,
-                "yield_main_tier_2": self.module.crop_yield_t2_wo,
-                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
+                "yield_main_tier_2": self.module.crop_yield_t2_start,
+                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4 if self._is_minor_residue_burned("start") else None,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
                 "yield_value_minor": self.minor_yield_default_start.average,
-                "yield_minor_tier_2": self.module.crop_yield_t2_wo,
+                "yield_minor_tier_2": self.module.minor_yield_start,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
-                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
+                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o if self._is_minor_residue_burned("start") else None,
                 "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
@@ -1856,16 +1860,16 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_main": self.n_estimation_factor_w.intercept,
                 "yield_value_main": self.crop_yield_w.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_w,
-                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
+                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4 if self._is_minor_residue_burned("w") else None,
                 "combustion_factor_minor": self.minor_fires_w.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_w.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
                 "yield_value_minor": self.minor_yield_default_w.average,
-                "yield_minor_tier_2": self.module.crop_yield_t2_w,
+                "yield_minor_tier_2": self.module.minor_yield_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_w.name_en == "Retained",
-                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
+                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o if self._is_minor_residue_burned("w") else None,
                 "retained_minor": self.module.minor_residue_management_type_w.name_en == "Retained" if self.module.minor_residue_management_type_w else None,
                 "n_content_ag_main": self.n_estimation_factor_w.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_w.rs_t,
@@ -1923,16 +1927,16 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_main": self.n_estimation_factor_wo.intercept,
                 "yield_value_main": self.crop_yield_wo.average,
                 "yield_main_tier_2": self.module.crop_yield_t2_wo,
-                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
+                "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4 if self._is_minor_residue_burned("wo") else None,
                 "combustion_factor_minor": self.minor_fires_wo.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_wo.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
                 "yield_value_minor": self.minor_yield_default_wo.average,
-                "yield_minor_tier_2": self.module.crop_yield_t2_wo,
+                "yield_minor_tier_2": self.module.minor_yield_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_wo.name_en == "Retained",
-                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
+                "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o if self._is_minor_residue_burned("wo") else None,
                 "retained_minor": self.module.minor_residue_management_type_wo.name_en == "Retained" if self.module.minor_residue_management_type_wo else None,
                 "n_content_ag_main": self.n_estimation_factor_wo.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_wo.rs_t,

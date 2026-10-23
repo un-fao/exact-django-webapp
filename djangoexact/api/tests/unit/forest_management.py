@@ -5,7 +5,6 @@ import ipcc.models as ipcc_models
 from rest_framework.test import force_authenticate
 import copy
 from . import base_module
-import time
 import logging
 
 logging.getLogger().setLevel(logging.CRITICAL)
@@ -67,43 +66,37 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
 
-        has_results = False
-        while not has_results:
-            response = self.get_results()
-            if response.status_code == status.HTTP_200_OK:
-                has_results = True
-            else:
-                logging.info("No results found, retrying...")
-                super().setUp()
-                self.validated_data = self.build_validated_data()
-                self.edit_module(self.module, self.user, self.validated_data)
-                self.module.refresh_from_db()
-                time.sleep(1)
+        def results_ok():
+            self.assertEqual(self.get_results().status_code, status.HTTP_200_OK)
+
+        def repick():
+            self.validated_data = self.build_validated_data()
+            self.edit_module(self.module, self.user, self.validated_data)
+            self.module.refresh_from_db()
+
+        self.retry(results_ok, repick, "forest management results in setUp")
 
     def test_modify(self):
-        acceptable = False
-        while not acceptable:
-            try:
-                response = self.edit_module(self.module, self.user, {"land_use_type_start": self.land_use_types.order_by("?").first().id})
+        def modify():
+            response = self.edit_module(self.module, self.user, {"land_use_type_start": self.land_use_types.order_by("?").first().id})
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(self.module_status_name(response), "READY")
+            return response
 
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(response.data["status"]["name"], "READY")
-                acceptable = True
-            except Exception:
-                logging.error("Retrying...")
-                time.sleep(1)
-
-        return response
+        return self.retry(modify, what="forest management test_modify")
 
     def test_modify_and_check_cache_invalidation(self):
-        logging.info("START test_modify_and_check_cache_invalidation")
+        self.module.refresh_from_db()
+        self.assertTrue(self.module.is_cached_results_valid())
 
-        self.test_modify()
+        # test_modify can re-pick the current land use type, which is a no-op edit,
+        # so change a field that always differs.
+        response = self.edit_module(self.module, self.user, {"rotation_length_yrs_w": self.module.rotation_length_yrs_w + 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.module.refresh_from_db()
 
-        self.assertIsNone(self.module.last_cached_at)
-
-        logging.info("END test_modify_and_check_cache_invalidation")
+        # Invalidation works by stamping last_modified past last_cached_at, not by nulling last_cached_at.
+        self.assertFalse(self.module.is_cached_results_valid())
 
     def test_patch_to_not_ready(self):
         validated_data = copy.deepcopy(self.validated_data)
@@ -111,7 +104,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
@@ -134,14 +127,15 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
     def test_select_fra_data_source_and_check_if_results_change(self):
         response = self.get_results()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
 
-        first_balance = response.data["balance"]
+        # FRA replaces the stocks of every scenario alike, so in a standalone module the
+        # with/without balance can stay put while each scenario total moves.
+        first_total_w = response.data["total_w"]
 
         # Change the data source
         edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         if not ipcc_models.FRACarbonStock.objects.filter(country=self.project.country).exists():
@@ -150,8 +144,15 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         response = self.get_results(cached="false")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("balance" in response.data)
-        self.assertNotEqual(first_balance, response.data["balance"])
+        self.assertNotEqual(first_total_w, response.data["total_w"])
+
+    def disable_rotation_w(self):
+        # With a short rotation the stand is cut before it can approach the AGB/BGB cap,
+        # and the with scenario continues the start stand, so neither tier 2 can matter.
+        response = self.edit_module(self.module, self.user, {"rotation_length_yrs_w": None})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.module_status_name(response), "READY")
+        self.module.refresh_from_db()
 
     def test_if_defaults_contain_not_none_agb_max_t2_start_default(self):
         response = self.get_module_defaults(self.module, self.user)
@@ -171,14 +172,15 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertIn("agb_max_t2_wo_default", response.data)
 
     def test_that_agb_and_agb_max_t2_w_changes_balance(self):
-        results = self.get_results()
+        self.disable_rotation_w()
+        results = self.get_results(cached="false")
         self.assertEqual(results.status_code, status.HTTP_200_OK)
         self.assertIn("total_w", results.data)
         initial_balance = results.data["total_w"]
 
         edit_response = self.edit_module(self.module, self.user, {"agb_t2_w": 100, "agb_max_t2_w": 10000})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         results = self.get_results(cached="false")
@@ -189,14 +191,15 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertNotEqual(initial_balance, new_balance)
 
     def test_that_bgb_and_bgb_max_t2_w_changes_balance(self):
-        results = self.get_results()
+        self.disable_rotation_w()
+        results = self.get_results(cached="false")
         self.assertEqual(results.status_code, status.HTTP_200_OK)
         self.assertIn("total_w", results.data)
         initial_balance = results.data["total_w"]
 
         edit_response = self.edit_module(self.module, self.user, {"bgb_t2_w": 100, "bgb_max_t2_w": 10000})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         results = self.get_results(cached="false")
@@ -207,22 +210,20 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertNotEqual(initial_balance, new_balance)
 
     def test_set_fra_data_source_and_check_if_litter_and_deadwood_defaults_change(self):
-        defaults = self.get_module_defaults(self.module, self.user)
-        self.assertEqual(defaults.status_code, status.HTTP_200_OK)
-        self.assertIn("litter_t2_w_default", defaults.data)
-        self.assertIn("deadwood_t2_w_default", defaults.data)
+        fra = ipcc_models.FRACarbonStock.objects.filter(country=self.project.country).first()
+        if fra is None:
+            self.skipTest("FRA carbon stock data not found for this country")
 
         edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         new_defaults = self.get_module_defaults(self.module, self.user)
         self.assertEqual(new_defaults.status_code, status.HTTP_200_OK)
-        self.assertIn("litter_t2_w_default", new_defaults.data)
-        self.assertIn("deadwood_t2_w_default", new_defaults.data)
-        self.assertNotEqual(new_defaults.data["litter_t2_w_default"], defaults.data["litter_t2_w_default"])
-        self.assertNotEqual(new_defaults.data["deadwood_t2_w_default"], defaults.data["deadwood_t2_w_default"])
+        # The IPCC default can coincide with the FRA figure (Kenya: both 0), so assert the source, not a change.
+        self.assertEqual(new_defaults.data["litter_t2_w_default"], fra.litter or 0)
+        self.assertEqual(new_defaults.data["deadwood_t2_w_default"], fra.deadwood or 0)
 
     def test_get_defaults_and_check_it_has_agb_and_bgb_max_t2_start_default(self):
         defaults = self.get_module_defaults(self.module, self.user)
