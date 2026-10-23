@@ -231,3 +231,51 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertIn("bgb_max_t2_start_default", defaults.data)
         self.assertIsNotNone(defaults.data["agb_max_t2_start_default"])
         self.assertIsNotNone(defaults.data["bgb_max_t2_start_default"])
+
+    def test_patch_forest_field_drops_cached_results(self):
+        first = self.get_results()
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.module.refresh_from_db()
+        self.assertTrue(self.module.is_cached_results_valid())
+
+        response = self.edit_module(self.module, self.user, {"rotation_length_yrs_w": 7})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.module.refresh_from_db()
+        self.assertIsNone(self.module.last_cached_at)
+        self.assertIsNone(self.module.cached_results_total)
+
+        second = self.get_results()
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(first.data["balance"], second.data["balance"])
+
+    def test_patch_disturbance_drops_parent_cached_results(self):
+        no_rotation = {f"rotation_length_yrs_{s}": None for s in ("start", "w", "wo")}
+        self.assertEqual(self.edit_module(self.module, self.user, no_rotation).status_code, status.HTTP_200_OK)
+
+        # The math model treats the destruction percentage as a fraction of AGB.
+        created = self.create_submodule(
+            models.ForestDisturbance,
+            self.user,
+            {
+                "parent": str(self.module.pk),
+                "disturbance_type": models.DisturbanceType.objects.first().pk,
+                **{f"recurrence_yrs_{s}": 5 for s in ("start", "w", "wo")},
+                **{f"percentage_biomass_destruction_{s}": 0.1 for s in ("start", "w", "wo")},
+            },
+        )
+        self.assertEqual(created.status_code, status.HTTP_201_CREATED)
+        disturbance = models.ForestDisturbance.objects.get(pk=created.data["id"])
+
+        first = self.get_results()
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.module.refresh_from_db()
+        self.assertTrue(self.module.is_cached_results_valid())
+
+        response = self.edit_module(disturbance, self.user, {"percentage_biomass_destruction_w": 0.5})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.module.refresh_from_db()
+        self.assertIsNone(self.module.last_cached_at)
+
+        second = self.get_results()
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(first.data["balance"], second.data["balance"])
