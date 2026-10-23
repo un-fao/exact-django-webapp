@@ -104,82 +104,19 @@ class GrasslandToForestExampleTestCase(base_module.AnyToAnyLandUseChangeTestCase
         log.info(f"Doubled area: {new_area}, balance: {new_balance}")
 
 
-class AnnualToAquacultureExampleTestCase(base_module.AnyToAnyLandUseChangeTestCase):
+class AnnualToAquacultureExampleTestCase(base_module.APITestCaseMixin):
     """
-    Example 2: Complex scenario with detailed configuration
+    Example 2: a scenario the API must reject
 
-    This shows how to handle scenarios that require extensive module configuration,
-    such as converting cropland to aquaculture systems.
+    Aquaculture is not a land (is_luc) module, so it cannot take a role in a Land Use Change.
     """
 
-    def setUp(self):
-        super().setUp()
-        # Setup an unusual but valid scenario: Annual Cropland → Aquaculture
-        self.setup_scenario(start_module="AnnualCropland", w_module="Aquaculture", wo_module="AnnualCropland")
-
-        self.apply_detailed_configuration()
-
-    def apply_detailed_configuration(self):
-        """Apply detailed configuration to all modules after setup"""
-
-        # Configure annual cropland modules (start & wo scenarios)
-        annual_config = self.get_annual_cropland_config()
-        if self.module_start:
-            self.edit_module(self.module_start, self.user, annual_config)
-        if self.module_wo:
-            self.edit_module(self.module_wo, self.user, annual_config)
-
-        # Configure aquaculture module (w scenario)
-        aqua_config = self.get_aquaculture_config()
-        if self.module_w:
-            self.edit_module(self.module_w, self.user, aqua_config)
-
-    def get_annual_cropland_config(self):
-        """Get comprehensive configuration for annual cropland modules"""
-        land_use_types = models.LandUseType.objects.filter(module_types__class_name="AnnualCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True)
-
-        if not land_use_types.exists():
-            return {}
-
-        return {
-            "land_use_type_start": land_use_types.first().id,
-            "land_use_type_w": land_use_types.first().id,
-            "land_use_type_wo": land_use_types.first().id,
-            "tillage_management_type_start": models.TillageManagementType.objects.first().id,
-            "tillage_management_type_w": models.TillageManagementType.objects.first().id,
-            "tillage_management_type_wo": models.TillageManagementType.objects.first().id,
-            "organic_input_type_start": models.OrganicInputType.objects.first().id,
-            "organic_input_type_w": models.OrganicInputType.objects.first().id,
-            "organic_input_type_wo": models.OrganicInputType.objects.first().id,
-        }
-
-    def get_aquaculture_config(self):
-        """Get comprehensive configuration for aquaculture module"""
-        # Note: Aquaculture might have different configuration requirements
-        # This is a placeholder - actual configuration depends on the Aquaculture model
-        return {
-            # Add aquaculture-specific configuration fields here
-            # Example: "pond_type": models.PondType.objects.first().id,
-            # Example: "fish_species": models.FishSpecies.objects.first().id,
-        }
-
-    def test_land_to_aquaculture_conversion(self):
-        """Test the unique aspects of converting land to aquaculture"""
-        response = self.get_land_use_change_results()
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # Aquaculture conversion typically has unique environmental impacts
-        balance = response.data["balance"]
-        self.assertIsInstance(balance, (int, float))
-
-        log.info(f"Annual Cropland to Aquaculture conversion balance: {balance}")
-
-    def test_aquaculture_module_specifics(self):
-        """Test that the aquaculture module can be calculated independently"""
-        if self.module_w:  # Aquaculture module
-            aqua_response = self.get_module_results(self.module_w)
-            self.assertEqual(aqua_response.status_code, status.HTTP_200_OK)
-            self.assertIn("balance", aqua_response.data)
+    def test_land_to_aquaculture_conversion_is_rejected(self):
+        project = models.Project.objects.get(id=self.create_project().data["id"])
+        annual = models.ModuleType.objects.get(class_name="AnnualCropland")
+        aquaculture = models.ModuleType.objects.get(class_name="Aquaculture")
+        response = self.create_activity(project, self.user, [annual, aquaculture, annual], land_use_change=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 # ==========================================
@@ -346,9 +283,10 @@ class ParameterizedLandUseTestCase(base_module.AnyToAnyLandUseChangeTestCase):
     which is useful for systematic testing with different expected outcomes.
     """
 
-    def setUp(self):
-        super().setUp()
-        # Don't setup scenario here - it will be done in individual tests
+    # Each test sets up its own scenarios, so the inherited single-scenario tests have nothing to run on.
+    test_generic_calculation = None
+    test_land_use_change_calculation = None
+    test_module_edit_invalidates_cache = None
 
     def run_scenario_test(self, scenario_name, start, w, wo, expected_characteristics=None):
         """

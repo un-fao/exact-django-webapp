@@ -44,7 +44,8 @@ class ProjectTestCase(APITestCaseMixin):
 
         create_response = self.create_project()
         project = models.Project.objects.get(id=create_response.data["id"])
-        membership_response = self.create_project_membership(project, self.user2)
+        # The lock is what must stop user2, so user2 needs a role that may otherwise edit.
+        membership_response = self.create_project_membership(project, self.user2, models.Group.objects.get(name="Admin"))
         self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
         modify_response = self.edit_project(project, self.user2, {"name": "New Name"})
         self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -93,7 +94,8 @@ class ProjectTestCase(APITestCaseMixin):
         create_project_response = self.create_project()
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
-        membership_response = self.create_project_membership(project, self.user2)
+        # The lock is what must stop user2, so user2 needs a role that may otherwise edit.
+        membership_response = self.create_project_membership(project, self.user2, models.Group.objects.get(name="Admin"))
         self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
 
         create_activity_response = self.create_activity(project, self.user)
@@ -557,9 +559,6 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
 
-        create_membership_response = self.create_project_membership(project, self.user)
-        self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
-
         create_membership_response = self.create_project_membership(project, self.user2)
         self.assertEqual(create_membership_response.status_code, status.HTTP_201_CREATED)
 
@@ -953,6 +952,21 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertIn("climate", str(activity_response.data).lower() or str(activity_response.data.get("non_field_errors", [])).lower())
 
         log.info("END - test_create_activity_with_module_requires_fields_but_missing_on_project_and_activity")
+
+    def test_create_activity_rejects_moisture_not_valid_for_climate(self):
+        climate = models.Climate.objects.filter(moistures__isnull=False).first()
+        invalid_moisture = models.Moisture.objects.exclude(climates=climate).first()
+        valid_moisture = climate.moistures.first()
+        annual_cropland = models.ModuleType.objects.get(class_name="AnnualCropland")
+        project = models.Project.objects.get(id=self.create_project().data["id"])
+
+        response = self.create_activity(project, self.user, [annual_cropland], extra={"climate_t2": climate.id, "moisture_t2": invalid_moisture.id})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("moisture_t2", response.data)
+        self.assertFalse(models.Activity.objects.filter(project=project).exists())
+
+        response = self.create_activity(project, self.user, [annual_cropland], extra={"climate_t2": climate.id, "moisture_t2": valid_moisture.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_activity_with_module_requires_fields_set_on_activity(self):
         """

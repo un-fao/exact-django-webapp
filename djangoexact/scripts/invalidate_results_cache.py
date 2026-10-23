@@ -30,8 +30,7 @@ def cycle_all_modules_and_invalidate_cached_results():
                     cached_results_by_activity_by_gas=None,
                     last_modified=None,
                 )
-
-            log.debug(f"Invalidated {modules.count():,} modules")
+                log.debug(f"Invalidated {modules.count():,} modules")
         except LookupError:
             log.error(f"Could not find module class for {module_type}")
 

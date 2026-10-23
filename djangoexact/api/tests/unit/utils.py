@@ -10,6 +10,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 import public.views as public_views
 import logging
+import uuid
+import factory.random
+from django.db import connection
+from api.tests.factories import reference_country
+
+
+MAX_ATTEMPTS = 5
 
 
 logging.disable(logging.ERROR)
@@ -24,7 +31,7 @@ class APITestCaseMixin(APITestCase):
         - self.user: A CustomUser instance with the email "testuser@example.com".
         - self.user2: A CustomUser instance with the email "test@user.org".
         - self.group: A Group instance with the name "Second Reviewer".
-        - self.country: A randomly selected Country instance.
+        - self.country: The reference country (see factories.reference_country).
         - self.climate: A randomly selected Climate instance.
         - self.moisture: A randomly selected Moisture instance associated with the selected Climate.
         - self.soil_type: A randomly selected SoilType instance.
@@ -41,11 +48,17 @@ class APITestCaseMixin(APITestCase):
         """
         log.getLogger().setLevel(log.INFO)
         log.debug("Setting up ProjectLockTestCase")
+        # Tests pick reference rows with order_by("?") and factory fuzzers. Seeding both
+        # turns a 1-in-N flake into a reproducible result. SQLite's random() is unseedable.
+        factory.random.reseed_random(0)
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT setseed(0)")
         self.request_factory = APIRequestFactory(enforce_csrf_checks=False)
         self.user = models.CustomUser.objects.get(email="testuser@example.com")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
-        self.country = models.Country.objects.filter(region__isnull=False).order_by("?").first()
+        self.country = reference_country()
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
@@ -53,7 +66,8 @@ class APITestCaseMixin(APITestCase):
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
         self.project_data = {
-            "name": FuzzyText().fuzz(),
+            # Not fuzzed: helpers that call setUp() again re-seed, and a repeated name breaks unique (name, owner).
+            "name": f"Test project {uuid.uuid4().hex}",
             "start_year_of_activities": 2024,
             "implementation_years": 10,
             "last_year_of_accounting": 2040,
@@ -64,6 +78,22 @@ class APITestCaseMixin(APITestCase):
             "gw_potential": self.gw_potential.id,
             "soc_ref_t2": FuzzyInteger(0, 100).fuzz(),
         }
+
+    def module_status_name(self, response):
+        # Module endpoints return status as a StatusType id (since #316), not a nested object.
+        return models.StatusType.objects.get(pk=response.data["status"]).name_en
+
+    def retry(self, attempt, on_failure=None, what="attempt"):
+        # Some tests re-pick random reference rows until one has IPCC defaults. Bounded so
+        # a failure no re-pick can fix fails fast instead of hanging the suite.
+        for _ in range(MAX_ATTEMPTS):
+            try:
+                return attempt()
+            except Exception as exc:
+                last = exc
+                if on_failure:
+                    on_failure()
+        self.fail(f"{what} still failing after {MAX_ATTEMPTS} attempts: {last!r}")
 
     def create_project(self):
         """
@@ -198,7 +228,7 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request)
 
-    def create_activity(self, project, user, module_types=None, land_use_change=False):
+    def create_activity(self, project, user, module_types=None, land_use_change=False, extra=None):
         """
         Create an activity using the ActivityViewSet.
 
@@ -226,6 +256,7 @@ class APITestCaseMixin(APITestCase):
             activity_builder_data["module_types"] = [module_type.id for module_type in module_types]
         else:
             activity_builder_data["module_types"] = [self.module_type.id]
+        activity_builder_data.update(extra or {})
 
         view = ActivityViewSet.as_view({"post": "build"})
         request = self.request_factory.post(
