@@ -3316,7 +3316,7 @@ class SmallFisheryCalculator(BaseCalculator):
         super().get_defaults(calculate)
 
         try:
-            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__icontains="Off-Road").all()
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name_en="Off-Road").all()  # exact: the off-road sector use types must not join this average
             if not self.energy_ef_default:
                 raise ipcc.EnergyDefaultEmissionFactor.DoesNotExist
 
@@ -3517,7 +3517,7 @@ class LargeFisheryCalculator(BaseCalculator):
         super().get_defaults(calculate)
 
         try:
-            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road").all()
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name_en="Off-Road").all()  # exact: the off-road sector use types must not join this average
             if not self.energy_ef_default:
                 raise ipcc.EnergyDefaultEmissionFactor.DoesNotExist
 

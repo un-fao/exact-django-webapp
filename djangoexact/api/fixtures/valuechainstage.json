@@ -1,0 +1,101 @@
+[
+  {
+    "model": "api.valuechainstage",
+    "pk": 5,
+    "fields": {
+      "name": "Downstream",
+      "name_en": "Downstream",
+      "name_fr": "Aval",
+      "name_es": "Aguas abajo",
+      "name_ru": "Конечное звено"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 2,
+    "fields": {
+      "name": "Fertilizers manufacturing",
+      "name_en": "Fertilizers manufacturing",
+      "name_fr": "Fabrication d'engrais",
+      "name_es": "Fabricación de fertilizantes",
+      "name_ru": "Производство удобрений"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 7,
+    "fields": {
+      "name": "Food packaging",
+      "name_en": "Food packaging",
+      "name_fr": "Emballage alimentaire",
+      "name_es": "Envasado de alimentos",
+      "name_ru": "Упаковка пищевых продуктов"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 6,
+    "fields": {
+      "name": "Food processing",
+      "name_en": "Food processing",
+      "name_fr": "Transformation alimentaire",
+      "name_es": "Procesamiento de alimentos",
+      "name_ru": "Переработка пищевых продуктов"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 8,
+    "fields": {
+      "name": "Food retail",
+      "name_en": "Food retail",
+      "name_fr": "Commerce de détail alimentaire",
+      "name_es": "Venta minorista de alimentos",
+      "name_ru": "Розничная торговля продуктами питания"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 9,
+    "fields": {
+      "name": "Household consumption",
+      "name_en": "Household consumption",
+      "name_fr": "Consommation des ménages",
+      "name_es": "Consumo de los hogares",
+      "name_ru": "Потребление домохозяйств"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 4,
+    "fields": {
+      "name": "On-farm",
+      "name_en": "On-farm",
+      "name_fr": "Sur l'exploitation",
+      "name_es": "En la explotación",
+      "name_ru": "На ферме"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 3,
+    "fields": {
+      "name": "Pesticides manufacturing",
+      "name_en": "Pesticides manufacturing",
+      "name_fr": "Fabrication de pesticides",
+      "name_es": "Fabricación de plaguicidas",
+      "name_ru": "Производство пестицидов"
+    }
+  },
+  {
+    "model": "api.valuechainstage",
+    "pk": 1,
+    "fields": {
+      "name": "Upstream",
+      "name_en": "Upstream",
+      "name_fr": "Amont",
+      "name_es": "Aguas arriba",
+      "name_ru": "Начальное звено"
+    }
+  }
+]
