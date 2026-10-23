@@ -484,6 +484,7 @@ class CalculatorFactory:
         """
         try:
             calculator: BaseCalculator = self.get_calculator(input)(input)
+            self.calculator = calculator
             result: tuple[MathResult] = calculator.calculate()
             result_obj = Result(*result)
 
@@ -8357,3 +8358,7 @@ class TransportEntryCalculator(BaseValueChainCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+# Kept in api/services to keep this file from growing; imported here so CalculatorFactory finds it by name.
+from api.services.solid_waste import SolidWasteCalculator  # noqa: E402,F401

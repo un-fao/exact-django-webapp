@@ -35,6 +35,10 @@
             {% include "reports/partials/fr/activity_breakdown.html" %}
             <div class="page-break"></div>
             {% include "reports/partials/fr/units_table.html" %}
+            {% if indicators %}
+                <div class="page-break"></div>
+                {% include "reports/partials/common/indicators.html" %}
+            {% endif %}
             <div class="page-break"></div>
             {% include "reports/partials/fr/methodology.html" %}
             <div class="page-break"></div>

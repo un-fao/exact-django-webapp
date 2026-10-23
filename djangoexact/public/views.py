@@ -2,6 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
 import api.models as api_models
 import api.serializers as api_serializers
+import api.views as api_views
 import public.serializers as public_serializers
 import logging as log
 from drf_yasg.utils import swagger_auto_schema
@@ -118,6 +119,12 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(manual_parameters=[api_views._INDICATORS_LANG_PARAM], responses={404: "Project not found"})
+    def indicators(self, request, pk=None):
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
+        return api_views.indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
@@ -448,7 +455,8 @@ def generic_public_module_viewset(model: api_models.Module):
 
                 if module_results is None or not use_cached_results:
                     log.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = calculators.CalculatorFactory().calculate_result(module)
+                    factory = calculators.CalculatorFactory()
+                    total, by_activity, by_gas, by_activity_gas, inventory = factory.calculate_result(module)
 
                     results_total = api_serializers.DynamicResultFactory.create(activity, total, aggregate_by=api_serializers.BreakdownTypes.TOTAL).data
                     results_by_activity = api_serializers.DynamicResultFactory.create(activity, by_activity, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY).data
@@ -459,6 +467,8 @@ def generic_public_module_viewset(model: api_models.Module):
                     results_by_activity["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY)
                     results_by_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.GAS)
                     results_by_activity_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY_GAS)
+                    for results in (results_total, results_by_activity, results_by_gas, results_by_activity_gas):
+                        results.update(getattr(factory.calculator, "results_extra", {}))
 
                     module_results = (
                         results_total

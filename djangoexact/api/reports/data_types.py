@@ -100,6 +100,7 @@ class ActivityResult:
     # Used by BaseProjectReport._build_aggregated_from_module_emissions()
     # and html_context._gas_totals(). Not used by renderers.
     _module_reports: list = field(default_factory=list, repr=False)
+    _activity: Any = field(default=None, repr=False)
 
 
 @dataclass
@@ -217,3 +218,6 @@ class ProjectResult:
     extra_shadow_prices: list[Any]     # Extrapolated SPC instances
 
     inventory_items: list[InventoryItem]
+
+    # api.services.indicators.build() output, or None when it could not be computed.
+    indicators: dict | None = None

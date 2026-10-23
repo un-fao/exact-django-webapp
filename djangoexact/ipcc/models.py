@@ -1705,3 +1705,77 @@ class FRACarbonStock(Model):
     litter = FloatField(null=True, blank=True)
     carbon_stock_biomass_total = FloatField(null=True, blank=True)
     carbon_stock_total = FloatField(null=True, blank=True)
+
+
+class WasteComponent(Model):
+    """Default parameters of one MSW component, as fractions.
+
+    - dry_matter, doc (DOC in wet waste), carbon (total carbon in dry matter), fossil_carbon (fossil share of total
+      carbon): 2006 IPCC Guidelines, Vol. 5, ch. 2, Table 2.4 (not changed by the 2019 Refinement). Rubber and leather
+      keep the DOC of Table 2.4, footnote 5 rules out its decay in SWDS (k = 0); 40% of textiles are synthetic (note 3).
+    - k_*: methane generation rate (1/yr) by climate zone, Vol. 5, ch. 3, Table 3.3 (unchanged in the 2019 Refinement).
+      Table 3.3 groups paper with textiles, so nappies take the paper/textiles rates. Inert components have k = 0.
+    """
+
+    class Meta:
+        verbose_name = "Waste Component"
+        verbose_name_plural = "Waste Components"
+
+    code = CharField(max_length=32, unique=True)
+    name = CharField(max_length=100)
+    dry_matter = FloatField()
+    doc = FloatField()
+    carbon = FloatField()
+    fossil_carbon = FloatField()
+    k_boreal_temperate_dry = FloatField()
+    k_boreal_temperate_wet = FloatField()
+    k_tropical_dry = FloatField()
+    k_tropical_wet = FloatField()
+
+    def __str__(self):
+        return self.name
+
+
+class SolidWasteDisposalSiteType(Model):
+    """SWDS type: methane correction factor, 2019 Refinement, Vol. 5, ch. 3, Table 3.1 (Updated), and oxidation factor,
+    2006 IPCC Guidelines, Vol. 5, ch. 3, Table 3.2 (0.1 for managed sites, taken as covered with CH4 oxidising material).
+
+    Open dumping is not a Table 3.1 row: it takes the uncategorised SWDS MCF (0.6) because a dump's depth is unknown.
+    """
+
+    class Meta:
+        verbose_name = "Solid Waste Disposal Site Type"
+        verbose_name_plural = "Solid Waste Disposal Site Types"
+
+    code = CharField(max_length=40, unique=True)
+    name = CharField(max_length=100)
+    mcf = FloatField()
+    ox = FloatField()
+
+    def __str__(self):
+        return self.name
+
+
+class WasteTreatmentEmissionFactor(Model):
+    """Tier 1 factors per treatment, 2006 IPCC Guidelines, Vol. 5, with the 2019 Refinement where updated.
+
+    - composting, anaerobic_digestion: ch. 4, Table 4.1, g gas per kg wet waste (AD N2O assumed negligible, its CH4 EF
+      already accounts for recovery).
+    - incineration: CH4 ch. 5, Table 5.3, continuous stoker, 0.2 kg/Gg = g per t wet waste; N2O Table 5.6, continuous
+      and semi-continuous incinerators, g per t wet waste; oxidation factor Table 5.2.
+    - open_burning: CH4 ch. 5, section 5.4.2, g per t wet waste; N2O Table 5.6, g per t dry matter; oxidation factor
+      2019 Refinement, Vol. 5, ch. 5, Table 5.2 (Updated), 71% (was 58%).
+    """
+
+    class Meta:
+        verbose_name = "Waste Treatment Emission Factor"
+        verbose_name_plural = "Waste Treatment Emission Factors"
+
+    code = CharField(max_length=40, unique=True)
+    name = CharField(max_length=100)
+    ch4 = FloatField()
+    n2o = FloatField()
+    oxidation_factor = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
