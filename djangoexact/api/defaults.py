@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services.solid_waste import module_defaults
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1850,6 +1851,17 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class SolidWasteDefaults(Defaults):
+    """Tier 1 treatment factors and crop sources (yield, production); needed before the module is ready."""
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        self.values = SimpleNamespace(**module_defaults(input))
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return self.values
 
 
 @dataclass

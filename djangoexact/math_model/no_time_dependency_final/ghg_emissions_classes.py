@@ -81,6 +81,11 @@ class ActivityTypes(Enum):
     TRANSPORT = "Transport"
     STORAGE = "Storage"
     PROCESSING = "Processing"
+    SOLID_WASTE_DISPOSAL = "Solid Waste Disposal"
+    COMPOSTING = "Composting"
+    ANAEROBIC_DIGESTION = "Anaerobic Digestion"
+    WASTE_INCINERATION = "Waste Incineration"
+    WASTE_OPEN_BURNING = "Open Burning of Waste"
 
 
 class Emission:
