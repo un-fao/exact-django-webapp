@@ -8,7 +8,7 @@ from django.db.models import Count, Model
 from django.db.models.query import QuerySet
 from django.forms.models import model_to_dict
 from django.utils import timezone
-from ipcc.models import GlobalWarmingPotential
+from ipcc.models import GlobalWarmingPotential, WastewaterTreatmentSystem
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -23,6 +23,7 @@ from django.utils.text import slugify
 from . import labels
 from .models import guided_step_format
 from .models import (
+    FoodProcessingWastewater,
     Module,
     Submodule,
     Activity,
@@ -3530,6 +3531,54 @@ class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "ForestDisturbance"
         mandatory_fields = ForestDisturbanceWriteSerializer.Meta.mandatory_fields
+
+
+# Food processing wastewater
+
+FOOD_WASTEWATER_SCENARIOS = (utils.ScenarioTypes.START, utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT)
+
+
+class FoodProcessingWastewaterWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = FoodProcessingWastewater
+        fields = "__all__"
+        ref_name = "FoodProcessingWastewater"
+        mandatory_fields = {
+            scenario.verbose_name: {"mandatory": [f"industry_type_{scenario.value}", f"production_{scenario.value}", f"treatment_mix_{scenario.value}"]}
+            for scenario in FOOD_WASTEWATER_SCENARIOS
+        }
+
+    def validate(self, data):
+        codes = set(WastewaterTreatmentSystem.objects.values_list("code", flat=True))
+        errors = []
+        for scenario in FOOD_WASTEWATER_SCENARIOS:
+            key = f"treatment_mix_{scenario.value}"
+            if key not in data:
+                continue
+            # An empty mix is "not filled in yet", so the module stays EMPTY instead of failing the sum check.
+            mix = data[key] or None
+            data[key] = mix
+            if mix is None:
+                continue
+            if not isinstance(mix, dict) or not set(mix) <= codes:
+                errors.append(f"Food processing wastewater: unknown treatment system in the {scenario.verbose_name} scenario")
+                continue
+            shares = list(mix.values())
+            if any(not isinstance(share, (int, float)) or isinstance(share, bool) or not 0 <= share <= 1 for share in shares):
+                errors.append(f"Food processing wastewater: treatment shares must be between 0 and 100% in the {scenario.verbose_name} scenario")
+            elif abs(sum(shares) - 1) > 1e-6:
+                errors.append(f"Food processing wastewater: treatment shares must add up to 100% in the {scenario.verbose_name} scenario")
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super().validate(data)
+
+
+class FoodProcessingWastewaterReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = FoodProcessingWastewater
+        fields = "__all__"
+        ref_name = "FoodProcessingWastewater"
+        mandatory_fields = FoodProcessingWastewaterWriteSerializer.Meta.mandatory_fields
 
 
 class ChangeSerializer(serializers.Serializer):

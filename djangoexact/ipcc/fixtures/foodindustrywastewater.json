@@ -1,0 +1,233 @@
+[
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 1,
+    "fields": {
+      "code": "alcohol_refining",
+      "name": "Alcohol refining",
+      "name_en": "Alcohol refining",
+      "name_fr": "Raffinage de l'alcool",
+      "name_es": "Refinación de alcohol",
+      "name_ru": "Производство спирта",
+      "wastewater": 24,
+      "wastewater_min": 16,
+      "wastewater_max": 32,
+      "cod": 11,
+      "cod_min": 5,
+      "cod_max": 22,
+      "total_n": 2.4,
+      "total_n_min": 0.94,
+      "total_n_max": 3.86
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 2,
+    "fields": {
+      "code": "beer_malt",
+      "name": "Beer and malt",
+      "name_en": "Beer and malt",
+      "name_fr": "Bière et malt",
+      "name_es": "Cerveza y malta",
+      "name_ru": "Пиво и солод",
+      "wastewater": 6.3,
+      "wastewater_min": 5,
+      "wastewater_max": 9,
+      "cod": 2.9,
+      "cod_min": 2,
+      "cod_max": 7,
+      "total_n": 0.055,
+      "total_n_min": 0.02,
+      "total_n_max": 0.08
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 3,
+    "fields": {
+      "code": "coffee",
+      "name": "Coffee",
+      "name_en": "Coffee",
+      "name_fr": "Café",
+      "name_es": "Café",
+      "name_ru": "Кофе",
+      "wastewater": null,
+      "wastewater_min": null,
+      "wastewater_max": null,
+      "cod": 9,
+      "cod_min": 3,
+      "cod_max": 15,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 4,
+    "fields": {
+      "code": "dairy",
+      "name": "Dairy products",
+      "name_en": "Dairy products",
+      "name_fr": "Produits laitiers",
+      "name_es": "Productos lácteos",
+      "name_ru": "Молочные продукты",
+      "wastewater": 7,
+      "wastewater_min": 3,
+      "wastewater_max": 10,
+      "cod": 2.7,
+      "cod_min": 1.5,
+      "cod_max": 5.2,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 5,
+    "fields": {
+      "code": "fish_processing",
+      "name": "Fish processing",
+      "name_en": "Fish processing",
+      "name_fr": "Transformation du poisson",
+      "name_es": "Procesamiento de pescado",
+      "name_ru": "Переработка рыбы",
+      "wastewater": 5,
+      "wastewater_min": 2,
+      "wastewater_max": 8,
+      "cod": 2.5,
+      "cod_min": null,
+      "cod_max": null,
+      "total_n": 0.6,
+      "total_n_min": 0.21,
+      "total_n_max": 0.98
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 6,
+    "fields": {
+      "code": "meat_poultry",
+      "name": "Meat and poultry",
+      "name_en": "Meat and poultry",
+      "name_fr": "Viande et volaille",
+      "name_es": "Carne y aves",
+      "name_ru": "Мясо и птица",
+      "wastewater": 13,
+      "wastewater_min": 8,
+      "wastewater_max": 18,
+      "cod": 4.1,
+      "cod_min": 2,
+      "cod_max": 7,
+      "total_n": 0.19,
+      "total_n_min": 0.17,
+      "total_n_max": 0.2
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 7,
+    "fields": {
+      "code": "starch",
+      "name": "Starch production",
+      "name_en": "Starch production",
+      "name_fr": "Production d'amidon",
+      "name_es": "Producción de almidón",
+      "name_ru": "Производство крахмала",
+      "wastewater": 9,
+      "wastewater_min": 4,
+      "wastewater_max": 18,
+      "cod": 10,
+      "cod_min": 1.5,
+      "cod_max": 42,
+      "total_n": 0.9,
+      "total_n_min": 0.8,
+      "total_n_max": 1.1
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 8,
+    "fields": {
+      "code": "sugar_refining",
+      "name": "Sugar refining",
+      "name_en": "Sugar refining",
+      "name_fr": "Raffinage du sucre",
+      "name_es": "Refinación de azúcar",
+      "name_ru": "Рафинирование сахара",
+      "wastewater": null,
+      "wastewater_min": 4,
+      "wastewater_max": 18,
+      "cod": 3.2,
+      "cod_min": 1,
+      "cod_max": 6,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 9,
+    "fields": {
+      "code": "vegetable_oils",
+      "name": "Vegetable oils",
+      "name_en": "Vegetable oils",
+      "name_fr": "Huiles végétales",
+      "name_es": "Aceites vegetales",
+      "name_ru": "Растительные масла",
+      "wastewater": 3.1,
+      "wastewater_min": 1,
+      "wastewater_max": 5,
+      "cod": null,
+      "cod_min": 0.5,
+      "cod_max": 1.2,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 10,
+    "fields": {
+      "code": "fruits_vegetables",
+      "name": "Vegetables, fruits and juices",
+      "name_en": "Vegetables, fruits and juices",
+      "name_fr": "Légumes, fruits et jus",
+      "name_es": "Verduras, frutas y jugos",
+      "name_ru": "Овощи, фрукты и соки",
+      "wastewater": 20,
+      "wastewater_min": 7,
+      "wastewater_max": 35,
+      "cod": 5.0,
+      "cod_min": 2,
+      "cod_max": 10,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  },
+  {
+    "model": "ipcc.foodindustrywastewater",
+    "pk": 11,
+    "fields": {
+      "code": "wine_vinegar",
+      "name": "Wine and vinegar",
+      "name_en": "Wine and vinegar",
+      "name_fr": "Vin et vinaigre",
+      "name_es": "Vino y vinagre",
+      "name_ru": "Вино и уксус",
+      "wastewater": 23,
+      "wastewater_min": 11,
+      "wastewater_max": 46,
+      "cod": 1.5,
+      "cod_min": 0.7,
+      "cod_max": 3.0,
+      "total_n": null,
+      "total_n_min": null,
+      "total_n_max": null
+    }
+  }
+]

@@ -1832,6 +1832,26 @@ class ForestManagementDefaults(Defaults):
         ])
 
 
+class FoodProcessingWastewaterDefaults(Defaults):
+    """IPCC defaults of each scenario's industry (Table 6.9 / 6.12), shown as soon as an industry is picked."""
+
+    FIELDS = (("wastewater", "wastewater"), ("cod", "cod"), ("tn", "total_n"))
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        values = SimpleNamespace()
+        sources = []
+        for scenario in ("start", "w", "wo"):
+            industry = getattr(input, f"industry_type_{scenario}")
+            for name, column in self.FIELDS:
+                setattr(values, f"{name}_t2_{scenario}_default", getattr(industry, column) if industry else None)
+                sources.append(((f"{name}_t2_{scenario}_default",), industry, column))
+        self.values = _with_ranges(values, sources)
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return self.values
+
+
 class ForestDisturbanceDefaults(Defaults):
     start_year_t2_start_default = 0
     start_year_t2_w_default = 0

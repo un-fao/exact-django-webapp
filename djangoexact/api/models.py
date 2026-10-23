@@ -3260,6 +3260,51 @@ class LandUseChange(Module):
         return module_types
 
 
+class FoodProcessingWastewater(Module):
+    """CH4 and N2O from the wastewater of a food-processing plant (CRT 5.D.2, industrial wastewater).
+
+    Math in math_model/no_time_dependency_final/food_wastewater.py, calculator in api/food_wastewater_calculator.py.
+    Per scenario: the industry (IPCC defaults for W, COD and TN), production, the treatment mix and the optional sludge
+    removal and CH4 recovery. treatment_mix_<scenario> maps ipcc.WastewaterTreatmentSystem codes to fractions (0-1)
+    that add up to 1. The *_t2_* fields override the industry defaults.
+    """
+
+    industry_type_start = models.ForeignKey(ipcc.FoodIndustryWastewater, on_delete=models.PROTECT, null=True, blank=True, related_name="%(class)s_industry_start")
+    industry_type_w = models.ForeignKey(ipcc.FoodIndustryWastewater, on_delete=models.PROTECT, null=True, blank=True, related_name="%(class)s_industry_w")
+    industry_type_wo = models.ForeignKey(ipcc.FoodIndustryWastewater, on_delete=models.PROTECT, null=True, blank=True, related_name="%(class)s_industry_wo")
+    industry_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_industry_type_thread")
+
+    production_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    production_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    production_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    production_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_production_thread")
+
+    treatment_mix_start = models.JSONField(null=True, blank=True)
+    treatment_mix_w = models.JSONField(null=True, blank=True)
+    treatment_mix_wo = models.JSONField(null=True, blank=True)
+    treatment_mix_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_treatment_mix_thread")
+
+    sludge_removed_start = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+    sludge_removed_w = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+    sludge_removed_wo = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+
+    ch4_recovered_start = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+    ch4_recovered_w = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+    ch4_recovered_wo = models.FloatField(default=0, validators=[validators.MinValueValidator(0)])
+
+    wastewater_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    wastewater_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    wastewater_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    cod_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    cod_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    cod_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    tn_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    tn_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    tn_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+
 ### MODEL PARAMETERS TABLES ###
 
 
