@@ -340,5 +340,239 @@
         59
       ]
     }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 50,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 4,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 51,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 4,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 52,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 53,
+    "fields": {
+      "name": "Gasoline (4-stroke)",
+      "name_en": "Gasoline (4-stroke)",
+      "name_fr": "Essence (4 temps)",
+      "name_es": "Gasolina (4-tiempos)",
+      "name_ru": "Бензин (4-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 166,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 54,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 5,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 55,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 56,
+    "fields": {
+      "name": "Gasoline (4-stroke)",
+      "name_en": "Gasoline (4-stroke)",
+      "name_fr": "Essence (4 temps)",
+      "name_es": "Gasolina (4-tiempos)",
+      "name_ru": "Бензин (4-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 166,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 57,
+    "fields": {
+      "name": "Gasoline (2-stroke)",
+      "name_en": "Gasoline (2-stroke)",
+      "name_fr": "Essence (2 temps)",
+      "name_es": "Gasolina (2-tiempos)",
+      "name_ru": "Бензин (2-тактный)",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 6,
+      "macro_fuel_type": null,
+      "unit": 167,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 58,
+    "fields": {
+      "name": "Diesel",
+      "name_en": "Diesel",
+      "name_fr": "Diesel",
+      "name_es": "Diesel",
+      "name_ru": "Дизель",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 7,
+      "macro_fuel_type": null,
+      "unit": 165,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 59,
+    "fields": {
+      "name": "Gasoil/Diesel Oil",
+      "name_en": "Gasoil/Diesel Oil",
+      "name_fr": "Gasoil / huile diesel",
+      "name_es": "Gasóleo/Diésel",
+      "name_ru": "Газойль/дизельное топливо",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 8,
+      "macro_fuel_type": null,
+      "unit": 156,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 60,
+    "fields": {
+      "name": "Residual Fuel Oil",
+      "name_en": "Residual Fuel Oil",
+      "name_fr": "Fioul résiduel",
+      "name_es": "Fuelóleo residual",
+      "name_ru": "Остаточное жидкое топливо",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 8,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 61,
+    "fields": {
+      "name": "Aviation Gasoline",
+      "name_en": "Aviation Gasoline",
+      "name_fr": "Essence aviation",
+      "name_es": "Gasolina de aviación",
+      "name_ru": "Авиационный бензин",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 9,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
+      ]
+    }
+  },
+  {
+    "model": "api.fueltype",
+    "pk": 62,
+    "fields": {
+      "name": "Jet Kerosene",
+      "name_en": "Jet Kerosene",
+      "name_fr": "Kérosène carburéacteur",
+      "name_es": "Queroseno para motores a reacción",
+      "name_ru": "Керосин для реактивных двигателей",
+      "parent_fuel_type": 1,
+      "fuel_use_type": 9,
+      "macro_fuel_type": null,
+      "unit": 168,
+      "module_types": [
+        60
+      ]
+    }
   }
 ]
