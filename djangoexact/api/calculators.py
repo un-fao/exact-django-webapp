@@ -63,6 +63,7 @@ from math_model.no_time_dependency_final.flooded_rice import (
 from math_model.no_time_dependency_final.forest_management import (
     ForestManagement as MathForestManagement,
 )
+from api.services.forest_stock_difference import calculate_stock_difference
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from math_model.no_time_dependency_final.ghg_emissions_classes import (
     Result as MathResult,
@@ -7109,9 +7110,9 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         if calculate:
             self.calculate()
-            self.bgb_max_start = self.math_start.max_bgb_value if self.math_start else 0
-            self.bgb_max_w = self.math_w.max_bgb_value if self.math_w else 0
-            self.bgb_max_wo = self.math_wo.max_bgb_value if self.math_wo else 0
+            self.bgb_max_start = getattr(self.math_start, "max_bgb_value", 0)
+            self.bgb_max_w = getattr(self.math_w, "max_bgb_value", 0)
+            self.bgb_max_wo = getattr(self.math_wo, "max_bgb_value", 0)
 
         land_use_type = self.module.land_use_type_start
 
@@ -7337,6 +7338,9 @@ class ForestManagementCalculator(LandModuleCalculator):
 
     def calculate(self) -> Result:
         super().calculate(self)
+
+        if self.forest.is_stock_difference():
+            return calculate_stock_difference(self)
 
         self.get_defaults()
 
