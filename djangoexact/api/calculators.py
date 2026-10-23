@@ -99,6 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
+from api.services.organic_soil_peat import apply_water_table_class, peat_offsite_inputs
 from api import reference_cache
 
 from . import utilities as utils
@@ -6588,10 +6589,12 @@ class OrganicSoilCalculator(BaseCalculator):
             module_type_start = luc.module_type_start.name
             module_type_w = luc.module_type_w.name
             module_type_wo = luc.module_type_wo.name
+            module_types = (luc.module_type_start, luc.module_type_w, luc.module_type_wo)
             self.area_affected_by_module = luc.area
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
+            module_types = (parent_module_type,) * 3
 
             self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
 
@@ -6796,6 +6799,10 @@ class OrganicSoilCalculator(BaseCalculator):
         except ipcc.PeatExtractionConversionFactor.DoesNotExist:
             raise ValueError(f"Could not find Peat Extraction Conversion Factor WO for {module.peat_type}, {self.climate}, {self.moisture}")
 
+        water_table_classes = (module.water_table_class_start, module.water_table_class_w, module.water_table_class_wo)
+        for ef, water_table_class, module_type in zip((self.ef_onsite_start, self.ef_onsite_w, self.ef_onsite_wo), water_table_classes, module_types):
+            apply_water_table_class(ef, water_table_class, module_type, self.climate, module.peat_type)
+
     def calculate(self) -> Result:
         super().calculate(self.module)
 
@@ -6907,6 +6914,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
+                **peat_offsite_inputs(input, "w", self.conversion_factor_w),
             }
 
             self.peat_extraction_math_w = MathPeatExtraction(**self.peat_extraction_inputs_w)
@@ -7005,6 +7013,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
+                **peat_offsite_inputs(input, "wo", self.conversion_factor_wo),
             }
 
             self.peat_extraction_math_wo = MathPeatExtraction(**self.peat_extraction_inputs_wo)
