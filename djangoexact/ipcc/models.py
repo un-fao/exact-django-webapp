@@ -614,6 +614,27 @@ class OtherConstructedWaterbodiesEmissionFactor(Model):
     value_max = FloatField(null=True, blank=True)
 
 
+class ReservoirEmissionFactor(Model):
+    """Reservoir (flooded land) emission factors, 2019 Refinement to the 2006 IPCC Guidelines, Vol. 4, Ch. 7.
+
+    - ch4_age_le_20: kg CH4/ha/yr, reservoirs <= 20 years old (Land Converted to Flooded Land), Table 7.15.
+    - ch4_age_gt_20: kg CH4/ha/yr, reservoirs > 20 years old (Flooded Land Remaining Flooded Land), Table 7.9.
+    - co2_c_age_le_20: t CO2-C/ha/yr, reservoirs <= 20 years old, Table 7.13. No CO2 after 20 years (section 7.3.1.1).
+
+    Keyed on EX-ACT climate and moisture; the six IPCC aggregated zones map as in Table 7.14.
+    """
+
+    class Meta:
+        verbose_name = "Reservoir Emission Factor"
+        verbose_name_plural = "Reservoir Emission Factors"
+
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    ch4_age_le_20 = FloatField()
+    ch4_age_gt_20 = FloatField()
+    co2_c_age_le_20 = FloatField()
+
+
 class Atwood(Model):
     class Meta:
         verbose_name = "Atwood"
@@ -1366,7 +1387,7 @@ class RiceYield(Model):
 
 class TrophicStateFactor(Model):
     """
-    IPCC:3222
+    IPCC:3222. IPCC 2019 Refinement Vol. 4 Ch. 7 Table 7.11, recommended alpha per trophic class.
     """
 
     class Meta:

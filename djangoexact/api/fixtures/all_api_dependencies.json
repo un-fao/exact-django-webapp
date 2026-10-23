@@ -482,6 +482,24 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 312,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        67
+      ],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 73,
     "fields": {
       "name": "﻿Long-Term Cultivated",
@@ -2525,6 +2543,21 @@
   },
   {
     "model": "api.moduletype",
+    "pk": 67,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "class_name": "FloodedLand",
+      "is_luc": true,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
     "pk": 19,
     "fields": {
       "name": "Waterbody",
@@ -3952,17 +3985,6 @@
       "name_en": "Nutrient Poor",
       "name_fr": null,
       "name_es": "Pobre en Nutrientes",
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.waterbodytype",
-    "pk": 5,
-    "fields": {
-      "name": "﻿Freshwater Pond",
-      "name_en": "﻿Freshwater Pond",
-      "name_fr": null,
-      "name_es": null,
       "name_ru": null
     }
   },

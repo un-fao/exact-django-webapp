@@ -99,6 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
+from api.services import flooded_land, reservoirs
 from api import reference_cache
 
 from . import utilities as utils
@@ -6408,12 +6409,15 @@ class WaterbodyCalculator(BaseCalculator):
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        try:
-            self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=self.climate, moisture=self.moisture, waterbody_type=self.module.waterbody_type)
-        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
-            missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_ef_t2")
-            if missing_scenarios:
-                raise ValueError(f"Methane Emission Factor for {self.module.waterbody_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+        if self.module.is_reservoir():
+            self.reservoir_ef = reservoirs.reservoir_emission_factor(self.climate, self.moisture)
+        else:
+            try:
+                self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=self.climate, moisture=self.moisture, waterbody_type=self.module.waterbody_type)
+            except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
+                missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_ef_t2")
+                if missing_scenarios:
+                    raise ValueError(f"Methane Emission Factor for {self.module.waterbody_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         if self.module.is_start():
             try:
@@ -6446,6 +6450,9 @@ class WaterbodyCalculator(BaseCalculator):
         project: Project = activity.project
 
         self.get_defaults()
+
+        if module.is_reservoir():
+            return reservoirs.calculate(self)
 
         # Inputs for the starting scenario
         inputs_start = {
@@ -7771,6 +7778,13 @@ class OtherLandCalculator(LandModuleCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+class FloodedLandCalculator(LandModuleCalculator):
+    """Reservoir (flooded land) at the end of a land use change, see api.services.flooded_land."""
+
+    def calculate(self) -> tuple:
+        return flooded_land.calculate(self)
 
 
 class SetAsideCalculator(LandModuleCalculator):
