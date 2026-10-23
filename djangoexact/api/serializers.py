@@ -23,6 +23,9 @@ from django.utils.text import slugify
 from . import labels
 from .models import guided_step_format
 from .models import (
+    SOLID_WASTE_CROP_MODULES,
+    SOLID_WASTE_ROUTES,
+    SolidWaste,
     Module,
     Submodule,
     Activity,
@@ -3162,6 +3165,13 @@ class DynamicResultSerializer(serializers.Serializer):
     def get_inventory(self, obj):
         return obj.get("inventory")
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Module-specific blocks a calculator adds next to the emissions (CalculatorFactory results_extra).
+        if isinstance(instance, dict) and "solid_waste" in instance:
+            data["solid_waste"] = instance["solid_waste"]
+        return data
+
     def _serialize_data(self, data):
         match self.aggregate_by:
             case BreakdownTypes.TOTAL:
@@ -3530,6 +3540,62 @@ class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "ForestDisturbance"
         mandatory_fields = ForestDisturbanceWriteSerializer.Meta.mandatory_fields
+
+
+# Solid waste
+
+SOLID_WASTE_ROUTE_TOLERANCE = 0.001
+
+
+def _solid_waste_route_sum(data: dict, scenario: str) -> float:
+    return sum(data.get(f"route_{route}_{scenario}") or 0.0 for route in SOLID_WASTE_ROUTES)
+
+
+def _solid_waste_inputs(data: dict, scenario: str, crop_keys) -> list:
+    return [data.get(f"amount_{scenario}"), *(data.get(f"crop_waste_{key}_{scenario}") for key in crop_keys)]
+
+
+class SolidWasteWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = SolidWaste
+        fields = "__all__"
+        ref_name = "SolidWaste"
+        # The amount is optional when a crop module of the activity supplies the food waste; is_ready checks either.
+        mandatory_fields = {"start": {"mandatory": []}, "with": {"mandatory": []}, "without": {"mandatory": []}}
+
+    def is_ready(self, data, mandatory_fields, instance=None):
+        is_ready, errors = super().is_ready(data, mandatory_fields, instance=instance)
+        merged = self.merge_instance_data(data, instance=instance)
+        activity = merged.get("activity") or (instance.activity if instance else None)
+        present = {type(module).__name__ for module in activity.modules} if activity else set()
+        crop_keys = [key for key, class_name in SOLID_WASTE_CROP_MODULES.items() if class_name in present]
+        for scenario in utils.ScenarioTypes:
+            inputs = _solid_waste_inputs(merged, scenario.value, crop_keys)
+            if all(value is None for value in inputs):
+                errors.setdefault(scenario.verbose_name, []).append("Enter the food waste amount or a share of crop production wasted")
+            elif any(inputs) and abs(_solid_waste_route_sum(merged, scenario.value) - 1) > SOLID_WASTE_ROUTE_TOLERANCE:
+                errors.setdefault(scenario.verbose_name, []).append("Management route shares must add up to 100%")
+        return not errors, errors
+
+    def validate(self, data):
+        merged = self.merge_instance_data(data, instance=self.instance)
+        errors = [
+            f"Solid waste: management route shares cannot add up to more than 100% in the {scenario.verbose_name} scenario"
+            for scenario in utils.ScenarioTypes
+            if _solid_waste_route_sum(merged, scenario.value) > 1 + SOLID_WASTE_ROUTE_TOLERANCE
+        ]
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate(data)
+
+
+class SolidWasteReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = SolidWaste
+        fields = "__all__"
+        ref_name = "SolidWaste"
+        mandatory_fields = SolidWasteWriteSerializer.Meta.mandatory_fields
 
 
 class ChangeSerializer(serializers.Serializer):
