@@ -14,6 +14,22 @@ def average_yearly_value(yearly_breakdown: list):
     return average_yearly_value
 
 
+def s_curve_fraction(t, years_implementation):
+    """Share of the change reached after t years on the S-curve dynamic.
+
+    Logistic with steepness 10 / T and midpoint T / 2, rescaled so it is exactly 0 at t = 0 and
+    exactly 1 at t = T. The unscaled logistic only covers tanh(2.5), about 98.66%, of the change
+    before t = T and would jump the rest at t = T; the rescaling keeps the curve continuous.
+    """
+    if years_implementation == 0:
+        return 1.0
+
+    def logistic(x):
+        return 1 / (1 + math.exp(-(10 / years_implementation) * (x - years_implementation / 2)))
+
+    return (logistic(t) - logistic(0)) / (logistic(years_implementation) - logistic(0))
+
+
 def compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
     # IMPORTANT NOTE:
@@ -61,6 +77,17 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
         yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
         # return the yearly breakdown
+        if interim_values:
+            return average_yearly_value(yearly_breakdown)
+        else:
+            return yearly_breakdown
+
+    elif function == "s-curve":
+        # Weighted form (not start + delta * s) so both endpoints come out exact in floating point.
+        shares = [s_curve_fraction(i, years_implementation) for i in range(years_implementation + 1)]
+        yearly_breakdown = [start_value * (1 - s) + end_value * s for s in shares]
+        yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
+
         if interim_values:
             return average_yearly_value(yearly_breakdown)
         else:
@@ -142,7 +169,8 @@ import matplotlib.pyplot as plt
 
 def compute_yearly_cumulative_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
-    if function == "linear":
+    # The matrices only use yearly deltas, so the S-curve shares the linear layout.
+    if function in ("linear", "s-curve"):
         years_total = years_implementation + years_capitalization
 
         half_year = compute_half_year_delta(start_value, end_value, years_implementation, years_capitalization, function)
@@ -206,7 +234,8 @@ def compute_yearly_cumulative_matrix(start_value, end_value, years_implementatio
 
 def compute_matrix_for_log_rec_dis(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
-    if function == "linear":
+    # The matrices only use yearly deltas, so the S-curve shares the linear layout.
+    if function in ("linear", "s-curve"):
         # NOTE: Basically the same as above, however rather than having the values of half a year of hectares across the diagonal (i.e. we intervene at half of the year),
         # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year
         years_total = years_implementation + years_capitalization
