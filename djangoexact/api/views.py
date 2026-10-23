@@ -160,6 +160,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from api.services import async_jobs
 from api.services import report_links
+from api.services.conditionality_results import AGGREGATE_CONDITIONALITY, aggregate_by_conditionality
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
@@ -810,6 +811,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
+            openapi.Parameter(
+                "aggregate",
+                openapi.IN_QUERY,
+                description=(
+                    "Aggregate module results by. 'conditionality' returns the 'gas' breakdown plus a "
+                    "'conditionality' object with the balance split by NDC conditionality."
+                ),
+                type=openapi.TYPE_STRING,
+                enum=[*(b.value for b in BreakdownTypes if b != BreakdownTypes.INVENTORY), AGGREGATE_CONDITIONALITY],
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer},
     )
@@ -837,9 +848,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         response = serialized_project
         response["activities"] = []
 
-        # Function to process an activity
+        by_conditionality = request.query_params.get("aggregate") == AGGREGATE_CONDITIONALITY
+        module_aggregate = BreakdownTypes.GAS.value if by_conditionality else None
+
         def process_activity(activity_pk):
-            return ActivityViewSet.results(self, request, pk=activity_pk).data
+            return ActivityViewSet.results(self, request, pk=activity_pk, aggregate=module_aggregate).data
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
@@ -853,6 +866,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             activity_pks,
             on_error=log_activity_failure,
         )
+
+        if by_conditionality:
+            response["conditionality"] = aggregate_by_conditionality(response["activities"], project.start_year_of_activities)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -2455,9 +2471,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         ],
         responses={400: "Bad request", 403: "Selected user does not have permission to view activity results", 200: ActivityResultSerializer},
     )
-    def results(self, request, pk=None):
+    def results(self, request, pk=None, aggregate=None):
         """
         Calculates and returns total emissions for each module in the activity.
+
+        ``aggregate`` overrides the request's ``?aggregate=`` for internal callers.
         """
 
         activity = Activity.objects.prefetch_related().get(pk=pk)
@@ -2476,7 +2494,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_dict = get_module_serializer(module.__class__)(module).data
 
             try:
-                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk)
+                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk, aggregate=aggregate)
                 module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
@@ -2936,7 +2954,7 @@ def generic_module_viewset(model: Module):
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
         )
-        def results(self, request, pk=None):
+        def results(self, request, pk=None, aggregate=None):
             """
             Calculates and returns total emissions for a single module.
             """
@@ -2962,7 +2980,7 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+                aggregate_by = BreakdownTypes(aggregate or request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
 
