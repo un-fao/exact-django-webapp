@@ -1091,6 +1091,21 @@
     }
   },
   {
+    "model": "api.moduletype",
+    "pk": 65,
+    "fields": {
+      "name": "Solid Waste",
+      "name_en": "Solid Waste",
+      "name_fr": "Déchets solides",
+      "name_es": "Residuos sólidos",
+      "name_ru": "Твёрдые отходы",
+      "class_name": "SolidWaste",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
     "model": "api.foresttype",
     "pk": 1,
     "fields": {
@@ -830949,6 +830964,370 @@
       "litter": null,
       "carbon_stock_biomass_total": null,
       "carbon_stock_total": null
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 1,
+    "fields": {
+      "code": "food",
+      "name": "Food waste",
+      "name_en": "Food waste",
+      "name_fr": "Déchets alimentaires",
+      "name_es": "Residuos de alimentos",
+      "name_ru": "Пищевые отходы",
+      "dry_matter": 0.4,
+      "doc": 0.15,
+      "carbon": 0.38,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.06,
+      "k_boreal_temperate_wet": 0.185,
+      "k_tropical_dry": 0.085,
+      "k_tropical_wet": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 2,
+    "fields": {
+      "code": "garden",
+      "name": "Garden and park waste",
+      "name_en": "Garden and park waste",
+      "name_fr": "Déchets de jardins et de parcs",
+      "name_es": "Residuos de jardines y parques",
+      "name_ru": "Садово-парковые отходы",
+      "dry_matter": 0.4,
+      "doc": 0.2,
+      "carbon": 0.49,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.05,
+      "k_boreal_temperate_wet": 0.1,
+      "k_tropical_dry": 0.065,
+      "k_tropical_wet": 0.17
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 3,
+    "fields": {
+      "code": "paper",
+      "name": "Paper and cardboard",
+      "name_en": "Paper and cardboard",
+      "name_fr": "Papier et carton",
+      "name_es": "Papel y cartón",
+      "name_ru": "Бумага и картон",
+      "dry_matter": 0.9,
+      "doc": 0.4,
+      "carbon": 0.46,
+      "fossil_carbon": 0.01,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 4,
+    "fields": {
+      "code": "wood",
+      "name": "Wood",
+      "name_en": "Wood",
+      "name_fr": "Bois",
+      "name_es": "Madera",
+      "name_ru": "Древесина",
+      "dry_matter": 0.85,
+      "doc": 0.43,
+      "carbon": 0.5,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.02,
+      "k_boreal_temperate_wet": 0.03,
+      "k_tropical_dry": 0.025,
+      "k_tropical_wet": 0.035
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 5,
+    "fields": {
+      "code": "textiles",
+      "name": "Textiles",
+      "name_en": "Textiles",
+      "name_fr": "Textiles",
+      "name_es": "Textiles",
+      "name_ru": "Текстиль",
+      "dry_matter": 0.8,
+      "doc": 0.24,
+      "carbon": 0.5,
+      "fossil_carbon": 0.2,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 6,
+    "fields": {
+      "code": "nappies",
+      "name": "Disposable nappies",
+      "name_en": "Disposable nappies",
+      "name_fr": "Couches jetables",
+      "name_es": "Pañales desechables",
+      "name_ru": "Одноразовые подгузники",
+      "dry_matter": 0.4,
+      "doc": 0.24,
+      "carbon": 0.7,
+      "fossil_carbon": 0.1,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 7,
+    "fields": {
+      "code": "rubber_leather",
+      "name": "Rubber and leather",
+      "name_en": "Rubber and leather",
+      "name_fr": "Caoutchouc et cuir",
+      "name_es": "Caucho y cuero",
+      "name_ru": "Резина и кожа",
+      "dry_matter": 0.84,
+      "doc": 0.39,
+      "carbon": 0.67,
+      "fossil_carbon": 0.2,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 8,
+    "fields": {
+      "code": "plastics",
+      "name": "Plastics",
+      "name_en": "Plastics",
+      "name_fr": "Plastiques",
+      "name_es": "Plásticos",
+      "name_ru": "Пластмассы",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.75,
+      "fossil_carbon": 1.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 9,
+    "fields": {
+      "code": "metal",
+      "name": "Metal",
+      "name_en": "Metal",
+      "name_fr": "Métal",
+      "name_es": "Metal",
+      "name_ru": "Металл",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.0,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 10,
+    "fields": {
+      "code": "glass",
+      "name": "Glass",
+      "name_en": "Glass",
+      "name_fr": "Verre",
+      "name_es": "Vidrio",
+      "name_ru": "Стекло",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.0,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 11,
+    "fields": {
+      "code": "other",
+      "name": "Other, inert waste",
+      "name_en": "Other, inert waste",
+      "name_fr": "Autres déchets inertes",
+      "name_es": "Otros residuos inertes",
+      "name_ru": "Прочие инертные отходы",
+      "dry_matter": 0.9,
+      "doc": 0.0,
+      "carbon": 0.03,
+      "fossil_carbon": 1.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 1,
+    "fields": {
+      "code": "swds_managed_anaerobic",
+      "name": "Managed SWDS, anaerobic",
+      "name_en": "Managed SWDS, anaerobic",
+      "name_fr": "Site géré, anaérobie",
+      "name_es": "Sitio gestionado, anaeróbico",
+      "name_ru": "Управляемый полигон, анаэробный",
+      "mcf": 1.0,
+      "ox": 0.1
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 2,
+    "fields": {
+      "code": "swds_managed_semi_aerobic",
+      "name": "Managed SWDS, semi-aerobic",
+      "name_en": "Managed SWDS, semi-aerobic",
+      "name_fr": "Site géré, semi-aérobie",
+      "name_es": "Sitio gestionado, semiaeróbico",
+      "name_ru": "Управляемый полигон, полуаэробный",
+      "mcf": 0.5,
+      "ox": 0.1
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 3,
+    "fields": {
+      "code": "swds_unmanaged_deep",
+      "name": "Unmanaged SWDS, deep (5 m or more)",
+      "name_en": "Unmanaged SWDS, deep (5 m or more)",
+      "name_fr": "Site non géré, profond (5 m ou plus)",
+      "name_es": "Sitio no gestionado, profundo (5 m o más)",
+      "name_ru": "Неуправляемый полигон, глубокий (5 м и более)",
+      "mcf": 0.8,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 4,
+    "fields": {
+      "code": "swds_unmanaged_shallow",
+      "name": "Unmanaged SWDS, shallow (less than 5 m)",
+      "name_en": "Unmanaged SWDS, shallow (less than 5 m)",
+      "name_fr": "Site non géré, peu profond (moins de 5 m)",
+      "name_es": "Sitio no gestionado, poco profundo (menos de 5 m)",
+      "name_ru": "Неуправляемый полигон, мелкий (менее 5 м)",
+      "mcf": 0.4,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 5,
+    "fields": {
+      "code": "swds_uncategorised",
+      "name": "Uncategorised SWDS",
+      "name_en": "Uncategorised SWDS",
+      "name_fr": "Site non catégorisé",
+      "name_es": "Sitio sin categorizar",
+      "name_ru": "Некатегоризированный полигон",
+      "mcf": 0.6,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 6,
+    "fields": {
+      "code": "open_dumping",
+      "name": "Open dumping",
+      "name_en": "Open dumping",
+      "name_fr": "Décharge à ciel ouvert",
+      "name_es": "Vertedero a cielo abierto",
+      "name_ru": "Открытая свалка",
+      "mcf": 0.6,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastetreatmentemissionfactor",
+    "pk": 1,
+    "fields": {
+      "code": "composting",
+      "name": "Composting",
+      "name_en": "Composting",
+      "name_fr": "Compostage",
+      "name_es": "Compostaje",
+      "name_ru": "Компостирование",
+      "ch4": 4.0,
+      "n2o": 0.24,
+      "oxidation_factor": null
+    }
+  },
+  {
+    "model": "ipcc.wastetreatmentemissionfactor",
+    "pk": 2,
+    "fields": {
+      "code": "anaerobic_digestion",
+      "name": "Anaerobic digestion",
+      "name_en": "Anaerobic digestion",
+      "name_fr": "Digestion anaérobie",
+      "name_es": "Digestión anaeróbica",
+      "name_ru": "Анаэробное сбраживание",
+      "ch4": 0.8,
+      "n2o": 0.0,
+      "oxidation_factor": null
+    }
+  },
+  {
+    "model": "ipcc.wastetreatmentemissionfactor",
+    "pk": 3,
+    "fields": {
+      "code": "incineration",
+      "name": "Incineration",
+      "name_en": "Incineration",
+      "name_fr": "Incinération",
+      "name_es": "Incineración",
+      "name_ru": "Сжигание в установках",
+      "ch4": 0.2,
+      "n2o": 50.0,
+      "oxidation_factor": 1.0
+    }
+  },
+  {
+    "model": "ipcc.wastetreatmentemissionfactor",
+    "pk": 4,
+    "fields": {
+      "code": "open_burning",
+      "name": "Open burning",
+      "name_en": "Open burning",
+      "name_fr": "Brûlage à l'air libre",
+      "name_es": "Quema a cielo abierto",
+      "name_ru": "Открытое сжигание",
+      "ch4": 6500.0,
+      "n2o": 150.0,
+      "oxidation_factor": 0.71
     }
   },
   {

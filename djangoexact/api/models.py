@@ -18,6 +18,10 @@ import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from math_model.no_time_dependency_final.solid_waste import ROUTES as SOLID_WASTE_ROUTES
+
+# crop_waste_<key> field key -> crop module class whose production feeds the solid waste module
+SOLID_WASTE_CROP_MODULES = {"annual_cropland": "AnnualCropland", "perennial_cropland": "PerennialCropland", "flooded_rice": "FloodedRice"}
 from dirtyfields import DirtyFieldsMixin
 from django.utils.text import slugify
 
@@ -3258,6 +3262,107 @@ class LandUseChange(Module):
             raise Exception("At least one module type is missing")
 
         return module_types
+
+
+class SolidWaste(Module):
+    """Agrifood systems waste of an activity, all of it food waste, in tonnes of wet waste per year (not a land module).
+
+    IPCC 2006 Vol. 5 with the 2019 Refinement where updated; the math is in
+    math_model/no_time_dependency_final/solid_waste.py and the calculator in api/services/solid_waste.py. Shares are
+    fractions (0-1). The food waste of a scenario is ``amount`` (waste not tied to a crop module of the activity, e.g.
+    livestock, fish or processing) plus, per crop module of the activity, its production times ``crop_waste_<key>``.
+    Null route shares, recoveries and Tier 2 emission factors mean 0, 0 and the IPCC default.
+    """
+
+    amount_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_amount_thread")
+
+    crop_waste_annual_cropland_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_annual_cropland_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_annual_cropland_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    route_swds_managed_anaerobic_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_anaerobic_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_anaerobic_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    swds_recovery_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    swds_recovery_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    swds_recovery_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    composting_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    def routes(self, scenario: str) -> dict[str, float]:
+        return {route: getattr(self, f"route_{route}_{scenario}") or 0.0 for route in SOLID_WASTE_ROUTES}
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        results = super().get_cached_results(by)
+        # Report runs cache emissions without the food-waste block the module page and indicators read: recompute.
+        if not (isinstance(results, dict) and "solid_waste" in results):
+            return None
+        # Crop module edits change the food waste amount but only invalidate the crop module's own cache.
+        crops = (module for module in self.activity.modules if type(module).__name__ in SOLID_WASTE_CROP_MODULES.values())
+        return None if any(crop.last_modified and crop.last_modified > self.last_cached_at for crop in crops) else results
 
 
 ### MODEL PARAMETERS TABLES ###

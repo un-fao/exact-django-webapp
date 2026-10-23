@@ -1,0 +1,86 @@
+[
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 1,
+    "fields": {
+      "code": "swds_managed_anaerobic",
+      "name": "Managed SWDS, anaerobic",
+      "name_en": "Managed SWDS, anaerobic",
+      "name_fr": "Site géré, anaérobie",
+      "name_es": "Sitio gestionado, anaeróbico",
+      "name_ru": "Управляемый полигон, анаэробный",
+      "mcf": 1.0,
+      "ox": 0.1
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 2,
+    "fields": {
+      "code": "swds_managed_semi_aerobic",
+      "name": "Managed SWDS, semi-aerobic",
+      "name_en": "Managed SWDS, semi-aerobic",
+      "name_fr": "Site géré, semi-aérobie",
+      "name_es": "Sitio gestionado, semiaeróbico",
+      "name_ru": "Управляемый полигон, полуаэробный",
+      "mcf": 0.5,
+      "ox": 0.1
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 3,
+    "fields": {
+      "code": "swds_unmanaged_deep",
+      "name": "Unmanaged SWDS, deep (5 m or more)",
+      "name_en": "Unmanaged SWDS, deep (5 m or more)",
+      "name_fr": "Site non géré, profond (5 m ou plus)",
+      "name_es": "Sitio no gestionado, profundo (5 m o más)",
+      "name_ru": "Неуправляемый полигон, глубокий (5 м и более)",
+      "mcf": 0.8,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 4,
+    "fields": {
+      "code": "swds_unmanaged_shallow",
+      "name": "Unmanaged SWDS, shallow (less than 5 m)",
+      "name_en": "Unmanaged SWDS, shallow (less than 5 m)",
+      "name_fr": "Site non géré, peu profond (moins de 5 m)",
+      "name_es": "Sitio no gestionado, poco profundo (menos de 5 m)",
+      "name_ru": "Неуправляемый полигон, мелкий (менее 5 м)",
+      "mcf": 0.4,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 5,
+    "fields": {
+      "code": "swds_uncategorised",
+      "name": "Uncategorised SWDS",
+      "name_en": "Uncategorised SWDS",
+      "name_fr": "Site non catégorisé",
+      "name_es": "Sitio sin categorizar",
+      "name_ru": "Некатегоризированный полигон",
+      "mcf": 0.6,
+      "ox": 0.0
+    }
+  },
+  {
+    "model": "ipcc.solidwastedisposalsitetype",
+    "pk": 6,
+    "fields": {
+      "code": "open_dumping",
+      "name": "Open dumping",
+      "name_en": "Open dumping",
+      "name_fr": "Décharge à ciel ouvert",
+      "name_es": "Vertedero a cielo abierto",
+      "name_ru": "Открытая свалка",
+      "mcf": 0.6,
+      "ox": 0.0
+    }
+  }
+]
