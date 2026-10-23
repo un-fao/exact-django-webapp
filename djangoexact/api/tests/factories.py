@@ -78,6 +78,14 @@ def get_factory_by_class_name(class_name):
     }
 
 
+def reference_country():
+    # Kenya has every per-country and per-region default the calculators read (rice and
+    # crop yields, grid electricity EF, Atwood, FRA stocks). A random pick could land in
+    # North America, which has no RiceYield row and crashes rice defaults: a real data gap
+    # that is out of scope for module tests.
+    return Country.objects.get(iso3="KEN")
+
+
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
@@ -100,7 +108,7 @@ class ProjectFactory(DjangoModelFactory):
 
     # climate = selected_climate
     # moisture = factory.fuzzy.FuzzyChoice(moisture)
-    # country = factory.fuzzy.FuzzyChoice(countries)
+    country = factory.LazyFunction(reference_country)
     # soil_type = factory.fuzzy.FuzzyChoice(soil_types)
     gw_potential = factory.fuzzy.FuzzyChoice(gw_potentials)
 

@@ -31,7 +31,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
         validated_data = copy.deepcopy(self.validated_data)
@@ -39,7 +39,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_add_minor_season_and_calculate_results(self):
         previous_balance = self.get_results().data["balance"]
@@ -56,7 +56,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, minor_season_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
         new_balance = self.get_results(cached="false").data["balance"]
 

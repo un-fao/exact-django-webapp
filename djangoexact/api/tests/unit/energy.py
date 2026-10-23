@@ -95,7 +95,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
         log.info("START - Testing patch to not ready")
@@ -104,7 +104,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
         log.info("START - Testing calculate results")
@@ -135,7 +135,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[1], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
         self.module.refresh_from_db()
         self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")

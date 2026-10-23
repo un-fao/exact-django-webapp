@@ -35,6 +35,7 @@ class LucSwapSanitizeTestCase(base_module.BaseLandUseChangeTestCase):
             module_type_w_name="FloodedRice",
             module_type_wo_name="AnnualCropland",
         )
+        self.make_modules_ready()
 
     def _swap_roles(self):
         """Swap the LUC roles through the activity builder: FloodedRice -> start/wo, AnnualCropland -> with."""
