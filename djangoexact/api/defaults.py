@@ -789,9 +789,9 @@ class LargeFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_start_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_w_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_wo_default=defaults.refrigerant_gwp_ef.value,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -858,9 +858,9 @@ class SmallFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_start_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_w_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_wo_default=defaults.refrigerant_gwp_ef.value,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -1997,6 +1997,19 @@ class PackagingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
         self.emission_factor_t2_wo_default = self.defaults.packaging_ef_wo.value
 
         return self.get_defaults_for_frontend()
+
+
+class ValueChainParentDefaults(Defaults):
+    """
+    Value chain parents (Storage, Transport, Processing, Packaging) hold no tier 2
+    fields; their defaults live on each entry's own /defaults/ endpoint.
+    """
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return SimpleNamespace()
+
+
+StorageDefaults = TransportDefaults = ProcessingDefaults = PackagingDefaults = ValueChainParentDefaults
 
 
 @dataclass

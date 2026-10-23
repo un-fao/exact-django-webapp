@@ -917,24 +917,28 @@ class SmallFisheryFUIManager(Manager):
 # LargeFisheryFUIManager
 class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
+        # The fish x gear matrix stores 0 for combinations the source has no observation for
+        # (121 of 230 rows). A motorised large-scale fleet never burns zero fuel, so a 0 means
+        # "no data": it must fall through to the averages and must not drag them down.
+        rows = LargeFisheryFUI.objects.filter(value__gt=0)
         try:
-            model = LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type)
+            model = rows.get(fish_type=fish_type, gear_type=gear_type)
             return model.value
         except LargeFisheryFUI.DoesNotExist:
             if fish_type.name_en == "Not Specified" and gear_type.name_en == "Not Specified":
-                _all = LargeFisheryFUI.objects.exclude(fish_type__name="Not Specified")
+                _all = rows.exclude(fish_type__name="Not Specified")
                 _all = _all.exclude(gear_type__name="Not Specified").values_list("value", flat=True)
                 return sum(_all) / len(_all)
 
             if fish_type.name_en == "Not Specified":
-                fuis = LargeFisheryFUI.objects.filter(gear_type=gear_type).values_list("value", flat=True)
+                fuis = rows.filter(gear_type=gear_type).values_list("value", flat=True)
                 return sum(fuis) / len(fuis)
 
             if gear_type.name_en == "Not Specified":
-                fuis = LargeFisheryFUI.objects.filter(fish_type=fish_type).values_list("value", flat=True)
+                fuis = rows.filter(fish_type=fish_type).values_list("value", flat=True)
                 return sum(fuis) / len(fuis)
 
-            _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
+            _all = rows.filter(fish_type=fish_type)
             _all = _all.exclude(Q(gear_type__name="Not Specified") | Q(fish_type__name="Not Specified")).values_list("value", flat=True)
             return sum(_all) / len(_all)
 
