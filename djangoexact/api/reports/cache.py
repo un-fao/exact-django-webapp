@@ -107,7 +107,17 @@ def load_emissions_from_cache(module) -> CacheResult | None:
     - cached_results_by_activity_by_gas is None
 
     Otherwise returns a CacheResult mapping the three scenario keys.
+
+    Modules of a finalized project always load their frozen snapshot, never the
+    live cache, and never return None: the report must not recalculate them.
+    Raises FrozenResultMissingError when the snapshot is missing.
     """
+    from api.services.finalization import frozen_result
+
+    frozen = frozen_result(module)
+    if frozen is not None:
+        return _cache_result(frozen.results_by_activity_by_gas, frozen.units_breakdown)
+
     if not module.is_cached_results_valid():
         return None
     cached = module.cached_results_by_activity_by_gas
@@ -120,7 +130,22 @@ def load_emissions_from_cache(module) -> CacheResult | None:
         # Written before the inventory roll-up fix, so its "inventory" key is an
         # empty list. Recalculate rather than serve rows that are known missing.
         return None
-    units = module.cached_units_breakdown or {}
+    return _cache_result(cached, module.cached_units_breakdown)
+
+
+def submodule_balance_emissions(submodule, calculator):
+    """Balance emission sets of a submodule: frozen for a finalized project, calculated otherwise."""
+    from api.calculators import Result
+    from api.services.finalization import frozen_result
+
+    frozen = frozen_result(submodule)
+    if frozen is not None:
+        return frozen.results_by_activity_by_gas["balance"]
+    return Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+
+
+def _cache_result(cached: dict, units: dict | None) -> CacheResult:
+    units = units or {}
     return CacheResult(
         balance=cached["balance"],
         with_project=cached["total_w"],
