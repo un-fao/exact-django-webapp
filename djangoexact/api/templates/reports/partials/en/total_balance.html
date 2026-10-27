@@ -13,7 +13,7 @@
                 <div class="col-sm-6 text-start">
                     <p>
                         {{ project.name }} has an estimated total carbon balance of
-                        <b>{{ total_carbon_balance|floatformat:2|intcomma }}</b>
+                        <b>{{ total_carbon_balance|floatformat:"2g" }}</b>
                         tCO2e over the entire period of accounting of {{ total_project_years }}
                         years.
                     </p>
@@ -22,13 +22,12 @@
                         removals between the With project scenario and the Without project
                         scenario (what would happen if the project was not implemented).
                     </p>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
-                                 alt="BalanceChart"
-                                 id="balanceChart">
-                        </div>
-                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
+                         class="report-chart"
+                         alt="Total carbon balance chart: with project, without project and balance"
+                         id="balanceChart" />
                 </div>
             </div>
         </div>

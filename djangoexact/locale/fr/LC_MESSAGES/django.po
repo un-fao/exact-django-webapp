@@ -47,3 +47,28 @@ msgstr "matériel d'emballage"
 #: api/views.py:1004
 msgid "agricultural inputs use"
 msgstr "utilisation d'intrants agricoles"
+
+#: api/reports/charts.py
+msgid "With project"
+msgstr "Avec projet"
+
+#: api/reports/charts.py
+msgid "Without project"
+msgstr "Sans projet"
+
+#: api/reports/charts.py
+msgid "Balance"
+msgstr "Bilan"
+
+#: api/reports/charts.py
+msgid "Other"
+msgstr "Autres"
+
+#: api/reports/charts.py
+msgid "Net total"
+msgstr "Total net"
+
+#: api/reports/charts.py
+#, python-format
+msgid "Net: %(value)s"
+msgstr "Net : %(value)s"

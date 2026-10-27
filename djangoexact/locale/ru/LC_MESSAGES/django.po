@@ -1185,3 +1185,28 @@ msgstr "Сельскохозяйственные постройки (метал�
 
 #~ msgid "Rainfed, Deep Water"
 #~ msgstr "Дождевое орошение, глубокие воды"
+
+#: api/reports/charts.py
+msgid "With project"
+msgstr "С проектом"
+
+#: api/reports/charts.py
+msgid "Without project"
+msgstr "Без проекта"
+
+#: api/reports/charts.py
+msgid "Balance"
+msgstr "Баланс"
+
+#: api/reports/charts.py
+msgid "Other"
+msgstr "Прочие"
+
+#: api/reports/charts.py
+msgid "Net total"
+msgstr "Итого (нетто)"
+
+#: api/reports/charts.py
+#, python-format
+msgid "Net: %(value)s"
+msgstr "Нетто: %(value)s"

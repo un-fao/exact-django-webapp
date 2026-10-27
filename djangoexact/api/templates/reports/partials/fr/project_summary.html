@@ -11,14 +11,14 @@
                 <div class="col-sm-6 text-start">
                     <p>
                         <strong>Superficie Totale (hectares) :</strong>
-                        {{ total_area|floatformat:2|intcomma }}
+                        {{ total_area|floatformat:"2g" }}
                     </p>
                     <p>
-                        <strong>Total de Têtes :</strong> {{ total_heads|floatformat:2|intcomma }}
+                        <strong>Total de Têtes :</strong> {{ total_heads|floatformat:"2g" }}
                     </p>
                     <p>
                         <strong>Total de Tonnes de Capture :</strong>
-                        {{ total_tonnes_of_catch|floatformat:2|intcomma }}
+                        {{ total_tonnes_of_catch|floatformat:"2g" }}
                     </p>
                 </div>
             </div>

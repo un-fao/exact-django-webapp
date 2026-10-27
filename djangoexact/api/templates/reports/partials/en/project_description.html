@@ -22,7 +22,7 @@
                         <strong>Executing Agency:</strong> {{ project.executing_agency }}
                     </p>
                     <p>
-                        <strong>Project Cost [USD]:</strong> {{ project.cost|floatformat:2|intcomma }}
+                        <strong>Project Cost [USD]:</strong> {{ project.cost|floatformat:"2g" }}
                     </p>
                     <p>
                         <strong>Status:</strong> {{ project.status }}
@@ -69,24 +69,19 @@
             <div class="row">
                 <div class="col-12">
                     <div class="timeline-container">
-                        <div class="timeline">
-                            <div class="timeline-phase implementation-phase">
-                                <div class="segments implementation-segments"></div>
+                        {% widthratio project.implementation_years total_project_years 100 as impl_pct %}
+                        <div class="timeline-bar">
+                            <div class="timeline-segment timeline-implementation" style="width: {{ impl_pct }}%"></div>
+                            <div class="timeline-segment timeline-capitalization" style="left: {{ impl_pct }}%"></div>
+                        </div>
+                        <div class="timeline-phases">
+                            <div class="timeline-phase-label timeline-phase-start">
+                                <span class="timeline-swatch timeline-implementation"></span>Implementation phase
+                                <div class="timeline-duration">{{ project.start_year_of_activities }}–{{ project.start_year_of_activities|add:project.implementation_years }}, {{ project.implementation_years }} year{{ project.implementation_years|pluralize }}</div>
                             </div>
-                            <div class="timeline-phase capitalization-phase">
-                                <div class="segments capitalization-segments"></div>
-                            </div>
-                            <div class="timeline-point start">
-                                <div class="year">{{ project.start_year_of_activities }}</div>
-                                <div class="label text-wrap text-center timeline-label">Start year of accounting</div>
-                            </div>
-                            <div class="timeline-point implementation">
-                                <div class="year">{{ project.start_year_of_activities|add:project.implementation_years }}</div>
-                                <div class="label text-wrap text-center timeline-label">End year of implementation</div>
-                            </div>
-                            <div class="timeline-point end">
-                                <div class="year">{{ project.last_year_of_accounting }}</div>
-                                <div class="label text-wrap text-center timeline-label">Last year of accounting</div>
+                            <div class="timeline-phase-label timeline-phase-end">
+                                <span class="timeline-swatch timeline-capitalization"></span>Capitalization phase
+                                <div class="timeline-duration">{{ project.start_year_of_activities|add:project.implementation_years }}–{{ project.last_year_of_accounting }}, {{ capitalization_years }} year{{ capitalization_years|pluralize }}</div>
                             </div>
                         </div>
                     </div>

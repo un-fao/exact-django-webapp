@@ -152,7 +152,6 @@ import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
-import matplotlib.pyplot as plt
 import io
 import base64
 import api.permissions as api_permissions
@@ -3401,27 +3400,6 @@ class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
-
-
-def generate_chart(with_value, without_value, balance):
-    # Create the bar chart
-    fig, ax = plt.subplots(figsize=(10, 4))
-    labels = ["With", "Without", "Balance"]
-    values = [with_value, without_value, balance]
-    colors = ["green" if v < 0 else "red" for v in values]
-
-    # Create horizontal bar chart
-    ax.barh(labels, values, color=colors)
-
-    # Customize the chart
-    ax.set_xlim(min(values) - 10000, max(values) + 10000)
-    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
-
-    # Save the chart
-    chart_path = os.path.join(settings.STATIC_ROOT, "images", "ghg_chart.png")
-    os.makedirs(os.path.dirname(chart_path), exist_ok=True)
-    plt.savefig(chart_path, bbox_inches="tight", dpi=300)
-    plt.close()
 
 
 class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
