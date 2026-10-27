@@ -75,6 +75,27 @@ class DefaultUncertaintyTests(SimpleTestCase):
         self.assertIsNone(values.ef_t2_w_default_max)
         self.assertFalse(hasattr(values, "country_t2_default_min"))
 
+    def test_every_numeric_default_has_bound_keys_for_ready_modules(self):
+        for returned in (
+            SimpleNamespace(ef_t2_w_default=12, ef_t2_w_default_min=10, ef_t2_w_default_max=15, fui_t2_w_default=3.5, country_t2_default="Italy"),
+            {"ef_t2_w_default": 12, "ef_t2_w_default_min": 10, "ef_t2_w_default_max": 15, "fui_t2_w_default": 3.5, "country_t2_default": "Italy"},
+        ):
+            class ReadyDefaults:
+                def __init__(self, input):
+                    pass
+
+                def get_defaults(self, calculate=False, returned=returned):
+                    return returned
+
+            with patch("api.defaults._get_defaults_class", return_value=ReadyDefaults):
+                values = DefaultsFactory.get_defaults(SimpleNamespace(is_ready=lambda: True))
+
+            fields = values if isinstance(values, dict) else vars(values)
+            self.assertEqual((fields["ef_t2_w_default_min"], fields["ef_t2_w_default_max"]), (10, 15))
+            self.assertIsNone(fields["fui_t2_w_default_min"])
+            self.assertIsNone(fields["fui_t2_w_default_max"])
+            self.assertNotIn("country_t2_default_min", fields)
+
     def test_coastal_wetland_litter_and_deadwood_defaults_per_scenario(self):
         row = lambda value: SimpleNamespace(value=value)  # noqa: E731
         calculator = SimpleNamespace(
