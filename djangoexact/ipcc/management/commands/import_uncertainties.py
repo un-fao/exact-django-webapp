@@ -130,9 +130,12 @@ def resolve_fixture_name(csv_path):
     return name
 
 
+def csv_encoding(csv_path):
+    return "cp1252" if csv_path.name.lower() in CP1252_FILES else "utf-8-sig"
+
+
 def read_csv_rows(csv_path):
-    encoding = "cp1252" if csv_path.name.lower() in CP1252_FILES else "utf-8-sig"
-    with open(csv_path, encoding=encoding, newline="") as fh:
+    with open(csv_path, encoding=csv_encoding(csv_path), newline="") as fh:
         rows = list(csv.reader(fh))
     if not rows:
         raise CommandError(f"{csv_path.name}: empty file")

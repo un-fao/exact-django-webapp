@@ -150,6 +150,31 @@ class FixtureWriterTests(SimpleTestCase):
             self.fail(f"report does not match committed baseline: {exc}")
 
 
+class ReviewSheetTests(SimpleTestCase):
+    """The review workbook lists every base-value disagreement of a table that carries
+    bounds, each traced to its CSV line with references shown by name."""
+
+    def test_every_disagreement_is_traceable(self):
+        from openpyxl import load_workbook
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.xlsx"
+            call_command("uncertainty_review_sheet", "--output", str(path), stdout=StringIO())
+            workbook = load_workbook(path, read_only=True)
+            values = list(workbook["Mismatches"].iter_rows(values_only=True))
+            workbook.close()
+            rows = [dict(zip(values[0], r)) for r in values[1:]]
+
+        report = json.loads((iu.data_dir() / "import_report.json").read_text(encoding="utf-8"))
+        tables_with_mismatches = {t["model"] for t in report["tables"] if t["base_mismatch"] and t["carrying_bound"]}
+        self.assertEqual({r["table"] for r in rows}, tables_with_mismatches)
+        for row in rows:
+            self.assertGreater(row["csv_line"], 1)
+            self.assertTrue(row["ipcc_source"])
+            self.assertNotIn(" object (", row["natural_key"])
+            self.assertIsNotNone(row["db_inside_csv_range"])
+
+
 class PublishRuleTests(SimpleTestCase):
     """The join against a tiny in-memory source: which rows count as issues, and that one
     issue holds the whole table back."""
