@@ -157,6 +157,7 @@ import base64
 import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import report_links
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
@@ -1737,7 +1738,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import NotReadyError, compute_project_result
 
         try:
-            result = compute_project_result(project, activities)
+            # Module titles are translated names read during the compute, so the
+            # report language must be active here, not only in build_template_context;
+            # otherwise they follow Accept-Language instead of ?lang=.
+            with translation_override(lang):
+                result = compute_project_result(project, activities)
         except NotReadyError as e:
             # Same contract as report(): a module that cannot be calculated is
             # the user's data to fix, so name it instead of a generic 500.

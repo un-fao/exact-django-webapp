@@ -4,7 +4,11 @@
     "pk": 2,
     "fields": {
       "name": "Design",
-      "value": 0
+      "value": 0,
+      "name_en": "Design",
+      "name_fr": "Conception",
+      "name_es": "Diseño",
+      "name_ru": "Разработка"
     }
   },
   {
@@ -12,7 +16,11 @@
     "pk": 1,
     "fields": {
       "name": "Implementation",
-      "value": 1
+      "value": 1,
+      "name_en": "Implementation",
+      "name_fr": "Mise en œuvre",
+      "name_es": "Ejecución",
+      "name_ru": "Реализация"
     }
   },
   {
@@ -20,7 +28,11 @@
     "pk": 4,
     "fields": {
       "name": "Mid-term implementation",
-      "value": 2
+      "value": 2,
+      "name_en": "Mid-term implementation",
+      "name_fr": "Mi-parcours de la mise en œuvre",
+      "name_es": "Ejecución a medio término",
+      "name_ru": "Среднесрочный этап реализации"
     }
   },
   {
@@ -28,7 +40,11 @@
     "pk": 3,
     "fields": {
       "name": "Terminal Evaluation",
-      "value": 3
+      "value": 3,
+      "name_en": "Terminal Evaluation",
+      "name_fr": "Évaluation finale",
+      "name_es": "Evaluación final",
+      "name_ru": "Итоговая оценка"
     }
   }
 ]

@@ -82,3 +82,11 @@ msgstr ""
 #, python-format
 msgid "Net: %(value)s"
 msgstr ""
+
+#: api/reports/html_context.py
+msgid "Large fisheries"
+msgstr ""
+
+#: api/reports/html_context.py
+msgid "Aquaculture"
+msgstr ""

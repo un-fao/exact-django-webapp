@@ -46,6 +46,11 @@ class StatusTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
 
 
+@register(models.ProjectStatus)
+class ProjectStatusTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
 @register(models.LandUseType)
 class LandUseTypeTranslationOptions(NameOnlyTranslationOptions):
     pass

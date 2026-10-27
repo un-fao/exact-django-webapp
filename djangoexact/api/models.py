@@ -286,7 +286,7 @@ class ChangeRate(models.Model):
 
 
 class ProjectStatus(models.Model):
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=100)
     value = models.IntegerField(unique=True)
 
     class Meta:

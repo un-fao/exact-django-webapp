@@ -663,9 +663,6 @@ msgstr "Сельскохозяйственные постройки (метал�
 #~ msgid "Large Fishery"
 #~ msgstr "Крупное рыболовное хозяйство"
 
-#~ msgid "Aquaculture"
-#~ msgstr "Аквакультура"
-
 #~ msgid "Coastal Wetland"
 #~ msgstr "Прибрежное водно-болотное угодье"
 
@@ -1210,3 +1207,11 @@ msgstr "Итого (нетто)"
 #, python-format
 msgid "Net: %(value)s"
 msgstr "Нетто: %(value)s"
+
+#: api/reports/html_context.py
+msgid "Large fisheries"
+msgstr "Крупное рыболовное хозяйство"
+
+#: api/reports/html_context.py
+msgid "Aquaculture"
+msgstr "Аквакультура"
