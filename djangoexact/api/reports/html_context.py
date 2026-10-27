@@ -174,8 +174,8 @@ def _compute_indicator_aggregates(activities_by_name: dict, project) -> dict:
         {"name": ft.name, "value_w": 0, "value_wo": 0}
         for ft in api_models.FisheryType.objects.all()
     ]
-    large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
-    aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
+    large_fishery_data = {"name": _("Large fisheries"), "value_w": 0, "value_wo": 0}
+    aquaculture_data = {"name": _("Aquaculture"), "value_w": 0, "value_wo": 0}
     land_types = [
         {"name": lt.name, "value_w": 0, "value_wo": 0}
         for lt in api_models.ModuleType.objects.filter(is_luc=True).all()

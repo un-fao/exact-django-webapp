@@ -82,3 +82,11 @@ msgstr "Total neto"
 #, python-format
 msgid "Net: %(value)s"
 msgstr "Neto: %(value)s"
+
+#: api/reports/html_context.py
+msgid "Large fisheries"
+msgstr "Pesca industrial"
+
+#: api/reports/html_context.py
+msgid "Aquaculture"
+msgstr "Acuicultura"
