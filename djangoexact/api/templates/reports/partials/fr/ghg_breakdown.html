@@ -15,24 +15,21 @@
                         Le principal GES qui contribue au bilan est
                         <b>{{ project_primary_ghg }}</b>, qui
                         <b>{{ project_primary_ghg_direction }}</b> de
-                        {{ project_primary_ghg_emissions|floatformat:2|intcomma }} tCO2-e,
+                        {{ project_primary_ghg_emissions|floatformat:"2g" }} tCO2-e,
                         en résultat de la différence avec le scénario "Sans Projet", suivi par
                         <b>{{ project_secondary_ghg }}</b> qui
                         <b>{{ project_secondary_ghg_direction }}</b> de
-                        {{ project_secondary_ghg_emissions|floatformat:2|intcomma }} tCO2-e et
+                        {{ project_secondary_ghg_emissions|floatformat:"2g" }} tCO2-e et
                         <b>{{ project_tertiary_ghg }}</b> qui
                         <b>{{ project_tertiary_ghg_direction }}</b>
-                        de {{ project_tertiary_ghg_emissions|floatformat:2|intcomma }} tCO2-e.
+                        de {{ project_tertiary_ghg_emissions|floatformat:"2g" }} tCO2-e.
                     </p>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <img src="data:image/svg+xml;base64,{{ project_gases_chart_base64 }}"
-                                 alt="Graphique de Bilan"
-                                 width="100%"
-                                 height="400"
-                                 id="balanceChart" />
-                        </div>
-                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <img src="data:image/svg+xml;base64,{{ project_gases_chart_base64 }}"
+                         class="report-chart"
+                         alt="Graphique du bilan carbone par GES : avec projet, sans projet et bilan"
+                         id="gasesChart" />
                 </div>
             </div>
         </div>
