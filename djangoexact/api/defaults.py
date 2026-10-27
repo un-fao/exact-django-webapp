@@ -53,6 +53,20 @@ def _with_ranges(values, sources):
     return values
 
 
+def _with_null_ranges(values):
+    """Give every numeric default a `_min`/`_max` pair, null where no bound was set.
+
+    The frontend reads a missing key and a null bound the same way only if the keys are
+    always there, so the response shape must not depend on which defaults are mapped.
+    """
+    fields = values if isinstance(values, dict) else vars(values)
+    for name, value in list(fields.items()):
+        if name.endswith("_default") and (value is None or isinstance(value, (int, float))):
+            fields.setdefault(f"{name}_min", None)
+            fields.setdefault(f"{name}_max", None)
+    return values
+
+
 def _get_defaults_class(class_name: str):
     """Look up a Defaults subclass by name within this module, returning None if not found.
 
@@ -100,18 +114,13 @@ class DefaultsFactory:
         module_type = type(input).__name__
         DefaultClass: Defaults = _get_defaults_class(f"{module_type}Defaults")
 
-        if DefaultClass is not None:
-            if not input.is_ready():
-                values = DefaultClass(input).values
-                for name, value in list(vars(values).items()):
-                    if name.endswith("_default") and (value is None or isinstance(value, (int, float))):
-                        setattr(values, f"{name}_min", None)
-                        setattr(values, f"{name}_max", None)
-                return values
-
-            return DefaultClass(input).get_defaults(calculate=calculate)
-        else:
+        if DefaultClass is None:
             raise NotImplementedError(f"Defaults for {module_type} have not been implemented.")
+
+        if not input.is_ready():
+            return _with_null_ranges(DefaultClass(input).values)
+
+        return _with_null_ranges(DefaultClass(input).get_defaults(calculate=calculate))
 
 
 class GrasslandDefaults(Defaults):
