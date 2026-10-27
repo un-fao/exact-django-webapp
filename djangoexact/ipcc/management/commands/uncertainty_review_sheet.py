@@ -170,7 +170,7 @@ def inside_range(value, csv_value, lower, upper):
 
 
 def review_rows(tables, details, fixture_cache):
-    """One row per disagreeing field, in COLUMNS order, plus the table's source."""
+    """One row per disagreeing field, in COLUMNS order."""
     review_id = 0
     for table in tables:
         mismatches = details[table["csv"]].get("base_mismatch", [])
