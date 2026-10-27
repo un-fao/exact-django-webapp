@@ -150,6 +150,35 @@ class FixtureWriterTests(SimpleTestCase):
             self.fail(f"report does not match committed baseline: {exc}")
 
 
+class ReviewSheetTests(SimpleTestCase):
+    """The review workbook has one sheet per held-back table with one row per disagreeing
+    CSV line, each traced to its CSV line and database row with references by name."""
+
+    def test_every_disagreement_is_traceable(self):
+        from openpyxl import load_workbook
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.xlsx"
+            call_command("uncertainty_review_sheet", "--output", str(path), stdout=StringIO())
+            workbook = load_workbook(path, read_only=True)
+            summary = list(workbook["Summary"].iter_rows(min_row=2, values_only=True))
+            sheets = {table: list(workbook[title].iter_rows(min_row=2, values_only=True)) for title, table, *_ in summary}
+            workbook.close()
+
+        report = json.loads((iu.data_dir() / "import_report.json").read_text(encoding="utf-8"))
+        expected = {t["model"]: t["base_mismatch"] for t in report["tables"] if t["base_mismatch"] and t["carrying_bound"]}
+        self.assertEqual({table: len(values) - 1 for table, values in sheets.items()}, expected)
+        for table, (header, *rows) in sheets.items():
+            describes = header[header.index("db_pk") + 1:header.index("fields that disagree")]
+            for row in rows:
+                cells = dict(zip(header, row))
+                self.assertGreater(cells["csv_line"], 1, table)
+                self.assertIsNotNone(cells["db_pk"], table)
+                self.assertTrue(cells["fields that disagree"], table)
+                for name in describes:
+                    self.assertNotIn(" object (", str(cells[name]), table)
+
+
 class PublishRuleTests(SimpleTestCase):
     """The join against a tiny in-memory source: which rows count as issues, and that one
     issue holds the whole table back."""
@@ -185,6 +214,16 @@ class PublishRuleTests(SimpleTestCase):
         self.assertEqual(table["base_mismatch"], 1)
         self.assertFalse(table["published"])
         self.assertEqual(patches, {})
+
+    def test_same_value_printed_at_different_precision_matches(self):
+        for csv_base, fixture_base in (("2.11", 2.1), ("4.87E-05", 4.86831e-05)):
+            table, _patches = self.join([f"1,Straw,{csv_base},0.5,1.5"], {3: fixture_base})
+            self.assertTrue(table["published"], (csv_base, fixture_base))
+
+    def test_different_value_is_still_a_base_mismatch(self):
+        for csv_base, fixture_base in (("0.466", 0.402), ("5", 5.4), ("0.7", 0.0)):
+            table, _patches = self.join([f"1,Straw,{csv_base},0.5,1.5"], {3: fixture_base})
+            self.assertEqual(table["base_mismatch"], 1, (csv_base, fixture_base))
 
     def test_name_shared_by_two_rows_stays_unresolved(self):
         table, patches = self.join(["1,Straw,1.0,0.5,1.5"], {3: 1.0, 4: 1.0}, {3: "Straw", 4: "Straw"})

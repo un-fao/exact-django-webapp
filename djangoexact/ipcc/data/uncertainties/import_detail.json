@@ -20,38 +20,6 @@
       ]
     },
     "CoastalBGB.csv": {
-      "base_mismatch": [
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Tidal Marsh"
-          },
-          "pk": 93,
-          "f": [
-            [
-              "value",
-              2.11,
-              2.1
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Tidal Marsh"
-          },
-          "pk": 94,
-          "f": [
-            [
-              "value",
-              2.11,
-              2.1
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -177,19 +145,6 @@
           ]
         }
       ],
-      "unresolved_fk": [
-        {
-          "k": {
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        }
-      ],
       "groups": [
         "intercept",
         "n_ag_residues",
@@ -295,7 +250,7 @@
           "k": {
             "fuel_type": "Ethanol (Cars)"
           },
-          "pk": 118,
+          "pk": 101,
           "f": [
             [
               "co2",
@@ -313,7 +268,7 @@
           "k": {
             "fuel_type": "Ethanol (Trucks)"
           },
-          "pk": 119,
+          "pk": 102,
           "f": [
             [
               "co2",
@@ -336,7 +291,7 @@
           "k": {
             "fuel_type": "Diesel"
           },
-          "pk": 120,
+          "pk": 103,
           "f": [
             [
               "co2",
@@ -359,7 +314,7 @@
           "k": {
             "fuel_type": "Gasoline (2-Stroke)"
           },
-          "pk": 121,
+          "pk": 104,
           "f": [
             [
               "co2",
@@ -382,7 +337,7 @@
           "k": {
             "fuel_type": "Gasoline (4-Stroke)"
           },
-          "pk": 122,
+          "pk": 105,
           "f": [
             [
               "co2",
@@ -405,7 +360,7 @@
           "k": {
             "fuel_type": "Wood"
           },
-          "pk": 123,
+          "pk": 106,
           "f": [
             [
               "co2",
@@ -428,7 +383,7 @@
           "k": {
             "fuel_type": "Peat"
           },
-          "pk": 124,
+          "pk": 107,
           "f": [
             [
               "co2",
@@ -451,7 +406,7 @@
           "k": {
             "fuel_type": "Charcoal"
           },
-          "pk": 125,
+          "pk": 108,
           "f": [
             [
               "co2",
@@ -529,1722 +484,6 @@
       ]
     },
     "FLUData.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Millet"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Sorghum"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Rye"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Soybeans"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Dry Bean"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Potatoes"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Peanuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Vegetables"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Oilseeds"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Groundnuts"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Grains"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Maize"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Sugarcane"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Wheat"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Beans & Pulses"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Tubers"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Root Crops"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Barley"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Oats"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Millet"
-          }
-        }
-      ],
-      "unresolved_fk": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Wet",
-            "land_use_type": "Alfalfa"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Alfalfa"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Wet",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -2262,7 +501,7 @@
             "forest_type": "Natural",
             "land_use_type": "Mangrove Forest"
           },
-          "pk": 126,
+          "pk": 90,
           "f": [
             [
               "co2",
@@ -2275,22 +514,6 @@
               null
             ]
           ]
-        }
-      ],
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Tropical",
-            "forest_type": "Natural",
-            "land_use_type": "Mountain System"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "forest_type": "Plantation",
-            "land_use_type": "Mountain System"
-          }
         }
       ],
       "groups": [
@@ -2333,19 +556,6 @@
       ]
     },
     "ipcc.atwood.csv": {
-      "unresolved_fk": [
-        {
-          "k": {
-            "country": "Iran"
-          },
-          "bad": [
-            [
-              "country",
-              "Iran"
-            ]
-          ]
-        }
-      ],
       "groups": [
         "area_2014_km2",
         "mg_c_ha",
@@ -2363,59 +573,6 @@
       ]
     },
     "ipcc.forestmanagementbgb.csv": {
-      "base_mismatch": [
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "region": "South America",
-            "forest_type": "Natural",
-            "land_use_type": "Oceanic Forest",
-            "threshold": "125"
-          },
-          "pk": 1561,
-          "f": [
-            [
-              "value",
-              0.466,
-              0.402
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "region": "Central America",
-            "forest_type": "Natural",
-            "land_use_type": "Oceanic Forest",
-            "threshold": "125"
-          },
-          "pk": 1562,
-          "f": [
-            [
-              "value",
-              0.466,
-              0.402
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "region": "Caribbean",
-            "forest_type": "Natural",
-            "land_use_type": "Oceanic Forest",
-            "threshold": "125"
-          },
-          "pk": 1563,
-          "f": [
-            [
-              "value",
-              0.466,
-              0.402
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -2429,7 +586,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 43375,
+          "pk": 31615,
           "f": [
             [
               "value",
@@ -2445,7 +602,7 @@
             "continent": "Central Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 43411,
+          "pk": 31650,
           "f": [
             [
               "value",
@@ -2461,7 +618,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 43447,
+          "pk": 31685,
           "f": [
             [
               "value",
@@ -2477,7 +634,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 43483,
+          "pk": 31720,
           "f": [
             [
               "value",
@@ -2493,7 +650,7 @@
             "continent": "Western Africa",
             "land_use_type": "Grassland"
           },
-          "pk": 43519,
+          "pk": 31755,
           "f": [
             [
               "value",
@@ -2509,7 +666,7 @@
             "continent": "Central Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 43555,
+          "pk": 31790,
           "f": [
             [
               "value",
@@ -2525,7 +682,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 43591,
+          "pk": 31825,
           "f": [
             [
               "value",
@@ -2541,7 +698,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 43627,
+          "pk": 31860,
           "f": [
             [
               "value",
@@ -2557,7 +714,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 43663,
+          "pk": 31895,
           "f": [
             [
               "value",
@@ -2573,7 +730,7 @@
             "continent": "Western Asia",
             "land_use_type": "Grassland"
           },
-          "pk": 43699,
+          "pk": 31930,
           "f": [
             [
               "value",
@@ -2589,7 +746,7 @@
             "continent": "Europe",
             "land_use_type": "Grassland"
           },
-          "pk": 43735,
+          "pk": 31965,
           "f": [
             [
               "value",
@@ -2605,7 +762,7 @@
             "continent": "Oceania",
             "land_use_type": "Grassland"
           },
-          "pk": 43771,
+          "pk": 32000,
           "f": [
             [
               "value",
@@ -2621,7 +778,7 @@
             "continent": "North America",
             "land_use_type": "Grassland"
           },
-          "pk": 43807,
+          "pk": 32035,
           "f": [
             [
               "value",
@@ -2637,7 +794,7 @@
             "continent": "South America",
             "land_use_type": "Grassland"
           },
-          "pk": 43843,
+          "pk": 32070,
           "f": [
             [
               "value",
@@ -2653,7 +810,7 @@
             "continent": "Central America",
             "land_use_type": "Grassland"
           },
-          "pk": 43879,
+          "pk": 32105,
           "f": [
             [
               "value",
@@ -2669,7 +826,7 @@
             "continent": "Caribbean",
             "land_use_type": "Grassland"
           },
-          "pk": 43915,
+          "pk": 32140,
           "f": [
             [
               "value",
@@ -2719,24 +876,6 @@
       ]
     },
     "ipcc.livestockawms.csv": {
-      "base_mismatch": [
-        {
-          "k": {
-            "livestock_production_type": "High-Productivity",
-            "manure_management_type": "Burned For Fuel",
-            "livestock_category_type": "Growing Swine",
-            "ipcc_region": "South Asia"
-          },
-          "pk": 9813,
-          "f": [
-            [
-              "value",
-              2.0,
-              0.0
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -6344,148 +4483,6 @@
           ]
         }
       ],
-      "unmatched": [
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Lagoon"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Liquid/Slurry"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Solid Storage"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Dry Lot"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Pasture/Range/Paddock"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Daily Spread"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Digester"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Burned For Fuel"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Pit<1Month"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Pit>1Month"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Poultry Manure"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Deep Bedding"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Composting"
-          }
-        },
-        {
-          "k": {
-            "emission_type": "EmissionType object (1)",
-            "livestock_category_type": "Growing Swine",
-            "livestock_production_type": "Default",
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "manure_management_type": "Aerobic Treatment"
-          }
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -6511,908 +4508,6 @@
       ]
     },
     "ipcc.methaneentericfermentationfactor.csv": {
-      "base_mismatch": [
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 525,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 526,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 542,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 543,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 559,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 560,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 576,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 577,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 593,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 594,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 610,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 611,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 627,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 628,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 644,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 645,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 661,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 662,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 678,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "High-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 679,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 695,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 696,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 712,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 713,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 729,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 730,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 746,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 747,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 763,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 764,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 780,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 781,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 797,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 798,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 814,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 815,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 831,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 832,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 848,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "Low-Productivity",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 849,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 865,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Sub-Saharan Africa",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 866,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 882,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "East Asia And South-East Asia",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 883,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 899,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "North America",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 900,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 916,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Latin America And The Caribbean",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 917,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 933,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Western Europe",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 934,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 950,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Eastern Europe",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 951,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 967,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Russian Federation",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 968,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 984,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "Oceania",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 985,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 1001,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "NENA/Middle East",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 1002,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Layer"
-          },
-          "pk": 1018,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        },
-        {
-          "k": {
-            "ipcc_region": "South Asia",
-            "livestock_production_type": "Default",
-            "livestock_category_type": "Chicken Broiler"
-          },
-          "pk": 1019,
-          "f": [
-            [
-              "value",
-              4.87e-05,
-              4.86831e-05
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
@@ -7423,728 +4518,6 @@
       ]
     },
     "ipcc.organicsoildrainageemissionfactor.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(1) On-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Poor",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(52) Plantation",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "module_type": "(54) OtherLandUse",
-            "peat_type": "Nutrient Rich",
-            "site_location_type": "(2) Off-Site"
-          }
-        }
-      ],
       "groups": [
         "ch4",
         "co2",
@@ -8158,328 +4531,6 @@
       ]
     },
     "ipcc.organicsoilrewettingemissionfactor.csv": {
-      "unmatched": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Rich",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(52) Plantation"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "peat_type": "Nutrient Poor",
-            "module_type": "(54) OtherLandUse"
-          }
-        }
-      ],
       "groups": [
         "ch4",
         "co2",
@@ -8596,7 +4647,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Tea"
           },
-          "pk": 42985,
+          "pk": 30361,
           "f": [
             [
               "value",
@@ -8612,7 +4663,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45423,
+          "pk": 32685,
           "f": [
             [
               "value",
@@ -8628,7 +4679,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45424,
+          "pk": 32686,
           "f": [
             [
               "value",
@@ -8644,7 +4695,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45425,
+          "pk": 32687,
           "f": [
             [
               "value",
@@ -8660,7 +4711,7 @@
             "continent": "Eastern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45426,
+          "pk": 32688,
           "f": [
             [
               "value",
@@ -8676,7 +4727,7 @@
             "continent": "Central Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45461,
+          "pk": 32721,
           "f": [
             [
               "value",
@@ -8692,7 +4743,7 @@
             "continent": "Central Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45462,
+          "pk": 32722,
           "f": [
             [
               "value",
@@ -8708,7 +4759,7 @@
             "continent": "Central Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45463,
+          "pk": 32723,
           "f": [
             [
               "value",
@@ -8724,7 +4775,7 @@
             "continent": "Central Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45464,
+          "pk": 32724,
           "f": [
             [
               "value",
@@ -8740,7 +4791,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45499,
+          "pk": 32757,
           "f": [
             [
               "value",
@@ -8756,7 +4807,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45500,
+          "pk": 32758,
           "f": [
             [
               "value",
@@ -8772,7 +4823,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45501,
+          "pk": 32759,
           "f": [
             [
               "value",
@@ -8788,7 +4839,7 @@
             "continent": "Northern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45502,
+          "pk": 32760,
           "f": [
             [
               "value",
@@ -8804,7 +4855,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45537,
+          "pk": 32793,
           "f": [
             [
               "value",
@@ -8820,7 +4871,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45538,
+          "pk": 32794,
           "f": [
             [
               "value",
@@ -8836,7 +4887,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45539,
+          "pk": 32795,
           "f": [
             [
               "value",
@@ -8852,7 +4903,7 @@
             "continent": "Southern Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45540,
+          "pk": 32796,
           "f": [
             [
               "value",
@@ -8868,7 +4919,7 @@
             "continent": "Western Africa",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45575,
+          "pk": 32829,
           "f": [
             [
               "value",
@@ -8884,7 +4935,7 @@
             "continent": "Western Africa",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45576,
+          "pk": 32830,
           "f": [
             [
               "value",
@@ -8900,7 +4951,7 @@
             "continent": "Western Africa",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45577,
+          "pk": 32831,
           "f": [
             [
               "value",
@@ -8916,7 +4967,7 @@
             "continent": "Western Africa",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45578,
+          "pk": 32832,
           "f": [
             [
               "value",
@@ -8932,7 +4983,7 @@
             "continent": "Central Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45613,
+          "pk": 32865,
           "f": [
             [
               "value",
@@ -8948,7 +4999,7 @@
             "continent": "Central Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45614,
+          "pk": 32866,
           "f": [
             [
               "value",
@@ -8964,7 +5015,7 @@
             "continent": "Central Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45615,
+          "pk": 32867,
           "f": [
             [
               "value",
@@ -8980,7 +5031,7 @@
             "continent": "Central Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45616,
+          "pk": 32868,
           "f": [
             [
               "value",
@@ -8996,7 +5047,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45651,
+          "pk": 32901,
           "f": [
             [
               "value",
@@ -9012,7 +5063,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45652,
+          "pk": 32902,
           "f": [
             [
               "value",
@@ -9028,7 +5079,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45653,
+          "pk": 32903,
           "f": [
             [
               "value",
@@ -9044,7 +5095,7 @@
             "continent": "Eastern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45654,
+          "pk": 32904,
           "f": [
             [
               "value",
@@ -9060,7 +5111,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45689,
+          "pk": 32937,
           "f": [
             [
               "value",
@@ -9076,7 +5127,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45690,
+          "pk": 32938,
           "f": [
             [
               "value",
@@ -9092,7 +5143,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45691,
+          "pk": 32939,
           "f": [
             [
               "value",
@@ -9108,7 +5159,7 @@
             "continent": "South-Eastern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45692,
+          "pk": 32940,
           "f": [
             [
               "value",
@@ -9124,7 +5175,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45727,
+          "pk": 32973,
           "f": [
             [
               "value",
@@ -9140,7 +5191,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45728,
+          "pk": 32974,
           "f": [
             [
               "value",
@@ -9156,7 +5207,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45729,
+          "pk": 32975,
           "f": [
             [
               "value",
@@ -9172,7 +5223,7 @@
             "continent": "Southern Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45730,
+          "pk": 32976,
           "f": [
             [
               "value",
@@ -9188,7 +5239,7 @@
             "continent": "Western Asia",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45765,
+          "pk": 33009,
           "f": [
             [
               "value",
@@ -9204,7 +5255,7 @@
             "continent": "Western Asia",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45766,
+          "pk": 33010,
           "f": [
             [
               "value",
@@ -9220,7 +5271,7 @@
             "continent": "Western Asia",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45767,
+          "pk": 33011,
           "f": [
             [
               "value",
@@ -9236,7 +5287,7 @@
             "continent": "Western Asia",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45768,
+          "pk": 33012,
           "f": [
             [
               "value",
@@ -9252,7 +5303,7 @@
             "continent": "Europe",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45803,
+          "pk": 33045,
           "f": [
             [
               "value",
@@ -9268,7 +5319,7 @@
             "continent": "Europe",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45804,
+          "pk": 33046,
           "f": [
             [
               "value",
@@ -9284,7 +5335,7 @@
             "continent": "Europe",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45805,
+          "pk": 33047,
           "f": [
             [
               "value",
@@ -9300,7 +5351,7 @@
             "continent": "Europe",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45806,
+          "pk": 33048,
           "f": [
             [
               "value",
@@ -9316,7 +5367,7 @@
             "continent": "Oceania",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45841,
+          "pk": 33081,
           "f": [
             [
               "value",
@@ -9332,7 +5383,7 @@
             "continent": "Oceania",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45842,
+          "pk": 33082,
           "f": [
             [
               "value",
@@ -9348,7 +5399,7 @@
             "continent": "Oceania",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45843,
+          "pk": 33083,
           "f": [
             [
               "value",
@@ -9364,7 +5415,7 @@
             "continent": "Oceania",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45844,
+          "pk": 33084,
           "f": [
             [
               "value",
@@ -9380,7 +5431,7 @@
             "continent": "North America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45879,
+          "pk": 33117,
           "f": [
             [
               "value",
@@ -9396,7 +5447,7 @@
             "continent": "North America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45880,
+          "pk": 33118,
           "f": [
             [
               "value",
@@ -9412,7 +5463,7 @@
             "continent": "North America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45881,
+          "pk": 33119,
           "f": [
             [
               "value",
@@ -9428,7 +5479,7 @@
             "continent": "North America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45882,
+          "pk": 33120,
           "f": [
             [
               "value",
@@ -9444,7 +5495,7 @@
             "continent": "South America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45917,
+          "pk": 33153,
           "f": [
             [
               "value",
@@ -9460,7 +5511,7 @@
             "continent": "South America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45918,
+          "pk": 33154,
           "f": [
             [
               "value",
@@ -9476,7 +5527,7 @@
             "continent": "South America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45919,
+          "pk": 33155,
           "f": [
             [
               "value",
@@ -9492,7 +5543,7 @@
             "continent": "South America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45920,
+          "pk": 33156,
           "f": [
             [
               "value",
@@ -9508,7 +5559,7 @@
             "continent": "Central America",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45955,
+          "pk": 33189,
           "f": [
             [
               "value",
@@ -9524,7 +5575,7 @@
             "continent": "Central America",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45956,
+          "pk": 33190,
           "f": [
             [
               "value",
@@ -9540,7 +5591,7 @@
             "continent": "Central America",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45957,
+          "pk": 33191,
           "f": [
             [
               "value",
@@ -9556,7 +5607,7 @@
             "continent": "Central America",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45958,
+          "pk": 33192,
           "f": [
             [
               "value",
@@ -9572,7 +5623,7 @@
             "continent": "Caribbean",
             "land_use_type": "Agroforestry - Default"
           },
-          "pk": 45993,
+          "pk": 33225,
           "f": [
             [
               "value",
@@ -9588,7 +5639,7 @@
             "continent": "Caribbean",
             "land_use_type": "Hedgerow"
           },
-          "pk": 45994,
+          "pk": 33226,
           "f": [
             [
               "value",
@@ -9604,7 +5655,7 @@
             "continent": "Caribbean",
             "land_use_type": "Silvoarable"
           },
-          "pk": 45995,
+          "pk": 33227,
           "f": [
             [
               "value",
@@ -9620,7 +5671,7 @@
             "continent": "Caribbean",
             "land_use_type": "Silvopasture"
           },
-          "pk": 45996,
+          "pk": 33228,
           "f": [
             [
               "value",
@@ -9756,320 +5807,6 @@
       ]
     },
     "LandUseCarbonStockExchangeFactor.csv": {
-      "unresolved_fk": [
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Boreal",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Cool Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical",
-            "moisture": "Wet",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Wet",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Tropical Montane",
-            "moisture": "Wet",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Dry",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Annual Fallow"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Annual Fallow"
-            ]
-          ]
-        },
-        {
-          "k": {
-            "climate": "Warm Temperate",
-            "moisture": "Moist",
-            "land_use_type": "Degraded Land"
-          },
-          "bad": [
-            [
-              "land_use_type",
-              "Degraded Land"
-            ]
-          ]
-        }
-      ],
       "groups": [
         "value"
       ]
