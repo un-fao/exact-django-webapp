@@ -151,8 +151,8 @@ class FixtureWriterTests(SimpleTestCase):
 
 
 class ReviewSheetTests(SimpleTestCase):
-    """The review workbook lists every base-value disagreement of a table that carries
-    bounds, each traced to its CSV line with references shown by name."""
+    """The review workbook has one sheet per held-back table with one row per disagreeing
+    CSV line, each traced to its CSV line and database row with references by name."""
 
     def test_every_disagreement_is_traceable(self):
         from openpyxl import load_workbook
@@ -161,18 +161,22 @@ class ReviewSheetTests(SimpleTestCase):
             path = Path(tmp) / "review.xlsx"
             call_command("uncertainty_review_sheet", "--output", str(path), stdout=StringIO())
             workbook = load_workbook(path, read_only=True)
-            values = list(workbook["Mismatches"].iter_rows(values_only=True))
+            summary = list(workbook["Summary"].iter_rows(min_row=2, values_only=True))
+            sheets = {table: list(workbook[title].iter_rows(min_row=2, values_only=True)) for title, table, *_ in summary}
             workbook.close()
-            rows = [dict(zip(values[0], r)) for r in values[1:]]
 
         report = json.loads((iu.data_dir() / "import_report.json").read_text(encoding="utf-8"))
-        tables_with_mismatches = {t["model"] for t in report["tables"] if t["base_mismatch"] and t["carrying_bound"]}
-        self.assertEqual({r["table"] for r in rows}, tables_with_mismatches)
-        for row in rows:
-            self.assertGreater(row["csv_line"], 1)
-            self.assertTrue(row["ipcc_source"])
-            self.assertNotIn(" object (", row["natural_key"])
-            self.assertIsNotNone(row["db_inside_csv_range"])
+        expected = {t["model"]: t["base_mismatch"] for t in report["tables"] if t["base_mismatch"] and t["carrying_bound"]}
+        self.assertEqual({table: len(values) - 1 for table, values in sheets.items()}, expected)
+        for table, (header, *rows) in sheets.items():
+            describes = header[header.index("db_pk") + 1:header.index("fields that disagree")]
+            for row in rows:
+                cells = dict(zip(header, row))
+                self.assertGreater(cells["csv_line"], 1, table)
+                self.assertIsNotNone(cells["db_pk"], table)
+                self.assertTrue(cells["fields that disagree"], table)
+                for name in describes:
+                    self.assertNotIn(" object (", str(cells[name]), table)
 
 
 class PublishRuleTests(SimpleTestCase):
