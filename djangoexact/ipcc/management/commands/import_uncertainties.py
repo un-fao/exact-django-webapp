@@ -10,6 +10,7 @@ import csv
 import json
 import math
 import re
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path
 
 from django.apps import apps as django_apps
@@ -93,6 +94,22 @@ def _to_float_or_none(raw):
         return float(raw)
     except ValueError:
         return None
+
+
+def same_published_value(base_raw, fixture_val):
+    """True when the CSV base and the fixture value are the same number printed at
+    different precision (2.11 vs 2.1, 4.87E-05 vs 4.86831e-05): both agree once rounded
+    to the coarser of the two precisions. The 1% cap stops a CSV that prints an integer
+    from matching any fractional value that happens to round onto it."""
+    try:
+        csv_dec = Decimal(base_raw)
+    except InvalidOperation:
+        return False
+    db_dec = Decimal(repr(float(fixture_val)))
+    if not math.isclose(float(csv_dec), float(db_dec), rel_tol=0.01):
+        return False
+    coarser = Decimal(1).scaleb(max(csv_dec.as_tuple().exponent, db_dec.as_tuple().exponent))
+    return csv_dec.quantize(coarser, ROUND_HALF_UP) == db_dec.quantize(coarser, ROUND_HALF_UP)
 
 
 def get_cell(row, ref, name_to_index):
@@ -371,7 +388,10 @@ def process_csv(csv_path, spec, model, manifest_by_model, fixture_cache, detail=
                     mismatch = True
                     mismatched_fields.append([model_field, base_val, None])
                 elif isinstance(fixture_val, (int, float)) and not isinstance(fixture_val, bool):
-                    if not math.isclose(base_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9):
+                    if not (
+                        math.isclose(base_val, fixture_val, rel_tol=1e-6, abs_tol=1e-9)
+                        or same_published_value(base_raw, fixture_val)
+                    ):
                         mismatch = True
                         mismatched_fields.append([model_field, base_val, fixture_val])
 

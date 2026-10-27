@@ -186,6 +186,16 @@ class PublishRuleTests(SimpleTestCase):
         self.assertFalse(table["published"])
         self.assertEqual(patches, {})
 
+    def test_same_value_printed_at_different_precision_matches(self):
+        for csv_base, fixture_base in (("2.11", 2.1), ("4.87E-05", 4.86831e-05)):
+            table, _patches = self.join([f"1,Straw,{csv_base},0.5,1.5"], {3: fixture_base})
+            self.assertTrue(table["published"], (csv_base, fixture_base))
+
+    def test_different_value_is_still_a_base_mismatch(self):
+        for csv_base, fixture_base in (("0.466", 0.402), ("5", 5.4), ("0.7", 0.0)):
+            table, _patches = self.join([f"1,Straw,{csv_base},0.5,1.5"], {3: fixture_base})
+            self.assertEqual(table["base_mismatch"], 1, (csv_base, fixture_base))
+
     def test_name_shared_by_two_rows_stays_unresolved(self):
         table, patches = self.join(["1,Straw,1.0,0.5,1.5"], {3: 1.0, 4: 1.0}, {3: "Straw", 4: "Straw"})
         self.assertEqual((table["unresolved_fk"], table["written"]), (1, 0))
