@@ -12,7 +12,8 @@ CLEARED = {
 
 def invalidate_caches(apps, schema_editor):
     """The dry matter harvested before conversion is now ignored unless the land use change starts from forest or
-    perennial cropland, and perennial cropland feeds the HWP pool only on complete renewal. Finalized projects keep
+    perennial cropland. Perennial cropland feeds the HWP pool on complete renewal and change of system, but its own
+    results do not change (the pool recomputes its sources), so only the pools are cleared. Finalized projects keep
     their results."""
     LandUseChange = apps.get_model("api", "LandUseChange")
     HarvestedWoodProducts = apps.get_model("api", "HarvestedWoodProducts")

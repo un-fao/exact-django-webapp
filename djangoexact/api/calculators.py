@@ -2178,8 +2178,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         module_end_is_perennial = self._is_scenario_perennial(scenario_type_end)
 
         is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
-        # Read by the inputs built right after this call: only a perennial-to-perennial complete renewal feeds wood products.
-        self.hwp_complete_renewal = module_start_is_perennial and module_end_is_perennial and is_complete_renewal
+        # Read by the inputs built right after this call. Complete renewal and change of system clear the start trees
+        # (perennial_to_luc below). A conversion to other land is left out on purpose: this module computes no biomass
+        # for that scenario (calculate_biomass is False), the land use change module does and feeds its trees.
+        self.hwp_woody_loss = module_start_is_perennial and module_end_is_perennial and (has_change_in_system or is_complete_renewal)
 
         self.agb_start = copy.deepcopy(agb_start)
         self.agb_end = copy.deepcopy(agb_end)
@@ -2347,7 +2349,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_w,
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
-                "hwp_complete_renewal": self.hwp_complete_renewal,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -2416,7 +2418,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_wo,
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
-                "hwp_complete_renewal": self.hwp_complete_renewal,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
@@ -2489,7 +2491,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_w,
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
-                "hwp_complete_renewal": self.hwp_complete_renewal,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
@@ -2561,7 +2563,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_wo,
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
-                "hwp_complete_renewal": self.hwp_complete_renewal,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_wo,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
