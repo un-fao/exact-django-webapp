@@ -957,6 +957,8 @@ class ForestManagementReport(LandModuleReport):
     def compute(self) -> ModuleResult:  # noqa: C901
         activity_title = self.module.activity.name
         m = self.module
+        if m.is_stock_difference():
+            return self._compute_stock_difference(activity_title)
         es = self.emissions_set
 
         def extr(activity, gas):
@@ -1093,6 +1095,54 @@ class ForestManagementReport(LandModuleReport):
             title=m.module_type.name,
             metadata_section_title="Forest Management",
             result_rows=result_rows,
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            units_breakdown_w=self._units_breakdown_w,
+            units_breakdown_wo=self._units_breakdown_wo,
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items(activity_title),
+        )
+
+
+    def _compute_stock_difference(self, activity_title: str) -> ModuleResult:
+        # The gain-loss defaults and inputs (growth, rotation, logging, disturbances) do not apply here.
+        m = self.module
+        es = self.emissions_set
+        AT = math_utils.ActivityTypes
+        GT = math_utils.GasTypes
+        biomass_co2 = _add(self._extract(es, AT.AGB_GROWTH, GT.CO2), self._extract(es, AT.BGB_GROWTH, GT.CO2))
+        dom_co2 = _add(self._extract(es, AT.LITTER, GT.CO2), self._extract(es, AT.DEADWOOD, GT.CO2))
+        zeros = [0.0] * self._project_duration
+
+        pools = [("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood")]
+        mw = [
+            MetadataWrite(1, 1, "Hectares"),
+            MetadataWrite(2, 1, "Type of forest"),
+            MetadataWrite(3, 1, "Forest category"),
+            MetadataWrite(4, 1, "Approach"),
+            MetadataWrite(5, 1, "Data source"),
+            MetadataWrite(4, 2, m.get_approach_display()),
+            MetadataWrite(5, 2, m.data_source.short_name if m.data_source else None),
+        ]
+        mw += [MetadataWrite(6 + i, 1, f"{label} stock (tC/ha)") for i, (_, label) in enumerate(pools)]
+        for col, is_state, sfx in [(2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")]:
+            if not is_state:
+                continue
+            mw += [
+                MetadataWrite(1, col, m.area),
+                MetadataWrite(2, col, m.forest_type.name),
+                MetadataWrite(3, col, m.forest_condition_type.name),
+            ]
+            mw += [MetadataWrite(6 + i, col, getattr(m, f"stock_{pool}_{sfx}")) for i, (pool, _) in enumerate(pools)]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Forest Management (stock difference)",
+            result_rows=self._standard_result_rows(
+                biomass_co2, zeros, zeros, zeros, zeros,
+                extra_rows=[ResultRow("CO2 in dead organic matter", dom_co2)],
+            ),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,

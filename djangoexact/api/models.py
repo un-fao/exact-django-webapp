@@ -2421,6 +2421,37 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True)
     degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True)
 
+    # Stock-difference approach (IPCC 2006 Vol. 4, ch. 2, eq. 2.5). Carbon stocks in tC/ha: _start at the start of the period, _w / _wo expected at its end.
+    # Gain-loss inputs (growth, rotation, logging, degradation, disturbances) are ignored under stock difference.
+
+    APPROACH_GAIN_LOSS = "gain_loss"
+    APPROACH_STOCK_DIFFERENCE = "stock_difference"
+    APPROACH_CHOICES = [(APPROACH_GAIN_LOSS, "Gain-loss"), (APPROACH_STOCK_DIFFERENCE, "Stock difference")]
+    # Soil carbon is deliberately not a pool here (FAO review 2026-10-28): stock difference accounts for biomass and DOM only.
+    STOCK_DIFFERENCE_POOLS = ("agb", "bgb", "litter", "deadwood")
+
+    approach = models.CharField(max_length=20, choices=APPROACH_CHOICES, default=APPROACH_GAIN_LOSS, verbose_name="approach")
+
+    stock_agb_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_agb_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_agb_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    def is_stock_difference(self) -> bool:
+        return self.approach == self.APPROACH_STOCK_DIFFERENCE
+
+    def stock_difference_stocks(self, scenario: str) -> dict[str, float | None]:
+        """Pool -> stock (tC/ha) for scenario "start", "w" or "wo"."""
+        return {pool: getattr(self, f"stock_{pool}_{scenario}") for pool in self.STOCK_DIFFERENCE_POOLS}
+
     @property
     def submodules(self) -> list["Submodule"]:
         return list(self.disturbances.all())
