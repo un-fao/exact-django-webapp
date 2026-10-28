@@ -581,6 +581,27 @@ _REPORT_BODY = openapi.Schema(
 )
 
 
+_INDICATORS_LANG_PARAM = openapi.Parameter(
+    "lang",
+    openapi.IN_QUERY,
+    description="Label language; falls back to Accept-Language, then en",
+    type=openapi.TYPE_STRING,
+    required=False,
+)
+
+
+def indicators_response(request, project):
+    """Shared by the private and public project indicators actions."""
+    from django.utils import translation
+    from api.services import indicators as indicators_service
+
+    lang = utils.requested_language(request)
+    with translation.override(lang):
+        data = indicators_service.compute_project_indicators(project)
+        # Render lazy labels while the requested language is still active.
+        return Response(data=json.loads(json.dumps(data, default=str)), status=http_status.HTTP_200_OK)
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -855,6 +876,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[_INDICATORS_LANG_PARAM],
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
+    )
+    def indicators(self, request, pk=None):
+        """Project indicators (land use change matrix, food waste), grouped.
+
+        Read-only: computed from the module results of the project's ready activities.
+        """
+        project: Project = get_object_or_404(Project, pk=pk)
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+        return indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
@@ -2972,7 +3009,8 @@ def generic_module_viewset(model: Module):
 
                 if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = CalculatorFactory().calculate_result(module)
+                    factory = CalculatorFactory()
+                    total, by_activity, by_gas, by_activity_gas, inventory = factory.calculate_result(module)
 
                     results_total = DynamicResultFactory.create(activity, total, aggregate_by=BreakdownTypes.TOTAL).data
                     results_by_activity = DynamicResultFactory.create(activity, by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data
@@ -2983,6 +3021,8 @@ def generic_module_viewset(model: Module):
                     results_by_activity["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY)
                     results_by_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.GAS)
                     results_by_activity_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
+                    for results in (results_total, results_by_activity, results_by_gas, results_by_activity_gas):
+                        results.update(getattr(factory.calculator, "results_extra", {}))
 
                     module_results = (
                         results_total
