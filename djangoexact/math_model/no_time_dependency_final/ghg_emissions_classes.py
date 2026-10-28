@@ -46,6 +46,7 @@ class ActivityTypes(Enum):
     HWP_LOGGING_BGB = "Harvested Wood Product Logging BGB"
     HWP_ROTATION_AGB = "Harvested Wood Product Rotation AGB"
     HWP_ROTATION_BGB = "Harvested Wood Product Rotation BGB"
+    HWP_POOL = "Harvested Wood Products Pool"
     CH4_EMITTED_RICE = "CH4 Emitted Rice"
     STRAW_BURNING = "Straw Burning"
     IRRIGATION_OPERATIONAL = "Operational Phase of Irrigation"

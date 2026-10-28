@@ -2972,7 +2972,8 @@ def generic_module_viewset(model: Module):
 
                 if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = CalculatorFactory().calculate_result(module)
+                    factory = CalculatorFactory()
+                    total, by_activity, by_gas, by_activity_gas, inventory = factory.calculate_result(module)
 
                     results_total = DynamicResultFactory.create(activity, total, aggregate_by=BreakdownTypes.TOTAL).data
                     results_by_activity = DynamicResultFactory.create(activity, by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data
@@ -2983,6 +2984,8 @@ def generic_module_viewset(model: Module):
                     results_by_activity["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY)
                     results_by_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.GAS)
                     results_by_activity_gas["inventory"] = inventory.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
+                    for results in (results_total, results_by_activity, results_by_gas, results_by_activity_gas):
+                        results.update(getattr(factory.calculator, "results_extra", {}))
 
                     module_results = (
                         results_total
