@@ -622,27 +622,29 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
         ValueError: If the parent module or module type cannot be found.
     """
 
-    parent_module = None
-    module_type = None
+    activity = organic_soil.activity
+    # The bare M2M has no ordering, so Postgres (online) and SQLite (offline,
+    # index order by moduletype_id) used to pick different parents. Through-table
+    # pk is insertion order, the closest match to what Postgres returns today.
+    links = activity.module_types.through.objects.filter(activity=activity).select_related("moduletype").order_by("id")
+    module_types = [link.moduletype for link in links]
 
-    for mt in organic_soil.activity.module_types.all():
-        if mt.is_luc:
-            parent_module = getattr(organic_soil.activity, mt.class_name.lower()).first()
-            module_type = mt
-            break
-        else:
-            potential_parent = getattr(organic_soil.activity, mt.class_name.lower(), None)
-            if potential_parent:
-                parent = potential_parent.first()
-                if parent and getattr(parent, "organic_soil", None) == organic_soil:
-                    parent_module = parent
-                    module_type = mt
-                    break
+    for mt in module_types:
+        modules = getattr(activity, (mt.class_name or "").lower(), None)
+        if hasattr(getattr(modules, "model", None), "organic_soil"):
+            owner = modules.filter(organic_soil=organic_soil).first()
+            if owner:
+                return owner, mt
+
+    # Legacy fallback: many existing soils have no owning module, so keep picking
+    # the first LUC type's first module instead of raising for them.
+    luc_type = next((mt for mt in module_types if mt.is_luc), None)
+    parent_module = getattr(activity, luc_type.class_name.lower()).first() if luc_type else None
 
     if parent_module is None:
         raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")
 
-    return parent_module, module_type
+    return parent_module, luc_type
 
 
 class ChangeLog:
