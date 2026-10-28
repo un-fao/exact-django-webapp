@@ -5295,6 +5295,21 @@
   },
   {
     "model": "api.moduletype",
+    "pk": 68,
+    "fields": {
+      "name": "Rewetted Wetland Mineral Soils",
+      "name_en": "Rewetted Wetland Mineral Soils",
+      "name_fr": "Sols minéraux de zones humides remis en eau",
+      "name_es": "Suelos minerales de humedales rehumedecidos",
+      "name_ru": "Повторно обводнённые минеральные почвы водно-болотных угодий",
+      "class_name": "IwmsRewetting",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
     "pk": 23,
     "fields": {
       "name": "Settlement",

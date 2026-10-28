@@ -8357,3 +8357,7 @@ class TransportEntryCalculator(BaseValueChainCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+# Kept in its own module to keep this file from growing; imported here so CalculatorFactory finds it by name.
+from api.iwms_rewetting_calculator import IwmsRewettingCalculator  # noqa: E402,F401

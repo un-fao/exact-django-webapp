@@ -61,6 +61,7 @@ class IsPublicOrAuthenticated(BasePermission):
                 "irrigationphase",
                 "landusechange",
                 "organicsoil",
+                "iwmsrewetting",
                 "floodedriceminorseason",
                 "forestdisturbance",
                 "building",

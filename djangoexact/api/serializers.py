@@ -18,6 +18,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from api.services import iwms_rewetting
 from django.utils.text import slugify
 
 from . import labels
@@ -67,6 +68,7 @@ from .models import (
     ModuleType,
     Moisture,
     OrganicSoil,
+    IwmsRewetting,
     OtherInfrastructure,
     PerennialCropland,
     Project,
@@ -2124,6 +2126,36 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         representation["parent_land_use_type_w"] = self.parent_land_use_type_w
         representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
         return representation
+
+
+# Rewetted inland wetland mineral soils
+
+IWMS_REWETTING_SCENARIOS = (utils.ScenarioTypes.START, utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT)
+
+
+class IwmsRewettingWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = IwmsRewetting
+        fields = "__all__"
+        ref_name = "IwmsRewetting"
+        mandatory_fields = {scenario.verbose_name: {"mandatory": [f"area_{scenario.value}"]} for scenario in IWMS_REWETTING_SCENARIOS}
+
+    def validate(self, data):
+        iwms_rewetting.validate_areas(data, data["activity"] if "activity" in data else self.instance.activity)
+        return super().validate(data)
+
+
+class IwmsRewettingReadSerializer(BaseGenericModuleSerializer):
+    is_wetland_soil = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IwmsRewetting
+        fields = "__all__"
+        ref_name = "IwmsRewetting"
+        mandatory_fields = IwmsRewettingWriteSerializer.Meta.mandatory_fields
+
+    def get_is_wetland_soil(self, instance) -> bool:
+        return iwms_rewetting.is_wetland_soil(iwms_rewetting.activity_soil_type(instance.activity))
 
 
 # Flooded Rice

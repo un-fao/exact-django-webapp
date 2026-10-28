@@ -3260,6 +3260,24 @@ class LandUseChange(Module):
         return module_types
 
 
+class IwmsRewetting(Module):
+    """CH4 from rewetted inland wetland mineral soils, IPCC 2013 Wetlands Supplement ch. 5 (Eq. 5.1, Table 5.4).
+
+    An addendum to the activity's land modules, like OrganicSoil: it carries its own rewetted hectares per scenario
+    and only the CH4. The cropland SOC side (Table 5.3 FLU) stays on the cropland module, as its FLU tier 2. Applies
+    only on the soil type Wetland; math in math_model/no_time_dependency_final/iwms_rewetting.py.
+    """
+
+    area_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_start")
+    area_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_w")
+    area_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_wo")
+    area_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_area_thread")
+
+    ef_ch4_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_start")
+    ef_ch4_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_w")
+    ef_ch4_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_wo")
+
+
 ### MODEL PARAMETERS TABLES ###
 
 

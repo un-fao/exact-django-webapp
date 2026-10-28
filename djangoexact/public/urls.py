@@ -24,6 +24,7 @@ router.register(r"other-lands", public_views.generic_public_module_viewset(api_m
 router.register(r"coastal-wetlands", public_views.generic_public_module_viewset(api_models.CoastalWetland), basename="coastalwetland")
 router.register(r"land-use-changes", public_views.generic_public_module_viewset(api_models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", public_views.generic_public_module_viewset(api_models.OrganicSoil), basename="organicsoil")
+router.register(r"iwms-rewettings", public_views.generic_public_module_viewset(api_models.IwmsRewetting), basename="iwmsrewetting")
 router.register(r"flooded-rices", public_views.generic_public_module_viewset(api_models.FloodedRice), basename="floodedrice")
 router.register(r"flooded-rices-minor-seasons", public_views.generic_public_module_viewset(api_models.MinorSeasonFloodedRice), basename="floodedriceminorseason")
 router.register(r"livestocks", public_views.generic_public_module_viewset(api_models.Livestock), basename="livestock")

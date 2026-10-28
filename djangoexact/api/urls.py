@@ -106,6 +106,7 @@ router.register(r"status-types", views.public_generic_viewset(models.StatusType)
 
 router.register(r"land-use-changes", views.generic_module_viewset(models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", views.generic_module_viewset(models.OrganicSoil), basename="organicsoil")
+router.register(r"iwms-rewettings", views.generic_module_viewset(models.IwmsRewetting), basename="iwmsrewetting")
 router.register(r"soil-types", views.SoilTypeViewset, basename="soiltype")
 router.register(r"climates", views.public_generic_viewset(models.Climate), basename="climate")
 router.register(r"moistures", views.public_generic_viewset(models.Moisture), basename="moisture")
