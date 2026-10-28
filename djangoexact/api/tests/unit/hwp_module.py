@@ -344,7 +344,7 @@ class PerennialHwpModuleTestCase(HwpModuleMixin, base_module.BaseModuleTestCase)
         self.assertGreater(source["pool_w"], -source["inflow_w"])
         self.assertEqual(source["inflow_wo"], 0)
 
-    def test_change_of_system_without_complete_renewal_feeds_nothing(self):
+    def test_change_of_system_feeds_the_trees_removed(self):
         other_trees = models.LandUseType.objects.filter(
             module_types__class_name="PerennialCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True
         ).exclude(pk=self.module.land_use_type_start_id)
@@ -355,9 +355,10 @@ class PerennialHwpModuleTestCase(HwpModuleMixin, base_module.BaseModuleTestCase)
         else:
             self.skipTest("Only one perennial land-use type with IPCC data in this random test project")
 
-        self.add_hwp(self.activity)
-        [source] = self.results(self.hwp_of(self.activity))["hwp"]["sources"]
-        self.assertEqual(source["inflow_w"], 0)
+        hwp = self.assert_sources_unchanged_and_pool_matches([self.module])
+        [source] = self.results(hwp)["hwp"]["sources"]
+        self.assertGreater(source["inflow_w"], 0)
+        self.assertLess(source["pool_w"], 0)
         self.assertEqual(source["inflow_wo"], 0)
 
 
@@ -480,13 +481,16 @@ class PerennialLandUseChangeHwpModuleTestCase(HwpModuleMixin, base_module.AnyToA
         self.assertGreater(sources["LandUseChange"]["inflow_w"], 0)
 
     def test_conversion_from_perennial_counts_the_wood_once(self):
-        # The perennial module is part of the land use change, so it is a source of the activity too; a renewal flag
-        # left on it must not add the same trees a second time on top of the harvest before conversion.
+        # The perennial module is part of the land use change, so it is a source too. With project the trees are
+        # converted: only the land use change computes them (harvest before conversion), even with a renewal flag left
+        # on the perennial module. Without project they stay perennial and are renewed: only the perennial module does.
         self.edit_module(self.module_start, self.user, {"is_complete_renewal_w": True})
         self.add_hwp(self.activity)
         sources = {entry["class_name"]: entry for entry in self.results(self.hwp_of(self.activity))["hwp"]["sources"]}
         self.assertEqual(sources["PerennialCropland"]["inflow_w"], 0)
+        self.assertGreater(sources["PerennialCropland"]["inflow_wo"], 0)
         self.assertGreater(sources["LandUseChange"]["inflow_w"], 0)
+        self.assertEqual(sources["LandUseChange"]["inflow_wo"], 0)
 
     def test_wood_harvested_before_conversion_is_reported_in_dry_matter(self):
         self.add_hwp(self.activity)

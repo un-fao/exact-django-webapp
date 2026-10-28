@@ -50,8 +50,8 @@ class PerennialCropland(LandModule):
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float] = None
     end_module_has_growth: bool
-    # Only a complete renewal sends the removed trees to wood products; change of system and conversion do not (yet).
-    hwp_complete_renewal: bool = False
+    # The start trees are cleared (complete renewal or change of system): the AGB lost feeds wood products.
+    hwp_woody_loss: bool = False
     
     # NOTE: Add specific AGB and BGB and t2 values
     agb_start_default: float
@@ -168,7 +168,8 @@ class PerennialCropland(LandModule):
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
-                        if self.hwp_complete_renewal and self.agb_end < self.agb_start:
+                        # Only this tabulated branch can lose start AGB; the growth branch below only adds to it.
+                        if self.hwp_woody_loss and self.agb_end < self.agb_start:
                             self.hwp_inflow_co2, _ = biomass_emissions(self.agb_start, self.agb_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
                     else:

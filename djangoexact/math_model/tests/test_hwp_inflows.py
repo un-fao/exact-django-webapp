@@ -19,9 +19,9 @@ def line(module, activity):
     return [e.value for line in module.result.yearly_emissions_by_sector_by_gas if line.activity == activity for e in line.emissions]
 
 
-def perennial(agb_start, agb_end, bgb_end, complete_renewal=True):
+def perennial(agb_start, agb_end, bgb_end, woody_loss=True, growth=False):
     module = PerennialCropland(
-        hwp_complete_renewal=complete_renewal,
+        hwp_woody_loss=woody_loss,
         **TIMING,
         **SOIL,
         hectares_start=10.0,
@@ -39,7 +39,7 @@ def perennial(agb_start, agb_end, bgb_end, complete_renewal=True):
         agb_rate_default=2.0,
         agb_maximum_c=60.0,
         bgb_rate_default=0.5,
-        end_module_has_growth=False,
+        end_module_has_growth=growth,
         agb_start_default=agb_start,
         agb_end_default=agb_end,
         bgb_end_default=bgb_end,
@@ -61,11 +61,23 @@ def test_perennial_removal_inflow_is_the_agb_part_of_the_booked_loss():
         assert removed == pytest.approx(booked * 40.0 / (40.0 + module.bgb_start))
 
 
-def test_perennial_loss_other_than_complete_renewal_has_no_inflow():
-    # Change of system or conversion to another land use: the trees are not assumed to become products.
-    module = perennial(agb_start=40.0, agb_end=0.0, bgb_end=0.0, complete_renewal=False)
+def test_perennial_partial_loss_feeds_only_the_agb_lost():
+    # A Tier 2 end AGB below the start (e.g. a change to a smaller system): only the difference becomes wood.
+    module = perennial(agb_start=40.0, agb_end=15.0, bgb_end=0.0)
+    assert sum(module.hwp_inflow_co2) == pytest.approx((40.0 - 15.0) * 10.0 * C_TO_CO2)
+
+
+def test_perennial_loss_without_cleared_trees_has_no_inflow():
+    # The calculator sets the flag only when the start trees are cleared; the booked loss is the same either way.
+    module = perennial(agb_start=40.0, agb_end=0.0, bgb_end=0.0, woody_loss=False)
     assert getattr(module, "hwp_inflow_co2", None) is None
     assert sum(line(module, ActivityTypes.BIOMASS)) == pytest.approx(sum(line(perennial(40.0, 0.0, 0.0), ActivityTypes.BIOMASS)))
+
+
+def test_perennial_growing_end_has_no_inflow():
+    # The growth branch computes the end stock from growth, so it never books a loss of start AGB.
+    module = perennial(agb_start=10.0, agb_end=None, bgb_end=None, growth=True)
+    assert getattr(module, "hwp_inflow_co2", None) is None
 
 
 def test_perennial_without_removal_has_no_inflow():
