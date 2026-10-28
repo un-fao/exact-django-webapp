@@ -16,7 +16,7 @@
     "fields": {
       "name": "Farm Yard Manure",
       "name_en": "Farm Yard Manure",
-      "name_fr": "Fumier de ferme\n",
+      "name_fr": "Fumier de ferme",
       "name_es": "Estiércol de corral",
       "name_ru": "Навоз для фермерского двора"
     }
@@ -27,7 +27,7 @@
     "fields": {
       "name": "Green Manure",
       "name_en": "Green Manure",
-      "name_fr": "Engrais vert\n",
+      "name_fr": "Engrais vert",
       "name_es": "Estiércol verde",
       "name_ru": "Зеленое удобрение"
     }
@@ -38,9 +38,9 @@
     "fields": {
       "name": "Straw Burnt",
       "name_en": "Straw Burnt",
-      "name_fr": "Paille brûlée\n",
+      "name_fr": "Paille brûlée",
       "name_es": "Paja quemada",
-      "name_ru": "Сожженная солома  "
+      "name_ru": "Сожженная солома"
     }
   },
   {
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Straw Exported",
       "name_en": "Straw Exported",
-      "name_fr": "Paille extraite\n",
+      "name_fr": "Paille extraite",
       "name_es": "Paja exportada",
       "name_ru": "Экспортированная солома"
     }
@@ -60,7 +60,7 @@
     "fields": {
       "name": "Straw Incorporated Long (>30 Days) Before Cultivation",
       "name_en": "Straw Incorporated Long (>30 Days) Before Cultivation",
-      "name_fr": "Paille incorporée longtemps avant la culture (>30 jours)\n",
+      "name_fr": "Paille incorporée longtemps avant la culture (>30 jours)",
       "name_es": "Paja Incorporada Mucho (>30 días) Antes del cultivo",
       "name_ru": "Солома, внесённая за долго до посева (>30 дней)"
     }
@@ -71,7 +71,7 @@
     "fields": {
       "name": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
       "name_en": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
-      "name_fr": "Paille incorporée peu avant la culture (<30 jours)\n",
+      "name_fr": "Paille incorporée peu avant la culture (<30 jours)",
       "name_es": "Paja Incorporada Poco (<30 días) Antes del cultivo",
       "name_ru": "Солома, внесённая за долго до посева (<30 дней)"
     }

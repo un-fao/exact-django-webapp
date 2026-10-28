@@ -5,7 +5,7 @@
     "fields": {
       "name": "Nutrient Poor",
       "name_en": "Nutrient Poor",
-      "name_fr": "Pauvre en nutriments\n",
+      "name_fr": "Pauvre en nutriments",
       "name_es": "Pobre en Nutrientes",
       "name_ru": "Бедный питательными веществами"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Nutrient Rich",
       "name_en": "Nutrient Rich",
-      "name_fr": "Riche en nutriments\n",
+      "name_fr": "Riche en nutriments",
       "name_es": "Rica en Nutrientes",
       "name_ru": "Богат питательными веществами"
     }

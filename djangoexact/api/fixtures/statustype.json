@@ -17,7 +17,7 @@
     "fields": {
       "name": "IN PROGRESS",
       "name_en": "IN PROGRESS",
-      "name_fr": "EN COURS\n",
+      "name_fr": "EN COURS",
       "name_es": "EN CURSO",
       "name_ru": "В ПРОЦЕССЕ",
       "value": 3.0
@@ -41,7 +41,7 @@
     "fields": {
       "name": "SUBMODULES_EMPTY",
       "name_en": "SUBMODULES_EMPTY",
-      "name_fr": "SOUS-MODULES_VIDE\n",
+      "name_fr": "SOUS-MODULES_VIDE",
       "name_es": "SUBMÓDULOS_VACÍOS",
       "name_ru": "ПОДМОДУЛИ_ПУСТЫЕ",
       "value": 0.5

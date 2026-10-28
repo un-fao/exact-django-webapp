@@ -57,7 +57,7 @@
     "fields": {
       "name": "Cool Temperate",
       "name_en": "Cool Temperate",
-      "name_fr": "Froid tempéré\n",
+      "name_fr": "Froid tempéré",
       "name_es": "Templado Frío",
       "name_ru": "Холодный умеренный",
       "is_active": true,
@@ -105,7 +105,7 @@
     "fields": {
       "name": "Warm Temperate",
       "name_en": "Warm Temperate",
-      "name_fr": "Chaud tempéré\n",
+      "name_fr": "Chaud tempéré",
       "name_es": "Templado Cálido",
       "name_ru": "Тёплый умеренный",
       "is_active": true,
@@ -132,7 +132,7 @@
     "fields": {
       "name": "Central Africa",
       "name_en": "Central Africa",
-      "name_fr": "Afrique centrale\n",
+      "name_fr": "Afrique centrale",
       "name_es": "África Central",
       "name_ru": "Центральная Африка"
     }
@@ -143,7 +143,7 @@
     "fields": {
       "name": "Central America",
       "name_en": "Central America",
-      "name_fr": "Amérique centrale\n",
+      "name_fr": "Amérique centrale",
       "name_es": "América Central",
       "name_ru": "Центральная Америка"
     }
@@ -154,7 +154,7 @@
     "fields": {
       "name": "Central Asia",
       "name_en": "Central Asia",
-      "name_fr": "Asie centrale\n",
+      "name_fr": "Asie centrale",
       "name_es": "Asia Central",
       "name_ru": "Центральная Азия"
     }
@@ -165,7 +165,7 @@
     "fields": {
       "name": "Eastern Africa",
       "name_en": "Eastern Africa",
-      "name_fr": "Afrique de l'Est\n",
+      "name_fr": "Afrique de l'Est",
       "name_es": "África Oriental",
       "name_ru": "Восточная Африка"
     }
@@ -176,7 +176,7 @@
     "fields": {
       "name": "Eastern Asia",
       "name_en": "Eastern Asia",
-      "name_fr": "Asie de l'Est\n",
+      "name_fr": "Asie de l'Est",
       "name_es": "Asia Oriental",
       "name_ru": "Восточная Азия"
     }
@@ -187,7 +187,7 @@
     "fields": {
       "name": "Eastern Europe",
       "name_en": "Eastern Europe",
-      "name_fr": "Europe de l'Est\n",
+      "name_fr": "Europe de l'Est",
       "name_es": "Europa Oriental",
       "name_ru": "Восточная Европа"
     }
@@ -209,7 +209,7 @@
     "fields": {
       "name": "North America",
       "name_en": "North America",
-      "name_fr": "Amérique du Nord\n",
+      "name_fr": "Amérique du Nord",
       "name_es": "América Septentrional",
       "name_ru": "Северная Америка"
     }
@@ -220,7 +220,7 @@
     "fields": {
       "name": "Northern Africa",
       "name_en": "Northern Africa",
-      "name_fr": "Afrique du Nord\n",
+      "name_fr": "Afrique du Nord",
       "name_es": "África Septentrional",
       "name_ru": "Северная Африка"
     }
@@ -242,7 +242,7 @@
     "fields": {
       "name": "South America",
       "name_en": "South America",
-      "name_fr": "Amérique du Sud\n",
+      "name_fr": "Amérique du Sud",
       "name_es": "América del Sur",
       "name_ru": "Южная Америка"
     }
@@ -253,7 +253,7 @@
     "fields": {
       "name": "South-Eastern Asia",
       "name_en": "South-Eastern Asia",
-      "name_fr": "Asie du Sud-Est\n",
+      "name_fr": "Asie du Sud-Est",
       "name_es": "Asia Sudoriental",
       "name_ru": "Юго-восточная Азия"
     }
@@ -264,7 +264,7 @@
     "fields": {
       "name": "Southern Africa",
       "name_en": "Southern Africa",
-      "name_fr": "Afrique méridionale\n\n",
+      "name_fr": "Afrique méridionale",
       "name_es": "África Meridional",
       "name_ru": "Южная Африка"
     }
@@ -275,7 +275,7 @@
     "fields": {
       "name": "Southern Asia",
       "name_en": "Southern Asia",
-      "name_fr": "Asie méridionale\n",
+      "name_fr": "Asie méridionale",
       "name_es": "Asia Meridional",
       "name_ru": "Южная Азия"
     }
@@ -286,7 +286,7 @@
     "fields": {
       "name": "Western Africa",
       "name_en": "Western Africa",
-      "name_fr": "Afrique de l'Ouest\n",
+      "name_fr": "Afrique de l'Ouest",
       "name_es": "África Occidental",
       "name_ru": "Западная Африка"
     }
@@ -297,7 +297,7 @@
     "fields": {
       "name": "Western Asia",
       "name_en": "Western Asia",
-      "name_fr": "Asie de l'Ouest\n",
+      "name_fr": "Asie de l'Ouest",
       "name_es": "Asia Occidental",
       "name_ru": "Западная Азия"
     }
@@ -308,7 +308,7 @@
     "fields": {
       "name": "Western Europe",
       "name_en": "Western Europe",
-      "name_fr": "Europe de l'Ouest\n",
+      "name_fr": "Europe de l'Ouest",
       "name_es": "Europa Occidenta",
       "name_ru": "Западная Европа"
     }
@@ -332,7 +332,7 @@
     "fields": {
       "name": "High Activity Clay",
       "name_en": "High Activity Clay",
-      "name_fr": "Argileux très actif\n",
+      "name_fr": "Argileux très actif",
       "name_es": "Arcillas de Alta Intensidad",
       "name_ru": "Высокоактивная глина",
       "active": true,
@@ -345,7 +345,7 @@
     "fields": {
       "name": "Low Activity Clay",
       "name_en": "Low Activity Clay",
-      "name_fr": "Argileux peu actif\n",
+      "name_fr": "Argileux peu actif",
       "name_es": "Arcillas de Baja Intensidad",
       "name_ru": "Глина с низкой активностью",
       "active": true,
@@ -423,7 +423,7 @@
     "fields": {
       "name": "Wetland",
       "name_en": "Wetland",
-      "name_fr": "Terres humides\n",
+      "name_fr": "Terres humides",
       "name_es": "Humedales",
       "name_ru": "Влажные земли",
       "active": true,
@@ -1144,7 +1144,7 @@
     "fields": {
       "name": "Agroforestry - Default",
       "name_en": "Agroforestry - Default",
-      "name_fr": "Agroforesterie - défaut\n",
+      "name_fr": "Agroforesterie - défaut",
       "name_es": "Agroforestería - Por defecto",
       "name_ru": "Агролесомелиорация - по умолчанию",
       "forest_type": null,
@@ -1172,7 +1172,7 @@
     "fields": {
       "name": "Alley Cropping",
       "name_en": "Alley Cropping",
-      "name_fr": "Cultures en allées\n",
+      "name_fr": "Cultures en allées",
       "name_es": "Cultivos en Fajas",
       "name_ru": "Междурядные Культуры",
       "forest_type": null,
@@ -1278,7 +1278,7 @@
     "fields": {
       "name": "Annual Fallow",
       "name_en": "Annual Fallow",
-      "name_fr": "Jachère annuelle\n",
+      "name_fr": "Jachère annuelle",
       "name_es": "Barbecho Anual",
       "name_ru": "Однолетний пар",
       "forest_type": null,
@@ -1575,7 +1575,7 @@
     "fields": {
       "name": "Beans & Pulses",
       "name_en": "Beans & Pulses",
-      "name_fr": "Haricots et légumineuses\n",
+      "name_fr": "Haricots et légumineuses",
       "name_es": "Frijoles y legumbres",
       "name_ru": "Бобовые, зернобобовые культуры",
       "forest_type": null,
@@ -2517,7 +2517,7 @@
     "fields": {
       "name": "Dry Bean",
       "name_en": "Dry Bean",
-      "name_fr": "Haricot sec\n",
+      "name_fr": "Haricot sec",
       "name_es": "Frijoles",
       "name_ru": "Сухие бобы",
       "forest_type": null,
@@ -2545,7 +2545,7 @@
     "fields": {
       "name": "Dry Forest",
       "name_en": "Dry Forest",
-      "name_fr": "Forêt sèche tropicale\n",
+      "name_fr": "Forêt sèche tropicale",
       "name_es": "Bosque Seco",
       "name_ru": "Сухой лес",
       "forest_type": null,
@@ -2652,7 +2652,7 @@
     "fields": {
       "name": "Flooded Rice",
       "name_en": "Flooded Rice",
-      "name_fr": "Riz inondé\n",
+      "name_fr": "Riz inondé",
       "name_es": "Arroz Inundado",
       "name_ru": "Затопленный рис",
       "forest_type": null,
@@ -2734,7 +2734,7 @@
     "fields": {
       "name": "Generic Value",
       "name_en": "Generic Value",
-      "name_fr": "Valeur générique\n",
+      "name_fr": "Valeur générique",
       "name_es": "Valor genérico",
       "name_ru": "Общая ценность",
       "forest_type": null,
@@ -2861,7 +2861,7 @@
     "fields": {
       "name": "Grass-Clover Mixtures",
       "name_en": "Grass-Clover Mixtures",
-      "name_fr": "Mélanges herbe-trèfle\n",
+      "name_fr": "Mélanges herbe-trèfle",
       "name_es": "Mezcla de Trébol-Pasto",
       "name_ru": "Смеси травы и клевера",
       "forest_type": null,
@@ -3070,7 +3070,7 @@
     "fields": {
       "name": "Humid Forest",
       "name_en": "Humid Forest",
-      "name_fr": "Forêt humide subtropicale\n",
+      "name_fr": "Forêt humide subtropicale",
       "name_es": "Bosque húmedo",
       "name_ru": "Влажный лес",
       "forest_type": null,
@@ -3416,7 +3416,7 @@
     "fields": {
       "name": "﻿Long-Term Cultivated",
       "name_en": "﻿Long-Term Cultivated",
-      "name_fr": "Cultivé à long terme\n",
+      "name_fr": "Cultivé à long terme",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
       "forest_type": null,
@@ -3432,7 +3432,7 @@
     "fields": {
       "name": "Long-Term Cultivated",
       "name_en": "Long-Term Cultivated",
-      "name_fr": "Cultivé à long terme\n",
+      "name_fr": "Cultivé à long terme",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
       "forest_type": null,
@@ -3585,7 +3585,7 @@
     "fields": {
       "name": "Mangrove Forest",
       "name_en": "Mangrove Forest",
-      "name_fr": "Forêt de mangrove\n",
+      "name_fr": "Forêt de mangrove",
       "name_es": "Manglar",
       "name_ru": "Мангровый лес",
       "forest_type": null,
@@ -3685,7 +3685,7 @@
     "fields": {
       "name": "Moist Deciduous Forest",
       "name_en": "Moist Deciduous Forest",
-      "name_fr": "Forêt décidue tropicale humide\n",
+      "name_fr": "Forêt décidue tropicale humide",
       "name_es": "Bosque húmedo de hojas caducas",
       "name_ru": "Лиственный лес, увлажненный",
       "forest_type": null,
@@ -3709,7 +3709,7 @@
     "fields": {
       "name": "Mountain System",
       "name_en": "Mountain System",
-      "name_fr": "Système montagneux\n",
+      "name_fr": "Système montagneux",
       "name_es": "Sistemas montañosos",
       "name_ru": "Горная система",
       "forest_type": null,
@@ -3736,7 +3736,7 @@
     "fields": {
       "name": "Multistrata",
       "name_en": "Multistrata",
-      "name_fr": "Multi-strates\n",
+      "name_fr": "Multi-strates",
       "name_es": "Sistemas de cultivos a diversos niveles",
       "name_ru": "Многоярусный",
       "forest_type": null,
@@ -3817,7 +3817,7 @@
     "fields": {
       "name": "N-Fixing Forages",
       "name_en": "N-Fixing Forages",
-      "name_fr": "Fourrages fixateurs d’azote\n",
+      "name_fr": "Fourrages fixateurs d’azote",
       "name_es": "Forrajes fijadores de N",
       "name_ru": "N-фиксирующие корма",
       "forest_type": null,
@@ -3833,7 +3833,7 @@
     "fields": {
       "name": "Non-Legume Hay",
       "name_en": "Non-Legume Hay",
-      "name_fr": "Foin sans légumineuses\n",
+      "name_fr": "Foin sans légumineuses",
       "name_es": "Heno no leguminoso",
       "name_ru": "Небобовое сено",
       "forest_type": null,
@@ -3849,7 +3849,7 @@
     "fields": {
       "name": "Non-N-Fixing Forages",
       "name_en": "Non-N-Fixing Forages",
-      "name_fr": "Fourrages non fixateurs d’azote\n",
+      "name_fr": "Fourrages non fixateurs d’azote",
       "name_es": "Forrajes no fijadores de N",
       "name_ru": "Не N-фиксирующие корма",
       "forest_type": null,
@@ -3919,7 +3919,7 @@
     "fields": {
       "name": "Oceanic Forest",
       "name_en": "Oceanic Forest",
-      "name_fr": "Forêt océanique tempérée\n",
+      "name_fr": "Forêt océanique tempérée",
       "name_es": "Bosque oceánico",
       "name_ru": "Океанический/прибрежный лес",
       "forest_type": null,
@@ -3943,7 +3943,7 @@
     "fields": {
       "name": "Oil Palm",
       "name_en": "Oil Palm",
-      "name_fr": "Palmier à huile\n",
+      "name_fr": "Palmier à huile",
       "name_es": "Palma Aceitera",
       "name_ru": "Масличная Пальма",
       "forest_type": null,
@@ -4182,7 +4182,7 @@
     "fields": {
       "name": "Organic Soil",
       "name_en": "Organic Soil",
-      "name_fr": "Sol organique\n",
+      "name_fr": "Sol organique",
       "name_es": "Suelo Orgánico",
       "name_ru": "Органическая почва",
       "forest_type": null,
@@ -4263,7 +4263,7 @@
     "fields": {
       "name": "Other Land",
       "name_en": "Other Land",
-      "name_fr": "Autres terres\n",
+      "name_fr": "Autres terres",
       "name_es": "Otras tierras",
       "name_ru": "Прочее землепользования",
       "forest_type": null,
@@ -4290,7 +4290,7 @@
     "fields": {
       "name": "Other Land (Non-Vegetated)",
       "name_en": "Other Land (Non-Vegetated)",
-      "name_fr": "Autres terres (non végétalisées)\n",
+      "name_fr": "Autres terres (non végétalisées)",
       "name_es": "Otras Tierras (Sin Vegetación)",
       "name_ru": "Прочее землепользования (не покрытая растительностью)",
       "forest_type": null,
@@ -4369,7 +4369,7 @@
     "fields": {
       "name": "Parkland",
       "name_en": "Parkland",
-      "name_fr": "Parc arboré\n",
+      "name_fr": "Parc arboré",
       "name_es": "Parques Agroforestales",
       "name_ru": "Парковая зона",
       "forest_type": null,
@@ -4554,7 +4554,7 @@
     "fields": {
       "name": "Perennial Cropland",
       "name_en": "Perennial Cropland",
-      "name_fr": "Cultures pérennes\n",
+      "name_fr": "Cultures pérennes",
       "name_es": "Cultivos perennes",
       "name_ru": "Многолетние культуры",
       "forest_type": null,
@@ -4581,7 +4581,7 @@
     "fields": {
       "name": "Perennial Fallow",
       "name_en": "Perennial Fallow",
-      "name_fr": "Jachère pérenne\n",
+      "name_fr": "Jachère pérenne",
       "name_es": "Barbecho Mejorado",
       "name_ru": "Многолетний Пар",
       "forest_type": null,
@@ -4606,7 +4606,7 @@
     "fields": {
       "name": "Perennial Grasses",
       "name_en": "Perennial Grasses",
-      "name_fr": "Graminées pérennes\n",
+      "name_fr": "Graminées pérennes",
       "name_es": "Hierbas perennes",
       "name_ru": "Многолетние травы",
       "forest_type": null,
@@ -4622,7 +4622,7 @@
     "fields": {
       "name": "Perennial/Tree Crop",
       "name_en": "Perennial/Tree Crop",
-      "name_fr": "Culture pérenne/d'arbres\n",
+      "name_fr": "Culture pérenne/d'arbres",
       "name_es": "Cultivo perenne/arbóreo",
       "name_ru": "Многолетние/деревья-урожай",
       "forest_type": null,
@@ -4852,7 +4852,7 @@
     "fields": {
       "name": "Potatoes",
       "name_en": "Potatoes",
-      "name_fr": "Pommes de terre\n",
+      "name_fr": "Pommes de terre",
       "name_es": "Patatas",
       "name_ru": "Картофель",
       "forest_type": null,
@@ -4990,7 +4990,7 @@
     "fields": {
       "name": "Rainforest",
       "name_en": "Rainforest",
-      "name_fr": "Forêt dense tropicale\n",
+      "name_fr": "Forêt dense tropicale",
       "name_es": "Bosque lluvioso",
       "name_ru": "Дождевой лес",
       "forest_type": null,
@@ -5123,7 +5123,7 @@
     "fields": {
       "name": "Root Crops",
       "name_en": "Root Crops",
-      "name_fr": "Cultures-racines\n",
+      "name_fr": "Cultures-racines",
       "name_es": "Cultivos de Raíz alimenticia",
       "name_ru": "Корнеплоды",
       "forest_type": null,
@@ -5260,7 +5260,7 @@
     "fields": {
       "name": "Seagrass",
       "name_en": "Seagrass",
-      "name_fr": "Herbiers marins\n",
+      "name_fr": "Herbiers marins",
       "name_es": "Pradera Marina",
       "name_ru": "Морская трава",
       "forest_type": null,
@@ -5386,7 +5386,7 @@
     "fields": {
       "name": "Shaded Perennial",
       "name_en": "Shaded Perennial",
-      "name_fr": "Pérenne ombragé\n",
+      "name_fr": "Pérenne ombragé",
       "name_es": "Cultivos perennes bajo sombra",
       "name_ru": "Тенистое многолетнее растение",
       "forest_type": null,
@@ -5411,7 +5411,7 @@
     "fields": {
       "name": "Short Rotation Coppice",
       "name_en": "Short Rotation Coppice",
-      "name_fr": "Taillis à courte rotation\n",
+      "name_fr": "Taillis à courte rotation",
       "name_es": "Monte bajo de ciclo corto",
       "name_ru": "Краткосроковый пни",
       "forest_type": null,
@@ -5491,7 +5491,7 @@
       "name_en": "Silvopasture",
       "name_fr": "Système sylvopastoral",
       "name_es": "Silvopastoril",
-      "name_ru": " Лесопастбище",
+      "name_ru": "Лесопастбище",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -5681,7 +5681,7 @@
     "fields": {
       "name": "Spring Wheat",
       "name_en": "Spring Wheat",
-      "name_fr": "Blé de printemps\n",
+      "name_fr": "Blé de printemps",
       "name_es": "Trigo de primavera",
       "name_ru": "Яровая пшеница",
       "forest_type": null,
@@ -5806,7 +5806,7 @@
     "fields": {
       "name": "Sugarcane",
       "name_en": "Sugarcane",
-      "name_fr": "Canne à sucre\n",
+      "name_fr": "Canne à sucre",
       "name_es": "Caña de azúcar",
       "name_ru": "Сахарный тростник",
       "forest_type": null,
@@ -6132,7 +6132,7 @@
     "fields": {
       "name": "Tidal Marsh",
       "name_en": "Tidal Marsh",
-      "name_fr": "Marais de marée\n",
+      "name_fr": "Marais de marée",
       "name_es": "Marisma",
       "name_ru": "Прибрежные болота",
       "forest_type": null,
@@ -6159,7 +6159,7 @@
     "fields": {
       "name": "Tidal Marsh Mediterranean",
       "name_en": "Tidal Marsh Mediterranean",
-      "name_fr": "Marais de marée méditerranéen\n",
+      "name_fr": "Marais de marée méditerranéen",
       "name_es": "Marisma mediterránea",
       "name_ru": "Прибрежные болота Средиземноморья",
       "forest_type": null,
@@ -6270,7 +6270,7 @@
     "fields": {
       "name": "Tundra Woodland",
       "name_en": "Tundra Woodland",
-      "name_fr": "Forêt-toundra boréale\n",
+      "name_fr": "Forêt-toundra boréale",
       "name_es": "Bosque de tundra",
       "name_ru": "Лесная тундра",
       "forest_type": null,
@@ -6592,9 +6592,9 @@
     "fields": {
       "name": "Winter Wheat",
       "name_en": "Winter Wheat",
-      "name_fr": "Blé d'hiver\n",
+      "name_fr": "Blé d'hiver",
       "name_es": "Trigo de Invierno",
-      "name_ru": "Озимая пшеница ",
+      "name_ru": "Озимая пшеница",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
@@ -6756,7 +6756,7 @@
     "fields": {
       "name": "Off-Site",
       "name_en": "Off-Site",
-      "name_fr": "Hors site\n",
+      "name_fr": "Hors site",
       "name_es": "Fuera del Sitio",
       "name_ru": "Вне участка"
     }
@@ -6767,7 +6767,7 @@
     "fields": {
       "name": "On-Site",
       "name_en": "On-Site",
-      "name_fr": "Sur site\n",
+      "name_fr": "Sur site",
       "name_es": "In Situ",
       "name_ru": "на месте, локальный"
     }
@@ -7329,7 +7329,7 @@
     "fields": {
       "name": "IN PROGRESS",
       "name_en": "IN PROGRESS",
-      "name_fr": "EN COURS\n",
+      "name_fr": "EN COURS",
       "name_es": "EN CURSO",
       "name_ru": "В ПРОЦЕССЕ",
       "value": 3.0
@@ -7353,7 +7353,7 @@
     "fields": {
       "name": "SUBMODULES_EMPTY",
       "name_en": "SUBMODULES_EMPTY",
-      "name_fr": "SOUS-MODULES_VIDE\n",
+      "name_fr": "SOUS-MODULES_VIDE",
       "name_es": "SUBMÓDULOS_VACÍOS",
       "name_ru": "ПОДМОДУЛИ_ПУСТЫЕ",
       "value": 0.5
@@ -7365,7 +7365,7 @@
     "fields": {
       "name": "Cultivated soil",
       "name_en": "Cultivated soil",
-      "name_fr": "Sol cultivé\n",
+      "name_fr": "Sol cultivé",
       "name_es": "Suelo cultivado",
       "name_ru": "Культивированная почва"
     }
@@ -7376,7 +7376,7 @@
     "fields": {
       "name": "Infrastructure on existing land (no paving)",
       "name_en": "Infrastructure on existing land (no paving)",
-      "name_fr": "Infrastructure sur terrain existant (sans pavage)\n",
+      "name_fr": "Infrastructure sur terrain existant (sans pavage)",
       "name_es": "Infraestructura en terreno existente (sin pavimentación)",
       "name_ru": "Инфраструктура на существующей земле (без асфальтирования)"
     }
@@ -7387,7 +7387,7 @@
     "fields": {
       "name": "Paved settlement",
       "name_en": "Paved settlement",
-      "name_fr": "Établissement pavée\n",
+      "name_fr": "Établissement pavée",
       "name_es": "Asentamiento pavimentado",
       "name_ru": "Асфальтированное поселение"
     }
@@ -7409,7 +7409,7 @@
     "fields": {
       "name": "Wooded area",
       "name_en": "Wooded area",
-      "name_fr": "Zone boisée\n",
+      "name_fr": "Zone boisée",
       "name_es": "Zona boscosa",
       "name_ru": "Лесистая местность"
     }
@@ -7562,7 +7562,7 @@
     "fields": {
       "name": "Prescribed Fire (E.G. Land Mgnt)",
       "name_en": "Prescribed Fire (E.G. Land Mgnt)",
-      "name_fr": "Incendie prescrit (ex. gestion des terres)\n",
+      "name_fr": "Incendie prescrit (ex. gestion des terres)",
       "name_es": "Quema controlada (p. ej. Gestión de tierras)",
       "name_ru": "Предписанный огонь (например, управление земельными ресурсами)"
     }
@@ -7573,7 +7573,7 @@
     "fields": {
       "name": "Wildfire Drained Peat",
       "name_en": "Wildfire Drained Peat",
-      "name_fr": "Tourbe drainée brûlée\n",
+      "name_fr": "Tourbe drainée brûlée",
       "name_es": "Incendio forestal en Turba Drenada",
       "name_ru": "Торф, высушенный лесным пожаром"
     }
@@ -7584,9 +7584,9 @@
     "fields": {
       "name": "Wildfire Undrained Peat",
       "name_en": "Wildfire Undrained Peat",
-      "name_fr": "Tourbe non drainée brûlée\n",
+      "name_fr": "Tourbe non drainée brûlée",
       "name_es": "Incendio forestal en Turba sin drenar",
-      "name_ru": " Торф, не высушенный лесным пожаром"
+      "name_ru": "Торф, не высушенный лесным пожаром"
     }
   },
   {
@@ -7595,7 +7595,7 @@
     "fields": {
       "name": "Nutrient Poor",
       "name_en": "Nutrient Poor",
-      "name_fr": "Pauvre en nutriments\n",
+      "name_fr": "Pauvre en nutriments",
       "name_es": "Pobre en Nutrientes",
       "name_ru": "Бедный питательными веществами"
     }
@@ -7606,7 +7606,7 @@
     "fields": {
       "name": "Nutrient Rich",
       "name_en": "Nutrient Rich",
-      "name_fr": "Riche en nutriments\n",
+      "name_fr": "Riche en nutriments",
       "name_es": "Rica en Nutrientes",
       "name_ru": "Богат питательными веществами"
     }
@@ -7617,7 +7617,7 @@
     "fields": {
       "name": "Brackishwater Pond",
       "name_en": "Brackishwater Pond",
-      "name_fr": "Étang d'eau saumâtre\n",
+      "name_fr": "Étang d'eau saumâtre",
       "name_es": "Estanque de agua salobre",
       "name_ru": "Солоноватый пруд"
     }
@@ -7628,7 +7628,7 @@
     "fields": {
       "name": "Canals & Ditches",
       "name_en": "Canals & Ditches",
-      "name_fr": "Canaux et fossés\n",
+      "name_fr": "Canaux et fossés",
       "name_es": "Canales y Acequia",
       "name_ru": "Каналы, Канавы"
     }
@@ -7650,7 +7650,7 @@
     "fields": {
       "name": "Freshwater Pond",
       "name_en": "Freshwater Pond",
-      "name_fr": "Étang d'eau douce\n",
+      "name_fr": "Étang d'eau douce",
       "name_es": "Estanque de agua dulce",
       "name_ru": "Пресноводный пруд"
     }
@@ -7661,7 +7661,7 @@
     "fields": {
       "name": "Saline Pond",
       "name_en": "Saline Pond",
-      "name_fr": "Étang salin\n",
+      "name_fr": "Étang salin",
       "name_es": "Estanque Salino",
       "name_ru": "Солёный пруд"
     }
@@ -7749,7 +7749,7 @@
     "fields": {
       "name": "Unmotorized Fishing",
       "name_en": "Unmotorized Fishing",
-      "name_fr": "Pêche non motorisée\n",
+      "name_fr": "Pêche non motorisée",
       "name_es": "Pesca sin motor",
       "name_ru": "Ручное рыболовство"
     }
@@ -7760,7 +7760,7 @@
     "fields": {
       "name": "Abalones, Winkles And Conchs",
       "name_en": "Abalones, Winkles And Conchs",
-      "name_fr": "Ormeaux, bigorneaux et lambis\n",
+      "name_fr": "Ormeaux, bigorneaux et lambis",
       "name_es": "Abulones, Caracolas y Conchas",
       "name_ru": "Морские ушки, улитки и ракушки"
     }
@@ -7771,7 +7771,7 @@
     "fields": {
       "name": "Clams, Cockles And Arkshells",
       "name_en": "Clams, Cockles And Arkshells",
-      "name_fr": "Palourdes, coques et coquilles d’arche\n",
+      "name_fr": "Palourdes, coques et coquilles d’arche",
       "name_es": "Almejas, Berberechos y Árcidos",
       "name_ru": "Моллюски, Моллюски семейства сердцевидок и Арковидные моллюски"
     }
@@ -7782,9 +7782,9 @@
     "fields": {
       "name": "Cods, Hakes And Haddocks",
       "name_en": "Cods, Hakes And Haddocks",
-      "name_fr": "Morues, merluches et aiglefins\n",
+      "name_fr": "Morues, merluches et aiglefins",
       "name_es": "Bacalaos, Merluzas Y Eglefino",
-      "name_ru": "Треска, Пикша, Морской окунь "
+      "name_ru": "Треска, Пикша, Морской окунь"
     }
   },
   {
@@ -7793,7 +7793,7 @@
     "fields": {
       "name": "Flounders, Halibuts And Soles",
       "name_en": "Flounders, Halibuts And Soles",
-      "name_fr": "Plies, flétans et soles\n",
+      "name_fr": "Plies, flétans et soles",
       "name_es": "Lenguados y Halibut",
       "name_ru": "Камбалы, палтусы и Солевая рыба"
     }
@@ -7804,7 +7804,7 @@
     "fields": {
       "name": "Herrings, Sardines And Anchovies",
       "name_en": "Herrings, Sardines And Anchovies",
-      "name_fr": "Harengs, sardines et anchois\n",
+      "name_fr": "Harengs, sardines et anchois",
       "name_es": "Arenques, Sardinas y Anchoas",
       "name_ru": "Сельдь, сардины и анчоусы"
     }
@@ -7815,7 +7815,7 @@
     "fields": {
       "name": "Jacks, Mullets And Sauries",
       "name_en": "Jacks, Mullets And Sauries",
-      "name_fr": "Carangues, mulets et sauries\n",
+      "name_fr": "Carangues, mulets et sauries",
       "name_es": "Jurel, Salmonetes y Papardas",
       "name_ru": "Джековые рыбы, Кефаль и Сайра"
     }
@@ -7826,7 +7826,7 @@
     "fields": {
       "name": "Krill And Plankton",
       "name_en": "Krill And Plankton",
-      "name_fr": "Krill et plancton\n",
+      "name_fr": "Krill et plancton",
       "name_es": "Kril y Plancton",
       "name_ru": "Криль и планктон"
     }
@@ -7837,7 +7837,7 @@
     "fields": {
       "name": "Lobsters And Spiny-rock Lobsters",
       "name_en": "Lobsters And Spiny-rock Lobsters",
-      "name_fr": "Homards et langoustes\n",
+      "name_fr": "Homards et langoustes",
       "name_es": "Langostas",
       "name_ru": "Омары и лангусты"
     }
@@ -7848,7 +7848,7 @@
     "fields": {
       "name": "Mackerels, Snoeks And Cutlassfish",
       "name_en": "Mackerels, Snoeks And Cutlassfish",
-      "name_fr": "Maquereaux, snoeks et poissons sabres\n",
+      "name_fr": "Maquereaux, snoeks et poissons sabres",
       "name_es": "Caballa, Barracuda  y Papardas",
       "name_ru": "Скумбрия, зубатки и рыбы-сабли"
     }
@@ -7859,7 +7859,7 @@
     "fields": {
       "name": "Miscellaneous Marine Crustaceans",
       "name_en": "Miscellaneous Marine Crustaceans",
-      "name_fr": "Crustacés marins divers\n",
+      "name_fr": "Crustacés marins divers",
       "name_es": "Varios crustáceos marinos",
       "name_ru": "Разнообразные морские ракообразные"
     }
@@ -7870,9 +7870,9 @@
     "fields": {
       "name": "Miscellaneous Marine Fishes",
       "name_en": "Miscellaneous Marine Fishes",
-      "name_fr": "Poissons marins divers\n",
+      "name_fr": "Poissons marins divers",
       "name_es": "Peces marinos varios",
-      "name_ru": "Разнообразные морские рыбы\n"
+      "name_ru": "Разнообразные морские рыбы"
     }
   },
   {
@@ -7881,7 +7881,7 @@
     "fields": {
       "name": "Miscellaneous Marine Molluscs",
       "name_en": "Miscellaneous Marine Molluscs",
-      "name_fr": "Mollusques marins divers\n",
+      "name_fr": "Mollusques marins divers",
       "name_es": "Varios moluscos marinos",
       "name_ru": "Разнообразные морские моллюски"
     }
@@ -7903,7 +7903,7 @@
     "fields": {
       "name": "Redfish, Basses And Congers",
       "name_en": "Redfish, Basses And Congers",
-      "name_fr": "Sébastes, bars et congres\n",
+      "name_fr": "Sébastes, bars et congres",
       "name_es": "Gallineta, Lubinas y Congrios",
       "name_ru": "Красная рыба, окуни и угри"
     }
@@ -7914,8 +7914,8 @@
     "fields": {
       "name": "Salmons, Trots And Smelts",
       "name_en": "Salmons, Trots And Smelts",
-      "name_fr": "Saumons, truites et éperlans\n",
-      "name_es": "Salmones, Truchas y Capellanes ",
+      "name_fr": "Saumons, truites et éperlans",
+      "name_es": "Salmones, Truchas y Capellanes",
       "name_ru": "Лососи, форели и смельты"
     }
   },
@@ -7925,7 +7925,7 @@
     "fields": {
       "name": "Scallops And Pectens",
       "name_en": "Scallops And Pectens",
-      "name_fr": "Coquilles Saint-Jacques et pectens\n",
+      "name_fr": "Coquilles Saint-Jacques et pectens",
       "name_es": "Vieiras y Pecten",
       "name_ru": "Гребешки и пектены"
     }
@@ -7936,7 +7936,7 @@
     "fields": {
       "name": "Sea-spiders And Crabs",
       "name_en": "Sea-spiders And Crabs",
-      "name_fr": "Araignées de mer et crabes\n",
+      "name_fr": "Araignées de mer et crabes",
       "name_es": "Arañas marinas y cangrejos",
       "name_ru": "Морские пауки и крабы"
     }
@@ -7958,7 +7958,7 @@
     "fields": {
       "name": "Sharks And Rays",
       "name_en": "Sharks And Rays",
-      "name_fr": "Requins et raies\n",
+      "name_fr": "Requins et raies",
       "name_es": "Tiburones y Rayas",
       "name_ru": "Акулы и скаты"
     }
@@ -7969,7 +7969,7 @@
     "fields": {
       "name": "Shrimps And Prawns",
       "name_en": "Shrimps And Prawns",
-      "name_fr": "Crevettes et gambas\n",
+      "name_fr": "Crevettes et gambas",
       "name_es": "Gambas y Camarones",
       "name_ru": "Креветки и раки"
     }
@@ -7991,7 +7991,7 @@
     "fields": {
       "name": "Squids, Cuttlefish And Octopuses",
       "name_en": "Squids, Cuttlefish And Octopuses",
-      "name_fr": "Calmars, seiches et poulpes\n",
+      "name_fr": "Calmars, seiches et poulpes",
       "name_es": "Calamares, Sepias Y Pulpos",
       "name_ru": "Кальмары, каракатицы и осьминоги"
     }
@@ -8002,7 +8002,7 @@
     "fields": {
       "name": "Tunas, Bonitos And Billfishes",
       "name_en": "Tunas, Bonitos And Billfishes",
-      "name_fr": "Thons, bonites et istiophoridés\n",
+      "name_fr": "Thons, bonites et istiophoridés",
       "name_es": "Atunes, Bonitos Y Picudos",
       "name_ru": "Тунцы, бонито и рыбы-марлины"
     }
@@ -8015,7 +8015,7 @@
       "name_en": "accepted",
       "name_fr": "accepté",
       "name_es": "aceptada",
-      "name_ru": "одобренный\n"
+      "name_ru": "одобренный"
     }
   },
   {
@@ -8079,7 +8079,7 @@
     "fields": {
       "name": "Agroforestry - default",
       "name_en": "Agroforestry - default",
-      "name_fr": "Agroforesterie - défaut\n",
+      "name_fr": "Agroforesterie - défaut",
       "name_es": "Agroforestería - Por Defecto",
       "name_ru": "Агролесомелиорация - по умолчанию",
       "description": "",
@@ -8121,7 +8121,7 @@
     "fields": {
       "name": "Alley cropping",
       "name_en": "Alley cropping",
-      "name_fr": "Cultures en allées\n",
+      "name_fr": "Cultures en allées",
       "name_es": "Cultivos en fajas",
       "name_ru": "Междурядные культуры",
       "description": "",
@@ -8415,7 +8415,7 @@
     "fields": {
       "name": "Oil palm",
       "name_en": "Oil palm",
-      "name_fr": "Palmier à huile\n",
+      "name_fr": "Palmier à huile",
       "name_es": "Palma Aceitera",
       "name_ru": "Масличная пальма",
       "description": "",
@@ -8499,7 +8499,7 @@
     "fields": {
       "name": "Perennial fallow",
       "name_en": "Perennial fallow",
-      "name_fr": "Jachère pérenne\n",
+      "name_fr": "Jachère pérenne",
       "name_es": "Barbecho mejorado",
       "name_ru": "Многолетний пар",
       "description": "",
@@ -8611,7 +8611,7 @@
     "fields": {
       "name": "Roots And Tubers",
       "name_en": "Roots And Tubers",
-      "name_fr": "Racines et tubercules\n",
+      "name_fr": "Racines et tubercules",
       "name_es": "Raizes y Tubérculos",
       "name_ru": "Корни и клубни",
       "description": null,
@@ -8667,7 +8667,7 @@
     "fields": {
       "name": "Shaded perennial",
       "name_en": "Shaded perennial",
-      "name_fr": "Pérenne ombragé\n",
+      "name_fr": "Pérenne ombragé",
       "name_es": "Cultivos perennes bajo sombra",
       "name_ru": "Тенистое многолетнее растение",
       "description": "",
@@ -8877,7 +8877,7 @@
     "fields": {
       "name": "Liquid or gaseous (m3)",
       "name_en": "Liquid or gaseous (m3)",
-      "name_fr": "Liquide ou gazeux (m3)\n",
+      "name_fr": "Liquide ou gazeux (m3)",
       "name_es": "Líquido o gaseoso (m3)",
       "name_ru": "Жидкость или газ (м3)"
     }
@@ -8888,7 +8888,7 @@
     "fields": {
       "name": "Solid (tdm)",
       "name_en": "Solid (tdm)",
-      "name_fr": "Solide (tms)\n",
+      "name_fr": "Solide (tms)",
       "name_es": "Sólido (tdm)",
       "name_ru": "Твёрдый (тонн сухого вещества)"
     }
@@ -8910,7 +8910,7 @@
     "fields": {
       "name": "Off-Road",
       "name_en": "Off-Road",
-      "name_fr": "Hors-route\n",
+      "name_fr": "Hors-route",
       "name_es": "Fuera de la carretera",
       "name_ru": "бездорожный"
     }
@@ -10108,7 +10108,7 @@
     "fields": {
       "name": "Charcoal",
       "name_en": "Charcoal",
-      "name_fr": "Charbon ",
+      "name_fr": "Charbon",
       "name_es": "Carbón Vegetal",
       "name_ru": "Уголь",
       "parent_fuel_type": 1,
@@ -10162,7 +10162,7 @@
     "fields": {
       "name": "Ethanol (Cars)",
       "name_en": "Ethanol (Cars)",
-      "name_fr": "Éthanol (voitures)\n",
+      "name_fr": "Éthanol (voitures)",
       "name_es": "Etanol (Coches)",
       "name_ru": "Этанол (Автомобили)",
       "parent_fuel_type": 1,
@@ -10180,7 +10180,7 @@
     "fields": {
       "name": "Ethanol (Trucks)",
       "name_en": "Ethanol (Trucks)",
-      "name_fr": "Éthanol (camions)\n",
+      "name_fr": "Éthanol (camions)",
       "name_es": "Etanol (Camiones)",
       "name_ru": "Этанол (Грузовики)",
       "parent_fuel_type": 1,
@@ -10198,7 +10198,7 @@
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
-      "name_fr": "Gasoil / huile diesel\n",
+      "name_fr": "Gasoil / huile diesel",
       "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10216,7 +10216,7 @@
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
-      "name_fr": "Gasoil / huile diesel\n",
+      "name_fr": "Gasoil / huile diesel",
       "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10234,7 +10234,7 @@
     "fields": {
       "name": "Gasoline (2-stroke)",
       "name_en": "Gasoline (2-stroke)",
-      "name_fr": "Essence (2 temps)\n",
+      "name_fr": "Essence (2 temps)",
       "name_es": "Gasolina (2-tiempos)",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10252,7 +10252,7 @@
     "fields": {
       "name": "Gasoline (4-stroke)",
       "name_en": "Gasoline (4-stroke)",
-      "name_fr": "Essence (4 temps)\n",
+      "name_fr": "Essence (4 temps)",
       "name_es": "Gasolina (4-tiempos)",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10306,7 +10306,7 @@
     "fields": {
       "name": "Motor Gasoline",
       "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
+      "name_fr": "Essence pour moteurs",
       "name_es": "Motor de Gasolina",
       "name_ru": "Motor Gasoline",
       "parent_fuel_type": 1,
@@ -10324,7 +10324,7 @@
     "fields": {
       "name": "Motor Gasoline",
       "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
+      "name_fr": "Essence pour moteurs",
       "name_es": "Motor de Gasolina",
       "name_ru": "Motor Gasoline",
       "parent_fuel_type": 1,
@@ -10342,7 +10342,7 @@
     "fields": {
       "name": "Natural Gas",
       "name_en": "Natural Gas",
-      "name_fr": "Gaz naturel\n",
+      "name_fr": "Gaz naturel",
       "name_es": "Gas Natural",
       "name_ru": "Природный газ",
       "parent_fuel_type": 1,
@@ -10360,7 +10360,7 @@
     "fields": {
       "name": "Natural Gas",
       "name_en": "Natural Gas",
-      "name_fr": "Gaz naturel\n",
+      "name_fr": "Gaz naturel",
       "name_es": "Gas Natural",
       "name_ru": "Природный газ",
       "parent_fuel_type": 1,
@@ -10396,7 +10396,7 @@
     "fields": {
       "name": "Renewable",
       "name_en": "Renewable",
-      "name_fr": "Renouvelable\n",
+      "name_fr": "Renouvelable",
       "name_es": "Solar",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10414,7 +10414,7 @@
     "fields": {
       "name": "Waste Oil/Lubricants",
       "name_en": "Waste Oil/Lubricants",
-      "name_fr": "Huiles usées / lubrifiants\n",
+      "name_fr": "Huiles usées / lubrifiants",
       "name_es": "Aceite Usado/ Lubricante",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -10475,7 +10475,7 @@
     "fields": {
       "name": "Lime Application",
       "name_en": "Lime Application",
-      "name_fr": "Application de chaux\n",
+      "name_fr": "Application de chaux",
       "name_es": "Aplicación de cal",
       "name_ru": "Применение извести"
     }
@@ -10486,7 +10486,7 @@
     "fields": {
       "name": "N-Fertilizers On Irrigated Rice",
       "name_en": "N-Fertilizers On Irrigated Rice",
-      "name_fr": "Engrais azotés sur le riz irrigué\n",
+      "name_fr": "Engrais azotés sur le riz irrigué",
       "name_es": "Fertilizantes de N en Arroz de Regadío",
       "name_ru": "N-удобрения на орошаемом рисе"
     }
@@ -10497,7 +10497,7 @@
     "fields": {
       "name": "Organic N-Fertilizers",
       "name_en": "Organic N-Fertilizers",
-      "name_fr": "Engrais azotés organiques\n",
+      "name_fr": "Engrais azotés organiques",
       "name_es": "Fertilizantes de N orgánicos",
       "name_ru": "Органические N-удобрения"
     }
@@ -10530,7 +10530,7 @@
     "fields": {
       "name": "Synthetic Fertilizers",
       "name_en": "Synthetic Fertilizers",
-      "name_fr": "Engrais synthétiques\n",
+      "name_fr": "Engrais synthétiques",
       "name_es": "Fertilizantes sintéticos",
       "name_ru": "Синтетические удобрения"
     }
@@ -10644,7 +10644,7 @@
       "macro_input_type": 3,
       "name": "N-Fertilizers In Continuously Irrigated Rice",
       "name_en": "N-Fertilizers In Continuously Irrigated Rice",
-      "name_fr": "Engrais azotés dans le riz irrigué en permanence\n",
+      "name_fr": "Engrais azotés dans le riz irrigué en permanence",
       "name_es": "Fertilizantes de N en arroz permentemente Inundado",
       "name_ru": "N-удобрения в условиях постоянного орошения риса",
       "description": "",
@@ -10661,7 +10661,7 @@
       "macro_input_type": 3,
       "name": "N-Fertilizers In Wet And Dry Irrigated Rice",
       "name_en": "N-Fertilizers In Wet And Dry Irrigated Rice",
-      "name_fr": "Engrais azotés dans le riz irrigué de manière intermittente\n",
+      "name_fr": "Engrais azotés dans le riz irrigué de manière intermittente",
       "name_es": "Fertilizantes de N en arroz Inundado Intermitente",
       "name_ru": "N-удобрения в условиях влажного и сухого орошения риса",
       "description": "",
@@ -10729,7 +10729,7 @@
       "macro_input_type": 4,
       "name": "Rendering Waste, Brewery Waste, Guano",
       "name_en": "Rendering Waste, Brewery Waste, Guano",
-      "name_fr": "Déchets de fonte, déchets de brasserie, guano\n",
+      "name_fr": "Déchets de fonte, déchets de brasserie, guano",
       "name_es": "Desechos, Residuos de la fabricación de cerveza, Guano",
       "name_ru": "Отходы переработки, отходы пивоварни, гуано",
       "description": "",
@@ -10746,7 +10746,7 @@
       "macro_input_type": 4,
       "name": "Sewage",
       "name_en": "Sewage",
-      "name_fr": "Eaux usées\n",
+      "name_fr": "Eaux usées",
       "name_es": "Aguas Residuales",
       "name_ru": "Канализация",
       "description": "",
@@ -10763,7 +10763,7 @@
       "macro_input_type": 2,
       "name": "Synthetic N-Fertilizers Other Than Urea",
       "name_en": "Synthetic N-Fertilizers Other Than Urea",
-      "name_fr": "Engrais azotés synthétiques hors urée\n",
+      "name_fr": "Engrais azotés synthétiques hors urée",
       "name_es": "Fertilizantes de N Sintéticos Distintos de la Urea",
       "name_ru": "Синтетические азотные удобрения, кроме карбамидa",
       "description": "",
@@ -10797,7 +10797,7 @@
       "macro_input_type": 6,
       "name": "User Defined Animal Feed (tier 2)",
       "name_en": "User Defined Animal Feed (tier 2)",
-      "name_fr": "Nourriture animale définie par l'utilisateur (tier 2)\n",
+      "name_fr": "Nourriture animale définie par l'utilisateur (tier 2)",
       "name_es": "Pienso Definido por el usuario (tier 2)",
       "name_ru": "Кормление животных, определённый пользователем (Уровень 2/Tier 2)",
       "description": "",
@@ -10814,7 +10814,7 @@
       "macro_input_type": 10,
       "name": "User Defined Input (tier 2)",
       "name_en": "User Defined Input (tier 2)",
-      "name_fr": "Intrant défini par l'utilisateur (tier 2)\n",
+      "name_fr": "Intrant défini par l'utilisateur (tier 2)",
       "name_es": null,
       "name_ru": "Поступление, определённый пользователем (уровень 2/Tier 2)",
       "description": "",
@@ -10844,7 +10844,7 @@
     "fields": {
       "name": "Center-Pivot Sprinkler",
       "name_en": "Center-Pivot Sprinkler",
-      "name_fr": "Irrigation á pivot central\n",
+      "name_fr": "Irrigation á pivot central",
       "name_es": "Aspersor de pivote central",
       "name_ru": "Центробежное орошение",
       "module_types": [
@@ -10859,7 +10859,7 @@
     "fields": {
       "name": "Hand Moved Sprinkler",
       "name_en": "Hand Moved Sprinkler",
-      "name_fr": "Arroseur mobile manuel\n",
+      "name_fr": "Arroseur mobile manuel",
       "name_es": "Aspersor movido a mano",
       "name_ru": "Ручной передвижной спринклер",
       "module_types": [
@@ -10873,7 +10873,7 @@
     "fields": {
       "name": "Micro Sprinkler",
       "name_en": "Micro Sprinkler",
-      "name_fr": "Micro-arroseur\n",
+      "name_fr": "Micro-arroseur",
       "name_es": "Micro Aspersor",
       "name_ru": "Микроорашиватель",
       "module_types": [
@@ -10887,7 +10887,7 @@
     "fields": {
       "name": "Other (set up Tier 2)",
       "name_en": "Other (set up Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": null,
       "name_ru": null,
       "module_types": [
@@ -10901,7 +10901,7 @@
     "fields": {
       "name": "Permanent Sprinkler",
       "name_en": "Permanent Sprinkler",
-      "name_fr": "Arroseur permanent\n",
+      "name_fr": "Arroseur permanent",
       "name_es": "Aspersor permanente",
       "name_ru": "Постоянный орошатель",
       "module_types": [
@@ -10915,7 +10915,7 @@
     "fields": {
       "name": "Solid Roll Sprinkler",
       "name_en": "Solid Roll Sprinkler",
-      "name_fr": "Arroseur à rouleau solide\n",
+      "name_fr": "Arroseur à rouleau solide",
       "name_es": "Aspersor de rodillo macizo",
       "name_ru": "Твёрдый вращающийся орошатель",
       "module_types": [
@@ -10929,7 +10929,7 @@
     "fields": {
       "name": "Solid Set Sprinkler",
       "name_en": "Solid Set Sprinkler",
-      "name_fr": "Arroseur fixe\n",
+      "name_fr": "Arroseur fixe",
       "name_es": "Conjunto de aspersores solidos",
       "name_ru": "Твёрдое орошение",
       "module_types": [
@@ -10985,7 +10985,7 @@
     "fields": {
       "name": "Traveler Sprinkler",
       "name_en": "Traveler Sprinkler",
-      "name_fr": "Arroseur mobile\n",
+      "name_fr": "Arroseur mobile",
       "name_es": "Aspersor viajero",
       "name_ru": "Перемещающийся орошатель",
       "module_types": [
@@ -11000,7 +11000,7 @@
     "fields": {
       "name": "Trickle",
       "name_en": "Trickle",
-      "name_fr": "Irrigation goutte-à-goutte\n",
+      "name_fr": "Irrigation goutte-à-goutte",
       "name_es": "Riego por goteo",
       "name_ru": "Капельное орошение",
       "module_types": [
@@ -11015,7 +11015,7 @@
     "fields": {
       "name": "Agricultural Buildings (Concrete)",
       "name_en": "Agricultural Buildings (Concrete)",
-      "name_fr": "Bâtiments agricoles (béton)\n",
+      "name_fr": "Bâtiments agricoles (béton)",
       "name_es": "Construcciones Agrícolas (Cemento)",
       "name_ru": "Сельскохозяйственные постройки (бетон)"
     }
@@ -11026,7 +11026,7 @@
     "fields": {
       "name": "Agricultural Buildings (Metal)",
       "name_en": "Agricultural Buildings (Metal)",
-      "name_fr": "Bâtiments agricoles (métal)\n",
+      "name_fr": "Bâtiments agricoles (métal)",
       "name_es": "Construcciones Agrícolas (Metal)",
       "name_ru": "Сельскохозяйственные постройки (металл)"
     }
@@ -11048,7 +11048,7 @@
     "fields": {
       "name": "Food Sales (Retail Or Wholesale)",
       "name_en": "Food Sales (Retail Or Wholesale)",
-      "name_fr": "Vente alimentaire (détail ou gros)\n",
+      "name_fr": "Vente alimentaire (détail ou gros)",
       "name_es": "Venta de alimentos (al por menor o al por mayor)",
       "name_ru": "Продажа продуктов питания (розничная или оптовая)"
     }
@@ -11059,7 +11059,7 @@
     "fields": {
       "name": "Food Service (Restaurants)",
       "name_en": "Food Service (Restaurants)",
-      "name_fr": "Service alimentaire (restaurants)\n",
+      "name_fr": "Service alimentaire (restaurants)",
       "name_es": "Servicio de Comida (Restaurantes)",
       "name_ru": "Общественное питание (рестораны)"
     }
@@ -11070,7 +11070,7 @@
     "fields": {
       "name": "Garage (Concrete)",
       "name_en": "Garage (Concrete)",
-      "name_fr": "Garage (béton)\n",
+      "name_fr": "Garage (béton)",
       "name_es": "Garaje (Cemento)",
       "name_ru": "Гараж (Бетон)"
     }
@@ -11081,7 +11081,7 @@
     "fields": {
       "name": "Garage (Metal)",
       "name_en": "Garage (Metal)",
-      "name_fr": "Garage (métal)\n",
+      "name_fr": "Garage (métal)",
       "name_es": "Garaje (Metal)",
       "name_ru": "Гараж (Металлический)"
     }
@@ -11092,7 +11092,7 @@
     "fields": {
       "name": "Health Care (Metal)",
       "name_en": "Health Care (Metal)",
-      "name_fr": "Soins de santé (métal)\n",
+      "name_fr": "Soins de santé (métal)",
       "name_es": "Atención Sanitaria (Metal)",
       "name_ru": "Здравоохранение (Металл)"
     }
@@ -11103,7 +11103,7 @@
     "fields": {
       "name": "Housing (Concrete)",
       "name_en": "Housing (Concrete)",
-      "name_fr": "Logement (béton)\n",
+      "name_fr": "Logement (béton)",
       "name_es": "Viviendas (Cemento)",
       "name_ru": "Жилье (Бетон)"
     }
@@ -11114,7 +11114,7 @@
     "fields": {
       "name": "Industrial Buildings (Concrete)",
       "name_en": "Industrial Buildings (Concrete)",
-      "name_fr": "Bâtiments industriels (béton)\n",
+      "name_fr": "Bâtiments industriels (béton)",
       "name_es": "Construcciones Industriales (Cemento)",
       "name_ru": "Промышленные здания (бетон)"
     }
@@ -11125,7 +11125,7 @@
     "fields": {
       "name": "Industrial Buildings (Metal)",
       "name_en": "Industrial Buildings (Metal)",
-      "name_fr": "Bâtiments industriels (métal)\n",
+      "name_fr": "Bâtiments industriels (métal)",
       "name_es": "Construcciones Industriales (Metal)",
       "name_ru": "Промышленные здания (металл)"
     }
@@ -11136,7 +11136,7 @@
     "fields": {
       "name": "Offices (Concrete)",
       "name_en": "Offices (Concrete)",
-      "name_fr": "Bureaux (béton)\n",
+      "name_fr": "Bureaux (béton)",
       "name_es": "Oficinas (Cemento)",
       "name_ru": "Офисы (бетонные)"
     }
@@ -11147,7 +11147,7 @@
     "fields": {
       "name": "Offices (Metal)",
       "name_en": "Offices (Metal)",
-      "name_fr": "Bureaux (métal)\n",
+      "name_fr": "Bureaux (métal)",
       "name_es": "Oficinas (Metal)",
       "name_ru": "Офисы (металлические)"
     }
@@ -11158,7 +11158,7 @@
     "fields": {
       "name": "Warehouse And Storage",
       "name_en": "Warehouse And Storage",
-      "name_fr": "Entrepôt et stockage\n",
+      "name_fr": "Entrepôt et stockage",
       "name_es": "Almacén y Almacenamiento",
       "name_ru": "Склад и хранение"
     }
@@ -11169,7 +11169,7 @@
     "fields": {
       "name": "Road (Asphalt)",
       "name_en": "Road (Asphalt)",
-      "name_fr": "Route (asphalte)\n",
+      "name_fr": "Route (asphalte)",
       "name_es": "Carretera (Asfalto)",
       "name_ru": "Дорога (Асфальт)"
     }
@@ -11180,7 +11180,7 @@
     "fields": {
       "name": "Road (Bitumen)",
       "name_en": "Road (Bitumen)",
-      "name_fr": "Route (bitume)\n",
+      "name_fr": "Route (bitume)",
       "name_es": "Carretera (Bitumen)",
       "name_ru": "Дорога (Битум)"
     }
@@ -11191,7 +11191,7 @@
     "fields": {
       "name": "Road Rehabilitated (Pavement)",
       "name_en": "Road Rehabilitated (Pavement)",
-      "name_fr": "Route réhabilitée (revêtement)\n",
+      "name_fr": "Route réhabilitée (revêtement)",
       "name_es": "Carretera Rehabilitada (Pavimentada)",
       "name_ru": "Реконструкция дорог (Покрытие)"
     }
@@ -11202,7 +11202,7 @@
     "fields": {
       "name": "Road (Reinforced Concrete)",
       "name_en": "Road (Reinforced Concrete)",
-      "name_fr": "Route (béton armé)\n",
+      "name_fr": "Route (béton armé)",
       "name_es": "Carretera (Hormigón Armado)",
       "name_ru": "Дорога (Армированный бетон)"
     }
@@ -11361,7 +11361,7 @@
     "fields": {
       "name": "Plastic (LDPE)",
       "name_en": "Plastic (LDPE)",
-      "name_fr": "Plastique (LDPE)\n",
+      "name_fr": "Plastique (LDPE)",
       "name_es": null,
       "name_ru": null
     }
@@ -11372,7 +11372,7 @@
     "fields": {
       "name": "Plastic (mixed)",
       "name_en": "Plastic (mixed)",
-      "name_fr": "Plastique (mixte)\n",
+      "name_fr": "Plastique (mixte)",
       "name_es": null,
       "name_ru": null
     }
@@ -14334,7 +14334,7 @@
     "fields": {
       "name": "High C input, no manure",
       "name_en": "High C input, no manure",
-      "name_fr": "Apport élevé de C, sans fumier (entrées élevées)\n",
+      "name_fr": "Apport élevé de C, sans fumier (entrées élevées)",
       "name_es": "Aporte alto de carbono,  sin estiércol",
       "name_ru": "Высокий уровень поступления С, без навоза",
       "is_active": true
@@ -14346,7 +14346,7 @@
     "fields": {
       "name": "High C input, with manure",
       "name_en": "High C input, with manure",
-      "name_fr": "Apport élevé de C, avec fumier (entrées élevées avec fumier)\n",
+      "name_fr": "Apport élevé de C, avec fumier (entrées élevées avec fumier)",
       "name_es": "Aporte alto de carbono,  con estiércol",
       "name_ru": "Высокий уровень поступления С, с навозом",
       "is_active": true
@@ -14358,7 +14358,7 @@
     "fields": {
       "name": "Low C input",
       "name_en": "Low C input",
-      "name_fr": "Faible apport de C (à faible entrées)\n",
+      "name_fr": "Faible apport de C (à faible entrées)",
       "name_es": "Aporte bajo de carbono",
       "name_ru": "Низкий уротупления С",
       "is_active": true
@@ -14370,7 +14370,7 @@
     "fields": {
       "name": "Medium C input",
       "name_en": "Medium C input",
-      "name_fr": "Apport moyen de C (entrées moyennes)\n",
+      "name_fr": "Apport moyen de C (entrées moyennes)",
       "name_es": "Aporte medio de carbono",
       "name_ru": "Средний уровень поступления С",
       "is_active": true
@@ -14415,7 +14415,7 @@
     "fields": {
       "name": "Irrigated, Continuously Flooded",
       "name_en": "Irrigated, Continuously Flooded",
-      "name_fr": "Irrigué, inondé en permanence\n",
+      "name_fr": "Irrigué, inondé en permanence",
       "name_es": "Irrigadas, Inundadas permanentemente",
       "name_ru": "Орошаемый, постоянно затопленный"
     }
@@ -14426,7 +14426,7 @@
     "fields": {
       "name": "Irrigated, Multiple Drainage Periods",
       "name_en": "Irrigated, Multiple Drainage Periods",
-      "name_fr": "Irrigué de manière intermittente – aération multiple\n",
+      "name_fr": "Irrigué de manière intermittente – aération multiple",
       "name_es": "Irrigadas, Inundados intermitentemente – aireación múltiple",
       "name_ru": "Орошаемый, с неоднократным периодом осушения"
     }
@@ -14437,7 +14437,7 @@
     "fields": {
       "name": "Irrigated, Single Drainage Period",
       "name_en": "Irrigated, Single Drainage Period",
-      "name_fr": "Irrigué de manière intermittente – aération simple\n",
+      "name_fr": "Irrigué de manière intermittente – aération simple",
       "name_es": "Irrigadas, Inundados intermitentemente – aireación simple",
       "name_ru": "Орошаемое, с одним периодом осушения"
     }
@@ -14459,7 +14459,7 @@
     "fields": {
       "name": "Farm Yard Manure",
       "name_en": "Farm Yard Manure",
-      "name_fr": "Fumier de ferme\n",
+      "name_fr": "Fumier de ferme",
       "name_es": "Estiércol de corral",
       "name_ru": "Навоз для фермерского двора"
     }
@@ -14470,7 +14470,7 @@
     "fields": {
       "name": "Green Manure",
       "name_en": "Green Manure",
-      "name_fr": "Engrais vert\n",
+      "name_fr": "Engrais vert",
       "name_es": "Estiércol verde",
       "name_ru": "Зеленое удобрение"
     }
@@ -14481,9 +14481,9 @@
     "fields": {
       "name": "Straw Burnt",
       "name_en": "Straw Burnt",
-      "name_fr": "Paille brûlée\n",
+      "name_fr": "Paille brûlée",
       "name_es": "Paja quemada",
-      "name_ru": "Сожженная солома  "
+      "name_ru": "Сожженная солома"
     }
   },
   {
@@ -14492,7 +14492,7 @@
     "fields": {
       "name": "Straw Exported",
       "name_en": "Straw Exported",
-      "name_fr": "Paille extraite\n",
+      "name_fr": "Paille extraite",
       "name_es": "Paja exportada",
       "name_ru": "Экспортированная солома"
     }
@@ -14503,7 +14503,7 @@
     "fields": {
       "name": "Straw Incorporated Long (>30 Days) Before Cultivation",
       "name_en": "Straw Incorporated Long (>30 Days) Before Cultivation",
-      "name_fr": "Paille incorporée longtemps avant la culture (>30 jours)\n",
+      "name_fr": "Paille incorporée longtemps avant la culture (>30 jours)",
       "name_es": "Paja Incorporada Mucho (>30 días) Antes del cultivo",
       "name_ru": "Солома, внесённая за долго до посева (>30 дней)"
     }
@@ -14514,7 +14514,7 @@
     "fields": {
       "name": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
       "name_en": "Straw Incorporated Shortly (<30 Days) Before Cultivation",
-      "name_fr": "Paille incorporée peu avant la culture (<30 jours)\n",
+      "name_fr": "Paille incorporée peu avant la culture (<30 jours)",
       "name_es": "Paja Incorporada Poco (<30 días) Antes del cultivo",
       "name_ru": "Солома, внесённая за долго до посева (<30 дней)"
     }
@@ -14525,7 +14525,7 @@
     "fields": {
       "name": "Flooded Pre-Season > 30 D",
       "name_en": "Flooded Pre-Season > 30 D",
-      "name_fr": "Inondé avant saison > 30 j\n",
+      "name_fr": "Inondé avant saison > 30 j",
       "name_es": "Pretemporada inundada > 30 días",
       "name_ru": "С затоплениями (>30 суток)"
     }
@@ -14536,7 +14536,7 @@
     "fields": {
       "name": "Non Flooded Pre-Season <180 D",
       "name_en": "Non Flooded Pre-Season <180 D",
-      "name_fr": "Non inondé pré-saison < 180 j\n",
+      "name_fr": "Non inondé pré-saison < 180 j",
       "name_es": "Pretemporada no inundada <180 días",
       "name_ru": "Без затоплений <180 суток"
     }
@@ -14547,7 +14547,7 @@
     "fields": {
       "name": "Non Flooded Pre-Season >180 D",
       "name_en": "Non Flooded Pre-Season >180 D",
-      "name_fr": "Non inondé pré-saison > 180 j\n",
+      "name_fr": "Non inondé pré-saison > 180 j",
       "name_es": "Pretemporada no inundada >180 días",
       "name_ru": "Без затоплений >180 суток"
     }
@@ -14591,8 +14591,8 @@
     "fields": {
       "name": "Rainfed, Deep Water",
       "name_en": "Rainfed, Deep Water",
-      "name_fr": "Pluvial, eau profonde\n",
-      "name_es": "Alimentadas a lluvia, Aguas profundas ",
+      "name_fr": "Pluvial, eau profonde",
+      "name_es": "Alimentadas a lluvia, Aguas profundas",
       "name_ru": "Дождевое орошение, с высоким уровнем воды"
     }
   },
@@ -14602,7 +14602,7 @@
     "fields": {
       "name": "Rainfed, Dry Season (Drought Prone)",
       "name_en": "Rainfed, Dry Season (Drought Prone)",
-      "name_fr": "Pluvial, saison sèche (susceptible à sècheresses)\n",
+      "name_fr": "Pluvial, saison sèche (susceptible à sècheresses)",
       "name_es": "Alimentadas a lluvia, Con tendencia a la sequía",
       "name_ru": "Дождевое орошение, сухой сезон (подвержено засухе)"
     }
@@ -14613,7 +14613,7 @@
     "fields": {
       "name": "Rainfed, Wet Season (Regular Rainfed)",
       "name_en": "Rainfed, Wet Season (Regular Rainfed)",
-      "name_fr": "Pluvial, saison humide (pluies régulières)\n",
+      "name_fr": "Pluvial, saison humide (pluies régulières)",
       "name_es": "Alimentadas a lluvia, Alimentación regular por lluvia",
       "name_ru": "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
     }
@@ -14624,7 +14624,7 @@
     "fields": {
       "name": "High Intensity Grazing",
       "name_en": "High Intensity Grazing",
-      "name_fr": "Pâturage à haute intensité\n",
+      "name_fr": "Pâturage à haute intensité",
       "name_es": "Pastoreo intensivo",
       "name_ru": "Высокоинтенсивный выпас"
     }
@@ -14635,7 +14635,7 @@
     "fields": {
       "name": "Improved Grassland",
       "name_en": "Improved Grassland",
-      "name_fr": "Prairies améliorées\n",
+      "name_fr": "Prairies améliorées",
       "name_es": "Pastizal mejorado",
       "name_ru": "Улучшенные пастбища"
     }
@@ -14646,7 +14646,7 @@
     "fields": {
       "name": "Improved With High Inputs",
       "name_en": "Improved With High Inputs",
-      "name_fr": "Amélioré avec des intrants élevés\n",
+      "name_fr": "Amélioré avec des intrants élevés",
       "name_es": "Pastizal mejorado con insumos altos",
       "name_ru": "Улучшено с высокими поступлениями"
     }
@@ -14657,7 +14657,7 @@
     "fields": {
       "name": "Improved With Medium Inputs",
       "name_en": "Improved With Medium Inputs",
-      "name_fr": "Amélioré avec des intrants moyens\n",
+      "name_fr": "Amélioré avec des intrants moyens",
       "name_es": "Pastizal mejorado con insumos medios",
       "name_ru": "Улучшено со средними поступлениями"
     }
@@ -14668,7 +14668,7 @@
     "fields": {
       "name": "Non-Degraded",
       "name_en": "Non-Degraded",
-      "name_fr": "Non dégradé\n",
+      "name_fr": "Non dégradé",
       "name_es": "No degradado",
       "name_ru": "Недеградированный"
     }
@@ -14679,7 +14679,7 @@
     "fields": {
       "name": "Severely Degraded",
       "name_en": "Severely Degraded",
-      "name_fr": "Fortement dégradé\n",
+      "name_fr": "Fortement dégradé",
       "name_es": "Severamente degradados",
       "name_ru": "Сильно деградированные"
     }
@@ -14714,7 +14714,7 @@
     "fields": {
       "name": "Chicken Broiler",
       "name_en": "Chicken Broiler",
-      "name_fr": "Poulets\n",
+      "name_fr": "Poulets",
       "name_es": "Pollos parrilleros",
       "name_ru": "Цыпленок-бройлер",
       "is_active": true
@@ -14726,7 +14726,7 @@
     "fields": {
       "name": "Chicken Layer",
       "name_en": "Chicken Layer",
-      "name_fr": "Poules pondeuses\n",
+      "name_fr": "Poules pondeuses",
       "name_es": "Gallinas ponedoras",
       "name_ru": "Курица несушка",
       "is_active": true
@@ -14738,7 +14738,7 @@
     "fields": {
       "name": "Dairy Buffalo",
       "name_en": "Dairy Buffalo",
-      "name_fr": "Buffles laitiers\n",
+      "name_fr": "Buffles laitiers",
       "name_es": "Búfala lechera",
       "name_ru": "дойная буйвола",
       "is_active": true
@@ -14750,7 +14750,7 @@
     "fields": {
       "name": "Dairy Cattle",
       "name_en": "Dairy Cattle",
-      "name_fr": "Vaches laitières\n",
+      "name_fr": "Vaches laitières",
       "name_es": "Vacas lecheras",
       "name_ru": "дойная корова",
       "is_active": true
@@ -14762,7 +14762,7 @@
     "fields": {
       "name": "Dairy Sheep",
       "name_en": "Dairy Sheep",
-      "name_fr": "Brebis laitières\n",
+      "name_fr": "Brebis laitières",
       "name_es": "Oveja lechera",
       "name_ru": "дойная овца",
       "is_active": true
@@ -14822,7 +14822,7 @@
     "fields": {
       "name": "Llamas And Alpacas",
       "name_en": "Llamas And Alpacas",
-      "name_fr": "Lamas et alpacas\n",
+      "name_fr": "Lamas et alpacas",
       "name_es": "Llamas y Alpacas",
       "name_ru": "Ламы и альпаки",
       "is_active": false
@@ -14834,7 +14834,7 @@
     "fields": {
       "name": "Mules And Asses",
       "name_en": "Mules And Asses",
-      "name_fr": "Mules et ânes\n",
+      "name_fr": "Mules et ânes",
       "name_es": "Mulas y asnos",
       "name_ru": "Мулы и ослы",
       "is_active": true
@@ -14858,7 +14858,7 @@
     "fields": {
       "name": "Other Buffalo",
       "name_en": "Other Buffalo",
-      "name_fr": "Autres buffles\n",
+      "name_fr": "Autres buffles",
       "name_es": "Búfalo otro",
       "name_ru": "Прочий буйвол",
       "is_active": true
@@ -14870,7 +14870,7 @@
     "fields": {
       "name": "Other Cattle",
       "name_en": "Other Cattle",
-      "name_fr": "Autres bovins\n",
+      "name_fr": "Autres bovins",
       "name_es": "Vacuno otro",
       "name_ru": "Прочий крупный рогатый скот",
       "is_active": true
@@ -14882,7 +14882,7 @@
     "fields": {
       "name": "Other Sheep",
       "name_en": "Other Sheep",
-      "name_fr": "Autres moutons\n",
+      "name_fr": "Autres moutons",
       "name_es": "Ovino otro",
       "name_ru": "Прочий вид овец",
       "is_active": true
@@ -14905,7 +14905,7 @@
     "fields": {
       "name": "High-Productivity",
       "name_en": "High-Productivity",
-      "name_fr": "Haute productivité\n",
+      "name_fr": "Haute productivité",
       "name_es": "Alta Productividad",
       "name_ru": "Высокая производительность"
     }
@@ -14916,7 +14916,7 @@
     "fields": {
       "name": "Low-Productivity",
       "name_en": "Low-Productivity",
-      "name_fr": "Faible productivité\n",
+      "name_fr": "Faible productivité",
       "name_es": "Baja Productividad",
       "name_ru": "Низкая продуктивность"
     }
@@ -14927,7 +14927,7 @@
     "fields": {
       "name": "Aerobic Treatment",
       "name_en": "Aerobic Treatment",
-      "name_fr": "Traitement aérobie\n",
+      "name_fr": "Traitement aérobie",
       "name_es": "Tratamiento Aeróbico",
       "name_ru": "Аэробная обработка"
     }
@@ -14938,7 +14938,7 @@
     "fields": {
       "name": "Burned For Fuel",
       "name_en": "Burned For Fuel",
-      "name_fr": "Brûlage à des fins de combustible\n",
+      "name_fr": "Brûlage à des fins de combustible",
       "name_es": "Quemado para combustible",
       "name_ru": "Сожжённый в качестве топлива"
     }
@@ -14960,7 +14960,7 @@
     "fields": {
       "name": "Daily Spread",
       "name_en": "Daily Spread",
-      "name_fr": "Épandage quotidien\n",
+      "name_fr": "Épandage quotidien",
       "name_es": "Distribución diaria",
       "name_ru": "Ежедневное распределение"
     }
@@ -14971,7 +14971,7 @@
     "fields": {
       "name": "Deep Bedding",
       "name_en": "Deep Bedding",
-      "name_fr": "Litière profonde\n",
+      "name_fr": "Litière profonde",
       "name_es": "Camas profundas",
       "name_ru": "Глубокая подстилка"
     }
@@ -15015,7 +15015,7 @@
     "fields": {
       "name": "Liquid/Slurry",
       "name_en": "Liquid/Slurry",
-      "name_fr": "Liquide/Lisier\n",
+      "name_fr": "Liquide/Lisier",
       "name_es": "Líquido/fango",
       "name_ru": "Жидкость/Жижа"
     }
@@ -15026,7 +15026,7 @@
     "fields": {
       "name": "Other (pls. Go Tier 2)",
       "name_en": "Other (pls. Go Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": "Otros (Por favor, inserte Nivel 2)",
       "name_ru": "Прочее (пожалуйста, перейдите ко второму уровню)"
     }
@@ -15037,7 +15037,7 @@
     "fields": {
       "name": "Other (Pls. Go Tier 2)",
       "name_en": "Other (Pls. Go Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": "Otros (Por favor, inserte Nivel 2)",
       "name_ru": "Прочее (перейдите к уровень 2/Tier 2)"
     }
@@ -15048,7 +15048,7 @@
     "fields": {
       "name": "Pasture/Range/Paddock",
       "name_en": "Pasture/Range/Paddock",
-      "name_fr": "Pâturages/parcours/parcelles\n",
+      "name_fr": "Pâturages/parcours/parcelles",
       "name_es": "Pastura/Prado/Pradera",
       "name_ru": "Пастбище/Выпас/Паддок"
     }
@@ -15059,7 +15059,7 @@
     "fields": {
       "name": "Pit<1Month",
       "name_en": "Pit<1Month",
-      "name_fr": "Fosse <1 mois\n",
+      "name_fr": "Fosse <1 mois",
       "name_es": "Pozo<1Mes",
       "name_ru": "Яма <1 месяц"
     }
@@ -15070,7 +15070,7 @@
     "fields": {
       "name": "Pit>1Month",
       "name_en": "Pit>1Month",
-      "name_fr": "Fosse >1 mois\n",
+      "name_fr": "Fosse >1 mois",
       "name_es": "Pozo>1Mes",
       "name_ru": "Яма >1 месяц"
     }
@@ -15081,7 +15081,7 @@
     "fields": {
       "name": "Poultry Manure",
       "name_en": "Poultry Manure",
-      "name_fr": "Fumier de volaille\n",
+      "name_fr": "Fumier de volaille",
       "name_es": "Estiercol de aves de corral",
       "name_ru": "Птичий навоз"
     }
@@ -15092,7 +15092,7 @@
     "fields": {
       "name": "Solid Storage",
       "name_en": "Solid Storage",
-      "name_fr": "Stockage solide\n",
+      "name_fr": "Stockage solide",
       "name_es": "Almacenaje de sólidos",
       "name_ru": "Твёрдое хранение"
     }
@@ -15103,7 +15103,7 @@
     "fields": {
       "name": "Bottom Trawls",
       "name_en": "Bottom Trawls",
-      "name_fr": "Chaluts de fond\n",
+      "name_fr": "Chaluts de fond",
       "name_es": "Redes de Arrastre de Fondo",
       "name_ru": "Донные тралы"
     }
@@ -15125,7 +15125,7 @@
     "fields": {
       "name": "Gillnets And Entangling Nets",
       "name_en": "Gillnets And Entangling Nets",
-      "name_fr": "Filets maillants et filets emmêlants\n",
+      "name_fr": "Filets maillants et filets emmêlants",
       "name_es": "Redes de Enmalle y Redes de Enredo",
       "name_ru": "Ловчие и запутывающие сети"
     }
@@ -15136,7 +15136,7 @@
     "fields": {
       "name": "Hooks And Lines",
       "name_en": "Hooks And Lines",
-      "name_fr": "Hameçons et lignes\n",
+      "name_fr": "Hameçons et lignes",
       "name_es": "Sedales y Anzuelos",
       "name_ru": "Крючки и лески"
     }
@@ -15147,7 +15147,7 @@
     "fields": {
       "name": "Midwater Trawls",
       "name_en": "Midwater Trawls",
-      "name_fr": "Chaluts pélagiques\n",
+      "name_fr": "Chaluts pélagiques",
       "name_es": "Redes de Arrastre Pelágico",
       "name_ru": "Травы средней воды"
     }
@@ -15158,7 +15158,7 @@
     "fields": {
       "name": "Mobile Seine",
       "name_en": "Mobile Seine",
-      "name_fr": "Seine mobile\n",
+      "name_fr": "Seine mobile",
       "name_es": "Redes de tiro mobil",
       "name_ru": "Мобильный сачок"
     }
@@ -15169,7 +15169,7 @@
     "fields": {
       "name": "Not Specified",
       "name_en": "Not Specified",
-      "name_fr": "Non spécifié\n",
+      "name_fr": "Non spécifié",
       "name_es": "Sin especificar",
       "name_ru": "Не указано"
     }
@@ -15180,7 +15180,7 @@
     "fields": {
       "name": "Other Or Mixed",
       "name_en": "Other Or Mixed",
-      "name_fr": "Autre ou Mixte\n",
+      "name_fr": "Autre ou Mixte",
       "name_es": "Otros o Mezclados",
       "name_ru": "Прочее или смешанное"
     }
@@ -15191,7 +15191,7 @@
     "fields": {
       "name": "Surrounding Nets",
       "name_en": "Surrounding Nets",
-      "name_fr": "Senne\n",
+      "name_fr": "Senne",
       "name_es": "Redes de Cerco",
       "name_ru": "Окружающие сети"
     }
@@ -15202,7 +15202,7 @@
     "fields": {
       "name": "Traps And Lift Nets",
       "name_en": "Traps And Lift Nets",
-      "name_fr": "Pièges et filets relevables\n",
+      "name_fr": "Pièges et filets relevables",
       "name_es": "Trampas y Redes Izadas",
       "name_ru": "Ловушки и подъёмные сети"
     }
@@ -15261,7 +15261,7 @@
       "name_en": "Multiple",
       "name_fr": "Multiple",
       "name_es": "Múltiple",
-      "name_ru": "Множество ",
+      "name_ru": "Множество",
       "fishery_types": [
         1,
         2,
@@ -16190,8 +16190,8 @@
     "fields": {
       "module_type": 6,
       "field_name": "cultivation_period",
-      "description": "Refers to the number of days covered under each cropping season, from seeding to final harvest. The cropping seasons are set to 1 by default and can be up to 5. The sum of cultivation periods should never exceed 365 days, regardless of the number of cropping seasons. ",
-      "description_en": "Refers to the number of days covered under each cropping season, from seeding to final harvest. The cropping seasons are set to 1 by default and can be up to 5. The sum of cultivation periods should never exceed 365 days, regardless of the number of cropping seasons. ",
+      "description": "Refers to the number of days covered under each cropping season, from seeding to final harvest. The cropping seasons are set to 1 by default and can be up to 5. The sum of cultivation periods should never exceed 365 days, regardless of the number of cropping seasons.",
+      "description_en": "Refers to the number of days covered under each cropping season, from seeding to final harvest. The cropping seasons are set to 1 by default and can be up to 5. The sum of cultivation periods should never exceed 365 days, regardless of the number of cropping seasons.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16242,8 +16242,8 @@
     "fields": {
       "module_type": 7,
       "field_name": "categories_of_grassland_management",
-      "description": "1. Non-degraded: Represents non-degraded and sustainably managed grassland, but without significant management improvements. \n2. Moderately degraded / High intensity grazing: Represents high intensity grazing systems (or cutting and removal of vegetation) with shifts in vegetation composition and possibly productivity but is not severely degraded. Note: Termed \"Moderately degraded\" in IPCC 2006 and \"High intensity grazing\" in IPCC 2019. \n3. Severely degraded: Implies major long-term loss of productivity and vegetation cover, due to severe mechanical damage to the vegetation and/or severe soil erosion. \n4. Improved: Represents grassland which is sustainably managed with moderate grazing pressure and that receives at least one improvement: fertilization, species improvement, irrigation. \n5. Improved with high inputs: Applies to improved grassland where one or more additional management inputs/improvements have been used (beyond what is required to be classified as improved grassland). ",
-      "description_en": "1. Non-degraded: Represents non-degraded and sustainably managed grassland, but without significant management improvements. \n2. Moderately degraded / High intensity grazing: Represents high intensity grazing systems (or cutting and removal of vegetation) with shifts in vegetation composition and possibly productivity but is not severely degraded. Note: Termed \"Moderately degraded\" in IPCC 2006 and \"High intensity grazing\" in IPCC 2019. \n3. Severely degraded: Implies major long-term loss of productivity and vegetation cover, due to severe mechanical damage to the vegetation and/or severe soil erosion. \n4. Improved: Represents grassland which is sustainably managed with moderate grazing pressure and that receives at least one improvement: fertilization, species improvement, irrigation. \n5. Improved with high inputs: Applies to improved grassland where one or more additional management inputs/improvements have been used (beyond what is required to be classified as improved grassland). ",
+      "description": "1. Non-degraded: Represents non-degraded and sustainably managed grassland, but without significant management improvements. \n2. Moderately degraded / High intensity grazing: Represents high intensity grazing systems (or cutting and removal of vegetation) with shifts in vegetation composition and possibly productivity but is not severely degraded. Note: Termed \"Moderately degraded\" in IPCC 2006 and \"High intensity grazing\" in IPCC 2019. \n3. Severely degraded: Implies major long-term loss of productivity and vegetation cover, due to severe mechanical damage to the vegetation and/or severe soil erosion. \n4. Improved: Represents grassland which is sustainably managed with moderate grazing pressure and that receives at least one improvement: fertilization, species improvement, irrigation. \n5. Improved with high inputs: Applies to improved grassland where one or more additional management inputs/improvements have been used (beyond what is required to be classified as improved grassland).",
+      "description_en": "1. Non-degraded: Represents non-degraded and sustainably managed grassland, but without significant management improvements. \n2. Moderately degraded / High intensity grazing: Represents high intensity grazing systems (or cutting and removal of vegetation) with shifts in vegetation composition and possibly productivity but is not severely degraded. Note: Termed \"Moderately degraded\" in IPCC 2006 and \"High intensity grazing\" in IPCC 2019. \n3. Severely degraded: Implies major long-term loss of productivity and vegetation cover, due to severe mechanical damage to the vegetation and/or severe soil erosion. \n4. Improved: Represents grassland which is sustainably managed with moderate grazing pressure and that receives at least one improvement: fertilization, species improvement, irrigation. \n5. Improved with high inputs: Applies to improved grassland where one or more additional management inputs/improvements have been used (beyond what is required to be classified as improved grassland).",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16268,8 +16268,8 @@
     "fields": {
       "module_type": 7,
       "field_name": "definitions_of_fire_management",
-      "description": "1. Fire occurrence: Fire occurrence refers to the presence or absence of fire events in a given grassland area over the period of accounting. \n2. Fire periodicity: Fire periodicity describes the frequency or regularity of fire events in a grassland ecosystem. It is expressed as the average time (in years) between successive fire events. A value of 1 stands for 1 year between two fire events, a value of 2 stands for 2 years between two fire events.  \n3. Fire impact: Fire impact refers to the effects of fire on the grassland ecosystem, expressed in the % of grassland biomass that is lost to each fire event. ",
-      "description_en": "1. Fire occurrence: Fire occurrence refers to the presence or absence of fire events in a given grassland area over the period of accounting. \n2. Fire periodicity: Fire periodicity describes the frequency or regularity of fire events in a grassland ecosystem. It is expressed as the average time (in years) between successive fire events. A value of 1 stands for 1 year between two fire events, a value of 2 stands for 2 years between two fire events.  \n3. Fire impact: Fire impact refers to the effects of fire on the grassland ecosystem, expressed in the % of grassland biomass that is lost to each fire event. ",
+      "description": "1. Fire occurrence: Fire occurrence refers to the presence or absence of fire events in a given grassland area over the period of accounting. \n2. Fire periodicity: Fire periodicity describes the frequency or regularity of fire events in a grassland ecosystem. It is expressed as the average time (in years) between successive fire events. A value of 1 stands for 1 year between two fire events, a value of 2 stands for 2 years between two fire events.  \n3. Fire impact: Fire impact refers to the effects of fire on the grassland ecosystem, expressed in the % of grassland biomass that is lost to each fire event.",
+      "description_en": "1. Fire occurrence: Fire occurrence refers to the presence or absence of fire events in a given grassland area over the period of accounting. \n2. Fire periodicity: Fire periodicity describes the frequency or regularity of fire events in a grassland ecosystem. It is expressed as the average time (in years) between successive fire events. A value of 1 stands for 1 year between two fire events, a value of 2 stands for 2 years between two fire events.  \n3. Fire impact: Fire impact refers to the effects of fire on the grassland ecosystem, expressed in the % of grassland biomass that is lost to each fire event.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16359,8 +16359,8 @@
     "fields": {
       "module_type": 19,
       "field_name": "categories_of_trophic_class",
-      "description": "1. Oligotrophic: An oligotrophic lake or reservoir is characterised by low primary productivity, as a result of low nutrient content. (Chl-a ≤ 2.6 µg L-1.)\n2. Mesotrophic : A mesotrophic lake or reservoir is characterised with an intermediate level of productivity. (2.6 µg L-1 < Chl-a ≤ 20 µg L-1.)\n3. Eutrophic : A eutrophic lake, pond or reservoir with high biological productivity. Due to excessive nutrients, especially nitrogen and phosphorus, these water bodies are able to support an abundance of aquatic plants. (20 µg L-1 < Chl-a ≤ 56 µg L-1.)\n4. Hypereutrophic: A hypereutrophic body of water experiences the highest levels of biological productivity. (56 µg L-1 < Chl-a.)\n5. Default: ",
-      "description_en": "1. Oligotrophic: An oligotrophic lake or reservoir is characterised by low primary productivity, as a result of low nutrient content. (Chl-a ≤ 2.6 µg L-1.)\n2. Mesotrophic : A mesotrophic lake or reservoir is characterised with an intermediate level of productivity. (2.6 µg L-1 < Chl-a ≤ 20 µg L-1.)\n3. Eutrophic : A eutrophic lake, pond or reservoir with high biological productivity. Due to excessive nutrients, especially nitrogen and phosphorus, these water bodies are able to support an abundance of aquatic plants. (20 µg L-1 < Chl-a ≤ 56 µg L-1.)\n4. Hypereutrophic: A hypereutrophic body of water experiences the highest levels of biological productivity. (56 µg L-1 < Chl-a.)\n5. Default: ",
+      "description": "1. Oligotrophic: An oligotrophic lake or reservoir is characterised by low primary productivity, as a result of low nutrient content. (Chl-a ≤ 2.6 µg L-1.)\n2. Mesotrophic : A mesotrophic lake or reservoir is characterised with an intermediate level of productivity. (2.6 µg L-1 < Chl-a ≤ 20 µg L-1.)\n3. Eutrophic : A eutrophic lake, pond or reservoir with high biological productivity. Due to excessive nutrients, especially nitrogen and phosphorus, these water bodies are able to support an abundance of aquatic plants. (20 µg L-1 < Chl-a ≤ 56 µg L-1.)\n4. Hypereutrophic: A hypereutrophic body of water experiences the highest levels of biological productivity. (56 µg L-1 < Chl-a.)\n5. Default:",
+      "description_en": "1. Oligotrophic: An oligotrophic lake or reservoir is characterised by low primary productivity, as a result of low nutrient content. (Chl-a ≤ 2.6 µg L-1.)\n2. Mesotrophic : A mesotrophic lake or reservoir is characterised with an intermediate level of productivity. (2.6 µg L-1 < Chl-a ≤ 20 µg L-1.)\n3. Eutrophic : A eutrophic lake, pond or reservoir with high biological productivity. Due to excessive nutrients, especially nitrogen and phosphorus, these water bodies are able to support an abundance of aquatic plants. (20 µg L-1 < Chl-a ≤ 56 µg L-1.)\n4. Hypereutrophic: A hypereutrophic body of water experiences the highest levels of biological productivity. (56 µg L-1 < Chl-a.)\n5. Default:",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16385,8 +16385,8 @@
     "fields": {
       "module_type": 19,
       "field_name": "definition_of_trophic_class",
-      "description": "A measure of the biological productivity of a water body. It is usually characterized by some combination of nutrients, photosynthetic pigments (Chl-a) and/or water column optical properties. As the ambient nutrient levels increase, primary production (the algal population) increases and the water clarity decreases. As primary production increases, higher levels of biological production are supported and the trophic state increases. ",
-      "description_en": "A measure of the biological productivity of a water body. It is usually characterized by some combination of nutrients, photosynthetic pigments (Chl-a) and/or water column optical properties. As the ambient nutrient levels increase, primary production (the algal population) increases and the water clarity decreases. As primary production increases, higher levels of biological production are supported and the trophic state increases. ",
+      "description": "A measure of the biological productivity of a water body. It is usually characterized by some combination of nutrients, photosynthetic pigments (Chl-a) and/or water column optical properties. As the ambient nutrient levels increase, primary production (the algal population) increases and the water clarity decreases. As primary production increases, higher levels of biological production are supported and the trophic state increases.",
+      "description_en": "A measure of the biological productivity of a water body. It is usually characterized by some combination of nutrients, photosynthetic pigments (Chl-a) and/or water column optical properties. As the ambient nutrient levels increase, primary production (the algal population) increases and the water clarity decreases. As primary production increases, higher levels of biological production are supported and the trophic state increases.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16424,8 +16424,8 @@
     "fields": {
       "module_type": 20,
       "field_name": "definition_of_fisheries",
-      "description": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area. ",
-      "description_en": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area. ",
+      "description": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area.",
+      "description_en": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16476,8 +16476,8 @@
     "fields": {
       "module_type": 21,
       "field_name": "definition_of_fisheries",
-      "description": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area. ",
-      "description_en": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area. ",
+      "description": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area.",
+      "description_en": "A Fishery is an activity leading to the harvesting of fish, within the boundaries of a defined area.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16528,8 +16528,8 @@
     "fields": {
       "module_type": 24,
       "field_name": "categories_of_disturbance",
-      "description": "1. Disturbance by fire:Disturbance caused by wildfire regardless of whether it broke out inside or outside the forest. A wildfire is any unplanned and uncontrolled wildland fire which, regardless of ignition source, may require suppression response. \n2. Disturbance by diseases: Disturbances caused by diseases attributable to pathogens such as bacteria, fungi, phytoplasma, or virus. \n3. Disturbance by insects: Disturbance caused by insect pests that are detrimental to tree health. \n4. Other disturbances: Disturbance caused by factors other than fire, insects, or diseases. May include areas affected by drought, flooding, windfalls, acid rain, etc. ",
-      "description_en": "1. Disturbance by fire:Disturbance caused by wildfire regardless of whether it broke out inside or outside the forest. A wildfire is any unplanned and uncontrolled wildland fire which, regardless of ignition source, may require suppression response. \n2. Disturbance by diseases: Disturbances caused by diseases attributable to pathogens such as bacteria, fungi, phytoplasma, or virus. \n3. Disturbance by insects: Disturbance caused by insect pests that are detrimental to tree health. \n4. Other disturbances: Disturbance caused by factors other than fire, insects, or diseases. May include areas affected by drought, flooding, windfalls, acid rain, etc. ",
+      "description": "1. Disturbance by fire:Disturbance caused by wildfire regardless of whether it broke out inside or outside the forest. A wildfire is any unplanned and uncontrolled wildland fire which, regardless of ignition source, may require suppression response. \n2. Disturbance by diseases: Disturbances caused by diseases attributable to pathogens such as bacteria, fungi, phytoplasma, or virus. \n3. Disturbance by insects: Disturbance caused by insect pests that are detrimental to tree health. \n4. Other disturbances: Disturbance caused by factors other than fire, insects, or diseases. May include areas affected by drought, flooding, windfalls, acid rain, etc.",
+      "description_en": "1. Disturbance by fire:Disturbance caused by wildfire regardless of whether it broke out inside or outside the forest. A wildfire is any unplanned and uncontrolled wildland fire which, regardless of ignition source, may require suppression response. \n2. Disturbance by diseases: Disturbances caused by diseases attributable to pathogens such as bacteria, fungi, phytoplasma, or virus. \n3. Disturbance by insects: Disturbance caused by insect pests that are detrimental to tree health. \n4. Other disturbances: Disturbance caused by factors other than fire, insects, or diseases. May include areas affected by drought, flooding, windfalls, acid rain, etc.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16541,8 +16541,8 @@
     "fields": {
       "module_type": 24,
       "field_name": "categories_of_forest",
-      "description": "1. Primary Forest: A naturally regenerating forest of native tree species with no clear signs of human activities and minimal disturbance to ecological processes. This includes:\n- Pristine and carefully managed forests for long-term conservation.\n- Forests under traditional stewardship by Indigenous Peoples and local communities.\n- Forests affected by natural disturbances.\n- Excludes forests significantly impacted by hunting or gathering activities that have disrupted native species populations or ecological processes.\n\n2. Secondary Forest: A forest composed of indigenous trees. It includes forests that are regenerating largely through natural processes after significant human and/or natural disturbance of the original forest vegetation at a single point in time or over an extended period, and displaying a major difference in forest structure and/or canopy species composition with respect to nearby primary forests on similar sites.It includes forests established through planting or seeding and under extensive management, which at stand maturity resembles or will resemble naturally regenerating forest. \n\n3. Forest Plantations (high density): Planeted forest that is intensively managed and meets all of the following criteria:  one or two species at planting, even age class, and regular spacing. ",
-      "description_en": "1. Primary Forest: A naturally regenerating forest of native tree species with no clear signs of human activities and minimal disturbance to ecological processes. This includes:\n- Pristine and carefully managed forests for long-term conservation.\n- Forests under traditional stewardship by Indigenous Peoples and local communities.\n- Forests affected by natural disturbances.\n- Excludes forests significantly impacted by hunting or gathering activities that have disrupted native species populations or ecological processes.\n\n2. Secondary Forest: A forest composed of indigenous trees. It includes forests that are regenerating largely through natural processes after significant human and/or natural disturbance of the original forest vegetation at a single point in time or over an extended period, and displaying a major difference in forest structure and/or canopy species composition with respect to nearby primary forests on similar sites.It includes forests established through planting or seeding and under extensive management, which at stand maturity resembles or will resemble naturally regenerating forest. \n\n3. Forest Plantations (high density): Planeted forest that is intensively managed and meets all of the following criteria:  one or two species at planting, even age class, and regular spacing. ",
+      "description": "1. Primary Forest: A naturally regenerating forest of native tree species with no clear signs of human activities and minimal disturbance to ecological processes. This includes:\n- Pristine and carefully managed forests for long-term conservation.\n- Forests under traditional stewardship by Indigenous Peoples and local communities.\n- Forests affected by natural disturbances.\n- Excludes forests significantly impacted by hunting or gathering activities that have disrupted native species populations or ecological processes.\n\n2. Secondary Forest: A forest composed of indigenous trees. It includes forests that are regenerating largely through natural processes after significant human and/or natural disturbance of the original forest vegetation at a single point in time or over an extended period, and displaying a major difference in forest structure and/or canopy species composition with respect to nearby primary forests on similar sites.It includes forests established through planting or seeding and under extensive management, which at stand maturity resembles or will resemble naturally regenerating forest. \n\n3. Forest Plantations (high density): Planeted forest that is intensively managed and meets all of the following criteria:  one or two species at planting, even age class, and regular spacing.",
+      "description_en": "1. Primary Forest: A naturally regenerating forest of native tree species with no clear signs of human activities and minimal disturbance to ecological processes. This includes:\n- Pristine and carefully managed forests for long-term conservation.\n- Forests under traditional stewardship by Indigenous Peoples and local communities.\n- Forests affected by natural disturbances.\n- Excludes forests significantly impacted by hunting or gathering activities that have disrupted native species populations or ecological processes.\n\n2. Secondary Forest: A forest composed of indigenous trees. It includes forests that are regenerating largely through natural processes after significant human and/or natural disturbance of the original forest vegetation at a single point in time or over an extended period, and displaying a major difference in forest structure and/or canopy species composition with respect to nearby primary forests on similar sites.It includes forests established through planting or seeding and under extensive management, which at stand maturity resembles or will resemble naturally regenerating forest. \n\n3. Forest Plantations (high density): Planeted forest that is intensively managed and meets all of the following criteria:  one or two species at planting, even age class, and regular spacing.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16554,8 +16554,8 @@
     "fields": {
       "module_type": 24,
       "field_name": "definition_of_disturbance",
-      "description": "A disturbance is defined as an environmental fluctuation and destructive event that disturbs forest health, structure, and/or change resources or physical environment at any given spatial or temporal scale. Disturbances that affect health and vitality include biotic agents such as insects and diseases extreme ",
-      "description_en": "A disturbance is defined as an environmental fluctuation and destructive event that disturbs forest health, structure, and/or change resources or physical environment at any given spatial or temporal scale. Disturbances that affect health and vitality include biotic agents such as insects and diseases extreme ",
+      "description": "A disturbance is defined as an environmental fluctuation and destructive event that disturbs forest health, structure, and/or change resources or physical environment at any given spatial or temporal scale. Disturbances that affect health and vitality include biotic agents such as insects and diseases extreme",
+      "description_en": "A disturbance is defined as an environmental fluctuation and destructive event that disturbs forest health, structure, and/or change resources or physical environment at any given spatial or temporal scale. Disturbances that affect health and vitality include biotic agents such as insects and diseases extreme",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16580,8 +16580,8 @@
     "fields": {
       "module_type": 24,
       "field_name": "definition_of_timber_harvesting",
-      "description": "Timber harvesting is the cutting and removal of trees, mainly for productive uses – for sale as timber or pulp, fuelwood, or for forest regeneration purposes. Timber harvesting activities include, and are not limited to, logging, thinning, fuelwood gathering. Timber harvesting through rotations should be represented in the \"Rotation\" section. ",
-      "description_en": "Timber harvesting is the cutting and removal of trees, mainly for productive uses – for sale as timber or pulp, fuelwood, or for forest regeneration purposes. Timber harvesting activities include, and are not limited to, logging, thinning, fuelwood gathering. Timber harvesting through rotations should be represented in the \"Rotation\" section. ",
+      "description": "Timber harvesting is the cutting and removal of trees, mainly for productive uses – for sale as timber or pulp, fuelwood, or for forest regeneration purposes. Timber harvesting activities include, and are not limited to, logging, thinning, fuelwood gathering. Timber harvesting through rotations should be represented in the \"Rotation\" section.",
+      "description_en": "Timber harvesting is the cutting and removal of trees, mainly for productive uses – for sale as timber or pulp, fuelwood, or for forest regeneration purposes. Timber harvesting activities include, and are not limited to, logging, thinning, fuelwood gathering. Timber harvesting through rotations should be represented in the \"Rotation\" section.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16593,8 +16593,8 @@
     "fields": {
       "module_type": 24,
       "field_name": "forest_management",
-      "description": "A system of practices for stewardship and use of forest land aimed at fulfilling relevant ecological (including biological diversity), economic and social functions of the forest.  ",
-      "description_en": "A system of practices for stewardship and use of forest land aimed at fulfilling relevant ecological (including biological diversity), economic and social functions of the forest.  ",
+      "description": "A system of practices for stewardship and use of forest land aimed at fulfilling relevant ecological (including biological diversity), economic and social functions of the forest.",
+      "description_en": "A system of practices for stewardship and use of forest land aimed at fulfilling relevant ecological (including biological diversity), economic and social functions of the forest.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -16983,8 +16983,8 @@
     "fields": {
       "module_type": 38,
       "field_name": "definition_of_organic_soil",
-      "description": "Soil that satisfies the requirements 1 and 2, or 1 and 3 below: \n1) Thickness of organic horizon greater than or equal to 10 cm. A horizon of less than 20 cm must have 12 percent or more organic carbon when mixed to a depth of 20 cm; \n2) Soils that are never saturated with water for more than a few days must contain more than 20 percent organic carbon by weight (i.e. about 35 percent organic matter); and \n3) Soils are subject to water saturation episodes and have either: \n     a) At least 12 percent organic carbon by weight (i.e. about 20 percent organic matter) if the soil has no clay; or\n     b) At least 18 percent organic carbon by weight (i.e. about 30 percent organic matter) if the soil has 60% or more clay; or \n     c) An intermediate proportional amount of organic carbon for intermediate amounts of clay.  ",
-      "description_en": "Soil that satisfies the requirements 1 and 2, or 1 and 3 below: \n1) Thickness of organic horizon greater than or equal to 10 cm. A horizon of less than 20 cm must have 12 percent or more organic carbon when mixed to a depth of 20 cm; \n2) Soils that are never saturated with water for more than a few days must contain more than 20 percent organic carbon by weight (i.e. about 35 percent organic matter); and \n3) Soils are subject to water saturation episodes and have either: \n     a) At least 12 percent organic carbon by weight (i.e. about 20 percent organic matter) if the soil has no clay; or\n     b) At least 18 percent organic carbon by weight (i.e. about 30 percent organic matter) if the soil has 60% or more clay; or \n     c) An intermediate proportional amount of organic carbon for intermediate amounts of clay.  ",
+      "description": "Soil that satisfies the requirements 1 and 2, or 1 and 3 below: \n1) Thickness of organic horizon greater than or equal to 10 cm. A horizon of less than 20 cm must have 12 percent or more organic carbon when mixed to a depth of 20 cm; \n2) Soils that are never saturated with water for more than a few days must contain more than 20 percent organic carbon by weight (i.e. about 35 percent organic matter); and \n3) Soils are subject to water saturation episodes and have either: \n     a) At least 12 percent organic carbon by weight (i.e. about 20 percent organic matter) if the soil has no clay; or\n     b) At least 18 percent organic carbon by weight (i.e. about 30 percent organic matter) if the soil has 60% or more clay; or \n     c) An intermediate proportional amount of organic carbon for intermediate amounts of clay.",
+      "description_en": "Soil that satisfies the requirements 1 and 2, or 1 and 3 below: \n1) Thickness of organic horizon greater than or equal to 10 cm. A horizon of less than 20 cm must have 12 percent or more organic carbon when mixed to a depth of 20 cm; \n2) Soils that are never saturated with water for more than a few days must contain more than 20 percent organic carbon by weight (i.e. about 35 percent organic matter); and \n3) Soils are subject to water saturation episodes and have either: \n     a) At least 12 percent organic carbon by weight (i.e. about 20 percent organic matter) if the soil has no clay; or\n     b) At least 18 percent organic carbon by weight (i.e. about 30 percent organic matter) if the soil has 60% or more clay; or \n     c) An intermediate proportional amount of organic carbon for intermediate amounts of clay.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -17113,8 +17113,8 @@
     "fields": {
       "module_type": 44,
       "field_name": "categories_of_inputs",
-      "description": "Fertilizers: The term fertilizer refers to a chemical or natural substance or material that is used to provide nutrients to plants, usually via application to the soil, but also to foliage or through water in rice systems, fertigation or hydroponics or aquaculture operations. Thus, multiple nutrient types and sources are considered and include: chemical and mineral fertilizers; organic fertilizers such as livestock manures and composts; and sources of recycled nutrients such as wastewater, sewage sludge, digestates and other processed wastes.\nPesticides: A pesticide is defined as a natural or synthetic substance used for controlling or modifying plant growth processes without reducing nutritive value or causing severe phytotoxicity.\nAnimal feed: Animal feed refers to any raw or processed product given to farm animals in the course of husbandry or production processes. It includes both livestock and aquaculture feeds. ",
-      "description_en": "Fertilizers: The term fertilizer refers to a chemical or natural substance or material that is used to provide nutrients to plants, usually via application to the soil, but also to foliage or through water in rice systems, fertigation or hydroponics or aquaculture operations. Thus, multiple nutrient types and sources are considered and include: chemical and mineral fertilizers; organic fertilizers such as livestock manures and composts; and sources of recycled nutrients such as wastewater, sewage sludge, digestates and other processed wastes.\nPesticides: A pesticide is defined as a natural or synthetic substance used for controlling or modifying plant growth processes without reducing nutritive value or causing severe phytotoxicity.\nAnimal feed: Animal feed refers to any raw or processed product given to farm animals in the course of husbandry or production processes. It includes both livestock and aquaculture feeds. ",
+      "description": "Fertilizers: The term fertilizer refers to a chemical or natural substance or material that is used to provide nutrients to plants, usually via application to the soil, but also to foliage or through water in rice systems, fertigation or hydroponics or aquaculture operations. Thus, multiple nutrient types and sources are considered and include: chemical and mineral fertilizers; organic fertilizers such as livestock manures and composts; and sources of recycled nutrients such as wastewater, sewage sludge, digestates and other processed wastes.\nPesticides: A pesticide is defined as a natural or synthetic substance used for controlling or modifying plant growth processes without reducing nutritive value or causing severe phytotoxicity.\nAnimal feed: Animal feed refers to any raw or processed product given to farm animals in the course of husbandry or production processes. It includes both livestock and aquaculture feeds.",
+      "description_en": "Fertilizers: The term fertilizer refers to a chemical or natural substance or material that is used to provide nutrients to plants, usually via application to the soil, but also to foliage or through water in rice systems, fertigation or hydroponics or aquaculture operations. Thus, multiple nutrient types and sources are considered and include: chemical and mineral fertilizers; organic fertilizers such as livestock manures and composts; and sources of recycled nutrients such as wastewater, sewage sludge, digestates and other processed wastes.\nPesticides: A pesticide is defined as a natural or synthetic substance used for controlling or modifying plant growth processes without reducing nutritive value or causing severe phytotoxicity.\nAnimal feed: Animal feed refers to any raw or processed product given to farm animals in the course of husbandry or production processes. It includes both livestock and aquaculture feeds.",
       "description_fr": null,
       "description_es": null,
       "description_ru": null
@@ -18373,7 +18373,7 @@
     "fields": {
       "name": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
       "name_en": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
-      "name_fr": "5e rapport d’évaluation du GIEC (AR5) sans rétroaction climatique\n",
+      "name_fr": "5e rapport d’évaluation du GIEC (AR5) sans rétroaction climatique",
       "name_es": "Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática",
       "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата",
       "co2": 1.0,
@@ -18388,7 +18388,7 @@
     "fields": {
       "name": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
       "name_en": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
-      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique\n",
+      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique",
       "name_es": "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática",
       "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата",
       "co2": 1.0,
@@ -18403,7 +18403,7 @@
     "fields": {
       "name": "IPCC Second Assessment Report (SAR)",
       "name_en": "IPCC Second Assessment Report (SAR)",
-      "name_fr": "2e rapport d’évaluation du GIEC (SAR)\n",
+      "name_fr": "2e rapport d’évaluation du GIEC (SAR)",
       "name_es": "Segundo Informe de Evaluación del IPCC (SAR)",
       "name_ru": "Второй оценочный отчет МГЭИК (SAR)",
       "co2": 1.0,
@@ -18418,7 +18418,7 @@
     "fields": {
       "name": "IPCC Fourth Assessment Report (AR4)",
       "name_en": "IPCC Fourth Assessment Report (AR4)",
-      "name_fr": "4e rapport d’évaluation du GIEC (AR4)\n",
+      "name_fr": "4e rapport d’évaluation du GIEC (AR4)",
       "name_es": "Cuarto Informe de Evaluación del IPCC (AR4)",
       "name_ru": "Четвертый оценочный отчет МГЭИК (ОД4)",
       "co2": 1.0,
@@ -18433,7 +18433,7 @@
     "fields": {
       "name": "IPCC Sixth Assessment Report (AR6)",
       "name_en": "IPCC Sixth Assessment Report (AR6)",
-      "name_fr": "6e rapport d’évaluation du GIEC (AR6)\n",
+      "name_fr": "6e rapport d’évaluation du GIEC (AR6)",
       "name_es": "Sexto Informe de Evaluación del IPCC (AR6)",
       "name_ru": "Шестой оценочный отчет МГЭИК (ОД6)",
       "co2": 1.0,

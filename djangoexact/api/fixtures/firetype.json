@@ -5,7 +5,7 @@
     "fields": {
       "name": "Prescribed Fire (E.G. Land Mgnt)",
       "name_en": "Prescribed Fire (E.G. Land Mgnt)",
-      "name_fr": "Incendie prescrit (ex. gestion des terres)\n",
+      "name_fr": "Incendie prescrit (ex. gestion des terres)",
       "name_es": "Quema controlada (p. ej. Gestión de tierras)",
       "name_ru": "Предписанный огонь (например, управление земельными ресурсами)"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Wildfire Drained Peat",
       "name_en": "Wildfire Drained Peat",
-      "name_fr": "Tourbe drainée brûlée\n",
+      "name_fr": "Tourbe drainée brûlée",
       "name_es": "Incendio forestal en Turba Drenada",
       "name_ru": "Торф, высушенный лесным пожаром"
     }
@@ -27,9 +27,9 @@
     "fields": {
       "name": "Wildfire Undrained Peat",
       "name_en": "Wildfire Undrained Peat",
-      "name_fr": "Tourbe non drainée brûlée\n",
+      "name_fr": "Tourbe non drainée brûlée",
       "name_es": "Incendio forestal en Turba sin drenar",
-      "name_ru": " Торф, не высушенный лесным пожаром"
+      "name_ru": "Торф, не высушенный лесным пожаром"
     }
   }
 ]
