@@ -13,66 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='historicalorganicsoil',
-            name='include_energy_peat_offsite',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_bulk_density_t2_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_bulk_density_t2_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_bulk_density_t2_wo',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_carbon_fraction_t2_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_carbon_fraction_t2_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_carbon_fraction_t2_wo',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_quantity_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_quantity_thread',
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='api.commentthread'),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_quantity_unit',
-            field=models.CharField(blank=True, choices=[('weight', 'Air-dry weight (t/ha/yr)'), ('volume', 'Volume (m3/ha/yr)')], max_length=10, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_quantity_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
-            name='peat_quantity_wo',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorganicsoil',
             name='water_table_class_start',
             field=models.CharField(blank=True, choices=[('shallow_drained', 'Shallow-drained'), ('deep_drained', 'Deep-drained')], max_length=20, null=True),
         ),
@@ -90,66 +30,6 @@ class Migration(migrations.Migration):
             model_name='historicalorganicsoil',
             name='water_table_class_wo',
             field=models.CharField(blank=True, choices=[('shallow_drained', 'Shallow-drained'), ('deep_drained', 'Deep-drained')], max_length=20, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='include_energy_peat_offsite',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_bulk_density_t2_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_bulk_density_t2_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_bulk_density_t2_wo',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_carbon_fraction_t2_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_carbon_fraction_t2_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_carbon_fraction_t2_wo',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_quantity_start',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_quantity_thread',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_peat_quantity_thread', to='api.commentthread'),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_quantity_unit',
-            field=models.CharField(blank=True, choices=[('weight', 'Air-dry weight (t/ha/yr)'), ('volume', 'Volume (m3/ha/yr)')], max_length=10, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_quantity_w',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='organicsoil',
-            name='peat_quantity_wo',
-            field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='organicsoil',

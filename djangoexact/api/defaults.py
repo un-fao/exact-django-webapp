@@ -28,7 +28,6 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
-from api.services.organic_soil_peat import default_bulk_density, default_carbon_fraction
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1213,12 +1212,6 @@ class OrganicSoilDefaults(Defaults):
             peat_density_t2_start_default=0,
             peat_density_t2_w_default=0,
             peat_density_t2_wo_default=0,
-            peat_carbon_fraction_t2_start_default=0,
-            peat_carbon_fraction_t2_w_default=0,
-            peat_carbon_fraction_t2_wo_default=0,
-            peat_bulk_density_t2_start_default=0,
-            peat_bulk_density_t2_w_default=0,
-            peat_bulk_density_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1285,12 +1278,6 @@ class OrganicSoilDefaults(Defaults):
             peat_density_t2_start_default=0,
             peat_density_t2_w_default=defaults.peat_extraction_math_w.peat_density_tier_2_default if defaults.peat_extraction_math_w else 0,
             peat_density_t2_wo_default=defaults.peat_extraction_math_wo.peat_density_tier_2_default if defaults.peat_extraction_math_wo else 0,
-            peat_carbon_fraction_t2_start_default=default_carbon_fraction(defaults.conversion_factor_w),
-            peat_carbon_fraction_t2_w_default=default_carbon_fraction(defaults.conversion_factor_w),
-            peat_carbon_fraction_t2_wo_default=default_carbon_fraction(defaults.conversion_factor_wo),
-            peat_bulk_density_t2_start_default=default_bulk_density(defaults.conversion_factor_w),
-            peat_bulk_density_t2_w_default=default_bulk_density(defaults.conversion_factor_w),
-            peat_bulk_density_t2_wo_default=default_bulk_density(defaults.conversion_factor_wo),
         ), [
             (('onsite_co2_drainage_t2_start_default',), defaults.ef_onsite_start, 'co2'),
             (('onsite_co2_drainage_t2_w_default',), defaults.ef_onsite_w, 'co2'),

@@ -2017,18 +2017,6 @@ class LandUseChangeReadSerializer(LandUseChangeWriteSerializer):
 # Organic Soil
 
 
-def _peat_quantity_mandatory_fields(mandatory_fields: dict) -> dict:
-    """With a quantity unit set, extraction height is unused and the per-scenario quantity is required instead."""
-    swapped = {}
-    for scenario, config in mandatory_fields.items():
-        conditional = {
-            field: [dep.replace("peat_extraction_height_", "peat_quantity_") for dep in deps]
-            for field, deps in config.get("conditional", {}).items()
-        }
-        swapped[scenario] = {**config, "conditional": conditional}
-    return swapped
-
-
 class OrganicSoilWriteSerializer(LandModuleSeralizer):
     class Meta:
         model = OrganicSoil
@@ -2076,9 +2064,6 @@ class OrganicSoilWriteSerializer(LandModuleSeralizer):
 
     def is_ready(self, data, mandatory_fields, instance=None):
         combined_data = self.merge_instance_data(data, instance=instance)
-
-        if combined_data.get("peat_quantity_unit"):
-            mandatory_fields = _peat_quantity_mandatory_fields(mandatory_fields)
 
         errors = {}
 

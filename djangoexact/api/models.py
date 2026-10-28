@@ -3000,7 +3000,6 @@ class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
 
 
-PEAT_QUANTITY_UNIT_CHOICES = [("weight", "Air-dry weight (t/ha/yr)"), ("volume", "Volume (m3/ha/yr)")]
 WATER_TABLE_CLASS_CHOICES = [("shallow_drained", "Shallow-drained"), ("deep_drained", "Deep-drained")]
 
 
@@ -3134,26 +3133,6 @@ class OrganicSoil(LandModuleFixed):
     peat_density_t2_start = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
     peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
     peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
-
-    # Setting peat_quantity_unit switches off-site CO2 to the quantity path (IPCC 2006 V4 Ch7 Eq. 7.4);
-    # null keeps the legacy extraction-height path so existing projects compute the same results.
-    peat_quantity_unit = models.CharField(max_length=10, choices=PEAT_QUANTITY_UNIT_CHOICES, null=True, blank=True)
-    peat_quantity_start = models.FloatField(null=True, blank=True)
-    peat_quantity_w = models.FloatField(null=True, blank=True)
-    peat_quantity_wo = models.FloatField(null=True, blank=True)
-    peat_quantity_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_quantity_thread", on_delete=models.SET_NULL)
-
-    peat_carbon_fraction_t2_start = models.FloatField(null=True, blank=True)
-    peat_carbon_fraction_t2_w = models.FloatField(null=True, blank=True)
-    peat_carbon_fraction_t2_wo = models.FloatField(null=True, blank=True)
-
-    peat_bulk_density_t2_start = models.FloatField(null=True, blank=True)
-    peat_bulk_density_t2_w = models.FloatField(null=True, blank=True)
-    peat_bulk_density_t2_wo = models.FloatField(null=True, blank=True)
-
-    # IPCC reports combustion of energy peat in the Energy sector (1.A), and EX-ACT's energy modules take
-    # peat as a fuel, so energy peat is left out of off-site CO2 here unless the user opts in.
-    include_energy_peat_offsite = models.BooleanField(default=False)
 
     water_table_class_start = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
     water_table_class_w = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)

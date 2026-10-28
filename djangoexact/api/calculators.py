@@ -99,7 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
-from api.services.organic_soil_peat import apply_water_table_class, peat_offsite_inputs
+from api.services.organic_soil_peat import apply_water_table_class
 from api import reference_cache
 
 from . import utilities as utils
@@ -6916,7 +6916,6 @@ class OrganicSoilCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                **peat_offsite_inputs(input, "w", self.conversion_factor_w),
             }
 
             self.peat_extraction_math_w = MathPeatExtraction(**self.peat_extraction_inputs_w)
@@ -7015,7 +7014,6 @@ class OrganicSoilCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                **peat_offsite_inputs(input, "wo", self.conversion_factor_wo),
             }
 
             self.peat_extraction_math_wo = MathPeatExtraction(**self.peat_extraction_inputs_wo)

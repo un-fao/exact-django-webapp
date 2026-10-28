@@ -1,4 +1,4 @@
-"""OrganicSoil peat extraction quantity path and drainage water-table classes.
+"""OrganicSoil drainage water-table classes, temperate grassland CO2 factors, and the unchanged legacy off-site path.
 
 Setup: Grassland activity with OrganicSoil, Cool Temperate / Moist, nutrient-rich peat. Table 7.5 (IPCC 2006
 V4 Ch7) gives 0.4 tC/t and 0.24 tC/m3 for that case.
@@ -12,7 +12,7 @@ from rest_framework import status
 import api.calculators as calcs
 import api.models as models
 import ipcc.models as ipcc_models
-from api.serializers import OrganicSoilReadSerializer, _peat_quantity_mandatory_fields
+from api.serializers import OrganicSoilReadSerializer
 from api.services.organic_soil_peat import apply_water_table_class, water_table_class_applies
 from api.tests.unit.utils import APITestCaseMixin
 from math_model.no_time_dependency_final.ghg_emissions_classes import ActivityTypes
@@ -67,9 +67,6 @@ class OrganicSoilPeatExtractionTestCase(APITestCaseMixin):
         rows = calculator.peat_extraction_math_w.inventory.emissions_by_sector_by_gas
         return next(row.value for row in rows if row.activity == ActivityTypes.OFFSITE_PEAT)
 
-    def _weight_fields(self, **extra):
-        return {"peat_quantity_unit": "weight", "peat_quantity_start": 10.0, "peat_quantity_w": 10.0, "peat_quantity_wo": 10.0, **extra}
-
     def test_legacy_project_keeps_legacy_inputs_and_result(self):
         calculator = self._calculate()
 
@@ -83,35 +80,6 @@ class OrganicSoilPeatExtractionTestCase(APITestCaseMixin):
     def test_nutrient_poor_onsite_co2_is_table_2_1_value(self):
         calculator = self._calculate(peat_type=models.PeatType.objects.get(name_en="Nutrient Poor"))
         self.assertAlmostEqual(calculator.ef_onsite_start.co2, 5.3)
-
-    def test_horticulture_peat_by_weight(self):
-        # 10 t/ha x 100 ha x 0.9 x 0.4 tC/t x 44/12 = 1320 tCO2
-        self.assertAlmostEqual(self._offsite_baseline(self._calculate(**self._weight_fields())), 1320.0)
-
-    def test_horticulture_peat_by_volume_uses_table_7_5_volume_factor(self):
-        # 20 m3/ha x 100 ha x 0.9 x 0.24 tC/m3 x 44/12 = 1584 tCO2
-        calculator = self._calculate(peat_quantity_unit="volume", peat_quantity_start=20.0, peat_quantity_w=20.0, peat_quantity_wo=20.0)
-        self.assertAlmostEqual(self._offsite_baseline(calculator), 1584.0)
-
-    def test_tier_2_carbon_fraction_and_bulk_density(self):
-        # 20 m3/ha x 100 ha x 0.9 x 0.5 t/m3 x 0.5 tC/t x 44/12 = 1650 tCO2
-        calculator = self._calculate(
-            peat_quantity_unit="volume", peat_quantity_start=20.0, peat_quantity_w=20.0,
-            peat_carbon_fraction_t2_start=0.5, peat_bulk_density_t2_start=0.5,
-        )
-        self.assertAlmostEqual(self._offsite_baseline(calculator), 1650.0)
-
-    def test_energy_peat_excluded_by_default(self):
-        calculator = self._calculate(**self._weight_fields(is_peat_for_energy_start=True))
-        self.assertEqual(self._offsite_baseline(calculator), 0.0)
-
-    def test_energy_peat_counted_when_flag_set(self):
-        calculator = self._calculate(**self._weight_fields(is_peat_for_energy_start=True, include_energy_peat_offsite=True))
-        self.assertAlmostEqual(self._offsite_baseline(calculator), 1320.0)
-
-    def test_energy_flag_does_not_touch_legacy_projects(self):
-        calculator = self._calculate(is_peat_for_energy_start=True)
-        self.assertAlmostEqual(self._offsite_baseline(calculator), 0.4 * 0.24 * 100 * 2.0 * 100 * 44 / 12)
 
     def test_water_table_class_swaps_drainage_efs_per_scenario(self):
         calculator = self._calculate(water_table_class_w="deep_drained", water_table_class_wo="shallow_drained")
@@ -149,8 +117,3 @@ class WaterTableApplicabilityTests(unittest.TestCase):
         apply_water_table_class(ef, "deep_drained", self.grassland, self.boreal, self.rich)
         self.assertEqual((ef.co2, ef.ch4, ef.n2o), (5.7, 1.4, 9.5))
 
-
-class PeatQuantityMandatoryFieldsTests(unittest.TestCase):
-    def test_quantity_replaces_extraction_height(self):
-        swapped = _peat_quantity_mandatory_fields({"with": {"conditional": {"peat_area_w": ["peat_extraction_height_w", "peat_ditches_area_w"]}}})
-        self.assertEqual(swapped["with"]["conditional"]["peat_area_w"], ["peat_quantity_w", "peat_ditches_area_w"])
