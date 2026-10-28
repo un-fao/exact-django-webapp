@@ -49,11 +49,9 @@ def indicator(
     label: Any,
     unit: str,
     *,
-    start: float | None = None,
     with_: float | None = None,
     without: float | None = None,
     value: float | None = None,
-    target: float | None = None,
     series: dict | None = None,
 ) -> dict:
     """One indicator row. ``series`` is ``{"years": [...], "with": [...], "without": [...]}``."""
@@ -61,11 +59,9 @@ def indicator(
         "id": indicator_id,
         "label": label,
         "unit": unit,
-        "start": start,
         "with": with_,
         "without": without,
         "value": value,
-        "target": target,
         "series": series,
     }
 
@@ -82,7 +78,6 @@ class IndicatorContext:
     project: Any
     activity_results: list
     skipped_activities: list = field(default_factory=list)
-    _memo: dict = field(default_factory=dict, repr=False)
 
     @property
     def duration(self) -> int:
@@ -91,12 +86,6 @@ class IndicatorContext:
     @property
     def start_year(self) -> int:
         return self.project.start_year_of_activities
-
-    def memo(self, key: str, fn: Callable[[], Any]) -> Any:
-        """Share one expensive read between groups of the same request."""
-        if key not in self._memo:
-            self._memo[key] = fn()
-        return self._memo[key]
 
 
 def build(project, activity_results: list, skipped_activities: list | None = None) -> dict:

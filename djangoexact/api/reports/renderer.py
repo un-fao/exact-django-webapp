@@ -494,7 +494,7 @@ class ExcelRenderer:
         if not data:
             return
         ws = wb.create_sheet(WS_INDICATORS)
-        headers = ["Indicator", "Unit", "Start", "With project", "Without project", "Value", "Target"]
+        headers = ["Indicator", "Unit", "With project", "Without project", "Value"]
         row = 1
         for group in data["groups"]:
             ws.cell(row=row, column=1, value=str(group["label"])).fill = _BLUE
@@ -508,7 +508,7 @@ class ExcelRenderer:
             row += 1
             series_rows = []
             for item in group["indicators"]:
-                values = [str(item["label"]), item["unit"], item["start"], item["with"], item["without"], item["value"], item["target"]]
+                values = [str(item["label"]), item["unit"], item["with"], item["without"], item["value"]]
                 for col, value in enumerate(values, start=1):
                     ws.cell(row=row, column=col, value=value)
                 if item.get("series"):
