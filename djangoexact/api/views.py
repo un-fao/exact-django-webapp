@@ -1069,7 +1069,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 for comment_data in comments_data:
                     _create_comment(thread, comment_data, author_cache)
 
-        def prepare_model_data(model_class, data, module_id_map=None):
+        def prepare_model_data(model_class, data, module_id_map=None, forward_refs=None):
             """
             Filter data to valid model fields and convert FK fields to use _id suffix.
             Django expects FK fields as either model instances or field_id=integer.
@@ -1078,6 +1078,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             For OneToOneField cross-references between modules in the same
             activity (e.g. Settlement.land_use_change → LandUseChange),
             ``module_id_map`` remaps old PKs to newly-created instances.
+            A reference to a module not created yet is left unset and, when
+            ``forward_refs`` is given, appended to it as (field_name, old_pk)
+            so the caller can link it once the target exists.
             """
             import re
             from django.db.models import ForeignKey
@@ -1103,25 +1106,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 # OneToOneField cross-module references need ID remapping
                 # because the referenced module was re-created with a new PK.
                 if isinstance(field, OneToOneField):
-                    if isinstance(value, int) and value in module_id_map:
-                        # New export format: integer ID that maps to a
-                        # previously-created module in this activity.
-                        result[f"{field_name}_id"] = module_id_map[value].id
-                    elif isinstance(value, str):
+                    old_pk = value
+                    if isinstance(value, str):
                         # Old export format: string like "(4) LandUseChange
-                        # in settlements". Parse the PK and remap.
+                        # in settlements".
                         match = re.match(r'\((\d+)\)', value)
-                        if match:
-                            old_pk = int(match.group(1))
-                            if old_pk in module_id_map:
-                                result[f"{field_name}_id"] = module_id_map[old_pk].id
-                        # If not in the map the target module hasn't been
-                        # created yet or doesn't exist — skip gracefully
-                        # (the field is nullable).
-                    elif isinstance(value, int):
-                        # Reference-data FK (e.g. OrganicSoil pointing to
-                        # a shared record) — not in the map, use as-is.
-                        result[f"{field_name}_id"] = value
+                        old_pk = int(match.group(1)) if match else None
+                    if not isinstance(old_pk, int):
+                        continue
+                    if old_pk in module_id_map:
+                        result[f"{field_name}_id"] = module_id_map[old_pk].id
+                    elif forward_refs is not None:
+                        # The old PK belongs to the exporting database, so it
+                        # must never be written as-is: OrganicSoil and
+                        # LandUseChange reference each other, and the one
+                        # created first would point at a foreign row.
+                        forward_refs.append((field_name, old_pk))
                     continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
@@ -1220,6 +1220,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     # Cache for author lookups to avoid repeated DB queries
                     author_cache = {}
 
+                    # (instance, field_name, old_pk) for references to modules
+                    # created later in this activity.
+                    forward_links = []
+
                     # Create modules
                     for module_type, modules_list in modules_data.items():
                         model_class = self._get_module_class(module_type)
@@ -1233,12 +1237,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     module_data, resolve_status_id
                                 )
 
+                                forward_refs = []
                                 filtered_module_data = prepare_model_data(
-                                    model_class, module_data, module_id_map
+                                    model_class, module_data, module_id_map, forward_refs
                                 )
                                 new_instance = model_class.objects.create(
                                     activity=activity,
                                     **filtered_module_data
+                                )
+                                forward_links.extend(
+                                    (new_instance, field_name, old_pk) for field_name, old_pk in forward_refs
                                 )
 
                                 if restore_values:
@@ -1259,6 +1267,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                         _reconstruct_threads, author_cache, module_id_map,
                                         cache_restores, resolve_status_id
                                     )
+
+                    for instance, field_name, old_pk in forward_links:
+                        target = module_id_map.get(old_pk)
+                        if isinstance(target, instance._meta.get_field(field_name).related_model):
+                            type(instance).objects.filter(pk=instance.pk).update(**{f"{field_name}_id": target.pk})
 
                 # Replay the exported results now that every module and
                 # submodule exists. update() bypasses save(), so this cannot
