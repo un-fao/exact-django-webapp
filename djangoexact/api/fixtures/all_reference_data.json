@@ -7558,6 +7558,14 @@
     }
   },
   {
+    "model": "api.changerate",
+    "pk": 4,
+    "fields": {
+      "name": "s-curve",
+      "value": 0.5001
+    }
+  },
+  {
     "model": "api.projectstatus",
     "pk": 2,
     "fields": {
