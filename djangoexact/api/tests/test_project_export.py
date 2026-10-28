@@ -574,6 +574,55 @@ class IrrigationSubmoduleExportImportTests(TestCase):
         )
 
 
+class OrganicSoilLandUseChangeImportTests(TestCase):
+    """OrganicSoil and LandUseChange point at each other, so whichever is
+    imported first holds a reference to a module that does not exist yet.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.project = ProjectFactory(
+            owner=self.user,
+            name='Organic Soil LUC Project',
+            climate=Climate.objects.first(),
+            moisture=Moisture.objects.first(),
+            soil_type=SoilType.objects.first(),
+            country=Country.objects.first(),
+        )
+
+    def test_import_links_organic_soil_to_imported_land_use_change(self):
+        from .factories import LandUseChangeFactory, OrganicSoilFactory
+        from ..models import LandUseChange, OrganicSoil
+
+        activity = _make_activity(self.project, self.user, 'LandUseChange')
+        activity.module_types.add(
+            ModuleType.objects.get_or_create(class_name='OrganicSoil', defaults={'name_en': 'OrganicSoil'})[0]
+        )
+        grassland = ModuleType.objects.get_or_create(class_name='Grassland', defaults={'name_en': 'Grassland'})[0]
+        organic_soil = OrganicSoilFactory(activity=activity)
+        luc = LandUseChangeFactory(
+            activity=activity,
+            organic_soil=organic_soil,
+            module_type_start=grassland,
+            module_type_w=grassland,
+            module_type_wo=grassland,
+        )
+        organic_soil.land_use_change = luc
+        organic_soil.save()
+
+        export_data = _export_project(self.client, self.project.id)
+        response = _import_payload(self.client, export_data, force_copy=True)
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED, getattr(response, 'data', None))
+        new_project = Project.objects.get(id=response.data['projectId'])
+        new_luc = LandUseChange.objects.get(activity__project=new_project)
+        new_soil = OrganicSoil.objects.get(activity__project=new_project)
+        self.assertEqual(new_soil.land_use_change_id, new_luc.id)
+        self.assertEqual(new_luc.organic_soil_id, new_soil.id)
+
+
 
 class ProjectImportCachedResultsTests(TestCase):
     """Regression: the export/import round trip must carry module cached
