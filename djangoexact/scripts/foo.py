@@ -765,6 +765,7 @@ def run():
         # import_crop_nitrous_estimation_default_factors()
         # import_fires_combustion_factors()
         # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
+        # remove_perennial_cropland_module_from_perennial_land_use_types()
         pass
 
     if app_mode == "review":
@@ -785,6 +786,7 @@ def run():
         # import_fires_combustion_factors()
         # import_input_types_units()
         # set_all_climates_and_moistures_for_crop_nitrous_land_use_types()
+        remove_perennial_cropland_module_from_perennial_land_use_types()
         pass
 
     if app_mode == "test":

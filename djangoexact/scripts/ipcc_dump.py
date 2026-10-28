@@ -5218,9 +5218,10 @@ def update_crop_types_annuals_perennials():
 
     Reads the "Annualsperennials" sheet of FAOSTAT_Crop_Types_20260813.xlsx and,
     for every item that matches an existing LandUseType by name, adds the
-    AnnualCropland / PerennialCropland module type when the column is marked YES
-    and removes it when the column is marked NO. Items with no matching
-    LandUseType are skipped, no new LandUseType is created.
+    AnnualCropland module type when ANNUALS is marked YES and removes it when
+    marked NO. PerennialCropland is always removed, whatever the PERENNIALS
+    column says: FAOSTAT crops do not belong to the Perennial Cropland module.
+    Items with no matching LandUseType are skipped, no new LandUseType is created.
     """
     from api.models import LandUseType, ModuleType
 
@@ -5248,19 +5249,16 @@ def update_crop_types_annuals_perennials():
             print(f"Skipping row {i}: no LandUseType named '{name}'")
             continue
 
-        for column, module_type in (
-            ("ANNUALS", annual_module_type),
-            ("PERENNIALS", perennial_module_type),
-        ):
-            value = row[column]
-            keep = not pd.isna(value) and str(value).strip().upper() == "YES"
+        value = row["ANNUALS"]
+        if not pd.isna(value) and str(value).strip().upper() == "YES":
+            land_use_type.module_types.add(annual_module_type)
+            print(f"Kept {annual_module_type} on {land_use_type}")
+        else:
+            land_use_type.module_types.remove(annual_module_type)
+            print(f"Removed {annual_module_type} from {land_use_type}")
 
-            if keep:
-                land_use_type.module_types.add(module_type)
-                print(f"Kept {module_type} on {land_use_type}")
-            else:
-                land_use_type.module_types.remove(module_type)
-                print(f"Removed {module_type} from {land_use_type}")
+        land_use_type.module_types.remove(perennial_module_type)
+        print(f"Removed {perennial_module_type} from {land_use_type}")
 
 def delete_and_import_set_aside_organic_soil_rewetting_emission_factors():
     """
