@@ -6615,8 +6615,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_start.n2o is None and module.onsite_n2o_drainage_t2_start is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start]):
                 raise ValueError(f"Could not find EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6626,8 +6625,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainage_t2_start is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start]):
                 raise ValueError(f"Could not find EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6641,8 +6639,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_start.doc is None and module.offsite_doc_rewetting_t2_start is None:
                 raise ValueError(f"Could not find DOC value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start]):
                 raise ValueError(f"Could not find Rewetting EF Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6654,8 +6651,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_w.n2o is None and module.onsite_n2o_drainage_t2_w is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w]):
                 raise ValueError(f"Could not find EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6665,8 +6661,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainage_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w]):
                 raise ValueError(f"Could not find EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_w = module.fire_type_w is not None
@@ -6687,8 +6682,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_w.doc is None and module.offsite_doc_rewetting_t2_w is None:
                 raise ValueError(f"Could not find DOC value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_w, module.onsite_ch4_rewetting_t2_w, module.onsite_n2o_rewetting_t2_w, module.offsite_doc_rewetting_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_w, module.onsite_ch4_rewetting_t2_w, module.onsite_n2o_rewetting_t2_w, module.offsite_doc_rewetting_t2_w]):
                 raise ValueError(f"Could not find Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6698,8 +6692,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.onsite_ef_w.n2o is None and module.onsite_n2o_peat_t2_w is None:
                 raise ValueError(f"Could not find N2O value of On-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_w, module.onsite_n2o_peat_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_peat_t2_w, module.onsite_ch4_peat_t2_w, module.onsite_n2o_peat_t2_w]):
                 raise ValueError(f"Could not find On-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6709,8 +6702,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.offsite_ef_w.ch4 is None and module.offsite_ch4_peat_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of Off-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_w, module.offsite_ch4_peat_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_peat_t2_w, module.offsite_ch4_peat_t2_w]):
                 raise ValueError(f"Could not find Off-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6728,8 +6720,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_wo.n2o is None and module.onsite_n2o_drainage_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo]):
                 raise ValueError(f"Could not find EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6739,8 +6730,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo]):
                 raise ValueError(f"Could not find EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_wo = module.fire_type_wo is not None
@@ -6762,8 +6752,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_wo.doc is None and module.offsite_doc_rewetting_t2_wo is None:
                 raise ValueError(f"Could not find DOC value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo]):
                 raise ValueError(f"Could not find Rewetting EF WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         ##### Peat Extraction Inputs #####
@@ -6776,8 +6765,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.onsite_ef_wo.n2o is None and module.onsite_n2o_peat_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of On-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo]):
                 raise ValueError(f"Could not find On-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6787,8 +6775,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.offsite_ef_wo.ch4 is None and module.offsite_ch4_peat_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of Off-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_wo, module.offsite_ch4_peat_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_peat_t2_wo, module.offsite_ch4_peat_t2_wo]):
                 raise ValueError(f"Could not find Off-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
