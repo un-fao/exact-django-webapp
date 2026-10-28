@@ -3000,6 +3000,9 @@ class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
 
 
+WATER_TABLE_CLASS_CHOICES = [("shallow_drained", "Shallow-drained"), ("deep_drained", "Deep-drained")]
+
+
 class OrganicSoil(LandModuleFixed):
     drainage_area_start = models.FloatField(default=0, verbose_name="drainage_area_start")
     drainage_area_w = models.FloatField(default=0, verbose_name="drainage_area_w")
@@ -3130,6 +3133,11 @@ class OrganicSoil(LandModuleFixed):
     peat_density_t2_start = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
     peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
     peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
+
+    water_table_class_start = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_w = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_wo = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_water_table_class_thread", on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:

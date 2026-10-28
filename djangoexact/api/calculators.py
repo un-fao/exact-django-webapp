@@ -99,6 +99,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
+from api.services.organic_soil_peat import apply_water_table_class
 from api import reference_cache
 
 from . import utilities as utils
@@ -6588,10 +6589,12 @@ class OrganicSoilCalculator(BaseCalculator):
             module_type_start = luc.module_type_start.name
             module_type_w = luc.module_type_w.name
             module_type_wo = luc.module_type_wo.name
+            module_types = (luc.module_type_start, luc.module_type_w, luc.module_type_wo)
             self.area_affected_by_module = luc.area
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
+            module_types = (parent_module_type,) * 3
 
             self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
 
@@ -6795,6 +6798,10 @@ class OrganicSoilCalculator(BaseCalculator):
             self.conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
         except ipcc.PeatExtractionConversionFactor.DoesNotExist:
             raise ValueError(f"Could not find Peat Extraction Conversion Factor WO for {module.peat_type}, {self.climate}, {self.moisture}")
+
+        water_table_classes = (module.water_table_class_start, module.water_table_class_w, module.water_table_class_wo)
+        for ef, water_table_class, module_type in zip((self.ef_onsite_start, self.ef_onsite_w, self.ef_onsite_wo), water_table_classes, module_types):
+            apply_water_table_class(ef, water_table_class, module_type, self.climate, module.peat_type)
 
     def calculate(self) -> Result:
         super().calculate(self.module)
