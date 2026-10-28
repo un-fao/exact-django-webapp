@@ -111,6 +111,33 @@ def _energy_fuel_metadata_writes(
     return writes
 
 
+def _energy_value_chain_stage_metadata_writes(
+    entries,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """One metadata row per energy entry with its value-chain stage.
+
+    Nothing is written when no entry has a stage, so reports of projects that
+    never set one stay byte-identical. Entry numbers follow creation order.
+    """
+    if not any(entry.value_chain_stage_id for entry in entries):
+        return []
+
+    writes: list[MetadataWrite] = []
+    for i, entry in enumerate(entries):
+        row = base_row + i
+        writes.append(MetadataWrite(row, 1, f"Energy entry {i + 1} - value chain stage"))
+        stage_name = entry.value_chain_stage.name if entry.value_chain_stage else ""
+        for col, is_state in [(2, is_start), (3, is_with), (4, is_without)]:
+            if is_state:
+                writes.append(MetadataWrite(row, col, stage_name))
+    return writes
+
+
 # ---------------------------------------------------------------------------
 # Waterbody
 # ---------------------------------------------------------------------------
@@ -572,6 +599,14 @@ class EnergyReport(BaseModuleReport):
                 is_with=m.is_with(),
                 is_without=m.is_without(),
             )
+
+        mw += _energy_value_chain_stage_metadata_writes(
+            list(m.entries.select_related("value_chain_stage").order_by("id")),
+            base_row=fuel_base + 4 * len(fuels),
+            is_start=m.is_start(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+        )
 
         return ModuleResult(
             title=m.module_type.name,

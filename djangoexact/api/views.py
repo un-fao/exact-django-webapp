@@ -70,6 +70,7 @@ from .models import (
     ProjectFileAttachment,
     APIHealth,
     FuelType,
+    Energy,
     SoilType,
     Fishery,
     Livestock,
@@ -160,6 +161,7 @@ from django.utils.translation import activate
 from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import report_links
+from api.services import energy_value_chain
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
@@ -2934,7 +2936,7 @@ def generic_module_viewset(model: Module):
                     openapi.IN_QUERY,
                     description="Aggregate results by",
                     type=openapi.TYPE_STRING,
-                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value],
+                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value, "value_chain_stage"],
                 ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
@@ -2966,6 +2968,11 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
+                if request.query_params.get("aggregate") == energy_value_chain.VALUE_CHAIN_STAGE_AGGREGATE:
+                    if not isinstance(module, Energy):
+                        return utils.ErrorResponse("aggregate=value_chain_stage is only available for the Energy module.")
+                    return Response(energy_value_chain.results_by_value_chain_stage(module))
+
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
