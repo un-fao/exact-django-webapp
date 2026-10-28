@@ -581,6 +581,27 @@ _REPORT_BODY = openapi.Schema(
 )
 
 
+_INDICATORS_LANG_PARAM = openapi.Parameter(
+    "lang",
+    openapi.IN_QUERY,
+    description="Label language; falls back to Accept-Language, then en",
+    type=openapi.TYPE_STRING,
+    required=False,
+)
+
+
+def indicators_response(request, project):
+    """Shared by the private and public project indicators actions."""
+    from django.utils import translation
+    from api.services import indicators as indicators_service
+
+    lang = utils.requested_language(request)
+    with translation.override(lang):
+        data = indicators_service.compute_project_indicators(project)
+        # Render lazy labels while the requested language is still active.
+        return Response(data=json.loads(json.dumps(data, default=str)), status=http_status.HTTP_200_OK)
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -855,6 +876,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
         )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[_INDICATORS_LANG_PARAM],
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
+    )
+    def indicators(self, request, pk=None):
+        """Project indicators (land use change matrix), grouped.
+
+        Read-only: computed from the module results of the project's ready activities.
+        """
+        project: Project = get_object_or_404(Project, pk=pk)
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+        return indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
