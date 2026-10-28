@@ -162,29 +162,12 @@ class LitterDeadwoodCarbonStock(Model):
     dw_max = FloatField(null=True, blank=True)
 
 
-class LandUseCarbonStockExchangeFactorManager(Manager):
-    def get_or_default(self, climate, moisture, land_use_type):
-        try:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=land_use_type,
-            )
-        except LandUseCarbonStockExchangeFactor.DoesNotExist:
-            return LandUseCarbonStockExchangeFactor.objects.get(
-                climate=climate,
-                moisture=moisture,
-                land_use_type__name__icontains="Default",
-            )
-
-
 class LandUseCarbonStockExchangeFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
-    objects = LandUseCarbonStockExchangeFactorManager()
     value_min = FloatField(null=True, blank=True)
     value_max = FloatField(null=True, blank=True)
 
@@ -327,22 +310,6 @@ class ForestTotalBiomass(Model):
     value_max = FloatField(null=True, blank=True)
 
 
-class AfforestationLandUseStockExchangeFactorManager(Manager):
-    def get_or_default(self, climate, moisture, land_use_type):
-        try:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=land_use_type,
-            )
-        except AfforestationLandUseStockExchangeFactor.DoesNotExist:
-            return AfforestationLandUseStockExchangeFactor.objects.get(
-                climate=climate,
-                moisture=moisture,
-                land_use_type__name__icontains="Default",
-            )
-
-
 class AfforestationLandUseStockExchangeFactor(Model):
     class Meta:
         verbose_name = "Afforestation Land Use Stock Exchange Factor"
@@ -353,7 +320,6 @@ class AfforestationLandUseStockExchangeFactor(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
-    objects = AfforestationLandUseStockExchangeFactorManager()
 
 
 class ForestManagementAGBGrowth(Model):
@@ -669,24 +635,6 @@ class DrainageEmissionFactor(Model):
         verbose_name_plural = "Drainage Emission Factors"
 
 
-class PerennialAGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, land_use_type):
-        try:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type=land_use_type,
-            )
-        except PerennialAGB.DoesNotExist:
-            return PerennialAGB.objects.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type__name="Agroforestry - Default",
-            )
-
-
 class PerennialAGB(Model):
     """
     IPCC A107
@@ -702,27 +650,8 @@ class PerennialAGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
-    objects = PerennialAGBManager()
     value_min = FloatField(null=True, blank=True)
     value_max = FloatField(null=True, blank=True)
-
-
-class PerennialBGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, land_use_type):
-        try:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type=land_use_type,
-            )
-        except PerennialBGB.DoesNotExist:
-            return PerennialBGB.objects.get(
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                land_use_type__name="Agroforestry - Default",
-            )
 
 
 class PerennialBGB(Model):
@@ -736,7 +665,6 @@ class PerennialBGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
-    objects = PerennialBGBManager()
     value_min = FloatField(null=True, blank=True)
     value_max = FloatField(null=True, blank=True)
 
@@ -1382,26 +1310,6 @@ class TrophicStateFactor(Model):
     chloa_max = FloatField(null=True, blank=True)
 
 
-class OrganicSoilDrainageEmissionFactorManager(Manager):
-    def get_or_other_luc(self, climate, moisture, module_type_name, peat_type, site_location_type_name):
-        try:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                module_type__name=module_type_name,
-                peat_type=peat_type,
-                site_location_type__name=site_location_type_name,
-            )
-        except:
-            return self.get(
-                climate=climate,
-                moisture=moisture,
-                module_type__name=module_type_name,
-                peat_type=peat_type,
-                site_location_type__name="OtherLandUseChange",
-            )
-
-
 class OrganicSoilDrainageEmissionFactor(Model):
     class Meta:
         verbose_name = "Organic Soil Drainage Emission Factor"
@@ -1425,7 +1333,6 @@ class OrganicSoilDrainageEmissionFactor(Model):
     n2o = FloatField(default=0)
     n2o_unit = CharField(max_length=100, default="kg N2O/ha/yr")
 
-    objects = OrganicSoilDrainageEmissionFactorManager()
     co2_min = FloatField(null=True, blank=True)
     co2_max = FloatField(null=True, blank=True)
     doc_min = FloatField(null=True, blank=True)
