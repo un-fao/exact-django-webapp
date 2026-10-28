@@ -13,7 +13,6 @@
                             <tr>
                                 <th></th>
                                 <th>{% translate "Unit" %}</th>
-                                <th>{% translate "Start" %}</th>
                                 <th>{% translate "Without Project" %}</th>
                                 <th>{% translate "With Project" %}</th>
                                 <th>{% translate "Value" %}</th>
@@ -24,10 +23,9 @@
                                 <tr>
                                     <td>{{ item.label }}</td>
                                     <td>{{ item.unit }}</td>
-                                    <td>{{ item.start|floatformat:2|default:"" }}</td>
                                     <td>{{ item.without|floatformat:2|default:"" }}</td>
                                     <td>{{ item.with|floatformat:2|default:"" }}</td>
-                                    <td>{% if item.unit == "year" %}{{ item.value|default:"" }}{% else %}{{ item.value|floatformat:2|default:"" }}{% endif %}</td>
+                                    <td>{{ item.value|floatformat:2|default:"" }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

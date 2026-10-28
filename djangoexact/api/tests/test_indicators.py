@@ -28,7 +28,9 @@ from api.tests.factories import (
 )
 from api.views import ProjectViewSet
 
-LAND_GROUPS = ["land_use_change_matrix", "soil_carbon", "four_per_1000", "forest_cover", "net_zero_deforestation"]
+LAND_GROUPS = ["land_use_change_matrix"]
+# Dropped after the 2026-10-28 methodology review; they must not come back unnoticed.
+REMOVED_GROUPS = {"soil_carbon", "four_per_1000", "forest_cover", "net_zero_deforestation"}
 
 
 class RegistryTests(SimpleTestCase):
@@ -113,13 +115,7 @@ class LandGroupsTests(TestCase):
         self.assertEqual(group["data"]["with"][grassland][grassland], 5)
         converted = self._values(group)["converted_area"]
         self.assertEqual((converted["with"], converted["without"]), (10, 0))
-
-    def test_forest_cover_and_net_zero_year(self):
-        groups = self._build()
-        area = self._values(groups["forest_cover"])["forest_area"]
-        self.assertEqual((area["start"], area["with"], area["without"]), (10, 0, 10))
-        year = self._values(groups["net_zero_deforestation"])["net_zero_deforestation_year"]
-        self.assertEqual(year["value"], 2024 + 6)
+        self.assertEqual(set(converted), {"id", "label", "unit", "with", "without", "value", "series"})
 
     def test_endpoint_permissions(self):
         view = ProjectViewSet.as_view({"get": "indicators"})
@@ -129,7 +125,9 @@ class LandGroupsTests(TestCase):
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.project.pk)
         self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual([g["id"] for g in response.data["groups"]][: len(LAND_GROUPS)], LAND_GROUPS)
+        ids = [g["id"] for g in response.data["groups"]]
+        self.assertEqual(ids[: len(LAND_GROUPS)], LAND_GROUPS)
+        self.assertFalse(REMOVED_GROUPS & set(ids))
 
         stranger = UserFactory(email="indicators-stranger@example.com")
         request = factory.get(f"/api/projects/{self.project.pk}/indicators/")
@@ -142,17 +140,18 @@ class ExcelSheetTests(SimpleTestCase):
 
     def test_indicators_sheet_is_appended_after_existing_sheets(self):
         data = {"groups": [
-            {"id": "forest_cover", "label": "Forest cover", "available": True, "data": None, "indicators": [
-                indicators.indicator("forest_area", "Forest area", "ha", start=10, with_=0, without=10),
-            ]},
-            {"id": "four_per_1000", "label": "4 per 1000", "available": False, "data": None, "indicators": []},
+            {"id": "land_use_change_matrix", "label": "Land use change matrix", "available": True, "data": None,
+             "indicators": [indicators.indicator("converted_area", "Area changing land use", "ha", with_=10, without=0)]},
+            {"id": "food_waste", "label": "Food waste", "available": False, "data": None, "indicators": []},
         ]}
         renderer = ExcelRenderer(SimpleNamespace(indicators=data))
         wb = renderer._manager.get_workbook()
         renderer._write_indicators(wb)
         self.assertEqual(wb.sheetnames, self.EXISTING_SHEETS + ["Indicators"])
         ws = wb["Indicators"]
-        self.assertEqual(ws.cell(row=3, column=1).value, "Forest area")
+        self.assertEqual([ws.cell(row=2, column=c).value for c in range(1, 6)],
+                         ["Indicator", "Unit", "With project", "Without project", "Value"])
+        self.assertEqual(ws.cell(row=3, column=1).value, "Area changing land use")
         self.assertEqual(ws.cell(row=3, column=3).value, 10)
 
     def test_no_indicators_leaves_workbook_unchanged(self):
@@ -186,8 +185,8 @@ class ComputedProjectTests(base_module.BaseModuleTestCase):
         groups = {g["id"]: g for g in out["groups"]}
         matrix = groups["land_use_change_matrix"]["data"]["with"]
         self.assertEqual(matrix[1][1], self.module.area)
-        self.assertTrue(groups["soil_carbon"]["available"])
-        self.assertFalse(groups["forest_cover"]["available"])
+        self.assertTrue(groups["land_use_change_matrix"]["available"])
+        self.assertFalse(REMOVED_GROUPS & set(groups))
 
     def test_excel_report_gains_an_indicators_sheet(self):
         from io import BytesIO
@@ -209,7 +208,7 @@ class PdfPartialTests(SimpleTestCase):
              "indicators": [indicators.indicator("converted_area", "Area changing land use", "ha", with_=12.5, without=0)],
              "data": {"categories": [{"id": "forest", "label": "Forest"}, {"id": "cropland", "label": "Cropland"}],
                       "with": [[0, 12.5], [0, 3]], "without": [[12.5, 0], [0, 3]]}},
-            {"id": "four_per_1000", "label": "Hidden group", "available": False, "indicators": [], "data": None},
+            {"id": "food_waste", "label": "Hidden group", "available": False, "indicators": [], "data": None},
         ]}
         html = render_to_string("reports/partials/common/indicators.html", {"indicators": data})
         self.assertIn("Area changing land use", html)

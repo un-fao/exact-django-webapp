@@ -883,7 +883,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def indicators(self, request, pk=None):
-        """Project indicators (land use change matrix, soil carbon, 4 per 1000, forest), grouped.
+        """Project indicators (land use change matrix, food waste), grouped.
 
         Read-only: computed from the module results of the project's ready activities.
         """
