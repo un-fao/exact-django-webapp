@@ -1,6 +1,7 @@
 """Forest management, stock-difference approach.
 
-IPCC 2006 Vol. 4, ch. 2, eq. 2.5: delta C = (C_t2 - C_t1) / (t2 - t1), applied per carbon pool.
+IPCC 2006 Vol. 4, ch. 2, eq. 2.5: delta C = (C_t2 - C_t1) / (t2 - t1), applied per carbon pool
+(AGB, BGB, litter, deadwood). Soil carbon is not accounted under this approach (FAO review 2026-10-28).
 The user gives the stock of each pool (tC/ha) at the start and at the end of the period; the transition
 between the two follows the activity's change rate over the implementation period, then stays at the end
 stock during capitalisation. Summed over the period the CO2 equals -(C_end - C_start) x area x 44/12.
@@ -20,7 +21,6 @@ POOL_ACTIVITIES = {
     "bgb": ActivityTypes.BGB_GROWTH,
     "litter": ActivityTypes.LITTER,
     "deadwood": ActivityTypes.DEADWOOD,
-    "soc": ActivityTypes.SOIL_CO2_CHANGE,
 }
 
 C_TO_CO2 = 44 / 12

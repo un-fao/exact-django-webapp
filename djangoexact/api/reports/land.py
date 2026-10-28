@@ -1113,10 +1113,9 @@ class ForestManagementReport(LandModuleReport):
         GT = math_utils.GasTypes
         biomass_co2 = _add(self._extract(es, AT.AGB_GROWTH, GT.CO2), self._extract(es, AT.BGB_GROWTH, GT.CO2))
         dom_co2 = _add(self._extract(es, AT.LITTER, GT.CO2), self._extract(es, AT.DEADWOOD, GT.CO2))
-        soil_co2 = self._extract(es, AT.SOIL_CO2_CHANGE, GT.CO2)
         zeros = [0.0] * self._project_duration
 
-        pools = [("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood"), ("soc", "SOC")]
+        pools = [("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood")]
         mw = [
             MetadataWrite(1, 1, "Hectares"),
             MetadataWrite(2, 1, "Type of forest"),
@@ -1141,7 +1140,7 @@ class ForestManagementReport(LandModuleReport):
             title=m.module_type.name,
             metadata_section_title="Forest Management (stock difference)",
             result_rows=self._standard_result_rows(
-                biomass_co2, soil_co2, zeros, zeros, zeros,
+                biomass_co2, zeros, zeros, zeros, zeros,
                 extra_rows=[ResultRow("CO2 in dead organic matter", dom_co2)],
             ),
             metadata_writes=mw,

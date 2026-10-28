@@ -8,8 +8,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from math_model.no_time_dependency_final.forest_stock_difference import ForestStockDifference, yearly_change_fractions  # noqa: E402
 from math_model.no_time_dependency_final.ghg_emissions_classes import ActivityTypes  # noqa: E402
 
-START = {"agb": 50.0, "bgb": 10.0, "litter": 5.0, "deadwood": 4.0, "soc": 60.0}
-END = {"agb": 70.0, "bgb": 10.0, "litter": 3.0, "deadwood": 6.0, "soc": 55.0}
+START = {"agb": 50.0, "bgb": 10.0, "litter": 5.0, "deadwood": 4.0}
+END = {"agb": 70.0, "bgb": 10.0, "litter": 3.0, "deadwood": 6.0}
 
 
 def build(stocks_end=END, rate_type="linear", delay=0, **kwargs):
@@ -33,7 +33,13 @@ def test_linear_series_hand_checked():
     # Litter -2 tC/ha: +733.33 tCO2 in total.
     assert series(module, ActivityTypes.LITTER) == pytest.approx([183.3333] * 4 + [0, 0])
     assert series(module, ActivityTypes.DEADWOOD) == pytest.approx([-183.3333] * 4 + [0, 0])
-    assert series(module, ActivityTypes.SOIL_CO2_CHANGE) == pytest.approx([458.3333] * 4 + [0, 0])
+
+
+def test_soil_carbon_is_not_accounted():
+    module = build(stocks_end={**END, "soc": 0.0})
+    activities = {s.activity for s in module.result.yearly_emissions_by_sector_by_gas}
+    assert ActivityTypes.SOIL_CO2_CHANGE not in activities
+    assert {i.activity for i in module.inventory.emissions_by_sector_by_gas} == activities
 
 
 def test_pools_sum_to_total_stock_difference():

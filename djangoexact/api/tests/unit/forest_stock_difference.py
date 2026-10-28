@@ -17,9 +17,9 @@ from api.views import ProjectViewSet
 
 from . import base_module
 
-START = {"agb": 120.0, "bgb": 30.0, "litter": 5.0, "deadwood": 8.0, "soc": 60.0}
-END_W = {"agb": 150.0, "bgb": 36.0, "litter": 6.0, "deadwood": 9.0, "soc": 62.0}
-END_WO = {"agb": 100.0, "bgb": 25.0, "litter": 4.0, "deadwood": 6.0, "soc": 58.0}
+START = {"agb": 120.0, "bgb": 30.0, "litter": 5.0, "deadwood": 8.0}
+END_W = {"agb": 150.0, "bgb": 36.0, "litter": 6.0, "deadwood": 9.0}
+END_WO = {"agb": 100.0, "bgb": 25.0, "litter": 4.0, "deadwood": 6.0}
 
 
 def stock_fields():
@@ -76,7 +76,7 @@ class ForestStockDifferenceTestCase(base_module.BaseModuleTestCase):
 
     def test_stock_difference_with_missing_stock_is_not_ready(self):
         fields = stock_fields()
-        del fields["stock_soc_wo"]
+        del fields["stock_deadwood_wo"]
         self.edit_module(self.module, self.user, {"approach": "stock_difference", **fields})
         self.module.refresh_from_db()
         self.assertEqual(self.module.status.name_en, "EMPTY")
@@ -92,8 +92,9 @@ class ForestStockDifferenceTestCase(base_module.BaseModuleTestCase):
         workbook = openpyxl.load_workbook(io.BytesIO(response.content))
         rows = [row for sheet in workbook.worksheets for row in sheet.iter_rows(values_only=True)]
         by_label = {row[0]: row[1:4] for row in rows if row and isinstance(row[0], str)}
-        for pool, label in (("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood"), ("soc", "SOC")):
+        for pool, label in (("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood")):
             self.assertEqual(tuple(by_label[f"{label} stock (tC/ha)"]), (START[pool], END_W[pool], END_WO[pool]))
+        self.assertNotIn("SOC stock (tC/ha)", by_label)
         self.assertEqual(by_label["Approach"][0], "Stock difference")
         self.assertEqual(by_label["Data source"][0], self.module.data_source.short_name)
         self.assertNotIn("AGB growth rate <=20 years (tC/ha)", by_label)
@@ -152,9 +153,7 @@ class StockDifferenceDefaultsTestCase(base_module.BaseModuleTestCase):
         ).first()
         self.assertEqual(values["stock_litter_w_default"], litter_dw.litter if litter_dw else None)
         self.assertEqual(values["stock_deadwood_wo_default"], litter_dw.dw if litter_dw else None)
-
-        soc = ipcc_models.SoilOrganicCarbon.objects.filter(climate=self.project.climate, moisture=self.project.moisture, soil_type=self.project.soil_type).first()
-        self.assertEqual(values["stock_soc_start_default"], self.activity.soc or (soc.value if soc else None))
+        self.assertNotIn("stock_soc_start_default", values)
 
     def test_fra_reference_uses_latest_year_up_to_project_start(self):
         country = self.project.country
@@ -205,4 +204,4 @@ class StockDifferenceDefaultsTestCase(base_module.BaseModuleTestCase):
     def test_gain_loss_defaults_keep_their_fields_and_add_stocks(self):
         values = self.defaults()
         self.assertIn("soc_t2_start_default", values)
-        self.assertIn("stock_soc_start_default", values)
+        self.assertIn("stock_agb_start_default", values)

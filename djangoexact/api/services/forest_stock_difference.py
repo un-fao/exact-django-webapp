@@ -54,18 +54,14 @@ def _ipcc_stocks(forest) -> dict[str, float | None]:
 
     AGB: ForestManagementAGB (IPCC 2019 Vol. 4 ch. 4 Table 4.7), same row and mean as the gain-loss agb_max, x 0.47 tC/t d.m.
     BGB: AGB x root-to-shoot (Table 4.4), whose classes are bounded by the AGB stock in t d.m./ha.
-    Litter/deadwood: LitterDeadwoodCarbonStock (IPCC 2019 Vol. 4 ch. 2 Table 2.2). SOC: the SOC_ref the gain-loss soc defaults use.
+    Litter/deadwood: LitterDeadwoodCarbonStock (IPCC 2019 Vol. 4 ch. 2 Table 2.2).
     """
     activity = forest.activity
     project = activity.project
     climate = activity.climate_t2 or project.climate
-    moisture = activity.moisture_t2 or project.moisture
     region = project.country.region
     land_use_type = forest.land_use_type_start
     stocks = dict.fromkeys(forest.STOCK_DIFFERENCE_POOLS)
-
-    soc = ipcc.SoilOrganicCarbon.objects.filter(climate=climate, moisture=moisture, soil_type=project.soil_type).first()
-    stocks["soc"] = activity.soc or (soc.value if soc else None)
 
     if land_use_type is None or forest.forest_type is None or forest.forest_condition_type is None:
         return stocks
@@ -92,7 +88,7 @@ def _ipcc_stocks(forest) -> dict[str, float | None]:
 def _fra_reference(forest) -> dict | None:
     """The country's FRA stocks (tC/ha): latest year up to the project start, else the nearest later year.
 
-    Pools FRA leaves empty count as 0 (user decision); SOC is not in FRA and stays IPCC.
+    Pools FRA leaves empty count as 0 (user decision).
     """
     data_source = DataSource.objects.filter(short_name="FRA").first()
     if data_source is None:
@@ -100,14 +96,14 @@ def _fra_reference(forest) -> dict | None:
     project = forest.activity.project
     rows = ipcc.FRACarbonStock.objects.filter(country=project.country)
     row = rows.filter(year__lte=project.start_year_of_activities).order_by("-year").first() or rows.order_by("year").first()
-    pools = ("agb", "bgb", "litter", "deadwood")
+    pools = forest.STOCK_DIFFERENCE_POOLS
     reference = {"data_source": data_source.id, "country": project.country.name, "year": row.year if row else None}
     reference.update({pool: (getattr(row, pool) or 0) if row else None for pool in pools})
     return reference
 
 
 def stock_difference_defaults(forest) -> dict:
-    """Prefill values for the 15 stock inputs (IPCC; end stocks default to the start stock) plus the FRA alternative.
+    """Prefill values for the 12 stock inputs (IPCC; end stocks default to the start stock) plus the FRA alternative.
 
     Never raises on missing reference data: the inputs are user-editable, so a gap just means no prefill.
     """

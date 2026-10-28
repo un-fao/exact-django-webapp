@@ -2427,7 +2427,8 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     APPROACH_GAIN_LOSS = "gain_loss"
     APPROACH_STOCK_DIFFERENCE = "stock_difference"
     APPROACH_CHOICES = [(APPROACH_GAIN_LOSS, "Gain-loss"), (APPROACH_STOCK_DIFFERENCE, "Stock difference")]
-    STOCK_DIFFERENCE_POOLS = ("agb", "bgb", "litter", "deadwood", "soc")
+    # Soil carbon is deliberately not a pool here (FAO review 2026-10-28): stock difference accounts for biomass and DOM only.
+    STOCK_DIFFERENCE_POOLS = ("agb", "bgb", "litter", "deadwood")
 
     approach = models.CharField(max_length=20, choices=APPROACH_CHOICES, default=APPROACH_GAIN_LOSS, verbose_name="approach")
 
@@ -2443,9 +2444,6 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     stock_deadwood_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
     stock_deadwood_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
     stock_deadwood_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
-    stock_soc_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
-    stock_soc_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
-    stock_soc_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
 
     def is_stock_difference(self) -> bool:
         return self.approach == self.APPROACH_STOCK_DIFFERENCE

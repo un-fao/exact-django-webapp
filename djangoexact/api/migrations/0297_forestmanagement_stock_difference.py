@@ -77,21 +77,6 @@ class Migration(migrations.Migration):
             field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
         ),
         migrations.AddField(
-            model_name='forestmanagement',
-            name='stock_soc_start',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
-            model_name='forestmanagement',
-            name='stock_soc_w',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
-            model_name='forestmanagement',
-            name='stock_soc_wo',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
             model_name='historicalforestmanagement',
             name='approach',
             field=models.CharField(choices=[('gain_loss', 'Gain-loss'), ('stock_difference', 'Stock difference')], default='gain_loss', max_length=20, verbose_name='approach'),
@@ -154,21 +139,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='historicalforestmanagement',
             name='stock_litter_wo',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
-            model_name='historicalforestmanagement',
-            name='stock_soc_start',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
-            model_name='historicalforestmanagement',
-            name='stock_soc_w',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
-        ),
-        migrations.AddField(
-            model_name='historicalforestmanagement',
-            name='stock_soc_wo',
             field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0)]),
         ),
     ]

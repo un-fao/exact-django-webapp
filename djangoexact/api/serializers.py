@@ -3042,7 +3042,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             raise serializers.ValidationError(errors)
 
         if is_stock_difference:
-            # Gain-loss inputs and disturbances are ignored, so only the 15 stocks decide readiness.
+            # Gain-loss inputs and disturbances are ignored, so only the 12 stocks decide readiness.
             stock_fields = [f"stock_{pool}_{scenario}" for pool in ForestManagement.STOCK_DIFFERENCE_POOLS for scenario in ("start", "w", "wo")]
             if any(data.get(field) is None for field in stock_fields):
                 data["status"] = StatusType.objects.get(name_en="EMPTY")
