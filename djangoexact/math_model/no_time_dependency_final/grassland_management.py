@@ -121,5 +121,4 @@ class GrasslandManagement(LandModule):
         calculate_soil_emissions()
         calculate_emissions_som()
         calculate_biomass_emissions()
-        self.calculate_iwms_rewetting()
 

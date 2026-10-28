@@ -9,7 +9,6 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 from .ghg_inventory_class import Inventory
-from .iwms_rewetting import calculate_iwms_rewetting
 
 from .general_functions import (
     breakdown_proportionally_to_values,
@@ -80,13 +79,6 @@ class LandModule(BaseModule):
     biomass_start_tier_2: Optional[float] = None
     biomass_end_tier_2: Optional[float] = None
 
-    # IWMS rewetting (IPCC 2013 Wetlands Supplement ch.5). Off by default, so existing inputs compute as before.
-    iwms_rewetted_start: bool = False
-    iwms_rewetted_end: bool = False
-    ef_ch4_iwms: float = 0.0
-    iwms_flu_after_20: Optional[float] = None
-    methane_constant: Optional[float] = None
-
     def __post_init__(self):
         super().__post_init__()
 
@@ -101,15 +93,11 @@ class LandModule(BaseModule):
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
-        self.soc_end_iwms_after_40 = soc_ref_end * fmg_end * fi_end * self.iwms_flu_after_20 if self.iwms_flu_after_20 is not None else None
 
         self.biomass_start = self.biomass_start_tier_2 if self.biomass_start_tier_2 is not None else self.biomass_start_default
         self.biomass_end = self.biomass_end_tier_2 if self.biomass_end_tier_2 is not None else self.biomass_end_default
 
         self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
-
-    def calculate_iwms_rewetting(self):
-        calculate_iwms_rewetting(self)
 
     # TODO: Consider moving som_calculation, soil_calculation and biomass_calculation to here

@@ -818,6 +818,44 @@ class IrrigationReport(BaseModuleReport):
 
 
 # ---------------------------------------------------------------------------
+# Rewetted inland wetland mineral soils
+# ---------------------------------------------------------------------------
+
+@dataclass
+class IwmsRewettingReport(BaseModuleReport):
+    module: api_models.IwmsRewetting
+
+    def __post_init__(self):
+        self.calculator = calculators.IwmsRewettingCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        mw = [
+            MetadataWrite(1, 1, "Rewetted area (ha)"),
+            MetadataWrite(2, 1, "CH4 emission factor (kg CH4/ha/yr)"),
+        ]
+        for col, sfx in ((2, "start"), (3, "w"), (4, "wo")):
+            mw += [
+                MetadataWrite(1, col, getattr(m, f"area_{sfx}")),
+                MetadataWrite(2, col, self.calculator.ef_ch4(sfx)),
+            ]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Rewetted Inland Wetland Mineral Soils",
+            result_rows=[
+                ResultRow("CH4 from rewetted wetland mineral soils", self._extract(self.emissions_set, math_utils.ActivityTypes.IWMS_REWETTING_CH4, math_utils.GasTypes.CH4)),
+            ],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
+        )
+
+
+# ---------------------------------------------------------------------------
 # OrganicSoil
 # ---------------------------------------------------------------------------
 

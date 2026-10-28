@@ -1873,21 +1873,6 @@ class LandModule(Module):
         return self.module_type.class_name == "ForestManagement"
 
 
-class IwmsRewettingMixin(models.Model):
-    """Per-scenario rewetting of inland wetland mineral soils (IPCC 2013 Wetlands Supplement ch.5).
-
-    Only meaningful on Wetland soil; api.services.iwms_rewetting rejects it elsewhere and ignores stale flags.
-    """
-
-    is_rewetted_start = models.BooleanField(default=False, verbose_name="is_rewetted_start")
-    is_rewetted_w = models.BooleanField(default=False, verbose_name="is_rewetted_w")
-    is_rewetted_wo = models.BooleanField(default=False, verbose_name="is_rewetted_wo")
-    is_rewetted_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_is_rewetted_thread")
-
-    class Meta:
-        abstract = True
-
-
 class LandSubmodule(Submodule):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
     area = models.FloatField(null=True, blank=True)
@@ -1950,7 +1935,7 @@ class CropType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability, IwmsRewettingMixin):
+class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     tillage_management_type_start = models.ForeignKey(
         TillageManagementType, on_delete=models.CASCADE, related_name="%(class)s_tillage_management_type_start", null=True, blank=True, verbose_name="tillage_management_type_start"
     )
@@ -2067,7 +2052,7 @@ class PerennialCrop(models.Model):
     fire_periodicity_t2_wo = models.FloatField(null=True, blank=True, verbose_name="fire_periodicity_t2_wo")
 
 
-class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability, IwmsRewettingMixin):
+class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
@@ -2225,7 +2210,7 @@ class MinorSeasonFloodedRice(Rice, LandSubmodule, BiomassMixin):
 ##### Grassland and Livestock #####
 
 
-class Grassland(LandModuleFixed, AboveBelowGroundBiomassModule, IwmsRewettingMixin):
+class Grassland(LandModuleFixed, AboveBelowGroundBiomassModule):
     grassland_management_type_start = models.ForeignKey(
         GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name="grassland_management_type_start"
     )
@@ -3178,7 +3163,7 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class SetAside(LandModule, SingleBiomassModule, IwmsRewettingMixin):
+class SetAside(LandModule, SingleBiomassModule):
     is_set_aside_start = models.BooleanField(default=False, verbose_name="is_set_aside_start")
     is_set_aside_w = models.BooleanField(default=False, verbose_name="is_set_aside_w")
     is_set_aside_wo = models.BooleanField(default=False, verbose_name="is_set_aside_wo")
@@ -3193,7 +3178,7 @@ class SetAside(LandModule, SingleBiomassModule, IwmsRewettingMixin):
         return super().save(*args, **kwargs)
 
 
-class OtherLand(LandModule, SingleBiomassModule, IwmsRewettingMixin):
+class OtherLand(LandModule, SingleBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name="is_degraded_land_start")
     is_degraded_land_w = models.BooleanField(default=False, verbose_name="is_degraded_land_w")
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name="is_degraded_land_wo")
@@ -3273,6 +3258,24 @@ class LandUseChange(Module):
             raise Exception("At least one module type is missing")
 
         return module_types
+
+
+class IwmsRewetting(Module):
+    """CH4 from rewetted inland wetland mineral soils, IPCC 2013 Wetlands Supplement ch. 5 (Eq. 5.1, Table 5.4).
+
+    An addendum to the activity's land modules, like OrganicSoil: it carries its own rewetted hectares per scenario
+    and only the CH4. The cropland SOC side (Table 5.3 FLU) stays on the cropland module, as its FLU tier 2. Applies
+    only on the soil type Wetland; math in math_model/no_time_dependency_final/iwms_rewetting.py.
+    """
+
+    area_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_start")
+    area_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_w")
+    area_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="area_wo")
+    area_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_area_thread")
+
+    ef_ch4_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_start")
+    ef_ch4_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_w")
+    ef_ch4_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)], verbose_name="ef_ch4_t2_wo")
 
 
 ### MODEL PARAMETERS TABLES ###

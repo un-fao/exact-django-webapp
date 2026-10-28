@@ -218,4 +218,3 @@ class AnnualCropland(LandModule):
         calculate_emissions_som()
         calculate_emissions_residue_burning()
         calculate_biomass_emissions()
-        self.calculate_iwms_rewetting()

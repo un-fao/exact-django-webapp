@@ -99,7 +99,6 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
 )
 
 from api.utilities import getattr_or_default
-from api.services import iwms_rewetting
 from api import reference_cache
 
 from . import utilities as utils
@@ -809,7 +808,6 @@ class LandModuleCalculator(BaseCalculator):
         self.fi_wo = get_fi_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
-        iwms_rewetting.apply_rewetted_flu(self)
 
         if isinstance(self.module, BiomassModule) and not isinstance(self.module, Settlement) and not isinstance(self.module, ForestManagement):  # TODO: Incorporate SettlementEF with relevant IPCC tables
             if self.module.is_start() and self.module.is_with():
@@ -1752,7 +1750,6 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
                 "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1817,7 +1814,6 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_start.dry_matter if self.n_estimation_factor_start.dry_matter is not None else 1,
                 "dm_content_minor": self.minor_n_estimation_factor_start.dry_matter if self.minor_n_estimation_factor_start.dry_matter is not None else 1,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1885,7 +1881,6 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "dm_content_main": self.n_estimation_factor_w.dry_matter if self.n_estimation_factor_w.dry_matter is not None else 1,
                 "dm_content_minor": self.minor_n_estimation_factor_w.dry_matter if self.minor_n_estimation_factor_w.dry_matter is not None else 1,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1953,7 +1948,6 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "dm_content_main": self.n_estimation_factor_wo.dry_matter if self.n_estimation_factor_wo.dry_matter is not None else 1,
                 "dm_content_minor": self.minor_n_estimation_factor_wo.dry_matter if self.minor_n_estimation_factor_wo.dry_matter is not None else 1,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -2345,7 +2339,6 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -2414,7 +2407,6 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
 
@@ -2487,7 +2479,6 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
                 "agb_maximum_c_tier_2": self.agb_max_t2_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -2559,7 +2550,6 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
                 "agb_maximum_c_tier_2": self.agb_max_t2_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -3115,7 +3105,6 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_start,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -3164,7 +3153,6 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_start,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
@@ -3216,7 +3204,6 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             log.debug("Inputs w: %s", self.inputs_w)
@@ -3268,7 +3255,6 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             log.debug("Inputs wo: %s", self.inputs_wo)
@@ -7654,7 +7640,6 @@ class OtherLandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             log.debug(f"Inputs start w: {self.inputs_start_w}")
@@ -7693,7 +7678,6 @@ class OtherLandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_wo,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             log.debug(f"Inputs start wo: {self.inputs_start_wo}")
@@ -7733,7 +7717,6 @@ class OtherLandCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             log.debug(f"Inputs w: {self.inputs_w}")
@@ -7773,7 +7756,6 @@ class OtherLandCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             log.debug(f"Inputs wo: {self.inputs_wo}")
@@ -7838,7 +7820,6 @@ class SetAsideCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -7875,7 +7856,6 @@ class SetAsideCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_start_wo,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             self.math_start_wo = MathNotCultivatedLand(**self.inputs_start_wo)
@@ -7913,7 +7893,6 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
-                **iwms_rewetting.rewetting_inputs(self, "w"),
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -7951,7 +7930,6 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
-                **iwms_rewetting.rewetting_inputs(self, "wo"),
             }
 
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
@@ -8381,3 +8359,7 @@ class TransportEntryCalculator(BaseValueChainCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+# Kept in its own module to keep this file from growing; imported here so CalculatorFactory finds it by name.
+from api.iwms_rewetting_calculator import IwmsRewettingCalculator  # noqa: E402,F401

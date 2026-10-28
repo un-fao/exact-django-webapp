@@ -68,6 +68,7 @@ from .models import (
     ModuleType,
     Moisture,
     OrganicSoil,
+    IwmsRewetting,
     OtherInfrastructure,
     PerennialCropland,
     Project,
@@ -1700,15 +1701,6 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
     pass
 
 
-class IwmsRewettingReadMixin(serializers.Serializer):
-    """Tells the client whether the per-scenario rewetted toggle applies (activity on Wetland soil)."""
-
-    iwms_rewetting_available = serializers.SerializerMethodField()
-
-    def get_iwms_rewetting_available(self, instance) -> bool:
-        return iwms_rewetting.is_wetland_soil(iwms_rewetting.activity_soil_type(instance.activity))
-
-
 class LandModuleSeralizer(ScenarioModuleSerializer):
     class Meta:
         model = None
@@ -1721,7 +1713,6 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
         log.debug(f"Data: {data}")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
-        iwms_rewetting.validate_rewetting(data, activity)
         luc: LandUseChange = activity.landusechange.first()
 
         if self.instance and not isinstance(self.instance, LandUseChange):
@@ -1801,7 +1792,7 @@ class GrasslandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class GrasslandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
+class GrasslandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = Grassland
         fields = "__all__"
@@ -1911,7 +1902,7 @@ class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
     pass
 
 
-class AnnualCroplandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
+class AnnualCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = AnnualCropland
         fields = "__all__"
@@ -1988,7 +1979,7 @@ class PerennialCroplandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class PerennialCroplandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
+class PerennialCroplandReadSerializer(BaseGenericModuleSerializer):
     minor_seasons = MinorSeasonPerennialCroplandReadSerializer(many=True, read_only=True)
 
     class Meta:
@@ -2134,6 +2125,36 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         representation["parent_land_use_type_w"] = self.parent_land_use_type_w
         representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
         return representation
+
+
+# Rewetted inland wetland mineral soils
+
+IWMS_REWETTING_SCENARIOS = (utils.ScenarioTypes.START, utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT)
+
+
+class IwmsRewettingWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = IwmsRewetting
+        fields = "__all__"
+        ref_name = "IwmsRewetting"
+        mandatory_fields = {scenario.verbose_name: {"mandatory": [f"area_{scenario.value}"]} for scenario in IWMS_REWETTING_SCENARIOS}
+
+    def validate(self, data):
+        iwms_rewetting.validate_areas(data, data["activity"] if "activity" in data else self.instance.activity)
+        return super().validate(data)
+
+
+class IwmsRewettingReadSerializer(BaseGenericModuleSerializer):
+    is_wetland_soil = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IwmsRewetting
+        fields = "__all__"
+        ref_name = "IwmsRewetting"
+        mandatory_fields = IwmsRewettingWriteSerializer.Meta.mandatory_fields
+
+    def get_is_wetland_soil(self, instance) -> bool:
+        return iwms_rewetting.is_wetland_soil(iwms_rewetting.activity_soil_type(instance.activity))
 
 
 # Flooded Rice
@@ -3323,7 +3344,7 @@ class SetAsideWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class SetAsideReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
+class SetAsideReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = SetAside
         fields = "__all__"
@@ -3339,7 +3360,7 @@ class OtherLandWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class OtherLandReadSerializer(IwmsRewettingReadMixin, BaseGenericModuleSerializer):
+class OtherLandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = OtherLand
         fields = "__all__"

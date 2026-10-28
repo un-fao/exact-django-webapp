@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services import iwms_rewetting
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1148,6 +1149,18 @@ class WaterbodyDefaults(Defaults):
             (('mean_annual_t2_w_default',), defaults.trophic_state_w, 'chloa'),
             (('mean_annual_t2_wo_default',), defaults.trophic_state_wo, 'chloa'),
         ])
+
+
+class IwmsRewettingDefaults(Defaults):
+    """Wetlands Supplement Table 5.4 CH4 EF for the activity climate, the same in every scenario."""
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        ef = iwms_rewetting.default_ef_ch4(self.climate)
+        self.values = SimpleNamespace(**{f"ef_ch4_t2_{scenario}_default": ef for scenario in ("start", "w", "wo")})
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return self.values
 
 
 class OrganicSoilDefaults(Defaults):
