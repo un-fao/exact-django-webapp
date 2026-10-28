@@ -6216,8 +6216,11 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.salinity_type = self.module.avg_salinity_t2
 
         self.soil_type_name = "Mineral"
+        self.soil_type_filter = {"soil_type__name": "Mineral"}
         if self.module.soil_type_t2:
             self.soil_type_name = self.module.soil_type_t2.name
+            # .name is translated; filter by instance so the lookup does not depend on the active language.
+            self.soil_type_filter = {"soil_type": self.module.soil_type_t2}
 
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
@@ -6264,7 +6267,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 raise ValueError(f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
+            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, **self.soil_type_filter)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
             if missing_scenarios:
@@ -6285,7 +6288,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 raise ValueError(f"Percentage C Lost After Excavation is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
+            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=self.module.land_use_type, **self.soil_type_filter)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
@@ -6584,13 +6587,16 @@ class OrganicSoilCalculator(BaseCalculator):
         project: Project = module.activity.project
         luc: LandUseChange = module.land_use_change
 
+        # Filter EFs by ModuleType instance: .name is translated, but module_type__name hits the English column.
         if luc:
-            module_type_start = luc.module_type_start.name
-            module_type_w = luc.module_type_w.name
-            module_type_wo = luc.module_type_wo.name
+            mt_start, mt_w, mt_wo = luc.module_type_start, luc.module_type_w, luc.module_type_wo
+            module_type_start = mt_start.name
+            module_type_w = mt_w.name
+            module_type_wo = mt_wo.name
             self.area_affected_by_module = luc.area
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
+            mt_start = mt_w = mt_wo = parent_module_type
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
             self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
@@ -6607,7 +6613,7 @@ class OrganicSoilCalculator(BaseCalculator):
             raise ValueError(f"Could not find Fire Reference for {self.climate}, {self.moisture}")
 
         try:
-            self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_start, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_start.co2 is None and module.onsite_co2_drainage_t2_start is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_start.ch4 is None and module.onsite_ch4_drainage_t2_start is None:
@@ -6620,7 +6626,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_start.doc is None and module.offsite_doc_drainage_t2_start is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainage_t2_start is None:
@@ -6631,7 +6637,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_start)
+            self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_start)
             if self.rewetting_start.co2 is None and module.onsite_co2_rewetting_t2_start is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_start.ch4 is None and module.onsite_ch4_rewetting_t2_start is None:
@@ -6646,7 +6652,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find Rewetting EF Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_w, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_w.co2 is None and module.onsite_co2_drainage_t2_w is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_w.ch4 is None and module.onsite_ch4_drainage_t2_w is None:
@@ -6659,7 +6665,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_w.doc is None and module.offsite_doc_drainage_t2_w is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainage_t2_w is None:
@@ -6677,7 +6683,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 if self.module.mean_dry_matter_t2_w is None:
                     raise ValueError(f"Could not find Dry Matter W for {module.fire_type_w.name}, {self.climate}, {self.moisture}")
         try:
-            self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_w)
+            self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_w)
             if self.rewetting_w.co2 is None and module.onsite_co2_rewetting_t2_w is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_w.ch4 is None and module.onsite_ch4_rewetting_t2_w is None:
@@ -6720,7 +6726,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find Peat Extraction Conversion Factor W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_wo.co2 is None and module.onsite_co2_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_wo.ch4 is None and module.onsite_ch4_drainage_t2_wo is None:
@@ -6733,7 +6739,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_wo.doc is None and module.offsite_doc_drainage_t2_wo is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainage_t2_wo is None:
@@ -6752,7 +6758,7 @@ class OrganicSoilCalculator(BaseCalculator):
                     raise ValueError(f"Could not find Dry Matter WO for {module.fire_type_wo.name}, {self.climate}, {self.moisture}")
 
         try:
-            self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_wo)
+            self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_wo)
             if self.rewetting_wo.co2 is None and module.onsite_co2_rewetting_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_wo.ch4 is None and module.onsite_ch4_rewetting_t2_wo is None:
