@@ -22,7 +22,6 @@ def _build_registry() -> dict[type, type]:
     from .land import (
         AnnualCroplandReport,
         CoastalWetlandReport,
-        FloodedLandReport,
         FloodedRiceReport,
         ForestManagementReport,
         GrasslandReport,
@@ -56,7 +55,6 @@ def _build_registry() -> dict[type, type]:
         api_models.SetAside: SetAsideReport,
         api_models.Grassland: GrasslandReport,
         api_models.OtherLand: OtherLandReport,
-        api_models.FloodedLand: FloodedLandReport,
         api_models.Waterbody: WaterbodyReport,
         api_models.Aquaculture: AquacultureReport,
         api_models.SmallFishery: SmallFisheryReport,

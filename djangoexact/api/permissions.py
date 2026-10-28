@@ -45,7 +45,6 @@ class IsPublicOrAuthenticated(BasePermission):
                 "irrigation",
                 "setaside",
                 "otherland",
-                "floodedland",
                 "coastalwetland",
                 "floodedrice",
                 "livestock",

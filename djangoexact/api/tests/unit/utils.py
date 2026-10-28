@@ -49,8 +49,7 @@ class APITestCaseMixin(APITestCase):
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
-        # FloodedLand is a land module that only exists as the end of a land use change, never standalone.
-        self.module_type = models.ModuleType.objects.filter(is_luc=True).exclude(class_name="FloodedLand").order_by("?").first()
+        self.module_type = models.ModuleType.objects.filter(is_luc=True).order_by("?").first()
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.gw_potential = ipcc_models.GlobalWarmingPotential.objects.order_by("?").first()
         self.project_data = {

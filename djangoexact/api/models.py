@@ -3203,44 +3203,6 @@ class OtherLand(LandModule, SingleBiomassModule):
         return super().save(*args, **kwargs)
 
 
-FLOODED_LAND_NAME = "Reservoir (flooded land)"
-
-
-class FloodedLand(LandModule):
-    """Reservoir created by a land use change (IPCC 2019 Vol. 4 Ch. 7, land converted to flooded land).
-
-    Only ever the final land use of a LandUseChange: the LUC calculators remove the pre-flood biomass, and
-    FloodedLandCalculator adds the pre-flood soil carbon loss and the reservoir CH4 / CO2 of the flooded area.
-    """
-
-    trophic_type_w = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_w", verbose_name="trophic_type_w")
-    trophic_type_wo = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_wo", verbose_name="trophic_type_wo")
-    trophic_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_thread")
-
-    alpha_t2_w = models.FloatField(null=True, blank=True, verbose_name="alpha_t2_w")
-    alpha_t2_wo = models.FloatField(null=True, blank=True, verbose_name="alpha_t2_wo")
-    # Mean annual chlorophyll-a (ug/L), Eq. 7.11.
-    mean_annual_t2_w = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_w")
-    mean_annual_t2_wo = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_wo")
-    ch4_ef_le_20_t2_w = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_le_20_t2_w")
-    ch4_ef_le_20_t2_wo = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_le_20_t2_wo")
-    ch4_ef_gt_20_t2_w = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_gt_20_t2_w")
-    ch4_ef_gt_20_t2_wo = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_gt_20_t2_wo")
-
-    downstream_emissions = models.BooleanField(default=True, verbose_name="downstream_emissions")
-    rd_t2 = models.FloatField(null=True, blank=True, verbose_name="rd_t2")
-
-    # The start module's calculator reads the end module's biomass Tier 2; nothing grows on a reservoir.
-    biomass_t2_start = biomass_t2_w = biomass_t2_wo = None
-
-    def save(self, *args, **kwargs):
-        # The LUC calculators look up the final land use type (combustion factors, labels).
-        if not self.land_use_type_w:
-            self.land_use_type_w = self.land_use_type_wo = LandUseType.objects.get(name_en=FLOODED_LAND_NAME)
-
-        return super().save(*args, **kwargs)
-
-
 class LandUseChange(Module):
     module_type_start = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="start", verbose_name="module_type_start")
     module_type_w = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="w", verbose_name="module_type_w")

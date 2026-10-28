@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from math_model.no_time_dependency_final.ghg_emissions_classes import ActivityTypes, GasTypes  # noqa: E402
-from math_model.no_time_dependency_final.reservoirs import RESERVOIR_DEFAULT_ALPHA, FloodedLandConversion, Reservoir, trophic_alpha  # noqa: E402
+from math_model.no_time_dependency_final.reservoirs import RESERVOIR_DEFAULT_ALPHA, Reservoir, trophic_alpha  # noqa: E402
 
 # Tropical moist/wet: Table 7.15 (<= 20 y), Table 7.9 (> 20 y), Table 7.13 (CO2-C)
 EF_LE_20, EF_GT_20, CO2_C = 251.6, 141.1, 2.77
@@ -88,51 +88,3 @@ def test_trophic_alpha_precedence():
     assert trophic_alpha(5.0, 100.0, 0.7) == 5.0
     assert trophic_alpha(None, 20.0, 0.7) == pytest.approx(5.2)  # Eq. 7.11
     assert trophic_alpha(None, None, 0.7) == 0.7
-
-
-def conversion(**kw):
-    base = dict(
-        implementation_time=5,
-        capitalization_time=25,
-        rate_type="linear",
-        delay=0,
-        area=100,
-        alpha=3.0,
-        ch4_ef_age_le_20=EF_LE_20,
-        ch4_ef_age_gt_20=EF_GT_20,
-        co2_c_ef_age_le_20=CO2_C,
-        rd=0.09,
-        methane_constant=GWP_CH4,
-    )
-    base.update(kw)
-    r = FloodedLandConversion(**base)
-    r.calculate_emissions()
-    return r
-
-
-def test_conversion_cohorts_switch_to_old_ef_20_years_after_flooding():
-    # 100 ha flooded linearly over 5 years: mid-year flooded area [10, 30, 50, 70, 90, 100, ...]. Each yearly
-    # cohort uses the <= 20 y EF for 20 years from its own flooding, so the switch is staggered over years 20-24.
-    r = conversion()
-    flooded = [10, 30, 50, 70, 90] + [100] * 25
-    aged = [0] * 20 + [10, 30, 50, 70, 90] + [100] * 5
-    k = 3.0 * 1.09 / 1000 * GWP_CH4
-    expected = [((f - a) * EF_LE_20 + a * EF_GT_20) * k for f, a in zip(flooded, aged)]
-    assert series(r, ActivityTypes.FLOODED_LAND_CH4) == pytest.approx(expected)
-    assert series(r, ActivityTypes.FLOODED_LAND_CH4)[19] == pytest.approx(100 * EF_LE_20 * k)
-    assert series(r, ActivityTypes.FLOODED_LAND_CH4)[25] == pytest.approx(100 * EF_GT_20 * k)
-
-
-def test_conversion_co2_stops_when_each_cohort_turns_20():
-    r = conversion()
-    co2 = series(r, ActivityTypes.FLOODED_LAND_CO2)
-    young = [10, 30, 50, 70, 90] + [100] * 15 + [90, 70, 50, 30, 10] + [0] * 5
-    assert co2 == pytest.approx([y * CO2_C * CO2 for y in young])
-    assert co2[25:] == [0] * 5
-
-
-def test_conversion_without_downstream_and_zero_start_inventory():
-    r = conversion(rd=0, alpha=RESERVOIR_DEFAULT_ALPHA, rate_type="immediate", capitalization_time=5)
-    assert series(r, ActivityTypes.FLOODED_LAND_CH4) == pytest.approx([100 * 0.7 * EF_LE_20 / 1000 * GWP_CH4] * 10)
-    # Converted land is not flooded in the start year.
-    assert all(i.value == 0 for i in r.inventory.emissions_by_sector_by_gas)

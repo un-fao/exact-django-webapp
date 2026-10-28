@@ -8,7 +8,6 @@ CO2, Eq. 7.13, only while the reservoir is <= 20 years old (Land Converted to Fl
 alpha: Eq. 7.11 (0.26 x mean annual Chl-a) or Table 7.11 by trophic class.
 
 Reservoir: a waterbody already flooded at the project start, of a known age.
-FloodedLandConversion: land flooded by the project through a land use change, aged per yearly cohort.
 """
 
 import traceback
@@ -83,34 +82,3 @@ class Reservoir(BaseModule):
         except Exception as e:
             traceback.print_exc()
             raise e
-
-
-@dataclass(kw_only=True)
-class FloodedLandConversion(BaseModule):
-    area: float
-    alpha: float
-    ch4_ef_age_le_20: float
-    ch4_ef_age_gt_20: float
-    co2_c_ef_age_le_20: float
-    rd: float
-    methane_constant: float
-
-    def calculate_emissions(self):
-        # Each year's newly flooded area stays "land converted to flooded land" for 20 years from its own
-        # flooding, so the area older than 20 in year t is the flooded area of year t - 20.
-        flooded = compute_yearly_or_half_year_cumulative(0, self.area, self.implementation_time, self.capitalization_time, self.rate_type)
-        aged = [flooded[i - LAND_CONVERTED_YEARS] if i >= LAND_CONVERTED_YEARS else 0.0 for i in range(len(flooded))]
-        young = [f - a for f, a in zip(flooded, aged)]
-
-        ch4_factor = self.alpha * (1 + self.rd) / 1000 * self.methane_constant
-        ch4 = [(y * self.ch4_ef_age_le_20 + a * self.ch4_ef_age_gt_20) * ch4_factor for y, a in zip(young, aged)]
-        co2 = [y * self.co2_c_ef_age_le_20 * C_TO_CO2 for y in young]
-
-        self.result.yearly_emissions_by_sector_by_gas.append(
-            YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4], ActivityTypes.FLOODED_LAND_CH4, delay=self.delay)
-        )
-        self.result.yearly_emissions_by_sector_by_gas.append(
-            YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2], ActivityTypes.FLOODED_LAND_CO2, delay=self.delay)
-        )
-        self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CH4, 0, ActivityTypes.FLOODED_LAND_CH4))
-        self.inventory.emissions_by_sector_by_gas(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.FLOODED_LAND_CO2))
