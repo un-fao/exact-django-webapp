@@ -3316,7 +3316,7 @@ class SmallFisheryCalculator(BaseCalculator):
         super().get_defaults(calculate)
 
         try:
-            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name_en="Off-Road").all()  # exact: the off-road sector use types must not join this average
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__icontains="Off-Road").all()
             if not self.energy_ef_default:
                 raise ipcc.EnergyDefaultEmissionFactor.DoesNotExist
 
@@ -3517,7 +3517,7 @@ class LargeFisheryCalculator(BaseCalculator):
         super().get_defaults(calculate)
 
         try:
-            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name_en="Off-Road").all()  # exact: the off-road sector use types must not join this average
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road").all()
             if not self.energy_ef_default:
                 raise ipcc.EnergyDefaultEmissionFactor.DoesNotExist
 
@@ -4406,11 +4406,11 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_with() and self.is_fuel_w:
             inputs_w = {
                 "emissions_factor_co2": self.energy_ef_default_w.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_w,
                 "emissions_factor_ch4": self.energy_ef_default_w.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_w,
                 "emissions_factor_n2o": self.energy_ef_default_w.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_w,
                 "rate_type": self.change_rate.name,
@@ -4428,11 +4428,11 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_without() and self.is_fuel_wo:
             inputs_wo = {
                 "emissions_factor_co2": self.energy_ef_default_wo.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_wo,
                 "emissions_factor_ch4": self.energy_ef_default_wo.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_wo,
                 "emissions_factor_n2o": self.energy_ef_default_wo.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "rate_type": self.change_rate.name,
@@ -6333,9 +6333,8 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "percentage_c_lost_excavation_tier_2": self.module.pc_c_lost_after_excavation_t2_w,
                 "ef_rewetting_carbon_default": self.rewetting_c.value,
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
-                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_start,
+                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_w,
                 "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_w,
-                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
                 "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
@@ -6374,7 +6373,6 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
                 "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_wo,
                 "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_wo,
-                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
                 "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
