@@ -14,17 +14,24 @@ WS_INVENTORY = "Inventory"
 ROW_HEADER_YEARS = 1
 ROW_CUMULATIVE_BALANCE = 2
 ROW_YEARLY_BALANCE = 3
-ROW_BIOMASS_CO2 = 4
-ROW_SOIL_CO2 = 5
-ROW_OTHER_CO2 = 6
-ROW_CH4 = 7
-ROW_N2O = 8
-ROW_OTHER_GHGS = 9
-ROW_CUMULATIVE_HECTARES = 10
-ROW_CUMULATIVE_HEADS = 11
-ROW_CUMULATIVE_CATCH = 12
-ROW_YEARLY_FLUX_WO = 13
-ROW_YEARLY_FLUX_W = 14
+# Per-category rows from row 4 down: (label, EmissionsAggregator attribute).
+ROW_FIRST_CATEGORY = 4
+SUMMARY_CATEGORY_ROWS = (
+    ("CO2 in above-ground biomass (AGB)", "agb_co2"),
+    ("CO2 in below-ground biomass (BGB)", "bgb_co2"),
+    ("CO2 in biomass (AGB+BGB)", "biomass_co2"),
+    ("CO2 in dead organic matter (litter and deadwood)", "dom_co2"),
+    ("CO2 in soils", "soil_co2"),
+    ("Other CO2", "other_co2"),
+    ("CH4", "ch4"),
+    ("N2O", "n2o"),
+    ("Other GHGs", "other_ghgs"),
+)
+ROW_CUMULATIVE_HECTARES = ROW_FIRST_CATEGORY + len(SUMMARY_CATEGORY_ROWS)
+ROW_CUMULATIVE_HEADS = ROW_CUMULATIVE_HECTARES + 1
+ROW_CUMULATIVE_CATCH = ROW_CUMULATIVE_HECTARES + 2
+ROW_YEARLY_FLUX_WO = ROW_CUMULATIVE_HECTARES + 3
+ROW_YEARLY_FLUX_W = ROW_CUMULATIVE_HECTARES + 4
 
 # Metadata worksheet column indices
 META_COL_LABEL = 1

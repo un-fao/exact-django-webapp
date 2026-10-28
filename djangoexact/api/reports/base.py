@@ -28,6 +28,7 @@ from .data_types import (
     ShadowPriceRow,
     T2Override,
 )
+from . import land_pools
 from .extractors import _add, extract_emissions
 
 
@@ -358,61 +359,34 @@ class BaseProjectReport:
         # Emissions sets are stored on BaseModuleReport instances, not on ModuleResult.
         # ActivityResult._module_reports holds the report instances in the same order
         # as module_results, populated by BaseActivityReport.compute().
+        AT, GT = math_utils.ActivityTypes, math_utils.GasTypes
+        pools = (
+            ("agb_co2", land_pools.AGB),
+            ("bgb_co2", land_pools.BGB),
+            ("biomass_co2", land_pools.BIOMASS),
+            ("dom_co2", land_pools.DOM),
+        )
         for activity_result in activity_results:
             for report in activity_result._module_reports:
-                es = report.emissions_set
-                es_w = report.emissions_set_w
-                es_wo = report.emissions_set_wo
+                for suffix, source in (
+                    ("", report.emissions_set),
+                    ("_w", report.emissions_set_w),
+                    ("_wo", report.emissions_set_wo),
+                ):
+                    def add(name, values):
+                        setattr(agg, name + suffix, _add(getattr(agg, name + suffix), values))
 
-                def extr(source, activity_type=None, gas_type=None, excl_a=None, excl_g=None):
-                    return extract_emissions(
-                        source, activity_type, gas_type, excl_a, excl_g, duration=dur
-                    )
+                    def extr(activity_type=None, gas_type=None, excl_a=None):
+                        return extract_emissions(source, activity_type, gas_type, excl_a, duration=dur)
 
-                # Balance
-                agg.other_ghgs = _add(agg.other_ghgs, extr(es, gas_type=math_utils.GasTypes.OTHER))
-                agg.other_ghgs = _add(agg.other_ghgs, extr(es, gas_type=math_utils.GasTypes.DOC))
-                agg.other_ghgs = _add(agg.other_ghgs, extr(es, gas_type=math_utils.GasTypes.CO))
-                agg.n2o = _add(agg.n2o, extr(es, gas_type=math_utils.GasTypes.N2O))
-                agg.ch4 = _add(agg.ch4, extr(es, gas_type=math_utils.GasTypes.CH4))
-                agg.other_co2 = _add(agg.other_co2, extr(es, gas_type=math_utils.GasTypes.CO2,
-                    excl_a=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
-                agg.soil_co2 = _add(agg.soil_co2, extr(es,
-                    activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE,
-                    gas_type=math_utils.GasTypes.CO2))
-                agg.biomass_co2 = _add(agg.biomass_co2, extr(es,
-                    activity_type=math_utils.ActivityTypes.BIOMASS,
-                    gas_type=math_utils.GasTypes.CO2))
-
-                # With
-                agg.other_ghgs_w = _add(agg.other_ghgs_w, extr(es_w, gas_type=math_utils.GasTypes.OTHER))
-                agg.other_ghgs_w = _add(agg.other_ghgs_w, extr(es_w, gas_type=math_utils.GasTypes.DOC))
-                agg.other_ghgs_w = _add(agg.other_ghgs_w, extr(es_w, gas_type=math_utils.GasTypes.CO))
-                agg.n2o_w = _add(agg.n2o_w, extr(es_w, gas_type=math_utils.GasTypes.N2O))
-                agg.ch4_w = _add(agg.ch4_w, extr(es_w, gas_type=math_utils.GasTypes.CH4))
-                agg.other_co2_w = _add(agg.other_co2_w, extr(es_w, gas_type=math_utils.GasTypes.CO2,
-                    excl_a=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
-                agg.soil_co2_w = _add(agg.soil_co2_w, extr(es_w,
-                    activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE,
-                    gas_type=math_utils.GasTypes.CO2))
-                agg.biomass_co2_w = _add(agg.biomass_co2_w, extr(es_w,
-                    activity_type=math_utils.ActivityTypes.BIOMASS,
-                    gas_type=math_utils.GasTypes.CO2))
-
-                # Without
-                agg.other_ghgs_wo = _add(agg.other_ghgs_wo, extr(es_wo, gas_type=math_utils.GasTypes.OTHER))
-                agg.other_ghgs_wo = _add(agg.other_ghgs_wo, extr(es_wo, gas_type=math_utils.GasTypes.DOC))
-                agg.other_ghgs_wo = _add(agg.other_ghgs_wo, extr(es_wo, gas_type=math_utils.GasTypes.CO))
-                agg.n2o_wo = _add(agg.n2o_wo, extr(es_wo, gas_type=math_utils.GasTypes.N2O))
-                agg.ch4_wo = _add(agg.ch4_wo, extr(es_wo, gas_type=math_utils.GasTypes.CH4))
-                agg.other_co2_wo = _add(agg.other_co2_wo, extr(es_wo, gas_type=math_utils.GasTypes.CO2,
-                    excl_a=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
-                agg.soil_co2_wo = _add(agg.soil_co2_wo, extr(es_wo,
-                    activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE,
-                    gas_type=math_utils.GasTypes.CO2))
-                agg.biomass_co2_wo = _add(agg.biomass_co2_wo, extr(es_wo,
-                    activity_type=math_utils.ActivityTypes.BIOMASS,
-                    gas_type=math_utils.GasTypes.CO2))
+                    for gas in (GT.OTHER, GT.DOC, GT.CO):
+                        add("other_ghgs", extr(gas_type=gas))
+                    add("n2o", extr(gas_type=GT.N2O))
+                    add("ch4", extr(gas_type=GT.CH4))
+                    add("other_co2", extr(gas_type=GT.CO2, excl_a=[*land_pools.ALL, AT.SOIL_CO2_CHANGE]))
+                    add("soil_co2", extr(AT.SOIL_CO2_CHANGE, GT.CO2))
+                    for name, activities in pools:
+                        add(name, land_pools.co2(source, activities, dur))
 
         return agg
 

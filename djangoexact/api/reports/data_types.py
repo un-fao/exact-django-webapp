@@ -104,28 +104,43 @@ class ActivityResult:
 
 @dataclass
 class EmissionsAggregator:
-    """Aggregated project-level yearly emissions by gas type and scenario.
+    """Aggregated project-level yearly emissions by category and scenario.
 
-    Replaces the 18+ parallel lists in BaseProjectReport.finalize_report().
+    Each category exists for the balance (no suffix), ``_w`` and ``_wo``.
+    The CO2 categories are disjoint, so their sum is the full CO2 balance.
     """
+
+    CATEGORIES = (
+        "agb_co2", "bgb_co2", "biomass_co2", "dom_co2", "soil_co2", "other_co2",
+        "ch4", "n2o", "other_ghgs",
+    )
 
     duration: int
 
+    agb_co2: list[float] = field(default_factory=list)
+    bgb_co2: list[float] = field(default_factory=list)
     biomass_co2: list[float] = field(default_factory=list)
+    dom_co2: list[float] = field(default_factory=list)
     soil_co2: list[float] = field(default_factory=list)
     other_co2: list[float] = field(default_factory=list)
     ch4: list[float] = field(default_factory=list)
     n2o: list[float] = field(default_factory=list)
     other_ghgs: list[float] = field(default_factory=list)
 
+    agb_co2_w: list[float] = field(default_factory=list)
+    bgb_co2_w: list[float] = field(default_factory=list)
     biomass_co2_w: list[float] = field(default_factory=list)
+    dom_co2_w: list[float] = field(default_factory=list)
     soil_co2_w: list[float] = field(default_factory=list)
     other_co2_w: list[float] = field(default_factory=list)
     ch4_w: list[float] = field(default_factory=list)
     n2o_w: list[float] = field(default_factory=list)
     other_ghgs_w: list[float] = field(default_factory=list)
 
+    agb_co2_wo: list[float] = field(default_factory=list)
+    bgb_co2_wo: list[float] = field(default_factory=list)
     biomass_co2_wo: list[float] = field(default_factory=list)
+    dom_co2_wo: list[float] = field(default_factory=list)
     soil_co2_wo: list[float] = field(default_factory=list)
     other_co2_wo: list[float] = field(default_factory=list)
     ch4_wo: list[float] = field(default_factory=list)
@@ -133,38 +148,27 @@ class EmissionsAggregator:
     other_ghgs_wo: list[float] = field(default_factory=list)
 
     def __post_init__(self):
-        zeros = [0.0] * self.duration
-        for attr in (
-            "biomass_co2", "soil_co2", "other_co2", "ch4", "n2o", "other_ghgs",
-            "biomass_co2_w", "soil_co2_w", "other_co2_w", "ch4_w", "n2o_w", "other_ghgs_w",
-            "biomass_co2_wo", "soil_co2_wo", "other_co2_wo", "ch4_wo", "n2o_wo", "other_ghgs_wo",
-        ):
-            if not getattr(self, attr):
-                setattr(self, attr, list(zeros))
+        for suffix in ("", "_w", "_wo"):
+            for name in self.CATEGORIES:
+                if not getattr(self, name + suffix):
+                    setattr(self, name + suffix, [0.0] * self.duration)
+
+    def _sum(self, suffix: str) -> list[float]:
+        return list(map(sum, zip_longest(
+            *(getattr(self, name + suffix) for name in self.CATEGORIES), fillvalue=0,
+        )))
 
     @property
     def yearly_balance(self) -> list[float]:
-        return list(map(sum, zip_longest(
-            self.biomass_co2, self.soil_co2, self.other_co2,
-            self.ch4, self.n2o, self.other_ghgs,
-            fillvalue=0,
-        )))
+        return self._sum("")
 
     @property
     def yearly_balance_w(self) -> list[float]:
-        return list(map(sum, zip_longest(
-            self.biomass_co2_w, self.soil_co2_w, self.other_co2_w,
-            self.ch4_w, self.n2o_w, self.other_ghgs_w,
-            fillvalue=0,
-        )))
+        return self._sum("_w")
 
     @property
     def yearly_balance_wo(self) -> list[float]:
-        return list(map(sum, zip_longest(
-            self.biomass_co2_wo, self.soil_co2_wo, self.other_co2_wo,
-            self.ch4_wo, self.n2o_wo, self.other_ghgs_wo,
-            fillvalue=0,
-        )))
+        return self._sum("_wo")
 
 
 @dataclass
