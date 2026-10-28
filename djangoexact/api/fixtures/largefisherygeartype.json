@@ -5,7 +5,7 @@
     "fields": {
       "name": "Bottom Trawls",
       "name_en": "Bottom Trawls",
-      "name_fr": "Chaluts de fond\n",
+      "name_fr": "Chaluts de fond",
       "name_es": "Redes de Arrastre de Fondo",
       "name_ru": "Донные тралы"
     }
@@ -27,7 +27,7 @@
     "fields": {
       "name": "Gillnets And Entangling Nets",
       "name_en": "Gillnets And Entangling Nets",
-      "name_fr": "Filets maillants et filets emmêlants\n",
+      "name_fr": "Filets maillants et filets emmêlants",
       "name_es": "Redes de Enmalle y Redes de Enredo",
       "name_ru": "Ловчие и запутывающие сети"
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Hooks And Lines",
       "name_en": "Hooks And Lines",
-      "name_fr": "Hameçons et lignes\n",
+      "name_fr": "Hameçons et lignes",
       "name_es": "Sedales y Anzuelos",
       "name_ru": "Крючки и лески"
     }
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Midwater Trawls",
       "name_en": "Midwater Trawls",
-      "name_fr": "Chaluts pélagiques\n",
+      "name_fr": "Chaluts pélagiques",
       "name_es": "Redes de Arrastre Pelágico",
       "name_ru": "Травы средней воды"
     }
@@ -60,7 +60,7 @@
     "fields": {
       "name": "Mobile Seine",
       "name_en": "Mobile Seine",
-      "name_fr": "Seine mobile\n",
+      "name_fr": "Seine mobile",
       "name_es": "Redes de tiro mobil",
       "name_ru": "Мобильный сачок"
     }
@@ -71,7 +71,7 @@
     "fields": {
       "name": "Not Specified",
       "name_en": "Not Specified",
-      "name_fr": "Non spécifié\n",
+      "name_fr": "Non spécifié",
       "name_es": "Sin especificar",
       "name_ru": "Не указано"
     }
@@ -82,7 +82,7 @@
     "fields": {
       "name": "Other Or Mixed",
       "name_en": "Other Or Mixed",
-      "name_fr": "Autre ou Mixte\n",
+      "name_fr": "Autre ou Mixte",
       "name_es": "Otros o Mezclados",
       "name_ru": "Прочее или смешанное"
     }
@@ -93,7 +93,7 @@
     "fields": {
       "name": "Surrounding Nets",
       "name_en": "Surrounding Nets",
-      "name_fr": "Senne\n",
+      "name_fr": "Senne",
       "name_es": "Redes de Cerco",
       "name_ru": "Окружающие сети"
     }
@@ -104,7 +104,7 @@
     "fields": {
       "name": "Traps And Lift Nets",
       "name_en": "Traps And Lift Nets",
-      "name_fr": "Pièges et filets relevables\n",
+      "name_fr": "Pièges et filets relevables",
       "name_es": "Trampas y Redes Izadas",
       "name_ru": "Ловушки и подъёмные сети"
     }

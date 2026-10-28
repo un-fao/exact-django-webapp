@@ -31,7 +31,7 @@
     "fields": {
       "name": "Agroforestry - Default",
       "name_en": "Agroforestry - Default",
-      "name_fr": "Agroforesterie - défaut\n",
+      "name_fr": "Agroforesterie - défaut",
       "name_es": "Agroforestería - Por defecto",
       "name_ru": "Агролесомелиорация - по умолчанию",
       "forest_type": null,
@@ -59,7 +59,7 @@
     "fields": {
       "name": "Alley Cropping",
       "name_en": "Alley Cropping",
-      "name_fr": "Cultures en allées\n",
+      "name_fr": "Cultures en allées",
       "name_es": "Cultivos en Fajas",
       "name_ru": "Междурядные Культуры",
       "forest_type": null,
@@ -165,7 +165,7 @@
     "fields": {
       "name": "Annual Fallow",
       "name_en": "Annual Fallow",
-      "name_fr": "Jachère annuelle\n",
+      "name_fr": "Jachère annuelle",
       "name_es": "Barbecho Anual",
       "name_ru": "Однолетний пар",
       "forest_type": null,
@@ -462,7 +462,7 @@
     "fields": {
       "name": "Beans & Pulses",
       "name_en": "Beans & Pulses",
-      "name_fr": "Haricots et légumineuses\n",
+      "name_fr": "Haricots et légumineuses",
       "name_es": "Frijoles y legumbres",
       "name_ru": "Бобовые, зернобобовые культуры",
       "forest_type": null,
@@ -1404,7 +1404,7 @@
     "fields": {
       "name": "Dry Bean",
       "name_en": "Dry Bean",
-      "name_fr": "Haricot sec\n",
+      "name_fr": "Haricot sec",
       "name_es": "Frijoles",
       "name_ru": "Сухие бобы",
       "forest_type": null,
@@ -1432,7 +1432,7 @@
     "fields": {
       "name": "Dry Forest",
       "name_en": "Dry Forest",
-      "name_fr": "Forêt sèche tropicale\n",
+      "name_fr": "Forêt sèche tropicale",
       "name_es": "Bosque Seco",
       "name_ru": "Сухой лес",
       "forest_type": null,
@@ -1539,7 +1539,7 @@
     "fields": {
       "name": "Flooded Rice",
       "name_en": "Flooded Rice",
-      "name_fr": "Riz inondé\n",
+      "name_fr": "Riz inondé",
       "name_es": "Arroz Inundado",
       "name_ru": "Затопленный рис",
       "forest_type": null,
@@ -1621,7 +1621,7 @@
     "fields": {
       "name": "Generic Value",
       "name_en": "Generic Value",
-      "name_fr": "Valeur générique\n",
+      "name_fr": "Valeur générique",
       "name_es": "Valor genérico",
       "name_ru": "Общая ценность",
       "forest_type": null,
@@ -1748,7 +1748,7 @@
     "fields": {
       "name": "Grass-Clover Mixtures",
       "name_en": "Grass-Clover Mixtures",
-      "name_fr": "Mélanges herbe-trèfle\n",
+      "name_fr": "Mélanges herbe-trèfle",
       "name_es": "Mezcla de Trébol-Pasto",
       "name_ru": "Смеси травы и клевера",
       "forest_type": null,
@@ -1957,7 +1957,7 @@
     "fields": {
       "name": "Humid Forest",
       "name_en": "Humid Forest",
-      "name_fr": "Forêt humide subtropicale\n",
+      "name_fr": "Forêt humide subtropicale",
       "name_es": "Bosque húmedo",
       "name_ru": "Влажный лес",
       "forest_type": null,
@@ -2303,7 +2303,7 @@
     "fields": {
       "name": "﻿Long-Term Cultivated",
       "name_en": "﻿Long-Term Cultivated",
-      "name_fr": "Cultivé à long terme\n",
+      "name_fr": "Cultivé à long terme",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
       "forest_type": null,
@@ -2319,7 +2319,7 @@
     "fields": {
       "name": "Long-Term Cultivated",
       "name_en": "Long-Term Cultivated",
-      "name_fr": "Cultivé à long terme\n",
+      "name_fr": "Cultivé à long terme",
       "name_es": "Cultivado a largo plazo",
       "name_ru": "Долговременно культивируемый",
       "forest_type": null,
@@ -2472,7 +2472,7 @@
     "fields": {
       "name": "Mangrove Forest",
       "name_en": "Mangrove Forest",
-      "name_fr": "Forêt de mangrove\n",
+      "name_fr": "Forêt de mangrove",
       "name_es": "Manglar",
       "name_ru": "Мангровый лес",
       "forest_type": null,
@@ -2572,7 +2572,7 @@
     "fields": {
       "name": "Moist Deciduous Forest",
       "name_en": "Moist Deciduous Forest",
-      "name_fr": "Forêt décidue tropicale humide\n",
+      "name_fr": "Forêt décidue tropicale humide",
       "name_es": "Bosque húmedo de hojas caducas",
       "name_ru": "Лиственный лес, увлажненный",
       "forest_type": null,
@@ -2596,7 +2596,7 @@
     "fields": {
       "name": "Mountain System",
       "name_en": "Mountain System",
-      "name_fr": "Système montagneux\n",
+      "name_fr": "Système montagneux",
       "name_es": "Sistemas montañosos",
       "name_ru": "Горная система",
       "forest_type": null,
@@ -2623,7 +2623,7 @@
     "fields": {
       "name": "Multistrata",
       "name_en": "Multistrata",
-      "name_fr": "Multi-strates\n",
+      "name_fr": "Multi-strates",
       "name_es": "Sistemas de cultivos a diversos niveles",
       "name_ru": "Многоярусный",
       "forest_type": null,
@@ -2704,7 +2704,7 @@
     "fields": {
       "name": "N-Fixing Forages",
       "name_en": "N-Fixing Forages",
-      "name_fr": "Fourrages fixateurs d’azote\n",
+      "name_fr": "Fourrages fixateurs d’azote",
       "name_es": "Forrajes fijadores de N",
       "name_ru": "N-фиксирующие корма",
       "forest_type": null,
@@ -2720,7 +2720,7 @@
     "fields": {
       "name": "Non-Legume Hay",
       "name_en": "Non-Legume Hay",
-      "name_fr": "Foin sans légumineuses\n",
+      "name_fr": "Foin sans légumineuses",
       "name_es": "Heno no leguminoso",
       "name_ru": "Небобовое сено",
       "forest_type": null,
@@ -2736,7 +2736,7 @@
     "fields": {
       "name": "Non-N-Fixing Forages",
       "name_en": "Non-N-Fixing Forages",
-      "name_fr": "Fourrages non fixateurs d’azote\n",
+      "name_fr": "Fourrages non fixateurs d’azote",
       "name_es": "Forrajes no fijadores de N",
       "name_ru": "Не N-фиксирующие корма",
       "forest_type": null,
@@ -2806,7 +2806,7 @@
     "fields": {
       "name": "Oceanic Forest",
       "name_en": "Oceanic Forest",
-      "name_fr": "Forêt océanique tempérée\n",
+      "name_fr": "Forêt océanique tempérée",
       "name_es": "Bosque oceánico",
       "name_ru": "Океанический/прибрежный лес",
       "forest_type": null,
@@ -2830,7 +2830,7 @@
     "fields": {
       "name": "Oil Palm",
       "name_en": "Oil Palm",
-      "name_fr": "Palmier à huile\n",
+      "name_fr": "Palmier à huile",
       "name_es": "Palma Aceitera",
       "name_ru": "Масличная Пальма",
       "forest_type": null,
@@ -3069,7 +3069,7 @@
     "fields": {
       "name": "Organic Soil",
       "name_en": "Organic Soil",
-      "name_fr": "Sol organique\n",
+      "name_fr": "Sol organique",
       "name_es": "Suelo Orgánico",
       "name_ru": "Органическая почва",
       "forest_type": null,
@@ -3150,7 +3150,7 @@
     "fields": {
       "name": "Other Land",
       "name_en": "Other Land",
-      "name_fr": "Autres terres\n",
+      "name_fr": "Autres terres",
       "name_es": "Otras tierras",
       "name_ru": "Прочее землепользования",
       "forest_type": null,
@@ -3177,7 +3177,7 @@
     "fields": {
       "name": "Other Land (Non-Vegetated)",
       "name_en": "Other Land (Non-Vegetated)",
-      "name_fr": "Autres terres (non végétalisées)\n",
+      "name_fr": "Autres terres (non végétalisées)",
       "name_es": "Otras Tierras (Sin Vegetación)",
       "name_ru": "Прочее землепользования (не покрытая растительностью)",
       "forest_type": null,
@@ -3256,7 +3256,7 @@
     "fields": {
       "name": "Parkland",
       "name_en": "Parkland",
-      "name_fr": "Parc arboré\n",
+      "name_fr": "Parc arboré",
       "name_es": "Parques Agroforestales",
       "name_ru": "Парковая зона",
       "forest_type": null,
@@ -3441,7 +3441,7 @@
     "fields": {
       "name": "Perennial Cropland",
       "name_en": "Perennial Cropland",
-      "name_fr": "Cultures pérennes\n",
+      "name_fr": "Cultures pérennes",
       "name_es": "Cultivos perennes",
       "name_ru": "Многолетние культуры",
       "forest_type": null,
@@ -3468,7 +3468,7 @@
     "fields": {
       "name": "Perennial Fallow",
       "name_en": "Perennial Fallow",
-      "name_fr": "Jachère pérenne\n",
+      "name_fr": "Jachère pérenne",
       "name_es": "Barbecho Mejorado",
       "name_ru": "Многолетний Пар",
       "forest_type": null,
@@ -3493,7 +3493,7 @@
     "fields": {
       "name": "Perennial Grasses",
       "name_en": "Perennial Grasses",
-      "name_fr": "Graminées pérennes\n",
+      "name_fr": "Graminées pérennes",
       "name_es": "Hierbas perennes",
       "name_ru": "Многолетние травы",
       "forest_type": null,
@@ -3509,7 +3509,7 @@
     "fields": {
       "name": "Perennial/Tree Crop",
       "name_en": "Perennial/Tree Crop",
-      "name_fr": "Culture pérenne/d'arbres\n",
+      "name_fr": "Culture pérenne/d'arbres",
       "name_es": "Cultivo perenne/arbóreo",
       "name_ru": "Многолетние/деревья-урожай",
       "forest_type": null,
@@ -3739,7 +3739,7 @@
     "fields": {
       "name": "Potatoes",
       "name_en": "Potatoes",
-      "name_fr": "Pommes de terre\n",
+      "name_fr": "Pommes de terre",
       "name_es": "Patatas",
       "name_ru": "Картофель",
       "forest_type": null,
@@ -3877,7 +3877,7 @@
     "fields": {
       "name": "Rainforest",
       "name_en": "Rainforest",
-      "name_fr": "Forêt dense tropicale\n",
+      "name_fr": "Forêt dense tropicale",
       "name_es": "Bosque lluvioso",
       "name_ru": "Дождевой лес",
       "forest_type": null,
@@ -4010,7 +4010,7 @@
     "fields": {
       "name": "Root Crops",
       "name_en": "Root Crops",
-      "name_fr": "Cultures-racines\n",
+      "name_fr": "Cultures-racines",
       "name_es": "Cultivos de Raíz alimenticia",
       "name_ru": "Корнеплоды",
       "forest_type": null,
@@ -4147,7 +4147,7 @@
     "fields": {
       "name": "Seagrass",
       "name_en": "Seagrass",
-      "name_fr": "Herbiers marins\n",
+      "name_fr": "Herbiers marins",
       "name_es": "Pradera Marina",
       "name_ru": "Морская трава",
       "forest_type": null,
@@ -4273,7 +4273,7 @@
     "fields": {
       "name": "Shaded Perennial",
       "name_en": "Shaded Perennial",
-      "name_fr": "Pérenne ombragé\n",
+      "name_fr": "Pérenne ombragé",
       "name_es": "Cultivos perennes bajo sombra",
       "name_ru": "Тенистое многолетнее растение",
       "forest_type": null,
@@ -4298,7 +4298,7 @@
     "fields": {
       "name": "Short Rotation Coppice",
       "name_en": "Short Rotation Coppice",
-      "name_fr": "Taillis à courte rotation\n",
+      "name_fr": "Taillis à courte rotation",
       "name_es": "Monte bajo de ciclo corto",
       "name_ru": "Краткосроковый пни",
       "forest_type": null,
@@ -4378,7 +4378,7 @@
       "name_en": "Silvopasture",
       "name_fr": "Système sylvopastoral",
       "name_es": "Silvopastoril",
-      "name_ru": " Лесопастбище",
+      "name_ru": "Лесопастбище",
       "forest_type": null,
       "is_active": true,
       "module_types": [
@@ -4568,7 +4568,7 @@
     "fields": {
       "name": "Spring Wheat",
       "name_en": "Spring Wheat",
-      "name_fr": "Blé de printemps\n",
+      "name_fr": "Blé de printemps",
       "name_es": "Trigo de primavera",
       "name_ru": "Яровая пшеница",
       "forest_type": null,
@@ -4693,7 +4693,7 @@
     "fields": {
       "name": "Sugarcane",
       "name_en": "Sugarcane",
-      "name_fr": "Canne à sucre\n",
+      "name_fr": "Canne à sucre",
       "name_es": "Caña de azúcar",
       "name_ru": "Сахарный тростник",
       "forest_type": null,
@@ -5019,7 +5019,7 @@
     "fields": {
       "name": "Tidal Marsh",
       "name_en": "Tidal Marsh",
-      "name_fr": "Marais de marée\n",
+      "name_fr": "Marais de marée",
       "name_es": "Marisma",
       "name_ru": "Прибрежные болота",
       "forest_type": null,
@@ -5046,7 +5046,7 @@
     "fields": {
       "name": "Tidal Marsh Mediterranean",
       "name_en": "Tidal Marsh Mediterranean",
-      "name_fr": "Marais de marée méditerranéen\n",
+      "name_fr": "Marais de marée méditerranéen",
       "name_es": "Marisma mediterránea",
       "name_ru": "Прибрежные болота Средиземноморья",
       "forest_type": null,
@@ -5157,7 +5157,7 @@
     "fields": {
       "name": "Tundra Woodland",
       "name_en": "Tundra Woodland",
-      "name_fr": "Forêt-toundra boréale\n",
+      "name_fr": "Forêt-toundra boréale",
       "name_es": "Bosque de tundra",
       "name_ru": "Лесная тундра",
       "forest_type": null,
@@ -5479,9 +5479,9 @@
     "fields": {
       "name": "Winter Wheat",
       "name_en": "Winter Wheat",
-      "name_fr": "Blé d'hiver\n",
+      "name_fr": "Blé d'hiver",
       "name_es": "Trigo de Invierno",
-      "name_ru": "Озимая пшеница ",
+      "name_ru": "Озимая пшеница",
       "forest_type": null,
       "is_active": true,
       "module_types": [],
