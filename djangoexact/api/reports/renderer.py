@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import logging as log
 from datetime import datetime
-from itertools import zip_longest
 
 import numpy as np
 import openpyxl as pxl
@@ -26,16 +25,11 @@ from .constants import (
     META_COL_TIER2,
     META_COL_WITH,
     META_COL_WITHOUT,
-    ROW_BIOMASS_CO2,
-    ROW_CH4,
     ROW_CUMULATIVE_BALANCE,
     ROW_CUMULATIVE_HECTARES,
     ROW_CUMULATIVE_HEADS,
     ROW_CUMULATIVE_CATCH,
-    ROW_N2O,
-    ROW_OTHER_CO2,
-    ROW_OTHER_GHGS,
-    ROW_SOIL_CO2,
+    ROW_FIRST_CATEGORY,
     ROW_YEARLY_BALANCE,
     ROW_YEARLY_FLUX_W,
     ROW_YEARLY_FLUX_WO,
@@ -48,6 +42,7 @@ from .constants import (
     SPC_ROW_WO,
     SPC_ROW_WO_HIGH,
     SPC_ROW_WO_LOW,
+    SUMMARY_CATEGORY_ROWS,
     SPC_ROW_YEAR,
     WS_ADDITIONAL_INDICATORS,
     WS_INVENTORY,
@@ -109,15 +104,11 @@ class ExcelRenderer:
         ws_res.cell(row=1, column=1, value="Activity and GHGs / Years")
         ws_res.cell(row=2, column=1, value="Cumulative balance in Tco2-eq")
         ws_res.cell(row=3, column=1, value="Yearly balance in Tco2-eq")
-        ws_res.cell(row=4, column=1, value="CO2 in biomass")
-        ws_res.cell(row=5, column=1, value="CO2 in soils")
-        ws_res.cell(row=6, column=1, value="Other CO2")
-        ws_res.cell(row=7, column=1, value="CH4")
-        ws_res.cell(row=8, column=1, value="N20")
-        ws_res.cell(row=9, column=1, value="Other GHGs")
-        ws_res.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
-        ws_res.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
-        ws_res.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
+        for offset, (label, _) in enumerate(SUMMARY_CATEGORY_ROWS):
+            ws_res.cell(row=ROW_FIRST_CATEGORY + offset, column=1, value=label)
+        ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
         ws_res.cell(row=ROW_YEARLY_FLUX_WO, column=1, value="Yearly flux - without (tCO2-eq)")
         ws_res.cell(row=ROW_YEARLY_FLUX_W, column=1, value="Yearly flux - with (tCO2-eq)")
 
@@ -278,11 +269,7 @@ class ExcelRenderer:
         ws_res = wb[WS_RESULTS]
         agg = self.result.aggregated
 
-        yearly_balance = list(map(sum, zip_longest(
-            agg.biomass_co2, agg.soil_co2, agg.other_co2,
-            agg.ch4, agg.n2o, agg.other_ghgs,
-            fillvalue=0,
-        )))
+        yearly_balance = agg.yearly_balance
         cumulative_balance = list(np.cumsum(yearly_balance))
 
         chf = self.result.cumulative_hectares_yearly
@@ -292,12 +279,8 @@ class ExcelRenderer:
             col = i + DATA_COL_START
             ws_res.cell(row=ROW_CUMULATIVE_BALANCE, column=col, value=cumulative_balance[i])
             ws_res.cell(row=ROW_YEARLY_BALANCE, column=col, value=yearly_balance[i])
-            ws_res.cell(row=ROW_BIOMASS_CO2, column=col, value=agg.biomass_co2[i])
-            ws_res.cell(row=ROW_SOIL_CO2, column=col, value=agg.soil_co2[i])
-            ws_res.cell(row=ROW_OTHER_CO2, column=col, value=agg.other_co2[i])
-            ws_res.cell(row=ROW_CH4, column=col, value=agg.ch4[i])
-            ws_res.cell(row=ROW_N2O, column=col, value=agg.n2o[i])
-            ws_res.cell(row=ROW_OTHER_GHGS, column=col, value=agg.other_ghgs[i])
+            for offset, (_, attr) in enumerate(SUMMARY_CATEGORY_ROWS):
+                ws_res.cell(row=ROW_FIRST_CATEGORY + offset, column=col, value=getattr(agg, attr)[i])
             hv = chf[i] if i < len(chf) else 0
             ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=col, value=hv).fill = _BEIGE
             hh = hhf[i] if i < len(hhf) else 0
