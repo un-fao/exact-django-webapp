@@ -20,6 +20,7 @@ import numpy as np
 
 import api.models as api_models
 import api.calculators as calculators
+from api.services import reservoirs
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
@@ -128,13 +129,25 @@ class WaterbodyReport(BaseModuleReport):
         m = self.module
         es = self.emissions_set
 
-        ch4 = self._extract(es, math_utils.ActivityTypes.COASTAL_WATERBODIES, math_utils.GasTypes.CH4)
-        total = list(ch4)
+        if m.is_reservoir():
+            result_rows = [
+                ResultRow("CH4 from flooded land (reservoir)", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CH4, math_utils.GasTypes.CH4)),
+                ResultRow("CO2 from land converted to flooded land", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CO2, math_utils.GasTypes.CO2)),
+            ]
+        else:
+            result_rows = [ResultRow("CH4 from waterbody management", self._extract(es, math_utils.ActivityTypes.COASTAL_WATERBODIES, math_utils.GasTypes.CH4))]
 
         mw = [
             MetadataWrite(1, 1, "Waterbody type"),
             MetadataWrite(2, 1, "Trophic class"),
         ]
+        if m.is_reservoir():
+            mw += [
+                MetadataWrite(3, 1, "Reservoir age at project start (years)"),
+                MetadataWrite(3, 2, m.reservoir_age_start),
+                MetadataWrite(4, 1, "Downstream CH4 ratio (Rd)"),
+                MetadataWrite(4, 2, reservoirs.rd(m)),
+            ]
         if m.is_start():
             mw += [
                 MetadataWrite(1, 2, m.waterbody_type.name),
@@ -154,7 +167,7 @@ class WaterbodyReport(BaseModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Waterbody",
-            result_rows=[ResultRow("CH4 from waterbody management", ch4)],
+            result_rows=result_rows,
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             is_with=m.is_with(),

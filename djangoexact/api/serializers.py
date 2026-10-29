@@ -36,6 +36,7 @@ from .models import (
     ConfigParam,
     Country,
     CustomUser,
+    WaterbodyLand,
     OtherLand,
     Electricity,
     Energy,
@@ -1010,6 +1011,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if land_use_change and any(not module.is_luc for module in land_use_change.values()):
             raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
+
+        # WaterbodyLand only models land flooded by the project; a waterbody that exists at the project start is the
+        # Waterbody module.
+        if any(module.class_name == WaterbodyLand.__name__ for module in module_types):
+            raise serializers.ValidationError("Waterbody (flooded land) can only be the final land use of a Land Use Change")
+        if land_use_change and land_use_change["module_type_start"].class_name == WaterbodyLand.__name__:
+            raise serializers.ValidationError("Waterbody (flooded land) cannot be the starting land use of a Land Use Change")
 
         super().validate(data)
 
@@ -2880,6 +2888,15 @@ class WaterbodySerializer(LandModuleSeralizer):
             },
         }
 
+    def is_ready(self, data, mandatory_fields, instance=None):
+        is_ready, errors = super().is_ready(data, mandatory_fields, instance=instance)
+        combined_data = self.merge_instance_data(data, instance=instance)
+        waterbody_type = combined_data.get("waterbody_type")
+        if waterbody_type and waterbody_type.is_reservoir and combined_data.get("reservoir_age_start") is None:
+            errors.setdefault("start", []).append("Missing mandatory fields: reservoir_age_start")
+            return False, errors
+        return is_ready, errors
+
 
 class WaterbodyWriteSerializer(WaterbodySerializer):
     pass
@@ -3335,6 +3352,25 @@ class OtherLandReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "OtherLand"
         mandatory_fields = {}
+
+
+class WaterbodyLandWriteSerializer(LandModuleSeralizer):
+    class Meta:
+        model = WaterbodyLand
+        fields = "__all__"
+        ref_name = "WaterbodyLand"
+        mandatory_fields = {
+            "with": {"mandatory": ["waterbody_type", "trophic_type_w"]},
+            "without": {"mandatory": ["waterbody_type", "trophic_type_wo"]},
+        }
+
+
+class WaterbodyLandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = WaterbodyLand
+        fields = "__all__"
+        ref_name = "WaterbodyLand"
+        mandatory_fields = WaterbodyLandWriteSerializer.Meta.mandatory_fields
 
 
 class SettlementSerializer(LandModuleSeralizer):

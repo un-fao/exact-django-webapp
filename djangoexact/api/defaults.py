@@ -28,6 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services import waterbody_land, reservoirs
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1133,6 +1134,7 @@ class WaterbodyDefaults(Defaults):
             mean_annual_t2_start_default=0,
             mean_annual_t2_w_default=0,
             mean_annual_t2_wo_default=0,
+            rd_t2_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1141,16 +1143,26 @@ class WaterbodyDefaults(Defaults):
         defaults = calcs.WaterbodyCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        alpha = {s: getattr(defaults, f"trophic_state_{s}").value for s in ("start", "w", "wo")}
+        if self.input.is_reservoir():
+            ch4_ef = reservoirs.ch4_ef_at_start(self.input, defaults.reservoir_ef)
+            rd_t2 = reservoirs.RD_DEFAULT
+            alpha = {s: reservoirs.class_alpha(getattr(defaults, f"trophic_state_{s}")) for s in alpha}
+        else:
+            ch4_ef = defaults.methane_emission_factor.value
+            rd_t2 = None
+
         return _with_ranges(SimpleNamespace(
-            ch4_ef_t2_start_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_w_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_wo_default=defaults.methane_emission_factor.value,
-            alpha_t2_start_default=defaults.trophic_state_start.value,
-            alpha_t2_w_default=defaults.trophic_state_w.value,
-            alpha_t2_wo_default=defaults.trophic_state_wo.value,
+            ch4_ef_t2_start_default=ch4_ef,
+            ch4_ef_t2_w_default=ch4_ef,
+            ch4_ef_t2_wo_default=ch4_ef,
+            alpha_t2_start_default=alpha["start"],
+            alpha_t2_w_default=alpha["w"],
+            alpha_t2_wo_default=alpha["wo"],
             mean_annual_t2_start_default=defaults.trophic_state_start.chloa,
             mean_annual_t2_w_default=defaults.trophic_state_w.chloa,
             mean_annual_t2_wo_default=defaults.trophic_state_wo.chloa,
+            rd_t2_default=rd_t2,
         ), [
             (('ch4_ef_t2_start_default', 'ch4_ef_t2_w_default', 'ch4_ef_t2_wo_default'), defaults.methane_emission_factor, 'value'),
             (('alpha_t2_start_default',), defaults.trophic_state_start, 'value'),
@@ -1160,6 +1172,33 @@ class WaterbodyDefaults(Defaults):
             (('mean_annual_t2_w_default',), defaults.trophic_state_w, 'chloa'),
             (('mean_annual_t2_wo_default',), defaults.trophic_state_wo, 'chloa'),
         ])
+
+
+class WaterbodyLandDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            **{f"{field}_t2_{s}_default": 0 for field in ("ch4_ef", "ch4_ef_old", "alpha", "mean_annual") for s in waterbody_land.SCENARIOS},
+            rd_t2_default=reservoirs.RD_DEFAULT,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        module = self.input
+        if module.is_reservoir():
+            ef = reservoirs.reservoir_emission_factor(self.climate, self.moisture)
+            ch4_ef, ch4_ef_old = ef.ch4_age_le_20, ef.ch4_age_gt_20
+        else:
+            ch4_ef = ch4_ef_old = waterbody_land.pond_emission_factor(self.climate, self.moisture, module.waterbody_type) if module.waterbody_type_id else None
+        values = SimpleNamespace(rd_t2_default=reservoirs.RD_DEFAULT)
+        for s in waterbody_land.SCENARIOS:
+            state = waterbody_land.trophic_state(module, s)
+            setattr(values, f"ch4_ef_t2_{s}_default", ch4_ef)
+            setattr(values, f"ch4_ef_old_t2_{s}_default", ch4_ef_old)
+            setattr(values, f"alpha_t2_{s}_default", waterbody_land.class_alpha(module, s))
+            setattr(values, f"mean_annual_t2_{s}_default", state.chloa if state else None)
+        # No published bounds for these factors in the IPCC tables used.
+        return _with_ranges(values, [(tuple(vars(values)), None, "value")])
 
 
 class OrganicSoilDefaults(Defaults):
