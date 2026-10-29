@@ -3203,6 +3203,53 @@ class OtherLand(LandModule, SingleBiomassModule):
         return super().save(*args, **kwargs)
 
 
+WATERBODY_LAND_NAME = "Waterbody (flooded land)"
+
+
+class WaterbodyLand(LandModule):
+    """Waterbody created by a land use change (IPCC 2019 Vol. 4 Ch. 7, land converted to flooded land).
+
+    Only ever the final land use of a LandUseChange: the LUC calculators remove the pre-flood biomass (with no soil
+    carbon change, see api.services.waterbody_land), and WaterbodyLandCalculator adds the CH4, plus CO2 for a
+    reservoir, of the flooded area. Waterbodies that already exist at the project start are the Waterbody module.
+    """
+
+    waterbody_type = models.ForeignKey(WaterbodyType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="waterbody_type")
+
+    trophic_type_w = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_w", verbose_name="trophic_type_w")
+    trophic_type_wo = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_wo", verbose_name="trophic_type_wo")
+    trophic_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_type_thread")
+
+    alpha_t2_w = models.FloatField(null=True, blank=True, verbose_name="alpha_t2_w")
+    alpha_t2_wo = models.FloatField(null=True, blank=True, verbose_name="alpha_t2_wo")
+    # Mean annual chlorophyll-a (ug/L), Eq. 7.11.
+    mean_annual_t2_w = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_w")
+    mean_annual_t2_wo = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_wo")
+    # The only CH4 EF of a pond or canal; for a reservoir, the EF while the flooded area is <= 20 years old.
+    ch4_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_t2_w")
+    ch4_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_t2_wo")
+    # Reservoir only: CH4 EF once the flooded area is older than 20 years.
+    ch4_ef_old_t2_w = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_old_t2_w")
+    ch4_ef_old_t2_wo = models.FloatField(null=True, blank=True, verbose_name="ch4_ef_old_t2_wo")
+
+    # Reservoir only (Table 7.10 downstream CH4).
+    downstream_emissions = models.BooleanField(default=True, verbose_name="downstream_emissions")
+    rd_t2 = models.FloatField(null=True, blank=True, verbose_name="rd_t2")
+
+    # The start module's calculator reads the end module's biomass Tier 2; nothing grows on a waterbody.
+    biomass_t2_start = biomass_t2_w = biomass_t2_wo = None
+
+    def save(self, *args, **kwargs):
+        # The LUC calculators look up the final land use type (combustion factors, labels).
+        if not self.land_use_type_w:
+            self.land_use_type_w = self.land_use_type_wo = LandUseType.objects.get(name_en=WATERBODY_LAND_NAME)
+
+        return super().save(*args, **kwargs)
+
+    def is_reservoir(self) -> bool:
+        return bool(self.waterbody_type and self.waterbody_type.is_reservoir)
+
+
 class LandUseChange(Module):
     module_type_start = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="start", verbose_name="module_type_start")
     module_type_w = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="w", verbose_name="module_type_w")

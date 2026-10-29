@@ -14,6 +14,7 @@ import numpy as np
 import api.models as api_models
 import api.calculators as calculators
 import api.defaults as defaults
+from api.services import reservoirs
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
@@ -551,6 +552,48 @@ class OtherLandReport(LandModuleReport):
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items(activity_title),
+        )
+
+
+@dataclass
+class WaterbodyLandReport(LandModuleReport):
+    module: api_models.WaterbodyLand
+
+    def __post_init__(self):
+        self.calculator = calculators.WaterbodyLandCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        es = self.emissions_set
+        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        reservoir_rows = [
+            ResultRow("CH4 from flooded land", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CH4, math_utils.GasTypes.CH4)),
+            ResultRow("CO2 from land converted to flooded land", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CO2, math_utils.GasTypes.CO2)),
+        ]
+        mw = [
+            MetadataWrite(1, 1, "Trophic class"),
+            MetadataWrite(2, 1, "Waterbody type"),
+            MetadataWrite(2, 2, m.waterbody_type.name if m.waterbody_type else ""),
+            MetadataWrite(3, 1, "Downstream CH4 ratio (Rd)"),
+            MetadataWrite(3, 2, reservoirs.rd(m) if m.is_reservoir() else 0),
+        ]
+        if m.is_with() and m.trophic_type_w:
+            mw.append(MetadataWrite(1, 3, m.trophic_type_w.name))
+        if m.is_without() and m.trophic_type_wo:
+            mw.append(MetadataWrite(1, 4, m.trophic_type_wo.name))
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title=m.module_type.name,
+            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4, extra_rows=reservoir_rows),
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            units_breakdown_w=self._units_breakdown_w,
+            units_breakdown_wo=self._units_breakdown_wo,
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items(m.activity.name),
         )
 
 

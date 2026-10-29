@@ -28,7 +28,7 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
-from api.services import reservoirs
+from api.services import waterbody_land, reservoirs
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -1160,6 +1160,33 @@ class WaterbodyDefaults(Defaults):
             (('mean_annual_t2_w_default',), defaults.trophic_state_w, 'chloa'),
             (('mean_annual_t2_wo_default',), defaults.trophic_state_wo, 'chloa'),
         ])
+
+
+class WaterbodyLandDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            **{f"{field}_t2_{s}_default": 0 for field in ("ch4_ef", "ch4_ef_old", "alpha", "mean_annual") for s in waterbody_land.SCENARIOS},
+            rd_t2_default=reservoirs.RD_DEFAULT,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        module = self.input
+        if module.is_reservoir():
+            ef = reservoirs.reservoir_emission_factor(self.climate, self.moisture)
+            ch4_ef, ch4_ef_old = ef.ch4_age_le_20, ef.ch4_age_gt_20
+        else:
+            ch4_ef = ch4_ef_old = waterbody_land.pond_emission_factor(self.climate, self.moisture, module.waterbody_type) if module.waterbody_type_id else None
+        values = SimpleNamespace(rd_t2_default=reservoirs.RD_DEFAULT)
+        for s in waterbody_land.SCENARIOS:
+            state = waterbody_land.trophic_state(module, s)
+            setattr(values, f"ch4_ef_t2_{s}_default", ch4_ef)
+            setattr(values, f"ch4_ef_old_t2_{s}_default", ch4_ef_old)
+            setattr(values, f"alpha_t2_{s}_default", waterbody_land.class_alpha(module, s))
+            setattr(values, f"mean_annual_t2_{s}_default", state.chloa if state else None)
+        # No published bounds for these factors in the IPCC tables used.
+        return _with_ranges(values, [(tuple(vars(values)), None, "value")])
 
 
 class OrganicSoilDefaults(Defaults):
