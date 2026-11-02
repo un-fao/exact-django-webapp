@@ -4254,7 +4254,10 @@ class EnergyEntryCalculator(BaseCalculator):
             self.results_w.plot_emissions_and_aggregate_by_activity("energy_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("energy_wo")
 
-        results_tuple = (self.results_start + self.results_w, self.results_start + self.results_wo)
+        # math_w and math_wo already run from the start quantity over the full period, so adding the
+        # flat start series would count the baseline a second time. It cancels in the balance but
+        # inflates both totals. Forest and waterbody differ: their start run ramps down to zero.
+        results_tuple = (self.results_w, self.results_wo)
         log.debug("END EnergyEntryCalculator.calculate")
         return results_tuple
 
