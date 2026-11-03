@@ -1,3 +1,9 @@
+## 1.20.5 (2026-11-03)
+
+### Fix
+
+- **api**: count the energy baseline once in with/without totals
+
 ## 1.20.4 (2026-09-21)
 
 ### Feat
