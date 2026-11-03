@@ -23,17 +23,17 @@
                         </p>
                         <p>
                             Sous le scénario Avec Projet, l'activité impactera
-                            {% if activity.is_luc %}{{ activity.area }}{% elif activity.is_fishery %}{{ activity.catch|floatformat:2|intcomma }}{% elif activity.is_livestock %}{{ activity.heads }}{% else %}{{ activity.area }}{% endif %}
+                            {% if activity.is_luc %}{{ activity.area }}{% elif activity.is_fishery %}{{ activity.catch|floatformat:"2g" }}{% elif activity.is_livestock %}{{ activity.heads }}{% else %}{{ activity.area }}{% endif %}
                             {{ activity.main_impact }}
                             {% if activity.secondary_impacts %}, plus les émissions relatives à {{ activity.secondary_impacts }}.{% endif %}
                         </p>
                         <p>
                             L'activité a un bilan carbone de
-                            <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>
+                            <b>{{ activity.results.balance|floatformat:"2g" }} tCO2-e</b>
                             sur toute la période de comptabilisation, principalement dû aux interventions dans :
                         </p>
                         <ol>
-                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:2|intcomma }} tCO2-e)</li>{% endfor %}
+                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:"2g" }} tCO2-e)</li>{% endfor %}
                         </ol>
                     </div>
                 </div>

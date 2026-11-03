@@ -78,7 +78,9 @@ for language in LANGUAGES:
             except obj_type.DoesNotExist:
                 print(f"Object of type {obj_type} with name {entry.msgid} does not exist.")
                 continue
-            if entry.msgstr:
+            # Several Loco exports carry stray edge spaces (see api migration 0299).
+            msgstr = entry.msgstr.strip()
+            if msgstr:
                 for obj in objs:
-                    setattr(obj, f"name_{language[0]}", entry.msgstr)
+                    setattr(obj, f"name_{language[0]}", msgstr)
                     obj.save()

@@ -14,7 +14,7 @@
                     <p>
                         Se estima que el proyecto {{ project.name }} tiene un balance total de
                         carbono de
-                        <b>{{ total_carbon_balance|floatformat:2|intcomma }}</b>
+                        <b>{{ total_carbon_balance|floatformat:"2g" }}</b>
                         tCO2e durante todo el periodo de contabilidad de {{ total_project_years }}
                         años.
                     </p>
@@ -24,15 +24,12 @@
                         el escenario Sin Proyecto (lo que sucedería si el proyecto no se
                         implementara).
                     </p>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
-                                 alt="BalanceChart"
-                                 width="100%"
-                                 height="400"
-                                 id="balanceChart" />
-                        </div>
-                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
+                         class="report-chart"
+                         alt="Gráfico del balance total de carbono: con proyecto, sin proyecto y balance"
+                         id="balanceChart" />
                 </div>
             </div>
         </div>

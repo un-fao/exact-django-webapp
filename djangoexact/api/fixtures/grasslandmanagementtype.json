@@ -5,7 +5,7 @@
     "fields": {
       "name": "High Intensity Grazing",
       "name_en": "High Intensity Grazing",
-      "name_fr": "Pâturage à haute intensité\n",
+      "name_fr": "Pâturage à haute intensité",
       "name_es": "Pastoreo intensivo",
       "name_ru": "Высокоинтенсивный выпас"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Improved Grassland",
       "name_en": "Improved Grassland",
-      "name_fr": "Prairies améliorées\n",
+      "name_fr": "Prairies améliorées",
       "name_es": "Pastizal mejorado",
       "name_ru": "Улучшенные пастбища"
     }
@@ -27,7 +27,7 @@
     "fields": {
       "name": "Improved With High Inputs",
       "name_en": "Improved With High Inputs",
-      "name_fr": "Amélioré avec des intrants élevés\n",
+      "name_fr": "Amélioré avec des intrants élevés",
       "name_es": "Pastizal mejorado con insumos altos",
       "name_ru": "Улучшено с высокими поступлениями"
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Improved With Medium Inputs",
       "name_en": "Improved With Medium Inputs",
-      "name_fr": "Amélioré avec des intrants moyens\n",
+      "name_fr": "Amélioré avec des intrants moyens",
       "name_es": "Pastizal mejorado con insumos medios",
       "name_ru": "Улучшено со средними поступлениями"
     }
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Non-Degraded",
       "name_en": "Non-Degraded",
-      "name_fr": "Non dégradé\n",
+      "name_fr": "Non dégradé",
       "name_es": "No degradado",
       "name_ru": "Недеградированный"
     }
@@ -60,7 +60,7 @@
     "fields": {
       "name": "Severely Degraded",
       "name_en": "Severely Degraded",
-      "name_fr": "Fortement dégradé\n",
+      "name_fr": "Fortement dégradé",
       "name_es": "Severamente degradados",
       "name_ru": "Сильно деградированные"
     }

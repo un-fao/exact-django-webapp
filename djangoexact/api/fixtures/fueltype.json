@@ -5,7 +5,7 @@
     "fields": {
       "name": "Charcoal",
       "name_en": "Charcoal",
-      "name_fr": "Charbon ",
+      "name_fr": "Charbon",
       "name_es": "Carbón Vegetal",
       "name_ru": "Уголь",
       "parent_fuel_type": 1,
@@ -59,7 +59,7 @@
     "fields": {
       "name": "Ethanol (Cars)",
       "name_en": "Ethanol (Cars)",
-      "name_fr": "Éthanol (voitures)\n",
+      "name_fr": "Éthanol (voitures)",
       "name_es": "Etanol (Coches)",
       "name_ru": "Этанол (Автомобили)",
       "parent_fuel_type": 1,
@@ -77,7 +77,7 @@
     "fields": {
       "name": "Ethanol (Trucks)",
       "name_en": "Ethanol (Trucks)",
-      "name_fr": "Éthanol (camions)\n",
+      "name_fr": "Éthanol (camions)",
       "name_es": "Etanol (Camiones)",
       "name_ru": "Этанол (Грузовики)",
       "parent_fuel_type": 1,
@@ -95,7 +95,7 @@
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
-      "name_fr": "Gasoil / huile diesel\n",
+      "name_fr": "Gasoil / huile diesel",
       "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -113,7 +113,7 @@
     "fields": {
       "name": "Gasoil/Diesel Oil",
       "name_en": "Gasoil/Diesel Oil",
-      "name_fr": "Gasoil / huile diesel\n",
+      "name_fr": "Gasoil / huile diesel",
       "name_es": "Gasóleo/Diésel",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -131,7 +131,7 @@
     "fields": {
       "name": "Gasoline (2-stroke)",
       "name_en": "Gasoline (2-stroke)",
-      "name_fr": "Essence (2 temps)\n",
+      "name_fr": "Essence (2 temps)",
       "name_es": "Gasolina (2-tiempos)",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -149,7 +149,7 @@
     "fields": {
       "name": "Gasoline (4-stroke)",
       "name_en": "Gasoline (4-stroke)",
-      "name_fr": "Essence (4 temps)\n",
+      "name_fr": "Essence (4 temps)",
       "name_es": "Gasolina (4-tiempos)",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -203,7 +203,7 @@
     "fields": {
       "name": "Motor Gasoline",
       "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
+      "name_fr": "Essence pour moteurs",
       "name_es": "Motor de Gasolina",
       "name_ru": "Motor Gasoline",
       "parent_fuel_type": 1,
@@ -221,7 +221,7 @@
     "fields": {
       "name": "Motor Gasoline",
       "name_en": "Motor Gasoline",
-      "name_fr": "Essence pour moteurs\n",
+      "name_fr": "Essence pour moteurs",
       "name_es": "Motor de Gasolina",
       "name_ru": "Motor Gasoline",
       "parent_fuel_type": 1,
@@ -239,7 +239,7 @@
     "fields": {
       "name": "Natural Gas",
       "name_en": "Natural Gas",
-      "name_fr": "Gaz naturel\n",
+      "name_fr": "Gaz naturel",
       "name_es": "Gas Natural",
       "name_ru": "Природный газ",
       "parent_fuel_type": 1,
@@ -257,7 +257,7 @@
     "fields": {
       "name": "Natural Gas",
       "name_en": "Natural Gas",
-      "name_fr": "Gaz naturel\n",
+      "name_fr": "Gaz naturel",
       "name_es": "Gas Natural",
       "name_ru": "Природный газ",
       "parent_fuel_type": 1,
@@ -293,7 +293,7 @@
     "fields": {
       "name": "Renewable",
       "name_en": "Renewable",
-      "name_fr": "Renouvelable\n",
+      "name_fr": "Renouvelable",
       "name_es": "Solar",
       "name_ru": null,
       "parent_fuel_type": 1,
@@ -311,7 +311,7 @@
     "fields": {
       "name": "Waste Oil/Lubricants",
       "name_en": "Waste Oil/Lubricants",
-      "name_fr": "Huiles usées / lubrifiants\n",
+      "name_fr": "Huiles usées / lubrifiants",
       "name_es": "Aceite Usado/ Lubricante",
       "name_ru": null,
       "parent_fuel_type": 1,

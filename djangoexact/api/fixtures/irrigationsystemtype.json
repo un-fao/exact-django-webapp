@@ -5,7 +5,7 @@
     "fields": {
       "name": "Center-Pivot Sprinkler",
       "name_en": "Center-Pivot Sprinkler",
-      "name_fr": "Irrigation á pivot central\n",
+      "name_fr": "Irrigation á pivot central",
       "name_es": "Aspersor de pivote central",
       "name_ru": "Центробежное орошение",
       "module_types": [
@@ -20,7 +20,7 @@
     "fields": {
       "name": "Hand Moved Sprinkler",
       "name_en": "Hand Moved Sprinkler",
-      "name_fr": "Arroseur mobile manuel\n",
+      "name_fr": "Arroseur mobile manuel",
       "name_es": "Aspersor movido a mano",
       "name_ru": "Ручной передвижной спринклер",
       "module_types": [
@@ -34,7 +34,7 @@
     "fields": {
       "name": "Micro Sprinkler",
       "name_en": "Micro Sprinkler",
-      "name_fr": "Micro-arroseur\n",
+      "name_fr": "Micro-arroseur",
       "name_es": "Micro Aspersor",
       "name_ru": "Микроорашиватель",
       "module_types": [
@@ -48,7 +48,7 @@
     "fields": {
       "name": "Other (set up Tier 2)",
       "name_en": "Other (set up Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": null,
       "name_ru": null,
       "module_types": [
@@ -62,7 +62,7 @@
     "fields": {
       "name": "Permanent Sprinkler",
       "name_en": "Permanent Sprinkler",
-      "name_fr": "Arroseur permanent\n",
+      "name_fr": "Arroseur permanent",
       "name_es": "Aspersor permanente",
       "name_ru": "Постоянный орошатель",
       "module_types": [
@@ -76,7 +76,7 @@
     "fields": {
       "name": "Solid Roll Sprinkler",
       "name_en": "Solid Roll Sprinkler",
-      "name_fr": "Arroseur à rouleau solide\n",
+      "name_fr": "Arroseur à rouleau solide",
       "name_es": "Aspersor de rodillo macizo",
       "name_ru": "Твёрдый вращающийся орошатель",
       "module_types": [
@@ -90,7 +90,7 @@
     "fields": {
       "name": "Solid Set Sprinkler",
       "name_en": "Solid Set Sprinkler",
-      "name_fr": "Arroseur fixe\n",
+      "name_fr": "Arroseur fixe",
       "name_es": "Conjunto de aspersores solidos",
       "name_ru": "Твёрдое орошение",
       "module_types": [
@@ -146,7 +146,7 @@
     "fields": {
       "name": "Traveler Sprinkler",
       "name_en": "Traveler Sprinkler",
-      "name_fr": "Arroseur mobile\n",
+      "name_fr": "Arroseur mobile",
       "name_es": "Aspersor viajero",
       "name_ru": "Перемещающийся орошатель",
       "module_types": [
@@ -161,7 +161,7 @@
     "fields": {
       "name": "Trickle",
       "name_en": "Trickle",
-      "name_fr": "Irrigation goutte-à-goutte\n",
+      "name_fr": "Irrigation goutte-à-goutte",
       "name_es": "Riego por goteo",
       "name_ru": "Капельное орошение",
       "module_types": [

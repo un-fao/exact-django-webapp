@@ -12,7 +12,7 @@ django.setup()
 
 from django.test import SimpleTestCase  # noqa: E402
 
-from api.defaults import BuildingDefaults, DefaultsFactory, FuelDefaults, _with_ranges  # noqa: E402
+from api.defaults import BuildingDefaults, CoastalWetlandDefaults, DefaultsFactory, FuelDefaults, _with_ranges  # noqa: E402
 from ipcc.models import BuildingEmissionFactor, EnergyDefaultEmissionFactor  # noqa: E402
 
 
@@ -74,3 +74,21 @@ class DefaultUncertaintyTests(SimpleTestCase):
         self.assertIsNone(values.ef_t2_w_default_min)
         self.assertIsNone(values.ef_t2_w_default_max)
         self.assertFalse(hasattr(values, "country_t2_default_min"))
+
+    def test_coastal_wetland_litter_and_deadwood_defaults_per_scenario(self):
+        row = lambda value: SimpleNamespace(value=value)  # noqa: E731
+        calculator = SimpleNamespace(
+            agb_default=row(1), bgb_default=row(1), soil_1m=row(1), pc_c_lost_excavation=row(1),
+            ef_drainage=row(1), rewetting_c=row(1), rewetting_ch4=row(1), salinity_type=row("<18"),
+            soil_type_name="Mineral", litter=row(0.7), dw=row(10.7),
+            get_defaults=lambda calculate=False: None,
+        )
+        provider = object.__new__(CoastalWetlandDefaults)
+        provider.input = object()
+
+        with patch("api.defaults.calcs.CoastalWetlandCalculator", return_value=calculator):
+            values = provider.get_defaults()
+
+        for scenario in ("start", "w", "wo"):
+            self.assertEqual(getattr(values, f"litter_t2_{scenario}_default"), 0.7)
+            self.assertEqual(getattr(values, f"deadwood_t2_{scenario}_default"), 10.7)

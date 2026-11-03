@@ -1,7 +1,8 @@
-"""Validation for the analyst notes supplied with a report request.
+"""Validation for the analyst HTML supplied with a report request.
 
-``content`` is the only user-supplied input a report renders: analyst notes
-that arrive as HTML and must render as markup. The PDF engine is version-pinned
+``content`` (analyst notes) and ``additional_sources`` (references appended to
+the Sources section) are the only user-supplied input a report renders, and
+both arrive as HTML that must render as markup. The PDF engine is version-pinned
 under a CVE exemption, so ``clean_content``, an allowlist sanitizer, is the
 trust boundary, and api.reports.pdf refuses any fetch the sanitizer might have
 missed.
@@ -48,7 +49,7 @@ def _filter_content_attribute(tag: str, attribute: str, value: str) -> str | Non
     return None
 
 
-def clean_content(raw) -> SafeString:
+def clean_content(raw, field: str = "content") -> SafeString:
     """Sanitize analyst HTML notes down to the allowlist and mark the result safe.
 
     This is the only place report markup is marked safe. Templates output the
@@ -61,10 +62,10 @@ def clean_content(raw) -> SafeString:
     a PDF missing prose the analyst wrote.
     """
     if not isinstance(raw, str):
-        raise serializers.ValidationError("content must be a string of HTML.")
+        raise serializers.ValidationError(f"{field} must be a string of HTML.")
     if len(raw) > CONTENT_MAX_LENGTH:
         raise serializers.ValidationError(
-            f"content is too long: {len(raw)} characters, the limit is {CONTENT_MAX_LENGTH}."
+            f"{field} is too long: {len(raw)} characters, the limit is {CONTENT_MAX_LENGTH}."
         )
     return mark_safe(  # nosec B308 B703: output of the allowlist sanitizer
         nh3.clean(
@@ -83,18 +84,31 @@ def content_from_request(request, template_name) -> SafeString | None:
     Refused for reports that do not render it.
     """
     data = getattr(request, "data", None)
-    if not hasattr(data, "get"):
-        return None
-    if "narrative" in data:
+    if hasattr(data, "get") and "narrative" in data:
         # The structured narrative was replaced by content. A client still
         # sending it would otherwise get a PDF without the prose it carried.
         # Refused even when empty, so the retired key has one behaviour.
         raise serializers.ValidationError(
             "narrative is no longer accepted: send the analyst notes as HTML in content."
         )
-    raw = data.get("content")
+    return _html_field(request, template_name, "content")
+
+
+def sources_from_request(request, template_name) -> SafeString | None:
+    """Return the sanitized ``additional_sources`` of a report request, or ``None``.
+
+    Refused for reports that do not render it.
+    """
+    return _html_field(request, template_name, "additional_sources")
+
+
+def _html_field(request, template_name, field: str) -> SafeString | None:
+    data = getattr(request, "data", None)
+    if not hasattr(data, "get"):
+        return None
+    raw = data.get(field)
     if raw is None or raw == "":
         return None
     if template_name not in CONTENT_REPORTS:
-        raise serializers.ValidationError("This report does not accept analyst content.")
-    return clean_content(raw)
+        raise serializers.ValidationError(f"This report does not accept {field}.")
+    return clean_content(raw, field)

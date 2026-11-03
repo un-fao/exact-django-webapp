@@ -22,6 +22,9 @@ CACHE_FIELDS = (
 
 def set_ch4_fossil(apps, schema_editor):
     GlobalWarmingPotential = apps.get_model("ipcc", "GlobalWarmingPotential")
+    # A fresh database (test DB, offline bootstrap) has no reference rows yet; fixtures load them later.
+    if not GlobalWarmingPotential.objects.exists():
+        return
     changed_ids = []
     for name, value in CH4_FOSSIL.items():
         # .get() fails loudly if a set was renamed on this DB; filter().update() would skip it silently.

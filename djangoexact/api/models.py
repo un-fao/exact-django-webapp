@@ -286,7 +286,7 @@ class ChangeRate(models.Model):
 
 
 class ProjectStatus(models.Model):
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=100)
     value = models.IntegerField(unique=True)
 
     class Meta:
@@ -934,6 +934,9 @@ class ProjectMembership(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="memberships")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="members")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "project"], name="unique_project_membership")]
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email} - {self.group.name}"

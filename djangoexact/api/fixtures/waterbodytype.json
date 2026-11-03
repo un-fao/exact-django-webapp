@@ -5,7 +5,7 @@
     "fields": {
       "name": "Brackishwater Pond",
       "name_en": "Brackishwater Pond",
-      "name_fr": "Étang d'eau saumâtre\n",
+      "name_fr": "Étang d'eau saumâtre",
       "name_es": "Estanque de agua salobre",
       "name_ru": "Солоноватый пруд"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Canals & Ditches",
       "name_en": "Canals & Ditches",
-      "name_fr": "Canaux et fossés\n",
+      "name_fr": "Canaux et fossés",
       "name_es": "Canales y Acequia",
       "name_ru": "Каналы, Канавы"
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Freshwater Pond",
       "name_en": "Freshwater Pond",
-      "name_fr": "Étang d'eau douce\n",
+      "name_fr": "Étang d'eau douce",
       "name_es": "Estanque de agua dulce",
       "name_ru": "Пресноводный пруд"
     }
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Saline Pond",
       "name_en": "Saline Pond",
-      "name_fr": "Étang salin\n",
+      "name_fr": "Étang salin",
       "name_es": "Estanque Salino",
       "name_ru": "Солёный пруд"
     }

@@ -5,7 +5,7 @@
     "fields": {
       "name": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
       "name_en": "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback",
-      "name_fr": "5e rapport d’évaluation du GIEC (AR5) sans rétroaction climatique\n",
+      "name_fr": "5e rapport d’évaluation du GIEC (AR5) sans rétroaction climatique",
       "name_es": "Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática",
       "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата",
       "co2": 1.0,
@@ -20,7 +20,7 @@
     "fields": {
       "name": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
       "name_en": "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback",
-      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique\n",
+      "name_fr": "5e rapport d’évaluation du GIEC (AR5) avec rétroaction climatique",
       "name_es": "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática",
       "name_ru": "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата",
       "co2": 1.0,
@@ -35,7 +35,7 @@
     "fields": {
       "name": "IPCC Second Assessment Report (SAR)",
       "name_en": "IPCC Second Assessment Report (SAR)",
-      "name_fr": "2e rapport d’évaluation du GIEC (SAR)\n",
+      "name_fr": "2e rapport d’évaluation du GIEC (SAR)",
       "name_es": "Segundo Informe de Evaluación del IPCC (SAR)",
       "name_ru": "Второй оценочный отчет МГЭИК (SAR)",
       "co2": 1.0,
@@ -50,7 +50,7 @@
     "fields": {
       "name": "IPCC Fourth Assessment Report (AR4)",
       "name_en": "IPCC Fourth Assessment Report (AR4)",
-      "name_fr": "4e rapport d’évaluation du GIEC (AR4)\n",
+      "name_fr": "4e rapport d’évaluation du GIEC (AR4)",
       "name_es": "Cuarto Informe de Evaluación del IPCC (AR4)",
       "name_ru": "Четвертый оценочный отчет МГЭИК (ОД4)",
       "co2": 1.0,
@@ -65,7 +65,7 @@
     "fields": {
       "name": "IPCC Sixth Assessment Report (AR6)",
       "name_en": "IPCC Sixth Assessment Report (AR6)",
-      "name_fr": "6e rapport d’évaluation du GIEC (AR6)\n",
+      "name_fr": "6e rapport d’évaluation du GIEC (AR6)",
       "name_es": "Sexto Informe de Evaluación del IPCC (AR6)",
       "name_ru": "Шестой оценочный отчет МГЭИК (ОД6)",
       "co2": 1.0,

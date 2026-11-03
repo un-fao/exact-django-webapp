@@ -66,6 +66,29 @@ class SyncTemplateLanguageTestCase(SimpleTestCase):
     def test_header_is_used_when_no_parameter_is_given(self):
         self.assertEqual(self._resolved_lang(_request(header_lang="fr")), "fr")
 
+    def test_compute_runs_in_the_requested_language(self):
+        """Module titles are read from translated names during the compute; under the
+        header language they came out in English in an otherwise Spanish report."""
+        from django.utils.translation import get_language
+
+        from api.views import ProjectViewSet
+
+        viewset = ProjectViewSet()
+        viewset.kwargs = {"pk": 1}
+        viewset.format_kwarg = None
+        project = Mock()
+        project.activities.filter.return_value = []
+        viewset.get_object = Mock(return_value=project)
+        seen = []
+
+        with (
+            patch("api.reports.compute_project_result", side_effect=lambda *a: seen.append(get_language())),
+            patch("api.reports.html_context.build_template_context", return_value={}),
+            patch("api.views.render", return_value=Mock(content=b"<html></html>")),
+        ):
+            viewset.template(_request(lang="es", header_lang="en"), pk=1)
+        self.assertEqual(seen, ["es"])
+
     def test_english_when_neither_is_given(self):
         self.assertEqual(self._resolved_lang(_request()), "en")
 

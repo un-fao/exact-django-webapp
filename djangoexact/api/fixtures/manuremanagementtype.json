@@ -5,7 +5,7 @@
     "fields": {
       "name": "Aerobic Treatment",
       "name_en": "Aerobic Treatment",
-      "name_fr": "Traitement aérobie\n",
+      "name_fr": "Traitement aérobie",
       "name_es": "Tratamiento Aeróbico",
       "name_ru": "Аэробная обработка"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Burned For Fuel",
       "name_en": "Burned For Fuel",
-      "name_fr": "Brûlage à des fins de combustible\n",
+      "name_fr": "Brûlage à des fins de combustible",
       "name_es": "Quemado para combustible",
       "name_ru": "Сожжённый в качестве топлива"
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Daily Spread",
       "name_en": "Daily Spread",
-      "name_fr": "Épandage quotidien\n",
+      "name_fr": "Épandage quotidien",
       "name_es": "Distribución diaria",
       "name_ru": "Ежедневное распределение"
     }
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Deep Bedding",
       "name_en": "Deep Bedding",
-      "name_fr": "Litière profonde\n",
+      "name_fr": "Litière profonde",
       "name_es": "Camas profundas",
       "name_ru": "Глубокая подстилка"
     }
@@ -93,7 +93,7 @@
     "fields": {
       "name": "Liquid/Slurry",
       "name_en": "Liquid/Slurry",
-      "name_fr": "Liquide/Lisier\n",
+      "name_fr": "Liquide/Lisier",
       "name_es": "Líquido/fango",
       "name_ru": "Жидкость/Жижа"
     }
@@ -104,7 +104,7 @@
     "fields": {
       "name": "Other (pls. Go Tier 2)",
       "name_en": "Other (pls. Go Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": "Otros (Por favor, inserte Nivel 2)",
       "name_ru": "Прочее (пожалуйста, перейдите ко второму уровню)"
     }
@@ -115,7 +115,7 @@
     "fields": {
       "name": "Other (Pls. Go Tier 2)",
       "name_en": "Other (Pls. Go Tier 2)",
-      "name_fr": "Autre (veuillez passer au tier 2)\n",
+      "name_fr": "Autre (veuillez passer au tier 2)",
       "name_es": "Otros (Por favor, inserte Nivel 2)",
       "name_ru": "Прочее (перейдите к уровень 2/Tier 2)"
     }
@@ -126,7 +126,7 @@
     "fields": {
       "name": "Pasture/Range/Paddock",
       "name_en": "Pasture/Range/Paddock",
-      "name_fr": "Pâturages/parcours/parcelles\n",
+      "name_fr": "Pâturages/parcours/parcelles",
       "name_es": "Pastura/Prado/Pradera",
       "name_ru": "Пастбище/Выпас/Паддок"
     }
@@ -137,7 +137,7 @@
     "fields": {
       "name": "Pit<1Month",
       "name_en": "Pit<1Month",
-      "name_fr": "Fosse <1 mois\n",
+      "name_fr": "Fosse <1 mois",
       "name_es": "Pozo<1Mes",
       "name_ru": "Яма <1 месяц"
     }
@@ -148,7 +148,7 @@
     "fields": {
       "name": "Pit>1Month",
       "name_en": "Pit>1Month",
-      "name_fr": "Fosse >1 mois\n",
+      "name_fr": "Fosse >1 mois",
       "name_es": "Pozo>1Mes",
       "name_ru": "Яма >1 месяц"
     }
@@ -159,7 +159,7 @@
     "fields": {
       "name": "Poultry Manure",
       "name_en": "Poultry Manure",
-      "name_fr": "Fumier de volaille\n",
+      "name_fr": "Fumier de volaille",
       "name_es": "Estiercol de aves de corral",
       "name_ru": "Птичий навоз"
     }
@@ -170,7 +170,7 @@
     "fields": {
       "name": "Solid Storage",
       "name_en": "Solid Storage",
-      "name_fr": "Stockage solide\n",
+      "name_fr": "Stockage solide",
       "name_es": "Almacenaje de sólidos",
       "name_ru": "Твёрдое хранение"
     }

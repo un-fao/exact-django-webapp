@@ -24,6 +24,7 @@ from api.reports.narrative import (
     CONTENT_MAX_LENGTH,
     clean_content,
     content_from_request,
+    sources_from_request,
 )
 
 
@@ -133,6 +134,25 @@ class ContentFromRequestTestCase(SimpleTestCase):
                     with self.assertRaises(ValidationError) as caught:
                         content_from_request(_request({"narrative": value}), template_name)
                     self.assertIn("content", str(caught.exception))
+
+
+class SourcesFromRequestTestCase(SimpleTestCase):
+    def test_absent_or_empty_sources_are_none(self):
+        self.assertIsNone(sources_from_request(_request({}), "ifad"))
+        self.assertIsNone(sources_from_request(_request({"additional_sources": ""}), "ifad"))
+
+    def test_sources_are_sanitized(self):
+        sources = sources_from_request(
+            _request({"additional_sources": '<ul><li>FAO 2021</li></ul><img src="file:///etc/passwd">'}), "ifad",
+        )
+        self.assertEqual(sources, "<ul><li>FAO 2021</li></ul>")
+
+    def test_a_report_that_does_not_render_sources_refuses_them(self):
+        for template_name in ("fao", None):
+            with self.subTest(template=template_name):
+                with self.assertRaises(ValidationError) as caught:
+                    sources_from_request(_request({"additional_sources": "<p>x</p>"}), template_name)
+                self.assertIn("additional_sources", str(caught.exception))
 
 
 class ReportEndpointsArePostOnlyTestCase(SimpleTestCase):

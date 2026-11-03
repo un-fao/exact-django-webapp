@@ -571,3 +571,30 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
             viewset.template(request, pk=1)
 
         mock_log.exception.assert_called_once_with(exc)
+
+
+class TestIndicatorLabelsFollowReportLanguage(unittest.TestCase):
+    """The large-fishery and aquaculture rows of the units table were English literals."""
+
+    def test_labels_are_translated(self):
+        import api.models as api_models
+        from django.utils.translation import override
+
+        from api.reports.html_context import _compute_indicator_aggregates
+
+        large = Mock(spec=api_models.LargeFishery, total_catch_yr_w=1, total_catch_yr_wo=0)
+        aqua = Mock(spec=api_models.Aquaculture, annual_production_w=1, annual_production_wo=0)
+        activity = Mock(area=0, modules=[large, aqua])
+        with (
+            patch("api.models.LivestockCategoryType") as _lct,
+            patch("api.models.FisheryType") as _ft,
+            patch("api.models.ModuleType") as _mt,
+            override("es"),
+        ):
+            _lct.objects.all.return_value = []
+            _ft.objects.all.return_value = []
+            _mt.objects.filter.return_value.all.return_value = []
+            result = _compute_indicator_aggregates({"a": activity}, _make_project())
+
+        self.assertEqual(result["large_fishery_data"]["name"], "Pesca industrial")
+        self.assertEqual(result["aquaculture_data"]["name"], "Acuicultura")

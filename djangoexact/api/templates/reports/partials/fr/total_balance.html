@@ -13,7 +13,7 @@
                 <div class="col-sm-6 text-start">
                     <p>
                         Il est estimé que le projet {{ project.name }} a un bilan carbone total de
-                        <b>{{ total_carbon_balance|floatformat:2|intcomma }}</b>
+                        <b>{{ total_carbon_balance|floatformat:"2g" }}</b>
                         tCO2e sur toute la période de comptabilisation de {{ total_project_years }}
                         années.
                     </p>
@@ -23,15 +23,12 @@
                         le scénario Sans Projet (ce qui se passerait si le projet n'était pas
                         mis en œuvre).
                     </p>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
-                                 alt="Graphique de Bilan"
-                                 width="100%"
-                                 height="400"
-                                 id="balanceChart" />
-                        </div>
-                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <img src="data:image/svg+xml;base64,{{ project_chart_base64 }}"
+                         class="report-chart"
+                         alt="Graphique du bilan carbone total : avec projet, sans projet et bilan"
+                         id="balanceChart" />
                 </div>
             </div>
         </div>

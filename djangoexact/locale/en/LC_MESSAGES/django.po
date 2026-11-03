@@ -57,3 +57,36 @@ msgstr ""
 #: api/views.py:1004
 msgid "agricultural inputs use"
 msgstr ""
+
+#: api/reports/charts.py
+msgid "With project"
+msgstr ""
+
+#: api/reports/charts.py
+msgid "Without project"
+msgstr ""
+
+#: api/reports/charts.py
+msgid "Balance"
+msgstr ""
+
+#: api/reports/charts.py
+msgid "Other"
+msgstr ""
+
+#: api/reports/charts.py
+msgid "Net total"
+msgstr ""
+
+#: api/reports/charts.py
+#, python-format
+msgid "Net: %(value)s"
+msgstr ""
+
+#: api/reports/html_context.py
+msgid "Large fisheries"
+msgstr ""
+
+#: api/reports/html_context.py
+msgid "Aquaculture"
+msgstr ""

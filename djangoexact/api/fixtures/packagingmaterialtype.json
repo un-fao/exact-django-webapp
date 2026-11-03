@@ -27,7 +27,7 @@
     "fields": {
       "name": "Plastic (LDPE)",
       "name_en": "Plastic (LDPE)",
-      "name_fr": "Plastique (LDPE)\n",
+      "name_fr": "Plastique (LDPE)",
       "name_es": null,
       "name_ru": null
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Plastic (mixed)",
       "name_en": "Plastic (mixed)",
-      "name_fr": "Plastique (mixte)\n",
+      "name_fr": "Plastique (mixte)",
       "name_es": null,
       "name_ru": null
     }

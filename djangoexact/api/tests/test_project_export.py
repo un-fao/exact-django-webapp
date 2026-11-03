@@ -556,3 +556,58 @@ class ProjectImportCachedResultsTests(TestCase):
         self.assertIsNone(module.cached_results_total)
         self.assertFalse(module.is_cached_results_valid())
         self.assertEqual(module.status.name_en, "EMPTY")
+
+
+class OrganicSoilLandUseChangeImportTests(TestCase):
+    """OrganicSoil and LandUseChange point at each other, so whichever is
+    imported first holds a reference to a module that does not exist yet.
+    """
+
+    def setUp(self):
+        from ..models import Climate, Country, Group, Moisture, ProjectMembership, SoilType
+
+        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.project = ProjectFactory(
+            owner=self.user,
+            name="Organic Soil LUC Project",
+            climate=Climate.objects.first(),
+            moisture=Moisture.objects.first(),
+            soil_type=SoilType.objects.first(),
+            country=Country.objects.first(),
+        )
+        ProjectMembership.objects.create(
+            project=self.project, user=self.user, group=Group.objects.get_or_create(name="Admin")[0]
+        )
+
+    def test_import_links_organic_soil_to_imported_land_use_change(self):
+        from .factories import ActivityFactory, LandUseChangeFactory, OrganicSoilFactory
+        from ..models import LandUseChange, ModuleType, OrganicSoil
+
+        activity = ActivityFactory(project=self.project, owner=self.user)
+        activity.module_types.set(ModuleType.objects.filter(class_name__in=["LandUseChange", "OrganicSoil"]))
+        grassland = ModuleType.objects.get(class_name="Grassland")
+        organic_soil = OrganicSoilFactory(activity=activity)
+        luc = LandUseChangeFactory(
+            activity=activity,
+            organic_soil=organic_soil,
+            module_type_start=grassland,
+            module_type_w=grassland,
+            module_type_wo=grassland,
+        )
+        organic_soil.land_use_change = luc
+        organic_soil.save()
+
+        export = self.client.get(f"/api/projects/{self.project.id}/export/")
+        self.assertEqual(export.status_code, http_status.HTTP_200_OK)
+        response = self.client.post(
+            "/api/projects/import_project/?forceCopy=true", data=json.loads(export.content), format="json"
+        )
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED, getattr(response, "data", None))
+        new_project = Project.objects.get(id=response.data["projectId"])
+        new_luc = LandUseChange.objects.get(activity__project=new_project)
+        new_soil = OrganicSoil.objects.get(activity__project=new_project)
+        self.assertEqual(new_soil.land_use_change_id, new_luc.id)
+        self.assertEqual(new_luc.organic_soil_id, new_soil.id)

@@ -1,7 +1,6 @@
 {% if content %}
     {# No |safe here, on purpose: only the output of clean_content is already marked safe. #}
     <div class="analyst-content">
-        <h3>Analyst notes</h3>
         {{ content }}
     </div>
 {% else %}

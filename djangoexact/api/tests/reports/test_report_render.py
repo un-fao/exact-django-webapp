@@ -75,7 +75,7 @@ def _make_result(project, *, mitigating=False):
     return result
 
 
-def _build_context(*, mitigating=False, implementation_years=None, content=None):
+def _build_context(*, mitigating=False, implementation_years=None, content=None, additional_sources=None):
     """Run the real build_template_context with only its I/O boundaries mocked."""
     from api.reports import html_context
 
@@ -93,7 +93,9 @@ def _build_context(*, mitigating=False, implementation_years=None, content=None)
         if implementation_years is not None:
             project.implementation_years = implementation_years
         result = _make_result(project, mitigating=mitigating)
-        return html_context.build_template_context(result, content=content)
+        return html_context.build_template_context(
+            result, content=content, additional_sources=additional_sources,
+        )
 
 
 class TestEveryReportTemplateRenders(SimpleTestCase):
@@ -266,7 +268,6 @@ class TestAnalystContent(SimpleTestCase):
         from api.reports.narrative import clean_content
 
         html = self._render(clean_content('<p>Soil <b>carbon</b></p><img src="file:///etc/passwd">'))
-        self.assertIn("Analyst notes", html)
         self.assertIn("<p>Soil <b>carbon</b></p>", html)
         self.assertNotIn("file:", html)
 
@@ -275,10 +276,10 @@ class TestAnalystContent(SimpleTestCase):
 
         html = self._render(clean_content("<p>Degraded grazing land.</p>"))
         assumptions = _section(html, "III. Assumptions and activities", "IV. Results")
-        self.assertIn("Analyst notes", assumptions)
         self.assertIn("Degraded grazing land.", assumptions)
         self.assertEqual(html.count("Degraded grazing land."), 1)
-        self.assertEqual(html.count("Analyst notes"), 1)
+        # Requested by IFAD: the notes are the analyst's own text, not a labelled box.
+        self.assertNotIn("Analyst notes", html)
 
     def test_content_that_skipped_the_sanitizer_is_escaped(self):
         """Fails if a `|safe` is ever added to the partial."""
@@ -357,3 +358,31 @@ class TestComputedTier2Parameters(SimpleTestCase):
         html = " ".join(render_to_string("reports/ifad_en.html", context).split())
         self.assertIn("unless otherwise noted.", html)
         self.assertNotIn("Tier 2 parameters were used", html)
+
+
+class TestAdditionalSources(SimpleTestCase):
+    def _render(self, additional_sources):
+        return render_to_string("reports/ifad_en.html", _build_context(additional_sources=additional_sources))
+
+    def test_sanitized_sources_follow_the_fixed_references(self):
+        from api.reports.narrative import clean_content
+
+        html = " ".join(self._render(clean_content("<ul><li>FAO (2021). Soil survey.</li></ul>")).split())
+        sources = html[html.index("<h2>Sources</h2>"):]
+        self.assertIn("<li>FAO (2021). Soil survey.</li>", sources)
+        self.assertLess(sources.index("MDBs and IDFC"), sources.index("FAO (2021)"))
+
+    def test_sources_that_skipped_the_sanitizer_are_escaped(self):
+        html = self._render("<b>raw</b>")
+        self.assertNotIn("<b>raw</b>", html)
+        self.assertIn("&lt;b&gt;raw&lt;/b&gt;", html)
+
+
+class TestIfadPageLayout(SimpleTestCase):
+    """IFAD asked for no forced page break and no running header."""
+
+    def test_no_running_header_or_forced_break(self):
+        html = render_to_string("reports/ifad_en.html", _build_context())
+        self.assertNotIn("<header>", html)
+        self.assertNotIn("accounting annex", html.split("</head>")[1])
+        self.assertNotIn('class="page-break"', html)

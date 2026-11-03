@@ -135,7 +135,6 @@ from .serializers import (
     HandInHandAssessmentSerializer,
     HandInHandAssessmentGroupedSerializer,
     ModuleTypeIdModuleIdAreaSerializer,
-    ProjectInvitationAcceptSerializer,
     AsyncJobSerializer,
 )
 
@@ -153,14 +152,15 @@ import api.concurrency as concurrency
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
-import matplotlib.pyplot as plt
 import io
 import base64
 import api.permissions as api_permissions
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import report_links
+from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
 
@@ -375,6 +375,17 @@ class BaseWiewSet(viewsets.GenericViewSet):
         return super().get_queryset()
 
 
+def project_members(project, request):
+    """A project's memberships, narrowed to one user when the request carries ``?user=<id>``."""
+    members = project.members.select_related("user")
+    user_id = request.query_params.get("user")
+    if user_id is None:
+        return members
+    if not user_id.isdigit():
+        raise ValidationError({"user": "Must be a user id."})
+    return members.filter(user_id=int(user_id))
+
+
 class AuthenticatedViewSet(BaseWiewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -560,6 +571,11 @@ _REPORT_BODY = openapi.Schema(
             type=openapi.TYPE_STRING,
             description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
                         "of text, list, link and table tags. Accepted by the ifad report only.",
+        ),
+        "additional_sources": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description="Extra references as HTML, appended to the Sources section. Same limit, "
+                        "allowlist and report restriction as content.",
         ),
     },
 )
@@ -872,6 +888,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         report_narrative.content_from_request(request, None)
+        report_narrative.sources_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
@@ -964,6 +981,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         from .reports import narrative as report_narrative
 
         content = report_narrative.content_from_request(request, template_name)
+        additional_sources = report_narrative.sources_from_request(request, template_name)
 
         params = {
             "project_id": project.pk,
@@ -973,6 +991,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "lang": lang,
             # Stored already sanitized; the worker sanitizes it again anyway.
             "content": content,
+            "additional_sources": additional_sources,
         }
         job = async_jobs.enqueue(AsyncJob.Kind.REPORT, params, user=request.user, project=project)
         return Response({"job_id": job.pk, "status": job.status}, status=http_status.HTTP_202_ACCEPTED)
@@ -1136,7 +1155,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 for comment_data in comments_data:
                     _create_comment(thread, comment_data, author_cache)
 
-        def prepare_model_data(model_class, data, module_id_map=None):
+        def prepare_model_data(model_class, data, module_id_map=None, forward_refs=None):
             """
             Filter data to valid model fields and convert FK fields to use _id suffix.
             Django expects FK fields as either model instances or field_id=integer.
@@ -1145,6 +1164,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             For OneToOneField cross-references between modules in the same
             activity (e.g. Settlement.land_use_change → LandUseChange),
             ``module_id_map`` remaps old PKs to newly-created instances.
+            A reference to a module not created yet is left unset and, when
+            ``forward_refs`` is given, appended to it as (field_name, old_pk)
+            so the caller can link it once the target exists.
             """
             import re
             from django.db.models import ForeignKey
@@ -1170,25 +1192,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 # OneToOneField cross-module references need ID remapping
                 # because the referenced module was re-created with a new PK.
                 if isinstance(field, OneToOneField):
-                    if isinstance(value, int) and value in module_id_map:
-                        # New export format: integer ID that maps to a
-                        # previously-created module in this activity.
-                        result[f"{field_name}_id"] = module_id_map[value].id
-                    elif isinstance(value, str):
+                    old_pk = value
+                    if isinstance(value, str):
                         # Old export format: string like "(4) LandUseChange
-                        # in settlements". Parse the PK and remap.
+                        # in settlements".
                         match = re.match(r'\((\d+)\)', value)
-                        if match:
-                            old_pk = int(match.group(1))
-                            if old_pk in module_id_map:
-                                result[f"{field_name}_id"] = module_id_map[old_pk].id
-                        # If not in the map the target module hasn't been
-                        # created yet or doesn't exist — skip gracefully
-                        # (the field is nullable).
-                    elif isinstance(value, int):
-                        # Reference-data FK (e.g. OrganicSoil pointing to
-                        # a shared record) — not in the map, use as-is.
-                        result[f"{field_name}_id"] = value
+                        old_pk = int(match.group(1)) if match else None
+                    if not isinstance(old_pk, int):
+                        continue
+                    if old_pk in module_id_map:
+                        result[f"{field_name}_id"] = module_id_map[old_pk].id
+                    elif forward_refs is not None:
+                        # The old PK belongs to the exporting database, so it
+                        # must never be written as-is: OrganicSoil and
+                        # LandUseChange reference each other, and the one
+                        # created first would point at a foreign row.
+                        forward_refs.append((field_name, old_pk))
                     continue
 
                 # For ForeignKey fields with integer values, use field_id suffix
@@ -1286,6 +1305,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     # Cache for author lookups to avoid repeated DB queries
                     author_cache = {}
 
+                    # (instance, field_name, old_pk) for references to modules
+                    # created later in this activity.
+                    forward_links = []
+
                     # Create modules
                     for module_type, modules_list in modules_data.items():
                         model_class = self._get_module_class(module_type)
@@ -1299,12 +1322,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     module_data, resolve_status_id
                                 )
 
+                                forward_refs = []
                                 filtered_module_data = prepare_model_data(
-                                    model_class, module_data, module_id_map
+                                    model_class, module_data, module_id_map, forward_refs
                                 )
                                 new_instance = model_class.objects.create(
                                     activity=activity,
                                     **filtered_module_data
+                                )
+                                forward_links.extend(
+                                    (new_instance, field_name, old_pk) for field_name, old_pk in forward_refs
                                 )
 
                                 if restore_values:
@@ -1325,6 +1352,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                         _reconstruct_threads, author_cache, module_id_map,
                                         cache_restores, resolve_status_id
                                     )
+
+                    for instance, field_name, old_pk in forward_links:
+                        target = module_id_map.get(old_pk)
+                        if isinstance(target, instance._meta.get_field(field_name).related_model):
+                            type(instance).objects.filter(pk=instance.pk).update(**{f"{field_name}_id": target.pk})
 
                 # Replay the exported results now that every module and
                 # submodule exists. update() bypasses save(), so this cannot
@@ -1531,7 +1563,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project_members(project, request), many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     # TODO: Remove this action when the frontend is updated
@@ -1714,11 +1746,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         activities = list(project.activities.filter(pk__in=activity_ids)) if activity_ids else None
 
         content = report_narrative.content_from_request(request, template_name)
+        additional_sources = report_narrative.sources_from_request(request, template_name)
 
         from .reports import NotReadyError, compute_project_result
 
         try:
-            result = compute_project_result(project, activities)
+            # Module titles are translated names read during the compute, so the
+            # report language must be active here, not only in build_template_context;
+            # otherwise they follow Accept-Language instead of ?lang=.
+            with translation_override(lang):
+                result = compute_project_result(project, activities)
         except NotReadyError as e:
             # Same contract as report(): a module that cannot be calculated is
             # the user's data to fix, so name it instead of a generic 500.
@@ -1729,7 +1766,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             from .reports.html_context import build_template_context
             from .reports.pdf import render_pdf
 
-            context = build_template_context(result, request, lang, content=content)
+            context = build_template_context(
+                result, request, lang, content=content, additional_sources=additional_sources,
+            )
             html = render(request, template_path, context).content.decode()
             pdf = render_pdf(html)
 
@@ -1841,7 +1880,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project_members(project, request), many=True)
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
@@ -2164,19 +2203,17 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
-        if invitation.status == "declined" or invitation.status == "accepted":
-            logger.warning(f"Invitation already {invitation.status.name}. No further action is possible.")
-            return Response({"message": f"Invitation already {invitation.status.name}. No further action is possible."}, status=http_status.HTTP_200_OK)
-
         new_status = data.validated_data.get("status", None)
 
         if new_status == invitation.status:
             logger.warning(f"Invitation already {new_status.name}")
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
-        does_membership_exist = ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).exists()
-        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value and not does_membership_exist:
-            ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+        if new_status.name_en == utils.InvitationStatus.ACCEPTED.value:
+            try:
+                accept_invitation(invitation)
+            except InvitationNotAcceptableError as e:
+                return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
         else:
             ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
 
@@ -2221,26 +2258,36 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
-    @transaction.atomic
     @swagger_auto_schema(
+        methods=["get", "post"],
         manual_parameters=[openapi.Parameter("token", openapi.IN_PATH, description="Token of the invitation", type=openapi.TYPE_STRING)],
         responses={
-            400: "Bad request",
-            200: "Invitations deleted successfully",
-            403: "Selected user does not have permission to delete invitations",
+            200: "HTML page: confirm form (GET) or invitation accepted (POST)",
+            400: "HTML page: invitation is not pending or has expired",
+            404: "Unknown token",
         },
     )
-    @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=["get", "post"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
     def accept(self, request, token=None):
-        invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
+        """GET shows a confirm page; only the POST from its button accepts.
 
-        serializer = ProjectInvitationAcceptSerializer(data=request.data, instance=invitation, partial=True, context={"token": token})
-        serializer.is_valid(raise_exception=True)
+        Email security scanners pre-fetch links with GET, so accepting on GET let them
+        accept invitations (and, before accepting was idempotent, add duplicate memberships).
+        """
+        invitation: ProjectInvitation = get_object_or_404(ProjectInvitation.objects.select_related("project", "group", "status"), token=token)
+        context = {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL}
 
-        invitation = serializer.save()
-        ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+        if invitation.status.name_en == utils.InvitationStatus.ACCEPTED.value:
+            return render(request, "invitation_accepted.html", context)
+        if request.method == "GET":
+            return render(request, "invitation_confirm.html", context)
 
-        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
+        try:
+            accept_invitation(invitation)
+        except InvitationNotAcceptableError as e:
+            return render(request, "invitation_not_acceptable.html", {**context, "reason": str(e)}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        return render(request, "invitation_accepted.html", context)
 
 
 # The three statuses Activity.status (api/models.py __get_status) can resolve to.
@@ -3371,27 +3418,6 @@ class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
-
-
-def generate_chart(with_value, without_value, balance):
-    # Create the bar chart
-    fig, ax = plt.subplots(figsize=(10, 4))
-    labels = ["With", "Without", "Balance"]
-    values = [with_value, without_value, balance]
-    colors = ["green" if v < 0 else "red" for v in values]
-
-    # Create horizontal bar chart
-    ax.barh(labels, values, color=colors)
-
-    # Customize the chart
-    ax.set_xlim(min(values) - 10000, max(values) + 10000)
-    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
-
-    # Save the chart
-    chart_path = os.path.join(settings.STATIC_ROOT, "images", "ghg_chart.png")
-    os.makedirs(os.path.dirname(chart_path), exist_ok=True)
-    plt.savefig(chart_path, bbox_inches="tight", dpi=300)
-    plt.close()
 
 
 class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):

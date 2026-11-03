@@ -5,7 +5,7 @@
     "fields": {
       "name": "Agroforestry - default",
       "name_en": "Agroforestry - default",
-      "name_fr": "Agroforesterie - défaut\n",
+      "name_fr": "Agroforesterie - défaut",
       "name_es": "Agroforestería - Por Defecto",
       "name_ru": "Агролесомелиорация - по умолчанию",
       "description": "",
@@ -47,7 +47,7 @@
     "fields": {
       "name": "Alley cropping",
       "name_en": "Alley cropping",
-      "name_fr": "Cultures en allées\n",
+      "name_fr": "Cultures en allées",
       "name_es": "Cultivos en fajas",
       "name_ru": "Междурядные культуры",
       "description": "",
@@ -341,7 +341,7 @@
     "fields": {
       "name": "Oil palm",
       "name_en": "Oil palm",
-      "name_fr": "Palmier à huile\n",
+      "name_fr": "Palmier à huile",
       "name_es": "Palma Aceitera",
       "name_ru": "Масличная пальма",
       "description": "",
@@ -425,7 +425,7 @@
     "fields": {
       "name": "Perennial fallow",
       "name_en": "Perennial fallow",
-      "name_fr": "Jachère pérenne\n",
+      "name_fr": "Jachère pérenne",
       "name_es": "Barbecho mejorado",
       "name_ru": "Многолетний пар",
       "description": "",
@@ -537,7 +537,7 @@
     "fields": {
       "name": "Roots And Tubers",
       "name_en": "Roots And Tubers",
-      "name_fr": "Racines et tubercules\n",
+      "name_fr": "Racines et tubercules",
       "name_es": "Raizes y Tubérculos",
       "name_ru": "Корни и клубни",
       "description": null,
@@ -593,7 +593,7 @@
     "fields": {
       "name": "Shaded perennial",
       "name_en": "Shaded perennial",
-      "name_fr": "Pérenne ombragé\n",
+      "name_fr": "Pérenne ombragé",
       "name_es": "Cultivos perennes bajo sombra",
       "name_ru": "Тенистое многолетнее растение",
       "description": "",

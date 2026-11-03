@@ -5,7 +5,7 @@
     "fields": {
       "name": "High C input, no manure",
       "name_en": "High C input, no manure",
-      "name_fr": "Apport élevé de C, sans fumier (entrées élevées)\n",
+      "name_fr": "Apport élevé de C, sans fumier (entrées élevées)",
       "name_es": "Aporte alto de carbono,  sin estiércol",
       "name_ru": "Высокий уровень поступления С, без навоза",
       "is_active": true
@@ -17,7 +17,7 @@
     "fields": {
       "name": "High C input, with manure",
       "name_en": "High C input, with manure",
-      "name_fr": "Apport élevé de C, avec fumier (entrées élevées avec fumier)\n",
+      "name_fr": "Apport élevé de C, avec fumier (entrées élevées avec fumier)",
       "name_es": "Aporte alto de carbono,  con estiércol",
       "name_ru": "Высокий уровень поступления С, с навозом",
       "is_active": true
@@ -29,7 +29,7 @@
     "fields": {
       "name": "Low C input",
       "name_en": "Low C input",
-      "name_fr": "Faible apport de C (à faible entrées)\n",
+      "name_fr": "Faible apport de C (à faible entrées)",
       "name_es": "Aporte bajo de carbono",
       "name_ru": "Низкий уротупления С",
       "is_active": true
@@ -41,7 +41,7 @@
     "fields": {
       "name": "Medium C input",
       "name_en": "Medium C input",
-      "name_fr": "Apport moyen de C (entrées moyennes)\n",
+      "name_fr": "Apport moyen de C (entrées moyennes)",
       "name_es": "Aporte medio de carbono",
       "name_ru": "Средний уровень поступления С",
       "is_active": true

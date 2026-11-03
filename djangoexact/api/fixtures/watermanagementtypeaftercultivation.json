@@ -38,8 +38,8 @@
     "fields": {
       "name": "Rainfed, Deep Water",
       "name_en": "Rainfed, Deep Water",
-      "name_fr": "Pluvial, eau profonde\n",
-      "name_es": "Alimentadas a lluvia, Aguas profundas ",
+      "name_fr": "Pluvial, eau profonde",
+      "name_es": "Alimentadas a lluvia, Aguas profundas",
       "name_ru": "Дождевое орошение, с высоким уровнем воды"
     }
   },
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Rainfed, Dry Season (Drought Prone)",
       "name_en": "Rainfed, Dry Season (Drought Prone)",
-      "name_fr": "Pluvial, saison sèche (susceptible à sècheresses)\n",
+      "name_fr": "Pluvial, saison sèche (susceptible à sècheresses)",
       "name_es": "Alimentadas a lluvia, Con tendencia a la sequía",
       "name_ru": "Дождевое орошение, сухой сезон (подвержено засухе)"
     }
@@ -60,7 +60,7 @@
     "fields": {
       "name": "Rainfed, Wet Season (Regular Rainfed)",
       "name_en": "Rainfed, Wet Season (Regular Rainfed)",
-      "name_fr": "Pluvial, saison humide (pluies régulières)\n",
+      "name_fr": "Pluvial, saison humide (pluies régulières)",
       "name_es": "Alimentadas a lluvia, Alimentación regular por lluvia",
       "name_ru": "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
     }

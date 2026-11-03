@@ -5,7 +5,7 @@
     "fields": {
       "name": "Agricultural Buildings (Concrete)",
       "name_en": "Agricultural Buildings (Concrete)",
-      "name_fr": "Bâtiments agricoles (béton)\n",
+      "name_fr": "Bâtiments agricoles (béton)",
       "name_es": "Construcciones Agrícolas (Cemento)",
       "name_ru": "Сельскохозяйственные постройки (бетон)"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Agricultural Buildings (Metal)",
       "name_en": "Agricultural Buildings (Metal)",
-      "name_fr": "Bâtiments agricoles (métal)\n",
+      "name_fr": "Bâtiments agricoles (métal)",
       "name_es": "Construcciones Agrícolas (Metal)",
       "name_ru": "Сельскохозяйственные постройки (металл)"
     }
@@ -38,7 +38,7 @@
     "fields": {
       "name": "Food Sales (Retail Or Wholesale)",
       "name_en": "Food Sales (Retail Or Wholesale)",
-      "name_fr": "Vente alimentaire (détail ou gros)\n",
+      "name_fr": "Vente alimentaire (détail ou gros)",
       "name_es": "Venta de alimentos (al por menor o al por mayor)",
       "name_ru": "Продажа продуктов питания (розничная или оптовая)"
     }
@@ -49,7 +49,7 @@
     "fields": {
       "name": "Food Service (Restaurants)",
       "name_en": "Food Service (Restaurants)",
-      "name_fr": "Service alimentaire (restaurants)\n",
+      "name_fr": "Service alimentaire (restaurants)",
       "name_es": "Servicio de Comida (Restaurantes)",
       "name_ru": "Общественное питание (рестораны)"
     }
@@ -60,7 +60,7 @@
     "fields": {
       "name": "Garage (Concrete)",
       "name_en": "Garage (Concrete)",
-      "name_fr": "Garage (béton)\n",
+      "name_fr": "Garage (béton)",
       "name_es": "Garaje (Cemento)",
       "name_ru": "Гараж (Бетон)"
     }
@@ -71,7 +71,7 @@
     "fields": {
       "name": "Garage (Metal)",
       "name_en": "Garage (Metal)",
-      "name_fr": "Garage (métal)\n",
+      "name_fr": "Garage (métal)",
       "name_es": "Garaje (Metal)",
       "name_ru": "Гараж (Металлический)"
     }
@@ -82,7 +82,7 @@
     "fields": {
       "name": "Health Care (Metal)",
       "name_en": "Health Care (Metal)",
-      "name_fr": "Soins de santé (métal)\n",
+      "name_fr": "Soins de santé (métal)",
       "name_es": "Atención Sanitaria (Metal)",
       "name_ru": "Здравоохранение (Металл)"
     }
@@ -93,7 +93,7 @@
     "fields": {
       "name": "Housing (Concrete)",
       "name_en": "Housing (Concrete)",
-      "name_fr": "Logement (béton)\n",
+      "name_fr": "Logement (béton)",
       "name_es": "Viviendas (Cemento)",
       "name_ru": "Жилье (Бетон)"
     }
@@ -104,7 +104,7 @@
     "fields": {
       "name": "Industrial Buildings (Concrete)",
       "name_en": "Industrial Buildings (Concrete)",
-      "name_fr": "Bâtiments industriels (béton)\n",
+      "name_fr": "Bâtiments industriels (béton)",
       "name_es": "Construcciones Industriales (Cemento)",
       "name_ru": "Промышленные здания (бетон)"
     }
@@ -115,7 +115,7 @@
     "fields": {
       "name": "Industrial Buildings (Metal)",
       "name_en": "Industrial Buildings (Metal)",
-      "name_fr": "Bâtiments industriels (métal)\n",
+      "name_fr": "Bâtiments industriels (métal)",
       "name_es": "Construcciones Industriales (Metal)",
       "name_ru": "Промышленные здания (металл)"
     }
@@ -126,7 +126,7 @@
     "fields": {
       "name": "Offices (Concrete)",
       "name_en": "Offices (Concrete)",
-      "name_fr": "Bureaux (béton)\n",
+      "name_fr": "Bureaux (béton)",
       "name_es": "Oficinas (Cemento)",
       "name_ru": "Офисы (бетонные)"
     }
@@ -137,7 +137,7 @@
     "fields": {
       "name": "Offices (Metal)",
       "name_en": "Offices (Metal)",
-      "name_fr": "Bureaux (métal)\n",
+      "name_fr": "Bureaux (métal)",
       "name_es": "Oficinas (Metal)",
       "name_ru": "Офисы (металлические)"
     }
@@ -148,7 +148,7 @@
     "fields": {
       "name": "Warehouse And Storage",
       "name_en": "Warehouse And Storage",
-      "name_fr": "Entrepôt et stockage\n",
+      "name_fr": "Entrepôt et stockage",
       "name_es": "Almacén y Almacenamiento",
       "name_ru": "Склад и хранение"
     }

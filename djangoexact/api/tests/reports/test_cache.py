@@ -1012,3 +1012,36 @@ class TestExtractOtherGasFromCache(unittest.TestCase):
             gas_type=GasTypes.OTHER, duration=self.DURATION,
         )
         self.assertEqual(ice, [1.0, 2.0, 3.0])
+
+
+class TestReportCacheReadableByModuleSerializer(unittest.TestCase):
+    """The module GET serializes cached_results_by_activity_by_gas, which the report
+    cache also writes. A missing "year" key used to make that GET return 500."""
+
+    def _serialize(self, cached):
+        from api.serializers import DynamicResultSerializer
+        from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+
+        return DynamicResultSerializer(cached, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
+
+    def test_report_cache_rows_carry_year_and_serialize(self):
+        from types import SimpleNamespace
+
+        from api.reports.cache import save_results_to_cache
+
+        entry = SimpleNamespace(
+            year=0, activity="Biomass", gas_type=SimpleNamespace(name="CO2"),
+            emissions=[SimpleNamespace(value=1.0), SimpleNamespace(value=2.0)],
+        )
+        module = Mock(pk=1)
+        save_results_to_cache(module, [entry], [entry], [entry], inventory=None)
+
+        cached = module.cached_results_by_activity_by_gas
+        self.assertEqual(cached["total_w"][0]["year"], 0)
+        self.assertEqual(self._serialize(cached)["total_w"][0]["emissions"], [{"value": 1.0}, {"value": 2.0}])
+
+    def test_legacy_rows_without_year_still_serialize(self):
+        row = {"activity": "Biomass", "gas_type": {"name": "CO2"}, "emissions": [{"value": 1.0}]}
+        cached = {"balance": [row], "total_w": [row], "total_wo": [row], "inventory": []}
+
+        self.assertEqual(self._serialize(cached)["total_w"][0]["year"], 0)

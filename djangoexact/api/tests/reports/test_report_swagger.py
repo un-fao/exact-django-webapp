@@ -9,4 +9,4 @@ class ReportSwaggerBodyTestCase(SimpleTestCase):
         for url in ("/projects/{id}/report/", "/projects/{id}/report/async/"):
             with self.subTest(url=url):
                 body = next(p for p in paths[url]["post"]["parameters"] if p["in"] == "body")
-                self.assertEqual(list(body["schema"]["properties"]), ["content"])
+                self.assertEqual(list(body["schema"]["properties"]), ["content", "additional_sources"])

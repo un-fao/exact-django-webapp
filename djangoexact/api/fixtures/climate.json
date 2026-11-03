@@ -21,7 +21,7 @@
     "fields": {
       "name": "Cool Temperate",
       "name_en": "Cool Temperate",
-      "name_fr": "Froid tempéré\n",
+      "name_fr": "Froid tempéré",
       "name_es": "Templado Frío",
       "name_ru": "Холодный умеренный",
       "is_active": true,
@@ -69,7 +69,7 @@
     "fields": {
       "name": "Warm Temperate",
       "name_en": "Warm Temperate",
-      "name_fr": "Chaud tempéré\n",
+      "name_fr": "Chaud tempéré",
       "name_es": "Templado Cálido",
       "name_ru": "Тёплый умеренный",
       "is_active": true,

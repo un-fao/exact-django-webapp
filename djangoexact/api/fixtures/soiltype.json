@@ -18,7 +18,7 @@
     "fields": {
       "name": "High Activity Clay",
       "name_en": "High Activity Clay",
-      "name_fr": "Argileux très actif\n",
+      "name_fr": "Argileux très actif",
       "name_es": "Arcillas de Alta Intensidad",
       "name_ru": "Высокоактивная глина",
       "active": true,
@@ -31,7 +31,7 @@
     "fields": {
       "name": "Low Activity Clay",
       "name_en": "Low Activity Clay",
-      "name_fr": "Argileux peu actif\n",
+      "name_fr": "Argileux peu actif",
       "name_es": "Arcillas de Baja Intensidad",
       "name_ru": "Глина с низкой активностью",
       "active": true,
@@ -109,7 +109,7 @@
     "fields": {
       "name": "Wetland",
       "name_en": "Wetland",
-      "name_fr": "Terres humides\n",
+      "name_fr": "Terres humides",
       "name_es": "Humedales",
       "name_ru": "Влажные земли",
       "active": true,

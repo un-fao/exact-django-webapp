@@ -7,8 +7,8 @@
       "moisture": 2,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
-      "bgb_t_dm_ha": 8.5,
-      "bgb_t_c_ha": 3.995,
+      "total_biomass_t_dm_ha": 8.5,
+      "total_biomass_t_c_ha": 3.995,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -21,8 +21,8 @@
       "moisture": 1,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
-      "bgb_t_dm_ha": 8.5,
-      "bgb_t_c_ha": 3.995,
+      "total_biomass_t_dm_ha": 8.5,
+      "total_biomass_t_c_ha": 3.995,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -35,8 +35,8 @@
       "moisture": 1,
       "agb_t_dm_ha": 1.7,
       "agb_t_c_ha": 0.799,
-      "bgb_t_dm_ha": 6.5,
-      "bgb_t_c_ha": 3.055,
+      "total_biomass_t_dm_ha": 6.5,
+      "total_biomass_t_c_ha": 3.055,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -49,8 +49,8 @@
       "moisture": 2,
       "agb_t_dm_ha": 2.4,
       "agb_t_c_ha": 1.128,
-      "bgb_t_dm_ha": 13.6,
-      "bgb_t_c_ha": 6.392,
+      "total_biomass_t_dm_ha": 13.6,
+      "total_biomass_t_c_ha": 6.392,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -63,8 +63,8 @@
       "moisture": 2,
       "agb_t_dm_ha": 2.7,
       "agb_t_c_ha": 1.269,
-      "bgb_t_dm_ha": 13.5,
-      "bgb_t_c_ha": 6.345,
+      "total_biomass_t_dm_ha": 13.5,
+      "total_biomass_t_c_ha": 6.345,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -77,8 +77,8 @@
       "moisture": 1,
       "agb_t_dm_ha": 1.6,
       "agb_t_c_ha": 0.752,
-      "bgb_t_dm_ha": 6.1,
-      "bgb_t_c_ha": 2.867,
+      "total_biomass_t_dm_ha": 6.1,
+      "total_biomass_t_c_ha": 2.867,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -91,8 +91,8 @@
       "moisture": 1,
       "agb_t_dm_ha": 2.3,
       "agb_t_c_ha": 1.081,
-      "bgb_t_dm_ha": 8.7,
-      "bgb_t_c_ha": 4.089,
+      "total_biomass_t_dm_ha": 8.7,
+      "total_biomass_t_c_ha": 4.089,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -105,8 +105,8 @@
       "moisture": 2,
       "agb_t_dm_ha": 6.2,
       "agb_t_c_ha": 2.914,
-      "bgb_t_dm_ha": 16.1,
-      "bgb_t_c_ha": 7.567,
+      "total_biomass_t_dm_ha": 16.1,
+      "total_biomass_t_c_ha": 7.567,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -119,8 +119,8 @@
       "moisture": 4,
       "agb_t_dm_ha": 6.2,
       "agb_t_c_ha": 2.914,
-      "bgb_t_dm_ha": 16.1,
-      "bgb_t_c_ha": 7.567,
+      "total_biomass_t_dm_ha": 16.1,
+      "total_biomass_t_c_ha": 7.567,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
@@ -133,8 +133,8 @@
       "moisture": 1,
       "agb_t_dm_ha": 2.3,
       "agb_t_c_ha": 1.081,
-      "bgb_t_dm_ha": 8.7,
-      "bgb_t_c_ha": 4.089,
+      "total_biomass_t_dm_ha": 8.7,
+      "total_biomass_t_c_ha": 4.089,
       "agb_t_dm_ha_min": null,
       "agb_t_dm_ha_max": null
     }
