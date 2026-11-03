@@ -15,6 +15,12 @@
 - **reports**: honour the activity filter on the synchronous PDF path (#296)
 - **reports**: print livestock head counts in the es and fr reports (#295)
 
+## 1.20.5 (2026-11-03)
+
+### Fix
+
+- **api**: count the energy baseline once in with/without totals
+
 ## 1.20.4 (2026-09-21)
 
 ### Feat
