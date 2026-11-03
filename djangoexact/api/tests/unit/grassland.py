@@ -10,6 +10,8 @@ from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice, FuzzyFloat
 import logging as log
 from api.tests.unit.utils import APITestCaseMixin
 from api import serializers
+from api.calculators import GrasslandCalculator
+from api.defaults import GrasslandDefaults
 import copy
 from . import base_module
 
@@ -118,6 +120,24 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(type(response.data) == dict)
+
+    def test_fire_uses_agb_not_total_biomass(self):
+        """IPCC 2006 Table 6.4 lists AGB and total (above + below) biomass; fire burns only AGB."""
+        agb_t_c_ha, total_t_c_ha = 0.94, 4.7
+        ipcc_models.GrasslandBiomass.objects.update_or_create(
+            climate=self.climate,
+            moisture=self.moisture,
+            defaults={"agb_t_dm_ha": 2.0, "agb_t_c_ha": agb_t_c_ha, "total_biomass_t_dm_ha": 10.0, "total_biomass_t_c_ha": total_t_c_ha},
+        )
+
+        calculator = GrasslandCalculator(self.module)
+        calculator.calculate()
+        for inputs in (calculator.inputs_w, calculator.inputs_wo):
+            self.assertEqual(inputs["agb_ref"], agb_t_c_ha)
+
+        defaults = GrasslandDefaults(self.module).get_defaults()
+        for scenario in ("start", "w", "wo"):
+            self.assertEqual(getattr(defaults, f"agb_t2_{scenario}_default"), agb_t_c_ha)
 
     def test_that_changing_grassland_management_type_changes_fi_in_defaults(self):
         self.test_get_defaults()

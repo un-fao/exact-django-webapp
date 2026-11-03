@@ -3828,16 +3828,16 @@ for i, row in df.iterrows():
     moisture = Moisture.objects.get(name__iexact=row["moisture"])
     agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
     agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
-    bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
-    bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
+    total_biomass_t_dm_ha = parse_csv_number(row["total_biomass_t_dm_ha"])
+    total_biomass_t_c_ha = parse_csv_number(row["total_biomass_t_c_ha"])
 
     print(
         climate,
         moisture,
         agb_t_dm_ha,
         agb_t_c_ha,
-        bgb_t_dm_ha,
-        bgb_t_c_ha,
+        total_biomass_t_dm_ha,
+        total_biomass_t_c_ha,
     )
 
     ipcc.GrasslandBiomass.objects.create(
@@ -3845,8 +3845,8 @@ for i, row in df.iterrows():
         moisture=moisture,
         agb_t_dm_ha=agb_t_dm_ha,
         agb_t_c_ha=agb_t_c_ha,
-        bgb_t_dm_ha=bgb_t_dm_ha,
-        bgb_t_c_ha=bgb_t_c_ha,
+        total_biomass_t_dm_ha=total_biomass_t_dm_ha,
+        total_biomass_t_c_ha=total_biomass_t_c_ha,
     )
 
 """

@@ -771,8 +771,8 @@ class GrasslandBiomass(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     agb_t_dm_ha = FloatField()
     agb_t_c_ha = FloatField()
-    bgb_t_dm_ha = FloatField()
-    bgb_t_c_ha = FloatField()
+    total_biomass_t_dm_ha = FloatField(verbose_name="Total biomass tdm/ha")
+    total_biomass_t_c_ha = FloatField(verbose_name="Total biomass tC/ha")
     agb_t_dm_ha_min = FloatField(null=True, blank=True)
     agb_t_dm_ha_max = FloatField(null=True, blank=True)
 
