@@ -2,7 +2,6 @@ from datetime import timedelta
 from unittest import mock
 
 from django.db import IntegrityError, transaction
-from django.test import modify_settings
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
@@ -16,8 +15,6 @@ def _status(value):
     return InvitationStatusType.objects.get_or_create(name=value, defaults={"name_en": value})[0]
 
 
-# DatabaseConnectionMiddleware closes every connection after a request, which breaks TestCase's per-test transaction.
-@modify_settings(MIDDLEWARE={"remove": "minitool.middleware.DatabaseConnectionMiddleware"})
 class MembershipTestBase(APITestCase):
     def setUp(self):
         self.admin_group = Group.objects.get_or_create(name="Admin")[0]
