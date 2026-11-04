@@ -292,6 +292,7 @@ def create_project_shell(project, owner):
     project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
     project_copy.is_finalized = False
+    project_copy.finalized_at = None
     project_copy.is_public = False
     project_copy.export_id = None
     project_copy.guided_step = None

@@ -23,6 +23,7 @@ import api.calculators as calculators
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
+from .cache import submodule_balance_emissions
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
 from .extractors import _add, extract_emissions
 
@@ -506,7 +507,6 @@ class EnergyReport(BaseModuleReport):
         m = self.module
         dur = self._project_duration
 
-        from api.calculators import Result
 
         electricity_co2_eq = _zeros(dur)
         liquid_fuel_co2 = _zeros(dur)
@@ -519,7 +519,7 @@ class EnergyReport(BaseModuleReport):
         for submodule in m.submodules:
             calculator = calculators.EnergyEntryCalculator(submodule)
             try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, calculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -610,7 +610,6 @@ class InputReport(BaseModuleReport):
         m = self.module
         dur = self._project_duration
 
-        from api.calculators import Result
 
         inputs_co2 = _zeros(dur)
         inputs_n2o = _zeros(dur)
@@ -620,7 +619,7 @@ class InputReport(BaseModuleReport):
         for submodule in m.submodules:
             calculator = calculators.InputEntryCalculator(submodule)
             try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, calculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -702,7 +701,6 @@ class IrrigationReport(BaseModuleReport):
         m = self.module
         dur = self._project_duration
 
-        from api.calculators import Result
 
         other_infra_co2_eq = _zeros(dur)
         lf_elec_co2 = _zeros(dur)
@@ -715,7 +713,7 @@ class IrrigationReport(BaseModuleReport):
                                else calculators.IrrigationSystemCalculator)
             calculator = CalculatorClass(submodule)
             try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, calculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -950,7 +948,6 @@ class TransportReport(BaseModuleReport):
         m = self.module
         dur = self._project_duration
 
-        from api.calculators import Result
 
         fuel_co2 = _zeros(dur)
         fuel_ch4 = _zeros(dur)
@@ -969,7 +966,7 @@ class TransportReport(BaseModuleReport):
 
             calculator = calculators.TransportEntryCalculator(submodule)
             try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, calculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -1013,7 +1010,6 @@ class ProcessingReport(BaseModuleReport):
         m = self.module
         dur = self._project_duration
 
-        from api.calculators import Result
 
         fuel_co2 = _zeros(dur)
         fuel_ch4 = _zeros(dur)
@@ -1034,7 +1030,7 @@ class ProcessingReport(BaseModuleReport):
 
             calculator = calculators.ProcessingEntryCalculator(submodule)
             try:
-                sub_es = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, calculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")

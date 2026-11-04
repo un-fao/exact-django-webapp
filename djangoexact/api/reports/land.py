@@ -17,6 +17,7 @@ import api.defaults as defaults
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
+from .cache import submodule_balance_emissions
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
 from .extractors import _add, extract_emissions
 
@@ -37,14 +38,16 @@ class LandModuleReport(BaseModuleReport):
             self.module.activity.implementation_years
             + self.module.activity.capitalization_years
         )
-        # Snapshot whether cached units exist BEFORE base __post_init__ decides the path
+        super().__post_init__()  # dispatches to _init_from_cache or _init_from_calculator
+
+        # Units come from the same source as the emissions (live cache or, for a finalized
+        # project, its frozen snapshot), never from a cache the calculator path just wrote.
+        cache_result = self._cache_result
         _cached_units = (
-            self.module.cached_units_breakdown
-            if self.module.is_cached_results_valid()
+            {"w": cache_result.units_breakdown_w, "wo": cache_result.units_breakdown_wo}
+            if cache_result is not None and cache_result.units_breakdown_w is not None
             else None
         )
-
-        super().__post_init__()  # dispatches to _init_from_cache or _init_from_calculator
 
         if self._from_cache and _cached_units is not None:
             # ── Full cache hit ──────────────────────────────────────────────────
@@ -1112,7 +1115,6 @@ class SettlementReport(LandModuleReport):
         super().__post_init__()
 
     def _compute_submodule_emissions(self, dur: int):
-        from api.calculators import Result
 
         buildings_co2 = [0.0] * dur
         roads_co2 = [0.0] * dur
@@ -1127,7 +1129,7 @@ class SettlementReport(LandModuleReport):
                 else calculators.BuildingCalculator
             )
             try:
-                sub_es = Result(*CalculatorClass(submodule).calculate()).balance.yearly_emissions_by_sector_by_gas
+                sub_es = submodule_balance_emissions(submodule, CalculatorClass(submodule))
             except Exception as e:
                 log.error(f"Cannot calculate submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate submodule {submodule.module_type.name}: {e}")

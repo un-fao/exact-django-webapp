@@ -396,6 +396,7 @@ class TestRowSumEqualsBalanceTotal(unittest.TestCase):
             "inventory": [],
         }
         module = Mock()
+        module.project.is_finalized = False
         module.is_cached_results_valid.return_value = True
         module.cached_results_by_activity_by_gas = cached
         module.cached_units_breakdown = {"w": [0.0] * self.DURATION, "wo": [0.0] * self.DURATION}
