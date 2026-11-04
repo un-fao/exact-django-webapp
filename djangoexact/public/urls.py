@@ -30,6 +30,7 @@ router.register(r"livestocks", public_views.generic_public_module_viewset(api_mo
 router.register(r"forest-managements", public_views.generic_public_module_viewset(api_models.ForestManagement), basename="forestmanagement")
 router.register(r"forest-disturbances", public_views.generic_public_module_viewset(api_models.ForestDisturbance), basename="forestdisturbance")
 router.register(r"waterbodies", public_views.generic_public_module_viewset(api_models.Waterbody), basename="waterbody")
+router.register(r"solid-waste", public_views.generic_public_module_viewset(api_models.SolidWaste), basename="solidwaste")
 router.register(r"settlements", public_views.generic_public_module_viewset(api_models.Settlement), basename="settlement")
 router.register(r"buildings", public_views.generic_public_module_viewset(api_models.Building), basename="building")
 router.register(r"roads", public_views.generic_public_module_viewset(api_models.Road), basename="road")

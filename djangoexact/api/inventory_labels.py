@@ -22,6 +22,11 @@ DEFAULT_LABELS = {
     "Coastal Waterbodies": "Waterbody emissions (CH4)",
     "Flooded Land CH4": "Flooded land, reservoir CH4 (CRT 4.D, table 4(II))",
     "Flooded Land CO2": "Land converted to flooded land, reservoir CO2 (CRT 4.D.2)",
+    "Solid Waste Disposal": "Solid waste disposal (CRT 5.A)",
+    "Composting": "Composting (CRT 5.B.1)",
+    "Anaerobic Digestion": "Anaerobic digestion at biogas facilities (CRT 5.B.2)",
+    "Waste Incineration": "Waste incineration (CRT 5.C.1)",
+    "Open Burning of Waste": "Open burning of waste (CRT 5.C.2)",
 }
 
 MODULE_OVERRIDES = {

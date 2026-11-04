@@ -302,6 +302,7 @@ class BaseActivityReport:
             total_emissions_wo=total_emissions_wo,
             conditionality=self.activity.conditionality,
             _module_reports=module_reports,
+            _activity=self.activity,
         )
 
     def _t2_overrides(self) -> list[T2Override]:
@@ -373,6 +374,7 @@ class BaseProjectReport:
         cumulative_catch = self._build_cumulative_catch(activity_results)
         shadow_rows, nominal_spcs, extra_spcs = self._build_shadow_price_data(aggregated)
         inventory_items = self._build_inventory_items(activity_results)
+        indicators = self._build_indicators(activity_results)
 
         return ProjectResult(
             project=self.project,
@@ -389,7 +391,17 @@ class BaseProjectReport:
             extra_shadow_prices=extra_spcs,
             inventory_items=inventory_items,
             frozen_indicators=self.frozen.indicators() if self.frozen else None,
+            indicators=indicators,
         )
+
+    def _build_indicators(self, activity_results: list[ActivityResult]) -> dict | None:
+        from api.services import indicators
+
+        try:
+            return indicators.build(self.project, activity_results)
+        except Exception as e:
+            log.warning(f"Could not compute indicators for project {self.project.pk}: {e}")
+            return None
 
     def _build_aggregated(self, activity_results: list[ActivityResult]) -> EmissionsAggregator:
         return self._build_aggregated_from_module_emissions(activity_results)
