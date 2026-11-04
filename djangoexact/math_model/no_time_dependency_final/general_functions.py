@@ -23,20 +23,13 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
 
     # Exponential case
     if function == "exponential":
-        # NOTE: the function is y = b + a * e^(kx) where k = -0.519349 this was calculated as the integral between 0 and 1 of a*e^(bx) = 0.78
-        # where 0.78 was selected from the exact team, as it shows natural decay
-
-        if start_value < end_value:
-            k = -0.519349
-            a = end_value / (math.exp(k * years_implementation) - 1)
-            b = start_value - a
-            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
-        else:
-            # NOTE: We switch end and start values as we want the same decay as above but in the opposite direction
-            k = -0.519349
-            a = start_value / (math.exp(k * years_implementation) - 1)
-            b = end_value - a
-            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
+        # EX-ACT V9.4 Excel ("list" sheet) gives the exponential dynamic a coefficient of 0.78: the mean share of
+        # the start-to-end change reached over the implementation period (linear 0.5, immediate 1). On normalised time
+        # tau = t / T, the share (1 - e^(c * tau)) / (1 - e^c) has area 0.78 on [0, 1] for c = -4.270296, for any T.
+        c = -4.270296
+        shares = [(1 - math.exp(c * (i / years_implementation))) / (1 - math.exp(c)) for i in range(years_implementation + 1)]
+        # Written as a weighted mix so that share 0 and share 1 return start_value and end_value exactly.
+        yearly_breakdown = [start_value * (1 - s) + end_value * s for s in shares]
 
         yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
