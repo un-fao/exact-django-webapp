@@ -206,13 +206,11 @@ class TestProjectSummary(unittest.TestCase):
     def test_results_sheet_rows(self):
         renderer = ExcelRenderer.__new__(ExcelRenderer)
         renderer.result = SimpleNamespace(
-            aggregated=self.agg, start_year=2020, last_year=2020 + DURATION,
-            cumulative_hectares_yearly=[], cumulative_heads_yearly=[], cumulative_catch_yearly=[],
+            aggregated=self.agg, start_year=2020, last_year=2020 + DURATION, duration=DURATION, activity_results=[],
         )
         wb = openpyxl.Workbook()
-        wb.active.title = "Results"
-        renderer._write_results_summary(wb)
-        ws = wb["Results"]
+        ws = wb.active
+        renderer._write_results_sheet(ws, "", "balance")
         for offset, (_, attr) in enumerate(SUMMARY_CATEGORY_ROWS):
             self.assertEqual(ws.cell(ROW_FIRST_CATEGORY + offset, 2).value, getattr(self.agg, attr)[0])
         category_sum = sum(ws.cell(row, 2).value for row in range(ROW_FIRST_CATEGORY, ROW_CUMULATIVE_HECTARES))

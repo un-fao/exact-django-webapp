@@ -136,7 +136,7 @@ class LandGroupsTests(TestCase):
 
 
 class ExcelSheetTests(SimpleTestCase):
-    EXISTING_SHEETS = ["Results", "Metadata", "Additional Indicators", "Shadow Price of Carbon", "Inventory"]
+    EXISTING_SHEETS = ["Results", "Results - With", "Results - Without", "Metadata", "Additional Indicators", "Shadow Price of Carbon", "Inventory"]
 
     def test_indicators_sheet_is_appended_after_existing_sheets(self):
         data = {"groups": [

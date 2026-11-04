@@ -52,6 +52,7 @@ class TestComputeWithScenarios(unittest.TestCase):
         from api.reports.base import BaseModuleReport
 
         module = Mock()
+        module.project.is_finalized = False
         module.is_cached_results_valid.return_value = True
         module.cached_results_by_activity_by_gas = {
             "balance": self.BALANCE,
@@ -129,6 +130,7 @@ def _project_result():
     project = SimpleNamespace(
         name="P", status=named, country=named, climate=named, moisture=named,
         soil_type=named, implementation_years=2, capitalization_years=1, gwp=gwp,
+        analysis_purpose=None, project_phase=None,
     )
     return ProjectResult(
         project=project, start_year=2020, last_year=2020 + DURATION, duration=DURATION,

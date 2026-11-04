@@ -15,7 +15,8 @@ from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from api.models import Activity, AnalysisPurpose, Climate, Country, Group, Moisture, Project, ProjectMembership, ProjectPhase, SoilType
-from api.reports.data_types import ActivityResult
+from api.reports.constants import ROW_NDC_FIRST
+from api.reports.data_types import ActivityResult, EmissionsAggregator
 from api.reports.renderer import ExcelRenderer
 from api.serializers import ActivityResultSerializer, ActivitySummarySerializer, ProjectExportSerializer, ReadProjectSerializer, WriteActivitySerializer
 from api.services.conditionality_results import aggregate_by_conditionality
@@ -239,7 +240,10 @@ class ExcelReportTests(SimpleTestCase):
         })
         if purpose:
             project.analysis_purpose.name = purpose
-        result = mock.Mock(project=project, start_year=2024, last_year=2024 + self.DURATION, duration=self.DURATION)
+        result = mock.Mock(
+            project=project, start_year=2024, last_year=2024 + self.DURATION, duration=self.DURATION,
+            aggregated=EmissionsAggregator(duration=self.DURATION),
+        )
         result.activity_results = [
             ActivityResult(title=f"A{i}", module_results=[], total_emissions=[1.0, 2.0, 3.0], total_hectares_yearly=[], conditionality=c)
             for i, c in enumerate(conditionalities)
@@ -250,6 +254,7 @@ class ExcelReportTests(SimpleTestCase):
         renderer._write_conditionality_summary(wb)
         for ar in result.activity_results:
             renderer._write_activity(wb, ar)
+        renderer._write_results_sheet(wb["Results"], "", "balance")
         return wb
 
     def test_metadata_rows(self):
@@ -259,16 +264,16 @@ class ExcelReportTests(SimpleTestCase):
 
     def test_results_layout_unchanged_without_conditionality(self):
         wb = self.render([None, None])
-        self.assertEqual(wb["Results"].cell(15, 1).value, "A0")
+        self.assertEqual(wb["Results"].cell(ROW_NDC_FIRST, 1).value, "A0")
         labels = [c.value for c in wb["Metadata"]["A"]]
         self.assertNotIn("NDC conditionality", labels)
 
     def test_results_split_by_conditionality(self):
         wb = self.render(["unconditional", "conditional", None, "unconditional"])
         res = wb["Results"]
-        rows = {res.cell(r, 1).value: [res.cell(r, c).value for c in range(2, 2 + self.DURATION)] for r in range(15, 21)}
+        rows = {res.cell(r, 1).value: [res.cell(r, c).value for c in range(2, 2 + self.DURATION)] for r in range(ROW_NDC_FIRST, ROW_NDC_FIRST + 6)}
         self.assertEqual(rows["Unconditional - cumulative balance in Tco2-eq"], [2.0, 6.0, 12.0])
         self.assertEqual(rows["Conditional - yearly balance in Tco2-eq"], [1.0, 2.0, 3.0])
         self.assertEqual(rows["Not specified - cumulative balance in Tco2-eq"], [1.0, 3.0, 6.0])
-        self.assertEqual(res.cell(21, 1).value, "A0")
+        self.assertEqual(res.cell(ROW_NDC_FIRST + 6, 1).value, "A0")
         self.assertIn("NDC conditionality", [c.value for c in wb["Metadata"]["A"]])
