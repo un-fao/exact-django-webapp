@@ -299,6 +299,7 @@ class BaseActivityReport:
             t2_overrides=t2_overrides,
             total_emissions_w=total_emissions_w,
             total_emissions_wo=total_emissions_wo,
+            conditionality=self.activity.conditionality,
             _module_reports=module_reports,
         )
 

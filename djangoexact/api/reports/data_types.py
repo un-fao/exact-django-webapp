@@ -103,6 +103,7 @@ class ActivityResult:
     t2_overrides: list[T2Override] = field(default_factory=list)
     total_emissions_w: list[float] = field(default_factory=list)
     total_emissions_wo: list[float] = field(default_factory=list)
+    conditionality: str | None = None
 
     # Internal: module report instances carrying emissions_set / _w / _wo.
     # Used by BaseProjectReport._build_aggregated_from_module_emissions()
