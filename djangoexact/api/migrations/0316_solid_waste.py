@@ -37,7 +37,7 @@ def remove_module_type(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0315_organic_soil_peat_quantity_water_table"),
+        ("api", "0315_organic_soil_water_table_class"),
         ("ipcc", "0072_solid_waste"),
     ]
 

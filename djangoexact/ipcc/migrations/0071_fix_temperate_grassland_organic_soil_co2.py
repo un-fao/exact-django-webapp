@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("ipcc", "0070_trophicstatefactor_ipcc_recommended_values"),
-        ("api", "0315_organic_soil_peat_quantity_water_table"),
+        ("api", "0315_organic_soil_water_table_class"),
     ]
 
     operations = [
