@@ -20,6 +20,8 @@ DEFAULT_LABELS = {
     "Refrigerant": "Refrigerant emissions (CO2-eq)",
     "Ice": "Ice emissions (CO2-eq)",
     "Coastal Waterbodies": "Waterbody emissions (CH4)",
+    "Flooded Land CH4": "Flooded land, reservoir CH4 (CRT 4.D, table 4(II))",
+    "Flooded Land CO2": "Land converted to flooded land, reservoir CO2 (CRT 4.D.2)",
 }
 
 MODULE_OVERRIDES = {

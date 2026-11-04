@@ -2814,7 +2814,8 @@ MODULE_CONFIGS = {
     },
     "Waterbody": {
         "fields": {
-            "waterbody_type": models.WaterbodyType.objects.all(),
+            # ponytail: reservoirs need an age axis the minitool grid does not have; add one if the minitool covers them.
+            "waterbody_type": models.WaterbodyType.objects.filter(is_reservoir=False),
             "trophic_type_start": models.TrophicType.objects.all(),
             "trophic_type_w": models.TrophicType.objects.all(),
         },
