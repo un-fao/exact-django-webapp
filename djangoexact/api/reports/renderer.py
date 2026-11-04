@@ -27,18 +27,13 @@ from .constants import (
     META_COL_WITHOUT,
     META_ROW_ANALYSIS_PURPOSE,
     META_ROW_PROJECT_PHASE,
-    ROW_BIOMASS_CO2,
-    ROW_CH4,
     ROW_CUMULATIVE_BALANCE,
     ROW_CUMULATIVE_HECTARES,
     ROW_CUMULATIVE_HEADS,
     ROW_CUMULATIVE_CATCH,
+    ROW_FIRST_CATEGORY,
     ROW_HEADER_YEARS,
-    ROW_N2O,
     ROW_NDC_FIRST,
-    ROW_OTHER_CO2,
-    ROW_OTHER_GHGS,
-    ROW_SOIL_CO2,
     ROW_YEARLY_BALANCE,
     ROW_YEARLY_FLUX_W,
     ROW_YEARLY_FLUX_WO,
@@ -51,6 +46,7 @@ from .constants import (
     SPC_ROW_WO,
     SPC_ROW_WO_HIGH,
     SPC_ROW_WO_LOW,
+    SUMMARY_CATEGORY_ROWS,
     SPC_ROW_YEAR,
     WS_ADDITIONAL_INDICATORS,
     WS_INVENTORY,
@@ -114,11 +110,11 @@ class ExcelRenderer:
         ws_ai = wb[WS_ADDITIONAL_INDICATORS]
         ws_inv = wb[WS_INVENTORY]
 
-        # Balance-only Results rows; rows 1-9 are written by _write_results_sheet.
+        # Balance-only Results rows; the header and category rows are written by _write_results_sheet.
         # They must exist before the activity blocks, which start at max_row + 1.
-        ws_res.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
-        ws_res.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
-        ws_res.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_CUMULATIVE_HEADS, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
+        ws_res.cell(row=ROW_CUMULATIVE_CATCH, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
         ws_res.cell(row=ROW_YEARLY_FLUX_WO, column=1, value="Yearly flux - without (tCO2-eq)")
         ws_res.cell(row=ROW_YEARLY_FLUX_W, column=1, value="Yearly flux - with (tCO2-eq)")
 
@@ -191,7 +187,7 @@ class ExcelRenderer:
         row = ROW_NDC_FIRST
         for kind in ("Cumulative", "Yearly"):
             for key, label in groups:
-                values = list(np.cumsum(yearly[key])) if kind == "Cumulative" else yearly[key]
+                values = list(accumulate(yearly[key])) if kind == "Cumulative" else yearly[key]
                 ws_res.cell(row=row, column=1, value=f"{label} - {kind.lower()} balance in Tco2-eq").fill = _ORANGE
                 for i, v in enumerate(values):
                     ws_res.cell(row=row, column=i + DATA_COL_START, value=float(v))
@@ -256,7 +252,7 @@ class ExcelRenderer:
     def _write_results_sheet(
         self, ws: pxl.worksheet.worksheet.Worksheet, suffix: str, total_label: str
     ) -> None:
-        """Write rows 1-9 and the activity/module blocks of a Results-shaped sheet.
+        """Write the header and category rows and the activity/module blocks of a Results-shaped sheet.
 
         ``suffix`` selects the data: "" is the balance, "_w" / "_wo" are the
         absolute fluxes of the with / without scenario. One writer for all three
@@ -266,21 +262,17 @@ class ExcelRenderer:
         agg = r.aggregated
         dur = r.duration
 
-        gas_rows = [
-            (ROW_BIOMASS_CO2, "CO2 in biomass", getattr(agg, "biomass_co2" + suffix)),
-            (ROW_SOIL_CO2, "CO2 in soils", getattr(agg, "soil_co2" + suffix)),
-            (ROW_OTHER_CO2, "Other CO2", getattr(agg, "other_co2" + suffix)),
-            (ROW_CH4, "CH4", getattr(agg, "ch4" + suffix)),
-            (ROW_N2O, "N20", getattr(agg, "n2o" + suffix)),
-            (ROW_OTHER_GHGS, "Other GHGs", getattr(agg, "other_ghgs" + suffix)),
+        category_rows = [
+            (ROW_FIRST_CATEGORY + offset, label, getattr(agg, attr + suffix))
+            for offset, (label, attr) in enumerate(SUMMARY_CATEGORY_ROWS)
         ]
-        yearly = list(map(sum, zip_longest(*(vals for _, _, vals in gas_rows), fillvalue=0)))
+        yearly = list(map(sum, zip_longest(*(vals for _, _, vals in category_rows), fillvalue=0)))
         cumulative = list(accumulate(yearly))
 
         ws.cell(row=ROW_HEADER_YEARS, column=1, value="Activity and GHGs / Years")
         ws.cell(row=ROW_CUMULATIVE_BALANCE, column=1, value=f"Cumulative {total_label} in Tco2-eq")
         ws.cell(row=ROW_YEARLY_BALANCE, column=1, value=f"Yearly {total_label} in Tco2-eq")
-        for row, label, _ in gas_rows:
+        for row, label, _ in category_rows:
             ws.cell(row=row, column=1, value=label)
 
         for i, year in enumerate(range(r.start_year, r.last_year)):
@@ -288,7 +280,7 @@ class ExcelRenderer:
             ws.cell(row=ROW_HEADER_YEARS, column=col, value=year)
             ws.cell(row=ROW_CUMULATIVE_BALANCE, column=col, value=cumulative[i])
             ws.cell(row=ROW_YEARLY_BALANCE, column=col, value=yearly[i])
-            for row, _, vals in gas_rows:
+            for row, _, vals in category_rows:
                 ws.cell(row=row, column=col, value=vals[i])
 
         for ar in r.activity_results:
@@ -332,7 +324,7 @@ class ExcelRenderer:
                 cell.fill = _FILL_MAP.get(mw.fill, _BEIGE)
 
     # -------------------------------------------------------------------------
-    # Balance-only summary (Results rows 10-14)
+    # Balance-only summary (Results rows below the categories)
     # -------------------------------------------------------------------------
 
     def _write_results_summary(self, wb: pxl.Workbook) -> None:
