@@ -20,7 +20,7 @@ def invalidate_forest_rotation_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0296_projectmembership_unique_user_project"),
+        ("api", "0305_invalidate_exponential_change_rate_caches"),
     ]
 
     operations = [

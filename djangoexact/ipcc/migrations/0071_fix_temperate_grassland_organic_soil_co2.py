@@ -39,8 +39,8 @@ def swap_co2(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipcc", "0067_globalwarmingpotential_ch4_fossil_reference_values"),
-        ("api", "0297_organic_soil_peat_quantity_water_table"),
+        ("ipcc", "0070_trophicstatefactor_ipcc_recommended_values"),
+        ("api", "0315_organic_soil_peat_quantity_water_table"),
     ]
 
     operations = [

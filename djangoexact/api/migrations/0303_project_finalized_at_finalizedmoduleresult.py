@@ -75,8 +75,8 @@ def drop_immutability_triggers(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0296_projectmembership_unique_user_project'),
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("api", "0302_merge_hotfix_1_20_5"),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [

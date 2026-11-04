@@ -20,8 +20,8 @@ def unset_recommended(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipcc", "0068_reservoir_emission_factors"),
-        ("api", "0297_waterbody_reservoir"),
+        ("ipcc", "0069_reservoir_emission_factors"),
+        ("api", "0310_waterbody_reservoir"),
     ]
 
     operations = [

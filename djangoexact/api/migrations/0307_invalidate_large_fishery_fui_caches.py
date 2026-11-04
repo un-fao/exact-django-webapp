@@ -17,7 +17,7 @@ def invalidate_large_fishery_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0296_projectmembership_unique_user_project"),
+        ("api", "0306_invalidate_forest_rotation_caches"),
     ]
 
     operations = [

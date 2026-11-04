@@ -24,7 +24,7 @@ def invalidate_exponential_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0296_projectmembership_unique_user_project"),
+        ("api", "0304_finalizedreportdata"),
     ]
 
     operations = [

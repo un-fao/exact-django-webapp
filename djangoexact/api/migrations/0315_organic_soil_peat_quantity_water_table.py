@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0296_projectmembership_unique_user_project'),
+        ("api", "0314_ndc_framing"),
     ]
 
     operations = [

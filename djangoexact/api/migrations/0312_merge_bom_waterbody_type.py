@@ -33,8 +33,8 @@ def merge_bom_waterbody_types(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0298_invalidate_waterbody_caches"),
-        ("ipcc", "0069_trophicstatefactor_ipcc_recommended_values"),
+        ("api", "0311_invalidate_waterbody_caches"),
+        ("ipcc", "0070_trophicstatefactor_ipcc_recommended_values"),
     ]
 
     operations = [

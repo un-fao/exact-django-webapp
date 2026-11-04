@@ -45,8 +45,8 @@ def add_factors(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0297_waterbody_reservoir'),
-        ('ipcc', '0067_globalwarmingpotential_ch4_fossil_reference_values'),
+        ("ipcc", "0068_grasslandbiomass_total_biomass"),
+        ("api", "0310_waterbody_reservoir"),
     ]
 
     operations = [

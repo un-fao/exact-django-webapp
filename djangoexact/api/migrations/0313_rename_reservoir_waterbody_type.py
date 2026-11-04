@@ -29,7 +29,7 @@ def unrename(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0299_merge_bom_waterbody_type"),
+        ("api", "0312_merge_bom_waterbody_type"),
     ]
 
     operations = [

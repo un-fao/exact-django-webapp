@@ -12,7 +12,7 @@ from api.tests.factories import ActivityFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import GasTypes
 
-cache_migration = import_module("api.migrations.0299_invalidate_input_caches_project_gwp")
+cache_migration = import_module("api.migrations.0309_invalidate_input_caches_project_gwp")
 
 SYNTHETIC_N = "Synthetic N-Fertilizers Other Than Urea"
 AR5 = "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"

@@ -92,7 +92,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
         ipcc_models.OtherConstructedWaterbodiesEmissionFactor.objects.create(waterbody_type=dup, climate=ef.climate, moisture=ef.moisture, value=1)
         models.Waterbody.objects.filter(pk=self.module.pk).update(waterbody_type=dup)
 
-        import_module("api.migrations.0299_merge_bom_waterbody_type").merge_bom_waterbody_types(django_apps, None)
+        import_module("api.migrations.0312_merge_bom_waterbody_type").merge_bom_waterbody_types(django_apps, None)
 
         self.module.refresh_from_db()
         self.assertEqual(self.module.waterbody_type_id, clean.pk)

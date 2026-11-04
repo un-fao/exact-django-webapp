@@ -73,8 +73,7 @@ def add_reference_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0296_projectmembership_unique_user_project'),
-        ('ipcc', '0067_globalwarmingpotential_ch4_fossil_reference_values'),
+        ("ipcc", "0071_fix_temperate_grassland_organic_soil_co2"),
     ]
 
     operations = [

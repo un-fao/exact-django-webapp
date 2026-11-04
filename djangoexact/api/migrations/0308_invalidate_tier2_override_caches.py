@@ -62,7 +62,7 @@ def invalidate_tier2_override_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0296_projectmembership_unique_user_project"),
+        ("api", "0307_invalidate_large_fishery_fui_caches"),
     ]
 
     operations = [

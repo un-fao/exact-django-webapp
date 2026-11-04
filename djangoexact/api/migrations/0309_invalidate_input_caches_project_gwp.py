@@ -28,8 +28,7 @@ def invalidate_input_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0298_translate_projectstatus_and_moduletype_names"),
-        ("ipcc", "0067_globalwarmingpotential_ch4_fossil_reference_values"),
+        ("api", "0308_invalidate_tier2_override_caches"),
     ]
 
     operations = [

@@ -25,7 +25,7 @@ def remove_reservoir_type(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0296_projectmembership_unique_user_project'),
+        ("api", "0309_invalidate_input_caches_project_gwp"),
     ]
 
     operations = [

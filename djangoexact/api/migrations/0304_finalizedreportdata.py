@@ -49,8 +49,8 @@ def drop_triggers(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0297_project_finalized_at_finalizedmoduleresult'),
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("api", "0303_project_finalized_at_finalizedmoduleresult"),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [

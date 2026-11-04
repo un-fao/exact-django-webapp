@@ -17,7 +17,7 @@ def invalidate_waterbody_caches(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0297_waterbody_reservoir"),
+        ("api", "0310_waterbody_reservoir"),
     ]
 
     operations = [
