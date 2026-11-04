@@ -360,47 +360,6 @@ class ForestManagement(BaseModule):
                         )
                     )
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay
-                        )
-                    )
-                    self.result.yearly_emissions_by_sector_by_gas.append(
-                        YearlyGasActivityEmissionSet(
-                            year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay
-                        )
-                    )
-
                     self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.HWP_ROTATION_AGB))
                     self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.CO2, 0, ActivityTypes.HWP_ROTATION_BGB))
                     self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasPerActivity(GasTypes.N2O, 0, ActivityTypes.ROTATION_AGB))
