@@ -65,6 +65,8 @@ class _FakeReport:
     def compute(self):
         return self._module._result
 
+    compute_with_scenarios = compute
+
 
 def _activity(modules):
     activity = MagicMock(

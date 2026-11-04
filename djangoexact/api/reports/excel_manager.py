@@ -18,6 +18,8 @@ class ExcelFileManager:
         """Create the skeleton openpyxl workbook with required worksheets."""
         wb = pxl.Workbook()
         wb.active.title = "Results"
+        wb.create_sheet("Results - With")
+        wb.create_sheet("Results - Without")
         wb.create_sheet("Metadata")
         ai_ws = wb.create_sheet("Additional Indicators")
         wb.create_sheet("Shadow Price of Carbon")

@@ -6,9 +6,8 @@ from __future__ import annotations
 
 import logging as log
 from datetime import datetime
-from itertools import zip_longest
+from itertools import accumulate, zip_longest
 
-import numpy as np
 import openpyxl as pxl
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
@@ -32,6 +31,7 @@ from .constants import (
     ROW_CUMULATIVE_HECTARES,
     ROW_CUMULATIVE_HEADS,
     ROW_CUMULATIVE_CATCH,
+    ROW_HEADER_YEARS,
     ROW_N2O,
     ROW_OTHER_CO2,
     ROW_OTHER_GHGS,
@@ -53,9 +53,11 @@ from .constants import (
     WS_INVENTORY,
     WS_METADATA,
     WS_RESULTS,
+    WS_RESULTS_WITH,
+    WS_RESULTS_WITHOUT,
     WS_SHADOW_PRICE,
 )
-from .data_types import ActivityResult, ModuleResult, ProjectResult
+from .data_types import ActivityResult, ModuleResult, ProjectResult, ResultRow
 from .excel_manager import ExcelFileManager
 
 _ORANGE = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
@@ -87,6 +89,9 @@ class ExcelRenderer:
         for activity_result in self.result.activity_results:
             self._write_activity(wb, activity_result)
 
+        self._write_results_sheet(wb[WS_RESULTS], "", "balance")
+        self._write_results_sheet(wb[WS_RESULTS_WITH], "_w", "flux")
+        self._write_results_sheet(wb[WS_RESULTS_WITHOUT], "_wo", "flux")
         self._write_results_summary(wb)
         self._write_shadow_price(wb)
         self._write_inventory(wb)
@@ -105,24 +110,13 @@ class ExcelRenderer:
         ws_ai = wb[WS_ADDITIONAL_INDICATORS]
         ws_inv = wb[WS_INVENTORY]
 
-        # Results headers
-        ws_res.cell(row=1, column=1, value="Activity and GHGs / Years")
-        ws_res.cell(row=2, column=1, value="Cumulative balance in Tco2-eq")
-        ws_res.cell(row=3, column=1, value="Yearly balance in Tco2-eq")
-        ws_res.cell(row=4, column=1, value="CO2 in biomass")
-        ws_res.cell(row=5, column=1, value="CO2 in soils")
-        ws_res.cell(row=6, column=1, value="Other CO2")
-        ws_res.cell(row=7, column=1, value="CH4")
-        ws_res.cell(row=8, column=1, value="N20")
-        ws_res.cell(row=9, column=1, value="Other GHGs")
+        # Balance-only Results rows; rows 1-9 are written by _write_results_sheet.
+        # They must exist before the activity blocks, which start at max_row + 1.
         ws_res.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = _ORANGE
         ws_res.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = _ORANGE
         ws_res.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = _ORANGE
         ws_res.cell(row=ROW_YEARLY_FLUX_WO, column=1, value="Yearly flux - without (tCO2-eq)")
         ws_res.cell(row=ROW_YEARLY_FLUX_W, column=1, value="Yearly flux - with (tCO2-eq)")
-
-        for i, year in enumerate(range(r.start_year, r.last_year)):
-            ws_res.cell(row=1, column=i + DATA_COL_START, value=year)
 
         # Metadata headers
         ws_meta.cell(row=1, column=1, value="Report download date")
@@ -180,14 +174,9 @@ class ExcelRenderer:
     # -------------------------------------------------------------------------
 
     def _write_activity(self, wb: pxl.Workbook, ar: ActivityResult) -> None:
-        ws_res = wb[WS_RESULTS]
         ws_meta = wb[WS_METADATA]
         ws_ai = wb[WS_ADDITIONAL_INDICATORS]
         dur = self.result.duration
-
-        # Results: activity title row (values filled after modules)
-        activity_row = ws_res.max_row + 1
-        ws_res.cell(row=activity_row, column=1, value=str(ar.title)).fill = _ORANGE
 
         # Metadata: activity title + T2 overrides
         meta_row = ws_meta.max_row + 1
@@ -211,7 +200,6 @@ class ExcelRenderer:
 
         # Write modules
         for mr in ar.module_results:
-            self._write_module_results(ws_res, mr, dur)
             self._write_module_metadata(ws_meta, mr)
 
             # Additional Indicators: replicate original insert_rows logic.
@@ -233,26 +221,67 @@ class ExcelRenderer:
                     ws_ai.cell(wo_row + 1, i + DATA_COL_START, v)
                 # wo_row does NOT change: next insert also goes right after "Without project"
 
-        # Results: write total_emissions values on the activity title row
-        for i in range(dur):
-            v = ar.total_emissions[i] if i < len(ar.total_emissions) else 0
-            ws_res.cell(row=activity_row, column=i + DATA_COL_START, value=v).fill = _BEIGE
+    def _write_results_sheet(
+        self, ws: pxl.worksheet.worksheet.Worksheet, suffix: str, total_label: str
+    ) -> None:
+        """Write rows 1-9 and the activity/module blocks of a Results-shaped sheet.
+
+        ``suffix`` selects the data: "" is the balance, "_w" / "_wo" are the
+        absolute fluxes of the with / without scenario. One writer for all three
+        keeps their layouts identical.
+        """
+        r = self.result
+        agg = r.aggregated
+        dur = r.duration
+
+        gas_rows = [
+            (ROW_BIOMASS_CO2, "CO2 in biomass", getattr(agg, "biomass_co2" + suffix)),
+            (ROW_SOIL_CO2, "CO2 in soils", getattr(agg, "soil_co2" + suffix)),
+            (ROW_OTHER_CO2, "Other CO2", getattr(agg, "other_co2" + suffix)),
+            (ROW_CH4, "CH4", getattr(agg, "ch4" + suffix)),
+            (ROW_N2O, "N20", getattr(agg, "n2o" + suffix)),
+            (ROW_OTHER_GHGS, "Other GHGs", getattr(agg, "other_ghgs" + suffix)),
+        ]
+        yearly = list(map(sum, zip_longest(*(vals for _, _, vals in gas_rows), fillvalue=0)))
+        cumulative = list(accumulate(yearly))
+
+        ws.cell(row=ROW_HEADER_YEARS, column=1, value="Activity and GHGs / Years")
+        ws.cell(row=ROW_CUMULATIVE_BALANCE, column=1, value=f"Cumulative {total_label} in Tco2-eq")
+        ws.cell(row=ROW_YEARLY_BALANCE, column=1, value=f"Yearly {total_label} in Tco2-eq")
+        for row, label, _ in gas_rows:
+            ws.cell(row=row, column=1, value=label)
+
+        for i, year in enumerate(range(r.start_year, r.last_year)):
+            col = i + DATA_COL_START
+            ws.cell(row=ROW_HEADER_YEARS, column=col, value=year)
+            ws.cell(row=ROW_CUMULATIVE_BALANCE, column=col, value=cumulative[i])
+            ws.cell(row=ROW_YEARLY_BALANCE, column=col, value=yearly[i])
+            for row, _, vals in gas_rows:
+                ws.cell(row=row, column=col, value=vals[i])
+
+        for ar in r.activity_results:
+            activity_row = ws.max_row + 1
+            ws.cell(row=activity_row, column=1, value=str(ar.title)).fill = _ORANGE
+            for mr in ar.module_results:
+                self._write_module_results(ws, mr.title, getattr(mr, "result_rows" + suffix), dur)
+            totals = getattr(ar, "total_emissions" + suffix)
+            for i in range(dur):
+                v = totals[i] if i < len(totals) else 0
+                ws.cell(row=activity_row, column=i + DATA_COL_START, value=v).fill = _BEIGE
 
     def _write_module_results(
-        self, ws_res: pxl.worksheet.worksheet.Worksheet, mr: ModuleResult, dur: int
+        self, ws: pxl.worksheet.worksheet.Worksheet, title: str, rows: list[ResultRow], dur: int
     ) -> None:
-        # Module title row
-        title_row = ws_res.max_row + 1
-        ws_res.cell(row=title_row, column=1, value=str(mr.title)).fill = _BLUE
+        title_row = ws.max_row + 1
+        ws.cell(row=title_row, column=1, value=str(title)).fill = _BLUE
 
-        # Result data rows
-        for rr in mr.result_rows:
+        for rr in rows:
             title_row += 1
-            ws_res.cell(row=title_row, column=1, value=rr.label)
+            ws.cell(row=title_row, column=1, value=rr.label)
             vals = rr.yearly_values
             for i in range(dur):
-                ws_res.cell(row=title_row, column=i + DATA_COL_START,
-                            value=vals[i] if i < len(vals) else 0)
+                ws.cell(row=title_row, column=i + DATA_COL_START,
+                        value=vals[i] if i < len(vals) else 0)
 
     def _write_module_metadata(
         self, ws_meta: pxl.worksheet.worksheet.Worksheet, mr: ModuleResult
@@ -271,33 +300,18 @@ class ExcelRenderer:
                 cell.fill = _FILL_MAP.get(mw.fill, _BEIGE)
 
     # -------------------------------------------------------------------------
-    # Project-level summary (Results rows 2–10)
+    # Balance-only summary (Results rows 10-14)
     # -------------------------------------------------------------------------
 
     def _write_results_summary(self, wb: pxl.Workbook) -> None:
         ws_res = wb[WS_RESULTS]
         agg = self.result.aggregated
 
-        yearly_balance = list(map(sum, zip_longest(
-            agg.biomass_co2, agg.soil_co2, agg.other_co2,
-            agg.ch4, agg.n2o, agg.other_ghgs,
-            fillvalue=0,
-        )))
-        cumulative_balance = list(np.cumsum(yearly_balance))
-
         chf = self.result.cumulative_hectares_yearly
         hhf = self.result.cumulative_heads_yearly
         ctf = self.result.cumulative_catch_yearly
         for i, _year in enumerate(range(self.result.start_year, self.result.last_year)):
             col = i + DATA_COL_START
-            ws_res.cell(row=ROW_CUMULATIVE_BALANCE, column=col, value=cumulative_balance[i])
-            ws_res.cell(row=ROW_YEARLY_BALANCE, column=col, value=yearly_balance[i])
-            ws_res.cell(row=ROW_BIOMASS_CO2, column=col, value=agg.biomass_co2[i])
-            ws_res.cell(row=ROW_SOIL_CO2, column=col, value=agg.soil_co2[i])
-            ws_res.cell(row=ROW_OTHER_CO2, column=col, value=agg.other_co2[i])
-            ws_res.cell(row=ROW_CH4, column=col, value=agg.ch4[i])
-            ws_res.cell(row=ROW_N2O, column=col, value=agg.n2o[i])
-            ws_res.cell(row=ROW_OTHER_GHGS, column=col, value=agg.other_ghgs[i])
             hv = chf[i] if i < len(chf) else 0
             ws_res.cell(row=ROW_CUMULATIVE_HECTARES, column=col, value=hv).fill = _BEIGE
             hh = hhf[i] if i < len(hhf) else 0
