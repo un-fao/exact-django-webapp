@@ -50,6 +50,7 @@ class TestComputeWithScenarios(unittest.TestCase):
         from api.reports.base import BaseModuleReport
 
         module = Mock()
+        module.project.is_finalized = False
         module.is_cached_results_valid.return_value = True
         module.cached_results_by_activity_by_gas = {
             "balance": self.BALANCE,
