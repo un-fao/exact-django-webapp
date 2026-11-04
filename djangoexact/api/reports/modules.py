@@ -21,6 +21,8 @@ import numpy as np
 import api.models as api_models
 import api.calculators as calculators
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
+from api.services.solid_waste import crop_sources, food_waste
+from math_model.no_time_dependency_final.solid_waste import SWDS_ROUTES
 
 from .base import BaseModuleReport, NotReadyError
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
@@ -160,6 +162,61 @@ class WaterbodyReport(BaseModuleReport):
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Solid waste
+# ---------------------------------------------------------------------------
+
+SOLID_WASTE_RESULT_ROWS = (
+    ("CH4 from solid waste disposal (CRT 5.A)", math_utils.ActivityTypes.SOLID_WASTE_DISPOSAL, math_utils.GasTypes.CH4),
+    ("CH4 from composting (CRT 5.B.1)", math_utils.ActivityTypes.COMPOSTING, math_utils.GasTypes.CH4),
+    ("N2O from composting (CRT 5.B.1)", math_utils.ActivityTypes.COMPOSTING, math_utils.GasTypes.N2O),
+    ("CH4 from anaerobic digestion (CRT 5.B.2)", math_utils.ActivityTypes.ANAEROBIC_DIGESTION, math_utils.GasTypes.CH4),
+    ("Fossil CO2 from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.CO2),
+    ("CH4 from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.CH4),
+    ("N2O from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.N2O),
+    ("Fossil CO2 from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.CO2),
+    ("CH4 from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.CH4),
+    ("N2O from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.N2O),
+)
+
+
+@dataclass
+class SolidWasteReport(BaseModuleReport):
+    module: api_models.SolidWaste
+
+    def __post_init__(self):
+        self.calculator = calculators.SolidWasteCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        totals = food_waste(m, crop_sources(m))
+        rows = (
+            ("Food waste, total (t wet weight/yr)", lambda s: totals[s]),
+            ("Food waste not from crop modules (t wet weight/yr)", lambda s: getattr(m, f"amount_{s}")),
+            ("Disposal sites and open dumping (%)", lambda s: sum(m.routes(s)[r] for r in SWDS_ROUTES) * 100),
+            ("Composting (%)", lambda s: m.routes(s)["composting"] * 100),
+            ("Anaerobic digestion (%)", lambda s: m.routes(s)["anaerobic_digestion"] * 100),
+            ("Incineration (%)", lambda s: m.routes(s)["incineration"] * 100),
+            ("Open burning (%)", lambda s: m.routes(s)["open_burning"] * 100),
+        )
+        mw = [MetadataWrite(row, 1, label) for row, (label, _value) in enumerate(rows, start=1)]
+        for col, scenario in ((2, "start"), (3, "w"), (4, "wo")):
+            mw += [MetadataWrite(row, col, value(scenario)) for row, (_label, value) in enumerate(rows, start=1)]
+        mw.append(MetadataWrite(1, 6, m.amount_thread.format_comments() if m.amount_thread else ""))
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Solid Waste",
+            result_rows=[ResultRow(label, self._extract(self.emissions_set, activity, gas)) for label, activity, gas in SOLID_WASTE_RESULT_ROWS],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
         )
 
 

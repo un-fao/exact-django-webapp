@@ -658,5 +658,20 @@
       "is_submodule": false,
       "is_container": false
     }
+  },
+  {
+    "model": "api.moduletype",
+    "pk": 65,
+    "fields": {
+      "name": "Solid Waste",
+      "name_en": "Solid Waste",
+      "name_fr": "Déchets solides",
+      "name_es": "Residuos sólidos",
+      "name_ru": "Твёрдые отходы",
+      "class_name": "SolidWaste",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
   }
 ]

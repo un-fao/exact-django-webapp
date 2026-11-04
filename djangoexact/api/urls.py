@@ -136,6 +136,7 @@ router.register(r"forest-disturbances", views.generic_module_viewset(models.Fore
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")
+router.register(r"solid-waste", views.generic_module_viewset(models.SolidWaste), basename="solidwaste")
 router.register(r"waterbody-types", views.public_generic_viewset(models.WaterbodyType), basename="waterbodytypes")
 router.register(r"trophic-types", views.public_generic_viewset(models.TrophicType), basename="trophictypes")
 

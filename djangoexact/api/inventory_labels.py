@@ -20,6 +20,11 @@ DEFAULT_LABELS = {
     "Refrigerant": "Refrigerant emissions (CO2-eq)",
     "Ice": "Ice emissions (CO2-eq)",
     "Coastal Waterbodies": "Waterbody emissions (CH4)",
+    "Solid Waste Disposal": "Solid waste disposal (CRT 5.A)",
+    "Composting": "Composting (CRT 5.B.1)",
+    "Anaerobic Digestion": "Anaerobic digestion at biogas facilities (CRT 5.B.2)",
+    "Waste Incineration": "Waste incineration (CRT 5.C.1)",
+    "Open Burning of Waste": "Open burning of waste (CRT 5.C.2)",
 }
 
 MODULE_OVERRIDES = {

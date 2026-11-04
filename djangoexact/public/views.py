@@ -448,7 +448,8 @@ def generic_public_module_viewset(model: api_models.Module):
 
                 if module_results is None or not use_cached_results:
                     log.debug(f"Cache is invalid. Calculating results for module {module.id}")
-                    total, by_activity, by_gas, by_activity_gas, inventory = calculators.CalculatorFactory().calculate_result(module)
+                    factory = calculators.CalculatorFactory()
+                    total, by_activity, by_gas, by_activity_gas, inventory = factory.calculate_result(module)
 
                     results_total = api_serializers.DynamicResultFactory.create(activity, total, aggregate_by=api_serializers.BreakdownTypes.TOTAL).data
                     results_by_activity = api_serializers.DynamicResultFactory.create(activity, by_activity, aggregate_by=api_serializers.BreakdownTypes.ACTIVITY).data
@@ -459,6 +460,8 @@ def generic_public_module_viewset(model: api_models.Module):
                     results_by_activity["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY)
                     results_by_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.GAS)
                     results_by_activity_gas["inventory"] = inventory.breakdown(by=api_serializers.BreakdownTypes.ACTIVITY_GAS)
+                    for results in (results_total, results_by_activity, results_by_gas, results_by_activity_gas):
+                        results.update(getattr(factory.calculator, "results_extra", {}))
 
                     module_results = (
                         results_total
