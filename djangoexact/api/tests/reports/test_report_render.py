@@ -68,6 +68,7 @@ def _make_result(project, *, mitigating=False):
     aggregated.yearly_balance_wo = [wo] * TOTAL_YEARS
 
     result = Mock()
+    result.frozen_indicators = None  # an open project: indicators computed live
     result.project = project
     result.aggregated = aggregated
     result.activity_results = []
