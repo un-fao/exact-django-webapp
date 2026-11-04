@@ -162,6 +162,32 @@ class BaseModuleReport:
             f"{type(self).__name__} must implement compute()"
         )
 
+    def compute_with_scenarios(self) -> ModuleResult:
+        """compute(), plus result rows and totals for the with/without scenarios.
+
+        Every module builds its Results rows from ``self.emissions_set``, so
+        pointing it at the with/without set and re-running compute() yields the
+        same rows, labels and gas split as the balance, as absolute fluxes.
+        compute() only reads emission sets; cache writes live in __post_init__.
+
+        ponytail: runs compute() three times per module; give each module a
+        row builder taking the source set if report time ever matters.
+        """
+        result = self.compute()
+        balance = self.emissions_set
+        try:
+            self.emissions_set = self.emissions_set_w
+            with_result = self.compute()
+            self.emissions_set = self.emissions_set_wo
+            without_result = self.compute()
+        finally:
+            self.emissions_set = balance
+        result.result_rows_w = with_result.result_rows
+        result.total_emissions_w = with_result.total_emissions
+        result.result_rows_wo = without_result.result_rows
+        result.total_emissions_wo = without_result.total_emissions
+        return result
+
     def _inventory_items_from_module(self, activity_title: str) -> list[InventoryItem]:
         """Build InventoryItem list — from cache or from live inventory object."""
         if self._from_cache:
@@ -198,6 +224,8 @@ class BaseActivityReport:
         module_results: list[ModuleResult] = []
         module_reports: list[BaseModuleReport] = []
         total_emissions = [0.0] * self.project_report.duration
+        total_emissions_w = [0.0] * self.project_report.duration
+        total_emissions_wo = [0.0] * self.project_report.duration
         total_hectares_yearly = [0.0] * self.project_report.duration
         total_heads_yearly = [0.0] * self.project_report.duration
         total_catch_yearly = [0.0] * self.project_report.duration
@@ -217,13 +245,15 @@ class BaseActivityReport:
                 continue
 
             report = report_cls(module, self)
-            result = report.compute()
+            result = report.compute_with_scenarios()
             module_results.append(result)
             module_reports.append(report)
 
             total_emissions = list(map(sum, zip_longest(
                 total_emissions, result.total_emissions, fillvalue=0
             )))
+            total_emissions_w = _add(total_emissions_w, result.total_emissions_w)
+            total_emissions_wo = _add(total_emissions_wo, result.total_emissions_wo)
 
             is_land_module = isinstance(module, api_models.LandModule)
             if not (is_land_module and land_hectares_counted):
@@ -275,6 +305,8 @@ class BaseActivityReport:
             total_heads_yearly=total_heads_yearly,
             total_catch_yearly=total_catch_yearly,
             t2_overrides=t2_overrides,
+            total_emissions_w=total_emissions_w,
+            total_emissions_wo=total_emissions_wo,
             _module_reports=module_reports,
         )
 

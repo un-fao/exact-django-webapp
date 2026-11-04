@@ -58,6 +58,12 @@ class ModuleResult:
     # Aggregated total emissions (balance) for this module – used by activity totals
     total_emissions: list[float] = field(default_factory=list)
 
+    # result_rows / total_emissions as absolute fluxes of each scenario
+    result_rows_w: list[ResultRow] = field(default_factory=list)
+    result_rows_wo: list[ResultRow] = field(default_factory=list)
+    total_emissions_w: list[float] = field(default_factory=list)
+    total_emissions_wo: list[float] = field(default_factory=list)
+
     # Hectares breakdown for Additional Indicators and cumulative hectares tracking
     units_breakdown_w: list[float] = field(default_factory=list)
     units_breakdown_wo: list[float] = field(default_factory=list)
@@ -95,6 +101,8 @@ class ActivityResult:
     total_heads_yearly: list[float] = field(default_factory=list)
     total_catch_yearly: list[float] = field(default_factory=list)
     t2_overrides: list[T2Override] = field(default_factory=list)
+    total_emissions_w: list[float] = field(default_factory=list)
+    total_emissions_wo: list[float] = field(default_factory=list)
 
     # Internal: module report instances carrying emissions_set / _w / _wo.
     # Used by BaseProjectReport._build_aggregated_from_module_emissions()

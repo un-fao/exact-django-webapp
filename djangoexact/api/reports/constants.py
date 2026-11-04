@@ -5,6 +5,8 @@ SPC_INCREASE_RATE = 0.0225
 
 # Worksheet names
 WS_RESULTS = "Results"
+WS_RESULTS_WITH = "Results - With"
+WS_RESULTS_WITHOUT = "Results - Without"
 WS_METADATA = "Metadata"
 WS_ADDITIONAL_INDICATORS = "Additional Indicators"
 WS_SHADOW_PRICE = "Shadow Price of Carbon"
