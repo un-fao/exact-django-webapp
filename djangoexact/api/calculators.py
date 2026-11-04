@@ -2687,14 +2687,14 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
         except ipcc.RiceDefaultEmissionFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "efc_t2")
             if missing_scenarios:
-                raise Exception(f"RiceDefaultEmissionFactor for {self.region.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+                raise Exception(f"RiceDefaultEmissionFactor for {self.country.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.yield_default = ipcc.RiceYield.objects.get(continent=self.region)
         except ipcc.RiceYield.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "crop_yield_t2")
             if missing_scenarios:
-                raise Exception(f"RiceYield for {self.region.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+                raise Exception(f"RiceYield for {self.country.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
         lut_name_rice_flt = {"land_use_type__name": "Rice"}
 
