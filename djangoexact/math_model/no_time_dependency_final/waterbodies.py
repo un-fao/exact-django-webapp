@@ -6,6 +6,7 @@ from .generalized_modules import BaseModule
 from dataclasses import dataclass
 from typing import Optional
 from .ghg_inventory_class import InventoryPerGasPerActivity
+from .reservoirs import trophic_alpha
 
 
 @dataclass
@@ -30,11 +31,8 @@ class CoastalWaterbodies(BaseModule):
 
     def calculate_emissions(self):
         try:
-            trophic_state_start = self.trophic_state_default if self.chlo_A_start is None else 0.26 * self.chlo_A_start
-            trophic_state_start = self.trophic_state_default if self.trophic_state_tier_2_start is None else self.trophic_state_tier_2_start
-
-            trophic_state_end = self.trophic_state_default if self.chlo_A_end is None else 0.26 * self.chlo_A_end
-            trophic_state_end = self.trophic_state_default if self.trophic_state_tier_2_end is None else self.trophic_state_tier_2_end
+            trophic_state_start = trophic_alpha(self.trophic_state_tier_2_start, self.chlo_A_start, self.trophic_state_default)
+            trophic_state_end = trophic_alpha(self.trophic_state_tier_2_end, self.chlo_A_end, self.trophic_state_default)
 
             methane_emission_factor_end = self.methane_emission_factor_default if self.methane_emission_factor_end_tier_2 is None else self.methane_emission_factor_end_tier_2
             methane_emission_factor_start = self.methane_emission_factor_default if self.methane_emission_factor_start_tier_2 is None else self.methane_emission_factor_start_tier_2

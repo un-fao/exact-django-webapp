@@ -145,6 +145,7 @@ _IPCC_ENTRIES = [
     ("ipcc.RewettingCarbonFactor", ("id",), "rewettingcarbonfactor.json", "ipcc"),
     ("ipcc.RewettingMethaneFactor", ("id",), "rewettingmethanefactor.json", "ipcc"),
     ("ipcc.OtherConstructedWaterbodiesEmissionFactor", ("id",), "otherconstructedwaterbodiesemissionfactor.json", "ipcc"),
+    ("ipcc.ReservoirEmissionFactor", ("id",), "reservoiremissionfactor.json", "ipcc"),
     ("ipcc.Atwood", ("id",), "atwood.json", "ipcc"),
     ("ipcc.DefaultSoilCarbonStock", ("id",), "defaultsoilcarbonstock.json", "ipcc"),
     ("ipcc.DrainageEmissionFactor", ("id",), "drainageemissionfactor.json", "ipcc"),
