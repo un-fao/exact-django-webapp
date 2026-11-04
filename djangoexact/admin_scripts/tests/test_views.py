@@ -1,25 +1,8 @@
 import io
 
-from django.test import TestCase, Client, override_settings
+from django.test import TestCase, Client
 from api.models import Climate, CustomUser, Moisture, SoilType
 from minitool.models import ChangeRecord
-
-# The DatabaseConnectionMiddleware calls connections.close_all() after every
-# request, which breaks TestCase's transaction-based isolation. We exclude it
-# during tests so the test-runner's database connection stays open.
-MIDDLEWARE_WITHOUT_DB_CLEANUP = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "auditlog.middleware.AuditlogMiddleware",
-    "simple_history.middleware.HistoryRequestMiddleware",
-]
 
 
 def _seed_reference_filter_options():
@@ -49,7 +32,6 @@ def _seed_reference_filter_options():
         SoilType.objects.create(name=name, active=active)
 
 
-@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class AdminScriptsAccessTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -106,7 +88,6 @@ class AdminScriptsAccessTest(TestCase):
         self.assertContains(response, "Please provide a name")
 
 
-@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class ScenarioUtilsTest(TestCase):
     databases = {"default"}
 
@@ -523,7 +504,6 @@ class ScenarioUtilsTest(TestCase):
         self.assertEqual(stats["per_change"][0]["module_type"], "Grassland")
 
 
-@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class CompileScenariosViewTest(TestCase):
     databases = {"default"}
 
@@ -1125,7 +1105,6 @@ class ChangeKeyParsingTest(TestCase):
         self.assertIsNone(result)
 
 
-@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class HtmxScenarioPrefixTest(TestCase):
     databases = {"default"}
 
@@ -1279,7 +1258,6 @@ class HtmxScenarioPrefixTest(TestCase):
         self.assertNotIn("Scenario B", wb.sheetnames)
 
 
-@override_settings(MIDDLEWARE=MIDDLEWARE_WITHOUT_DB_CLEANUP)
 class HtmxRunScenarioContextTest(TestCase):
     databases = {"default"}
 

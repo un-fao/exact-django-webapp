@@ -95,7 +95,7 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
         validated_data = copy.deepcopy(self.validated_data)
@@ -103,7 +103,7 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
@@ -135,7 +135,7 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[1], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
         self.module.refresh_from_db()
         self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")

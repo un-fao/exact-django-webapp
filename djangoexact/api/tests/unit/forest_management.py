@@ -5,7 +5,6 @@ import ipcc.models as ipcc_models
 from rest_framework.test import force_authenticate
 import copy
 from . import base_module
-import time
 import logging
 
 logging.getLogger().setLevel(logging.CRITICAL)
@@ -67,33 +66,24 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
 
-        has_results = False
-        while not has_results:
-            response = self.get_results()
-            if response.status_code == status.HTTP_200_OK:
-                has_results = True
-            else:
-                logging.info("No results found, retrying...")
-                super().setUp()
-                self.validated_data = self.build_validated_data()
-                self.edit_module(self.module, self.user, self.validated_data)
-                self.module.refresh_from_db()
-                time.sleep(1)
+        def results_ok():
+            self.assertEqual(self.get_results().status_code, status.HTTP_200_OK)
+
+        def repick():
+            self.validated_data = self.build_validated_data()
+            self.edit_module(self.module, self.user, self.validated_data)
+            self.module.refresh_from_db()
+
+        self.retry(results_ok, repick, "forest management results in setUp")
 
     def test_modify(self):
-        acceptable = False
-        while not acceptable:
-            try:
-                response = self.edit_module(self.module, self.user, {"land_use_type_start": self.land_use_types.order_by("?").first().id})
+        def modify():
+            response = self.edit_module(self.module, self.user, {"land_use_type_start": self.land_use_types.order_by("?").first().id})
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(self.module_status_name(response), "READY")
+            return response
 
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(response.data["status"]["name"], "READY")
-                acceptable = True
-            except Exception:
-                logging.error("Retrying...")
-                time.sleep(1)
-
-        return response
+        return self.retry(modify, what="forest management test_modify")
 
     def test_modify_and_check_cache_invalidation(self):
         logging.info("START test_modify_and_check_cache_invalidation")
@@ -111,7 +101,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})
@@ -141,7 +131,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         # Change the data source
         edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         if not ipcc_models.FRACarbonStock.objects.filter(country=self.project.country).exists():
@@ -178,7 +168,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
 
         edit_response = self.edit_module(self.module, self.user, {"agb_t2_w": 100, "agb_max_t2_w": 10000})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         results = self.get_results(cached="false")
@@ -196,7 +186,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
 
         edit_response = self.edit_module(self.module, self.user, {"bgb_t2_w": 100, "bgb_max_t2_w": 10000})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         results = self.get_results(cached="false")
@@ -214,7 +204,7 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
 
         edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
         self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(edit_response), "READY")
         self.module.refresh_from_db()
 
         new_defaults = self.get_module_defaults(self.module, self.user)
