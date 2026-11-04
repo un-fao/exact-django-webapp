@@ -183,7 +183,8 @@ class ExcelRenderer:
         groups = [("unconditional", "Unconditional"), ("conditional", "Conditional"), (None, "Not specified")]
         yearly = {key: [0.0] * dur for key, _ in groups}
         for ar in activities:
-            yearly[ar.conditionality] = list(map(sum, zip_longest(yearly[ar.conditionality], ar.total_emissions[:dur], fillvalue=0)))
+            key = ar.conditionality or None
+            yearly[key] = list(map(sum, zip_longest(yearly[key], ar.total_emissions[:dur], fillvalue=0)))
 
         ws_res = wb[WS_RESULTS]
         row = ROW_NDC_FIRST

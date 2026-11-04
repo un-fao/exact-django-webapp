@@ -1024,8 +1024,8 @@ class ForestManagementReport(LandModuleReport):
                 continue
             mw += [
                 MetadataWrite(1, col, m.area),
-                MetadataWrite(2, col, m.forest_type.name),
-                MetadataWrite(3, col, m.forest_condition_type.name),
+                MetadataWrite(2, col, m.forest_type.name if m.forest_type else None),
+                MetadataWrite(3, col, m.forest_condition_type.name if m.forest_condition_type else None),
                 MetadataWrite(4, col, getattr(m, f"rotation_length_yrs_{sfx}")),
                 MetadataWrite(5, col, getattr(m, f"rotation_percentage_biomass_for_energy_{sfx}")),
                 MetadataWrite(6, col, getattr(m, f"rotation_start_year_t2_{sfx}")),
@@ -1105,8 +1105,8 @@ class ForestManagementReport(LandModuleReport):
                 continue
             mw += [
                 MetadataWrite(1, col, m.area),
-                MetadataWrite(2, col, m.forest_type.name),
-                MetadataWrite(3, col, m.forest_condition_type.name),
+                MetadataWrite(2, col, m.forest_type.name if m.forest_type else None),
+                MetadataWrite(3, col, m.forest_condition_type.name if m.forest_condition_type else None),
             ]
             mw += [MetadataWrite(6 + i, col, getattr(m, f"stock_{pool}_{sfx}")) for i, (pool, _) in enumerate(pools)]
 
