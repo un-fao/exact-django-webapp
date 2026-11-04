@@ -128,6 +128,7 @@ def _project_result():
     project = SimpleNamespace(
         name="P", status=named, country=named, climate=named, moisture=named,
         soil_type=named, implementation_years=2, capitalization_years=1, gwp=gwp,
+        analysis_purpose=None, project_phase=None,
     )
     return ProjectResult(
         project=project, start_year=2020, last_year=2020 + DURATION, duration=DURATION,
