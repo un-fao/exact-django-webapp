@@ -2,6 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
 import api.models as api_models
 import api.serializers as api_serializers
+import api.views as api_views
 import public.serializers as public_serializers
 import logging as log
 from drf_yasg.utils import swagger_auto_schema
@@ -118,6 +119,12 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(manual_parameters=[api_views._INDICATORS_LANG_PARAM], responses={404: "Project not found"})
+    def indicators(self, request, pk=None):
+        project: api_models.Project = get_object_or_404(self.queryset, pk=pk)
+        return api_views.indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(

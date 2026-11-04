@@ -79,6 +79,8 @@ def compute_module_results(module) -> dict:
     ):
         data = DynamicResultFactory.create(activity, result.breakdown(by=by), aggregate_by=by).data
         data["inventory"] = inventory.breakdown(by=by)
+        # Module-specific blocks next to the emissions (solid waste food-waste flows); the results serializer passes them through.
+        data.update(getattr(calculator, "results_extra", {}))
         computed[key] = data
 
     computed["units"] = None
