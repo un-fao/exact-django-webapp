@@ -2776,13 +2776,14 @@ class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
         return super().list(request)
 
 
-class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class InputTypeViewSet(viewsets.ModelViewSet, BaseWiewSet):
     """
-    API endpoint that allows input types to be viewed or edited.
+    API endpoint that allows input types to be viewed by anyone and edited after login.
     """
 
     queryset = InputType.objects.all()
     serializer_class = InputTypeSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(manual_parameters=[macro_input_type])
     def list(self, request):
