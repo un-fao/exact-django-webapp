@@ -158,6 +158,7 @@ router.register(r"emission-factor-sources", views.public_generic_viewset(models.
 # Fuel
 router.register(r"macro-fuel-types", views.public_generic_viewset(models.MacroFuelType), basename="macrofueltypes")
 router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
+router.register(r"value-chain-stages", views.public_generic_viewset(models.ValueChainStage), basename="valuechainstages")
 router.register(r"fuel-use-types", views.public_generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil

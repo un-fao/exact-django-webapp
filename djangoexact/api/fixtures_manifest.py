@@ -60,6 +60,7 @@ _API_ENTRIES = [
     ("api.FuelType", ("name",), "fueltype.json", "fuel"),
     ("api.SalinityType", ("value",), "salinitytype.json", "fuel"),
     ("api.EnergySourceType", ("name",), "energysourcetype.json", "fuel"),
+    ("api.ValueChainStage", ("name",), "valuechainstage.json", "fuel"),
     # Input-related in dependency order
     ("api.MacroInputType", ("name",), "macroinputtype.json", "input"),
     ("api.InputType", ("name",), "inputtype.json", "input"),
