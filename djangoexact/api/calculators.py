@@ -3900,6 +3900,10 @@ class InputEntryCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
         self.get_defaults()
 
+        # InputReference.n2o_emissions_multiplier is 44/28 x 265 with AR5 baked in; apply the project's own
+        # N2O GWP instead. A falsy multiplier (no N2O for this input) stays as is.
+        n2o_emissions_factor = self.ref.n2o_emissions_multiplier and 44 / 28 * self.project.gwp.n2o
+
         self.inputs_w = {
             "unit_start": self.module.value_start,
             "unit_end": self.module.value_w,
@@ -3913,7 +3917,7 @@ class InputEntryCalculator(BaseCalculator):
             "ipcc_factor_n2o": self.ef.n2o_value if self.needs_n2o_ref else 0,
             "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
-            "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
+            "emissions_factor_n2o": n2o_emissions_factor,
             "ipcc_factor_eq": self.ef.co2_eq_value if self.needs_co2_e_ref else 0,
             "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
@@ -3938,7 +3942,7 @@ class InputEntryCalculator(BaseCalculator):
             "ipcc_factor_n2o": self.ef.n2o_value if self.needs_n2o_ref else 0,
             "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
-            "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
+            "emissions_factor_n2o": n2o_emissions_factor,
             "ipcc_factor_eq": self.ef.co2_eq_value if self.needs_co2_e_ref else 0,
             "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
