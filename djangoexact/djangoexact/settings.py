@@ -133,7 +133,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
-    "minitool.middleware.DatabaseConnectionMiddleware",  # Add connection cleanup middleware
 ]
 
 ROOT_URLCONF = "djangoexact.urls"
