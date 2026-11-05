@@ -1,5 +1,4 @@
 id,climate,moisture,soil_type,value,value_min,value_max,"Source: 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, IPCC (2019), Volume 4 AFOLU, table 2.3."
-493,Boreal,Dry,Low Activity Clay,N/A,N/A,N/A,
 492,Tropical Montane,Dry,Wetland,82,41,123,
 491,Tropical Montane,Dry,Volcanic,96,66.24,125.76,
 490,Tropical Montane,Dry,Sandy,52,34.32,69.68,
