@@ -1,0 +1,138 @@
+[
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 1,
+    "fields": {
+      "code": "discharge_aquatic",
+      "name": "Untreated, discharged to aquatic environments (Tier 1 default)",
+      "name_en": "Untreated, discharged to aquatic environments (Tier 1 default)",
+      "name_fr": "Non traitées, rejetées dans les milieux aquatiques",
+      "name_es": "Sin tratar, vertidas a medios acuáticos",
+      "name_ru": "Без очистки, сброс в водную среду",
+      "mcf": 0.11,
+      "mcf_min": 0.004,
+      "mcf_max": 0.27,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 2,
+    "fields": {
+      "code": "discharge_rivers",
+      "name": "Untreated, discharged to other aquatic environments (not reservoirs, lakes or estuaries)",
+      "name_en": "Untreated, discharged to other aquatic environments (not reservoirs, lakes or estuaries)",
+      "name_fr": "Non traitées, rejetées dans d'autres milieux aquatiques (hors réservoirs, lacs et estuaires)",
+      "name_es": "Sin tratar, vertidas a otros medios acuáticos (no embalses, lagos ni estuarios)",
+      "name_ru": "Без очистки, сброс в другую водную среду (кроме водохранилищ, озёр и эстуариев)",
+      "mcf": 0.035,
+      "mcf_min": 0.004,
+      "mcf_max": 0.06,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 3,
+    "fields": {
+      "code": "discharge_lakes",
+      "name": "Untreated, discharged to reservoirs, lakes or estuaries",
+      "name_en": "Untreated, discharged to reservoirs, lakes or estuaries",
+      "name_fr": "Non traitées, rejetées dans des réservoirs, lacs ou estuaires",
+      "name_es": "Sin tratar, vertidas a embalses, lagos o estuarios",
+      "name_ru": "Без очистки, сброс в водохранилища, озёра или эстуарии",
+      "mcf": 0.19,
+      "mcf_min": 0.08,
+      "mcf_max": 0.27,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 4,
+    "fields": {
+      "code": "aerobic",
+      "name": "Aerobic treatment plant, well managed",
+      "name_en": "Aerobic treatment plant, well managed",
+      "name_fr": "Station de traitement aérobie bien gérée",
+      "name_es": "Planta de tratamiento aerobio bien gestionada",
+      "name_ru": "Аэробные очистные сооружения, нормальная эксплуатация",
+      "mcf": 0,
+      "mcf_min": 0,
+      "mcf_max": 0.1,
+      "ef_n2o_plant": 0.016,
+      "n_removal": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 5,
+    "fields": {
+      "code": "aerobic_overloaded",
+      "name": "Aerobic treatment plant, overloaded or poorly managed",
+      "name_en": "Aerobic treatment plant, overloaded or poorly managed",
+      "name_fr": "Station de traitement aérobie surchargée ou mal gérée",
+      "name_es": "Planta de tratamiento aerobio sobrecargada o mal gestionada",
+      "name_ru": "Аэробные очистные сооружения, перегрузка или плохая эксплуатация",
+      "mcf": 0.3,
+      "mcf_min": 0.2,
+      "mcf_max": 0.4,
+      "ef_n2o_plant": 0.016,
+      "n_removal": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 6,
+    "fields": {
+      "code": "anaerobic_reactor",
+      "name": "Anaerobic reactor (e.g. UASB)",
+      "name_en": "Anaerobic reactor (e.g. UASB)",
+      "name_fr": "Réacteur anaérobie (p. ex. UASB)",
+      "name_es": "Reactor anaerobio (p. ej. UASB)",
+      "name_ru": "Анаэробный реактор (например, UASB)",
+      "mcf": 0.8,
+      "mcf_min": 0.8,
+      "mcf_max": 1.0,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 7,
+    "fields": {
+      "code": "anaerobic_shallow_lagoon",
+      "name": "Anaerobic shallow or facultative lagoon (less than 2 m deep)",
+      "name_en": "Anaerobic shallow or facultative lagoon (less than 2 m deep)",
+      "name_fr": "Lagune anaérobie peu profonde ou facultative (moins de 2 m)",
+      "name_es": "Laguna anaerobia poco profunda o facultativa (menos de 2 m)",
+      "name_ru": "Мелкий анаэробный или факультативный пруд (глубина менее 2 м)",
+      "mcf": 0.2,
+      "mcf_min": 0,
+      "mcf_max": 0.3,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  },
+  {
+    "model": "ipcc.wastewatertreatmentsystem",
+    "pk": 8,
+    "fields": {
+      "code": "anaerobic_deep_lagoon",
+      "name": "Anaerobic deep lagoon (more than 2 m deep)",
+      "name_en": "Anaerobic deep lagoon (more than 2 m deep)",
+      "name_fr": "Lagune anaérobie profonde (plus de 2 m)",
+      "name_es": "Laguna anaerobia profunda (más de 2 m)",
+      "name_ru": "Глубокий анаэробный пруд (глубина более 2 м)",
+      "mcf": 0.8,
+      "mcf_min": 0.8,
+      "mcf_max": 1.0,
+      "ef_n2o_plant": 0,
+      "n_removal": 0
+    }
+  }
+]

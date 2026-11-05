@@ -166,6 +166,21 @@
   },
   {
     "model": "api.moduletype",
+    "pk": 66,
+    "fields": {
+      "name": "Food Processing Wastewater",
+      "name_en": "Food Processing Wastewater",
+      "name_fr": "Eaux usées de la transformation alimentaire",
+      "name_es": "Aguas residuales del procesamiento de alimentos",
+      "name_ru": "Сточные воды пищевой переработки",
+      "class_name": "FoodProcessingWastewater",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
     "pk": 49,
     "fields": {
       "name": "Forest Disturbance",

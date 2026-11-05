@@ -9,3 +9,13 @@ class NameOnlyTranslationOptions(TranslationOptions):
 @register(models.GlobalWarmingPotential)
 class GlobalWarmingPotentialTranslationOptions(NameOnlyTranslationOptions):
     pass
+
+
+@register(models.FoodIndustryWastewater)
+class FoodIndustryWastewaterTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.WastewaterTreatmentSystem)
+class WastewaterTreatmentSystemTranslationOptions(NameOnlyTranslationOptions):
+    pass

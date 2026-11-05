@@ -81,6 +81,8 @@ class ActivityTypes(Enum):
     TRANSPORT = "Transport"
     STORAGE = "Storage"
     PROCESSING = "Processing"
+    FOOD_WASTEWATER_CH4 = "Food Processing Wastewater CH4"
+    FOOD_WASTEWATER_N2O = "Food Processing Wastewater N2O"
 
 
 class Emission:
