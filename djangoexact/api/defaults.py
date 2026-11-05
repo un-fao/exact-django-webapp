@@ -161,6 +161,9 @@ class GrasslandDefaults(Defaults):
         else:
             biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
+        biomass = defaults.biomass
+        bgb_default = biomass.total_biomass_t_c_ha - biomass.agb_t_c_ha if getattr(biomass, "agb_t_c_ha", None) is not None else None
+
         return _with_ranges(SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
@@ -174,6 +177,9 @@ class GrasslandDefaults(Defaults):
             agb_t2_start_default=defaults.biomass.agb_t_c_ha,
             agb_t2_w_default=defaults.biomass.agb_t_c_ha,
             agb_t2_wo_default=defaults.biomass.agb_t_c_ha,
+            bgb_t2_start_default=bgb_default,
+            bgb_t2_w_default=bgb_default,
+            bgb_t2_wo_default=bgb_default,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
