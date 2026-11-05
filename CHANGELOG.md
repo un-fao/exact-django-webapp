@@ -1,3 +1,56 @@
+## 1.22.0 (2026-11-05)
+
+### BREAKING CHANGE
+
+- All endpoints now return related entities as IDs only.
+Clients need to make separate API calls to fetch detailed information
+about related entities (e.g., country, climate, land_use_type, etc.).
+
+### Feat
+
+- **api**: freeze the results and report data of finalized projects (#413)
+- **reports**: add with/without absolute flux sheets to Excel report (#409)
+- **reports**: localized charts, number formatting and phase timeline in the FAO report (#379)
+- **api**: per-scenario litter and deadwood defaults for coastal wetlands (#359)
+- **reports**: IFAD annex additional sources and layout fixes (#328)
+- **reports**: make analyst notes the only user input of the IFAD annex (#315)
+- **reports**: accept sanitized HTML content and make report endpoints POST-only (#311)
+- **reports**: add report-templates endpoint for the template select (#310)
+- **api**: add guided_step tour checkpoint to Project (#309)
+
+### Fix
+
+- **api**: count below-ground biomass in the grassland LUC stock (#416)
+- **api**: use AGB, not total biomass, for grassland fire emissions (#404)
+- **fixtures**: strip whitespace and newlines from translated reference names (#393)
+- **api**: only require organic soil tier 2 values that are actually missing (#391)
+- **api**: resolve the organic soil parent module by ownership, in insertion order (#390)
+- **api**: resolve organic soil and land use change links after import creates both (#392)
+- **api**: look up organic soil and coastal EFs by object, not translated name (#389)
+- **scripts**: keep FAOSTAT crops off the Perennial Cropland module (#388)
+- **reports**: auto-filled report text follows the requested language (#380)
+- **math_model**: fuel consumption prefers Tier 2 emission factors over IPCC defaults (#360)
+- **api**: store year in report-cached results so module GET does not 500 (#358)
+- **math_model**: spread CW one-off losses over the hectares converted each year (#330)
+- **math_model**: CW drainage uses start area, net of excavation, with depleted pre-drained soil (#329)
+- **api**: CW rewetting CO2 only on actively revegetated land; WP uses its own Tier 2 factor (#332)
+- **api**: coastal wetlands rewetting CH4 honours the default <18 salinity (#331)
+- **api**: project memberships: restore id, honor ?user=, expose member email, prevent duplicates (#327)
+- **ipcc**: set fossil CH4 GWP from the GWP reference sheet (#325)
+- **reports**: return 422 naming the module when a PDF report cannot be calculated (#324)
+- **ipcc**: fill the NULL fossil CH4 GWP that crashed charcoal and peat (#323)
+- **reports**: use one project-named download filename for sync and async reports (#319)
+- **api**: expose Content-Disposition to cross-origin clients (#320)
+- **api**: document the { content } body of report/async in swagger (#321)
+- **api**: export module data_source so FRA survives project import (#314)
+- **api**: clear export_id when copying a project (#303)
+- **admin_scripts**: show readable labels for LUC preset identifiers (#305)
+- **fixtures**: align cropyieldstat fixture to prod data
+
+### Refactor
+
+- **api**: return related entities as IDs only in serializers (#316)
+
 ## 1.21.0 (2026-09-30)
 
 ### Feat
