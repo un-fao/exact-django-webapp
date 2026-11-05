@@ -93,7 +93,27 @@ class LargeFisheryTestCase(base_module.BaseModuleTestCase):
     def test_presence_of_electricity_emission_default_in_defaults(self):
         response = self.get_module_defaults(self.module, self.user)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("electricity_emission_default", response.data)
+        country = self.module.country_t2 or self.project.country
+        expected = ipcc_models.ElectricityEmission.objects.get(country=country).operating_margin
+        self.assertEqual(response.data["electricity_ef_t2_default"], expected)
+
+    def test_refrigerant_gwp_default_is_the_refrigerant_gwp(self):
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected = ipcc_models.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type__name="HCFC-22 (R22)", gwp=self.project.gw_potential).value
+        self.assertGreater(expected, 1)
+        for scenario in ("start", "w", "wo"):
+            self.assertEqual(response.data[f"refrigerant_gwp_t2_{scenario}_default"], expected)
+
+    def test_fui_default_skips_no_data_rows(self):
+        no_data = ipcc_models.LargeFisheryFUI.objects.filter(value=0).exclude(fish_type__name="Not Specified").exclude(gear_type__name="Not Specified").first()
+        validated_data = {**self.validated_data, "fish_type": no_data.fish_type_id, "gear_type_w": no_data.gear_type_id}
+        self.edit_module(self.module, self.user, validated_data)
+
+        response = self.get_module_defaults(self.module, self.user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected = ipcc_models.LargeFisheryFUI.objects.filter(fish_type=no_data.fish_type, value__gt=0).exclude(gear_type__name="Not Specified").values_list("value", flat=True)
+        self.assertAlmostEqual(response.data["fui_t2_w_default"], sum(expected) / len(expected))
 
     def test_patch_country_t2_and_ef_source_t2(self):
         validated_data = copy.deepcopy(self.validated_data)
