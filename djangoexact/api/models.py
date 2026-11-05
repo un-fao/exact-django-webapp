@@ -2352,6 +2352,31 @@ class Grassland(LandModuleFixed, AboveBelowGroundBiomassModule):
     combustion_factor_t2_w = models.FloatField(null=True, blank=True, verbose_name="combustion_factor_t2_w")
     combustion_factor_t2_wo = models.FloatField(null=True, blank=True, verbose_name="combustion_factor_t2_wo")
 
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        """Tier 2 total biomass stock (AGB + BGB) used by land-use change.
+
+        The Tier 2 AGB value also drives fire, so users often enter only AGB. Summing it alone
+        would understate the stock 2.6x to 5.7x, so a missing half falls back to IPCC 2006
+        Table 6.4 (BGB = total - AGB). With neither entered, land-use change uses its own table.
+        """
+        agb_t2 = getattr(self, f"agb_t2_{scenario.value}")
+        bgb_t2 = getattr(self, f"bgb_t2_{scenario.value}")
+        if agb_t2 is None and bgb_t2 is None:
+            return None
+
+        if agb_t2 is None or bgb_t2 is None:
+            reference = ipcc.GrasslandBiomass.objects.filter(
+                climate=self.activity.climate_t2 or self.activity.project.climate,
+                moisture=self.activity.moisture_t2 or self.activity.project.moisture,
+            ).first()
+            if reference is not None:
+                if agb_t2 is None:
+                    agb_t2 = reference.agb_t_c_ha
+                else:
+                    bgb_t2 = reference.total_biomass_t_c_ha - reference.agb_t_c_ha
+
+        return (agb_t2 or 0) + (bgb_t2 or 0)
+
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name_en="Grassland")

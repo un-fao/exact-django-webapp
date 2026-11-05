@@ -139,6 +139,34 @@ class GrasslandTestCase(base_module.BaseModuleTestCase):
         for scenario in ("start", "w", "wo"):
             self.assertEqual(getattr(defaults, f"agb_t2_{scenario}_default"), agb_t_c_ha)
 
+    def test_luc_biomass_t2_fills_missing_half_from_ipcc(self):
+        """The LUC stock is AGB + BGB; entering only AGB (the fire value) must not drop BGB."""
+        agb_t_c_ha, total_t_c_ha = 0.94, 4.7
+        ipcc_models.GrasslandBiomass.objects.update_or_create(
+            climate=self.climate,
+            moisture=self.moisture,
+            defaults={"agb_t_dm_ha": 2.0, "agb_t_c_ha": agb_t_c_ha, "total_biomass_t_dm_ha": 10.0, "total_biomass_t_c_ha": total_t_c_ha},
+        )
+        bgb_ref = total_t_c_ha - agb_t_c_ha
+
+        cases = [
+            ((None, None), None),
+            ((2.0, None), 2.0 + bgb_ref),
+            ((None, 3.0), agb_t_c_ha + 3.0),
+            ((2.0, 3.0), 5.0),
+        ]
+        for (agb, bgb), expected in cases:
+            with self.subTest(agb=agb, bgb=bgb):
+                self.module.agb_t2_w, self.module.bgb_t2_w = agb, bgb
+                if expected is None:
+                    self.assertIsNone(self.module.biomass_t2_w)
+                else:
+                    self.assertAlmostEqual(self.module.biomass_t2_w, expected)
+
+        defaults = GrasslandDefaults(self.module).get_defaults()
+        for scenario in ("start", "w", "wo"):
+            self.assertAlmostEqual(getattr(defaults, f"bgb_t2_{scenario}_default"), bgb_ref)
+
     def test_that_changing_grassland_management_type_changes_fi_in_defaults(self):
         self.test_get_defaults()
 
