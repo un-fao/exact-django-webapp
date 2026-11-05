@@ -2299,6 +2299,24 @@
   },
   {
     "model": "api.landusetype",
+    "pk": 312,
+    "fields": {
+      "name": "Waterbody (flooded land)",
+      "name_en": "Waterbody (flooded land)",
+      "name_fr": "Plan d'eau (terres inondées)",
+      "name_es": "Masa de agua (tierras inundadas)",
+      "name_ru": "Водоём (затопленные земли)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        67
+      ],
+      "climates": [],
+      "moistures": []
+    }
+  },
+  {
+    "model": "api.landusetype",
     "pk": 73,
     "fields": {
       "name": "﻿Long-Term Cultivated",

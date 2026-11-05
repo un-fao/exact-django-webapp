@@ -15,6 +15,13 @@ from . import base_module
 
 
 class WaterbodyTestCase(base_module.BaseModuleTestCase):
+    def create_project(self):
+        # Tier 1 CH4 factors exist for only some climate/moisture pairs; a random pair without one
+        # made results and defaults fail at random.
+        ef = ipcc_models.OtherConstructedWaterbodiesEmissionFactor.objects.order_by("pk").first()
+        self.project_data.update(climate=ef.climate_id, moisture=ef.moisture_id)
+        return super().create_project()
+
     def setUp(self):
         self.ModuleClass = models.Waterbody
         super().setUp()
@@ -22,7 +29,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
-            "waterbody_type": models.WaterbodyType.objects.order_by("?").first().id,
+            "waterbody_type": models.WaterbodyType.objects.filter(is_reservoir=False).order_by("?").first().id,
             "area": FuzzyInteger(1, 100).fuzz(),
             "trophic_type_start": models.TrophicType.objects.order_by("?").first().id,
             "trophic_type_w": models.TrophicType.objects.order_by("?").first().id,
@@ -35,7 +42,7 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["waterbody_type"] = models.WaterbodyType.objects.order_by("?").first().id
+        validated_data["waterbody_type"] = models.WaterbodyType.objects.filter(is_reservoir=False).order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -73,3 +80,21 @@ class WaterbodyTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(type(response.data) == dict)
+
+    def test_bom_waterbody_type_merge_keeps_modules(self):
+        from importlib import import_module
+
+        from django.apps import apps as django_apps
+
+        clean = models.WaterbodyType.objects.get(name="Freshwater Pond")
+        dup = models.WaterbodyType.objects.create(name="\ufeffFreshwater Pond", name_en="\ufeffFreshwater Pond")
+        ef = ipcc_models.OtherConstructedWaterbodiesEmissionFactor.objects.filter(waterbody_type=clean).first()
+        ipcc_models.OtherConstructedWaterbodiesEmissionFactor.objects.create(waterbody_type=dup, climate=ef.climate, moisture=ef.moisture, value=1)
+        models.Waterbody.objects.filter(pk=self.module.pk).update(waterbody_type=dup)
+
+        import_module("api.migrations.0299_merge_bom_waterbody_type").merge_bom_waterbody_types(django_apps, None)
+
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.waterbody_type_id, clean.pk)
+        self.assertFalse(models.WaterbodyType.objects.filter(name__startswith="\ufeff").exists())
+        self.assertEqual(ipcc_models.OtherConstructedWaterbodiesEmissionFactor.objects.filter(waterbody_type=clean, climate=ef.climate, moisture=ef.moisture).count(), 1)

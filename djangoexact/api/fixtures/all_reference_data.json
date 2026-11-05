@@ -957,6 +957,21 @@
   },
   {
     "model": "api.moduletype",
+    "pk": 67,
+    "fields": {
+      "name": "Waterbody (flooded land)",
+      "name_en": "Waterbody (flooded land)",
+      "name_fr": "Plan d'eau (terres inondées)",
+      "name_es": "Masa de agua (tierras inundadas)",
+      "name_ru": "Водоём (затопленные земли)",
+      "class_name": "WaterbodyLand",
+      "is_luc": true,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
+    "model": "api.moduletype",
     "pk": 31,
     "fields": {
       "name": "Road",
@@ -3408,6 +3423,24 @@
         2,
         4
       ]
+    }
+  },
+  {
+    "model": "api.landusetype",
+    "pk": 312,
+    "fields": {
+      "name": "Waterbody (flooded land)",
+      "name_en": "Waterbody (flooded land)",
+      "name_fr": "Plan d'eau (terres inondées)",
+      "name_es": "Masa de agua (tierras inundadas)",
+      "name_ru": "Водоём (затопленные земли)",
+      "forest_type": null,
+      "is_active": true,
+      "module_types": [
+        67
+      ],
+      "climates": [],
+      "moistures": []
     }
   },
   {
@@ -7619,7 +7652,8 @@
       "name_en": "Brackishwater Pond",
       "name_fr": "Étang d'eau saumâtre",
       "name_es": "Estanque de agua salobre",
-      "name_ru": "Солоноватый пруд"
+      "name_ru": "Солоноватый пруд",
+      "is_reservoir": false
     }
   },
   {
@@ -7630,18 +7664,8 @@
       "name_en": "Canals & Ditches",
       "name_fr": "Canaux et fossés",
       "name_es": "Canales y Acequia",
-      "name_ru": "Каналы, Канавы"
-    }
-  },
-  {
-    "model": "api.waterbodytype",
-    "pk": 5,
-    "fields": {
-      "name": "﻿Freshwater Pond",
-      "name_en": "﻿Freshwater Pond",
-      "name_fr": null,
-      "name_es": null,
-      "name_ru": null
+      "name_ru": "Каналы, Канавы",
+      "is_reservoir": false
     }
   },
   {
@@ -7652,7 +7676,20 @@
       "name_en": "Freshwater Pond",
       "name_fr": "Étang d'eau douce",
       "name_es": "Estanque de agua dulce",
-      "name_ru": "Пресноводный пруд"
+      "name_ru": "Пресноводный пруд",
+      "is_reservoir": false
+    }
+  },
+  {
+    "model": "api.waterbodytype",
+    "pk": 6,
+    "fields": {
+      "name": "Reservoir (flooded land)",
+      "name_en": "Reservoir (flooded land)",
+      "name_fr": "Réservoir (terres inondées)",
+      "name_es": "Embalse (tierras inundadas)",
+      "name_ru": "Водохранилище (затопленные земли)",
+      "is_reservoir": true
     }
   },
   {
@@ -7663,7 +7700,8 @@
       "name_en": "Saline Pond",
       "name_fr": "Étang salin",
       "name_es": "Estanque Salino",
-      "name_ru": "Солёный пруд"
+      "name_ru": "Солёный пруд",
+      "is_reservoir": false
     }
   },
   {
@@ -133346,6 +133384,116 @@
       "value": 30.0,
       "value_min": null,
       "value_max": null
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 1,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "ch4_age_le_20": 27.7,
+      "ch4_age_gt_20": 13.6,
+      "co2_c_age_le_20": 0.94
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 2,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "ch4_age_le_20": 27.7,
+      "ch4_age_gt_20": 13.6,
+      "co2_c_age_le_20": 0.94
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 3,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "ch4_age_le_20": 84.7,
+      "ch4_age_gt_20": 54.0,
+      "co2_c_age_le_20": 1.02
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 4,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "ch4_age_le_20": 84.7,
+      "ch4_age_gt_20": 54.0,
+      "co2_c_age_le_20": 1.02
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 5,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "ch4_age_le_20": 195.6,
+      "ch4_age_gt_20": 150.9,
+      "co2_c_age_le_20": 1.7
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 6,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "ch4_age_le_20": 127.5,
+      "ch4_age_gt_20": 80.3,
+      "co2_c_age_le_20": 1.46
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 7,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "ch4_age_le_20": 392.3,
+      "ch4_age_gt_20": 283.7,
+      "co2_c_age_le_20": 2.95
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 8,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "ch4_age_le_20": 392.3,
+      "ch4_age_gt_20": 283.7,
+      "co2_c_age_le_20": 2.95
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 9,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "ch4_age_le_20": 251.6,
+      "ch4_age_gt_20": 141.1,
+      "co2_c_age_le_20": 2.77
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 10,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "ch4_age_le_20": 251.6,
+      "ch4_age_gt_20": 141.1,
+      "co2_c_age_le_20": 2.77
     }
   },
   {
@@ -772959,7 +773107,7 @@
     "pk": 3,
     "fields": {
       "trophic_type": 3,
-      "value": 9.9,
+      "value": 10.0,
       "chloa": 38.0,
       "value_min": null,
       "value_max": null,
@@ -772972,7 +773120,7 @@
     "pk": 4,
     "fields": {
       "trophic_type": 5,
-      "value": 26.95,
+      "value": 25.0,
       "chloa": 105.5,
       "value_min": null,
       "value_max": null,

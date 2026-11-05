@@ -92,6 +92,7 @@ router.register(r"set-asides", views.generic_module_viewset(models.SetAside), ba
 
 # Other Land
 router.register(r"other-lands", views.generic_module_viewset(models.OtherLand), basename="otherland")
+router.register(r"waterbody-lands", views.generic_module_viewset(models.WaterbodyLand), basename="waterbodyland")
 
 # Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastalwetland")

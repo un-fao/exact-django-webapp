@@ -479,7 +479,7 @@ class WaterbodyFactory(DjangoModelFactory):
     area = 1
     status = READY
 
-    waterbody_type = factory.fuzzy.FuzzyChoice(WaterbodyType.objects.all())
+    waterbody_type = factory.fuzzy.FuzzyChoice(WaterbodyType.objects.filter(is_reservoir=False))
 
     trophic_type_start = factory.fuzzy.FuzzyChoice(trophic_types)
     trophic_type_w = factory.fuzzy.FuzzyChoice(trophic_types)
